@@ -26,6 +26,7 @@ export interface SearchResultsData {
   items: SearchResultItemData[];
   areEmbeddings?: boolean;
   isLoading?: boolean;
+  isRefreshing?: boolean;
   isCharacterResults?: boolean;
 }
 

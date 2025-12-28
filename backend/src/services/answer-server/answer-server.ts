@@ -24,51 +24,13 @@ import {
   type DocumentWithEmbeddings,
   type Document,
 } from "./embeddingManager";
+import type { Filter } from "./helpers/filters";
+import { shouldAllowDocument } from "./helpers/filters";
 
 export interface MessagePayload {
   query: string;
   filter: Filter;
 }
-
-export type Filter = {
-  paragraphFrom?: number;
-  paragraphTo?: number;
-  chapterFrom?: number;
-  chapterTo: number;
-  bookSlug: string;
-};
-
-export const shouldAllowDocument = (doc: Document, filter?: Filter) => {
-  const chapterFrom = filter?.chapterFrom;
-  const chapterTo = filter?.chapterTo;
-  const paragraphFrom = filter?.paragraphFrom;
-  const paragraphTo = filter?.paragraphTo;
-  const docChapter = doc.chapter;
-  const docParagraph = doc.paragraphNumber;
-
-  if (chapterFrom !== undefined && docChapter < chapterFrom) {
-    return false;
-  }
-
-  if (chapterTo !== undefined && docChapter > chapterTo) {
-    return false;
-  }
-
-  if (
-    chapterFrom !== undefined &&
-    docChapter === chapterFrom &&
-    paragraphFrom !== undefined &&
-    docParagraph < paragraphFrom
-  ) {
-    return false;
-  }
-
-  if (chapterTo !== undefined && docChapter === chapterTo && paragraphTo !== undefined && docParagraph > paragraphTo) {
-    return false;
-  }
-
-  return true;
-};
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -87,14 +49,25 @@ export async function findBestPassages(
   const embeddingValues = embeddingResponse.embeddings?.[0]?.values as number[];
   const queryEmbedding = { values: embeddingValues };
 
-  const dotProducts = documents
-    .filter((doc: Document) => shouldAllowDocument(doc, filter))
-    .map((doc) => doc.Embeddings.reduce((sum, val, idx) => sum + val * queryEmbedding.values[idx], 0));
+  console.log("[findBestPassages] filter:", JSON.stringify(filter));
+  console.log("[findBestPassages] total documents:", documents.length);
+
+  const filteredDocuments = documents.filter((doc: Document) => shouldAllowDocument(doc, filter));
+  console.log("[findBestPassages] after filter:", filteredDocuments.length);
+
+  if (filteredDocuments.length === 0) {
+    console.log("[findBestPassages] no documents passed filter, returning empty");
+    return [];
+  }
+
+  const dotProducts = filteredDocuments.map((doc) =>
+    doc.Embeddings.reduce((sum, val, idx) => sum + val * queryEmbedding.values[idx], 0),
+  );
 
   const indexedScores = dotProducts.map((score, index) => [index, score] as [number, number]);
   indexedScores.sort((a, b) => b[1] - a[1]);
 
-  console.log("indexedScores", indexedScores[0]);
+  console.log("[findBestPassages] indexedScores[0]:", indexedScores[0]);
   if (indexedScores.length === 0) {
     return [];
   }
@@ -104,7 +77,7 @@ export async function findBestPassages(
 
   for (const [index, score] of indexedScores) {
     if (score >= highestScore * similarityThreshold && results.length < maxResults) {
-      results.push({ ...documents[index], score });
+      results.push({ ...filteredDocuments[index], score });
     }
     if (results.length >= maxResults) {
       break;

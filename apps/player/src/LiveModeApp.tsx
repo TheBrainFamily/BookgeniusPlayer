@@ -51,6 +51,7 @@ import { DebugLocationOverlay } from "./components/DebugLocationOverlay";
 import { AvatarGenerationBadge } from "./components/AvatarGenerationBadge";
 import { useDraftMode } from "@player/context/DraftModeContext";
 import { useInlineAvatarSync } from "@player/hooks/useInlineAvatarSync";
+import { useEmbeddingsHeartbeat } from "@player/hooks/useEmbeddingsHeartbeat";
 
 // =============================================================================
 // Convex Client
@@ -78,6 +79,7 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
   usePostReadyPrefetch();
   useBackgroundSongs();
   useInlineAvatarSync();
+  useEmbeddingsHeartbeat();
 
   const { i18n: i18nInstance } = useTranslation();
   const { bookData } = useBookConvex();

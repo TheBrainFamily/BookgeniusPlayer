@@ -318,6 +318,64 @@ export const listCharacterDataFragments = query({
 });
 
 // =============================================================================
+// V2 Format Queries (combined HTML + occurrences)
+// =============================================================================
+
+export const listCompiledChapters = query({
+  args: { bookPath: v.string() },
+  handler: async (ctx, { bookPath }) => {
+    const compiledPath = `${bookPath}/chapters-compiled`;
+
+    const files = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: compiledPath },
+    );
+
+    if (files.length === 0) return null;
+
+    const assets = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedAssetsInFolder,
+      { folderPath: compiledPath },
+    );
+
+    const chapters = files.map((file) => {
+      const asset = assets.find((a) => a.basename === file.basename);
+      const extra = asset?.extra as
+        | { chapterNumber?: number; title?: string; paragraphCount?: number }
+        | undefined;
+
+      return {
+        basename: file.basename,
+        url: file.url,
+        versionId: file.versionId as string,
+        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
+        title: extra?.title,
+        paragraphCount: extra?.paragraphCount,
+      };
+    });
+
+    return chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
+  },
+});
+
+export const getCharacterIndexV2 = query({
+  args: { bookPath: v.string() },
+  handler: async (ctx, { bookPath }) => {
+    const indexPath = `${bookPath}/characters-v2`;
+
+    const files = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: indexPath },
+    );
+
+    const indexFile = files.find((f) => f.basename === "index.json");
+    if (!indexFile) return null;
+
+    return { url: indexFile.url, versionId: indexFile.versionId as string };
+  },
+});
+
+// =============================================================================
 // Background Queries
 // =============================================================================
 

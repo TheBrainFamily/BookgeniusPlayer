@@ -32,8 +32,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
   const deferredResults = useDeferredValue(searchResults);
 
   const isCurrentlyLoading = Boolean(searchResults?.isLoading);
+  const isRefreshing = Boolean(searchResults?.isRefreshing);
   const isDeferring = deferredResults !== searchResults;
-  const showSpinner = isCurrentlyLoading || (isDeferring && !deferredResults);
+  const showSpinner = isCurrentlyLoading && !isRefreshing && (isDeferring || !deferredResults?.items?.length);
   const showContent = Boolean(deferredResults) && !showSpinner;
 
   const [activeFilter, setActiveFilter] = useState<SearchFilter>("all");
@@ -296,8 +297,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
       )}
 
       {showContent && (
-        <div className="flex-grow overflow-y-auto" key="content">
-          <div className="space-y-3">
+        <motion.div className="flex-grow overflow-y-auto" key="content" initial={{ opacity: 0.7 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
+          <div className={cn("space-y-3 relative", isRefreshing && "search-results-refreshing")}>
             {hasItems ? (
               <div className="space-y-3">
                 <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
@@ -305,6 +306,13 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
                     <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} searchQuery={searchQuery} />
                   ))}
                 </Accordion>
+              </div>
+            ) : isRefreshing ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30 animate-pulse">
+                  <Search size={24} />
+                </div>
+                <p className="text-white/60 text-sm animate-pulse">{t("updating_results", "Updating results...")}</p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -316,7 +324,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
@@ -330,7 +338,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
         animate={{ opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }}
         exit={{ opacity: 0, transition: { duration: 0.25, ease: "easeIn" } }}
       >
-        <div className="rounded-lg overflow-hidden w-full flex flex-col bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[calc(100vh-10rem)]">
+        <div
+          className={cn(
+            "rounded-lg overflow-hidden w-full flex flex-col bg-black/70 textured-bg border border-white/30 shadow-xl text-white max-h-[calc(100vh-10rem)]",
+            isRefreshing && "search-modal-refreshing",
+          )}
+        >
           <header className="flex justify-between items-center p-4 pb-0">
             <div className="text-lg font-semibold text-white">{modalTitle}</div>
             <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalAction } from "./_generated/server";
+import { action, internalAction } from "./_generated/server";
 import { api, components, internal } from "./_generated/api";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import {
@@ -7,6 +7,7 @@ import {
   type CharacterBundleInfo,
 } from "../apps/player/src/services/live/xmlRendererCore";
 import { extractCharacterMetadata } from "../apps/player/src/services/live/characterExtractor";
+import { extractOccurrences, type CompiledChapter } from "./lib/characterDataV2";
 
 type ChapterExtra = { chapterNumber?: number; title?: string };
 
@@ -195,9 +196,11 @@ export const processPublishedChapter = internalAction({
 
     const htmlFolder = `${bookPath}/chapters-html`;
     const characterFolder = `${bookPath}/characters-data`;
+    const compiledFolder = `${bookPath}/chapters-compiled`;
 
     await ensureFolder(ctx, htmlFolder);
     await ensureFolder(ctx, characterFolder);
+    await ensureFolder(ctx, compiledFolder);
 
     await uploadGeneratedAsset(ctx, {
       folderPath: htmlFolder,
@@ -213,6 +216,25 @@ export const processPublishedChapter = internalAction({
       content: characterPayload,
       contentType: "application/json",
       extra: { chapterNumber, sourceVersionId: versionId },
+    });
+
+    const occurrences = extractOccurrences(
+      characterMetadata.map((c) => ({ slug: c.slug, infoPerChapter: c.infoPerChapter })),
+      chapterNumber,
+    );
+    const compiledChapter: CompiledChapter = {
+      html,
+      occurrences,
+      title: resolvedTitle,
+      paragraphCount,
+    };
+
+    await uploadGeneratedAsset(ctx, {
+      folderPath: compiledFolder,
+      basename: `chapter-${chapterNumber}.json`,
+      content: JSON.stringify(compiledChapter),
+      contentType: "application/json",
+      extra: { chapterNumber, title: resolvedTitle, sourceVersionId: versionId, paragraphCount },
     });
 
     const backendUrl = process.env.BACKEND_SERVER_URL;
@@ -241,5 +263,56 @@ export const processPublishedChapter = internalAction({
         console.error(`[chapterCompiler] Failed to trigger embedding regeneration:`, e);
       }
     }
+  },
+});
+
+type ChapterListItem = { basename: string; versionId: string; chapterNumber: number };
+
+type RecompileResult = {
+  success: boolean;
+  error?: string;
+  compiled: number;
+  total?: number;
+  failures?: { chapterNumber: number; success: boolean; error?: string }[];
+};
+
+export const recompileAllChapters = action({
+  args: { bookPath: v.string() },
+  handler: async (ctx, { bookPath }): Promise<RecompileResult> => {
+    const chapters = (await ctx.runQuery(api.bookQueries.listChapters, {
+      bookPath,
+    })) as ChapterListItem[];
+    if (chapters.length === 0) {
+      return { success: false, error: "No chapters found", compiled: 0 };
+    }
+
+    const results: { chapterNumber: number; success: boolean; error?: string }[] = [];
+
+    for (const chapter of chapters) {
+      try {
+        await ctx.runAction(internal.chapterCompiler.processPublishedChapter, {
+          bookPath,
+          chapterBasename: chapter.basename,
+          versionId: chapter.versionId,
+        });
+        results.push({ chapterNumber: chapter.chapterNumber, success: true });
+      } catch (e) {
+        results.push({
+          chapterNumber: chapter.chapterNumber,
+          success: false,
+          error: e instanceof Error ? e.message : String(e),
+        });
+      }
+    }
+
+    const compiled = results.filter((r) => r.success).length;
+    const failed = results.filter((r) => !r.success);
+
+    return {
+      success: failed.length === 0,
+      compiled,
+      total: chapters.length,
+      failures: failed.length > 0 ? failed : undefined,
+    };
   },
 });

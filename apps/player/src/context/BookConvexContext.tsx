@@ -31,6 +31,8 @@ import { setBookDataStore, clearBookDataStore, type Note, type Variant } from "@
 import { setListensToSpeaksUrls, setLiveAssetUrls } from "@player/utils/assetUrls";
 import type { BackgroundForBook, BackgroundSongSection, CharacterData, CharacterMedia, BookData, Chapter as ChapterTitle } from "@player/types/book";
 import { bookIndex } from "@player/logic/BookIndex";
+import type { CharacterIndex, ChapterOccurrences, CompiledChapter } from "@convex/lib/characterDataV2";
+import { mergeV2ToCharacterData } from "@convex/lib/characterDataV2";
 
 // =============================================================================
 // Types
@@ -319,6 +321,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   // Character fragment cache (keyed by chapter number)
   const characterFragmentCacheRef = useRef<Map<number, { versionId: string; payload: CharacterDataFragmentPayload }>>(new Map());
 
+  // V2 format caches
+  // V2 compiled chapter cache (stores full CompiledChapter with html + occurrences)
+  const compiledV2CacheRef = useRef<Map<number, { versionId: string; data: CompiledChapter }>>(new Map());
+  // V2 character index cache
+  const characterIndexV2Ref = useRef<{ versionId: string; index: CharacterIndex } | null>(null);
+
   // Track previous content signatures to detect actual changes
   const prevContentSignatureRef = useRef<string>("");
   const prevCharacterSignatureRef = useRef<string>("");
@@ -330,15 +338,20 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   // Extract book slug from path
   const bookSlug = useMemo(() => bookPath.split("/").pop() || "", [bookPath]);
 
+  // Feature flag: use V2 format (combined HTML + occurrences)
+  const useV2Format = true;
+
   // All queries run in parallel (Convex optimizes this)
   const bookMetadata = useQuery(api.bookQueries.getBookMetadata, { bookPath });
 
   // Use draft-aware or published-only queries based on draftMode
   const chaptersQuery = useQuery(draftMode ? api.bookQueries.listChaptersWithDrafts : api.bookQueries.listChapters, { bookPath }) as ChapterQueryItem[] | undefined;
 
-  // Compiled chapter HTML and per-chapter character fragments (published-only)
-  const chapterHtmlQuery = useQuery(api.bookQueries.listChapterHtml, { bookPath }) as ChapterHtmlQueryItem[] | undefined;
-  const characterDataFragmentsQuery = useQuery(api.bookQueries.listCharacterDataFragments, { bookPath }) as CharacterDataFragmentQueryItem[] | undefined;
+  const compiledChaptersV2Query = useQuery(api.bookQueries.listCompiledChapters, useV2Format ? { bookPath } : "skip");
+  const characterIndexV2Query = useQuery(api.bookQueries.getCharacterIndexV2, useV2Format ? { bookPath } : "skip");
+
+  const chapterHtmlQuery = useQuery(api.bookQueries.listChapterHtml, useV2Format ? "skip" : { bookPath }) as ChapterHtmlQueryItem[] | undefined;
+  const characterDataFragmentsQuery = useQuery(api.bookQueries.listCharacterDataFragments, useV2Format ? "skip" : { bookPath }) as CharacterDataFragmentQueryItem[] | undefined;
 
   //TODO character always use drafts
   const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
@@ -548,6 +561,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const compiledChaptersReady = !draftMode && chapters.length > 0 && compiledChaptersOrdered.length === chapters.length;
   const characterFragmentsReady = !draftMode && chapters.length > 0 && characterFragmentsOrdered.length === chapters.length;
 
+  const v2Available = useV2Format && !draftMode && compiledChaptersV2Query !== null && characterIndexV2Query !== null;
+  const compiledV2ByNumber = useMemo(() => {
+    if (!compiledChaptersV2Query) return new Map<number, { url: string; versionId: string }>();
+    return new Map(compiledChaptersV2Query.map((c) => [c.chapterNumber, { url: c.url, versionId: c.versionId }]));
+  }, [compiledChaptersV2Query]);
+
   const chapterOrderSet = useMemo(() => new Set(chapterOrder), [chapterOrder]);
 
   const getChaptersUpTo = useCallback(
@@ -584,6 +603,61 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     if (chapterOrder.length === 0) return "";
     return chapterOrder.map((chapterNumber) => characterFragmentCacheRef.current.get(chapterNumber)?.versionId ?? "missing").join("|");
   }, [chapterOrder]);
+
+  const buildV2Signature = useCallback((): string => {
+    if (chapterOrder.length === 0) return "";
+    const chapterSig = chapterOrder.map((n) => compiledV2CacheRef.current.get(n)?.versionId ?? "missing").join("|");
+    const indexSig = characterIndexV2Ref.current?.versionId ?? "missing";
+    return `${indexSig}:${chapterSig}`;
+  }, [chapterOrder]);
+
+  const buildV2ChapterEntries = useCallback((): ChapterHtmlEntry[] => {
+    return chapterOrder.map((chapterNumber) => {
+      const cached = compiledV2CacheRef.current.get(chapterNumber);
+      return { chapterNumber, html: cached?.data.html };
+    });
+  }, [chapterOrder]);
+
+  const updateFromV2Cache = useCallback(() => {
+    if (compiledV2CacheRef.current.size === 0 || !characterIndexV2Ref.current) return;
+
+    const signature = buildV2Signature();
+    if (signature === prevContentSignatureRef.current && bookStringified) {
+      return;
+    }
+
+    const bookForm = book?.extra?.form?.toLowerCase() || "book";
+    const htmlResult = buildBookHtmlFromChapters(buildV2ChapterEntries(), bookForm);
+    setBookStringified(htmlResult);
+
+    const occurrencesByChapter: Record<number, ChapterOccurrences> = {};
+    for (const [chapterNumber, entry] of compiledV2CacheRef.current) {
+      occurrencesByChapter[chapterNumber] = entry.data.occurrences;
+    }
+
+    const merged = mergeV2ToCharacterData(characterIndexV2Ref.current.index, occurrencesByChapter, bookSlug);
+    const mediaBySlug = new Map<string, CharacterMedia>();
+    for (const char of characters) {
+      mediaBySlug.set(char.slug.toLowerCase(), { avatarUrl: char.avatar?.url, listensUrl: char.listens?.url, speaksUrl: char.speaks?.url });
+    }
+    for (const char of merged) {
+      const media = mediaBySlug.get(char.slug.toLowerCase());
+      if (media) char.media = { ...char.media, ...media };
+    }
+    setCharactersData(merged);
+
+    prevContentSignatureRef.current = signature;
+    prevCharacterSignatureRef.current = signature;
+
+    if (!initialLoadCompleteRef.current) {
+      initialLoadCompleteRef.current = true;
+    }
+
+    setTextVersion((v) => {
+      console.log("[Convex:Flow:V2] Incrementing textVersion", v, "->", v + 1);
+      return v + 1;
+    });
+  }, [book, bookSlug, bookStringified, buildV2ChapterEntries, buildV2Signature, characters]);
 
   const updateCompiledBookHtml = useCallback(() => {
     if (compiledHtmlCacheRef.current.size === 0) return;
@@ -627,7 +701,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     prevCharacterSignatureRef.current = signature;
   }, [bookSlug, buildCharacterSignature, characters]);
 
-  const ensureCompiledChaptersLoaded = useCallback(
+  const ensureCompiledChaptersLoadedV1 = useCallback(
     async (chapterNumbers: number[]) => {
       if (draftMode || !compiledChaptersReady) return;
 
@@ -722,6 +796,86 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     [characterFragmentsByNumber, characterFragmentsReady, draftMode, getChapterContent, normalizeRequestedChapters, updateCharactersFromCache],
   );
 
+  const ensureCharacterIndexV2Loaded = useCallback(async () => {
+    if (!characterIndexV2Query?.url) return false;
+    if (characterIndexV2Ref.current?.versionId === characterIndexV2Query.versionId) return true;
+
+    try {
+      const response = await fetch(characterIndexV2Query.url);
+      if (!response.ok) return false;
+      const index = (await response.json()) as CharacterIndex;
+      characterIndexV2Ref.current = { versionId: characterIndexV2Query.versionId, index };
+      return true;
+    } catch (e) {
+      console.warn("[BookConvexContext] Failed to fetch V2 character index", e);
+      return false;
+    }
+  }, [characterIndexV2Query]);
+
+  const ensureCompiledChaptersLoadedV2 = useCallback(
+    async (chapterNumbers: number[]) => {
+      if (!v2Available) return;
+
+      const requested = normalizeRequestedChapters(chapterNumbers);
+      if (requested.length === 0) return;
+
+      lastRequestedCompiledChaptersRef.current = requested;
+      lastRequestedCharacterChaptersRef.current = requested;
+
+      const indexLoaded = await ensureCharacterIndexV2Loaded();
+      if (!indexLoaded) return;
+
+      const toFetch = requested.filter((chapterNumber) => {
+        const entry = compiledV2ByNumber.get(chapterNumber);
+        if (!entry?.versionId) return false;
+        const cached = compiledV2CacheRef.current.get(chapterNumber);
+        return !cached || cached.versionId !== entry.versionId;
+      });
+
+      if (toFetch.length > 0) {
+        setError(null);
+        const results = await Promise.all(
+          toFetch.map(async (chapterNumber) => {
+            const entry = compiledV2ByNumber.get(chapterNumber);
+            if (!entry?.url) return null;
+            try {
+              const response = await fetch(entry.url);
+              if (!response.ok) return null;
+              const data = (await response.json()) as CompiledChapter;
+              return { chapterNumber, versionId: entry.versionId, data };
+            } catch {
+              return null;
+            }
+          }),
+        );
+
+        const successful = results.filter((r): r is { chapterNumber: number; versionId: string; data: CompiledChapter } => Boolean(r));
+        if (successful.length === 0 && compiledV2CacheRef.current.size === 0) {
+          setError("No V2 compiled chapters available");
+          return;
+        }
+
+        for (const result of successful) {
+          compiledV2CacheRef.current.set(result.chapterNumber, { versionId: result.versionId, data: result.data });
+        }
+      }
+
+      updateFromV2Cache();
+    },
+    [compiledV2ByNumber, ensureCharacterIndexV2Loaded, normalizeRequestedChapters, updateFromV2Cache, v2Available],
+  );
+
+  const ensureCompiledChaptersLoaded = useCallback(
+    async (chapterNumbers: number[]) => {
+      if (v2Available) {
+        await ensureCompiledChaptersLoadedV2(chapterNumbers);
+      } else {
+        await ensureCompiledChaptersLoadedV1(chapterNumbers);
+      }
+    },
+    [ensureCompiledChaptersLoadedV1, ensureCompiledChaptersLoadedV2, v2Available],
+  );
+
   const prefetchChaptersUpTo = useCallback(
     async (chapterNumber: number) => {
       if (chapterNumber <= 0) return;
@@ -737,9 +891,13 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       if (chapterNumber <= 0) return;
       const chaptersToFetch = getChaptersUpTo(chapterNumber);
       if (chaptersToFetch.length === 0) return;
-      await ensureCharacterFragmentsLoaded(chaptersToFetch);
+      if (v2Available) {
+        await ensureCompiledChaptersLoaded(chaptersToFetch);
+      } else {
+        await ensureCharacterFragmentsLoaded(chaptersToFetch);
+      }
     },
-    [ensureCharacterFragmentsLoaded, getChaptersUpTo],
+    [ensureCharacterFragmentsLoaded, ensureCompiledChaptersLoaded, getChaptersUpTo, v2Available],
   );
 
   // Process chapters from XML (draft mode or fallback)
@@ -881,33 +1039,34 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     [chapters, characters, xmlChapterSignature, book, bookSlug, getChapterContent],
   );
 
-  // Reload function
   const reloadChapters = useCallback(async () => {
-    // Clear cache and reset tracking
     chapterContentCache.current.clear();
     compiledHtmlCacheRef.current.clear();
     characterFragmentCacheRef.current.clear();
+    compiledV2CacheRef.current.clear();
+    characterIndexV2Ref.current = null;
     prevContentSignatureRef.current = "";
     prevCharacterSignatureRef.current = "";
 
-    if (!draftMode && compiledChaptersReady && characterFragmentsReady) {
+    if (!draftMode && (v2Available || (compiledChaptersReady && characterFragmentsReady))) {
       if (lastRequestedCompiledChaptersRef.current.length > 0) {
         await ensureCompiledChaptersLoaded(lastRequestedCompiledChaptersRef.current);
       }
-      if (lastRequestedCharacterChaptersRef.current.length > 0) {
+      if (!v2Available && lastRequestedCharacterChaptersRef.current.length > 0) {
         await ensureCharacterFragmentsLoaded(lastRequestedCharacterChaptersRef.current);
       }
       return;
     }
 
     await processChaptersFromXml(true);
-  }, [draftMode, compiledChaptersReady, characterFragmentsReady, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded, processChaptersFromXml]);
+  }, [draftMode, compiledChaptersReady, characterFragmentsReady, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded, processChaptersFromXml, v2Available]);
 
-  // Reset cached signatures when switching modes or books
   useEffect(() => {
     chapterContentCache.current.clear();
     compiledHtmlCacheRef.current.clear();
     characterFragmentCacheRef.current.clear();
+    compiledV2CacheRef.current.clear();
+    characterIndexV2Ref.current = null;
     prevContentSignatureRef.current = "";
     prevCharacterSignatureRef.current = "";
     initialLoadCompleteRef.current = false;
@@ -918,9 +1077,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     setCharactersData([]);
   }, [draftMode, bookPath]);
 
-  // Process chapters when queries complete (draft mode or fallback)
   useEffect(() => {
     if (chaptersQuery === undefined || bookMetadata === undefined || charactersQuery === undefined) {
+      return;
+    }
+
+    if (v2Available) {
       return;
     }
 
@@ -944,11 +1106,22 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     chapterHtmlQuery,
     characterDataFragmentsQuery,
     processChaptersFromXml,
+    v2Available,
   ]);
 
-  // Keep chapter titles in sync for compiled mode (metadata only)
   useEffect(() => {
-    if (draftMode || !compiledChaptersReady) return;
+    if (draftMode) return;
+    if (v2Available) {
+      if (chapters.length === 0 || !compiledChaptersV2Query) {
+        setChaptersData([]);
+        return;
+      }
+      const v2TitleMap = new Map(compiledChaptersV2Query.map((c) => [c.chapterNumber, c.title]));
+      const chapterTitleFallback = new Map(chapters.map((c) => [c.chapterNumber, c.title]));
+      setChaptersData(chapterOrder.map((chapterNumber) => ({ id: String(chapterNumber), title: v2TitleMap.get(chapterNumber) ?? chapterTitleFallback.get(chapterNumber) ?? "" })));
+      return;
+    }
+    if (!compiledChaptersReady) return;
     if (chapters.length === 0) {
       setChaptersData([]);
       return;
@@ -961,7 +1134,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         title: compiledChaptersByNumber.get(chapterNumber)?.title ?? chapterTitleFallback.get(chapterNumber) ?? "",
       })),
     );
-  }, [draftMode, compiledChaptersReady, chapters, chapterOrder, compiledChaptersByNumber]);
+  }, [draftMode, compiledChaptersReady, chapters, chapterOrder, compiledChaptersByNumber, v2Available, compiledChaptersV2Query]);
 
   // Sync character metadata when Convex character bundles change (name/summary edits)
   // This is separate from chapter processing - allows character edits to update instantly
@@ -1018,14 +1191,14 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     setLiveAssetUrls(new Map(), videoToAvatar);
   }, [characters]);
 
-  // Compute loading state
   const isLoading =
     bookMetadata === undefined ||
     chaptersQuery === undefined ||
     charactersQuery === undefined ||
     backgroundsQuery === undefined ||
     musicQuery === undefined ||
-    (!draftMode && (chapterHtmlQuery === undefined || characterDataFragmentsQuery === undefined));
+    (!draftMode &&
+      (useV2Format ? compiledChaptersV2Query === undefined || characterIndexV2Query === undefined : chapterHtmlQuery === undefined || characterDataFragmentsQuery === undefined));
 
   // Ready when initial load complete - don't go back to "not ready" during updates
   // Once we have content, we stay "ready" even while processing updates in the background

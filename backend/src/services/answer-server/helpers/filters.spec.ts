@@ -1,5 +1,6 @@
-import { shouldAllowDocument, Filter } from "./answer-server";
-import { Document } from "./embeddingManager";
+import { describe, test, expect } from "vitest";
+import { shouldAllowDocument, Filter } from "./filters";
+import type { Document } from "../embeddingManager";
 
 describe("shouldAllowDocument", () => {
   // Helper to create a mock document
@@ -244,4 +245,10 @@ test("filterLogic", () => {
   const filter = { paragraphFrom: 2, chapterFrom: 2, chapterTo: 3, paragraphTo: 3, bookSlug: "test" };
   const result = shouldAllowDocument(doc, filter);
   expect(result).toBe(false);
+});
+
+test("BUG: chapterFrom=0 chapterTo=2 paragraphTo=7 should disallow chapter=2 paragraph=43", () => {
+  const doc = { chapter: 2, paragraphNumber: 43, text: "should be filtered" };
+  const filter: Filter = { chapterFrom: 0, chapterTo: 2, paragraphTo: 7, bookSlug: "test" };
+  expect(shouldAllowDocument(doc, filter)).toBe(false);
 });

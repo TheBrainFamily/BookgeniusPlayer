@@ -24,3 +24,7 @@ compiled-books/*/
 .repo_ignore
 .env.local
 
+# Local book development directories
+books/Dynamic-The-Great-Gatsby/
+books/player-of-games/
+

@@ -171,10 +171,6 @@ export function getCharacterOverrides(doc: Document): Map<string, CharacterOverr
   return overridesMap;
 }
 
-/**
- * Get summary for a character from the bundles map.
- * Uses case-insensitive slug matching since XML tags may differ in case from Convex slugs.
- */
 const getSummaryForCharacter = (slug: string, bundlesBySlug: Map<string, CharacterBundleForExtractor>): string => {
   const bundle = bundlesBySlug.get(slug.toLowerCase());
   if (!bundle) {
@@ -183,10 +179,6 @@ const getSummaryForCharacter = (slug: string, bundlesBySlug: Map<string, Charact
   return bundle.extra.summary ?? "";
 };
 
-/**
- * Get display name for a character from the bundles map.
- * Uses case-insensitive slug matching since XML tags may differ in case from Convex slugs.
- */
 const getDisplayForCharacter = (slug: string, bundlesBySlug: Map<string, CharacterBundleForExtractor>): string => {
   const bundle = bundlesBySlug.get(slug.toLowerCase());
   if (!bundle) {
@@ -218,16 +210,16 @@ export function extractCharacterMetadata(
 ): SimpleCharacterMetadata[] {
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
 
-  // Build lookup map by lowercase slug for case-insensitive matching
   const bundlesBySlug = new Map<string, CharacterBundleForExtractor>();
   for (const bundle of characterBundles) {
     bundlesBySlug.set(bundle.slug.toLowerCase(), bundle);
   }
 
   characterTags.forEach((tag) => {
-    const bundle = bundlesBySlug.get(tag.toLowerCase());
+    const slugLower = tag.toLowerCase();
+    const bundle = bundlesBySlug.get(slugLower);
     const base: SimpleCharacterMetadata = {
-      slug: tag,
+      slug: slugLower,
       characterName: getDisplayForCharacter(tag, bundlesBySlug),
       bookSlug,
       infoPerChapter: [],
@@ -239,7 +231,7 @@ export function extractCharacterMetadata(
       base.overrides = overrides;
     }
 
-    resultsMap.set(tag, base);
+    resultsMap.set(slugLower, base);
   });
 
   try {
@@ -277,8 +269,9 @@ export function extractCharacterMetadata(
           const entersInPara = new Set<string>();
           const exitsInPara = new Set<string>();
 
-          for (let i = 0; i < paragraph.childNodes.length; i++) {
-            const childNode = paragraph.childNodes[i];
+          const allDescendants = paragraph.getElementsByTagName("*");
+          for (let i = 0; i < allDescendants.length; i++) {
+            const childNode = allDescendants[i];
 
             if (isElementNode(childNode)) {
               const tagName = childNode.tagName;
@@ -302,7 +295,7 @@ export function extractCharacterMetadata(
           }
 
           const updateCharacterInfo = (charTag: string, listType: ListType) => {
-            const data = resultsMap.get(charTag);
+            const data = resultsMap.get(charTag.toLowerCase());
             if (!data) return;
 
             let chapterEntry = data.infoPerChapter.find((info) => info.chapter === chapterId);

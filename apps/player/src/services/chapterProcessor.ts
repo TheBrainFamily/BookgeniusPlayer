@@ -59,7 +59,8 @@ type CharacterRenderOptions = { isAtParagraphStart: boolean };
 type CharacterRenderResult = { html: string; isTalking: boolean; slug: string };
 
 const renderCharacterElement = (element: Element, characterMap: Map<string, CharacterInfo>, options: CharacterRenderOptions): CharacterRenderResult => {
-  const slug = element.tagName;
+  const tagName = element.tagName;
+  const slug = tagName.toLowerCase(); // Lowercase to match Convex folder slugs
   const isTalking = element.getAttribute("talking") === "true";
 
   if (isTalking) {
@@ -76,8 +77,8 @@ const renderCharacterElement = (element: Element, characterMap: Map<string, Char
     return { html: element.textContent || "", isTalking: false, slug };
   }
 
-  const charInfo = characterMap.get(slug) || characterMap.get(slug.toLowerCase());
-  const displayText = element.textContent || charInfo?.display || slug;
+  const charInfo = characterMap.get(tagName) ?? characterMap.get(slug);
+  const displayText = element.textContent || charInfo?.display || tagName;
 
   return { html: `<span class="character-highlighted" data-character="${slug}">${displayText}</span>`, isTalking: false, slug };
 };
