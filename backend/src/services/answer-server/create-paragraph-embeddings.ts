@@ -5,6 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 
 import dotenv from "dotenv";
 import { getParagraphsFromChapter } from "../../tools/createParagraphsWithPageNumbers";
+import { getParagraphsFromChapterWithText } from "../../tools/getParagraphsFromChapterWithText";
 import { getBookForm } from "../../tools/getBookForm";
 import { getBookData } from "../../shared-books-data/getBooksData";
 import * as cheerio from "cheerio";
@@ -18,6 +19,21 @@ import { getBookSettings } from "../../helpers/getBookSettings";
 
 export type Document = { text: string; chapter: number; paragraphNumber: number };
 export type DocumentWithEmbeddings = Document & { Embeddings: number[] };
+export type BookEmbeddings = Map<number, DocumentWithEmbeddings[]>;
+
+/**
+ * Options for generateEmbeddings when called with explicit data (not from global state)
+ */
+export interface GenerateEmbeddingsOptions {
+  /** Chapter summaries data - if not provided, reads from summaries-with-paragraphs.json */
+  summaries?: ScenesSummariesPerChapter[];
+  /** Book text HTML - if not provided, uses getBookData() */
+  bookText?: string;
+  /** Book form (play, book, etc) - if not provided, uses getBookForm() */
+  bookForm?: string;
+  /** Whether to write embeddings.json to file - default true */
+  writeToFile?: boolean;
+}
 
 // const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 // const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
@@ -88,39 +104,51 @@ export async function computeBatchEmbeddingsThroughHTTP(documents: Document[]): 
   return results;
 }
 
-const allSummaries = JSON.parse(
-  readBookFile("summaries-with-paragraphs.json", FILE_TYPE.TEMPORARY),
-) as ScenesSummariesPerChapter[];
-// const allSummaries = [];
-const getChapterData = async (chapter: number) => {
-  const chapterData = allSummaries.find((summary) => summary.chapterSummary.chapterNumber === chapter);
+function loadSummariesFromFile(): ScenesSummariesPerChapter[] {
+  return JSON.parse(readBookFile("summaries-with-paragraphs.json", FILE_TYPE.TEMPORARY)) as ScenesSummariesPerChapter[];
+}
+
+function getChapterDataFromSummaries(
+  summaries: ScenesSummariesPerChapter[],
+  chapter: number,
+): ScenesSummariesPerChapter {
+  const chapterData = summaries.find((summary) => summary.chapterSummary.chapterNumber === chapter);
   if (!chapterData) {
-    throw new Error(`Chapter ${chapter} not found`);
+    throw new Error(`Chapter ${chapter} not found in summaries`);
   }
   return chapterData;
-};
+}
 
-const generateEmbeddings = async (chaptersFrom: number, chaptersTo: number) => {
-  const embeddingsForChapters: Map<number, DocumentWithEmbeddings[]> = new Map();
+export const generateEmbeddings = async (
+  chaptersFrom: number,
+  chaptersTo: number,
+  options: GenerateEmbeddingsOptions = {},
+): Promise<BookEmbeddings> => {
+  const { summaries, bookText, bookForm, writeToFile = true } = options;
+
+  const allSummaries = summaries ?? loadSummariesFromFile();
+  const resolvedBookText = bookText ?? getBookData().bookText;
+  const resolvedBookForm = bookForm ?? getBookForm();
+  const isPlay = resolvedBookForm === "play";
+
+  const embeddingsForChapters: BookEmbeddings = new Map();
 
   for (let chapter = chaptersFrom; chapter <= chaptersTo; chapter++) {
-    const paragraphsFromChapter: { text: string; dataIndex: number }[] = getParagraphsFromChapter(chapter, true, true);
-    const chapterData = await getChapterData(chapter);
-    // If the book form is a play, compute speaker timeline for this chapter and
-    // inject speaker slugs before speech runs. Otherwise, keep existing behavior.
-    const isPlay = getBookForm() === "play";
+    const paragraphsFromChapter = bookText
+      ? getParagraphsFromChapterWithText(chapter, resolvedBookText, true, true)
+      : getParagraphsFromChapter(chapter, true, true);
 
-    // Build speaker timeline per chapter (only for plays)
+    const chapterData = getChapterDataFromSummaries(allSummaries, chapter);
+
     let speakerByIndex: Map<number, string> | null = null;
     let talkingLabelIndices: Set<number> | null = null;
     if (isPlay) {
-      const { speakerMap, labelIndices } = buildSpeakerTimelineForChapter(chapter, true);
+      const { speakerMap, labelIndices } = buildSpeakerTimelineForChapter(chapter, true, resolvedBookText);
       speakerByIndex = speakerMap;
       talkingLabelIndices = labelIndices;
     }
 
     const documents: Document[] = chapterData.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
-      // Render text either with speaker labels (for plays) or as plain concatenated text
       const renderedText = isPlay
         ? renderWithSpeakers(bulletPoint.paragraphNumbers, paragraphsFromChapter, speakerByIndex!, talkingLabelIndices!)
         : bulletPoint.paragraphNumbers
@@ -138,6 +166,7 @@ const generateEmbeddings = async (chaptersFrom: number, chaptersTo: number) => {
         paragraphNumber: bulletPoint.mainParagraphNumber,
       };
     });
+
     const pureSummariesDocuments: Document[] = chapterData.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
       return {
         text: `${bulletPoint.paragraphsSummary}`,
@@ -145,11 +174,14 @@ const generateEmbeddings = async (chaptersFrom: number, chaptersTo: number) => {
         paragraphNumber: bulletPoint.mainParagraphNumber,
       };
     });
+
     const documentsWithEmbeddings = await computeBatchEmbeddingsThroughHTTP([...documents, ...pureSummariesDocuments]);
     embeddingsForChapters.set(chapter, documentsWithEmbeddings);
   }
 
-  writeBookFile("embeddings.json", JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2));
+  if (writeToFile) {
+    writeBookFile("embeddings.json", JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2));
+  }
 
   return embeddingsForChapters;
 };
@@ -198,16 +230,8 @@ if (require.main === module) {
 
 type SpeakerTimeline = { speakerMap: Map<number, string>; labelIndices: Set<number> };
 
-/**
- * Build a map of paragraph index -> active speaker slug for a given chapter.
- * The logic mirrors indexing semantics of getParagraphsFromChapter(chapter, true, true):
- * - Iterate Chapter children in DOM order.
- * - Clean notes/anchors, derive pure text, and only keep non-empty paragraphs.
- * - Paragraphs that contain a direct child tag with talking="true" mark a speaker label paragraph.
- *   Speech starts at the following paragraph (index+1) and continues until the next label.
- */
-function buildSpeakerTimelineForChapter(chapter: number, clean = true): SpeakerTimeline {
-  const { bookText } = getBookData();
+function buildSpeakerTimelineForChapter(chapter: number, clean = true, providedBookText?: string): SpeakerTimeline {
+  const bookText = providedBookText ?? getBookData().bookText;
   const $ = cheerio.load(bookText);
 
   const elements = $(`[data-chapter="${chapter}"] > *`).toArray();

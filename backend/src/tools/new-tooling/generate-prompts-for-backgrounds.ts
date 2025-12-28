@@ -9,7 +9,7 @@ import { z } from "zod";
 import { readBookFile } from "../../helpers/readBookFile";
 import { generateFluxImage } from "./generate-flux-schnel-image";
 import { GraphicalStyle } from "./create-graphical-style";
-import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { callSonnet45 } from "../../callSonet45";
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("🚨 Unhandled Rejection at:", promise);
@@ -120,7 +120,7 @@ export const generateBackgrounds = async () => {
       }`;
 
         const schema = z.object({ sceneDescription: z.string() });
-        const response = await callGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
+        const response = await callSonnet45([prompt], schema);
         console.log(`${chapter.number} - ${JSON.stringify(response)}`);
         return {
           chapter: chapter.number,

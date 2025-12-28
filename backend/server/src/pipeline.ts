@@ -23,6 +23,8 @@ import { getBookSettings } from "../../src/helpers/getBookSettings";
 import { generateTagName } from "../../src/helpers/generateTagName";
 import { initProgress, markStepStarted, markStepComplete, markStepError, getStepIndex, getStepOrder } from "./pipeline-progress";
 import { convex } from "./convex-client";
+import { generateEmbeddings } from "../../src/services/answer-server/create-paragraph-embeddings";
+import { uploadBookFolder } from "../../src/services/upload-books-to-r2";
 
 export type Job = {
   id: string;
@@ -33,6 +35,8 @@ export type Job = {
   steps: { step: Step; status: "pending" | "running" | "done" | "error"; startedAt?: number; endedAt?: number; message?: string }[];
   logs: string[];
   error?: string;
+  downloadUrl?: string;
+  packagePath?: string;
 };
 
 export const jobs = new Map<string, Job>();
@@ -427,6 +431,21 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
       await runStep(job, "map_summaries_to_paragraphs", async () => {
         setBookArg(slug);
         await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
+      });
+
+      await runStep(job, "generate_embeddings", async () => {
+        setBookArg(slug);
+        const settings = getBookSettings();
+        await generateEmbeddings(settings.startFromChapter, settings.startFromChapter + settings.numberOfChaptersToProcess - 1);
+        addLog(job, `Generated embeddings for chapters ${settings.startFromChapter}-${settings.startFromChapter + settings.numberOfChaptersToProcess - 1}`);
+      });
+
+      await runStep(job, "upload_answer_server_data", async () => {
+        const result = await uploadBookFolder(bookRoot, slug);
+        if (!result.success) {
+          throw new Error(`Failed to upload answer server data: ${result.error}`);
+        }
+        addLog(job, `Uploaded embeddings and rich.xml to R2 for ${slug}`);
       });
     }
 

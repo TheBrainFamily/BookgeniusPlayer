@@ -2,43 +2,37 @@ import { S3Client } from "bun";
 import fs from "fs-extra";
 import path from "path";
 
-function createR2Client() {
+export function createR2Client() {
   const endpoint = process.env.R2_ENDPOINT;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
   const bucket = process.env.R2_BUCKET;
 
   if (!endpoint || !accessKeyId || !secretAccessKey || !bucket) {
-    throw new Error("Missing R2 environment variables. Required: R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET");
+    throw new Error(
+      "Missing R2 environment variables. Required: R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET",
+    );
   }
 
   return new S3Client({ endpoint, accessKeyId, secretAccessKey, bucket });
 }
 
-/**
- * Upload a single book folder to R2.
- * Expects folder structure:
- *   - {folderPath}/embeddings.json
- *   - {folderPath}/rich.xml
- *
- * Uploads to R2 as:
- *   - answer-server-data/{bookSlug}/embeddings.json
- *   - answer-server-data/{bookSlug}/rich.xml
- *
- * @param folderPath - Absolute or relative path to the book folder
- * @param bookSlug - Optional custom slug (defaults to folder name)
- * @returns Promise<{ success: boolean; bookSlug: string; error?: string }>
- */
-export async function uploadBookFolder(folderPath: string, bookSlug?: string): Promise<{ success: boolean; bookSlug: string; error?: string }> {
+export async function uploadBookFolder(
+  folderPath: string,
+  bookSlug?: string,
+): Promise<{ success: boolean; bookSlug: string; error?: string }> {
   const r2 = createR2Client();
   const resolvedPath = path.resolve(folderPath);
   const slug = bookSlug || path.basename(resolvedPath);
 
-  const embeddingsSrc = path.join(resolvedPath, "embeddings.json");
-  const richXmlSrc = path.join(resolvedPath, "rich.xml");
+  const embeddingsSrc = path.join(resolvedPath, "temporary-output", "embeddings.json");
+  const richXmlSrc = path.join(resolvedPath, "input", "rich.xml");
 
   if (!(await fs.pathExists(embeddingsSrc))) {
     return { success: false, bookSlug: slug, error: `embeddings.json not found at ${embeddingsSrc}` };
+  }
+  if (!(await fs.pathExists(richXmlSrc))) {
+    return { success: false, bookSlug: slug, error: `rich.xml not found at ${richXmlSrc}` };
   }
   if (!(await fs.pathExists(richXmlSrc))) {
     return { success: false, bookSlug: slug, error: `rich.xml not found at ${richXmlSrc}` };
@@ -87,10 +81,10 @@ export async function uploadAllBooks(booksDataDir: string): Promise<void> {
 
   for (const folder of bookFolders) {
     const folderPath = path.join(resolvedDir, folder);
-    const embeddingsPath = path.join(folderPath, "embeddings.json");
+    const embeddingsPath = path.join(folderPath, "temporary-output", "embeddings.json");
 
     if (!(await fs.pathExists(embeddingsPath))) {
-      console.log(`⏭️  Skipping ${folder} (no embeddings.json)`);
+      console.log(`⏭️  Skipping ${folder} (no embeddings.json in temporary-output/)`);
       continue;
     }
 
@@ -146,7 +140,7 @@ Environment variables required:
   const resolvedPath = path.resolve(targetPath);
   const stat = await fs.stat(resolvedPath);
 
-  const hasEmbeddings = await fs.pathExists(path.join(resolvedPath, "embeddings.json"));
+  const hasEmbeddings = await fs.pathExists(path.join(resolvedPath, "temporary-output", "embeddings.json"));
 
   if (hasEmbeddings) {
     console.log(`📤 Uploading single book: ${path.basename(resolvedPath)}\n`);

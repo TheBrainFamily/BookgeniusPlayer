@@ -4,11 +4,17 @@ import { JobStatusSchema, StartPipelineInput } from "../../shared/pipelineTypes"
 import { jobs, startPipeline } from "./pipeline";
 import fs from "fs";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
 import { spawn } from "child_process";
 import { setCurrentBook } from "../../src/helpers/getCurrentBook";
 import { convertBook } from "../../src/tools/fb2-converter/index";
 import { extractInlineImages } from "../../.scripts/extract-inline-images";
+import { generateSingleChapterSummary } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
+import { computeBatchEmbeddingsThroughHTTP, type BookEmbeddings, type DocumentWithEmbeddings, type Document } from "../../src/services/answer-server/create-paragraph-embeddings";
+import { createR2Client } from "../../src/services/upload-books-to-r2";
+import { readBookFile } from "../../src/helpers/readBookFile";
+import { FILE_TYPE } from "../../src/helpers/filesHelpers";
+import * as cheerio from "cheerio";
+import * as wl from "./wolne-lektury";
 
 function slugify(input: string): string {
   return input
@@ -38,38 +44,52 @@ export const appRouter = router({
     return { jobId: job.id, slug: job.slug };
   }),
 
-  // Convert an uploaded EPUB to FB2, generate rich.xml and return it for editing
-  prepareFromEpub: procedure
-    .input(
-      // Either absolute epubPath or both path and explicit slug
-      z.object({ epubPath: z.string(), slug: z.string().optional() }),
-    )
-    .mutation(async ({ input }) => {
-      const repoRoot = path.resolve(__dirname, "../../");
-      // Ensure we run converters from repo root due to relative paths in tools
-      try {
-        process.chdir(repoRoot);
-      } catch {}
-      const epubPath = input.epubPath;
-      const slug = input.slug || slugify(path.basename(epubPath, path.extname(epubPath)));
-      const bookRoot = path.join(repoRoot, "books-data", slug);
-      const inputDir = path.join(bookRoot, "input");
-      ensureDir(inputDir);
-      ensureDir(path.join(bookRoot, "output"));
-      ensureDir(path.join(bookRoot, "temporary-output"));
-      const fb2Path = path.join(inputDir, `${slug}.fb2`);
-      const bin = process.env.EBOOK_CONVERT_BIN || DEFAULT_EBOOK_CONVERT;
-      if (!fs.existsSync(bin)) throw new Error(`ebook-convert not found at ${bin}`);
-      await runEbookConvert(bin, epubPath, fb2Path);
-      // Generate text/html and rich.xml, then extract images out of data URLs
-      setCurrentBook(path.join("books-data", slug));
-      console.log("Converting book...");
-      convertBook(slug, 1, 0);
-      await extractInlineImages({ slug });
-      const richPath = path.join(bookRoot, "input", "rich.xml");
-      const rich = fs.readFileSync(richPath, "utf8");
-      return { slug, rich };
-    }),
+  prepareFromEpub: procedure.input(z.object({ epubPath: z.string(), slug: z.string().optional() })).mutation(async ({ input }) => {
+    const repoRoot = path.resolve(__dirname, "../../");
+    try {
+      process.chdir(repoRoot);
+    } catch {}
+    const epubPath = input.epubPath;
+    const slug = input.slug || slugify(path.basename(epubPath, path.extname(epubPath)));
+    const bookRoot = path.join(repoRoot, "books-data", slug);
+    const inputDir = path.join(bookRoot, "input");
+    ensureDir(inputDir);
+    ensureDir(path.join(bookRoot, "output"));
+    ensureDir(path.join(bookRoot, "temporary-output"));
+    const fb2Path = path.join(inputDir, `${slug}.fb2`);
+    const bin = process.env.EBOOK_CONVERT_BIN || DEFAULT_EBOOK_CONVERT;
+    if (!fs.existsSync(bin)) throw new Error(`ebook-convert not found at ${bin}`);
+    await runEbookConvert(bin, epubPath, fb2Path);
+    setCurrentBook(path.join("books-data", slug));
+    console.log("Converting book...");
+    convertBook(slug, 1, 0);
+    await extractInlineImages({ slug });
+    const richPath = path.join(bookRoot, "input", "rich.xml");
+    const rich = fs.readFileSync(richPath, "utf8");
+    return { slug, rich };
+  }),
+
+  prepareFromFb2: procedure.input(z.object({ fb2Path: z.string(), slug: z.string().optional() })).mutation(async ({ input }) => {
+    const repoRoot = path.resolve(__dirname, "../../");
+    try {
+      process.chdir(repoRoot);
+    } catch {}
+    const fb2Path = input.fb2Path;
+    const slug = input.slug || slugify(path.basename(fb2Path, path.extname(fb2Path)));
+    const bookRoot = path.join(repoRoot, "books-data", slug);
+    const inputDir = path.join(bookRoot, "input");
+    ensureDir(inputDir);
+    ensureDir(path.join(bookRoot, "output"));
+    ensureDir(path.join(bookRoot, "temporary-output"));
+    // Copy the uploaded FB2 file to the input directory
+    fs.copyFileSync(fb2Path, path.join(inputDir, `${slug}.fb2`));
+    setCurrentBook(path.join("books-data", slug));
+    console.log("Converting book...");
+    convertBook(slug, 1, 0);
+    const richPath = path.join(bookRoot, "input", "rich.xml");
+    const rich = fs.readFileSync(richPath, "utf8");
+    return { slug, rich };
+  }),
 
   getRichXml: procedure.input(z.object({ slug: z.string() })).query(({ input }) => {
     const repoRoot = path.resolve(__dirname, "../../");
@@ -100,6 +120,176 @@ export const appRouter = router({
       packagePath: job.packagePath,
     };
     return status;
+  }),
+
+  regenerateChapterEmbeddings: procedure
+    .input(z.object({ bookSlug: z.string(), chapterNumber: z.number(), chapterXml: z.string(), bookLanguage: z.string().optional() }))
+    .mutation(async ({ input }) => {
+      const { bookSlug, chapterNumber, chapterXml, bookLanguage = "English" } = input;
+
+      console.log(`[regenerateChapterEmbeddings] Starting for ${bookSlug} chapter ${chapterNumber}`);
+
+      setCurrentBook(path.join("books-data", bookSlug));
+
+      const $ = cheerio.load(chapterXml, { xmlMode: true });
+      const paragraphs: { text: string; dataIndex: number }[] = [];
+      let index = 0;
+      $("Chapter > *").each((_, elem) => {
+        const $elem = $(elem);
+        const $clone = $elem.clone();
+        $clone.find("note").remove();
+        $clone.find("a").remove();
+        const text = $clone.text().trim();
+        if (text) {
+          paragraphs.push({ text, dataIndex: index });
+        }
+        index++;
+      });
+      console.log(`[regenerateChapterEmbeddings] Extracted ${paragraphs.length} paragraphs from XML`);
+
+      let rollingSummary: string;
+      try {
+        rollingSummary = readBookFile(`summaries-chapter-by-chapter-${chapterNumber}.txt`, FILE_TYPE.TEMPORARY);
+      } catch (e) {
+        throw new Error(`Rolling summary not found for chapter ${chapterNumber}. Run full pipeline first.`);
+      }
+
+      console.log(`[regenerateChapterEmbeddings] Generating summary for chapter ${chapterNumber}`);
+      const chapterSummary = await generateSingleChapterSummary({ chapterNum: chapterNumber, paragraphs, rollingSummary, bookLanguage });
+
+      const documents: Document[] = chapterSummary.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
+        const renderedText = bulletPoint.paragraphNumbers
+          .map((p) =>
+            paragraphs
+              .filter((pfc) => pfc.dataIndex === p)
+              .map((pfc) => pfc.text)
+              .join(" "),
+          )
+          .join("\n");
+
+        return {
+          text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
+          chapter: chapterNumber,
+          paragraphNumber: bulletPoint.mainParagraphNumber,
+        };
+      });
+
+      const pureSummaryDocuments: Document[] = chapterSummary.chapterSummary.chapterBulletPoints.map((bulletPoint) => ({
+        text: bulletPoint.paragraphsSummary,
+        chapter: chapterNumber,
+        paragraphNumber: bulletPoint.mainParagraphNumber,
+      }));
+
+      console.log(`[regenerateChapterEmbeddings] Generating embeddings for ${documents.length + pureSummaryDocuments.length} documents`);
+      const newChapterEmbeddings = await computeBatchEmbeddingsThroughHTTP([...documents, ...pureSummaryDocuments]);
+
+      const r2 = createR2Client();
+      const embeddingsKey = `answer-server-data/${bookSlug}/embeddings.json`;
+      const embeddingsFile = r2.file(embeddingsKey);
+
+      let existingEmbeddings: BookEmbeddings = new Map();
+      try {
+        const exists = await embeddingsFile.exists();
+        if (exists) {
+          const arr = (await embeddingsFile.json()) as [number, DocumentWithEmbeddings[]][];
+          existingEmbeddings = new Map(arr);
+          console.log(`[regenerateChapterEmbeddings] Loaded existing embeddings with ${existingEmbeddings.size} chapters`);
+        }
+      } catch (e) {
+        console.log(`[regenerateChapterEmbeddings] No existing embeddings found, starting fresh`);
+      }
+
+      existingEmbeddings.set(chapterNumber, newChapterEmbeddings);
+
+      const mergedJson = JSON.stringify(Array.from(existingEmbeddings.entries()), null, 2);
+      await embeddingsFile.write(mergedJson);
+      console.log(`[regenerateChapterEmbeddings] Uploaded merged embeddings to R2`);
+
+      return { success: true, bookSlug, chapterNumber, embeddingsCount: newChapterEmbeddings.length };
+    }),
+
+  searchWolneLektury: procedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
+    const books = await wl.searchBooks(input.query);
+    return books
+      .slice(0, 50)
+      .map((book) => ({
+        title: book.title,
+        author: book.author,
+        slug: book.slug,
+        coverThumb: book.cover_thumb,
+        hasAudio: book.has_audio,
+        epoch: book.epoch,
+        genre: book.genre,
+        kind: book.kind,
+      }));
+  }),
+
+  getWolneLekturyBook: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+    const book = await wl.getBookBySlug(input.slug);
+    return {
+      title: book.title,
+      slug: book.slug,
+      language: book.language,
+      authors: book.authors.map((a) => a.name),
+      hasFb2: !!book.fb2,
+      hasEpub: !!book.epub,
+      cover: book.cover,
+      coverThumb: book.cover_thumb,
+    };
+  }),
+
+  downloadFromWolneLektury: procedure.input(z.object({ slug: z.string() })).mutation(async ({ input }) => {
+    const repoRoot = path.resolve(__dirname, "../../");
+    try {
+      process.chdir(repoRoot);
+    } catch {}
+
+    const { buffer, details } = await wl.downloadBookFb2(input.slug);
+
+    const slug = input.slug;
+    const bookRoot = path.join(repoRoot, "books-data", slug);
+    const inputDir = path.join(bookRoot, "input");
+    ensureDir(inputDir);
+    ensureDir(path.join(bookRoot, "output"));
+    ensureDir(path.join(bookRoot, "temporary-output"));
+
+    const fb2Path = path.join(inputDir, `${slug}.fb2`);
+    fs.writeFileSync(fb2Path, buffer);
+    console.log(`[downloadFromWolneLektury] Saved FB2 to ${fb2Path}`);
+
+    setCurrentBook(path.join("books-data", slug));
+    console.log(`[downloadFromWolneLektury] Converting book...`);
+    convertBook(slug, 1, 0);
+
+    const richPath = path.join(bookRoot, "input", "rich.xml");
+    const rich = fs.readFileSync(richPath, "utf8");
+
+    return { slug, rich, title: details.title, authors: details.authors.map((a) => a.name) };
+  }),
+
+  getWolneLekturyCollections: procedure.query(async () => {
+    const collections = await wl.getCollections();
+    return collections.map((c) => ({ title: c.title, slug: wl.extractSlugFromHref(c.href), url: c.url }));
+  }),
+
+  getWolneLekturyCollection: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+    const collection = await wl.getCollectionBySlug(input.slug);
+    return {
+      url: collection.url,
+      title: collection.title,
+      books: collection.books.map((book) => ({
+        title: book.title,
+        author: book.author,
+        slug: book.slug,
+        cover: book.cover,
+        coverThumb: book.cover_thumb,
+        coverColor: book.cover_color,
+        epoch: book.epoch,
+        genre: book.genre,
+        kind: book.kind,
+        hasAudio: book.has_audio,
+      })),
+    };
   }),
 });
 

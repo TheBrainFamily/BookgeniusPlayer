@@ -77,7 +77,6 @@ function identifyChapterSections(doc: Document): Set<Element> {
   const chapterSections = new Set<Element>();
   const allSections = doc.querySelectorAll("section"); // Get all sections first
 
-  console.log("allSections", [...allSections]);
   allSections.forEach((section) => {
     const hasTitle = section.querySelector(":scope > title") !== null;
     // Check if *any* direct child is a content element
@@ -105,7 +104,6 @@ function identifyChapterSections(doc: Document): Set<Element> {
 function identifyChapterInABookWithNoChapters(doc: Document): Set<Element> {
   const noChapterSections = new Set<Element>();
   const allSections = doc.querySelectorAll("section"); // Get all sections first
-  console.log("allSections with no chapters", [...allSections]);
   allSections.forEach((section) => {
     // Notes sections are not chapters; they always have an id, starting with fn, as an anchor, we don't want to include them in the output
     const hasIdWithFn = section.getAttribute("id")?.startsWith("fn");
@@ -115,7 +113,6 @@ function identifyChapterInABookWithNoChapters(doc: Document): Set<Element> {
 
     if (hasContent && !hasIdWithFn) {
       noChapterSections.add(section);
-      console.log("noChapterSections", [...noChapterSections]);
     }
   });
 

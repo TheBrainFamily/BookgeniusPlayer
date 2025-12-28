@@ -81,11 +81,8 @@ Provide your summary clearly organized according to the structure above, explici
     const llmProviders = [callGeminiWrapper, callClaude];
     const selectedProvider = llmProviders[attempt % llmProviders.length];
     try {
-      const bookLanguage = process.env.BOOK_LANGUAGE || "English";
       const summary = await selectedProvider(
-        bookLanguage === "Polish"
-          ? `${prompt}\n Książka jest po Polsku, więc napisz podsumowanie również po Polsku.`
-          : prompt,
+        `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages.`,
       ); // Replace with actual LLM output
       return summary;
     } catch (e) {

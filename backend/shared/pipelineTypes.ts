@@ -10,6 +10,8 @@ export const StepEnum = z.enum([
   "generate_entity_pictures",
   "make_chapter_summaries",
   "map_summaries_to_paragraphs",
+  "generate_embeddings",
+  "upload_answer_server_data",
   "complete",
   "failed",
 ]);
@@ -26,6 +28,8 @@ export const StepLabels: Record<Step, string> = {
   generate_entity_pictures: "Generate Character Pictures",
   make_chapter_summaries: "Make Chapter Summaries",
   map_summaries_to_paragraphs: "Map Summaries to Paragraphs",
+  generate_embeddings: "Generate Embeddings",
+  upload_answer_server_data: "Upload Answer Server Data",
   complete: "Complete",
   failed: "Failed",
 };

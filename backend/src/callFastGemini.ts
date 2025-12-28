@@ -75,8 +75,8 @@ export const callGeminiWithThinking = async (prompt: string) => {
       timeout: 15 * 60 * 1000, // 15 minutes in milliseconds
     },
   };
-  // const model = "gemini-3-flash-preview";
-  const model = "gemini-3-pro-preview";
+  const model = "gemini-3-flash-preview";
+  // const model = "gemini-3-pro-preview";
 
   const contents = [{ role: "user", parts: [{ text: prompt }] }];
   const safetySettings = [
@@ -127,14 +127,26 @@ export const callGeminiWithThinkingAndSchema = async <T>(
 export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
   prompt: string,
   zodSchema: z.ZodSchema<T>,
-  model: string = "gemini-3-pro-preview",
+  model: string = "gemini-3-flash-preview",
 ) => {
+  console.log("CALLING GEMINI WITH THINKING AND SCHEMA AND PARSED", model);
   const { object } = await generateObject({
     model: google(model),
     schema: zodSchema,
     prompt: prompt,
     // providerOptions: { google: { thinkingConfig: { thinkingBudget: 0, includeThoughts: true } } },
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
+    providerOptions: {
+      google: {
+        safetySettings: [
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+        ],
+      },
+    },
   });
 
   return object as T;

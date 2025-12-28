@@ -2,7 +2,10 @@ import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 import { api, components, internal } from "./_generated/api";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
-import { renderChapterFromXmlDocument, type CharacterBundleInfo } from "../apps/player/src/services/live/xmlRendererCore";
+import {
+  renderChapterFromXmlDocument,
+  type CharacterBundleInfo,
+} from "../apps/player/src/services/live/xmlRendererCore";
 import { extractCharacterMetadata } from "../apps/player/src/services/live/characterExtractor";
 
 type ChapterExtra = { chapterNumber?: number; title?: string };
@@ -37,16 +40,28 @@ const ensureFolder = async (ctx: any, path: string): Promise<void> => {
   }
 };
 
-const uploadGeneratedAsset = async (ctx: any, args: { folderPath: string; basename: string; content: string; contentType: string; extra?: Record<string, unknown> }) => {
+const uploadGeneratedAsset = async (
+  ctx: any,
+  args: {
+    folderPath: string;
+    basename: string;
+    content: string;
+    contentType: string;
+    extra?: Record<string, unknown>;
+  },
+) => {
   const { folderPath, basename, content, contentType, extra } = args;
-  const { intentId, backend, uploadUrl } = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
-    folderPath,
-    basename,
-    filename: basename,
-    publish: true,
-    label: "Generated chapter artifact",
-    extra,
-  });
+  const { intentId, backend, uploadUrl } = await ctx.runMutation(
+    internal.generateUploadUrl.startUploadInternal,
+    {
+      folderPath,
+      basename,
+      filename: basename,
+      publish: true,
+      label: "Generated chapter artifact",
+      extra,
+    },
+  );
 
   const encoded = new TextEncoder().encode(content);
   const response = await fetch(uploadUrl, {
@@ -74,11 +89,7 @@ const uploadGeneratedAsset = async (ctx: any, args: { folderPath: string; basena
  * Intended to be triggered by scheduler after publishDraft.
  */
 export const processPublishedChapter = internalAction({
-  args: {
-    bookPath: v.string(),
-    chapterBasename: v.string(),
-    versionId: v.string(),
-  },
+  args: { bookPath: v.string(), chapterBasename: v.string(), versionId: v.string() },
   handler: async (ctx, { bookPath, chapterBasename, versionId }) => {
     const chaptersPath = `${bookPath}/chapters`;
     if (!bookPath || !chaptersPath.endsWith(CHAPTERS_FOLDER_SUFFIX)) {
@@ -98,7 +109,9 @@ export const processPublishedChapter = internalAction({
     const publishedVersion = versions.find((v) => v._id === versionId);
     const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
 
-    const xmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, { versionId });
+    const xmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+      versionId,
+    });
     if (!xmlResult?.content) {
       throw new Error(`No XML content found for ${chapterBasename}`);
     }
@@ -108,13 +121,18 @@ export const processPublishedChapter = internalAction({
     const xmlDoc = parser.parseFromString(normalizedXml, "text/xml") as unknown as Document;
     const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
     if (parseError) {
-      throw new Error(`XML parse error for ${chapterBasename}: ${parseError.textContent || "unknown error"}`);
+      throw new Error(
+        `XML parse error for ${chapterBasename}: ${parseError.textContent || "unknown error"}`,
+      );
     }
 
     const chapterElement = xmlDoc.getElementsByTagName("Chapter")[0];
     const chapterIdFromXml = chapterElement?.getAttribute("id") || "";
     const chapterNumberFromXml = Number.parseInt(chapterIdFromXml, 10);
-    const chapterNumber = Number.isFinite(chapterNumberFromXml) && chapterNumberFromXml > 0 ? chapterNumberFromXml : versionExtra.chapterNumber ?? extractChapterNumber(chapterBasename);
+    const chapterNumber =
+      Number.isFinite(chapterNumberFromXml) && chapterNumberFromXml > 0
+        ? chapterNumberFromXml
+        : (versionExtra.chapterNumber ?? extractChapterNumber(chapterBasename));
 
     if (!chapterElement) {
       throw new Error(`Chapter element missing in ${chapterBasename}`);
@@ -135,10 +153,20 @@ export const processPublishedChapter = internalAction({
       name: string;
       extra: CharacterBundleInfo["extra"];
     }>;
-    const characterBundles = characters.map((c) => ({ slug: c.slug, name: c.name, extra: c.extra }));
+    const characterBundles = characters.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      extra: c.extra,
+    }));
 
     const serializer = new XMLSerializer();
-    const { html, title } = renderChapterFromXmlDocument(xmlDoc, { bookSlug, bookLang, bookForm, characterBundles, serializer });
+    const { html, title } = renderChapterFromXmlDocument(xmlDoc, {
+      bookSlug,
+      bookLang,
+      bookForm,
+      characterBundles,
+      serializer,
+    });
     const resolvedTitle = title || versionExtra.title;
     const paragraphCount = (html.match(/data-index="/g) ?? []).length;
 
@@ -152,9 +180,18 @@ export const processPublishedChapter = internalAction({
       }
     }
 
-    const characterMetadata = extractCharacterMetadata(xmlDoc, actualCharacterTags, bookForm, bookSlug, characterBundles);
+    const characterMetadata = extractCharacterMetadata(
+      xmlDoc,
+      actualCharacterTags,
+      bookForm,
+      bookSlug,
+      characterBundles,
+    );
     const strippedCharacterMetadata = characterMetadata.map(({ media, ...rest }) => rest);
-    const characterPayload = JSON.stringify({ chapterNumber, characters: strippedCharacterMetadata });
+    const characterPayload = JSON.stringify({
+      chapterNumber,
+      characters: strippedCharacterMetadata,
+    });
 
     const htmlFolder = `${bookPath}/chapters-html`;
     const characterFolder = `${bookPath}/characters-data`;
@@ -177,5 +214,32 @@ export const processPublishedChapter = internalAction({
       contentType: "application/json",
       extra: { chapterNumber, sourceVersionId: versionId },
     });
+
+    const backendUrl = process.env.BACKEND_SERVER_URL;
+    if (backendUrl) {
+      try {
+        console.log(
+          `[chapterCompiler] Triggering embedding regeneration for ${bookSlug} chapter ${chapterNumber}`,
+        );
+        const response = await fetch(`${backendUrl}/trpc/regenerateChapterEmbeddings`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bookSlug,
+            chapterNumber,
+            chapterXml: normalizedXml,
+            bookLanguage: bookLang,
+          }),
+        });
+        if (!response.ok) {
+          console.error(`[chapterCompiler] Embedding regeneration failed: ${response.status}`);
+        } else {
+          const result = await response.json();
+          console.log(`[chapterCompiler] Embedding regeneration complete:`, result);
+        }
+      } catch (e) {
+        console.error(`[chapterCompiler] Failed to trigger embedding regeneration:`, e);
+      }
+    }
   },
 });
