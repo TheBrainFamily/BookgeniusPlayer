@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { procedure, router } from "./trpc";
-import { JobStatusSchema, StartPipelineInput } from "../../shared/pipelineTypes";
+import { JobStatus, StartPipelineInput } from "../../shared/pipelineTypes";
 import { jobs, startPipeline } from "./pipeline";
 import fs from "fs";
 import path from "path";
@@ -109,7 +109,7 @@ export const appRouter = router({
   getJobStatus: procedure.input(z.object({ jobId: z.string() })).query(({ input }) => {
     const job = jobs.get(input.jobId);
     if (!job) throw new Error("Job not found");
-    const status: z.infer<typeof JobStatusSchema> = {
+    const status: JobStatus = {
       jobId: job.id,
       slug: job.slug,
       currentStep: job.currentStep,
@@ -163,7 +163,7 @@ export const appRouter = router({
             paragraphs
               .filter((pfc) => pfc.dataIndex === p)
               .map((pfc) => pfc.text)
-              .join(" "),
+              .join(" ")
           )
           .join("\n");
 
@@ -210,18 +210,16 @@ export const appRouter = router({
 
   searchWolneLektury: procedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
     const books = await wl.searchBooks(input.query);
-    return books
-      .slice(0, 50)
-      .map((book) => ({
-        title: book.title,
-        author: book.author,
-        slug: book.slug,
-        coverThumb: book.cover_thumb,
-        hasAudio: book.has_audio,
-        epoch: book.epoch,
-        genre: book.genre,
-        kind: book.kind,
-      }));
+    return books.slice(0, 50).map((book) => ({
+      title: book.title,
+      author: book.author,
+      slug: book.slug,
+      coverThumb: book.cover_thumb,
+      hasAudio: book.has_audio,
+      epoch: book.epoch,
+      genre: book.genre,
+      kind: book.kind,
+    }));
   }),
 
   getWolneLekturyBook: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {

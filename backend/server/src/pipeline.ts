@@ -180,11 +180,24 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
   }
 }
 
-async function uploadCharactersToConvex(job: Job, referenceCards: NewReferenceCardsResponse, outputDir: string) {
+async function uploadCharactersToConvex(job: Job, referenceCards: NewReferenceCardsResponse, outputDir: string, tempOutputDir: string) {
+  const generatedPromptsPath = path.join(tempOutputDir, "generated-prompts.json");
+  let generatedPrompts: { characters: { name: string; visualGuide: string }[] } = { characters: [] };
+  if (fs.existsSync(generatedPromptsPath)) {
+    try {
+      generatedPrompts = JSON.parse(fs.readFileSync(generatedPromptsPath, "utf-8"));
+      addLog(job, `Loaded ${generatedPrompts.characters.length} AI prompts from generated-prompts.json`);
+    } catch (e) {
+      addLog(job, `⚠ Failed to parse generated-prompts.json: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
   for (const character of referenceCards.characters) {
     const characterSlug = generateTagName(character.name).toLowerCase();
+    const promptEntry = generatedPrompts.characters.find((p) => generateTagName(p.name).toLowerCase() === characterSlug);
+    const aiPrompt = promptEntry?.visualGuide;
 
-    await convex.ensureCharacterFolder({ bookPath: job.bookPath, characterSlug, displayName: character.name, summary: character.referenceCard });
+    await convex.ensureCharacterFolder({ bookPath: job.bookPath, characterSlug, displayName: character.name, summary: character.referenceCard, aiPrompt });
 
     const avatarExtensions = [".png", ".jpg", ".jpeg", ".webp"];
     for (const ext of avatarExtensions) {
@@ -419,7 +432,7 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
       referenceCards = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
       await generatePicturesForEntities(referenceCards);
 
-      await uploadCharactersToConvex(job, referenceCards, outputDir);
+      await uploadCharactersToConvex(job, referenceCards, outputDir, tempOutputDir);
     });
 
     if (process.env.QUICK_MODE !== "true") {

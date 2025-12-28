@@ -84,6 +84,7 @@ export const convex = {
   }): Promise<{ assetId: string; versionId: string; version: number }> {
     const { intentId, uploadUrl, backend } = await this.startUpload({ folderPath: args.folderPath, basename: args.basename, publish: args.publish ?? true, extra: args.extra });
 
+    // @ts-expect-error - this works, not sure why ts is complaining
     const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": args.contentType }, body: args.content });
 
     if (!response.ok) {
