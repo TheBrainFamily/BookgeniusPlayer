@@ -29,7 +29,7 @@ const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 const containerId = "content-container";
 
 export function useBookContent() {
-  const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded } = useBookConvex();
+  const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded } = useBookConvex();
   const { location } = useLocation();
   const { currentChapter, currentParagraph } = location;
   const bookForm = bookData?.metadata?.bookForm || "book";
@@ -58,8 +58,7 @@ export function useBookContent() {
     if (typeof currentChapter !== "number") return;
     const requested = [currentChapter - 1, currentChapter, currentChapter + 1];
     void ensureCompiledChaptersLoaded(requested);
-    void ensureCharacterFragmentsLoaded(requested);
-  }, [currentChapter, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded]);
+  }, [currentChapter, ensureCompiledChaptersLoaded]);
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {

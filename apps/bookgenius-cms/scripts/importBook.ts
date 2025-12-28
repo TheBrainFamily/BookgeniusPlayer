@@ -14,9 +14,191 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { execSync } from "child_process";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
+import { parseHTML } from "linkedom";
 
+// =============================================================================
+// XML to HTML Conversion (Node-compatible version)
+// =============================================================================
+
+const STANDARD_TAGS = new Set([
+  "p",
+  "h3",
+  "h4",
+  "h5",
+  "em",
+  "strong",
+  "br",
+  "div",
+  "blockquote",
+  "note",
+  "linebreak",
+  "chapter",
+  "span",
+  "i",
+  "b",
+  "a",
+  "pre",
+  "code",
+  "ul",
+  "ol",
+  "li",
+  "table",
+  "tr",
+  "td",
+  "th",
+  "thead",
+  "tbody",
+  "act",
+  "title",
+  "subtitle",
+]);
+
+function isCharacterTag(tagName: string): boolean {
+  return !STANDARD_TAGS.has(tagName.toLowerCase()) && /^[A-Z]/.test(tagName);
+}
+
+function slugifyTagName(tagName: string): string {
+  return tagName
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function convertCharacterElement(el: Element): { html: string; speaker: string | null } {
+  const slug = slugifyTagName(el.tagName);
+  const isTalking = el.getAttribute("talking") === "true";
+  const isEntering = el.getAttribute("enters") === "true";
+  const isExiting = el.getAttribute("exits") === "true";
+  const text = el.textContent || "";
+
+  if (isTalking) {
+    return { html: text, speaker: slug };
+  }
+  if (text.trim()) {
+    const attrs = [`data-c="${slug}"`];
+    if (isEntering) attrs.push('data-enters="true"');
+    if (isExiting) attrs.push('data-exits="true"');
+    return { html: `<span ${attrs.join(" ")}>${text}</span>`, speaker: null };
+  }
+  return { html: "", speaker: slug };
+}
+
+function convertNote(el: Element): string {
+  const id = el.getAttribute("id") || "";
+  const text = el.textContent?.trim() || `[${id}]`;
+  return `<a data-note="${id}">${text}</a>`;
+}
+
+function convertPlayElement(el: Element): string {
+  const text = el.textContent || "";
+  switch (el.tagName.toLowerCase()) {
+    case "act":
+      return `<h3 class="act">${text}</h3>`;
+    case "title":
+      return `<h4 class="scene-title">${text}</h4>`;
+    case "subtitle":
+      return `<p class="scene-subtitle"><em>${text}</em></p>`;
+    default:
+      return `<div>${text}</div>`;
+  }
+}
+
+function convertElement(el: Element): { html: string; speakers: string[] } {
+  const tag = el.tagName.toLowerCase();
+
+  if (isCharacterTag(el.tagName)) {
+    const result = convertCharacterElement(el);
+    return { html: result.html, speakers: result.speaker ? [result.speaker] : [] };
+  }
+
+  switch (tag) {
+    case "note":
+      return { html: convertNote(el), speakers: [] };
+    case "linebreak":
+    case "br":
+      return { html: "<br>", speakers: [] };
+    case "act":
+    case "title":
+    case "subtitle":
+      return { html: convertPlayElement(el), speakers: [] };
+    default:
+      return convertStandardElement(el, tag);
+  }
+}
+
+function convertStandardElement(el: Element, htmlTag: string): { html: string; speakers: string[] } {
+  let inner = "";
+  const speakers: string[] = [];
+
+  for (const node of Array.from(el.childNodes)) {
+    if (node.nodeType === 3 /* TEXT_NODE */) {
+      inner += node.textContent || "";
+    } else if (node.nodeType === 1 /* ELEMENT_NODE */) {
+      const converted = convertElement(node as Element);
+      inner += converted.html;
+      speakers.push(...converted.speakers);
+    }
+  }
+
+  const attrs: string[] = [];
+  if (speakers.length > 0) {
+    attrs.push(`data-speaker="${speakers.join(" ")}"`);
+  }
+  for (const attr of Array.from(el.attributes)) {
+    if (attr.name === "id" || attr.name === "class") {
+      attrs.push(`${attr.name}="${attr.value}"`);
+    }
+  }
+
+  const attrStr = attrs.length ? " " + attrs.join(" ") : "";
+  const validTag = STANDARD_TAGS.has(htmlTag) ? htmlTag : "div";
+
+  return { html: `<${validTag}${attrStr}>${inner}</${validTag}>`, speakers: [] };
+}
+
+function convertXmlChapterToHtml(xml: string): string {
+  // Use linkedom to parse XML as HTML (works for our simple XML structure)
+  const { document } = parseHTML(`<html><body>${xml}</body></html>`);
+
+  const chapter = document.querySelector("Chapter");
+  if (!chapter) {
+    throw new Error("No Chapter element found in XML");
+  }
+
+  const chapterId = chapter.getAttribute("id") || "1";
+  let html = `<section data-chapter="${chapterId}">`;
+
+  for (const child of Array.from(chapter.children) as Element[]) {
+    const converted = convertElement(child);
+    html += converted.html;
+  }
+
+  html += "</section>";
+  return html;
+}
+
+function extractChapterMetadata(html: string): { chapterNumber: number; title: string | null; paragraphCount: number } {
+  const { document } = parseHTML(html);
+  const section = document.querySelector("section[data-chapter]");
+
+  if (!section) {
+    throw new Error("No section[data-chapter] found");
+  }
+
+  const chapterNumber = parseInt(section.getAttribute("data-chapter") || "1", 10);
+  const titleEl = section.querySelector("h3, h4, h5");
+  const title = titleEl?.textContent?.trim() || null;
+  const paragraphCount = section.children.length;
+
+  return { chapterNumber, title, paragraphCount };
+}
+
+// =============================================================================
+// Types
 // =============================================================================
 // Types
 // =============================================================================
@@ -43,14 +225,20 @@ interface CharacterFolderExtra {
   aiPrompt?: string;
 }
 
-interface ChapterExtra {
-  type: "chapter";
-  chapterNumber: number;
-  title: string;
-}
-
 // Note: Background and music cue points are now stored in separate tables
 // (backgroundCues, musicCues) rather than as file extra metadata.
+
+const CONCURRENCY = 10;
+
+async function runInBatches<T, R>(items: T[], fn: (item: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = [];
+  for (let i = 0; i < items.length; i += CONCURRENCY) {
+    const batch = items.slice(i, i + CONCURRENCY);
+    const batchResults = await Promise.all(batch.map(fn));
+    results.push(...batchResults);
+  }
+  return results;
+}
 
 // =============================================================================
 // Configuration
@@ -248,15 +436,13 @@ async function step1_CreateFolderStructure(book: { title: string; author: string
 async function step2_ImportCharacters(characters: { slug: string; displayName: string; summary: string; aiPrompt?: string }[]): Promise<number> {
   console.log("\n=== Step 2: Import Characters ===");
 
-  let count = 0;
-  for (const char of characters) {
-    console.log(`\nProcessing: ${char.displayName}`);
+  await runInBatches(characters, async (char) => {
+    console.log(`  Processing: ${char.displayName}`);
 
     const charPath = `${BOOK_PATH}/characters/${char.slug}`;
     const charExtra: CharacterFolderExtra = { type: "character", displayName: char.displayName, summary: char.summary, aiPrompt: char.aiPrompt };
     await createFolderIfNeeded(charPath, charExtra);
 
-    // Try different file extensions for avatar
     const avatarExtensions = [".png", ".jpg", ".jpeg", ".webp"];
     let avatarUploaded = false;
     for (const ext of avatarExtensions) {
@@ -268,25 +454,64 @@ async function step2_ImportCharacters(characters: { slug: string; displayName: s
       }
     }
     if (!avatarUploaded) {
-      console.log(`  No avatar found for ${char.slug}`);
+      console.log(`    No avatar found for ${char.slug}`);
     }
 
-    // Upload speaks/listens videos
     const speaksFile = path.join(ASSETS_DIR, `${char.slug}-speaks.mp4`);
     const listensFile = path.join(ASSETS_DIR, `${char.slug}-listens.mp4`);
 
-    await uploadFile(charPath, "speaks.mp4", speaksFile);
-    await uploadFile(charPath, "listens.mp4", listensFile);
+    await Promise.all([uploadFile(charPath, "speaks.mp4", speaksFile), uploadFile(charPath, "listens.mp4", listensFile)]);
+  });
 
-    count++;
-  }
-
-  return count;
+  return characters.length;
 }
 
-async function step3_ImportChapters(): Promise<number> {
-  console.log("\n=== Step 3: Import Chapters ===");
+async function step3_ImportChapters(book: { form?: string; language: string }): Promise<number> {
+  const isPlayFormat = book.form === "Play" || book.form === "Mixed";
 
+  if (isPlayFormat) {
+    console.log("\n=== Step 3: Import Chapters (XML for plays - use migrate script after) ===");
+    return step3_ImportChaptersAsXml();
+  }
+
+  console.log("\n=== Step 3: Import Chapters (HTML Source Format) ===");
+
+  if (!fs.existsSync(CONTENT_DIR)) {
+    console.log("  No booksContent directory found");
+    return 0;
+  }
+
+  const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
+  files.sort((a, b) => {
+    const numA = parseInt(a.match(/chapter(\d+)/)?.[1] || "0");
+    const numB = parseInt(b.match(/chapter(\d+)/)?.[1] || "0");
+    return numA - numB;
+  });
+
+  const chapters = files.map((file) => {
+    const chapterNum = parseInt(file.match(/chapter(\d+)/)?.[1] || "0");
+    const filePath = path.join(CONTENT_DIR, file);
+    const xmlContent = fs.readFileSync(filePath, "utf-8");
+    const htmlContent = convertXmlChapterToHtml(xmlContent);
+    const metadata = extractChapterMetadata(htmlContent);
+    return { chapterNum, htmlContent, metadata };
+  });
+
+  await runInBatches(chapters, async ({ chapterNum, htmlContent, metadata }) => {
+    console.log(`  Chapter ${chapterNum}: ${metadata.title || "(no title)"} (${metadata.paragraphCount} paragraphs)`);
+    await client.action(api.chapterCompiler.uploadHtmlSourceChapter, {
+      bookPath: BOOK_PATH,
+      chapterNumber: chapterNum,
+      htmlContent,
+      title: metadata.title || undefined,
+      paragraphCount: metadata.paragraphCount,
+    });
+  });
+
+  return files.length;
+}
+
+async function step3_ImportChaptersAsXml(): Promise<number> {
   const chaptersPath = `${BOOK_PATH}/chapters`;
 
   if (!fs.existsSync(CONTENT_DIR)) {
@@ -309,8 +534,24 @@ async function step3_ImportChapters(): Promise<number> {
 
     console.log(`  Chapter ${chapterNum}: ${title}`);
 
-    const extra: ChapterExtra = { type: "chapter", chapterNumber: chapterNum, title };
+    const extra = { type: "chapter", chapterNumber: chapterNum, title };
     await uploadFile(chaptersPath, file, filePath, extra);
+  }
+
+  console.log("\n  🔄 Triggering chapter compilation...");
+  try {
+    console.log("__dirname", __dirname);
+    execSync(`npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`, { stdio: "inherit" });
+    console.log("  ✅ Compilation complete");
+
+    console.log("\n  🔄 Migrating to HTML source format...");
+    execSync(`bun ./migrate-book-to-html.ts ${bookSlug}`, { stdio: "inherit", cwd: path.join(__dirname) });
+    console.log("  ✅ Migration complete");
+  } catch (error) {
+    console.error("  ❌ Auto-compilation/migration failed:", error);
+    console.log("\n  Manual steps:");
+    console.log(`     npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`);
+    console.log(`     bun tools/scripts/migrate-book-to-html.ts ${bookSlug}`);
   }
 
   return files.length;
@@ -333,23 +574,21 @@ async function step4_ImportBackgrounds(): Promise<number> {
 
   console.log(`  Found ${backgrounds.length} background entries`);
 
-  // Step 1: Upload unique files (no cue metadata on file - cues go in separate table)
-  const uploadedFiles = new Set<string>();
-
-  for (const bg of backgrounds) {
-    if (uploadedFiles.has(bg.file)) continue;
-
-    const filePath = path.join(ASSETS_DIR, bg.file);
+  const uniqueFiles = [...new Set(backgrounds.map((bg) => bg.file))];
+  const existingFiles = uniqueFiles.filter((file) => {
+    const filePath = path.join(ASSETS_DIR, file);
     if (!fs.existsSync(filePath)) {
-      console.log(`  Skipping (not found): ${bg.file}`);
-      continue;
+      console.log(`  Skipping (not found): ${file}`);
+      return false;
     }
+    return true;
+  });
 
-    // Upload file without extra - cue points stored separately
-    await uploadFile(backgroundsPath, bg.file, filePath);
-    uploadedFiles.add(bg.file);
-  }
+  await runInBatches(existingFiles, async (file) => {
+    await uploadFile(backgroundsPath, file, path.join(ASSETS_DIR, file));
+  });
 
+  const uploadedFiles = new Set(existingFiles);
   console.log(`  Uploaded ${uploadedFiles.size} unique background files`);
 
   // Step 2: Create cue points for ALL entries (supports reuse)
@@ -389,28 +628,30 @@ async function step5_ImportMusic(): Promise<number> {
 
   console.log(`  Found ${musicTracks.length} music entries`);
 
-  // Step 1: Upload unique files (no cue metadata on file - cues go in separate table)
-  const uploadedFiles = new Set<string>();
-
-  for (const track of musicTracks) {
-    for (const file of track.files) {
-      // Extract just the filename (handles nested paths like "music/1-0.mp3")
-      const basename = path.basename(file);
-
-      if (uploadedFiles.has(basename)) continue;
-
-      const filePath = path.join(ASSETS_DIR, file);
-      if (!fs.existsSync(filePath)) {
-        console.log(`  Skipping (not found): ${file}`);
-        continue;
-      }
-
-      // Upload file without extra - cue points stored separately
-      await uploadFile(musicPath, basename, filePath);
-      uploadedFiles.add(basename);
+  const allFiles = musicTracks.flatMap((track) => track.files);
+  const uniqueFilesMap = new Map<string, string>();
+  for (const file of allFiles) {
+    const basename = path.basename(file);
+    if (!uniqueFilesMap.has(basename)) {
+      uniqueFilesMap.set(basename, file);
     }
   }
 
+  const existingFiles: { basename: string; fullPath: string }[] = [];
+  for (const [basename, file] of uniqueFilesMap) {
+    const filePath = path.join(ASSETS_DIR, file);
+    if (!fs.existsSync(filePath)) {
+      console.log(`  Skipping (not found): ${file}`);
+      continue;
+    }
+    existingFiles.push({ basename, fullPath: filePath });
+  }
+
+  await runInBatches(existingFiles, async ({ basename, fullPath }) => {
+    await uploadFile(musicPath, basename, fullPath);
+  });
+
+  const uploadedFiles = new Set(existingFiles.map((f) => f.basename));
   console.log(`  Uploaded ${uploadedFiles.size} unique music files`);
 
   // Step 2: Create cue points for ALL entries (supports reuse)
@@ -592,7 +833,7 @@ async function main() {
   // Run import steps
   await step1_CreateFolderStructure(book);
   const characterCount = await step2_ImportCharacters(characters);
-  const chapterCount = await step3_ImportChapters();
+  const chapterCount = await step3_ImportChapters(book);
   const backgroundCount = await step4_ImportBackgrounds();
   const musicCount = await step5_ImportMusic();
   const noteCount = await step6_ImportNotes();

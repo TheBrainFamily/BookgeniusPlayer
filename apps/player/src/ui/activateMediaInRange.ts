@@ -261,9 +261,13 @@ function populateInlineAvatarShell(
   }
 
   const characterSlug = shell.dataset.character;
-  if (!characterSlug) return false;
+  if (!characterSlug) {
+    console.warn(`[populateInlineAvatarShell] shell has no data-character attribute`);
+    return false;
+  }
 
   if (!characterData) {
+    console.warn(`[populateInlineAvatarShell] ${characterSlug}: no characterData provided`);
     return false;
   }
 
@@ -295,9 +299,13 @@ function createMediaElement(
   snapshotOverride?: CharacterSnapshot | null,
 ): HTMLSpanElement | null {
   const characterSlug = placeholder.dataset.character;
-  if (!characterSlug) return null;
+  if (!characterSlug) {
+    console.warn(`[createMediaElement] placeholder has no data-character`);
+    return null;
+  }
 
   if (!characterData) {
+    console.warn(`[createMediaElement] ${characterSlug}: no characterData found`);
     return null;
   }
 
@@ -326,8 +334,17 @@ function createMediaElement(
 }
 
 function createDummyElement(characterPlaceholder: HTMLSpanElement) {
+  const existingInlineAvatar = characterPlaceholder.querySelector<HTMLSpanElement>(".inline-avatar");
   const dummyElement = document.createElement("span");
   dummyElement.classList.add("dummy-avatar-placeholder", "inline-avatar");
+
+  if (existingInlineAvatar?.dataset.character) {
+    dummyElement.dataset.character = existingInlineAvatar.dataset.character;
+  }
+  if (existingInlineAvatar?.title) {
+    dummyElement.title = existingInlineAvatar.title;
+  }
+
   const img = characterPlaceholder.querySelector<HTMLImageElement>("img");
   if (img) {
     dummyElement.appendChild(img.cloneNode(true));
@@ -347,7 +364,8 @@ const activatePlayFormatMediaDebounced = debounce(runPlayFormatMediaActivation, 
 
 /** Manages media loading and playback for paragraphs within the visible range **/
 export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean) {
-  const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
+  const charactersData = getCharactersData();
+  const charactersBySlug = new Map(charactersData.map((c) => [c.slug, c]));
 
   if (isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
@@ -415,15 +433,17 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
       const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
 
-      if (Array.from(activatedMedia).find((_rowEl) => _rowEl === rowEl)) return;
-
       const existingInlineAvatar = characterPlaceholder.querySelector<HTMLElement>(".inline-avatar");
+      let success = false;
 
       if (existingInlineAvatar) {
-        // Pre-rendered shell exists, populate it with the image
-        populateInlineAvatarShell(existingInlineAvatar, characterData, locationForPlaceholder, snapshot);
+        const hasImg = existingInlineAvatar.querySelector("img");
+        if (hasImg) {
+          success = true;
+        } else {
+          success = populateInlineAvatarShell(existingInlineAvatar, characterData, locationForPlaceholder, snapshot);
+        }
       } else {
-        // No shell exists, create full media element
         const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
 
         if (newMediaElement) {
@@ -432,14 +452,16 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
           } else {
             characterPlaceholder.appendChild(newMediaElement);
           }
+          success = true;
         }
       }
 
-      rowEl.dataset.activatedMedia = "true";
+      if (success) {
+        rowEl.dataset.activatedMedia = "true";
+      }
     });
   });
 
-  // Here we clean up the activated media
   activatedMedia.forEach((rowEl) => {
     if (!uniqueRows.includes(rowEl)) {
       const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");

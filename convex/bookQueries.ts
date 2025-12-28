@@ -358,6 +358,44 @@ export const listCompiledChapters = query({
   },
 });
 
+export const listHtmlSourceChapters = query({
+  args: { bookPath: v.string() },
+  handler: async (ctx, { bookPath }) => {
+    const sourcePath = `${bookPath}/chapters-source`;
+
+    const files = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: sourcePath },
+    );
+
+    if (files.length === 0) return null;
+
+    const assets = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedAssetsInFolder,
+      { folderPath: sourcePath },
+    );
+
+    const chapters = files.map((file) => {
+      const asset = assets.find((a) => a.basename === file.basename);
+      const extra = asset?.extra as
+        | { chapterNumber?: number; title?: string; paragraphCount?: number; sourceFormat?: string }
+        | undefined;
+
+      return {
+        basename: file.basename,
+        url: file.url,
+        versionId: file.versionId as string,
+        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
+        title: extra?.title,
+        paragraphCount: extra?.paragraphCount,
+        sourceFormat: extra?.sourceFormat ?? "html",
+      };
+    });
+
+    return chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
+  },
+});
+
 export const getCharacterIndexV2 = query({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {

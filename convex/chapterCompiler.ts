@@ -276,6 +276,41 @@ type RecompileResult = {
   failures?: { chapterNumber: number; success: boolean; error?: string }[];
 };
 
+export const uploadHtmlSourceChapter = action({
+  args: {
+    bookPath: v.string(),
+    chapterNumber: v.number(),
+    htmlContent: v.string(),
+    title: v.optional(v.string()),
+    paragraphCount: v.number(),
+  },
+  returns: v.object({ success: v.boolean(), versionId: v.string() }),
+  handler: async (ctx, { bookPath, chapterNumber, htmlContent, title, paragraphCount }) => {
+    const sourceFolder = `${bookPath}/chapters-source`;
+    await ensureFolder(ctx, sourceFolder);
+
+    await uploadGeneratedAsset(ctx, {
+      folderPath: sourceFolder,
+      basename: `chapter-${chapterNumber}.html`,
+      content: htmlContent,
+      contentType: "text/html",
+      extra: { chapterNumber, title, paragraphCount, sourceFormat: "html" },
+    });
+
+    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+      folderPath: sourceFolder,
+      basename: `chapter-${chapterNumber}.html`,
+    });
+
+    const publishedVersion = versions.find((v) => v.state === "published");
+    if (!publishedVersion) {
+      throw new Error("Failed to publish HTML source chapter");
+    }
+
+    return { success: true, versionId: publishedVersion._id };
+  },
+});
+
 export const recompileAllChapters = action({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }): Promise<RecompileResult> => {

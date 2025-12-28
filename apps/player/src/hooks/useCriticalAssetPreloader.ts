@@ -16,7 +16,7 @@ import { ExtendedLocation } from "@player/helpers/paragraphsNavigation";
 
 export function useCriticalAssetPreloader() {
   const [readingPosition, setReadingPosition] = useState<ExtendedLocation | null>(null);
-  const { backgroundsForBook, backgroundSongsForBook, isLoading, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded } = useBookConvex();
+  const { backgroundsForBook, backgroundSongsForBook, isLoading, ensureCompiledChaptersLoaded } = useBookConvex();
   const preloadStartedRef = useRef(false);
   const chapterPreloadStartedRef = useRef(false);
 
@@ -40,8 +40,7 @@ export function useCriticalAssetPreloader() {
     const startChapter = readingPosition.currentChapter ?? readingPosition.chapter ?? 1;
     const requested = [startChapter - 1, startChapter, startChapter + 1];
     void ensureCompiledChaptersLoaded(requested);
-    void ensureCharacterFragmentsLoaded(requested);
-  }, [isLoading, readingPosition, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded]);
+  }, [isLoading, readingPosition, ensureCompiledChaptersLoaded]);
 
   // Trigger background loading once we have position AND data
   useEffect(() => {
