@@ -16,29 +16,38 @@ export const useSearchLogic = () => {
   const { charactersData } = useBookConvex();
 
   const latestSearchIdRef = useRef(0);
+  const latestApiCallIdRef = useRef(0);
   const isFirstRemoteSearchRef = useRef(true);
 
   useEffect(() => {
     if (!query.trim()) {
+      console.log("[useSearchLogic] Query empty, resetting isFirstRemoteSearchRef to true");
       isFirstRemoteSearchRef.current = true;
     }
   }, [query]);
 
   const executeRemoteSearch = useCallback(
-    async (searchQuery: string, location: Location, searchId: number) => {
-      console.log("[useSearchLogic] executeRemoteSearch called", { searchQuery, searchId, latestSearchId: latestSearchIdRef.current });
+    async (searchQuery: string, location: Location) => {
+      const apiCallId = ++latestApiCallIdRef.current;
+      console.log("[useSearchLogic] executeRemoteSearch EXECUTING", { searchQuery, apiCallId });
       try {
         const results = await performUnifiedSearch(searchQuery, location);
-        console.log("[useSearchLogic] performUnifiedSearch returned", { resultsCount: results.items.length, searchId, latestSearchId: latestSearchIdRef.current });
-        if (searchId === latestSearchIdRef.current) {
-          console.log("[useSearchLogic] Setting results (searchId matches)", { resultsCount: results.items.length });
+        const isLatestApiCall = apiCallId === latestApiCallIdRef.current;
+        console.log("[useSearchLogic] performUnifiedSearch returned", {
+          resultsCount: results.items.length,
+          apiCallId,
+          latestApiCallId: latestApiCallIdRef.current,
+          isLatestApiCall,
+        });
+        if (isLatestApiCall) {
+          console.log("[useSearchLogic] Setting results (latest API call)", { resultsCount: results.items.length });
           setResults({ ...results, isRefreshing: false });
         } else {
-          console.log("[useSearchLogic] SKIPPING results (searchId stale)", { searchId, latestSearchId: latestSearchIdRef.current });
+          console.log("[useSearchLogic] SKIPPING results (newer API call in flight)", { apiCallId, latestApiCallId: latestApiCallIdRef.current });
         }
       } catch (err) {
         console.error("[useSearchLogic] executeRemoteSearch error", err);
-        if (searchId === latestSearchIdRef.current) {
+        if (apiCallId === latestApiCallIdRef.current) {
           setResults({ header: "Search failed. Please try again.", items: [], isLoading: false, isRefreshing: false });
         }
       }
@@ -46,18 +55,17 @@ export const useSearchLogic = () => {
     [setResults],
   );
 
-  const debouncedRemoteSearch = useMemo(
-    () =>
-      debounce(
-        (searchQuery: string, location: Location, searchId: number) => {
-          console.log("[useSearchLogic] debouncedRemoteSearch FIRED", { searchQuery: searchQuery.slice(0, 30), searchId });
-          void executeRemoteSearch(searchQuery, location, searchId);
-        },
-        REMOTE_SEARCH_DEBOUNCE_MS,
-        { leading: false, trailing: true, maxWait: REMOTE_SEARCH_MAX_WAIT_MS },
-      ),
-    [executeRemoteSearch],
-  );
+  const debouncedRemoteSearch = useMemo(() => {
+    console.log("[useSearchLogic] debouncedRemoteSearch RECREATED");
+    return debounce(
+      (searchQuery: string, location: Location) => {
+        console.log("[useSearchLogic] debouncedRemoteSearch FIRED", { searchQuery: searchQuery.slice(0, 30) });
+        void executeRemoteSearch(searchQuery, location);
+      },
+      REMOTE_SEARCH_DEBOUNCE_MS,
+      { leading: false, trailing: true, maxWait: REMOTE_SEARCH_MAX_WAIT_MS },
+    );
+  }, [executeRemoteSearch]);
 
   useEffect(() => {
     return () => {
@@ -67,6 +75,7 @@ export const useSearchLogic = () => {
 
   const performSearch = useCallback(
     (searchQuery: string, location: Location) => {
+      console.log("[useSearchLogic] performSearch CALLED (not recreated, this is normal)");
       if (!searchQuery.trim()) {
         setResults({ header: "Please enter a search term.", items: [], isLoading: false });
         return;
@@ -100,20 +109,26 @@ export const useSearchLogic = () => {
       console.log("[useSearchLogic] No local results, triggering remote search", { hasExistingResults, isFirstRemote: isFirstRemoteSearchRef.current });
 
       if (hasExistingResults) {
+        console.log("[useSearchLogic] Setting isRefreshing with existing results");
         setResults({ ...previousResults, isRefreshing: true, isLoading: false });
       } else if (!isFirstRemoteSearchRef.current) {
+        console.log("[useSearchLogic] Setting isRefreshing (no results yet, not first search)");
         setResults({ header: "", items: [], isLoading: false, isRefreshing: true });
       } else {
+        console.log("[useSearchLogic] Setting isLoading (first search)");
         setResults({ header: "Searching…", items: [], isLoading: true });
       }
 
       isFirstRemoteSearchRef.current = false;
-      debouncedRemoteSearch(searchQuery, location, searchId);
+      debouncedRemoteSearch(searchQuery, location);
     },
     [setResults, debouncedRemoteSearch, charactersData],
   );
 
-  const debouncedTriggerSearch = useMemo(() => debounce(performSearch, TYPING_DEBOUNCE_MS), [performSearch]);
+  const debouncedTriggerSearch = useMemo(() => {
+    console.log("[useSearchLogic] debouncedTriggerSearch RECREATED");
+    return debounce(performSearch, TYPING_DEBOUNCE_MS);
+  }, [performSearch]);
 
   useEffect(() => {
     if (query.trim()) {
