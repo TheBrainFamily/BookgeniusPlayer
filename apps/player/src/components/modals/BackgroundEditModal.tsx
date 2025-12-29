@@ -70,33 +70,32 @@ const BackgroundEditModal: React.FC = () => {
             )}
           </div>
 
-          <div className="flex gap-6 items-center">
-            <div className="flex-1">
-              <label className="text-xs text-zinc-400 mb-2 block">Describe how you want to modify this background:</label>
+          <div>
+            <label className="text-xs text-zinc-400 mb-2 block">Describe how you want to modify this background:</label>
+            <div className="flex gap-6 items-center">
               <textarea
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
                 placeholder="e.g., Make it nighttime with stars, add fog..."
-                className="w-full h-20 bg-zinc-800 border border-zinc-600 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 resize-none"
+                className="flex-1 h-20 bg-zinc-800 border border-zinc-600 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 resize-none"
                 disabled={isSubmitting}
               />
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={closeModal}
-                disabled={isSubmitting}
-                className="bg-zinc-700 text-white hover:bg-zinc-600 h-12 px-6 rounded-lg cursor-pointer disabled:opacity-50 transition-colors whitespace-nowrap"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={isSubmitting || !instructions.trim()}
-                className="bg-purple-600 text-white hover:bg-purple-500 h-12 px-8 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium whitespace-nowrap"
-              >
-                {isSubmitting ? "Starting..." : "Edit Background"}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={closeModal}
+                  disabled={isSubmitting}
+                  className="bg-zinc-700 text-white hover:bg-zinc-600 h-12 px-6 rounded-lg cursor-pointer disabled:opacity-50 transition-colors whitespace-nowrap"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !instructions.trim()}
+                  className="bg-purple-600 text-white hover:bg-purple-500 h-12 px-8 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium whitespace-nowrap"
+                >
+                  {isSubmitting ? "Starting..." : "Edit Background"}
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>

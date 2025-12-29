@@ -127,33 +127,32 @@ const BackgroundOptionsModal: React.FC<BackgroundOptionsModalProps> = ({ bg, bgK
           </div>
         )}
 
-        <div className="flex gap-6 items-center">
-          <div className="flex-1">
-            <label className="text-xs text-zinc-400 mb-2 block">Not happy? Modify the prompt and regenerate:</label>
+        <div>
+          <label className="text-xs text-zinc-400 mb-2 block">Not happy? Modify the prompt and regenerate:</label>
+          <div className="flex gap-6 items-center">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe the scene..."
-              className="w-full h-20 bg-zinc-800 border border-zinc-600 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 resize-none"
+              className="flex-1 h-20 bg-zinc-800 border border-zinc-600 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 resize-none"
               disabled={isSubmitting}
             />
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleRegenerate}
-              disabled={isSubmitting || !prompt.trim()}
-              className="bg-zinc-700 text-white hover:bg-zinc-600 h-12 px-6 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
-            >
-              {isSubmitting ? "Starting..." : "Regenerate"}
-            </button>
-            <button
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="bg-emerald-600 text-white hover:bg-emerald-500 h-12 px-8 rounded-lg cursor-pointer disabled:opacity-50 transition-colors font-medium whitespace-nowrap"
-            >
-              Keep Background
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleRegenerate}
+                disabled={isSubmitting || !prompt.trim()}
+                className="bg-zinc-700 text-white hover:bg-zinc-600 h-12 px-6 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+              >
+                {isSubmitting ? "Starting..." : "Regenerate"}
+              </button>
+              <button
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="bg-emerald-600 text-white hover:bg-emerald-500 h-12 px-8 rounded-lg cursor-pointer disabled:opacity-50 transition-colors font-medium whitespace-nowrap"
+              >
+                Keep Background
+              </button>
+            </div>
           </div>
         </div>
       </motion.div>
