@@ -448,7 +448,7 @@ async function step2_ImportCharacters(characters: { slug: string; displayName: s
     for (const ext of avatarExtensions) {
       const avatarFile = path.join(ASSETS_DIR, `${char.slug}${ext}`);
       if (fs.existsSync(avatarFile)) {
-        await uploadFile(charPath, `avatar${ext}`, avatarFile);
+        await uploadFile(charPath, `avatar-large${ext}`, avatarFile);
         avatarUploaded = true;
         break;
       }

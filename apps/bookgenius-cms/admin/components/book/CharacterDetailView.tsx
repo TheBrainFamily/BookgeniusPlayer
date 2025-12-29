@@ -32,6 +32,7 @@ interface CharacterDetailViewProps {
   characterPath: string;
   onBack: () => void;
   onUploadAsset: (basename: string) => void;
+  optimisticAvatarUrl?: string;
 }
 
 interface AssetSlotProps {
@@ -103,12 +104,13 @@ function AssetSlot({ label, icon, asset, onUpload, accept, isImage = false }: As
 // Main Component
 // =============================================================================
 
-export function CharacterDetailView({ characterPath, onBack, onUploadAsset }: CharacterDetailViewProps) {
+export function CharacterDetailView({ characterPath, onBack, onUploadAsset, optimisticAvatarUrl }: CharacterDetailViewProps) {
   const { bundle, isLoading, error } = useCharacterBundle(characterPath);
   const [showMetadataEditor, setShowMetadataEditor] = useState(false);
 
-  // Extract character slug from path for display
   const characterSlug = characterPath.split("/").pop() || "";
+
+  const displayAvatar = optimisticAvatarUrl ? { url: optimisticAvatarUrl, versionId: "optimistic", contentType: "image/png" } : bundle?.avatar;
 
   // Loading state
   if (isLoading) {
@@ -189,7 +191,14 @@ export function CharacterDetailView({ characterPath, onBack, onUploadAsset }: Ch
             <div>
               <h2 className="text-lg font-medium mb-4">Character Assets</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <AssetSlot label="Avatar" icon={<ImageIcon className="h-4 w-4" />} asset={bundle.avatar} onUpload={() => onUploadAsset("avatar.png")} accept="image/*" isImage />
+                <AssetSlot
+                  label="Avatar"
+                  icon={<ImageIcon className="h-4 w-4" />}
+                  asset={displayAvatar}
+                  onUpload={() => onUploadAsset("avatar-large.png")}
+                  accept="image/*"
+                  isImage
+                />
                 <AssetSlot label="Speaks" icon={<Video className="h-4 w-4" />} asset={bundle.speaks} onUpload={() => onUploadAsset("speaks.mp4")} accept="video/*" />
                 <AssetSlot label="Listens" icon={<Video className="h-4 w-4" />} asset={bundle.listens} onUpload={() => onUploadAsset("listens.mp4")} accept="video/*" />
               </div>

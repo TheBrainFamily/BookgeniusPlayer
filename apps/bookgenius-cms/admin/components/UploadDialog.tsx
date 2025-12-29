@@ -24,10 +24,11 @@ interface UploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   folderPath: string;
-  existingBasename?: string; // If provided, upload as new version
+  existingBasename?: string;
+  onUploadComplete?: (folderPath: string, basename: string, file: File) => void;
 }
 
-export function UploadDialog({ open, onOpenChange, folderPath, existingBasename }: UploadDialogProps) {
+export function UploadDialog({ open, onOpenChange, folderPath, existingBasename, onUploadComplete }: UploadDialogProps) {
   const [file, setFile] = useState<File | null>(null);
   const [basename, setBasename] = useState(existingBasename || "");
   const [label, setLabel] = useState("");
@@ -111,7 +112,8 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename 
 
       toast.success(`File uploaded${publishImmediately ? " and published" : " as draft"}`);
 
-      // Reset form
+      onUploadComplete?.(folderPath, finalBasename, file);
+
       setFile(null);
       setBasename("");
       setLabel("");

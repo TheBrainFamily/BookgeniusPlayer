@@ -121,16 +121,17 @@ export const getCharacterBundle = query({
       { folderPath: characterPath },
     );
 
-    // Build bundle with typed asset references
+    type AssetInfo = { url: string; versionId: string; contentType?: string; publishedAt?: number };
+
     const bundle: {
       path: string;
       slug: string;
       name: string;
       extra: unknown;
-      avatar?: { url: string; versionId: string; contentType?: string };
-      avatarLarge?: { url: string; versionId: string; contentType?: string };
-      speaks?: { url: string; versionId: string; contentType?: string };
-      listens?: { url: string; versionId: string; contentType?: string };
+      avatar?: AssetInfo;
+      avatarLarge?: AssetInfo;
+      speaks?: AssetInfo;
+      listens?: AssetInfo;
     } = {
       path: folder.path,
       slug: folder.path.split("/").pop()!,
@@ -138,19 +139,25 @@ export const getCharacterBundle = query({
       extra: folder.extra,
     };
 
-    // Match assets to bundle slots
     for (const file of files) {
       const basename = file.basename.toLowerCase();
-      const assetInfo = {
+      const assetInfo: AssetInfo = {
         url: file.url,
         versionId: file.versionId as string,
         contentType: file.contentType,
+        publishedAt: file.publishedAt,
       };
 
       if (basename.startsWith("avatar-large.")) {
         bundle.avatarLarge = assetInfo;
       } else if (basename.startsWith("avatar.")) {
-        bundle.avatar = assetInfo;
+        const isWebp = basename === "avatar.webp";
+        const existingIsWebp = bundle.avatar?.contentType === "image/webp";
+        const isNewer = (assetInfo.publishedAt ?? 0) > (bundle.avatar?.publishedAt ?? 0);
+
+        if (!bundle.avatar || isWebp || (!existingIsWebp && isNewer)) {
+          bundle.avatar = assetInfo;
+        }
       } else if (basename.startsWith("speaks.")) {
         bundle.speaks = assetInfo;
       } else if (basename.startsWith("listens.")) {
@@ -709,15 +716,17 @@ export const listCharacterBundlesWithDrafts = query({
     );
 
     return foldersWithAssets.map(({ folder, assets }) => {
+      type AssetInfo = { url: string; versionId: string; contentType?: string };
+
       const bundle: {
         path: string;
         slug: string;
         name: string;
         extra: unknown;
-        avatar?: { url: string; versionId: string; contentType?: string };
-        avatarLarge?: { url: string; versionId: string; contentType?: string };
-        speaks?: { url: string; versionId: string; contentType?: string };
-        listens?: { url: string; versionId: string; contentType?: string };
+        avatar?: AssetInfo;
+        avatarLarge?: AssetInfo;
+        speaks?: AssetInfo;
+        listens?: AssetInfo;
       } = {
         path: folder.path,
         slug: folder.path.split("/").pop()!,
@@ -727,7 +736,7 @@ export const listCharacterBundlesWithDrafts = query({
 
       for (const asset of assets) {
         const basename = asset.basename.toLowerCase();
-        const assetInfo = {
+        const assetInfo: AssetInfo = {
           url: asset.url,
           versionId: asset.versionId,
           contentType: asset.contentType,
@@ -736,7 +745,11 @@ export const listCharacterBundlesWithDrafts = query({
         if (basename.startsWith("avatar-large.")) {
           bundle.avatarLarge = assetInfo;
         } else if (basename.startsWith("avatar.")) {
-          bundle.avatar = assetInfo;
+          const isWebp = basename === "avatar.webp";
+          const existingIsWebp = bundle.avatar?.contentType === "image/webp";
+          if (!bundle.avatar || isWebp || !existingIsWebp) {
+            bundle.avatar = assetInfo;
+          }
         } else if (basename.startsWith("speaks.")) {
           bundle.speaks = assetInfo;
         } else if (basename.startsWith("listens.")) {

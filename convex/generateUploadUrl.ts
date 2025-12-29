@@ -57,10 +57,7 @@ export const getStorageBackendConfig = query({
   args: {},
   returns: storageBackendValidator,
   handler: async (ctx) => {
-    return await ctx.runQuery(
-      components.assetManager.assetManager.getStorageBackendConfig,
-      {},
-    );
+    return await ctx.runQuery(components.assetManager.assetManager.getStorageBackendConfig, {});
   },
 });
 
@@ -93,10 +90,10 @@ export const startUpload = mutation({
   }),
   handler: async (ctx, args) => {
     await requireAuth(ctx);
-    return await ctx.runMutation(
-      components.assetManager.assetManager.startUpload,
-      { ...args, r2Config: getR2Config() },
-    );
+    return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+      ...args,
+      r2Config: getR2Config(),
+    });
   },
 });
 
@@ -117,10 +114,10 @@ export const startUploadInternal = internalMutation({
     r2Key: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.assetManager.assetManager.startUpload,
-      { ...args, r2Config: getR2Config() },
-    );
+    return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+      ...args,
+      r2Config: getR2Config(),
+    });
   },
 });
 
@@ -144,30 +141,19 @@ export const finishUpload = mutation({
     folderPath: v.optional(v.string()),
     basename: v.optional(v.string()),
   },
-  returns: v.object({
-    assetId: v.string(),
-    versionId: v.string(),
-    version: v.number(),
-  }),
+  returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
     await requireAuth(ctx);
-    const result = await ctx.runMutation(
-      components.assetManager.assetManager.finishUpload,
-      {
-        intentId: args.intentId as any,
-        uploadResponse: args.uploadResponse,
-        r2Config: getR2Config(),
-        size: args.size,
-        contentType: args.contentType,
-      },
-    );
+    const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+      intentId: args.intentId as any,
+      uploadResponse: args.uploadResponse,
+      r2Config: getR2Config(),
+      size: args.size,
+      contentType: args.contentType,
+    });
 
     // Schedule music metadata extraction for MP3 files in music/ folder
-    if (
-      args.contentType === "audio/mpeg" &&
-      args.folderPath?.endsWith("/music") &&
-      args.basename
-    ) {
+    if (args.contentType === "audio/mpeg" && args.folderPath?.endsWith("/music") && args.basename) {
       const bookPath = args.folderPath.replace(/\/music$/, "");
       await ctx.scheduler.runAfter(0, internal.musicMetadata.extractFromFile, {
         bookPath,
@@ -182,18 +168,23 @@ export const finishUpload = mutation({
       const isImage = args.contentType?.startsWith("image/");
 
       if (isVideo) {
-        await ctx.scheduler.runAfter(
-          0,
-          internal.backgroundMetadata.generateVideoPreview,
-          { bookPath, fileBasename: args.basename },
-        );
+        await ctx.scheduler.runAfter(0, internal.backgroundMetadata.generateVideoPreview, {
+          bookPath,
+          fileBasename: args.basename,
+        });
       } else if (isImage) {
-        await ctx.scheduler.runAfter(
-          0,
-          internal.backgroundMetadata.generateImagePreview,
-          { bookPath, fileBasename: args.basename },
-        );
+        await ctx.scheduler.runAfter(0, internal.backgroundMetadata.generateImagePreview, {
+          bookPath,
+          fileBasename: args.basename,
+        });
       }
+    }
+
+    // Schedule avatar.webp generation when avatar-large.* is uploaded to a character folder
+    if (args.folderPath?.includes("/characters/") && args.basename?.startsWith("avatar-large.")) {
+      await ctx.scheduler.runAfter(0, internal.avatarGeneration.processUploadedAvatarLarge, {
+        characterPath: args.folderPath,
+      });
     }
 
     return result;
@@ -208,22 +199,15 @@ export const finishUploadInternal = internalMutation({
     size: v.optional(v.number()),
     contentType: v.optional(v.string()),
   },
-  returns: v.object({
-    assetId: v.string(),
-    versionId: v.string(),
-    version: v.number(),
-  }),
+  returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.assetManager.assetManager.finishUpload,
-      {
-        intentId: args.intentId as any,
-        uploadResponse: args.uploadResponse,
-        r2Config: getR2Config(),
-        size: args.size,
-        contentType: args.contentType,
-      },
-    );
+    return await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+      intentId: args.intentId as any,
+      uploadResponse: args.uploadResponse,
+      r2Config: getR2Config(),
+      size: args.size,
+      contentType: args.contentType,
+    });
   },
 });
 
@@ -248,13 +232,10 @@ export const getSignedUrl = action({
   },
   returns: v.union(v.null(), v.string()),
   handler: async (ctx, { versionId, expiresIn }) => {
-    return await ctx.runAction(
-      components.assetManager.signedUrl.getSignedUrl,
-      {
-        versionId: versionId as any,
-        expiresIn,
-        r2Config: getR2Config(),
-      },
-    );
+    return await ctx.runAction(components.assetManager.signedUrl.getSignedUrl, {
+      versionId: versionId as any,
+      expiresIn,
+      r2Config: getR2Config(),
+    });
   },
 });

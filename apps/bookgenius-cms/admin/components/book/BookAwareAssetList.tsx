@@ -35,6 +35,7 @@ interface BookAwareAssetListProps {
   onCreateAsset: () => void;
   onCreateFolder: () => void;
   onShowSnippet: () => void;
+  optimisticAvatars?: Record<string, string>;
 }
 
 export function BookAwareAssetList(props: BookAwareAssetListProps) {
@@ -76,11 +77,16 @@ export function BookAwareAssetList(props: BookAwareAssetListProps) {
       return <AssetList {...props} />;
 
     case "character":
-      // Individual character folder - show character detail with asset slots
       if (bookInfo) {
-        // Get parent characters-container path for back navigation
         const charactersPath = `${bookInfo.bookPath}/characters`;
-        return <CharacterDetailView characterPath={folderPath} onBack={() => onFolderSelect(charactersPath)} onUploadAsset={props.onUploadAsset} />;
+        return (
+          <CharacterDetailView
+            characterPath={folderPath}
+            onBack={() => onFolderSelect(charactersPath)}
+            onUploadAsset={props.onUploadAsset}
+            optimisticAvatarUrl={props.optimisticAvatars?.[folderPath]}
+          />
+        );
       }
       return <AssetList {...props} />;
 

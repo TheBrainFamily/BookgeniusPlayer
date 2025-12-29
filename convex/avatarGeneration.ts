@@ -233,17 +233,16 @@ export const selectAvatar = internalAction({
       });
       log("finished avatar-large upload");
 
-      const largeUrlInfo = await ctx.runQuery(
-        components.assetManager.assetFsHttp.getVersionPreviewUrl,
-        {
-          versionId: (
-            await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-              folderPath: characterPath,
-              basename: "avatar-large.png",
-            })
-          )[0]?._id as any,
-        },
+      const largeVersions = await ctx.runQuery(
+        components.assetManager.assetManager.getAssetVersions,
+        { folderPath: characterPath, basename: "avatar-large.png" },
       );
+      const latestLargeVersion = largeVersions.at(-1);
+      const largeUrlInfo = latestLargeVersion
+        ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
+            versionId: latestLargeVersion._id as any,
+          })
+        : null;
 
       if (!largeUrlInfo?.url) {
         return { success: false, error: "Failed to get avatar-large URL" };
@@ -367,10 +366,12 @@ export const processUploadedAvatarLarge = internalAction({
         return { success: false, error: "avatar-large.png not found after max retries" };
       }
 
-      const largeUrlInfo = await ctx.runQuery(
-        components.assetManager.assetFsHttp.getVersionPreviewUrl,
-        { versionId: versions[0]?._id as any },
-      );
+      const latestVersion = versions.at(-1);
+      const largeUrlInfo = latestVersion
+        ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
+            versionId: latestVersion._id as any,
+          })
+        : null;
 
       if (!largeUrlInfo?.url) {
         return { success: false, error: "Failed to get avatar-large URL" };

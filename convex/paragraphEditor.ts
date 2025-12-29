@@ -1,23 +1,46 @@
 import { v } from "convex/values";
 import { action, ActionCtx } from "./_generated/server";
 import { components, internal } from "./_generated/api";
-import { DOMParser, XMLSerializer, Document as XmlDocument, Element as XmlElement, Node as XmlNode } from "@xmldom/xmldom";
+import {
+  DOMParser,
+  XMLSerializer,
+  Document as XmlDocument,
+  Element as XmlElement,
+  Node as XmlNode,
+} from "@xmldom/xmldom";
 
 function slugify(name: string): string {
   const polishMap: { [key: string]: string } = {
-    ą: "a", ć: "c", ę: "e", ł: "l", ń: "n", ó: "o", ś: "s", ź: "z", ż: "z",
-    Ą: "A", Ć: "C", Ę: "E", Ł: "L", Ń: "N", Ó: "O", Ś: "S", Ź: "Z", Ż: "Z",
+    ą: "a",
+    ć: "c",
+    ę: "e",
+    ł: "l",
+    ń: "n",
+    ó: "o",
+    ś: "s",
+    ź: "z",
+    ż: "z",
+    Ą: "a",
+    Ć: "c",
+    Ę: "e",
+    Ł: "l",
+    Ń: "n",
+    Ó: "o",
+    Ś: "s",
+    Ź: "z",
+    Ż: "z",
   };
-  let tagName = name
+  let slug = name
+    .toLowerCase()
     .replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (char) => polishMap[char] || char)
-    .replace(/[,()]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
-    .trim();
-  tagName = tagName.replace(/[^a-zA-Z0-9\-_.:]/g, "");
-  if (!/^[a-zA-Z_]/.test(tagName)) {
-    tagName = "_" + tagName;
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  if (!/^[a-z]/.test(slug)) {
+    slug = "c-" + slug;
   }
-  return tagName || "Character";
+  return slug || "character";
 }
 
 type ChapterExtra = { chapterNumber?: number; title?: string };
@@ -25,10 +48,10 @@ type ChapterExtra = { chapterNumber?: number; title?: string };
 function findParagraphByIndex(doc: XmlDocument, index: number): XmlElement | null {
   const sections = doc.getElementsByTagName("section");
   if (sections.length === 0) return null;
-  
+
   const section = sections[0];
   let elementIndex = 0;
-  
+
   for (let i = 0; i < section.childNodes.length; i++) {
     const node = section.childNodes[i];
     if (node.nodeType === 1) {
@@ -52,9 +75,13 @@ function findSpanByDataC(parent: XmlElement, slug: string, text: string): XmlEle
   return null;
 }
 
-function findTextNode(parent: XmlElement, searchText: string, occurrenceIndex: number): { node: XmlNode; offset: number } | null {
+function findTextNode(
+  parent: XmlElement,
+  searchText: string,
+  occurrenceIndex: number,
+): { node: XmlNode; offset: number } | null {
   let currentOccurrence = 0;
-  
+
   function walk(node: XmlNode): { node: XmlNode; offset: number } | null {
     if (node.nodeType === 3) {
       const text = node.nodeValue || "";
@@ -76,7 +103,7 @@ function findTextNode(parent: XmlElement, searchText: string, occurrenceIndex: n
     }
     return null;
   }
-  
+
   return walk(parent);
 }
 
@@ -145,7 +172,13 @@ export const setParagraphSpeaker = action({
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
-    console.log("[setParagraphSpeaker] path:", chaptersPath, chapterBasename, "index:", paragraphIndex);
+    console.log(
+      "[setParagraphSpeaker] path:",
+      chaptersPath,
+      chapterBasename,
+      "index:",
+      paragraphIndex,
+    );
 
     const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
       folderPath: chaptersPath,
@@ -178,10 +211,15 @@ export const setParagraphSpeaker = action({
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlResult.content, "text/xml");
-    
+
     const paragraph = findParagraphByIndex(doc, paragraphIndex);
-    console.log("[setParagraphSpeaker] found paragraph:", !!paragraph, "tagName:", paragraph?.tagName);
-    
+    console.log(
+      "[setParagraphSpeaker] found paragraph:",
+      !!paragraph,
+      "tagName:",
+      paragraph?.tagName,
+    );
+
     if (!paragraph) {
       throw new Error(`Paragraph at index ${paragraphIndex} not found`);
     }
@@ -198,7 +236,7 @@ export const setParagraphSpeaker = action({
 
     const serializer = new XMLSerializer();
     const modifiedHtml = serializer.serializeToString(doc);
-    
+
     console.log("[setParagraphSpeaker] modified length:", modifiedHtml.length);
 
     const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
@@ -217,7 +255,7 @@ export const setParagraphSpeaker = action({
     return {
       success: true,
       versionId: uploadResult.versionId,
-      action: characterSlug ? "set" as const : "removed" as const,
+      action: characterSlug ? ("set" as const) : ("removed" as const),
       characterSlug: characterSlug || null,
     };
   },
@@ -238,7 +276,17 @@ export const modifyCharacterTag = action({
     action: v.union(v.literal("changed"), v.literal("removed")),
     newCharacterSlug: v.union(v.string(), v.null()),
   }),
-  handler: async (ctx, { bookPath, chapterNumber, paragraphIndex, currentCharacterSlug, textContent, newCharacterSlug }) => {
+  handler: async (
+    ctx,
+    {
+      bookPath,
+      chapterNumber,
+      paragraphIndex,
+      currentCharacterSlug,
+      textContent,
+      newCharacterSlug,
+    },
+  ) => {
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
@@ -271,7 +319,7 @@ export const modifyCharacterTag = action({
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlResult.content, "text/xml");
-    
+
     const paragraph = findParagraphByIndex(doc, paragraphIndex);
     if (!paragraph) {
       throw new Error(`Paragraph at index ${paragraphIndex} not found`);
@@ -313,7 +361,7 @@ export const modifyCharacterTag = action({
     return {
       success: true,
       versionId: uploadResult.versionId,
-      action: newCharacterSlug ? "changed" as const : "removed" as const,
+      action: newCharacterSlug ? ("changed" as const) : ("removed" as const),
       newCharacterSlug: newCharacterSlug || null,
     };
   },
@@ -329,11 +377,21 @@ export const wrapTextWithCharacter = action({
     characterSlug: v.string(),
   },
   returns: v.object({ success: v.boolean(), versionId: v.string(), characterSlug: v.string() }),
-  handler: async (ctx, { bookPath, chapterNumber, paragraphIndex, textToWrap, occurrenceIndex, characterSlug }) => {
+  handler: async (
+    ctx,
+    { bookPath, chapterNumber, paragraphIndex, textToWrap, occurrenceIndex, characterSlug },
+  ) => {
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
-    console.log("[wrapText] looking for:", textToWrap, "occurrence:", occurrenceIndex, "in paragraph:", paragraphIndex);
+    console.log(
+      "[wrapText] looking for:",
+      textToWrap,
+      "occurrence:",
+      occurrenceIndex,
+      "in paragraph:",
+      paragraphIndex,
+    );
 
     const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
       folderPath: chaptersPath,
@@ -364,7 +422,7 @@ export const wrapTextWithCharacter = action({
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlResult.content, "text/xml");
-    
+
     const paragraph = findParagraphByIndex(doc, paragraphIndex);
     if (!paragraph) {
       throw new Error(`Paragraph at index ${paragraphIndex} not found`);
@@ -392,8 +450,11 @@ export const wrapTextWithCharacter = action({
 
     const serializer = new XMLSerializer();
     const modifiedHtml = serializer.serializeToString(doc);
-    
-    console.log("[wrapText] modified contains data-c?:", modifiedHtml.includes(`data-c="${characterSlug}"`));
+
+    console.log(
+      "[wrapText] modified contains data-c?:",
+      modifiedHtml.includes(`data-c="${characterSlug}"`),
+    );
 
     const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
     const label = `Wrapped text with character: ${characterSlug}`;

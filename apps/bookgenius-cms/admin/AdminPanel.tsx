@@ -55,6 +55,8 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
   const [uploadBasename, setUploadBasename] = useState<string | undefined>();
   const [snippetOpen, setSnippetOpen] = useState(false);
 
+  const [optimisticAvatars, setOptimisticAvatars] = useState<Record<string, string>>({});
+
   // Panel state for responsive sidebars
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [leftSizeBeforeCollapse, setLeftSizeBeforeCollapse] = useState<number | null>(null);
@@ -93,6 +95,13 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
     setUploadBasename(basename);
     setUploadOpen(true);
   };
+
+  const handleUploadComplete = useCallback((uploadFolderPath: string, basename: string, file: File) => {
+    if (basename.startsWith("avatar-large.")) {
+      const objectUrl = URL.createObjectURL(file);
+      setOptimisticAvatars((prev) => ({ ...prev, [uploadFolderPath]: objectUrl }));
+    }
+  }, []);
 
   const handleCloseDetail = () => {
     onAssetSelect(null);
@@ -189,6 +198,7 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
                           }}
                           onCreateFolder={() => handleCreateFolder(folderPath)}
                           onShowSnippet={() => setSnippetOpen(true)}
+                          optimisticAvatars={optimisticAvatars}
                         />
                       </Suspense>
                     </div>
@@ -223,7 +233,7 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
         {/* Dialogs */}
         <CreateFolderDialog open={createFolderOpen} onOpenChange={setCreateFolderOpen} parentPath={createFolderParentPath} />
 
-        <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} folderPath={folderPath} existingBasename={uploadBasename} />
+        <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} folderPath={folderPath} existingBasename={uploadBasename} onUploadComplete={handleUploadComplete} />
 
         <CodeSnippetDialog open={snippetOpen} onOpenChange={setSnippetOpen} folderPath={folderPath} />
 
