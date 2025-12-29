@@ -127,7 +127,7 @@ const BackgroundOptionsModal: React.FC<BackgroundOptionsModalProps> = ({ bg, bgK
           </div>
         )}
 
-        <div className="flex gap-6 items-end">
+        <div className="flex gap-6 items-center">
           <div className="flex-1">
             <label className="text-xs text-zinc-400 mb-2 block">Not happy? Modify the prompt and regenerate:</label>
             <textarea

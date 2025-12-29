@@ -70,7 +70,7 @@ const BackgroundEditModal: React.FC = () => {
             )}
           </div>
 
-          <div className="flex gap-6 items-end">
+          <div className="flex gap-6 items-center">
             <div className="flex-1">
               <label className="text-xs text-zinc-400 mb-2 block">Describe how you want to modify this background:</label>
               <textarea
