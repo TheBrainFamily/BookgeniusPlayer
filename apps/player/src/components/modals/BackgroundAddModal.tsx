@@ -4,11 +4,13 @@ import { api } from "@convex/_generated/api";
 
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useBackgroundAddModal } from "@player/stores/modals/backgroundAddModal.store";
+import { useBackgroundGenerationStore, createBackgroundKey } from "@player/stores/backgroundGeneration.store";
 import ModalUI from "./ModalUI";
 
 const BackgroundAddModal: React.FC = () => {
   const { book } = useBookConvex();
   const { isOpen, chapter, paragraph, closeModal } = useBackgroundAddModal();
+  const { startGeneration } = useBackgroundGenerationStore();
 
   const startBackgroundGeneration = useAction(api.backgroundEditing.startBackgroundGeneration);
 
@@ -23,17 +25,16 @@ const BackgroundAddModal: React.FC = () => {
       return;
     }
 
-    console.log("[BackgroundAddModal] Starting background generation", { bookPath: book.path, chapter, paragraph, prompt: prompt.trim() });
-
     setIsSubmitting(true);
+
+    const key = createBackgroundKey(chapter, paragraph);
+    startGeneration(key, { chapter, paragraph, prompt: prompt.trim(), type: "add" });
+    closeModal();
 
     try {
       await startBackgroundGeneration({ bookPath: book.path, chapter, paragraph, prompt: prompt.trim() });
-      console.log("[BackgroundAddModal] Background generation action scheduled successfully");
-      closeModal();
     } catch (err) {
       console.error("[BackgroundAddModal] Failed to start background generation:", err);
-      setIsSubmitting(false);
     }
   };
 

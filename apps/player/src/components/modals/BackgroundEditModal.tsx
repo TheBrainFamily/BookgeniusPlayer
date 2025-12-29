@@ -5,18 +5,20 @@ import { Id } from "@convex/_generated/dataModel";
 
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useBackgroundEditModal } from "@player/stores/modals/backgroundEditModal.store";
+import { useBackgroundGenerationStore, createBackgroundKey } from "@player/stores/backgroundGeneration.store";
 import ModalUI from "./ModalUI";
 
 const BackgroundEditModal: React.FC = () => {
   const { book } = useBookConvex();
-  const { isOpen, cueId, fileBasename, currentBackgroundUrl, closeModal } = useBackgroundEditModal();
+  const { isOpen, cueId, fileBasename, chapter, paragraph, currentBackgroundUrl, closeModal } = useBackgroundEditModal();
+  const { startGeneration } = useBackgroundGenerationStore();
 
   const startBackgroundEdit = useAction(api.backgroundEditing.startBackgroundEdit);
 
   const [instructions, setInstructions] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!isOpen || !cueId || !fileBasename) return null;
+  if (!isOpen || !cueId || !fileBasename || chapter === null || paragraph === null) return null;
 
   const handleSubmit = async () => {
     if (!book?.path || !instructions.trim()) {
@@ -24,14 +26,14 @@ const BackgroundEditModal: React.FC = () => {
       return;
     }
 
-    console.log("[BackgroundEditModal] Starting background edit", { bookPath: book.path, cueId, fileBasename, instructions: instructions.trim() });
-
     setIsSubmitting(true);
+
+    const key = createBackgroundKey(chapter, paragraph);
+    startGeneration(key, { chapter, paragraph, prompt: instructions.trim(), type: "edit" });
     closeModal();
 
     try {
       await startBackgroundEdit({ bookPath: book.path, cueId: cueId as Id<"backgroundCues">, fileBasename, instructions: instructions.trim() });
-      console.log("[BackgroundEditModal] Background edit action scheduled successfully");
     } catch (err) {
       console.error("[BackgroundEditModal] Failed to start background edit:", err);
     }

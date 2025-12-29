@@ -49,6 +49,7 @@ import { ScrollIndicator } from "@player/components/ScrollIndicator";
 import { RightNotesPanel } from "./components/RightNotesPanel";
 import { DebugLocationOverlay } from "./components/DebugLocationOverlay";
 import { AvatarGenerationBadge } from "./components/AvatarGenerationBadge";
+import { BackgroundGenerationBadge } from "./components/BackgroundGenerationBadge";
 import { EditorToolbar } from "./components/EditorToolbar";
 import { useDraftMode } from "@player/context/DraftModeContext";
 import { useInlineAvatarSync } from "@player/hooks/useInlineAvatarSync";
@@ -275,6 +276,7 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
                       <ModalRenderers />
                       <EditorToolbar />
                       <AvatarGenerationBadge />
+                      <BackgroundGenerationBadge />
                       <ContentShiftWrapper />
                     </BookContentWrapper>
                     <DebugLocationOverlay />
