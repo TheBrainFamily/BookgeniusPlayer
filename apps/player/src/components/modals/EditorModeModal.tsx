@@ -5,6 +5,7 @@ import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store"
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
 import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
+import { useAvatarEditModal } from "@player/stores/modals/avatarEditModal.store";
 
 const capitalizeWords = (str: string): string => {
   return str
@@ -40,6 +41,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const currentCharacterForSort = modalType === "edit-character-tag" ? currentCharacterSlug : currentSpeaker;
 
   const { optimisticAvatars } = useAvatarGenerationStore();
+  const { openModal: openAvatarEditModal } = useAvatarEditModal();
 
   const sortedCharacters = useMemo<CharacterWithStats[]>(() => {
     const withStats = charactersData.map((charData) => {
@@ -100,6 +102,25 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const handleCharacterClick = (slug: string) => {
     setSelectedCharacter(slug);
     setError("");
+  };
+
+  const handleChangeAvatar = () => {
+    if (!selectedCharacter) return;
+
+    const charData = charactersData.find((c) => c.slug.toLowerCase() === selectedCharacter.toLowerCase());
+    const bundle = characters.find((c) => c.slug.toLowerCase() === selectedCharacter.toLowerCase());
+
+    if (!charData) return;
+
+    openAvatarEditModal(
+      {
+        characterSlug: selectedCharacter,
+        characterDisplayName: charData.characterName,
+        currentAvatarUrl: bundle?.avatar?.url,
+        aiPrompt: bundle?.extra?.aiPrompt as string | undefined,
+      },
+      true,
+    );
   };
 
   const handleCreateAndUse = async () => {
@@ -299,6 +320,16 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                 className="w-full bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/30 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
               >
                 {isSubmitting ? "Removing..." : "Remove Current Speaker"}
+              </button>
+            )}
+
+            {selectedCharacter && (
+              <button
+                onClick={handleChangeAvatar}
+                disabled={isSubmitting || isCreating}
+                className="w-full bg-zinc-700/50 text-zinc-300 border border-zinc-600 hover:bg-zinc-600/50 h-10 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors text-sm"
+              >
+                Change Character's Avatar
               </button>
             )}
           </div>

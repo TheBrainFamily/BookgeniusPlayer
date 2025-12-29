@@ -11,6 +11,7 @@
 import type * as admin_regenerateAvatarWebp from "../admin/regenerateAvatarWebp.js";
 import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
+import type * as avatarEditing from "../avatarEditing.js";
 import type * as avatarGeneration from "../avatarGeneration.js";
 import type * as backgroundCues from "../backgroundCues.js";
 import type * as backgroundMetadata from "../backgroundMetadata.js";
@@ -49,6 +50,7 @@ declare const fullApi: ApiFromModules<{
   "admin/regenerateAvatarWebp": typeof admin_regenerateAvatarWebp;
   auth: typeof auth;
   authHelpers: typeof authHelpers;
+  avatarEditing: typeof avatarEditing;
   avatarGeneration: typeof avatarGeneration;
   backgroundCues: typeof backgroundCues;
   backgroundMetadata: typeof backgroundMetadata;
