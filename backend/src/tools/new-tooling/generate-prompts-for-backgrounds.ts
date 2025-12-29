@@ -52,7 +52,14 @@ export const generateImageWithOpenAI = async (
   const openai = new OpenAI();
   let result: (OpenAI.Images.ImagesResponse & { _request_id?: string | null }) | undefined;
   try {
-    result = await openai.images.generate({ model: "gpt-image-1", prompt: finalPrompt, quality, size });
+    result = await openai.images.generate({
+      model: "gpt-image-1.5",
+      prompt: finalPrompt,
+      quality,
+      size,
+      moderation: "low",
+      output_format: "webp",
+    });
   } catch (e) {
     if (attempt < 3) {
       console.log(`Failed to generate image after ${attempt} attempts`);
@@ -77,7 +84,7 @@ export const generateImageWithOpenAI = async (
   }
   const image_base64 = result.data[0].b64_json;
   const image_bytes = Buffer.from(image_base64, "base64");
-  const fileName = `backgrounds/openai-${quality}-${chapter}-${startingParagraph}.png`;
+  const fileName = `backgrounds/openai-${quality}-${chapter}-${startingParagraph}.webp`;
   const filePath = writeBookFile(fileName, image_bytes, FILE_TYPE.PERMANENT);
   logger.info(`Image successfully saved to: ${filePath}`);
 };

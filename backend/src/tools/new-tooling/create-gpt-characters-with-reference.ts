@@ -2,7 +2,7 @@ import Replicate from "replicate";
 import dotenv from "dotenv";
 import fs from "fs";
 
-import {generateTagName} from "../../helpers/generateTagName";
+import { generateTagName } from "../../helpers/generateTagName";
 
 dotenv.config();
 
@@ -126,7 +126,7 @@ const doIt = async () => {
         output_compression: 90,
       };
       try {
-        const output = (await replicate.run("openai/gpt-image-1", { input })) as ReplicateOutput;
+        const output = (await replicate.run("openai/gpt-image-1.5", { input })) as ReplicateOutput;
 
         // To access the file URL:
         console.log(output[0].url()); //=> "http://example.com"
@@ -163,7 +163,7 @@ const doIt = async () => {
       };
 
       try {
-        const nextOutput = (await replicate.run("openai/gpt-image-1", { input: nextInput })) as ReplicateOutput;
+        const nextOutput = (await replicate.run("openai/gpt-image-1.5", { input: nextInput })) as ReplicateOutput;
 
         // To access the file URL:
         console.log(nextOutput[0].url()); //=> "http://example.com"

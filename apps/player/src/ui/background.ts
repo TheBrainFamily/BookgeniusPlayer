@@ -30,6 +30,56 @@ let sessionToken = 0; // increments to invalidate stale closures
 
 // ---- color helpers ---------------------------------------------------------
 
+/**
+ * Detects if an image is predominantly dark by sampling pixels.
+ * Returns "#000000" for dark images, "#ffffff" for light images.
+ * Samples corners + center for a quick luminance estimate.
+ */
+function detectImageBrightness(imgSrc: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        const size = 100; // downsample for speed
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) {
+          resolve("#ffffff");
+          return;
+        }
+        ctx.drawImage(img, 0, 0, size, size);
+
+        // Sample 5 points: corners + center
+        const samplePoints = [
+          [10, 10],
+          [size - 10, 10],
+          [10, size - 10],
+          [size - 10, size - 10],
+          [size / 2, size / 2],
+        ];
+
+        let totalLuminance = 0;
+        for (const [x, y] of samplePoints) {
+          const pixel = ctx.getImageData(x, y, 1, 1).data;
+          // Simple perceived luminance: 0.299*R + 0.587*G + 0.114*B
+          const luminance = (0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2]) / 255;
+          totalLuminance += luminance;
+        }
+
+        const avgLuminance = totalLuminance / samplePoints.length;
+        resolve(avgLuminance < 0.5 ? "#000000" : "#ffffff");
+      } catch {
+        resolve("#ffffff"); // fallback to light on any error
+      }
+    };
+    img.onerror = () => resolve("#ffffff");
+    img.src = imgSrc;
+  });
+}
+
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const cleaned = hex.replace(/^#/, "");
 
@@ -338,9 +388,17 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
             clearTimeout(colorTimeoutId);
             colorTimeoutId = null;
           }
-          colorTimeoutId = window.setTimeout(() => {
+          colorTimeoutId = window.setTimeout(async () => {
             if (signal.aborted || myToken !== sessionToken) return;
-            applyScopedColors({ backgroundColor: found.backgroundColor, textColor: found.textColor });
+
+            let bgColor = found.backgroundColor;
+            if (!bgColor || bgColor.trim().length === 0) {
+              console.time("time to calculate background color");
+              bgColor = newType === "video" ? "#ffffff" : await detectImageBrightness(newSrc);
+              console.timeEnd("time to calculate background color");
+            }
+
+            applyScopedColors({ backgroundColor: bgColor, textColor: found.textColor });
           }, COLOR_DELAY_MS);
 
           fadeTimeoutId = window.setTimeout(() => {
