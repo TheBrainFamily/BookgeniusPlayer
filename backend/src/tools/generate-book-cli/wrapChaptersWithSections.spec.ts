@@ -1,3 +1,5 @@
+import { describe, it, expect } from "vitest";
+
 import { wrapChaptersWithSections } from "./wrapChaptersWithSections";
 const exampleToWrap = `
 <FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:wl="http://wolnelektury.pl/functions" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:l="http://www.w3.org/1999/xlink">

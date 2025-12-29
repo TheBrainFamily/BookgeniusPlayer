@@ -103,7 +103,7 @@ export const ensureBookStructure = mutation({
     await createFolder("books");
     await createFolder(bookPath, bookExtra);
     await createFolder(`${bookPath}/chapters`);
-    await createFolder(`${bookPath}/chapters-html`);
+    await createFolder(`${bookPath}/chapters-source`);
     await createFolder(`${bookPath}/characters`);
     await createFolder(`${bookPath}/characters-data`);
     await createFolder(`${bookPath}/backgrounds`);

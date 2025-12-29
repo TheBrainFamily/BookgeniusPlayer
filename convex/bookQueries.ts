@@ -222,54 +222,6 @@ export const listChapters = query({
 // =============================================================================
 
 /**
- * List compiled chapter HTML for a book, sorted by chapter number.
- */
-export const listChapterHtml = query({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const htmlPath = `${bookPath}/chapters-html`;
-
-    const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: htmlPath },
-    );
-
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: htmlPath },
-    );
-
-    const chapters = files.map((file) => {
-      const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as
-        | {
-            chapterNumber?: number;
-            title?: string;
-            sourceVersionId?: string;
-            paragraphCount?: number;
-          }
-        | undefined;
-
-      return {
-        path: `${htmlPath}/${file.basename}`,
-        basename: file.basename,
-        url: file.url,
-        versionId: file.versionId as string,
-        contentType: file.contentType,
-        size: file.size,
-        publishedAt: file.publishedAt,
-        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
-        title: extra?.title,
-        sourceVersionId: extra?.sourceVersionId,
-        paragraphCount: extra?.paragraphCount,
-      };
-    });
-
-    return chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
-  },
-});
-
-/**
  * List per-chapter character data fragments for a book.
  */
 export const listCharacterDataFragments = query({

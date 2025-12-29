@@ -1,3 +1,4 @@
+import { describe, test, expect } from "vitest";
 import { compareXmlTextContent, restoreOriginalText } from "./compare-chapters-xml";
 
 // const restoreOriginalText = (original: string, changed: string, tagNames: string[]) => {

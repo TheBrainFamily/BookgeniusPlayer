@@ -2,7 +2,8 @@ import { callClaude, callGeminiWrapper } from "../callClaude";
 import { getParagraphsFromChapter } from "./createParagraphsWithPageNumbers";
 import { logger } from "../logger";
 import fs from "fs";
-import { compareXmlTextContent, restoreOriginalText } from "./new-tooling/compare-chapters-xml";
+import { compareXmlTextContent } from "./new-tooling/compare-chapters-xml";
+import { restoreOriginalTextInHtml } from "./new-tooling/restore-text-in-html";
 import path from "path";
 import { NewReferenceCardsResponse } from "../types";
 import { writeBookFile } from "../helpers/writeBookFile";
@@ -27,15 +28,16 @@ import { callGrok } from "../callGrok";
 /**
  * Build the XML characters string for the prompt
  */
-function buildXmlCharacters(charactersForChapter: { name: string; summary: string }[]): string {
-  return charactersForChapter
-    .map((entity) => {
-      const tagName = generateTagName(entity.name.trim(), true);
-      const displayName = entity.name.trim().replace(/"/g, "&quot;");
-      const summaryText = entity.summary.trim().replace(/"/g, "&quot;");
-      return `<${tagName} display="${displayName}" summary="${summaryText}" />`;
-    })
-    .join("\n");
+function buildJsonCharacters(charactersForChapter: { name: string; summary: string }[]): string {
+  return JSON.stringify(
+    charactersForChapter.map((entity) => ({
+      id: generateTagName(entity.name.trim()),
+      name: entity.name.trim(),
+      description: entity.summary.trim(),
+    })),
+    null,
+    2,
+  );
 }
 
 /**
@@ -44,14 +46,14 @@ function buildXmlCharacters(charactersForChapter: { name: string; summary: strin
 function buildChunkedPrompt(
   paragraphs: Paragraph[],
   chapterId: number,
-  xmlCharacters: string,
+  jsonCharacters: string,
   previousChunkOutput: string | null,
 ): string {
-  const prompt = fs.readFileSync(path.join(__dirname, "RewriteParagraphsPromptBookChunked.md"), "utf8");
+  const prompt = fs.readFileSync(path.join(__dirname, "NewRewriteParagraphsPromptBookChunked.md"), "utf8");
 
-  const paragraphsXml = `<Chapter id="${chapterId}">${paragraphs
+  const paragraphsXml = `${paragraphs
     .map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`)
-    .join("\n")}</Chapter>`;
+    .join("\n")}`;
 
   let previousContextSection = "";
   let outputOnlyInstruction = "";
@@ -66,16 +68,16 @@ The following is the PREVIOUS section of this chapter. Use it ONLY as context to
 ${previousChunkOutput}
 </PreviousContext>
 
-**IMPORTANT:** Your output should ONLY contain the paragraphs from the "Paragraphs to Process" section below. Do NOT include any paragraphs from the PreviousContext section.
+**IMPORTANT:** Your output should ONLY contain the paragraphs from the "### Text Content" section below. Do NOT include any paragraphs from the PreviousContext section.
 `;
     outputOnlyInstruction = `
-**OUTPUT ONLY THE "Paragraphs to Process" SECTION. Do NOT include the PreviousContext in your output.**
+**OUTPUT ONLY THE "### Text Content" SECTION. Do NOT include the PreviousContext in your output.**
 `;
   }
 
   return prompt
-    .replace("{{paragraphs}}", paragraphsXml)
-    .replace("{{characters}}", xmlCharacters)
+    .replace("{{paragraphs_html}}", paragraphsXml)
+    .replace("{{characters_json}}", jsonCharacters)
     .replace("{{previousContextSection}}", previousContextSection)
     .replace("{{outputOnlyInstruction}}", outputOnlyInstruction);
 }
@@ -87,9 +89,8 @@ async function processChunk(
   chapter: number,
   chunkIndex: number,
   chunk: ChapterChunk,
-  xmlCharacters: string,
+  jsonCharacters: string,
   previousChunkOutput: string | null,
-  allCharactersNames: string[],
   attempt: number = 0,
 ): Promise<string> {
   const chunkFileName = `rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`;
@@ -108,10 +109,10 @@ async function processChunk(
     throw new Error(`Too many attempts for chapter ${chapter} chunk ${chunkIndex}`);
   }
 
-  const compiledPrompt = buildChunkedPrompt(chunk.paragraphs, chapter, xmlCharacters, previousChunkOutput);
+  const compiledPrompt = buildChunkedPrompt(chunk.paragraphs, chapter, jsonCharacters, previousChunkOutput);
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-chunk-${chunkIndex}.md`, compiledPrompt);
 
-  const llmProviders = [callClaude, callGeminiWrapper, callGpt5, callGrok];
+  const llmProviders = [callGeminiWrapper, callClaude, callGpt5, callGrok];
 
   try {
     const selectedProvider = llmProviders[attempt % llmProviders.length];
@@ -125,9 +126,9 @@ async function processChunk(
 
     const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
 
-    let restored;
+    let restored = clearedResponse;
     try {
-      restored = restoreOriginalText(originalChunkXml, clearedResponse, allCharactersNames);
+      restored = restoreOriginalTextInHtml(originalChunkXml, clearedResponse);
     } catch (e) {
       logger.error(`Error restoring original text for chapter ${chapter} chunk ${chunkIndex}`, e);
     }
@@ -143,27 +144,11 @@ async function processChunk(
         clearedResponse,
       );
       logger.info(`❌ Validation failed for chapter ${chapter} chunk ${chunkIndex}, retrying...`);
-      return processChunk(
-        chapter,
-        chunkIndex,
-        chunk,
-        xmlCharacters,
-        previousChunkOutput,
-        allCharactersNames,
-        attempt + 1,
-      );
+      return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, attempt + 1);
     }
   } catch (e) {
     logger.error(`Error for chapter ${chapter} chunk ${chunkIndex}`, e);
-    return processChunk(
-      chapter,
-      chunkIndex,
-      chunk,
-      xmlCharacters,
-      previousChunkOutput,
-      allCharactersNames,
-      attempt + 1,
-    );
+    return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, attempt + 1);
   }
 }
 
@@ -175,15 +160,10 @@ async function processChunkedChapter(
   charactersForChapter: { name: string; summary: string }[],
   paragraphs: Paragraph[],
 ): Promise<string> {
-  const xmlCharacters = buildXmlCharacters(charactersForChapter);
+  const jsonCharacters = buildJsonCharacters(charactersForChapter);
   const chunks = chunkParagraphs(paragraphs);
 
   logger.info(`📦 Processing chapter ${chapter} in ${chunks.length} chunks`);
-
-  const allCharacters = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as {
-    characters: { name: string }[];
-  };
-  const allCharactersNames = allCharacters.characters.map((c) => generateTagName(c.name, true)) as string[];
 
   const processedChunks: string[] = [];
 
@@ -193,7 +173,7 @@ async function processChunkedChapter(
 
     logger.info(`📦 Processing chapter ${chapter} chunk ${i + 1}/${chunks.length} (${chunk.tokenCount} tokens)`);
 
-    const result = await processChunk(chapter, i, chunk, xmlCharacters, previousChunkOutput, allCharactersNames);
+    const result = await processChunk(chapter, i, chunk, jsonCharacters, previousChunkOutput);
     processedChunks.push(result);
   }
 
@@ -232,21 +212,23 @@ export const identifyAndRewriteParagraphs = async (
     logger.error("❌ Too many attempts for chapter " + chapter);
     throw new Error("Too many attempts for chapter " + chapter);
   }
-  const xmlCharacters = buildXmlCharacters(charactersForChapter);
+  const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
-  const paragraphsForPage = `<Chapter id="${chapter}">${paragraphsFromChapter
+  const paragraphsForPage = `${paragraphsFromChapter
     .map(
       (paragraph) => `<${paragraph.elementType}>${paragraph.text.trim().replace(/"/g, "'")}</${paragraph.elementType}>`,
     )
-    .join("\n")}</Chapter>`;
+    .join("\n")}`;
 
   let prompt = "";
   if (getBookForm() === "play") {
     prompt = fs.readFileSync(path.join(__dirname, "RewriteParagraphsPromptPlay.md"), "utf8");
   } else {
-    prompt = fs.readFileSync(path.join(__dirname, "RewriteParagraphsPromptBook.md"), "utf8");
+    prompt = fs.readFileSync(path.join(__dirname, "NewRewriteParagraphsPromptBook.md"), "utf8");
   }
-  const compiledPrompt = prompt.replace("{{paragraphs}}", paragraphsForPage).replace("{{characters}}", xmlCharacters);
+  const compiledPrompt = prompt
+    .replace("{{paragraphs_html}}", paragraphsForPage)
+    .replace("{{characters_json}}", jsonCharacters);
 
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-gemini2.md`, compiledPrompt);
 
@@ -265,18 +247,18 @@ export const identifyAndRewriteParagraphs = async (
       characters: { name: string }[];
     };
 
-    const allCharactersNames = allCharacters.characters.map((c) => generateTagName(c.name, true)) as string[];
-    let restored;
+    let restored = clearedResponse;
     try {
-      restored = restoreOriginalText(paragraphsForPage, clearedResponse, allCharactersNames);
+      restored = restoreOriginalTextInHtml(paragraphsForPage, clearedResponse);
     } catch (e) {
       logger.error("Error restoring original text for chapter " + chapter, e);
     }
 
     if (restored && compareXmlTextContent(paragraphsForPage, restored)) {
+      const finalRestored = `<section data-chapter="${chapter}">${restored}</section>`;
       logger.info("✅ No changes to paragraphs for chapter " + chapter);
-      writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`, restored);
-      writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, restored);
+      writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`, finalRestored);
+      writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, finalRestored);
     } else {
       writeBookFile(`broken-rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`, clearedResponse);
 
@@ -294,7 +276,7 @@ interface ChapterData {
   chapter: number;
   paragraphs: Paragraph[];
   chunks: ChapterChunk[];
-  xmlCharacters: string;
+  jsonCharacters: string;
   needsChunking: boolean;
 }
 
@@ -302,14 +284,8 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
   const bookSettings = getBookSettings();
   const isPlay = getBookForm() === "play";
 
-  // Get all character names for validation
-  const allCharacters = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as {
-    characters: { name: string }[];
-  };
-  const allCharactersNames = allCharacters.characters.map((c) => generateTagName(c.name, true)) as string[];
-
   const charactersForChapter = referenceCards.characters.map((c) => ({ name: c.name, summary: c.referenceCard }));
-  const xmlCharacters = buildXmlCharacters(charactersForChapter);
+  const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
   // Prepare all chapter data
   const chapters = Array.from(
@@ -321,14 +297,14 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
     // Check if already complete
     if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
       logger.info(`✅ Chapter ${chapter} already complete`);
-      return { chapter, paragraphs: [], chunks: [], xmlCharacters, needsChunking: false };
+      return { chapter, paragraphs: [], chunks: [], jsonCharacters, needsChunking: false };
     }
 
     const paragraphs = getParagraphsFromChapter(chapter);
     const shouldChunk = !isPlay && needsChunking(paragraphs);
     const chunks = shouldChunk ? chunkParagraphs(paragraphs) : [];
 
-    return { chapter, paragraphs, chunks, xmlCharacters, needsChunking: shouldChunk };
+    return { chapter, paragraphs, chunks, jsonCharacters, needsChunking: shouldChunk };
   });
 
   // Separate chapters that need chunking from those that don't
@@ -348,13 +324,13 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
 
     // Chunk 0 (no context)
     logger.info(`📦 Queueing chapter ${chapter} chunk 0/${chunks.length}`);
-    phase1Promises.push(processChunk(chapter, 0, chunks[0], xmlCharacters, null, allCharactersNames));
+    phase1Promises.push(processChunk(chapter, 0, chunks[0], jsonCharacters, null));
 
     // Chunk 1 (RAW chunk 0 text as context) - if exists
     if (chunks.length > 1) {
       const rawChunk0Context = buildChunkXml(chapter, chunks[0].paragraphs);
       logger.info(`📦 Queueing chapter ${chapter} chunk 1/${chunks.length} (with RAW context)`);
-      phase1Promises.push(processChunk(chapter, 1, chunks[1], xmlCharacters, rawChunk0Context, allCharactersNames));
+      phase1Promises.push(processChunk(chapter, 1, chunks[1], jsonCharacters, rawChunk0Context));
     }
   }
 
@@ -384,14 +360,7 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
         );
         logger.info(`📦 Queueing chapter ${chapter} chunk ${currentChunkIndex}/${chunks.length} (with TAGGED context)`);
         phasePromises.push(
-          processChunk(
-            chapter,
-            currentChunkIndex,
-            chunks[currentChunkIndex],
-            xmlCharacters,
-            taggedPreviousChunk,
-            allCharactersNames,
-          ),
+          processChunk(chapter, currentChunkIndex, chunks[currentChunkIndex], jsonCharacters, taggedPreviousChunk),
         );
       }
     }

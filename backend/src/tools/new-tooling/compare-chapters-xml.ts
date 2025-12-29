@@ -93,8 +93,8 @@ function splitIntoSentences(text: string): string[] {
 export function compareXmlTextContent(originalXml: string, modifiedXml: string): boolean {
   console.log("Comparing XML text content...");
 
-  const originalText = getNormalizedTextFromXml(originalXml);
-  const modifiedText = getNormalizedTextFromXml(modifiedXml);
+  const originalText = getNormalizedTextFromXml(`<Chapter>${originalXml}</Chapter>`);
+  const modifiedText = getNormalizedTextFromXml(`<Chapter>${modifiedXml}</Chapter>`);
 
   // console.log("\nOriginal Normalized Text:");
   // console.log(`"${originalText}"`);

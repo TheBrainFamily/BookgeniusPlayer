@@ -91,24 +91,13 @@ export function chunkParagraphs(paragraphs: Paragraph[], maxTokens: number = MAX
  * Build XML string for a chunk's paragraphs (for validation)
  */
 export function buildChunkXml(chapterId: number, paragraphs: Paragraph[]): string {
-  const paragraphsXml = paragraphs
-    .map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`)
-    .join("\n");
-
-  return `<Chapter id="${chapterId}">${paragraphsXml}</Chapter>`;
+  return paragraphs.map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`).join("\n");
 }
 
 /**
  * Combine multiple chunk XML outputs into a single chapter XML
  */
 export function combineChunks(chapterId: number, chunkOutputs: string[]): string {
-  // Extract the inner content from each chunk (removing <Chapter> wrapper)
-  const innerContents = chunkOutputs.map((xml) => {
-    // Match content between <Chapter ...> and </Chapter>
-    const match = xml.match(/<Chapter[^>]*>([\s\S]*)<\/Chapter>/i);
-    return match ? match[1].trim() : xml;
-  });
-
   // Combine into single chapter
-  return `<Chapter id="${chapterId}">\n${innerContents.join("\n")}\n</Chapter>`;
+  return `<section data-chapter="${chapterId}">\n${chunkOutputs.join("\n")}\n</section>`;
 }

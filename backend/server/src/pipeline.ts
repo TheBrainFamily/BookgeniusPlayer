@@ -159,16 +159,16 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
     const chapterNumber = parseInt(match[1], 10);
     const filePath = path.join(tempOutputDir, file);
     const content = fs.readFileSync(filePath);
-    const basename = `chapter-${chapterNumber}.xml`;
+    const basename = `chapter-${chapterNumber}.html`;
 
     addLog(job, `Uploading chapter ${chapterNumber} to Convex...`);
 
     try {
       await convex.uploadFile({
-        folderPath: `${job.bookPath}/chapters`,
+        folderPath: `${job.bookPath}/chapters-source`,
         basename,
         content,
-        contentType: "application/xml",
+        contentType: "application/html",
         publish: true,
         extra: { type: "chapter", chapterNumber, title: `Chapter ${chapterNumber}` },
       });

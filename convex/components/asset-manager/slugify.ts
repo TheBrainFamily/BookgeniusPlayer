@@ -1,3 +1,5 @@
+// Helper function to generate a valid XML tag name from a character name
+
 export function slugify(name: string): string {
   const polishMap: { [key: string]: string } = {
     ą: "a",
@@ -9,30 +11,25 @@ export function slugify(name: string): string {
     ś: "s",
     ź: "z",
     ż: "z",
-    Ą: "A",
-    Ć: "C",
-    Ę: "E",
-    Ł: "L",
-    Ń: "N",
-    Ó: "O",
-    Ś: "S",
-    Ź: "Z",
-    Ż: "Z",
+    Ą: "a",
+    Ć: "c",
+    Ę: "e",
+    Ł: "l",
+    Ń: "n",
+    Ó: "o",
+    Ś: "s",
+    Ź: "z",
+    Ż: "z",
   };
-
-  let tagName = name
-    .replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (char) => polishMap[char] || char) // Replace Polish characters
-    .replace(/[,()]/g, "") // Remove , ( )
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .trim(); // Trim whitespace
-
-  // Remove any remaining characters not allowed in XML tag names (simplified)
-  tagName = tagName.replace(/[^a-zA-Z0-9\-_.:]/g, "");
-
-  // Ensure it starts with a letter or underscore
-  if (!/^[a-zA-Z_]/.test(tagName)) {
-    tagName = "_" + tagName; // Prefix with underscore if invalid start
+  let slug = name
+    .toLowerCase()
+    .replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (char) => polishMap[char] || char)
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  if (!/^[a-z]/.test(slug)) {
+    slug = "c-" + slug;
   }
-
-  return tagName;
+  return slug || "character";
 }
