@@ -58,8 +58,9 @@ export const generateAvatarOptions = internalAction({
           const result = await openai.images.generate({
             model: "gpt-image-1.5",
             prompt: finalPrompt,
-            quality: "low",
+            quality: "medium",
             size: "1024x1024",
+            moderation: "low",
           });
 
           const imageBase64 = result.data?.[0]?.b64_json;

@@ -14,6 +14,8 @@ import type * as authHelpers from "../authHelpers.js";
 import type * as avatarEditing from "../avatarEditing.js";
 import type * as avatarGeneration from "../avatarGeneration.js";
 import type * as backgroundCues from "../backgroundCues.js";
+import type * as backgroundEditing from "../backgroundEditing.js";
+import type * as backgroundEditingInternal from "../backgroundEditingInternal.js";
 import type * as backgroundMetadata from "../backgroundMetadata.js";
 import type * as backgroundPreviewHttp from "../backgroundPreviewHttp.js";
 import type * as bookQueries from "../bookQueries.js";
@@ -53,6 +55,8 @@ declare const fullApi: ApiFromModules<{
   avatarEditing: typeof avatarEditing;
   avatarGeneration: typeof avatarGeneration;
   backgroundCues: typeof backgroundCues;
+  backgroundEditing: typeof backgroundEditing;
+  backgroundEditingInternal: typeof backgroundEditingInternal;
   backgroundMetadata: typeof backgroundMetadata;
   backgroundPreviewHttp: typeof backgroundPreviewHttp;
   bookQueries: typeof bookQueries;

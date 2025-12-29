@@ -10,6 +10,10 @@ import { DeepResearchModalRenderer } from "@player/features/modals/deepResearch/
 import { PositionHistoryModalRenderer } from "./modals/positionHistory/PositionHistoryModalRenderer";
 import { FootnoteModalRenderer } from "./modals/footnote/FootnoteModalRenderer";
 import { AvatarEditModalRenderer } from "./modals/avatarEdit/AvatarEditModalRenderer";
+import { BackgroundEditModalRenderer } from "./modals/backgroundEdit/BackgroundEditModalRenderer";
+import { BackgroundAddModalRenderer } from "./modals/backgroundAdd/BackgroundAddModalRenderer";
+import { MusicEditModalRenderer } from "./modals/musicEdit/MusicEditModalRenderer";
+import { MusicAddModalRenderer } from "./modals/musicAdd/MusicAddModalRenderer";
 
 export const ModalRenderers: React.FC = () => {
   return (
@@ -25,6 +29,10 @@ export const ModalRenderers: React.FC = () => {
       <SentenceModalRenderer />
       <FootnoteModalRenderer />
       <AvatarEditModalRenderer />
+      <BackgroundEditModalRenderer />
+      <BackgroundAddModalRenderer />
+      <MusicEditModalRenderer />
+      <MusicAddModalRenderer />
     </>
   );
 };

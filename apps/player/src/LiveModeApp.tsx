@@ -49,6 +49,7 @@ import { ScrollIndicator } from "@player/components/ScrollIndicator";
 import { RightNotesPanel } from "./components/RightNotesPanel";
 import { DebugLocationOverlay } from "./components/DebugLocationOverlay";
 import { AvatarGenerationBadge } from "./components/AvatarGenerationBadge";
+import { EditorToolbar } from "./components/EditorToolbar";
 import { useDraftMode } from "@player/context/DraftModeContext";
 import { useInlineAvatarSync } from "@player/hooks/useInlineAvatarSync";
 import { useEmbeddingsHeartbeat } from "@player/hooks/useEmbeddingsHeartbeat";
@@ -272,6 +273,7 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
                     <BookContentWrapper>
                       <LiveShell onShellMounted={() => setReactDomReady(true)} />
                       <ModalRenderers />
+                      <EditorToolbar />
                       <AvatarGenerationBadge />
                       <ContentShiftWrapper />
                     </BookContentWrapper>

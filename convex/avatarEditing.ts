@@ -93,10 +93,11 @@ export const editAvatarWithInstructions = internalAction({
       const generateAndUpload = async (optionNumber: number): Promise<string | null> => {
         try {
           const result = await openai.images.edit({
-            model: "gpt-image-1",
+            model: "gpt-image-1.5",
             image: imageFile,
             prompt: editPrompt,
             size: "1024x1024",
+            quality: "medium",
           });
 
           const imageBase64 = result.data?.[0]?.b64_json;

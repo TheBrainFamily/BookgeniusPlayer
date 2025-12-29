@@ -77,7 +77,7 @@ export const startUpload = mutation({
   args: {
     folderPath: v.string(),
     basename: v.string(),
-    filename: v.optional(v.string()), // Original filename with extension for URLs
+    filename: v.optional(v.string()),
     publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
@@ -89,11 +89,23 @@ export const startUpload = mutation({
     r2Key: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
+    console.log("[startUpload] Called with", {
+      folderPath: args.folderPath,
+      basename: args.basename,
+      publish: args.publish,
+    });
+
     await requireAuth(ctx);
-    return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+    const result = await ctx.runMutation(components.assetManager.assetManager.startUpload, {
       ...args,
       r2Config: getR2Config(),
     });
+
+    console.log("[startUpload] Intent created", {
+      intentId: result.intentId,
+      backend: result.backend,
+    });
+    return result;
   },
 });
 
@@ -130,19 +142,22 @@ export const startUploadInternal = internalMutation({
 export const finishUpload = mutation({
   args: {
     intentId: v.string(),
-    // The parsed JSON response from the upload POST request.
-    // For Convex: { storageId: "..." }
-    // For R2: can be empty (r2Key is in the intent)
     uploadResponse: v.optional(v.any()),
-    // Client-provided file metadata (required for R2)
     size: v.optional(v.number()),
     contentType: v.optional(v.string()),
-    // For post-upload hooks (e.g., music metadata extraction)
     folderPath: v.optional(v.string()),
     basename: v.optional(v.string()),
   },
   returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
+    console.log("[finishUpload] Called with", {
+      intentId: args.intentId,
+      folderPath: args.folderPath,
+      basename: args.basename,
+      contentType: args.contentType,
+      size: args.size,
+    });
+
     await requireAuth(ctx);
     const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
       intentId: args.intentId as any,
@@ -150,6 +165,11 @@ export const finishUpload = mutation({
       r2Config: getR2Config(),
       size: args.size,
       contentType: args.contentType,
+    });
+
+    console.log("[finishUpload] Asset created", {
+      assetId: result.assetId,
+      versionId: result.versionId,
     });
 
     // Schedule music metadata extraction for MP3 files in music/ folder

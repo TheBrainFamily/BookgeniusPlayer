@@ -28,7 +28,7 @@ export const listByBook = query({
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/music` }
+      { folderPath: `${bookPath}/music` },
     );
     const fileMap = new Map(files.map((f) => [f.basename, f.url]));
 
@@ -42,7 +42,7 @@ export const listByBook = query({
     // Get cover URLs
     const coverFiles = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/music-covers` }
+      { folderPath: `${bookPath}/music-covers` },
     );
     const coverMap = new Map(coverFiles.map((f) => [f.basename, f.url]));
 
@@ -85,7 +85,7 @@ export const listForPlayer = query({
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/music` }
+      { folderPath: `${bookPath}/music` },
     );
 
     const fileMap = new Map(files.map((f) => [f.basename, f.url]));
@@ -98,9 +98,7 @@ export const listForPlayer = query({
         files: [fileMap.get(cue.fileBasename)!],
       }))
       .sort((a, b) =>
-        a.chapter !== b.chapter
-          ? a.chapter - b.chapter
-          : a.paragraph - b.paragraph
+        a.chapter !== b.chapter ? a.chapter - b.chapter : a.paragraph - b.paragraph,
       );
   },
 });
@@ -120,19 +118,18 @@ export const listForPlayerWithDrafts = query({
     const musicPath = `${bookPath}/music`;
 
     // Get all assets (not just published)
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: musicPath }
-    );
+    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: musicPath,
+    });
 
     // Build fileBasename -> url map, preferring drafts
     const fileMap = new Map<string, string>();
 
     for (const asset of assets) {
-      const versions = await ctx.runQuery(
-        components.assetManager.assetManager.getAssetVersions,
-        { folderPath: musicPath, basename: asset.basename }
-      );
+      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+        folderPath: musicPath,
+        basename: asset.basename,
+      });
 
       const draftVersion = versions.find((v) => v.state === "draft");
       const publishedVersion = versions.find((v) => v.state === "published");
@@ -141,7 +138,7 @@ export const listForPlayerWithDrafts = query({
       if (bestVersion) {
         const urlInfo = await ctx.runQuery(
           components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id }
+          { versionId: bestVersion._id },
         );
         if (urlInfo?.url) {
           fileMap.set(asset.basename, urlInfo.url);
@@ -157,9 +154,7 @@ export const listForPlayerWithDrafts = query({
         files: [fileMap.get(cue.fileBasename)!],
       }))
       .sort((a, b) =>
-        a.chapter !== b.chapter
-          ? a.chapter - b.chapter
-          : a.paragraph - b.paragraph
+        a.chapter !== b.chapter ? a.chapter - b.chapter : a.paragraph - b.paragraph,
       );
   },
 });
@@ -173,7 +168,7 @@ export const listFiles = query({
   handler: async (ctx, { bookPath }) => {
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/music` }
+      { folderPath: `${bookPath}/music` },
     );
 
     // Get metadata with cover info
@@ -186,7 +181,7 @@ export const listFiles = query({
     // Get cover URLs
     const coverFiles = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/music-covers` }
+      { folderPath: `${bookPath}/music-covers` },
     );
     const coverMap = new Map(coverFiles.map((f) => [f.basename, f.url]));
 
@@ -236,18 +231,26 @@ export const create = mutation({
     paragraph: v.number(),
   },
   handler: async (ctx, args) => {
-    // Get existing cues at this chapter/paragraph to determine order
+    console.log("[musicCues.create] Creating music cue", args);
+
     const existingCues = await ctx.db
       .query("musicCues")
       .withIndex("by_book_position", (q) =>
-        q.eq("bookPath", args.bookPath).eq("chapter", args.chapter).eq("paragraph", args.paragraph)
+        q.eq("bookPath", args.bookPath).eq("chapter", args.chapter).eq("paragraph", args.paragraph),
       )
       .collect();
 
     const maxOrder = existingCues.reduce((max, cue) => Math.max(max, cue.order ?? 0), -1);
     const order = maxOrder + 1;
 
-    return await ctx.db.insert("musicCues", { ...args, order });
+    console.log("[musicCues.create] Inserting with order", {
+      order,
+      existingCount: existingCues.length,
+    });
+    const id = await ctx.db.insert("musicCues", { ...args, order });
+    console.log("[musicCues.create] Created cue with id", id);
+
+    return id;
   },
 });
 
@@ -255,11 +258,7 @@ export const create = mutation({
  * Update a cue's position.
  */
 export const updatePosition = mutation({
-  args: {
-    id: v.id("musicCues"),
-    chapter: v.number(),
-    paragraph: v.number(),
-  },
+  args: { id: v.id("musicCues"), chapter: v.number(), paragraph: v.number() },
   handler: async (ctx, { id, chapter, paragraph }) => {
     return await ctx.db.patch(id, { chapter, paragraph });
   },
@@ -269,12 +268,26 @@ export const updatePosition = mutation({
  * Update a cue's file.
  */
 export const updateFile = mutation({
-  args: {
-    id: v.id("musicCues"),
-    fileBasename: v.string(),
-  },
+  args: { id: v.id("musicCues"), fileBasename: v.string() },
   handler: async (ctx, { id, fileBasename }) => {
-    return await ctx.db.patch(id, { fileBasename });
+    console.log("[musicCues.updateFile] Updating cue file", { id, fileBasename });
+
+    const existingCue = await ctx.db.get(id);
+    if (!existingCue) {
+      console.error("[musicCues.updateFile] Cue not found", { id });
+      throw new Error(`Music cue not found: ${id}`);
+    }
+
+    console.log("[musicCues.updateFile] Found existing cue", {
+      oldFileBasename: existingCue.fileBasename,
+      chapter: existingCue.chapter,
+      paragraph: existingCue.paragraph,
+    });
+
+    await ctx.db.patch(id, { fileBasename });
+    console.log("[musicCues.updateFile] Updated successfully");
+
+    return id;
   },
 });
 
@@ -283,9 +296,7 @@ export const updateFile = mutation({
  * Takes an array of cue IDs in the new order.
  */
 export const reorder = mutation({
-  args: {
-    cueIds: v.array(v.id("musicCues")),
-  },
+  args: { cueIds: v.array(v.id("musicCues")) },
   handler: async (ctx, { cueIds }) => {
     // Update each cue's order based on its position in the array
     for (let i = 0; i < cueIds.length; i++) {
@@ -315,7 +326,7 @@ export const bulkCreate = mutation({
         fileBasename: v.string(),
         chapter: v.number(),
         paragraph: v.number(),
-      })
+      }),
     ),
   },
   handler: async (ctx, { cues }) => {

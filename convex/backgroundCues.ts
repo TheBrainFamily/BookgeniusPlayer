@@ -6,7 +6,7 @@
  */
 
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { components } from "./_generated/api";
 
 // =============================================================================
@@ -28,7 +28,7 @@ export const listByBook = query({
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/backgrounds` }
+      { folderPath: `${bookPath}/backgrounds` },
     );
 
     const fileMap = new Map(files.map((f) => [f.basename, f.url]));
@@ -43,7 +43,7 @@ export const listByBook = query({
     // Get preview file URLs
     const previewFiles = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/background-thumbnails` }
+      { folderPath: `${bookPath}/background-thumbnails` },
     );
     const previewMap = new Map(previewFiles.map((f) => [f.basename, f.url]));
 
@@ -68,9 +68,7 @@ export const listByBook = query({
         };
       })
       .sort((a, b) =>
-        a.chapter !== b.chapter
-          ? a.chapter - b.chapter
-          : a.paragraph - b.paragraph
+        a.chapter !== b.chapter ? a.chapter - b.chapter : a.paragraph - b.paragraph,
       );
   },
 });
@@ -90,7 +88,7 @@ export const listForPlayer = query({
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/backgrounds` }
+      { folderPath: `${bookPath}/backgrounds` },
     );
 
     const fileMap = new Map(files.map((f) => [f.basename, f.url]));
@@ -107,7 +105,7 @@ export const listForPlayer = query({
       .sort((a, b) =>
         a.startChapter !== b.startChapter
           ? a.startChapter - b.startChapter
-          : a.startParagraph - b.startParagraph
+          : a.startParagraph - b.startParagraph,
       );
   },
 });
@@ -127,19 +125,18 @@ export const listForPlayerWithDrafts = query({
     const backgroundsPath = `${bookPath}/backgrounds`;
 
     // Get all assets (not just published)
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath: backgroundsPath }
-    );
+    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath: backgroundsPath,
+    });
 
     // Build fileBasename -> url map, preferring drafts
     const fileMap = new Map<string, string>();
 
     for (const asset of assets) {
-      const versions = await ctx.runQuery(
-        components.assetManager.assetManager.getAssetVersions,
-        { folderPath: backgroundsPath, basename: asset.basename }
-      );
+      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+        folderPath: backgroundsPath,
+        basename: asset.basename,
+      });
 
       const draftVersion = versions.find((v) => v.state === "draft");
       const publishedVersion = versions.find((v) => v.state === "published");
@@ -148,7 +145,7 @@ export const listForPlayerWithDrafts = query({
       if (bestVersion) {
         const urlInfo = await ctx.runQuery(
           components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id }
+          { versionId: bestVersion._id },
         );
         if (urlInfo?.url) {
           fileMap.set(asset.basename, urlInfo.url);
@@ -169,7 +166,7 @@ export const listForPlayerWithDrafts = query({
       .sort((a, b) =>
         a.startChapter !== b.startChapter
           ? a.startChapter - b.startChapter
-          : a.startParagraph - b.startParagraph
+          : a.startParagraph - b.startParagraph,
       );
   },
 });
@@ -183,7 +180,7 @@ export const listFiles = query({
   handler: async (ctx, { bookPath }) => {
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/backgrounds` }
+      { folderPath: `${bookPath}/backgrounds` },
     );
 
     // Get preview metadata for all files
@@ -196,7 +193,7 @@ export const listFiles = query({
     // Get preview file URLs
     const previewFiles = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${bookPath}/background-thumbnails` }
+      { folderPath: `${bookPath}/background-thumbnails` },
     );
     const previewMap = new Map(previewFiles.map((f) => [f.basename, f.url]));
 
@@ -258,11 +255,7 @@ export const create = mutation({
  * Update a cue's position.
  */
 export const updatePosition = mutation({
-  args: {
-    id: v.id("backgroundCues"),
-    chapter: v.number(),
-    paragraph: v.number(),
-  },
+  args: { id: v.id("backgroundCues"), chapter: v.number(), paragraph: v.number() },
   handler: async (ctx, { id, chapter, paragraph }) => {
     return await ctx.db.patch(id, { chapter, paragraph });
   },
@@ -272,10 +265,7 @@ export const updatePosition = mutation({
  * Update a cue's file.
  */
 export const updateFile = mutation({
-  args: {
-    id: v.id("backgroundCues"),
-    fileBasename: v.string(),
-  },
+  args: { id: v.id("backgroundCues"), fileBasename: v.string() },
   handler: async (ctx, { id, fileBasename }) => {
     return await ctx.db.patch(id, { fileBasename });
   },
@@ -318,7 +308,7 @@ export const bulkCreate = mutation({
         paragraph: v.number(),
         backgroundColor: v.optional(v.string()),
         textColor: v.optional(v.string()),
-      })
+      }),
     ),
   },
   handler: async (ctx, { cues }) => {
@@ -347,5 +337,30 @@ export const deleteAllForBook = mutation({
     }
 
     return cues.length;
+  },
+});
+
+// =============================================================================
+// Internal Mutations (for use by actions)
+// =============================================================================
+
+export const createInternal = internalMutation({
+  args: {
+    bookPath: v.string(),
+    fileBasename: v.string(),
+    chapter: v.number(),
+    paragraph: v.number(),
+    backgroundColor: v.optional(v.string()),
+    textColor: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("backgroundCues", args);
+  },
+});
+
+export const updateFileInternal = internalMutation({
+  args: { id: v.id("backgroundCues"), fileBasename: v.string() },
+  handler: async (ctx, { id, fileBasename }) => {
+    return await ctx.db.patch(id, { fileBasename });
   },
 });
