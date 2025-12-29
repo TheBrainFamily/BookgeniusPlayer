@@ -6,7 +6,7 @@ import { useIsAppReady } from "./useIsAppReady";
 
 export function usePostReadyPrefetch() {
   const isAppReady = useIsAppReady();
-  const { prefetchChaptersUpTo, prefetchCharacterFragmentsUpTo } = useBookConvex();
+  const { prefetchChaptersUpTo } = useBookConvex();
   const didPrefetchRef = useRef(false);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export function usePostReadyPrefetch() {
     const targetParagraph = saved.currentParagraph ?? saved.paragraph ?? 1;
 
     void (async () => {
-      await Promise.all([prefetchChaptersUpTo(targetChapter), prefetchCharacterFragmentsUpTo(targetChapter)]);
+      await Promise.all([prefetchChaptersUpTo(targetChapter)]);
       const warmTextCache = () => {
         textCacheManager.ensureCacheUpto(targetChapter, targetParagraph);
       };
@@ -28,5 +28,5 @@ export function usePostReadyPrefetch() {
         setTimeout(warmTextCache, 100);
       }
     })();
-  }, [isAppReady, prefetchChaptersUpTo, prefetchCharacterFragmentsUpTo]);
+  }, [isAppReady, prefetchChaptersUpTo]);
 }

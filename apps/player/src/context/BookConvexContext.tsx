@@ -359,7 +359,6 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const characterIndexV2Query = useQuery(api.bookQueries.getCharacterIndexV2, useV2Format ? { bookPath } : "skip");
   const htmlSourceChaptersQuery = useQuery(api.bookQueries.listHtmlSourceChapters, !draftMode ? { bookPath } : "skip") as HtmlSourceChapterQueryItem[] | null | undefined;
 
-  const chapterHtmlQuery = useQuery(api.bookQueries.listChapterHtml, useV2Format ? "skip" : { bookPath }) as ChapterHtmlQueryItem[] | undefined;
   const characterDataFragmentsQuery = useQuery(api.bookQueries.listCharacterDataFragments, useV2Format ? "skip" : { bookPath }) as CharacterDataFragmentQueryItem[] | undefined;
 
   //TODO character always use drafts
@@ -466,16 +465,14 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const chapterOrder = useMemo(() => chapters.map((c) => c.chapterNumber), [chapters]);
 
-  const compiledChapters = useMemo<ChapterHtmlQueryItem[]>(() => chapterHtmlQuery ?? [], [chapterHtmlQuery]);
-  const compiledChaptersByNumber = useMemo(() => new Map(compiledChapters.map((c) => [c.chapterNumber, c])), [compiledChapters]);
-  const compiledChaptersOrdered = useMemo(() => {
-    if (chapters.length === 0) return [];
-    return chapters.map((c) => compiledChaptersByNumber.get(c.chapterNumber)).filter((c): c is ChapterHtmlQueryItem => Boolean(c));
-  }, [chapters, compiledChaptersByNumber]);
+  const htmlSourceByNumber = useMemo(() => {
+    if (!htmlSourceChaptersQuery) return new Map<number, HtmlSourceChapterQueryItem>();
+    return new Map(htmlSourceChaptersQuery.map((c) => [c.chapterNumber, c]));
+  }, [htmlSourceChaptersQuery]);
 
   const chapterStructure = useMemo(
-    () => chapters.map((chapter) => ({ chapterNumber: chapter.chapterNumber, paragraphCount: compiledChaptersByNumber.get(chapter.chapterNumber)?.paragraphCount ?? 0 })),
-    [chapters, compiledChaptersByNumber],
+    () => chapters.map((chapter) => ({ chapterNumber: chapter.chapterNumber, paragraphCount: htmlSourceByNumber.get(chapter.chapterNumber)?.paragraphCount ?? 0 })),
+    [chapters, htmlSourceByNumber],
   );
 
   const characterDataFragments = useMemo<CharacterDataFragmentQueryItem[]>(() => characterDataFragmentsQuery ?? [], [characterDataFragmentsQuery]);
@@ -581,14 +578,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     return chapters.map((c) => c.versionId).join("|");
   }, [chapters]);
 
-  const compiledChaptersReady = !draftMode && chapters.length > 0 && compiledChaptersOrdered.length === chapters.length;
   const characterFragmentsReady = !draftMode && chapters.length > 0 && characterFragmentsOrdered.length === chapters.length;
 
   const htmlSourceAvailable = !draftMode && htmlSourceChaptersQuery !== null && htmlSourceChaptersQuery !== undefined && htmlSourceChaptersQuery.length > 0;
-  const htmlSourceByNumber = useMemo(() => {
-    if (!htmlSourceChaptersQuery) return new Map<number, HtmlSourceChapterQueryItem>();
-    return new Map(htmlSourceChaptersQuery.map((c) => [c.chapterNumber, c]));
-  }, [htmlSourceChaptersQuery]);
 
   const v2Available = useV2Format && !draftMode && !htmlSourceAvailable && compiledChaptersV2Query !== null && characterIndexV2Query !== null;
   const compiledV2ByNumber = useMemo(() => {
@@ -992,7 +984,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     prevContentSignatureRef.current = "";
     prevCharacterSignatureRef.current = "";
 
-    if (!draftMode && (htmlSourceAvailable || v2Available || (compiledChaptersReady && characterFragmentsReady))) {
+    if (!draftMode && (htmlSourceAvailable || v2Available)) {
       if (lastRequestedCompiledChaptersRef.current.length > 0) {
         await ensureCompiledChaptersLoaded(lastRequestedCompiledChaptersRef.current);
       }
@@ -1003,16 +995,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     }
 
     await processChaptersFromXml(true);
-  }, [
-    draftMode,
-    compiledChaptersReady,
-    characterFragmentsReady,
-    ensureCompiledChaptersLoaded,
-    ensureCharacterFragmentsLoaded,
-    htmlSourceAvailable,
-    processChaptersFromXml,
-    v2Available,
-  ]);
+  }, [draftMode, ensureCompiledChaptersLoaded, ensureCharacterFragmentsLoaded, htmlSourceAvailable, processChaptersFromXml, v2Available]);
 
   useEffect(() => {
     chapterContentCache.current.clear();
@@ -1040,29 +1023,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       return;
     }
 
-    if (!draftMode && (chapterHtmlQuery === undefined || characterDataFragmentsQuery === undefined)) {
-      return;
-    }
-
-    if (!draftMode && compiledChaptersReady && characterFragmentsReady) {
+    if (!draftMode && characterDataFragmentsQuery === undefined) {
       return;
     }
 
     void processChaptersFromXml();
-  }, [
-    chaptersQuery,
-    bookMetadata,
-    charactersQuery,
-    compiledChaptersReady,
-    characterFragmentsReady,
-    xmlChapterSignature,
-    draftMode,
-    chapterHtmlQuery,
-    characterDataFragmentsQuery,
-    htmlSourceAvailable,
-    processChaptersFromXml,
-    v2Available,
-  ]);
+  }, [chaptersQuery, bookMetadata, charactersQuery, xmlChapterSignature, draftMode, characterDataFragmentsQuery, htmlSourceAvailable, processChaptersFromXml, v2Available]);
 
   useEffect(() => {
     if (draftMode) return;
@@ -1086,20 +1052,14 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       setChaptersData(chapterOrder.map((chapterNumber) => ({ id: String(chapterNumber), title: v2TitleMap.get(chapterNumber) ?? chapterTitleFallback.get(chapterNumber) ?? "" })));
       return;
     }
-    if (!compiledChaptersReady) return;
     if (chapters.length === 0) {
       setChaptersData([]);
       return;
     }
 
     const chapterTitleFallback = new Map(chapters.map((c) => [c.chapterNumber, c.title]));
-    setChaptersData(
-      chapterOrder.map((chapterNumber) => ({
-        id: String(chapterNumber),
-        title: compiledChaptersByNumber.get(chapterNumber)?.title ?? chapterTitleFallback.get(chapterNumber) ?? "",
-      })),
-    );
-  }, [draftMode, compiledChaptersReady, chapters, chapterOrder, compiledChaptersByNumber, htmlSourceAvailable, htmlSourceChaptersQuery, v2Available, compiledChaptersV2Query]);
+    setChaptersData(chapterOrder.map((chapterNumber) => ({ id: String(chapterNumber), title: chapterTitleFallback.get(chapterNumber) ?? "" })));
+  }, [draftMode, chapters, chapterOrder, htmlSourceAvailable, htmlSourceChaptersQuery, v2Available, compiledChaptersV2Query]);
 
   // Sync character metadata when Convex character bundles change (name/summary edits)
   // This is separate from chapter processing - allows character edits to update instantly
@@ -1165,7 +1125,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     (!draftMode && htmlSourceChaptersQuery === undefined) ||
     (!draftMode &&
       !htmlSourceAvailable &&
-      (useV2Format ? compiledChaptersV2Query === undefined || characterIndexV2Query === undefined : chapterHtmlQuery === undefined || characterDataFragmentsQuery === undefined));
+      (useV2Format ? compiledChaptersV2Query === undefined || characterIndexV2Query === undefined : characterDataFragmentsQuery === undefined));
 
   // Ready when initial load complete - don't go back to "not ready" during updates
   // Once we have content, we stay "ready" even while processing updates in the background
