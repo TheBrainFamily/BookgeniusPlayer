@@ -229,11 +229,12 @@ export const generateImagePreview = internalAction({
         status: "processing",
       });
 
-      // 4. Resize image to WebP via Cloudflare Worker
+      // 4. Resize image and extract colors via Cloudflare Worker
       const result = await ctx.runAction(internal.imageProcessing.resizeToWebpViaWorker, {
         sourceUrl: file.url,
         maxWidth: 400,
         quality: 80,
+        extractColors: true,
       });
 
       // 5. Upload the preview to background-thumbnails/
@@ -279,8 +280,22 @@ export const generateImagePreview = internalAction({
         previewWebpBasename: previewBasename,
       });
 
+      // 7. Update cues with detected colors (only if not already set)
+      let colorUpdateResult = { total: 0, updated: 0 };
+      if (result.backgroundColor && result.textColor) {
+        colorUpdateResult = await ctx.runMutation(
+          internal.backgroundCues.updateColorsForFileInternal,
+          {
+            bookPath,
+            fileBasename,
+            backgroundColor: result.backgroundColor,
+            textColor: result.textColor,
+          },
+        );
+      }
+
       console.log(
-        `[backgroundMetadata] Image preview completed: ${thumbnailsPath}/${previewBasename}`,
+        `[backgroundMetadata] Image preview completed: ${thumbnailsPath}/${previewBasename}, colors: ${result.backgroundColor} (updated ${colorUpdateResult.updated}/${colorUpdateResult.total} cues)`,
       );
     } catch (error) {
       console.error(`[backgroundMetadata] Image preview failed for ${fileBasename}:`, error);

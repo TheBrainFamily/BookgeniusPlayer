@@ -305,7 +305,7 @@ async function main() {
         bookPath,
         chapterNumber: metadata.chapterNumber,
         htmlContent: sourceHtml,
-        title: metadata.title,
+        ...(metadata.title ? { title: metadata.title } : {}),
         paragraphCount: metadata.paragraphCount,
       });
 

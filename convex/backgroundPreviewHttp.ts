@@ -58,7 +58,7 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
 
       const { intentId, uploadUrl, backend } = await ctx.runMutation(
         components.assetManager.assetManager.startUpload,
-        { folderPath: thumbnailsPath, basename: previewMp4Basename, publish: true, r2Config }
+        { folderPath: thumbnailsPath, basename: previewMp4Basename, publish: true, r2Config },
       );
 
       const uploadRes = await fetch(uploadUrl, {
@@ -81,10 +81,16 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
 
     // 4. Upload WebP thumbnail
     const previewWebpBasename = `${baseName}_preview.webp`;
-    const { intentId: webpIntentId, uploadUrl: webpUploadUrl, backend: webpBackend } = await ctx.runMutation(
-      components.assetManager.assetManager.startUpload,
-      { folderPath: thumbnailsPath, basename: previewWebpBasename, publish: true, r2Config }
-    );
+    const {
+      intentId: webpIntentId,
+      uploadUrl: webpUploadUrl,
+      backend: webpBackend,
+    } = await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+      folderPath: thumbnailsPath,
+      basename: previewWebpBasename,
+      publish: true,
+      r2Config,
+    });
 
     const webpUploadRes = await fetch(webpUploadUrl, {
       method: webpBackend === "r2" ? "PUT" : "POST",
@@ -103,7 +109,14 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
       contentType: "image/webp",
     });
 
-    // 5. Update metadata table
+    // 5. Extract dominant color from the webp preview
+    const webpArrayBuffer = await webpBlob.arrayBuffer();
+    const webpBase64 = btoa(String.fromCharCode(...new Uint8Array(webpArrayBuffer)));
+    const colorResult = await ctx.runAction(internal.imageProcessing.extractDominantColor, {
+      base64Data: webpBase64,
+    });
+
+    // 6. Update metadata table
     await ctx.runMutation(internal.backgroundMetadata.updateStatus, {
       bookPath,
       fileBasename,
@@ -112,7 +125,20 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
       previewWebpBasename,
     });
 
-    console.log(`[upload-background-preview] Completed for ${fileBasename}`);
+    // 7. Update cues with detected colors (only if not already set)
+    const colorUpdateResult = await ctx.runMutation(
+      internal.backgroundCues.updateColorsForFileInternal,
+      {
+        bookPath,
+        fileBasename,
+        backgroundColor: colorResult.backgroundColor,
+        textColor: colorResult.textColor,
+      },
+    );
+
+    console.log(
+      `[upload-background-preview] Completed for ${fileBasename}, colors: ${colorResult.backgroundColor} (updated ${colorUpdateResult.updated}/${colorUpdateResult.total} cues)`,
+    );
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -120,8 +146,11 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
   } catch (error) {
     console.error("[upload-background-preview] Error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 });

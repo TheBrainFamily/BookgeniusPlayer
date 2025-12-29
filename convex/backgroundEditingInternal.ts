@@ -138,6 +138,8 @@ export const editBackgroundWithInstructions = internalAction({
         uploadResponse,
         size: blob.size,
         contentType: "image/webp",
+        folderPath: backgroundsPath,
+        basename: newBasename,
       });
 
       await ctx.runMutation(internal.backgroundCues.updateFileInternal, {
@@ -269,6 +271,8 @@ export const generateNewBackground = internalAction({
         uploadResponse: uploadResponse2,
         size: blob.size,
         contentType: "image/webp",
+        folderPath: backgroundsPath,
+        basename: newBasename,
       });
 
       console.log("[generateNewBackground] Upload complete, creating cue", { newBasename });

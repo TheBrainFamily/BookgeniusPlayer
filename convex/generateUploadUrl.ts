@@ -218,16 +218,39 @@ export const finishUploadInternal = internalMutation({
     uploadResponse: v.optional(v.any()),
     size: v.optional(v.number()),
     contentType: v.optional(v.string()),
+    folderPath: v.optional(v.string()),
+    basename: v.optional(v.string()),
   },
   returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+    const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
       intentId: args.intentId as any,
       uploadResponse: args.uploadResponse,
       r2Config: getR2Config(),
       size: args.size,
       contentType: args.contentType,
     });
+
+    // Schedule preview generation for background files (videos and images)
+    if (args.folderPath?.endsWith("/backgrounds") && args.basename) {
+      const bookPath = args.folderPath.replace(/\/backgrounds$/, "");
+      const isVideo = args.contentType?.startsWith("video/");
+      const isImage = args.contentType?.startsWith("image/");
+
+      if (isVideo) {
+        await ctx.scheduler.runAfter(0, internal.backgroundMetadata.generateVideoPreview, {
+          bookPath,
+          fileBasename: args.basename,
+        });
+      } else if (isImage) {
+        await ctx.scheduler.runAfter(0, internal.backgroundMetadata.generateImagePreview, {
+          bookPath,
+          fileBasename: args.basename,
+        });
+      }
+    }
+
+    return result;
   },
 });
 

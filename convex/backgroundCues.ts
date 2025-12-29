@@ -364,3 +364,30 @@ export const updateFileInternal = internalMutation({
     return await ctx.db.patch(id, { fileBasename });
   },
 });
+
+export const updateColorsForFileInternal = internalMutation({
+  args: {
+    bookPath: v.string(),
+    fileBasename: v.string(),
+    backgroundColor: v.string(),
+    textColor: v.string(),
+  },
+  handler: async (ctx, { bookPath, fileBasename, backgroundColor, textColor }) => {
+    const cues = await ctx.db
+      .query("backgroundCues")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+
+    const matchingCues = cues.filter((c) => c.fileBasename === fileBasename);
+    let updatedCount = 0;
+
+    for (const cue of matchingCues) {
+      if (!cue.backgroundColor) {
+        await ctx.db.patch(cue._id, { backgroundColor, textColor });
+        updatedCount++;
+      }
+    }
+
+    return { total: matchingCues.length, updated: updatedCount };
+  },
+});

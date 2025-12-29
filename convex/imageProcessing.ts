@@ -3,6 +3,7 @@
 import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 import { Jimp } from "jimp";
+import { extractDominantColorFromBase64 } from "./lib/extractDominantColor";
 
 export const getImageMetadata = internalAction({
   args: { sourceUrl: v.string() },
@@ -26,8 +27,9 @@ export const resizeToWebpViaWorker = internalAction({
     sourceUrl: v.string(),
     maxWidth: v.optional(v.number()),
     quality: v.optional(v.number()),
+    extractColors: v.optional(v.boolean()),
   },
-  handler: async (ctx, { sourceUrl, maxWidth = 400, quality = 80 }) => {
+  handler: async (ctx, { sourceUrl, maxWidth = 400, quality = 80, extractColors = false }) => {
     const workerUrl = process.env.WEBP_WORKER_URL;
     const secret = process.env.WEBP_API_SECRET;
     if (!workerUrl || !secret) {
@@ -39,6 +41,7 @@ export const resizeToWebpViaWorker = internalAction({
       maxWidth: String(maxWidth),
       quality: String(quality),
       json: "true",
+      ...(extractColors && { extractColors: "true" }),
     });
 
     const response = await fetch(`${workerUrl}?${params}`, {
@@ -59,6 +62,8 @@ export const resizeToWebpViaWorker = internalAction({
       height: result.height as number,
       originalWidth: result.originalWidth as number,
       originalHeight: result.originalHeight as number,
+      backgroundColor: result.backgroundColor as string | undefined,
+      textColor: result.textColor as string | undefined,
       timing: result.timing as {
         total: number;
         fetch: number;
@@ -67,5 +72,12 @@ export const resizeToWebpViaWorker = internalAction({
         encode: number;
       },
     };
+  },
+});
+
+export const extractDominantColor = internalAction({
+  args: { base64Data: v.string() },
+  handler: async (ctx, { base64Data }) => {
+    return await extractDominantColorFromBase64(base64Data);
   },
 });

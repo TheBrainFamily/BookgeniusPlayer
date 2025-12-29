@@ -33,6 +33,7 @@ import type * as imageProcessing from "../imageProcessing.js";
 import type * as importHelpers from "../importHelpers.js";
 import type * as kanban from "../kanban.js";
 import type * as lib_characterDataV2 from "../lib/characterDataV2.js";
+import type * as lib_extractDominantColor from "../lib/extractDominantColor.js";
 import type * as musicCues from "../musicCues.js";
 import type * as musicMetadata from "../musicMetadata.js";
 import type * as notes from "../notes.js";
@@ -74,6 +75,7 @@ declare const fullApi: ApiFromModules<{
   importHelpers: typeof importHelpers;
   kanban: typeof kanban;
   "lib/characterDataV2": typeof lib_characterDataV2;
+  "lib/extractDominantColor": typeof lib_extractDominantColor;
   musicCues: typeof musicCues;
   musicMetadata: typeof musicMetadata;
   notes: typeof notes;
