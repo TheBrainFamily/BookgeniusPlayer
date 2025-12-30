@@ -47,11 +47,12 @@ export function useFootnotes(range: Location): Footnote[] {
       if (paragraphChapter < 0 || paragraphIndex < 0) return; // Skip invalid paragraphs
 
       if (isParagraphInRange(paragraphChapter, paragraphIndex, range)) {
-        const annotationLinks = paragraphElement.querySelectorAll<HTMLAnchorElement>(".link-note");
+        const annotationLinks = paragraphElement.querySelectorAll<HTMLAnchorElement>("a[data-note]");
         annotationLinks.forEach((link) => {
-          const targetId = link.getAttribute("href")?.substring(1); // Get href like '#fn3' and remove '#'
-          if (targetId) {
-            relevantFootnoteIds.add(targetId);
+          const noteId = link.getAttribute("data-note");
+          if (noteId) {
+            // Note IDs in database follow pattern "fnX" where X is the number from data-note
+            relevantFootnoteIds.add(`fn${noteId}`);
           }
         });
       }

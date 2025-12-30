@@ -23,6 +23,7 @@ import type * as chapterCompiler from "../chapterCompiler.js";
 import type * as characterIndexGenerator from "../characterIndexGenerator.js";
 import type * as characterPromptGeneration from "../characterPromptGeneration.js";
 import type * as cli from "../cli.js";
+import type * as colorExtraction from "../colorExtraction.js";
 import type * as comicGeneration from "../comicGeneration.js";
 import type * as comicSubmissions from "../comicSubmissions.js";
 import type * as comics from "../comics.js";
@@ -65,6 +66,7 @@ declare const fullApi: ApiFromModules<{
   characterIndexGenerator: typeof characterIndexGenerator;
   characterPromptGeneration: typeof characterPromptGeneration;
   cli: typeof cli;
+  colorExtraction: typeof colorExtraction;
   comicGeneration: typeof comicGeneration;
   comicSubmissions: typeof comicSubmissions;
   comics: typeof comics;

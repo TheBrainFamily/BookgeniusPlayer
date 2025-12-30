@@ -139,10 +139,11 @@ function openFootnoteModal(html: string) {
 export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
   if (initializedFootnotes.has(linkNoteEl)) return;
 
-  const href = linkNoteEl.getAttribute("href");
-  if (!href || !href.startsWith("#")) return;
+  const noteNumber = linkNoteEl.getAttribute("data-note");
+  if (!noteNumber) return;
 
-  const footnoteId = href.substring(1); // Remove the '#'
+  // Note IDs in database follow pattern "fnX" where X is the number from data-note
+  const footnoteId = `fn${noteNumber}`;
   const content = getFootnoteContent(footnoteId);
 
   if (!content) {

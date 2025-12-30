@@ -62,6 +62,11 @@ export const convex = {
     return await client.mutation(api.generator.markFailed, args);
   },
 
+  async uploadNotes(args: { notes: { bookPath: string; noteId: string; content: string; chapter: number; paragraph?: number }[] }) {
+    if (args.notes.length === 0) return [];
+    return await client.mutation(api.notes.bulkCreate, args);
+  },
+
   async getGenerationStatus(bookPath: string) {
     return await client.query(api.generator.getGenerationStatus, { bookPath });
   },
@@ -84,7 +89,6 @@ export const convex = {
   }): Promise<{ assetId: string; versionId: string; version: number }> {
     const { intentId, uploadUrl, backend } = await this.startUpload({ folderPath: args.folderPath, basename: args.basename, publish: args.publish ?? true, extra: args.extra });
 
-    // @ts-expect-error - this works, not sure why ts is complaining
     const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": args.contentType }, body: args.content });
 
     if (!response.ok) {

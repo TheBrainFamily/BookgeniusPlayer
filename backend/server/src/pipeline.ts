@@ -3,7 +3,8 @@ import path from "path";
 import { spawn } from "child_process";
 import { v4 as uuidv4 } from "uuid";
 import { Step, StepLabels } from "../../shared/pipelineTypes";
-import { convertBook } from "../../src/tools/fb2-converter/index";
+import { convertBook, findFb2FilePath } from "../../src/tools/fb2-converter/index";
+import { parseFb2Xml } from "../../src/tools/fb2-converter/fb2Converter";
 import { extractInlineImages } from "../../.scripts/extract-inline-images";
 import { createBookSettings } from "../../src/helpers/createBookSettings";
 import { checkIfBookDataExists } from "../../src/shared-books-data/getBooksData";
@@ -255,6 +256,92 @@ async function uploadBackgroundsToConvex(job: Job, outputDir: string) {
   }
 }
 
+async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
+  const fb2Path = findFb2FilePath(inputDir);
+  if (!fb2Path) {
+    addLog(job, `⚠ No FB2 file found, skipping notes extraction`);
+    return;
+  }
+
+  const richXmlPath = path.join(inputDir, "rich.xml");
+  if (!fs.existsSync(richXmlPath)) {
+    addLog(job, `⚠ No rich.xml found, skipping notes extraction`);
+    return;
+  }
+
+  const fb2Content = fs.readFileSync(fb2Path, "utf-8");
+  const fb2Doc = parseFb2Xml(fb2Content);
+  const notesBody = fb2Doc.querySelector("body[name='notes']");
+
+  if (!notesBody) {
+    addLog(job, `No notes section found in FB2`);
+    return;
+  }
+
+  const sections = notesBody.querySelectorAll("section");
+  const noteMap = new Map<string, string>();
+
+  for (const section of Array.from(sections)) {
+    const id = section.getAttribute("id");
+    const content = section.querySelector("p")?.innerHTML?.replace(' xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"', "") || "";
+    if (id && content) {
+      noteMap.set(id, content);
+    }
+  }
+
+  if (noteMap.size === 0) {
+    addLog(job, `No notes found in FB2`);
+    return;
+  }
+
+  addLog(job, `Found ${noteMap.size} notes in FB2`);
+
+  const richXml = fs.readFileSync(richXmlPath, "utf-8");
+  const notesToUpload: { bookPath: string; noteId: string; content: string; chapter: number }[] = [];
+  const usedNoteIds = new Set<string>();
+
+  // Regex: match <section data-chapter="N"> and capture chapter content until next section or end
+  const chapterRegex = /<section[^>]*data-chapter="(\d+)"[^>]*>([\s\S]*?)(?=<section[^>]*data-chapter="|$)/g;
+  const noteRefRegex = /<note\s+id=['"]([^'"]+)['"]/g;
+
+  let chapterMatch;
+  while ((chapterMatch = chapterRegex.exec(richXml)) !== null) {
+    const chapterNum = parseInt(chapterMatch[1], 10);
+    const chapterContent = chapterMatch[2];
+
+    let noteMatch;
+    while ((noteMatch = noteRefRegex.exec(chapterContent)) !== null) {
+      const noteId = noteMatch[1];
+      // Note IDs in rich.xml might be just numbers, but in FB2 they're prefixed with "fn"
+      const fb2NoteId = noteId.startsWith("fn") ? noteId : `fn${noteId}`;
+      const lookupId = noteMap.has(fb2NoteId) ? fb2NoteId : noteId;
+
+      if (noteMap.has(lookupId) && !usedNoteIds.has(lookupId)) {
+        notesToUpload.push({ bookPath: job.bookPath, noteId: fb2NoteId, content: noteMap.get(lookupId)!, chapter: chapterNum });
+        usedNoteIds.add(lookupId);
+      }
+    }
+  }
+
+  if (notesToUpload.length === 0) {
+    addLog(job, `No note references found in chapters`);
+    return;
+  }
+
+  try {
+    await convex.uploadNotes({ notes: notesToUpload });
+    addLog(job, `✔ Uploaded ${notesToUpload.length} notes to Convex`);
+
+    const orphaned = noteMap.size - usedNoteIds.size;
+    if (orphaned > 0) {
+      addLog(job, `⚠ ${orphaned} notes not referenced in any chapter`);
+    }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    addLog(job, `⚠ Failed to upload notes: ${msg}`);
+  }
+}
+
 async function uploadGraphicalStyleToConvex(job: Job, tempOutputDir: string) {
   const stylePath = path.join(tempOutputDir, "graphicalStyle.json");
   if (!fs.existsSync(stylePath)) return;
@@ -366,6 +453,8 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
         convertBook(slug, 1, 0);
         await extractInlineImages({ slug });
       }
+
+      await extractAndUploadNotesToConvex(job, inputDir);
     });
 
     await runStep(job, "create_settings", async () => {

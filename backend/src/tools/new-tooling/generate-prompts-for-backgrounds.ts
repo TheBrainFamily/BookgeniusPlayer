@@ -10,6 +10,7 @@ import { readBookFile } from "../../helpers/readBookFile";
 import { generateFluxImage } from "./generate-flux-schnel-image";
 import { GraphicalStyle } from "./create-graphical-style";
 import { callSonnet45 } from "../../callSonet45";
+import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("🚨 Unhandled Rejection at:", promise);
@@ -118,7 +119,7 @@ export const generateBackgrounds = async () => {
       Do not include any characters in the scene.
       Do not make it overly detailed. Make it generic, backgroundy, paintely, possibly abstract, atmospheric.
       Describe only ONE scene, if the chapter has multiple scenes, describe the first one.
-      Reply with a 2-3 sentences per scene. 
+      Reply with a 2-3 sentences. 
       Chapter Text: <chapter>${chapter.content}</chapter>
 
       ## Return format:
@@ -127,7 +128,7 @@ export const generateBackgrounds = async () => {
       }`;
 
         const schema = z.object({ sceneDescription: z.string() });
-        const response = await callSonnet45([prompt], schema);
+        const response = await callSlowGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
         console.log(`${chapter.number} - ${JSON.stringify(response)}`);
         return {
           chapter: chapter.number,
