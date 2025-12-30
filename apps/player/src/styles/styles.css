@@ -275,8 +275,13 @@
 
       /* Blockquote / Citation */
       blockquote {
-        padding: 0 3rem;
-        margin: 1.5em 0;
+        --padding-x: clamp(1.5rem, 4vw, 3rem);
+        padding: 0 var(--padding-x);
+        margin: 0;
+
+        &.has-speaker {
+          text-indent: 1.5em;
+        }
 
         .verse {
           padding: 0 2rem;
@@ -297,9 +302,9 @@
         }
       }
       /* Poem */
-      .poem {
+      /* .poem {
         margin: 1.5em 2em 1.5em 4em;
-      }
+      } */
       .stanza {
         margin-bottom: 1.2em;
       }
