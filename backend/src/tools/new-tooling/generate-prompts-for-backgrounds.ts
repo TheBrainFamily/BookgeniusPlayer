@@ -90,29 +90,49 @@ export const generateImageWithOpenAI = async (
   logger.info(`Image successfully saved to: ${filePath}`);
 };
 
-export const generateBackgrounds = async () => {
+export type GenerateBackgroundsOptions = {
+  customStyle?: GraphicalStyle;
+  chapterNumbers?: number[];
+  outputSubfolder?: string;
+  skipCache?: boolean;
+};
+
+export const generateBackgrounds = async (options: GenerateBackgroundsOptions = {}) => {
+  const { customStyle, chapterNumbers, outputSubfolder = "backgrounds", skipCache = false } = options;
+
   const bookSettings = getBookSettings();
-  const chapters = getChaptersUpTo(
+  let chapters = getChaptersUpTo(
     bookSettings.startFromChapter || 1,
     bookSettings.startFromChapter + bookSettings.numberOfChaptersToProcess - 1,
   );
 
-  const genericPrompt = JSON.parse(readBookFile("graphicalStyle.json", FILE_TYPE.TEMPORARY)) as GraphicalStyle;
-  // };
+  if (chapterNumbers && chapterNumbers.length > 0) {
+    chapters = chapters.filter((c) => chapterNumbers.includes(c.number));
+  }
+
+  const genericPrompt =
+    customStyle ?? (JSON.parse(readBookFile("graphicalStyle.json", FILE_TYPE.TEMPORARY)) as GraphicalStyle);
 
   let cleanedPrompts: { chapter: number; sceneDescription: string; startingParagraph: number }[] = [];
 
   let initialPrompts: { chapter: number; response: { sceneDescription: string; startingParagraph: number }[] }[] = [];
-  try {
-    initialPrompts = JSON.parse(readBookFile("initial-prompts.json", FILE_TYPE.TEMPORARY));
-  } catch {
-    console.log("No initial prompts found, generating new ones");
+
+  if (!skipCache) {
+    try {
+      initialPrompts = JSON.parse(readBookFile("initial-prompts.json", FILE_TYPE.TEMPORARY));
+      if (chapterNumbers && chapterNumbers.length > 0) {
+        initialPrompts = initialPrompts.filter((p) => chapterNumbers.includes(p.chapter));
+      }
+    } catch {
+      console.log("No initial prompts found, generating new ones");
+    }
   }
 
-  if (initialPrompts.length === 0) {
-    initialPrompts = await Promise.all(
-      chapters.map(async (chapter) => {
-        // if (FREE_RUN) {
+  const chaptersNeedingPrompts = chapters.filter((c) => !initialPrompts.some((p) => p.chapter === c.number));
+
+  if (chaptersNeedingPrompts.length > 0) {
+    const newPrompts = await Promise.all(
+      chaptersNeedingPrompts.map(async (chapter) => {
         const prompt = `Create a visual description of the book chapter provided below.
       This will be used as a prompt for an artist to draw a picture for a background for a chapter of a book during ${genericPrompt.periodStyle}, so make sure it's time appropriate.
       Do not include any plot details, any information about people in the scene, nothing about whats happening.
@@ -134,48 +154,15 @@ export const generateBackgrounds = async () => {
           chapter: chapter.number,
           response: [{ sceneDescription: response.sceneDescription, startingParagraph: 0 }],
         };
-        //   } else {
-        //     const paragraphsFromChapter: { text: string; dataIndex: number }[] = getParagraphsFromChapter(
-        //       chapter.number,
-        //       true,
-        //       true,
-        //     );
-
-        //     const paragraphsForPage = paragraphsFromChapter
-        //       .map((paragraph) => `<p id="${paragraph.dataIndex}">${paragraph.text.trim().replace(/"/g, "'")}</p>`)
-        //       .join("\n");
-        //     const prompt = `Create a visual description of the book scene described below.
-        // This will be used as a prompt for an artist to draw a picture for a background for a chapter of a book during ${genericPrompt.periodStyle}, so make sure it's time appropriate.
-        // Do not include any plot details, any information about people in the scene, nothing about whats happening.
-        // Do not include any characters in the scene.
-        // If the scene is outdoors, make it from a bird eye view, if indoors, position the camera far to allow for zoom in.
-        // Do not make it overly detailed.
-        // The prompts will be considered in isolation, so never mention previous or other scenes you are defining.
-        // Reply with one paragraph per scene. There can be just one scene in the chapter, thats fine. But if the scene changes to a completely different place (or day turns into night or vice versa), you should provide a new paragraph. Two paragraph images per scene MAX.
-        // Chapter Text: <chapter>${paragraphsForPage}</chapter>
-
-        // ## Return format:
-        // [{
-        //   "sceneDescription": "string",
-        //   "startingParagraph": 1,
-        // }]`;
-        //     // const models = [callGeminiWrapper, callClaude];
-
-        //     // const randomModel = models[Math.floor(Math.random() * models.length)];
-        //     // const response = await randomModel(prompt);
-        //     const schema = z.object({
-        //       response: z.array(z.object({ sceneDescription: z.string(), startingParagraph: z.number() })).max(2),
-        //     });
-        //     const response = await callGeminiWrapper(prompt, schema, 10);
-        //     console.log(`${chapter.number} - ${JSON.stringify(response)}`);
-        //     return { chapter: chapter.number, response: response.response };
-        //   }
       }),
     );
+    initialPrompts = [...initialPrompts, ...newPrompts];
   }
-  writeBookFile("initial-prompts.json", JSON.stringify(initialPrompts, null, 2), FILE_TYPE.TEMPORARY);
 
-  // Flatten all scenes from all chapters into a single array of { chapter, sceneDescription, startingParagraph }
+  if (!chapterNumbers || chapterNumbers.length === 0) {
+    writeBookFile("initial-prompts.json", JSON.stringify(initialPrompts, null, 2), FILE_TYPE.TEMPORARY);
+  }
+
   cleanedPrompts = initialPrompts.flatMap((p) =>
     p.response.map((r: { sceneDescription: string; startingParagraph: number }) => ({
       chapter: p.chapter,
@@ -189,7 +176,7 @@ export const generateBackgrounds = async () => {
   if (FREE_RUN) {
     await Promise.all(
       cleanedPrompts.map(async (prompt) => {
-        const fileName = `flux-schnell-${prompt.chapter}-${prompt.startingParagraph}.png`;
+        const fileName = `${outputSubfolder}/flux-schnell-${prompt.chapter}-${prompt.startingParagraph}.png`;
         const imageOpenAi = await generateFluxImage(
           prompt.sceneDescription,
           "skip avatar name",
@@ -204,18 +191,145 @@ export const generateBackgrounds = async () => {
   } else {
     await Promise.all(
       cleanedPrompts.map(async (prompt) => {
-        const imageOpenAi = await generateImageWithOpenAI(
+        const imageOpenAi = await generateImageWithOpenAIToFolder(
           prompt.sceneDescription,
           prompt.chapter,
           prompt.startingParagraph,
-          1,
-          "medium",
-          "1536x1024",
           genericPrompt,
+          outputSubfolder,
         );
         console.log(imageOpenAi);
       }),
     );
+  }
+};
+
+export const generateImageWithOpenAIToFolder = async (
+  prompt: string,
+  chapter: number,
+  startingParagraph: number,
+  genericPrompt: GenericBackgroundPrompt,
+  outputFolder: string,
+  attempt = 1,
+  quality: "medium" | "auto" | "standard" | "hd" | "low" | "high" | null | undefined = "medium",
+  size:
+    | "1536x1024"
+    | "1024x1536"
+    | "256x256"
+    | "512x512"
+    | "1792x1024"
+    | "1024x1792"
+    | "auto"
+    | null
+    | undefined = "1536x1024",
+): Promise<string | undefined> => {
+  const finalPrompt = `${genericPrompt.backgroundStyle} ${prompt}`;
+  console.log(`Generating image with OpenAI for chapter ${chapter} with prompt: ${finalPrompt}`);
+  const openai = new OpenAI();
+  let result: (OpenAI.Images.ImagesResponse & { _request_id?: string | null }) | undefined;
+  try {
+    result = await openai.images.generate({
+      model: "gpt-image-1.5",
+      prompt: finalPrompt,
+      quality,
+      size,
+      moderation: "low",
+      output_format: "webp",
+    });
+  } catch (e) {
+    if (attempt < 3) {
+      console.log(`Failed to generate image after ${attempt} attempts`);
+      return await generateImageWithOpenAIToFolder(
+        prompt,
+        chapter,
+        startingParagraph,
+        genericPrompt,
+        outputFolder,
+        attempt + 1,
+        quality,
+        size,
+      );
+    } else {
+      logger.error(`Failed to generate image after 3 attempts: ${JSON.stringify(e)}`);
+      return undefined;
+    }
+  }
+
+  if (!result?.data?.[0]?.b64_json) {
+    logger.error("No image data found");
+    return undefined;
+  }
+  const image_base64 = result.data[0].b64_json;
+  const image_bytes = Buffer.from(image_base64, "base64");
+  const fileName = `${outputFolder}/openai-${quality}-${chapter}-${startingParagraph}.webp`;
+  const filePath = writeBookFile(fileName, image_bytes, FILE_TYPE.PERMANENT);
+  logger.info(`Image successfully saved to: ${filePath}`);
+  return filePath;
+};
+
+export type StylePreviewResult = { imagePath: string; styleType: "auto" | "user" };
+
+export const generateStylePreview = async (
+  style: GraphicalStyle,
+  styleType: "auto" | "user",
+  chapterNumber = 1,
+): Promise<StylePreviewResult | undefined> => {
+  const bookSettings = getBookSettings();
+  const chapters = getChaptersUpTo(
+    bookSettings.startFromChapter || 1,
+    bookSettings.startFromChapter + bookSettings.numberOfChaptersToProcess - 1,
+  );
+  const chapter = chapters.find((c) => c.number === chapterNumber);
+
+  if (!chapter) {
+    logger.error(`Chapter ${chapterNumber} not found`);
+    return undefined;
+  }
+
+  const prompt = `Create a visual description of the book chapter provided below.
+This will be used as a prompt for an artist to draw a picture for a background for a chapter of a book during ${style.periodStyle}, so make sure it's time appropriate.
+Do not include any plot details, any information about people in the scene, nothing about whats happening.
+Do not include any characters in the scene.
+Do not make it overly detailed. Make it generic, backgroundy, paintely, possibly abstract, atmospheric.
+Describe only ONE scene, if the chapter has multiple scenes, describe the first one.
+Reply with a 2-3 sentences. 
+Chapter Text: <chapter>${chapter.content}</chapter>
+
+## Return format:
+{
+  "sceneDescription": "string",
+}`;
+
+  const schema = z.object({ sceneDescription: z.string() });
+  const response = await callSlowGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
+
+  const outputFolder = "style-previews";
+  const imagePath = await generateImageWithOpenAIToFolder(
+    response.sceneDescription,
+    chapterNumber,
+    0,
+    style,
+    outputFolder,
+  );
+
+  if (!imagePath) {
+    return undefined;
+  }
+
+  const fs = await import("fs");
+  const path = await import("path");
+
+  const finalFileName = `${styleType}-preview-chapter-${chapterNumber}.webp`;
+  const targetPath = path.join(path.dirname(imagePath), finalFileName);
+
+  try {
+    if (imagePath !== targetPath) {
+      fs.renameSync(imagePath, targetPath);
+    }
+    return { imagePath: targetPath, styleType };
+  } catch (e) {
+    logger.error(`Failed to rename preview file: ${e}`);
+    return { imagePath, styleType };
   }
 };
 

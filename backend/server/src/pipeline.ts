@@ -18,14 +18,19 @@ import { generatePicturesForEntities } from "../../src/tools/new-tooling/generat
 import { makeRollingChapterSummaries } from "../../src/tools/new-tooling/get-chapter-by-chapter-summary";
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import type { NewReferenceCardsResponse } from "../../src/types";
-import { generateBackgrounds } from "../../src/tools/new-tooling/generate-prompts-for-backgrounds";
-import { createGraphicalStyle } from "../../src/tools/new-tooling/create-graphical-style";
+import { generateBackgrounds, generateStylePreview } from "../../src/tools/new-tooling/generate-prompts-for-backgrounds";
+import { createGraphicalStyle, type GraphicalStyle } from "../../src/tools/new-tooling/create-graphical-style";
 import { getBookSettings } from "../../src/helpers/getBookSettings";
 import { generateTagName } from "../../src/helpers/generateTagName";
 import { initProgress, markStepStarted, markStepComplete, markStepError, getStepIndex, getStepOrder } from "./pipeline-progress";
 import { convex } from "./convex-client";
 import { generateEmbeddings } from "../../src/services/answer-server/create-paragraph-embeddings";
 import { uploadBookFolder } from "../../src/services/upload-books-to-r2";
+import { initStyleSelection, readStyleSelection, setAutoStyleComplete, setPreviewsGenerated, setTimedOut, setStyleChoice } from "./style-selection";
+
+export type StyleSelectionCallback = { onUserStyleSubmitted?: (userStyle: GraphicalStyle | null) => void; onStyleChosen?: (choice: "auto" | "user") => void };
+
+export const styleSelectionCallbacks = new Map<string, StyleSelectionCallback>();
 
 export type Job = {
   id: string;
@@ -302,7 +307,8 @@ async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
 
   // Regex: match <section data-chapter="N"> and capture chapter content until next section or end
   const chapterRegex = /<section[^>]*data-chapter="(\d+)"[^>]*>([\s\S]*?)(?=<section[^>]*data-chapter="|$)/g;
-  const noteRefRegex = /<note\s+id=['"]([^'"]+)['"]/g;
+  // Match both <note id="X"> and <a data-note="X"> formats
+  const noteRefRegex = /(?:<note\s+id=['"]([^'"]+)['"]|<a\s+data-note=['"]([^'"]+)['"])/g;
 
   let chapterMatch;
   while ((chapterMatch = chapterRegex.exec(richXml)) !== null) {
@@ -311,8 +317,7 @@ async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
 
     let noteMatch;
     while ((noteMatch = noteRefRegex.exec(chapterContent)) !== null) {
-      const noteId = noteMatch[1];
-      // Note IDs in rich.xml might be just numbers, but in FB2 they're prefixed with "fn"
+      const noteId = noteMatch[1] || noteMatch[2];
       const fb2NoteId = noteId.startsWith("fn") ? noteId : `fn${noteId}`;
       const lookupId = noteMap.has(fb2NoteId) ? fb2NoteId : noteId;
 
@@ -504,14 +509,110 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
 
     await runStep(job, "generate_graphical_style", async () => {
       setBookArg(slug);
-      await createGraphicalStyle(slug);
+
+      initStyleSelection(bookRoot);
+      addLog(job, "Style selection initialized - waiting for user input (2 min timeout)");
+
+      const autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
+      setAutoStyleComplete(bookRoot, autoStyle);
+      addLog(job, "Auto style generated, awaiting user input or timeout");
+
+      const TIMEOUT_MS = 2 * 60 * 1000;
+
+      let userStyleSubmitted = false;
+      let userStyle: GraphicalStyle | null = null;
+      let styleChosen = false;
+      let chosenStyleType: "auto" | "user" = "auto";
+
+      const userStylePromise = new Promise<GraphicalStyle | null>((resolve) => {
+        styleSelectionCallbacks.set(job.id, {
+          onUserStyleSubmitted: (style) => {
+            userStyleSubmitted = true;
+            userStyle = style;
+            resolve(style);
+          },
+          onStyleChosen: (choice) => {
+            styleChosen = true;
+            chosenStyleType = choice;
+          },
+        });
+
+        setTimeout(() => {
+          if (!userStyleSubmitted) {
+            addLog(job, "User input timeout - proceeding with auto style");
+            setTimedOut(bookRoot);
+            resolve(null);
+          }
+        }, TIMEOUT_MS);
+      });
+
+      await userStylePromise;
+
+      const state = readStyleSelection(bookRoot);
+      if (state?.status === "timed_out") {
+        addLog(job, "Generating preview with auto style only");
+        const autoPreview = await generateStylePreview(autoStyle, "auto", 1);
+        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null);
+        setStyleChoice(bookRoot, "auto");
+        chosenStyleType = "auto";
+      } else if (userStyle) {
+        addLog(job, "Generating previews for both styles");
+        const [autoPreview, userPreviewResult] = await Promise.all([generateStylePreview(autoStyle, "auto", 1), generateStylePreview(userStyle, "user", 1)]);
+        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, userPreviewResult?.imagePath || null);
+        addLog(job, "Previews generated, awaiting style choice");
+
+        await new Promise<void>((resolve) => {
+          const currentCallback = styleSelectionCallbacks.get(job.id);
+          if (currentCallback) {
+            currentCallback.onStyleChosen = (choice) => {
+              styleChosen = true;
+              chosenStyleType = choice;
+              resolve();
+            };
+          }
+
+          const checkInterval = setInterval(() => {
+            const currentState = readStyleSelection(bookRoot);
+            if (currentState?.selected) {
+              clearInterval(checkInterval);
+              chosenStyleType = currentState.selected;
+              resolve();
+            }
+          }, 1000);
+
+          setTimeout(() => {
+            clearInterval(checkInterval);
+            if (!styleChosen) {
+              const defaultChoice = userStyle ? "user" : "auto";
+              addLog(job, `Style choice timeout - defaulting to ${defaultChoice}`);
+              setStyleChoice(bookRoot, defaultChoice);
+              chosenStyleType = defaultChoice;
+              resolve();
+            }
+          }, TIMEOUT_MS);
+        });
+      } else {
+        addLog(job, "No user style provided, generating auto preview only");
+        const autoPreview = await generateStylePreview(autoStyle, "auto", 1);
+        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null);
+        setStyleChoice(bookRoot, "auto");
+        chosenStyleType = "auto";
+      }
+
+      styleSelectionCallbacks.delete(job.id);
+
+      const finalState = readStyleSelection(bookRoot);
+      const selectedChoice = finalState?.selected || "auto";
+      const finalStyle = selectedChoice === "user" && userStyle ? userStyle : autoStyle;
+      writeBookFile("graphicalStyle.json", JSON.stringify(finalStyle, null, 2), FILE_TYPE.TEMPORARY);
+      addLog(job, `Final style selected: ${selectedChoice}`);
 
       await uploadGraphicalStyleToConvex(job, tempOutputDir);
     });
 
     await runStep(job, "generate_backgrounds", async () => {
       setBookArg(slug);
-      await generateBackgrounds();
+      await generateBackgrounds({});
 
       await uploadBackgroundsToConvex(job, outputDir);
     });

@@ -1,5 +1,31 @@
 import { z } from "zod";
 
+export const StyleSelectionStatusEnum = z.enum([
+  "not_started",
+  "awaiting_input",
+  "generating_auto_style",
+  "generating_user_style",
+  "generating_previews",
+  "awaiting_choice",
+  "complete",
+  "timed_out",
+]);
+
+export type StyleSelectionStatus = z.infer<typeof StyleSelectionStatusEnum>;
+
+export const GraphicalStyleSchema = z.object({ backgroundStyle: z.string(), periodStyle: z.string(), avatarStyle: z.string() });
+
+export const StyleSelectionStateSchema = z.object({
+  status: StyleSelectionStatusEnum,
+  remainingTimeMs: z.number(),
+  autoStyle: GraphicalStyleSchema.nullable(),
+  userStyle: GraphicalStyleSchema.nullable(),
+  previews: z.object({ autoPreviewPath: z.string().nullable(), userPreviewPath: z.string().nullable() }).nullable(),
+  selected: z.enum(["auto", "user"]).nullable(),
+});
+
+export type StyleSelectionState = z.infer<typeof StyleSelectionStateSchema>;
+
 export const StepEnum = z.enum([
   "import_epub",
   "create_settings",
@@ -51,6 +77,7 @@ export const JobStatusSchema = z.object({
   error: z.string().optional(),
   downloadUrl: z.string().optional(),
   packagePath: z.string().optional(),
+  styleSelection: StyleSelectionStateSchema.optional(),
 });
 
 export type JobStatus = z.infer<typeof JobStatusSchema>;

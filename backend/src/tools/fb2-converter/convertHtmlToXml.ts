@@ -8,7 +8,7 @@ export const convertHtmlToXml = (html: string) => {
 
   // console.log("replying notes and brs again", mainSection);
   const result = mainSection
-    .replace(/<note id="(\d+)">\[\d+\]<\/note>/g, '<note id="$1"></note>')
+    .replace(/<note id="(\d+)">\[(\d+)\]<\/note>/g, '<a data-note="$1">[$2]</a>')
     .replace(/<br\s*\/?>/g, "<br/>");
   return wrapMainSectionByXmlTags(result);
 };

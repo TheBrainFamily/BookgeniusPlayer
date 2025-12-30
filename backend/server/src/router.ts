@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { procedure, router } from "./trpc";
 import { JobStatus, StartPipelineInput } from "../../shared/pipelineTypes";
-import { jobs, startPipeline } from "./pipeline";
+import { jobs, startPipeline, styleSelectionCallbacks } from "./pipeline";
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
@@ -15,6 +15,9 @@ import { readBookFile } from "../../src/helpers/readBookFile";
 import { FILE_TYPE } from "../../src/helpers/filesHelpers";
 import * as cheerio from "cheerio";
 import * as wl from "./wolne-lektury";
+import { readStyleSelection, getRemainingTimeMs, setUserStyleDescription, setUserStyleExpanded, setStyleChoice, setPreviewsGenerated } from "./style-selection";
+import { expandUserStyleDescription } from "../../src/tools/new-tooling/create-graphical-style";
+import { generateStylePreview } from "../../src/tools/new-tooling/generate-prompts-for-backgrounds";
 
 function slugify(input: string): string {
   return input
@@ -109,6 +112,11 @@ export const appRouter = router({
   getJobStatus: procedure.input(z.object({ jobId: z.string() })).query(({ input }) => {
     const job = jobs.get(input.jobId);
     if (!job) throw new Error("Job not found");
+
+    const repoRoot = path.resolve(__dirname, "../../");
+    const bookRoot = path.join(repoRoot, "books-data", job.slug);
+    const styleState = readStyleSelection(bookRoot);
+
     const status: JobStatus = {
       jobId: job.id,
       slug: job.slug,
@@ -118,6 +126,16 @@ export const appRouter = router({
       error: job.error,
       downloadUrl: job.downloadUrl,
       packagePath: job.packagePath,
+      styleSelection: styleState
+        ? {
+            status: styleState.status,
+            remainingTimeMs: getRemainingTimeMs(styleState),
+            autoStyle: styleState.autoStyle,
+            userStyle: styleState.userStyle,
+            previews: styleState.previews,
+            selected: styleState.selected,
+          }
+        : undefined,
     };
     return status;
   }),
@@ -163,7 +181,7 @@ export const appRouter = router({
             paragraphs
               .filter((pfc) => pfc.dataIndex === p)
               .map((pfc) => pfc.text)
-              .join(" ")
+              .join(" "),
           )
           .join("\n");
 
@@ -210,16 +228,18 @@ export const appRouter = router({
 
   searchWolneLektury: procedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
     const books = await wl.searchBooks(input.query);
-    return books.slice(0, 50).map((book) => ({
-      title: book.title,
-      author: book.author,
-      slug: book.slug,
-      coverThumb: book.cover_thumb,
-      hasAudio: book.has_audio,
-      epoch: book.epoch,
-      genre: book.genre,
-      kind: book.kind,
-    }));
+    return books
+      .slice(0, 50)
+      .map((book) => ({
+        title: book.title,
+        author: book.author,
+        slug: book.slug,
+        coverThumb: book.cover_thumb,
+        hasAudio: book.has_audio,
+        epoch: book.epoch,
+        genre: book.genre,
+        kind: book.kind,
+      }));
   }),
 
   getWolneLekturyBook: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
@@ -288,6 +308,121 @@ export const appRouter = router({
         hasAudio: book.has_audio,
       })),
     };
+  }),
+
+  getStyleSelectionStatus: procedure.input(z.object({ jobId: z.string() })).query(({ input }) => {
+    const job = jobs.get(input.jobId);
+    if (!job) throw new Error("Job not found");
+
+    const repoRoot = path.resolve(__dirname, "../../");
+    const bookRoot = path.join(repoRoot, "books-data", job.slug);
+    const state = readStyleSelection(bookRoot);
+
+    if (!state) {
+      return { status: "not_started" as const, remainingTimeMs: 0, autoStyle: null, userStyle: null, previews: null, selected: null };
+    }
+
+    return {
+      status: state.status,
+      remainingTimeMs: getRemainingTimeMs(state),
+      autoStyle: state.autoStyle,
+      userStyle: state.userStyle,
+      previews: state.previews,
+      selected: state.selected,
+    };
+  }),
+
+  submitStyleDescription: procedure.input(z.object({ jobId: z.string(), description: z.string().nullable() })).mutation(async ({ input }) => {
+    const job = jobs.get(input.jobId);
+    if (!job) throw new Error("Job not found");
+
+    const repoRoot = path.resolve(__dirname, "../../");
+    const bookRoot = path.join(repoRoot, "books-data", job.slug);
+    const state = readStyleSelection(bookRoot);
+
+    if (!state) throw new Error("Style selection not initialized");
+    if (state.status !== "awaiting_input" && state.status !== "generating_auto_style") {
+      throw new Error(`Cannot submit style in status: ${state.status}`);
+    }
+
+    if (input.description === null) {
+      setUserStyleDescription(bookRoot, null);
+
+      const callback = styleSelectionCallbacks.get(input.jobId);
+      if (callback?.onUserStyleSubmitted) {
+        callback.onUserStyleSubmitted(null);
+      }
+
+      return { success: true, userStyle: null };
+    }
+
+    setUserStyleDescription(bookRoot, input.description);
+
+    setCurrentBook(path.join("books-data", job.slug));
+
+    const periodStyle = state.autoStyle?.periodStyle || "Historical";
+    const userStyle = await expandUserStyleDescription(input.description, periodStyle);
+
+    setUserStyleExpanded(bookRoot, userStyle);
+
+    const callback = styleSelectionCallbacks.get(input.jobId);
+    if (callback?.onUserStyleSubmitted) {
+      callback.onUserStyleSubmitted(userStyle);
+    }
+
+    return { success: true, userStyle };
+  }),
+
+  chooseStyle: procedure.input(z.object({ jobId: z.string(), choice: z.enum(["auto", "user"]) })).mutation(async ({ input }) => {
+    const job = jobs.get(input.jobId);
+    if (!job) throw new Error("Job not found");
+
+    const repoRoot = path.resolve(__dirname, "../../");
+    const bookRoot = path.join(repoRoot, "books-data", job.slug);
+    const state = readStyleSelection(bookRoot);
+
+    if (!state) throw new Error("Style selection not initialized");
+    if (state.status !== "awaiting_choice") {
+      throw new Error(`Cannot choose style in status: ${state.status}`);
+    }
+
+    if (input.choice === "user" && !state.userStyle) {
+      throw new Error("No user style available to choose");
+    }
+
+    setStyleChoice(bookRoot, input.choice);
+
+    const callback = styleSelectionCallbacks.get(input.jobId);
+    if (callback?.onStyleChosen) {
+      callback.onStyleChosen(input.choice);
+    }
+
+    return { success: true, choice: input.choice };
+  }),
+
+  generateStylePreviews: procedure.input(z.object({ jobId: z.string() })).mutation(async ({ input }) => {
+    const job = jobs.get(input.jobId);
+    if (!job) throw new Error("Job not found");
+
+    const repoRoot = path.resolve(__dirname, "../../");
+    const bookRoot = path.join(repoRoot, "books-data", job.slug);
+    const state = readStyleSelection(bookRoot);
+
+    if (!state) throw new Error("Style selection not initialized");
+    if (!state.autoStyle) throw new Error("Auto style not yet generated");
+
+    setCurrentBook(path.join("books-data", job.slug));
+
+    const autoPreview = await generateStylePreview(state.autoStyle, "auto", 1);
+    let userPreview = null;
+
+    if (state.userStyle) {
+      userPreview = await generateStylePreview(state.userStyle, "user", 1);
+    }
+
+    setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, userPreview?.imagePath || null);
+
+    return { success: true, previews: { autoPreviewPath: autoPreview?.imagePath || null, userPreviewPath: userPreview?.imagePath || null } };
   }),
 });
 

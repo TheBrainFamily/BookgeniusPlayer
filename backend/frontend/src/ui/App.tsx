@@ -2,13 +2,32 @@ import React, { useCallback, useState, useMemo } from "react";
 import { trpc } from "../trpc";
 import { StepLabels, type Step } from "~shared/pipelineTypes";
 import Editor from "@monaco-editor/react";
-import { Upload, FileText, Play, Download, CheckCircle2, Circle, Loader2, AlertCircle, BookOpen, ChevronLeft, ChevronRight, Search, Library, LayoutGrid } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  Play,
+  Download,
+  CheckCircle2,
+  Circle,
+  Loader2,
+  AlertCircle,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Library,
+  LayoutGrid,
+  Wand2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CollectionsPage } from "../pages/CollectionsPage";
+
+import { StyleSelectionModal } from "@/components/StyleSelectionModal";
+import { StylePreviewComparison } from "@/components/StylePreviewComparison";
 
 type AppView = "pipeline" | "collections";
 type SourceMode = "upload" | "wolneLektury";
@@ -19,7 +38,25 @@ type UploadResult = { path: string };
 
 type StepState = { step: Step; status: "pending" | "running" | "done" | "error"; startedAt?: number; endedAt?: number; message?: string };
 
-type JobStatus = { jobId: string; slug: string; currentStep: Step; steps: StepState[]; logs?: string[]; error?: string; downloadUrl?: string };
+type StyleInfo = { backgroundStyle: string; periodStyle: string; avatarStyle: string };
+
+type JobStatus = {
+  jobId: string;
+  slug: string;
+  currentStep: Step;
+  steps: StepState[];
+  logs?: string[];
+  error?: string;
+  downloadUrl?: string;
+  styleSelection?: {
+    status: "not_started" | "awaiting_input" | "generating_auto_style" | "generating_user_style" | "generating_previews" | "awaiting_choice" | "complete" | "timed_out";
+    remainingTimeMs: number;
+    autoStyle: StyleInfo | null;
+    userStyle: StyleInfo | null;
+    previews: { autoPreviewPath: string | null; userPreviewPath: string | null } | null;
+    selected: "auto" | "user" | null;
+  };
+};
 
 type ChapterInfo = { originalIndex: number; content: string; title: string; selected: boolean };
 
@@ -218,6 +255,27 @@ export default function App() {
     setPolling(true);
   }, [slug, preamble, chapters, postamble]);
 
+  const submitStyleDescription = useCallback(
+    async (description: string | null) => {
+      if (!jobId) return;
+      await trpc.submitStyleDescription.mutate({ jobId, description });
+      // Force immediate poll to update status
+      const st = await trpc.getJobStatus.query({ jobId });
+      setStatus(st as JobStatus);
+    },
+    [jobId],
+  );
+
+  const chooseStyle = useCallback(
+    async (choice: "auto" | "user") => {
+      if (!jobId) return;
+      await trpc.chooseStyle.mutate({ jobId, choice });
+      const st = await trpc.getJobStatus.query({ jobId });
+      setStatus(st as JobStatus);
+    },
+    [jobId],
+  );
+
   React.useEffect(() => {
     let timer: number | undefined;
     const tick = async () => {
@@ -245,8 +303,25 @@ export default function App() {
   const selectedCount = chapters.filter((c) => c.selected).length;
   const currentChapter = chapters[selectedChapterIdx];
 
+  const showStyleModal = status?.styleSelection?.status === "awaiting_input";
+  const showStyleComparison = status?.styleSelection?.status === "awaiting_choice";
+  const isGeneratingStyle = ["generating_auto_style", "generating_user_style", "generating_previews"].includes(status?.styleSelection?.status || "");
+
   return (
     <div className="min-h-screen bg-background">
+      {showStyleModal && status?.styleSelection && <StyleSelectionModal remainingTimeMs={status.styleSelection.remainingTimeMs} onSubmit={submitStyleDescription} />}
+
+      {showStyleComparison && status?.styleSelection && (
+        <StylePreviewComparison
+          slug={status.slug}
+          previews={status.styleSelection.previews}
+          autoStyle={status.styleSelection.autoStyle}
+          userStyle={status.styleSelection.userStyle}
+          remainingTimeMs={status.styleSelection.remainingTimeMs}
+          onChoose={chooseStyle}
+        />
+      )}
+
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -624,6 +699,26 @@ export default function App() {
                     </div>
                     <Progress value={progressPercent} className="h-2" />
                   </div>
+
+                  {/* Style Generation Loading Indicator */}
+                  {isGeneratingStyle && (
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                          <Wand2 className="w-3 h-3 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">AI Style Generation in Progress</p>
+                          <p className="text-xs text-muted-foreground">
+                            {status?.styleSelection?.status === "generating_auto_style" && "Analyzing text for visual style..."}
+                            {status?.styleSelection?.status === "generating_user_style" && "Processing your style description..."}
+                            {status?.styleSelection?.status === "generating_previews" && "Rendering preview images..."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Steps List or Loading Skeleton */}
                   <div className="space-y-2">

@@ -34,15 +34,23 @@ app.put("/upload", (req, res) => {
 });
 
 // tRPC handler mounted under /trpc
-const handler = createHTTPHandler({
-  router: appRouter,
-});
+const handler = createHTTPHandler({ router: appRouter });
 
-app.use(
-  "/trpc",
-  cors({ origin: [/^http:\/\/localhost:\d+$/] }),
-  (req, res) => handler(req, res),
-);
+app.use("/trpc", cors({ origin: [/^http:\/\/localhost:\d+$/] }), (req, res) => handler(req, res));
+
+app.get("/preview/:slug/:filename", (req, res) => {
+  const { slug, filename } = req.params;
+  const safeName = path.basename(filename);
+  const safeSlug = path.basename(slug);
+  const filePath = path.join(__dirname, "../../books-data", safeSlug, "output", "style-previews", safeName);
+
+  if (!fs.existsSync(filePath)) {
+    res.status(404).json({ error: "Preview not found" });
+    return;
+  }
+
+  res.sendFile(filePath);
+});
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
