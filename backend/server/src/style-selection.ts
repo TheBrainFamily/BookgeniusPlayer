@@ -31,7 +31,7 @@ export const StyleSelectionStateSchema = z.object({
 export type StyleSelectionState = z.infer<typeof StyleSelectionStateSchema>;
 
 const STYLE_SELECTION_FILE = "style-selection.json";
-const TIMEOUT_MS = 2 * 60 * 1000;
+const TIMEOUT_MS = 4 * 60 * 1000;
 
 function getStyleSelectionPath(bookRoot: string): string {
   return path.join(bookRoot, "temporary-output", STYLE_SELECTION_FILE);
@@ -90,7 +90,11 @@ export function updateStyleSelection(bookRoot: string, updates: Partial<StyleSel
 }
 
 export function setAutoStyleComplete(bookRoot: string, autoStyle: GraphicalStyle): StyleSelectionState {
-  return updateStyleSelection(bookRoot, { autoStyle, status: "awaiting_input" });
+  const current = readStyleSelection(bookRoot);
+  if (current?.status === "generating_auto_style") {
+    return updateStyleSelection(bookRoot, { autoStyle, status: "awaiting_input" });
+  }
+  return updateStyleSelection(bookRoot, { autoStyle });
 }
 
 export function setUserStyleDescription(bookRoot: string, userPrompt: string | null): StyleSelectionState {

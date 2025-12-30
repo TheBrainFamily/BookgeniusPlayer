@@ -27,6 +27,7 @@ import { convex } from "./convex-client";
 import { generateEmbeddings } from "../../src/services/answer-server/create-paragraph-embeddings";
 import { uploadBookFolder } from "../../src/services/upload-books-to-r2";
 import { initStyleSelection, readStyleSelection, setAutoStyleComplete, setPreviewsGenerated, setTimedOut, setStyleChoice } from "./style-selection";
+import { STEP_DEPENDENCIES, getReadySteps, createSchedulerState, type ParallelSchedulerState } from "./parallel-scheduler";
 
 export type StyleSelectionCallback = { onUserStyleSubmitted?: (userStyle: GraphicalStyle | null) => void; onStyleChosen?: (choice: "auto" | "user") => void };
 
@@ -38,6 +39,7 @@ export type Job = {
   bookPath: string;
   status: "pending" | "running" | "done" | "error";
   currentStep: Step;
+  activeSteps: Step[];
   steps: { step: Step; status: "pending" | "running" | "done" | "error"; startedAt?: number; endedAt?: number; message?: string }[];
   logs: string[];
   error?: string;
@@ -383,6 +385,7 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
     bookPath,
     status: "running",
     currentStep: fromStep || "import_epub",
+    activeSteps: [],
     logs: [],
     steps: stepOrder.map((step) => {
       const stepIndex = getStepIndex(step);
@@ -404,25 +407,14 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
   const outputDir = path.join(bookRoot, "output");
   const tempOutputDir = path.join(bookRoot, "temporary-output");
 
-  const run = async () => {
-    try {
-      process.chdir(repoRoot);
-      addLog(job, `cwd -> ${process.cwd()}`);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      addLog(job, `Failed to chdir to repo root: ${msg}`);
-    }
+  const schedulerState = createSchedulerState();
+  let referenceCards: NewReferenceCardsResponse;
 
-    addLog(job, `Initializing book structure in Convex...`);
-    try {
-      await convex.ensureBookStructure({ jobId: job.id, bookSlug: slug });
-      addLog(job, `✔ Book structure created in Convex`);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      addLog(job, `⚠ Failed to create book structure: ${msg}`);
-    }
+  initStyleSelection(bookRoot);
+  addLog(job, "Style selection initialized - user can now provide style preference");
 
-    await runStep(job, "import_epub", async () => {
+  const stepFunctions: Record<string, () => Promise<void>> = {
+    import_epub: async () => {
       addLog(job, `Ensuring dirs exist → ${inputDir}, ${outputDir}, ${tempOutputDir}`);
       ensureDir(inputDir);
       ensureDir(outputDir);
@@ -460,9 +452,9 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
       }
 
       await extractAndUploadNotesToConvex(job, inputDir);
-    });
+    },
 
-    await runStep(job, "create_settings", async () => {
+    create_settings: async () => {
       setBookArg(slug);
       checkIfBookDataExists();
       createBookSettings();
@@ -471,11 +463,9 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
       await convex.updateBookMetadata({ bookPath: job.bookPath, metadata: { title: settings.title, author: settings.author, language: settings.language } }).catch((e) => {
         addLog(job, `⚠ Failed to update book metadata: ${e.message}`);
       });
-    });
+    },
 
-    let referenceCards: NewReferenceCardsResponse;
-
-    await runStep(job, "generate_reference_cards", async () => {
+    generate_reference_cards: async () => {
       setBookArg(slug);
       const fileName = "single-summary-per-person.json";
       const filePath = getFilePath(fileName, FILE_TYPE.PERMANENT);
@@ -497,34 +487,41 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
           addLog(job, `⚠ Failed to create character folder for ${character.name}: ${e.message}`);
         });
       }
-    });
+    },
 
-    await runStep(job, "rewrite_paragraphs", async () => {
+    rewrite_paragraphs: async () => {
       setBookArg(slug);
       referenceCards = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
       await identifyCharactersAndRewriteParagraphs(referenceCards);
-
       await uploadChaptersToConvex(job, tempOutputDir);
-    });
+    },
 
-    await runStep(job, "generate_graphical_style", async () => {
+    generate_graphical_style: async () => {
       setBookArg(slug);
-
-      initStyleSelection(bookRoot);
-      addLog(job, "Style selection initialized - waiting for user input (2 min timeout)");
 
       const autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
       setAutoStyleComplete(bookRoot, autoStyle);
       addLog(job, "Auto style generated, awaiting user input or timeout");
 
-      const TIMEOUT_MS = 2 * 60 * 1000;
+      const TIMEOUT_MS = 4 * 60 * 1000;
 
       let userStyleSubmitted = false;
       let userStyle: GraphicalStyle | null = null;
       let styleChosen = false;
-      let chosenStyleType: "auto" | "user" = "auto";
 
       const userStylePromise = new Promise<GraphicalStyle | null>((resolve) => {
+        const existingState = readStyleSelection(bookRoot);
+        if (existingState?.userStyle) {
+          userStyleSubmitted = true;
+          userStyle = existingState.userStyle;
+          resolve(existingState.userStyle);
+          return;
+        }
+        if (existingState?.status === "timed_out" || existingState?.status === "generating_previews") {
+          resolve(existingState.userStyle);
+          return;
+        }
+
         styleSelectionCallbacks.set(job.id, {
           onUserStyleSubmitted: (style) => {
             userStyleSubmitted = true;
@@ -533,7 +530,6 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
           },
           onStyleChosen: (choice) => {
             styleChosen = true;
-            chosenStyleType = choice;
           },
         });
 
@@ -554,7 +550,6 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
         const autoPreview = await generateStylePreview(autoStyle, "auto", 1);
         setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null);
         setStyleChoice(bookRoot, "auto");
-        chosenStyleType = "auto";
       } else if (userStyle) {
         addLog(job, "Generating previews for both styles");
         const [autoPreview, userPreviewResult] = await Promise.all([generateStylePreview(autoStyle, "auto", 1), generateStylePreview(userStyle, "user", 1)]);
@@ -564,9 +559,8 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
         await new Promise<void>((resolve) => {
           const currentCallback = styleSelectionCallbacks.get(job.id);
           if (currentCallback) {
-            currentCallback.onStyleChosen = (choice) => {
+            currentCallback.onStyleChosen = () => {
               styleChosen = true;
-              chosenStyleType = choice;
               resolve();
             };
           }
@@ -575,7 +569,6 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
             const currentState = readStyleSelection(bookRoot);
             if (currentState?.selected) {
               clearInterval(checkInterval);
-              chosenStyleType = currentState.selected;
               resolve();
             }
           }, 1000);
@@ -586,7 +579,6 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
               const defaultChoice = userStyle ? "user" : "auto";
               addLog(job, `Style choice timeout - defaulting to ${defaultChoice}`);
               setStyleChoice(bookRoot, defaultChoice);
-              chosenStyleType = defaultChoice;
               resolve();
             }
           }, TIMEOUT_MS);
@@ -596,7 +588,6 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
         const autoPreview = await generateStylePreview(autoStyle, "auto", 1);
         setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null);
         setStyleChoice(bookRoot, "auto");
-        chosenStyleType = "auto";
       }
 
       styleSelectionCallbacks.delete(job.id);
@@ -608,49 +599,123 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
       addLog(job, `Final style selected: ${selectedChoice}`);
 
       await uploadGraphicalStyleToConvex(job, tempOutputDir);
-    });
+    },
 
-    await runStep(job, "generate_backgrounds", async () => {
+    generate_backgrounds: async () => {
       setBookArg(slug);
       await generateBackgrounds({});
-
       await uploadBackgroundsToConvex(job, outputDir);
-    });
+    },
 
-    await runStep(job, "generate_entity_pictures", async () => {
+    generate_entity_pictures: async () => {
       setBookArg(slug);
       referenceCards = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
       await generatePicturesForEntities(referenceCards);
-
       await uploadCharactersToConvex(job, referenceCards, outputDir, tempOutputDir);
-    });
+    },
 
-    if (process.env.QUICK_MODE !== "true") {
-      await runStep(job, "make_chapter_summaries", async () => {
-        setBookArg(slug);
-        await makeRollingChapterSummaries();
-      });
+    make_chapter_summaries: async () => {
+      setBookArg(slug);
+      await makeRollingChapterSummaries();
+    },
 
-      await runStep(job, "map_summaries_to_paragraphs", async () => {
-        setBookArg(slug);
-        await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
-      });
+    map_summaries_to_paragraphs: async () => {
+      setBookArg(slug);
+      await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
+    },
 
-      await runStep(job, "generate_embeddings", async () => {
-        setBookArg(slug);
-        const settings = getBookSettings();
-        await generateEmbeddings(settings.startFromChapter, settings.startFromChapter + settings.numberOfChaptersToProcess - 1);
-        addLog(job, `Generated embeddings for chapters ${settings.startFromChapter}-${settings.startFromChapter + settings.numberOfChaptersToProcess - 1}`);
-      });
+    generate_embeddings: async () => {
+      setBookArg(slug);
+      const settings = getBookSettings();
+      await generateEmbeddings(settings.startFromChapter, settings.startFromChapter + settings.numberOfChaptersToProcess - 1);
+      addLog(job, `Generated embeddings for chapters ${settings.startFromChapter}-${settings.startFromChapter + settings.numberOfChaptersToProcess - 1}`);
+    },
 
-      await runStep(job, "upload_answer_server_data", async () => {
-        const result = await uploadBookFolder(bookRoot, slug);
-        if (!result.success) {
-          throw new Error(`Failed to upload answer server data: ${result.error}`);
-        }
-        addLog(job, `Uploaded embeddings and rich.xml to R2 for ${slug}`);
-      });
+    upload_answer_server_data: async () => {
+      const result = await uploadBookFolder(bookRoot, slug);
+      if (!result.success) {
+        throw new Error(`Failed to upload answer server data: ${result.error}`);
+      }
+      addLog(job, `Uploaded embeddings and rich.xml to R2 for ${slug}`);
+    },
+  };
+
+  const runStepParallel = async (step: Step) => {
+    const fn = stepFunctions[step];
+    if (!fn) {
+      addLog(job, `⚠ No function defined for step: ${step}`);
+      return;
     }
+    await runStep(job, step, fn);
+  };
+
+  const run = async () => {
+    try {
+      process.chdir(repoRoot);
+      addLog(job, `cwd -> ${process.cwd()}`);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      addLog(job, `Failed to chdir to repo root: ${msg}`);
+    }
+
+    addLog(job, `Initializing book structure in Convex...`);
+    try {
+      await convex.ensureBookStructure({ jobId: job.id, bookSlug: slug });
+      addLog(job, `✔ Book structure created in Convex`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      addLog(job, `⚠ Failed to create book structure: ${msg}`);
+    }
+
+    const stepsToRun: Step[] = STEP_DEPENDENCIES.map((d) => d.step).filter((step) => step !== "complete" && step !== "failed");
+
+    if (process.env.QUICK_MODE === "true") {
+      const skipSteps: Step[] = ["make_chapter_summaries", "map_summaries_to_paragraphs", "generate_embeddings", "upload_answer_server_data"];
+      for (const skip of skipSteps) {
+        const idx = stepsToRun.indexOf(skip);
+        if (idx !== -1) stepsToRun.splice(idx, 1);
+        schedulerState.completedSteps.add(skip);
+        const s = job.steps.find((x) => x.step === skip);
+        if (s) s.status = "done";
+      }
+    }
+
+    const runScheduler = async () => {
+      while (schedulerState.completedSteps.size + schedulerState.failedSteps.size < stepsToRun.length) {
+        const readySteps = getReadySteps(stepsToRun, schedulerState.completedSteps, schedulerState.runningSteps);
+
+        if (readySteps.length === 0 && schedulerState.runningSteps.size === 0) {
+          throw new Error("Pipeline deadlock: no steps ready and none running");
+        }
+
+        for (const step of readySteps) {
+          schedulerState.runningSteps.add(step);
+          job.activeSteps = Array.from(schedulerState.runningSteps);
+
+          const promise = runStepParallel(step)
+            .then(() => {
+              schedulerState.completedSteps.add(step);
+              schedulerState.runningSteps.delete(step);
+              job.activeSteps = Array.from(schedulerState.runningSteps);
+            })
+            .catch((e) => {
+              schedulerState.failedSteps.add(step);
+              schedulerState.runningSteps.delete(step);
+              job.activeSteps = Array.from(schedulerState.runningSteps);
+              throw e;
+            });
+
+          schedulerState.stepPromises.set(step, promise);
+        }
+
+        if (schedulerState.runningSteps.size > 0) {
+          const runningPromises = Array.from(schedulerState.runningSteps).map((step) => schedulerState.stepPromises.get(step)!);
+          await Promise.race(runningPromises);
+        }
+      }
+    };
+
+    await runScheduler();
 
     job.status = "done";
     job.currentStep = "complete";

@@ -64,6 +64,7 @@ export const JobStatusSchema = z.object({
   jobId: z.string(),
   slug: z.string(),
   currentStep: StepEnum,
+  activeSteps: z.array(StepEnum).optional(),
   steps: z.array(
     z.object({
       step: StepEnum,

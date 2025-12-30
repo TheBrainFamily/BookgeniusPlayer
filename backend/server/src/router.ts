@@ -121,6 +121,7 @@ export const appRouter = router({
       jobId: job.id,
       slug: job.slug,
       currentStep: job.currentStep,
+      activeSteps: job.activeSteps,
       steps: job.steps,
       logs: job.logs.slice(-200),
       error: job.error,

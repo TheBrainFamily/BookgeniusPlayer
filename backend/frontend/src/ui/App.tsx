@@ -44,6 +44,7 @@ type JobStatus = {
   jobId: string;
   slug: string;
   currentStep: Step;
+  activeSteps?: Step[];
   steps: StepState[];
   logs?: string[];
   error?: string;
@@ -303,13 +304,13 @@ export default function App() {
   const selectedCount = chapters.filter((c) => c.selected).length;
   const currentChapter = chapters[selectedChapterIdx];
 
-  const showStyleModal = status?.styleSelection?.status === "awaiting_input";
+  const canAcceptStyleInput = ["generating_auto_style", "awaiting_input"].includes(status?.styleSelection?.status || "");
   const showStyleComparison = status?.styleSelection?.status === "awaiting_choice";
-  const isGeneratingStyle = ["generating_auto_style", "generating_user_style", "generating_previews"].includes(status?.styleSelection?.status || "");
+  const isProcessingUserStyle = ["generating_user_style", "generating_previews"].includes(status?.styleSelection?.status || "");
 
   return (
     <div className="min-h-screen bg-background">
-      {showStyleModal && status?.styleSelection && <StyleSelectionModal remainingTimeMs={status.styleSelection.remainingTimeMs} onSubmit={submitStyleDescription} />}
+      {canAcceptStyleInput && status?.styleSelection && <StyleSelectionModal remainingTimeMs={status.styleSelection.remainingTimeMs} onSubmit={submitStyleDescription} />}
 
       {showStyleComparison && status?.styleSelection && (
         <StylePreviewComparison
@@ -701,7 +702,7 @@ export default function App() {
                   </div>
 
                   {/* Style Generation Loading Indicator */}
-                  {isGeneratingStyle && (
+                  {isProcessingUserStyle && (
                     <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in mb-4">
                       <div className="flex items-center gap-3">
                         <div className="relative">
@@ -711,7 +712,6 @@ export default function App() {
                         <div>
                           <p className="text-sm font-medium text-foreground">AI Style Generation in Progress</p>
                           <p className="text-xs text-muted-foreground">
-                            {status?.styleSelection?.status === "generating_auto_style" && "Analyzing text for visual style..."}
                             {status?.styleSelection?.status === "generating_user_style" && "Processing your style description..."}
                             {status?.styleSelection?.status === "generating_previews" && "Rendering preview images..."}
                           </p>
