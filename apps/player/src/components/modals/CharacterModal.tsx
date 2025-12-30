@@ -14,6 +14,7 @@ import { DialogEnhanceClose } from "../ui/dialog";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isVideoFile } from "@player/helpers/isVideoFile";
+import { getAvatarSource } from "@player/helpers/svgAvatars";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { FILTER_OPTIONS } from "@player/utils/filterOptions";
@@ -62,15 +63,21 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     [matchingCharacter, locationRef, latestSummary],
   );
 
+  const svgFallback = useMemo(
+    () => (matchingCharacter ? getAvatarSource({ slug: matchingCharacter.slug, characterName: matchingCharacter.characterName, bookSlug: "", infoPerChapter: [] }) : null),
+    [matchingCharacter],
+  );
+
   // Use Convex URLs from snapshot - prefer listening unless explicitly talking
   // explicitAssetUrl is only for character overrides with explicit file paths
   const resolvedMediaSrc = useMemo(() => {
-    if (!snapshot) return mediaSrc;
+    if (!snapshot) return mediaSrc || svgFallback;
     // Check for explicit override asset first
     if (snapshot.media.explicitAssetUrl) return snapshot.media.explicitAssetUrl;
     // Use talking or listening based on state
-    return isTalking ? snapshot.media.talking : snapshot.media.listening;
-  }, [snapshot, mediaSrc, isTalking]);
+    const url = isTalking ? snapshot.media.talking : snapshot.media.listening;
+    return url || svgFallback;
+  }, [snapshot, mediaSrc, isTalking, svgFallback]);
   const resolvedIsVideo = useMemo(() => (resolvedMediaSrc ? isVideoFile(resolvedMediaSrc) : isVideo), [resolvedMediaSrc, isVideo]);
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
