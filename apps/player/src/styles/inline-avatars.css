@@ -43,17 +43,26 @@
   margin-top: 0;
 }
 
-p[data-text-alignment="right"] .character-talking {
+p[data-text-alignment="right"] .character-talking,
+blockquote[data-text-alignment="right"] .character-talking {
   margin-right: -3em;
   margin-left: 0;
 }
 
-p[data-text-alignment="right"] .character-talking + .character-talking {
+p[data-text-alignment="right"] .character-talking + .character-talking,
+blockquote[data-text-alignment="right"] .character-talking + .character-talking {
   margin-right: -1em;
 }
 
-p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)) {
+p[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)),
+blockquote[data-text-alignment="right"] .character-talking:not(:has(~ .character-talking)) {
   margin-left: 0.5em;
+}
+
+blockquote > .character-placeholder.character-talking.start-of-paragraph {
+  float: left;
+  margin-right: 0.5em;
+  shape-outside: circle(50%);
 }
 
 /* --- Play Mode Avatar Styles --- */
@@ -370,38 +379,36 @@ p.dialogue .dialogue-avatar {
 
 /* Avatar-in-paragraph layout only on small screens */
 @media (max-width: 639px) {
-  /* paragraphs that have media injected */
-  p[data-index] {
+  p[data-index],
+  blockquote[data-index] {
     position: relative;
     text-indent: 0 !important;
   }
 
-  /* next dialogue paragraph should also have no indent */
-  p[data-index] + p[data-index] {
+  p[data-index] + p[data-index],
+  blockquote[data-index] + blockquote[data-index] {
     text-indent: 0 !important;
   }
 
-  /* clear the floated avatar */
-  p[data-index]::after {
+  p[data-index]::after,
+  blockquote[data-index]::after {
     content: "";
     display: block;
     clear: both;
   }
 
-  /* the avatar wrapper */
-  p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar {
+  p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar,
+  blockquote[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar {
     float: left;
     width: 4.5rem !important;
     height: 4.5rem !important;
     margin-left: calc(-1 * var(--padding-x, 1rem) + 0.2rem);
-    /* margin-right: 0.5rem; */
-    /* optional, for nicer circular wrap */
     shape-outside: circle(50%);
     clip-path: circle(50%);
   }
 
-  /* the avatar image */
-  p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar img {
+  p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar img,
+  blockquote[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar img {
     display: block;
     width: 100%;
     height: 100%;
@@ -410,43 +417,37 @@ p.dialogue .dialogue-avatar {
   }
 }
 
-/* Avatar-in-paragraph layout only on small screens */
 @media (max-width: 639px) {
-  /* Treat paragraphs with media as dialogue blocks */
-  p[data-index] {
+  p[data-index],
+  blockquote[data-index] {
     position: relative;
-    text-indent: 0 !important; /* no first-line indent */
+    text-indent: 0 !important;
   }
 
-  /* Undo the big negative margins from the desktop inline layout */
-  p[data-index] .character-talking.start-of-paragraph {
+  p[data-index] .character-talking.start-of-paragraph,
+  blockquote[data-index] .character-talking.start-of-paragraph {
     margin-left: 0;
     margin-right: 0;
   }
 
-  /* The FIRST speaker placeholder becomes the floated avatar wrapper */
-  p[data-index] > .character-placeholder.character-talking.start-of-paragraph {
+  p[data-index] > .character-placeholder.character-talking.start-of-paragraph,
+  blockquote[data-index] > .character-placeholder.character-talking.start-of-paragraph {
     float: left;
-    /* width: 4.5rem;
-    height: 4.5rem; */
-    /* margin-left: calc(-1 * var(--padding-x, 1.5rem) + 0.2rem); */
     margin-right: 0.5rem;
-    /* optional, nicer curve */
     shape-outside: circle(50%);
-    /* clip-path: circle(50%); */
   }
 
-  /* Avatar inside that wrapper */
-  p[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar {
+  p[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar,
+  blockquote[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar {
     display: block;
     width: 100%;
     height: 100%;
-    float: none; /* float is on the wrapper span, not here */
+    float: none;
   }
 
-  /* Actual <img> */
-  p[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar img {
-    position: static; /* override Tailwind's absolute */
+  p[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar img,
+  blockquote[data-index] > .character-placeholder.character-talking.start-of-paragraph .inline-avatar img {
+    position: static;
     display: block;
     width: 100%;
     height: 100%;
@@ -454,8 +455,8 @@ p.dialogue .dialogue-avatar {
     border-radius: 50%;
   }
 
-  /* clearfix for the float */
-  p[data-index]::after {
+  p[data-index]::after,
+  blockquote[data-index]::after {
     content: "";
     display: block;
     clear: both;
