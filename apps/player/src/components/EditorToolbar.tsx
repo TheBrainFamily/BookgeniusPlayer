@@ -14,9 +14,9 @@ function formatRange(startChapter: number, startParagraph: number, endChapter: n
     return `Ch ${startChapter} ¶${startParagraph} → end`;
   }
   if (startChapter === endChapter) {
-    return `Ch ${startChapter} ¶${startParagraph}–${endParagraph}`;
+    return `Ch ${startChapter} ${startParagraph}–${endParagraph}`;
   }
-  return `Ch ${startChapter} ¶${startParagraph} → Ch ${endChapter} ¶${endParagraph}`;
+  return `Ch ${startChapter} ${startParagraph} → Ch ${endChapter} ${endParagraph}`;
 }
 
 export const EditorToolbar: React.FC = () => {

@@ -35,16 +35,47 @@ export interface WLCategory {
   slug: string;
 }
 
+export interface WLFragmentData {
+  title: string;
+  html: string;
+}
+
+export interface WLMedia {
+  url: string;
+  director: string;
+  type: string;
+  name: string;
+  artist: string;
+}
+
 export interface WLBookDetails {
   title: string;
   slug: string;
   language: string;
-  authors: { name: string; slug: string }[];
+  authors: { name: string; slug: string; url: string; href: string }[];
+  translators: { name: string }[];
   epochs: WLCategory[];
   genres: WLCategory[];
   kinds: WLCategory[];
+  fragment_data: WLFragmentData;
+  children: WLBook[];
+  parent: WLBook | null;
+  preview: boolean;
   fb2: string;
   epub: string;
+  mobi: string;
+  pdf: string;
+  html: string;
+  txt: string;
+  xml: string;
+  media: WLMedia[];
+  audio_length: string;
   cover: string;
   cover_thumb: string;
+  cover_color: string;
+  simple_cover: string;
+  simple_thumb: string;
+  isbn_pdf: string;
+  isbn_epub: string;
+  isbn_mobi: string;
 }

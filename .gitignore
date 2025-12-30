@@ -27,4 +27,5 @@ compiled-books/*/
 # Local book development directories
 books/Dynamic-The-Great-Gatsby/
 books/player-of-games/
-
+backend/wolnelektury-data/generated-descriptions/
+backend/wolnelektury-data/fb2/

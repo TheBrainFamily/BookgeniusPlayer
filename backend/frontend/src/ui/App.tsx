@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { trpc } from "../trpc";
 import { StepLabels, type Step } from "~shared/pipelineTypes";
 import Editor from "@monaco-editor/react";
@@ -24,12 +25,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CollectionsPage } from "../pages/CollectionsPage";
 
 import { StyleSelectionModal } from "@/components/StyleSelectionModal";
 import { StylePreviewComparison } from "@/components/StylePreviewComparison";
-
-type AppView = "pipeline" | "collections";
 type SourceMode = "upload" | "wolneLektury";
 
 type WolneLekturySearchResult = { title: string; author: string; slug: string; coverThumb: string; hasAudio: boolean; epoch: string; genre: string; kind: string };
@@ -108,7 +106,7 @@ function recompileXml(preamble: string, chapters: ChapterInfo[], postamble: stri
 }
 
 export default function App() {
-  const [appView, setAppView] = useState<AppView>("pipeline");
+  const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
   const [upload, setUpload] = useState<UploadResult | null>(null);
@@ -237,14 +235,6 @@ export default function App() {
     }
   }, []);
 
-  const handleCollectionBookSelect = useCallback(
-    async (bookSlug: string) => {
-      setAppView("pipeline");
-      await downloadFromWolneLektury(bookSlug);
-    },
-    [downloadFromWolneLektury],
-  );
-
   const startPipeline = useCallback(async () => {
     if (!slug) return;
     setIsStartingPipeline(true);
@@ -335,485 +325,474 @@ export default function App() {
                 <p className="text-sm text-muted-foreground">Transform your EPUB into an interactive experience</p>
               </div>
             </div>
-            <Button
-              variant={appView === "collections" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setAppView(appView === "collections" ? "pipeline" : "collections")}
-              className="gap-2"
-            >
+            <Button variant="ghost" size="sm" onClick={() => navigate("/collections")} className="gap-2">
               <LayoutGrid className="w-4 h-4" />
-              {appView === "collections" ? "Back to Pipeline" : "Browse Collections"}
+              Browse Collections
             </Button>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-6 py-8 max-w-6xl">
-        {appView === "collections" ? (
-          <CollectionsPage onSelectBook={handleCollectionBookSelect} onBack={() => setAppView("pipeline")} />
-        ) : (
-          <>
-            {currentStep === "upload" && (
-              <Card className="animate-fade-in border-border/50 max-w-2xl mx-auto">
-                <CardHeader>
-                  <div className="flex gap-2 mb-4">
-                    <Button variant={sourceMode === "upload" ? "default" : "ghost"} size="sm" onClick={() => setSourceMode("upload")} className="gap-2">
-                      <Upload className="w-4 h-4" />
-                      Upload EPUB
-                    </Button>
-                    <Button variant={sourceMode === "wolneLektury" ? "default" : "ghost"} size="sm" onClick={() => setSourceMode("wolneLektury")} className="gap-2">
-                      <Library className="w-4 h-4" />
-                      Wolne Lektury
-                    </Button>
-                  </div>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    {sourceMode === "upload" ? (
-                      <>
-                        <Upload className="w-5 h-5 text-primary" />
-                        Upload EPUB
-                      </>
-                    ) : (
-                      <>
-                        <Library className="w-5 h-5 text-primary" />
-                        Wolne Lektury
-                      </>
+        {currentStep === "upload" && (
+          <Card className="animate-fade-in border-border/50 max-w-2xl mx-auto">
+            <CardHeader>
+              <div className="flex gap-2 mb-4">
+                <Button variant={sourceMode === "upload" ? "default" : "ghost"} size="sm" onClick={() => setSourceMode("upload")} className="gap-2">
+                  <Upload className="w-4 h-4" />
+                  Upload EPUB
+                </Button>
+                <Button variant={sourceMode === "wolneLektury" ? "default" : "ghost"} size="sm" onClick={() => setSourceMode("wolneLektury")} className="gap-2">
+                  <Library className="w-4 h-4" />
+                  Wolne Lektury
+                </Button>
+              </div>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                {sourceMode === "upload" ? (
+                  <>
+                    <Upload className="w-5 h-5 text-primary" />
+                    Upload EPUB
+                  </>
+                ) : (
+                  <>
+                    <Library className="w-5 h-5 text-primary" />
+                    Wolne Lektury
+                  </>
+                )}
+              </CardTitle>
+              <CardDescription>
+                {sourceMode === "upload" ? "Drag and drop your EPUB file or click to browse" : "Search and select a book from the Polish digital library"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sourceMode === "upload" ? (
+                <>
+                  <div
+                    onDrop={onDrop}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragging(true);
+                    }}
+                    onDragLeave={() => setIsDragging(false)}
+                    className={cn(
+                      "relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200",
+                      isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "border-border hover:border-muted-foreground/50",
+                      file && "border-success/50 bg-success/5",
                     )}
-                  </CardTitle>
-                  <CardDescription>
-                    {sourceMode === "upload" ? "Drag and drop your EPUB file or click to browse" : "Search and select a book from the Polish digital library"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {sourceMode === "upload" ? (
-                    <>
-                      <div
-                        onDrop={onDrop}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          setIsDragging(true);
-                        }}
-                        onDragLeave={() => setIsDragging(false)}
-                        className={cn(
-                          "relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200",
-                          isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "border-border hover:border-muted-foreground/50",
-                          file && "border-success/50 bg-success/5",
-                        )}
-                      >
-                        <input type="file" accept=".epub" onChange={onSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                        <div className="space-y-3">
-                          <div className={cn("mx-auto w-12 h-12 rounded-full flex items-center justify-center transition-colors", file ? "bg-success/20" : "bg-muted")}>
-                            {file ? <CheckCircle2 className="w-6 h-6 text-success" /> : <FileText className="w-6 h-6 text-muted-foreground" />}
-                          </div>
-                          {file ? (
-                            <div>
-                              <p className="font-medium text-foreground">{file.name}</p>
-                              <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                            </div>
-                          ) : (
-                            <div>
-                              <p className="font-medium text-foreground">Drop your EPUB here</p>
-                              <p className="text-sm text-muted-foreground">or click to browse</p>
-                            </div>
-                          )}
-                        </div>
+                  >
+                    <input type="file" accept=".epub" onChange={onSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    <div className="space-y-3">
+                      <div className={cn("mx-auto w-12 h-12 rounded-full flex items-center justify-center transition-colors", file ? "bg-success/20" : "bg-muted")}>
+                        {file ? <CheckCircle2 className="w-6 h-6 text-success" /> : <FileText className="w-6 h-6 text-muted-foreground" />}
                       </div>
-                      {file && !upload && (
-                        <div className="mt-4 flex justify-end">
-                          <Button onClick={uploadFile}>
-                            <Upload className="w-4 h-4" />
-                            Upload & Prepare
-                          </Button>
+                      {file ? (
+                        <div>
+                          <p className="font-medium text-foreground">{file.name}</p>
+                          <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && searchWolneLektury()}
-                          placeholder="Search by title or author..."
-                          className="flex-1 px-3 py-2 rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
-                        <Button onClick={searchWolneLektury} disabled={isSearching || !searchQuery.trim()}>
-                          {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                        </Button>
-                      </div>
-
-                      {isDownloadingWL && (
-                        <div className="flex items-center justify-center gap-3 p-8 text-muted-foreground">
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          <span>Downloading and preparing book...</span>
-                        </div>
-                      )}
-
-                      {!isDownloadingWL && searchResults.length > 0 && (
-                        <div className="max-h-96 overflow-auto space-y-2 scrollbar-thin">
-                          {searchResults.map((book) => (
-                            <div
-                              key={book.slug}
-                              onClick={() => downloadFromWolneLektury(book.slug)}
-                              className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all"
-                            >
-                              {book.coverThumb ? (
-                                <img src={book.coverThumb} alt={book.title} className="w-12 h-16 object-cover rounded" />
-                              ) : (
-                                <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
-                                  <BookOpen className="w-6 h-6 text-muted-foreground" />
-                                </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-foreground truncate">{book.title}</p>
-                                <p className="text-sm text-muted-foreground truncate">{book.author}</p>
-                                <div className="flex gap-1 mt-1">
-                                  {book.epoch && (
-                                    <Badge variant="muted" className="text-xs">
-                                      {book.epoch}
-                                    </Badge>
-                                  )}
-                                  {book.genre && (
-                                    <Badge variant="muted" className="text-xs">
-                                      {book.genre}
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {!isDownloadingWL && !isSearching && searchResults.length === 0 && searchQuery && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <p>No books found. Try a different search term.</p>
-                        </div>
-                      )}
-
-                      {!isDownloadingWL && !searchQuery && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <Library className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                          <p>Search for Polish literature classics</p>
-                          <p className="text-sm">Try "Lalka", "Pan Tadeusz", or "Sienkiewicz"</p>
+                      ) : (
+                        <div>
+                          <p className="font-medium text-foreground">Drop your EPUB here</p>
+                          <p className="text-sm text-muted-foreground">or click to browse</p>
                         </div>
                       )}
                     </div>
+                  </div>
+                  {file && !upload && (
+                    <div className="mt-4 flex justify-end">
+                      <Button onClick={uploadFile}>
+                        <Upload className="w-4 h-4" />
+                        Upload & Prepare
+                      </Button>
+                    </div>
                   )}
-                </CardContent>
-              </Card>
-            )}
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && searchWolneLektury()}
+                      placeholder="Search by title or author..."
+                      className="flex-1 px-3 py-2 rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                    <Button onClick={searchWolneLektury} disabled={isSearching || !searchQuery.trim()}>
+                      {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    </Button>
+                  </div>
 
-            {/* Editor Section with Chapter Sidebar */}
-            {currentStep === "editor" && (
-              <div className="animate-fade-in flex gap-4">
-                {/* Chapter Sidebar */}
-                <div className={cn("shrink-0 transition-all duration-200", sidebarCollapsed ? "w-12" : "w-72")}>
-                  <Card className="border-border/50 h-[calc(100vh-180px)] flex flex-col">
-                    <CardHeader className="p-3 border-b border-border/50">
-                      <div className="flex items-center justify-between">
-                        {!sidebarCollapsed && (
-                          <div className="flex-1">
-                            <CardTitle className="text-sm font-medium">Chapters</CardTitle>
-                            <CardDescription className="text-xs">
-                              {isUploading ? (
-                                <span className="animate-pulse">Loading chapters...</span>
-                              ) : (
-                                <>
-                                  {selectedCount} of {chapters.length} selected
-                                </>
-                              )}
-                            </CardDescription>
-                          </div>
-                        )}
-                        <Button variant="ghost" size="icon-sm" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} disabled={isUploading}>
-                          {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                        </Button>
-                      </div>
-                      {!sidebarCollapsed && !isUploading && (
-                        <div className="flex gap-2 mt-2">
-                          <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7 px-2">
-                            Select All
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={deselectAll} className="text-xs h-7 px-2">
-                            Deselect All
-                          </Button>
-                        </div>
-                      )}
-                    </CardHeader>
-                    <CardContent className="flex-1 overflow-auto p-2 scrollbar-thin">
-                      {isUploading ? (
-                        // Skeleton loading state
-                        <div className="space-y-2">
-                          {[...Array(8)].map((_, i) => (
-                            <div key={i} className="flex items-center gap-2 p-2 animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
-                              <div className="w-4 h-4 rounded bg-muted animate-pulse" />
-                              <div className="w-6 h-4 rounded bg-muted animate-pulse" />
-                              <div className="flex-1 h-4 rounded bg-muted animate-pulse" />
+                  {isDownloadingWL && (
+                    <div className="flex items-center justify-center gap-3 p-8 text-muted-foreground">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Downloading and preparing book...</span>
+                    </div>
+                  )}
+
+                  {!isDownloadingWL && searchResults.length > 0 && (
+                    <div className="max-h-96 overflow-auto space-y-2 scrollbar-thin">
+                      {searchResults.map((book) => (
+                        <div
+                          key={book.slug}
+                          onClick={() => downloadFromWolneLektury(book.slug)}
+                          className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all"
+                        >
+                          {book.coverThumb ? (
+                            <img src={book.coverThumb} alt={book.title} className="w-12 h-16 object-cover rounded" />
+                          ) : (
+                            <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
+                              <BookOpen className="w-6 h-6 text-muted-foreground" />
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        chapters.map((chapter, idx) => (
-                          <div
-                            key={chapter.originalIndex}
-                            className={cn(
-                              "flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors",
-                              selectedChapterIdx === idx && "bg-primary/10",
-                              !chapter.selected && "opacity-50",
-                            )}
-                            onClick={() => setSelectedChapterIdx(idx)}
-                          >
-                            {!sidebarCollapsed && (
-                              <input
-                                type="checkbox"
-                                checked={chapter.selected}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  toggleChapter(idx);
-                                }}
-                                className="shrink-0 w-4 h-4 rounded border-border accent-primary"
-                              />
-                            )}
-                            {sidebarCollapsed ? (
-                              <span
-                                className={cn(
-                                  "w-6 h-6 rounded text-xs flex items-center justify-center",
-                                  chapter.selected ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground",
-                                )}
-                              >
-                                {idx + 1}
-                              </span>
-                            ) : (
-                              <>
-                                <span className="text-xs text-muted-foreground shrink-0 w-6">{idx + 1}.</span>
-                                <span className="text-sm truncate flex-1">{chapter.title}</span>
-                              </>
-                            )}
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-foreground truncate">{book.title}</p>
+                            <p className="text-sm text-muted-foreground truncate">{book.author}</p>
+                            <div className="flex gap-1 mt-1">
+                              {book.epoch && (
+                                <Badge variant="muted" className="text-xs">
+                                  {book.epoch}
+                                </Badge>
+                              )}
+                              {book.genre && (
+                                <Badge variant="muted" className="text-xs">
+                                  {book.genre}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                        ))
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                {/* Editor Panel */}
-                <Card className="flex-1 border-border/50">
-                  <CardHeader className="p-4 border-b border-border/50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2 text-lg">
-                          {isUploading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <FileText className="w-5 h-5 text-primary" />}
-                          {isUploading ? "Preparing Book..." : currentChapter?.title || "XML Editor"}
-                        </CardTitle>
-                        <CardDescription>
+                  {!isDownloadingWL && !isSearching && searchResults.length === 0 && searchQuery && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No books found. Try a different search term.</p>
+                    </div>
+                  )}
+
+                  {!isDownloadingWL && !searchQuery && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Library className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>Search for Polish literature classics</p>
+                      <p className="text-sm">Try "Lalka", "Pan Tadeusz", or "Sienkiewicz"</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Editor Section with Chapter Sidebar */}
+        {currentStep === "editor" && (
+          <div className="animate-fade-in flex gap-4">
+            {/* Chapter Sidebar */}
+            <div className={cn("shrink-0 transition-all duration-200", sidebarCollapsed ? "w-12" : "w-72")}>
+              <Card className="border-border/50 h-[calc(100vh-180px)] flex flex-col">
+                <CardHeader className="p-3 border-b border-border/50">
+                  <div className="flex items-center justify-between">
+                    {!sidebarCollapsed && (
+                      <div className="flex-1">
+                        <CardTitle className="text-sm font-medium">Chapters</CardTitle>
+                        <CardDescription className="text-xs">
                           {isUploading ? (
-                            <span className="animate-pulse">Converting EPUB and extracting chapters...</span>
+                            <span className="animate-pulse">Loading chapters...</span>
                           ) : (
                             <>
-                              <span className="font-mono text-primary">{slug}</span>
-                              {currentChapter && (
-                                <span className="ml-2">
-                                  — Chapter {selectedChapterIdx + 1} of {chapters.length}
-                                  {!currentChapter.selected && (
-                                    <Badge variant="muted" className="ml-2">
-                                      Excluded
-                                    </Badge>
-                                  )}
-                                </span>
-                              )}
+                              {selectedCount} of {chapters.length} selected
                             </>
                           )}
                         </CardDescription>
                       </div>
-                      <Button onClick={startPipeline} disabled={selectedCount === 0 || isUploading} className="gap-2">
-                        <Play className="w-4 h-4" />
-                        Start Pipeline ({selectedCount} chapters)
+                    )}
+                    <Button variant="ghost" size="icon-sm" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} disabled={isUploading}>
+                      {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                  {!sidebarCollapsed && !isUploading && (
+                    <div className="flex gap-2 mt-2">
+                      <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7 px-2">
+                        Select All
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={deselectAll} className="text-xs h-7 px-2">
+                        Deselect All
                       </Button>
                     </div>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="border-b border-border bg-[#1e1e1e]">
-                      {isUploading ? (
-                        // Skeleton for editor
-                        <div className="h-[calc(100vh-280px)] p-4 space-y-3">
-                          {[...Array(20)].map((_, i) => (
-                            <div key={i} className="h-4 rounded bg-muted/30 animate-pulse" style={{ width: `${Math.random() * 40 + 60}%`, animationDelay: `${i * 0.03}s` }} />
-                          ))}
-                        </div>
-                      ) : (
-                        <Editor
-                          height="calc(100vh - 280px)"
-                          defaultLanguage="xml"
-                          value={currentChapter?.content || ""}
-                          theme="vs-dark"
-                          options={{
-                            readOnly: true,
-                            minimap: { enabled: false },
-                            fontSize: 13,
-                            lineNumbers: "on",
-                            scrollBeyondLastLine: false,
-                            padding: { top: 16, bottom: 16 },
-                            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                            wordWrap: "on",
-                            wrappingStrategy: "advanced",
-                          }}
-                        />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Progress Section */}
-            {currentStep === "progress" && (
-              <Card className="animate-fade-in border-border/50 max-w-2xl mx-auto">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        {status?.currentStep === "complete" ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Loader2 className="w-5 h-5 text-primary animate-spin" />}
-                        Pipeline Progress
-                      </CardTitle>
-                      <CardDescription>
-                        {!status
-                          ? "Starting pipeline..."
-                          : status.currentStep === "complete"
-                            ? "Processing complete!"
-                            : status.currentStep === "failed"
-                              ? "Pipeline failed"
-                              : `Processing ${status.slug}...`}
-                      </CardDescription>
-                    </div>
-                    <Badge variant={!status ? "info" : status.currentStep === "complete" ? "success" : status.currentStep === "failed" ? "destructive" : "info"}>
-                      {!status ? "Starting" : status.currentStep === "complete" ? "Complete" : status.currentStep === "failed" ? "Failed" : "In Progress"}
-                    </Badge>
-                  </div>
+                  )}
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Progress Bar */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Progress</span>
-                      <span className="text-foreground font-medium">{Math.round(progressPercent)}%</span>
-                    </div>
-                    <Progress value={progressPercent} className="h-2" />
-                  </div>
-
-                  {/* Style Generation Loading Indicator */}
-                  {isProcessingUserStyle && (
-                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                          <Wand2 className="w-3 h-3 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">AI Style Generation in Progress</p>
-                          <p className="text-xs text-muted-foreground">
-                            {status?.styleSelection?.status === "generating_user_style" && "Processing your style description..."}
-                            {status?.styleSelection?.status === "generating_previews" && "Rendering preview images..."}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Steps List or Loading Skeleton */}
-                  <div className="space-y-2">
-                    {!status
-                      ? // Skeleton while starting
-                        [...Array(5)].map((_, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 rounded-lg animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
-                            <div className="w-5 h-5 rounded-full bg-muted animate-pulse" />
-                            <div className="flex-1 h-4 rounded bg-muted animate-pulse" />
-                            <div className="w-16 h-5 rounded bg-muted animate-pulse" />
-                          </div>
-                        ))
-                      : steps.map((s, idx) => {
-                          const Icon = statusIcons[s.status];
-                          return (
-                            <div
-                              key={s.step}
-                              className={cn(
-                                "flex items-center gap-3 p-3 rounded-lg transition-all",
-                                s.status === "running" && "bg-info/5 animate-pulse-glow",
-                                s.status === "done" && "bg-success/5",
-                                s.status === "error" && "bg-destructive/5",
-                                "animate-fade-in",
-                                `stagger-${Math.min(idx + 1, 6)}`,
-                              )}
-                            >
-                              <Icon
-                                className={cn(
-                                  "w-5 h-5 shrink-0",
-                                  s.status === "pending" && "text-muted-foreground",
-                                  s.status === "running" && "text-info animate-spin",
-                                  s.status === "done" && "text-success",
-                                  s.status === "error" && "text-destructive",
-                                )}
-                              />
-                              <span
-                                className={cn(
-                                  "flex-1 text-sm font-medium",
-                                  s.status === "pending" && "text-muted-foreground",
-                                  s.status === "running" && "text-info",
-                                  s.status === "done" && "text-foreground",
-                                  s.status === "error" && "text-destructive",
-                                )}
-                              >
-                                {StepLabels[s.step as Step]}
-                              </span>
-                              <Badge variant={s.status} className="text-xs">
-                                {s.status}
-                              </Badge>
-                            </div>
-                          );
-                        })}
-                  </div>
-
-                  {/* Download Link */}
-                  {downloadHref && (
-                    <div className="animate-scale-in pt-2">
-                      <a
-                        href={downloadHref}
-                        download
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-success text-success-foreground font-medium hover:brightness-110 transition-all shadow-glow-sm"
-                      >
-                        <Download className="w-4 h-4" />
-                        Download Packaged Files
-                      </a>
-                    </div>
-                  )}
-
-                  {/* Logs Section */}
-                  {status?.logs && status.logs.length > 0 && (
+                <CardContent className="flex-1 overflow-auto p-2 scrollbar-thin">
+                  {isUploading ? (
+                    // Skeleton loading state
                     <div className="space-y-2">
-                      <button onClick={() => setShowLogs(!showLogs)} className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-                        {showLogs ? "▼" : "▶"} Logs ({status.logs.length} entries)
-                      </button>
-                      {showLogs && (
-                        <pre className="p-4 rounded-lg bg-[#0d1117] text-[#c9d1d9] text-xs font-mono overflow-auto max-h-60 scrollbar-thin animate-fade-in">
-                          {status.logs.join("\n")}
-                        </pre>
-                      )}
+                      {[...Array(8)].map((_, i) => (
+                        <div key={i} className="flex items-center gap-2 p-2 animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
+                          <div className="w-4 h-4 rounded bg-muted animate-pulse" />
+                          <div className="w-6 h-4 rounded bg-muted animate-pulse" />
+                          <div className="flex-1 h-4 rounded bg-muted animate-pulse" />
+                        </div>
+                      ))}
                     </div>
-                  )}
-
-                  {/* Error Display */}
-                  {status?.error && (
-                    <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 animate-fade-in">
-                      <p className="text-sm text-destructive flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 shrink-0" />
-                        {status.error}
-                      </p>
-                    </div>
+                  ) : (
+                    chapters.map((chapter, idx) => (
+                      <div
+                        key={chapter.originalIndex}
+                        className={cn(
+                          "flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors",
+                          selectedChapterIdx === idx && "bg-primary/10",
+                          !chapter.selected && "opacity-50",
+                        )}
+                        onClick={() => setSelectedChapterIdx(idx)}
+                      >
+                        {!sidebarCollapsed && (
+                          <input
+                            type="checkbox"
+                            checked={chapter.selected}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              toggleChapter(idx);
+                            }}
+                            className="shrink-0 w-4 h-4 rounded border-border accent-primary"
+                          />
+                        )}
+                        {sidebarCollapsed ? (
+                          <span
+                            className={cn(
+                              "w-6 h-6 rounded text-xs flex items-center justify-center",
+                              chapter.selected ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground",
+                            )}
+                          >
+                            {idx + 1}
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-xs text-muted-foreground shrink-0 w-6">{idx + 1}.</span>
+                            <span className="text-sm truncate flex-1">{chapter.title}</span>
+                          </>
+                        )}
+                      </div>
+                    ))
                   )}
                 </CardContent>
               </Card>
-            )}
-          </>
+            </div>
+
+            {/* Editor Panel */}
+            <Card className="flex-1 border-border/50">
+              <CardHeader className="p-4 border-b border-border/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      {isUploading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <FileText className="w-5 h-5 text-primary" />}
+                      {isUploading ? "Preparing Book..." : currentChapter?.title || "XML Editor"}
+                    </CardTitle>
+                    <CardDescription>
+                      {isUploading ? (
+                        <span className="animate-pulse">Converting EPUB and extracting chapters...</span>
+                      ) : (
+                        <>
+                          <span className="font-mono text-primary">{slug}</span>
+                          {currentChapter && (
+                            <span className="ml-2">
+                              — Chapter {selectedChapterIdx + 1} of {chapters.length}
+                              {!currentChapter.selected && (
+                                <Badge variant="muted" className="ml-2">
+                                  Excluded
+                                </Badge>
+                              )}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </CardDescription>
+                  </div>
+                  <Button onClick={startPipeline} disabled={selectedCount === 0 || isUploading} className="gap-2">
+                    <Play className="w-4 h-4" />
+                    Start Pipeline ({selectedCount} chapters)
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="border-b border-border bg-[#1e1e1e]">
+                  {isUploading ? (
+                    // Skeleton for editor
+                    <div className="h-[calc(100vh-280px)] p-4 space-y-3">
+                      {[...Array(20)].map((_, i) => (
+                        <div key={i} className="h-4 rounded bg-muted/30 animate-pulse" style={{ width: `${Math.random() * 40 + 60}%`, animationDelay: `${i * 0.03}s` }} />
+                      ))}
+                    </div>
+                  ) : (
+                    <Editor
+                      height="calc(100vh - 280px)"
+                      defaultLanguage="xml"
+                      value={currentChapter?.content || ""}
+                      theme="vs-dark"
+                      options={{
+                        readOnly: true,
+                        minimap: { enabled: false },
+                        fontSize: 13,
+                        lineNumbers: "on",
+                        scrollBeyondLastLine: false,
+                        padding: { top: 16, bottom: 16 },
+                        fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                        wordWrap: "on",
+                        wrappingStrategy: "advanced",
+                      }}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Progress Section */}
+        {currentStep === "progress" && (
+          <Card className="animate-fade-in border-border/50 max-w-2xl mx-auto">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    {status?.currentStep === "complete" ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Loader2 className="w-5 h-5 text-primary animate-spin" />}
+                    Pipeline Progress
+                  </CardTitle>
+                  <CardDescription>
+                    {!status
+                      ? "Starting pipeline..."
+                      : status.currentStep === "complete"
+                        ? "Processing complete!"
+                        : status.currentStep === "failed"
+                          ? "Pipeline failed"
+                          : `Processing ${status.slug}...`}
+                  </CardDescription>
+                </div>
+                <Badge variant={!status ? "info" : status.currentStep === "complete" ? "success" : status.currentStep === "failed" ? "destructive" : "info"}>
+                  {!status ? "Starting" : status.currentStep === "complete" ? "Complete" : status.currentStep === "failed" ? "Failed" : "In Progress"}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Progress</span>
+                  <span className="text-foreground font-medium">{Math.round(progressPercent)}%</span>
+                </div>
+                <Progress value={progressPercent} className="h-2" />
+              </div>
+
+              {/* Style Generation Loading Indicator */}
+              {isProcessingUserStyle && (
+                <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 animate-fade-in mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                      <Wand2 className="w-3 h-3 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">AI Style Generation in Progress</p>
+                      <p className="text-xs text-muted-foreground">
+                        {status?.styleSelection?.status === "generating_user_style" && "Processing your style description..."}
+                        {status?.styleSelection?.status === "generating_previews" && "Rendering preview images..."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Steps List or Loading Skeleton */}
+              <div className="space-y-2">
+                {!status
+                  ? // Skeleton while starting
+                    [...Array(5)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
+                        <div className="w-5 h-5 rounded-full bg-muted animate-pulse" />
+                        <div className="flex-1 h-4 rounded bg-muted animate-pulse" />
+                        <div className="w-16 h-5 rounded bg-muted animate-pulse" />
+                      </div>
+                    ))
+                  : steps.map((s, idx) => {
+                      const Icon = statusIcons[s.status];
+                      return (
+                        <div
+                          key={s.step}
+                          className={cn(
+                            "flex items-center gap-3 p-3 rounded-lg transition-all",
+                            s.status === "running" && "bg-info/5 animate-pulse-glow",
+                            s.status === "done" && "bg-success/5",
+                            s.status === "error" && "bg-destructive/5",
+                            "animate-fade-in",
+                            `stagger-${Math.min(idx + 1, 6)}`,
+                          )}
+                        >
+                          <Icon
+                            className={cn(
+                              "w-5 h-5 shrink-0",
+                              s.status === "pending" && "text-muted-foreground",
+                              s.status === "running" && "text-info animate-spin",
+                              s.status === "done" && "text-success",
+                              s.status === "error" && "text-destructive",
+                            )}
+                          />
+                          <span
+                            className={cn(
+                              "flex-1 text-sm font-medium",
+                              s.status === "pending" && "text-muted-foreground",
+                              s.status === "running" && "text-info",
+                              s.status === "done" && "text-foreground",
+                              s.status === "error" && "text-destructive",
+                            )}
+                          >
+                            {StepLabels[s.step as Step]}
+                          </span>
+                          <Badge variant={s.status} className="text-xs">
+                            {s.status}
+                          </Badge>
+                        </div>
+                      );
+                    })}
+              </div>
+
+              {/* Download Link */}
+              {downloadHref && (
+                <div className="animate-scale-in pt-2">
+                  <a
+                    href={downloadHref}
+                    download
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-success text-success-foreground font-medium hover:brightness-110 transition-all shadow-glow-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download Packaged Files
+                  </a>
+                </div>
+              )}
+
+              {/* Logs Section */}
+              {status?.logs && status.logs.length > 0 && (
+                <div className="space-y-2">
+                  <button onClick={() => setShowLogs(!showLogs)} className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                    {showLogs ? "▼" : "▶"} Logs ({status.logs.length} entries)
+                  </button>
+                  {showLogs && (
+                    <pre className="p-4 rounded-lg bg-[#0d1117] text-[#c9d1d9] text-xs font-mono overflow-auto max-h-60 scrollbar-thin animate-fade-in">
+                      {status.logs.join("\n")}
+                    </pre>
+                  )}
+                </div>
+              )}
+
+              {/* Error Display */}
+              {status?.error && (
+                <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 animate-fade-in">
+                  <p className="text-sm text-destructive flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    {status.error}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
       </main>
     </div>

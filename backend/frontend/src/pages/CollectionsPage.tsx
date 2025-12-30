@@ -1,199 +1,148 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { trpc } from "../trpc";
-import { Loader2, BookOpen, ArrowLeft, Library, Play, Clock, Calendar } from "lucide-react";
+import { Loader2, ArrowLeft, Library, ArrowRight } from "lucide-react";
+import { BookCard, CollectionBook } from "../components/BookCard";
+import { BookModal } from "../components/BookModal";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
+async function loadDescriptionsForCollection(slug: string): Promise<Map<string, { description: string; hook: string }>> {
+  try {
+    const data = await trpc.getBookDescriptions.query({ collectionSlug: slug });
+    const descriptions = new Map<string, { description: string; hook: string }>();
+    for (const book of data.descriptions) {
+      if (book.description && book.hook) {
+        descriptions.set(book.slug, { description: book.description, hook: book.hook });
+      }
+    }
+    return descriptions;
+  } catch (e) {
+    console.warn(`Failed to load descriptions for collection ${slug}:`, e);
+    return new Map();
+  }
+}
 
 type Collection = { title: string; slug: string; url: string };
 
-type CollectionBook = {
-  title: string;
-  author: string;
-  slug: string;
-  cover: string;
-  coverThumb: string;
-  coverColor: string;
-  epoch: string;
-  genre: string;
-  kind: string;
-  hasAudio: boolean;
-};
-
 type CollectionDetails = { url: string; title?: string; books: CollectionBook[] };
 
-interface CollectionsPageProps {
-  onSelectBook: (slug: string) => void;
-  onBack: () => void;
-}
+function CollectionRow({ collection, onSelectBook, onOpenModal }: { collection: Collection; onSelectBook?: (slug: string) => void; onOpenModal?: (book: CollectionBook) => void }) {
+  const [books, setBooks] = useState<CollectionBook[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollPosRef = useRef<number>(0);
+  const navigate = useNavigate();
 
-interface BookCardProps {
-  book: CollectionBook;
-  onSelect: (slug: string) => void;
-  index: number;
-  totalColumns: number;
-}
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        } else {
+          if (scrollRef.current) {
+            scrollPosRef.current = scrollRef.current.scrollLeft;
+          }
+          setIsVisible(false);
+        }
+      },
+      { rootMargin: "600px" }, // Load 2-3 rows ahead/behind
+    );
 
-function BookCard({ book, onSelect, index, totalColumns }: BookCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const hoverTimeoutRef = useRef<number | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const isRightSide = index % totalColumns >= totalColumns / 2;
-
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-    hoverTimeoutRef.current = window.setTimeout(() => {
-      setIsExpanded(true);
-    }, 500);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
-    setIsExpanded(false);
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-    };
-  }, []);
+    if (isVisible && !hasFetched && !isLoading) {
+      const fetchBooks = async () => {
+        setIsLoading(true);
+        try {
+          const [data, descriptions] = await Promise.all([trpc.getWolneLekturyCollection.query({ slug: collection.slug }), loadDescriptionsForCollection(collection.slug)]);
 
-  const handleStartClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onSelect(book.slug);
-    },
-    [book.slug, onSelect],
-  );
+          const enrichedBooks = data.books.map((book) => {
+            const desc = descriptions.get(book.slug);
+            return desc ? { ...book, generatedDescription: desc.description, generatedHook: desc.hook } : book;
+          });
 
-  const handleCardClick = useCallback(() => {
-    if (!isExpanded) {
-      onSelect(book.slug);
+          setBooks(enrichedBooks);
+        } catch (e) {
+          console.error(`Failed to load books for collection ${collection.slug}:`, e);
+        } finally {
+          setIsLoading(false);
+          setHasFetched(true);
+        }
+      };
+      fetchBooks();
     }
-  }, [isExpanded, book.slug, onSelect]);
+  }, [isVisible, hasFetched, isLoading, collection.slug]);
 
-  const detailsPanelWidth = 200;
+  useLayoutEffect(() => {
+    if (isVisible && scrollRef.current && scrollPosRef.current > 0) {
+      scrollRef.current.scrollLeft = scrollPosRef.current;
+    }
+  }, [isVisible, books]);
+
+  // Virtualization: If not visible and already fetched, render a placeholder to keep scroll height roughly correct
+  if (!isVisible && hasFetched) {
+    return <div ref={containerRef} className="h-[520px] w-full" />;
+  }
 
   return (
-    <div
-      ref={cardRef}
-      className="relative cursor-pointer"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{ zIndex: isHovered ? 50 : 1 }}
-      onClick={handleCardClick}
-    >
-      <div
-        className="transition-transform duration-300 ease-out will-change-transform"
-        style={{ transform: isHovered ? "scale(1.05)" : "scale(1)", transformOrigin: isRightSide ? "right top" : "left top" }}
-      >
-        <div className="flex" style={{ flexDirection: isRightSide ? "row-reverse" : "row" }}>
-          <div className="relative flex-shrink-0" style={{ width: "100%" }}>
-            <div
-              className="aspect-[2/3] overflow-hidden mb-2 transition-[border-radius] duration-300 rounded-lg"
-              style={{ backgroundColor: book.coverColor || "#333", borderRadius: isExpanded ? (isRightSide ? "0 0.5rem 0.5rem 0" : "0.5rem 0 0 0.5rem") : "0.5rem" }}
-            >
-              {book.cover ? (
-                <img src={book.cover} alt={book.title} className="w-full h-full object-cover" loading="lazy" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <BookOpen className="w-12 h-12 text-white/50" />
+    <div ref={containerRef} className="mb-10 space-y-5 min-h-[460px]">
+      <div className="flex items-center justify-between px-4 md:px-8 xl:px-48 group">
+        <h3 className="text-3xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/collections/${collection.slug}`)}>
+          {collection.title}
+        </h3>
+        <Button variant="ghost" size="default" onClick={() => navigate(`/collections/${collection.slug}`)} className="gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+          View All <ArrowRight className="w-5 h-5" />
+        </Button>
+      </div>
+
+      <div className="relative group/carousel">
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto pb-10 pt-5 px-4 md:px-8 xl:px-16 gap-5 snap-x snap-mandatory hide-scrollbar"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            maskImage: "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
+            WebkitMaskImage: "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
+          }}
+        >
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => <div key={i} className="flex-shrink-0 w-[275px] h-[412px] bg-muted/30 rounded-xl animate-pulse snap-start" />)
+            : books.map((book, i) => (
+                <div key={book.slug} className="flex-shrink-0 w-[275px] snap-start transition-transform duration-300">
+                  <BookCard book={book} index={i} totalColumns={6} onSelect={onSelectBook || (() => {})} onOpenModal={onOpenModal} />
                 </div>
-              )}
-              <div
-                className="absolute inset-0 pointer-events-none transition-opacity duration-300"
-                style={{
-                  opacity: isExpanded ? 1 : 0,
-                  background: isRightSide
-                    ? "linear-gradient(to left, hsl(var(--card)) 0%, hsl(var(--card) / 0.8) 15%, transparent 50%)"
-                    : "linear-gradient(to right, hsl(var(--card)) 0%, hsl(var(--card) / 0.8) 15%, transparent 50%)",
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="flex-shrink-0 overflow-hidden transition-all duration-300 ease-out" style={{ width: isExpanded ? detailsPanelWidth : 0, opacity: isExpanded ? 1 : 0 }}>
-            <div
-              className="h-full bg-card shadow-2xl"
-              style={{
-                width: detailsPanelWidth,
-                borderRadius: isRightSide ? "0.5rem 0 0 0.5rem" : "0 0.5rem 0.5rem 0",
-                marginLeft: isRightSide ? 0 : -12,
-                marginRight: isRightSide ? -12 : 0,
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-              }}
-            >
-              <div className="h-full p-4 flex flex-col justify-between" style={{ paddingLeft: isRightSide ? 16 : 24, paddingRight: isRightSide ? 24 : 16 }}>
-                <div className="space-y-2">
-                  <div>
-                    <h3 className="font-semibold text-foreground line-clamp-2 leading-tight">{book.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{book.author}</p>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      ~4h
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      1890
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground line-clamp-3">Klasyczne dzieło polskiej literatury, opowiadające historię miłości i przemian społecznych.</p>
-
-                  <div className="flex flex-wrap gap-1">
-                    {book.epoch && (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                        {book.epoch}
-                      </Badge>
-                    )}
-                    {book.genre && (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                        {book.genre}
-                      </Badge>
-                    )}
-                    {book.kind && (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                        {book.kind}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <Button className="w-full gap-2 mt-3" size="sm" onClick={handleStartClick}>
-                  <Play className="w-4 h-4 fill-current" />
-                  Start Reading
-                </Button>
-              </div>
-            </div>
-          </div>
+              ))}
         </div>
-
-        <h3 className={`text-sm font-medium line-clamp-2 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}>{book.title}</h3>
-        <p className={`text-xs text-muted-foreground line-clamp-1 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}>{book.author}</p>
       </div>
     </div>
   );
 }
 
-export function CollectionsPage({ onSelectBook, onBack }: CollectionsPageProps) {
+interface CollectionsPageProps {
+  onSelectBook?: (slug: string) => void;
+}
+
+export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
+  const { slug: collectionSlug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
   const [collectionDetails, setCollectionDetails] = useState<CollectionDetails | null>(null);
   const [isLoadingCollections, setIsLoadingCollections] = useState(true);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [gridColumns, setGridColumns] = useState(6);
+  const [modalBook, setModalBook] = useState<CollectionBook | null>(null);
 
   useEffect(() => {
     const updateColumns = () => {
@@ -210,6 +159,10 @@ export function CollectionsPage({ onSelectBook, onBack }: CollectionsPageProps) 
   }, []);
 
   useEffect(() => {
+    if (collectionSlug) {
+      setIsLoadingCollections(false);
+      return;
+    }
     const loadCollections = async () => {
       try {
         const data = await trpc.getWolneLekturyCollections.query();
@@ -221,112 +174,132 @@ export function CollectionsPage({ onSelectBook, onBack }: CollectionsPageProps) 
       }
     };
     loadCollections();
-  }, []);
+  }, [collectionSlug]);
 
-  const loadCollection = useCallback(async (slug: string) => {
-    setSelectedCollection(slug);
-    setIsLoadingDetails(true);
-    try {
-      const data = await trpc.getWolneLekturyCollection.query({ slug });
-      setCollectionDetails(data);
-    } catch (e) {
-      console.error("Failed to load collection:", e);
-    } finally {
-      setIsLoadingDetails(false);
+  useEffect(() => {
+    if (!collectionSlug) {
+      setCollectionDetails(null);
+      return;
     }
-  }, []);
+    const loadCollection = async () => {
+      setIsLoadingDetails(true);
+      try {
+        const [data, descriptions] = await Promise.all([trpc.getWolneLekturyCollection.query({ slug: collectionSlug }), loadDescriptionsForCollection(collectionSlug)]);
+
+        const enrichedBooks = data.books.map((book) => {
+          const desc = descriptions.get(book.slug);
+          return desc ? { ...book, generatedDescription: desc.description, generatedHook: desc.hook } : book;
+        });
+
+        setCollectionDetails({ ...data, books: enrichedBooks });
+      } catch (e) {
+        console.error("Failed to load collection:", e);
+      } finally {
+        setIsLoadingDetails(false);
+      }
+    };
+    loadCollection();
+  }, [collectionSlug]);
 
   const handleBookSelect = useCallback(
     async (bookSlug: string) => {
-      setIsDownloading(true);
-      try {
-        onSelectBook(bookSlug);
-      } finally {
-        setIsDownloading(false);
+      if (onSelectBook) {
+        setIsDownloading(true);
+        try {
+          onSelectBook(bookSlug);
+        } finally {
+          setIsDownloading(false);
+        }
       }
     },
     [onSelectBook],
   );
 
-  const goBackToCollections = useCallback(() => {
-    setSelectedCollection(null);
-    setCollectionDetails(null);
+  const handleOpenModal = useCallback((book: CollectionBook) => {
+    setModalBook(book);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setModalBook(null);
   }, []);
 
   if (isLoadingCollections) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-[500px]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
       </div>
     );
   }
 
   if (isDownloading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Downloading and preparing book...</p>
+      <div className="flex flex-col items-center justify-center min-h-[500px] gap-5">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="text-lg text-muted-foreground">Downloading and preparing book...</p>
       </div>
     );
   }
 
-  if (selectedCollection && collectionDetails) {
+  if (collectionSlug && collectionDetails) {
     return (
-      <div className="space-y-6 overflow-visible">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={goBackToCollections} className="gap-2">
-            <ArrowLeft className="w-4 h-4" />
+      <div className="space-y-10 overflow-visible pb-24">
+        <div className="flex items-center gap-5">
+          <Button variant="ghost" size="default" onClick={() => navigate("/collections")} className="gap-2">
+            <ArrowLeft className="w-5 h-5" />
             Back to Collections
           </Button>
           <div>
-            <h2 className="text-xl font-semibold">{collectionDetails.title || selectedCollection}</h2>
-            <p className="text-sm text-muted-foreground">{collectionDetails.books.length} books</p>
+            <h2 className="text-3xl font-bold">{collectionDetails.title || collectionSlug}</h2>
+            <p className="text-lg text-muted-foreground">{collectionDetails.books.length} books</p>
           </div>
         </div>
 
         {isLoadingDetails ? (
-          <div className="flex items-center justify-center min-h-[300px]">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <div className="flex items-center justify-center min-h-[500px]">
+            <Loader2 className="w-10 h-10 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-8 pb-32 overflow-visible">
+          <div className="grid gap-5 overflow-visible" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
             {collectionDetails.books.map((book, index) => (
-              <BookCard key={book.slug} book={book} onSelect={handleBookSelect} index={index} totalColumns={gridColumns} />
+              <BookCard key={book.slug} book={book} onSelect={handleBookSelect} onOpenModal={handleOpenModal} index={index} totalColumns={6} />
             ))}
           </div>
         )}
+        <BookModal book={modalBook} onClose={handleCloseModal} onSelect={handleBookSelect} />
+      </div>
+    );
+  }
+
+  if (collectionSlug && isLoadingDetails) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="pb-24">
+      <div className="flex items-center justify-between px-4 md:px-8 xl:px-48 mb-10">
         <div>
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Library className="w-5 h-5 text-primary" />
+          <h2 className="text-4xl font-bold flex items-center gap-3">
+            <Library className="w-10 h-10 text-primary" />
             Collections
           </h2>
-          <p className="text-sm text-muted-foreground">Browse curated book collections from Wolne Lektury</p>
+          <p className="text-lg text-muted-foreground mt-2">Browse curated book collections from Wolne Lektury</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={onBack} className="gap-2">
-          <ArrowLeft className="w-4 h-4" />
+        <Button variant="ghost" size="default" onClick={() => navigate("/")} className="gap-2">
+          <ArrowLeft className="w-5 h-5" />
           Back to Pipeline
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex flex-col">
         {collections.map((collection) => (
-          <Card key={collection.slug} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => loadCollection(collection.slug)}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base line-clamp-2">{collection.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-xs">Click to browse books</CardDescription>
-            </CardContent>
-          </Card>
+          <CollectionRow key={collection.slug} collection={collection} onSelectBook={handleBookSelect} onOpenModal={handleOpenModal} />
         ))}
       </div>
+      <BookModal book={modalBook} onClose={handleCloseModal} onSelect={handleBookSelect} />
     </div>
   );
 }

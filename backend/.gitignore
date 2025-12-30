@@ -29,3 +29,4 @@ src/standalone-scripts/gradeAndSimplifyBookSentences/output-modern-*
 src/standalone-scripts/gradeAndSimplifyBookSentences/evaluator-claude/frontend/public/api-data/spans/
 books-data
 uploads
+wolnelektury-data/collections/

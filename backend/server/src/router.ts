@@ -257,6 +257,26 @@ export const appRouter = router({
     };
   }),
 
+  getWolneLekturyBookDetails: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+    const book = await wl.getBookBySlug(input.slug);
+    return {
+      title: book.title,
+      slug: book.slug,
+      language: book.language,
+      authors: book.authors.map((a) => a.name),
+      epochs: book.epochs.map((e) => e.name),
+      genres: book.genres.map((g) => g.name),
+      kinds: book.kinds.map((k) => k.name),
+      audioLength: book.audio_length || null,
+      fragmentHtml: book.fragment_data?.html || null,
+      hasFb2: !!book.fb2,
+      hasEpub: !!book.epub,
+      hasAudio: book.media?.some((m) => m.type === "mp3") || false,
+      cover: book.cover,
+      coverThumb: book.cover_thumb,
+    };
+  }),
+
   downloadFromWolneLektury: procedure.input(z.object({ slug: z.string() })).mutation(async ({ input }) => {
     const repoRoot = path.resolve(__dirname, "../../");
     try {
@@ -307,6 +327,21 @@ export const appRouter = router({
         genre: book.genre,
         kind: book.kind,
         hasAudio: book.has_audio,
+      })),
+    };
+  }),
+
+  getBookDescriptions: procedure.input(z.object({ collectionSlug: z.string() })).query(async ({ input }) => {
+    const descriptionsPath = path.resolve(__dirname, `../../wolnelektury-data/generated-descriptions/${input.collectionSlug}-descriptions.json`);
+    if (!fs.existsSync(descriptionsPath)) {
+      return { descriptions: [] };
+    }
+    const data = JSON.parse(fs.readFileSync(descriptionsPath, "utf-8"));
+    return {
+      descriptions: data.map((book: { slug: string; generatedDescription?: string; generatedHook?: string }) => ({
+        slug: book.slug,
+        description: book.generatedDescription || "",
+        hook: book.generatedHook || "",
       })),
     };
   }),
