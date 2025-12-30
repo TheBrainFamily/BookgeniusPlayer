@@ -41,7 +41,8 @@ export default defineSchema({
     paragraph: v.optional(v.number()),
   })
     .index("by_book", ["bookPath"])
-    .index("by_book_chapter", ["bookPath", "chapter"]),
+    .index("by_book_chapter", ["bookPath", "chapter"])
+    .index("by_book_noteId", ["bookPath", "noteId"]),
 
   // Variants (sentence simplifications)
   variants: defineTable({

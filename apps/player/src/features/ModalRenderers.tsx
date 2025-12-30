@@ -14,6 +14,7 @@ import { BackgroundEditModalRenderer } from "./modals/backgroundEdit/BackgroundE
 import { BackgroundAddModalRenderer } from "./modals/backgroundAdd/BackgroundAddModalRenderer";
 import { MusicEditModalRenderer } from "./modals/musicEdit/MusicEditModalRenderer";
 import { MusicAddModalRenderer } from "./modals/musicAdd/MusicAddModalRenderer";
+import { NoteEditModalRenderer } from "./modals/noteEdit/NoteEditModalRenderer";
 
 export const ModalRenderers: React.FC = () => {
   return (
@@ -33,6 +34,7 @@ export const ModalRenderers: React.FC = () => {
       <BackgroundAddModalRenderer />
       <MusicEditModalRenderer />
       <MusicAddModalRenderer />
+      <NoteEditModalRenderer />
     </>
   );
 };

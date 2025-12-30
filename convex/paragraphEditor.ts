@@ -473,6 +473,102 @@ export const wrapTextWithCharacter = action({
   },
 });
 
+export const removeNoteFromChapter = action({
+  args: { bookPath: v.string(), chapterNumber: v.number(), noteNumber: v.string() },
+  returns: v.object({ success: v.boolean(), versionId: v.string() }),
+  handler: async (ctx, { bookPath, chapterNumber, noteNumber }) => {
+    const chaptersPath = `${bookPath}/chapters-source`;
+    const chapterBasename = `chapter-${chapterNumber}.html`;
+
+    console.log("[removeNote] chapter:", chapterBasename, "noteNumber:", noteNumber);
+
+    const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+    });
+
+    if (!asset) {
+      throw new Error(`Chapter not found: ${chapterBasename}`);
+    }
+
+    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+    });
+
+    const publishedVersion = versions.find((v) => v.state === "published");
+    if (!publishedVersion) {
+      throw new Error(`No published version for chapter: ${chapterBasename}`);
+    }
+
+    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+      versionId: publishedVersion._id,
+    });
+
+    if (!htmlResult?.content) {
+      throw new Error(`Failed to fetch HTML content for ${chapterBasename}`);
+    }
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+
+    let noteFound = false;
+
+    const notes = doc.getElementsByTagName("note");
+    for (let i = notes.length - 1; i >= 0; i--) {
+      const note = notes[i];
+      if (note.getAttribute("id") === noteNumber) {
+        const parent = note.parentNode;
+        if (parent) {
+          parent.removeChild(note);
+          noteFound = true;
+          break;
+        }
+      }
+    }
+
+    if (!noteFound) {
+      const anchors = doc.getElementsByTagName("a");
+      for (let i = anchors.length - 1; i >= 0; i--) {
+        const anchor = anchors[i];
+        if (anchor.getAttribute("data-note") === noteNumber) {
+          const parent = anchor.parentNode;
+          if (parent) {
+            parent.removeChild(anchor);
+            noteFound = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!noteFound) {
+      console.log("[removeNote] content preview:", htmlResult.content.substring(0, 500));
+      throw new Error(
+        `Note with id "${noteNumber}" not found in chapter (checked <note id> and <a data-note>)`,
+      );
+    }
+
+    const serializer = new XMLSerializer();
+    const modifiedHtml = serializer.serializeToString(doc);
+
+    const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
+    const label = `Removed note: ${noteNumber}`;
+
+    const uploadResult = await uploadAndPublishContent(
+      ctx,
+      chaptersPath,
+      chapterBasename,
+      modifiedHtml,
+      "text/html",
+      label,
+      versionExtra,
+    );
+
+    return { success: true, versionId: uploadResult.versionId };
+  },
+});
+
 export const createCharacter = action({
   args: {
     bookPath: v.string(),

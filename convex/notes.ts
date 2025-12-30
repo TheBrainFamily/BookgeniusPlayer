@@ -24,10 +24,7 @@ export const listByBook = query({
       .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
       .collect();
 
-    return notes.map((n) => ({
-      id: n.noteId,
-      content: n.content,
-    }));
+    return notes.map((n) => ({ id: n.noteId, content: n.content }));
   },
 });
 
@@ -36,22 +33,14 @@ export const listByBook = query({
  * Used for per-chapter loading in sliding window pattern.
  */
 export const listByChapter = query({
-  args: {
-    bookPath: v.string(),
-    chapter: v.number(),
-  },
+  args: { bookPath: v.string(), chapter: v.number() },
   handler: async (ctx, { bookPath, chapter }) => {
     const notes = await ctx.db
       .query("notes")
-      .withIndex("by_book_chapter", (q) =>
-        q.eq("bookPath", bookPath).eq("chapter", chapter)
-      )
+      .withIndex("by_book_chapter", (q) => q.eq("bookPath", bookPath).eq("chapter", chapter))
       .collect();
 
-    return notes.map((n) => ({
-      id: n.noteId,
-      content: n.content,
-    }));
+    return notes.map((n) => ({ id: n.noteId, content: n.content }));
   },
 });
 
@@ -60,28 +49,17 @@ export const listByChapter = query({
  * Useful for preloading adjacent chapters.
  */
 export const listByChapterRange = query({
-  args: {
-    bookPath: v.string(),
-    fromChapter: v.number(),
-    toChapter: v.number(),
-  },
+  args: { bookPath: v.string(), fromChapter: v.number(), toChapter: v.number() },
   handler: async (ctx, { bookPath, fromChapter, toChapter }) => {
     const notes = await ctx.db
       .query("notes")
       .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
       .filter((q) =>
-        q.and(
-          q.gte(q.field("chapter"), fromChapter),
-          q.lte(q.field("chapter"), toChapter)
-        )
+        q.and(q.gte(q.field("chapter"), fromChapter), q.lte(q.field("chapter"), toChapter)),
       )
       .collect();
 
-    return notes.map((n) => ({
-      id: n.noteId,
-      content: n.content,
-      chapter: n.chapter,
-    }));
+    return notes.map((n) => ({ id: n.noteId, content: n.content, chapter: n.chapter }));
   },
 });
 
@@ -89,10 +67,7 @@ export const listByChapterRange = query({
  * Get a single note by ID.
  */
 export const getByNoteId = query({
-  args: {
-    bookPath: v.string(),
-    noteId: v.string(),
-  },
+  args: { bookPath: v.string(), noteId: v.string() },
   handler: async (ctx, { bookPath, noteId }) => {
     const notes = await ctx.db
       .query("notes")
@@ -102,10 +77,30 @@ export const getByNoteId = query({
 
     if (!notes) return null;
 
+    return { id: notes.noteId, content: notes.content, chapter: notes.chapter };
+  },
+});
+
+/**
+ * Get a single note with full document including _id for editing.
+ * Uses the by_book_noteId index for efficient lookup.
+ */
+export const getFullNoteByNoteId = query({
+  args: { bookPath: v.string(), noteId: v.string() },
+  handler: async (ctx, { bookPath, noteId }) => {
+    const note = await ctx.db
+      .query("notes")
+      .withIndex("by_book_noteId", (q) => q.eq("bookPath", bookPath).eq("noteId", noteId))
+      .first();
+
+    if (!note) return null;
+
     return {
-      id: notes.noteId,
-      content: notes.content,
-      chapter: notes.chapter,
+      _id: note._id,
+      noteId: note.noteId,
+      content: note.content,
+      chapter: note.chapter,
+      paragraph: note.paragraph,
     };
   },
 });
@@ -150,10 +145,7 @@ export const create = mutation({
  * Update a note's content.
  */
 export const update = mutation({
-  args: {
-    id: v.id("notes"),
-    content: v.string(),
-  },
+  args: { id: v.id("notes"), content: v.string() },
   handler: async (ctx, { id, content }) => {
     return await ctx.db.patch(id, { content });
   },
@@ -163,11 +155,7 @@ export const update = mutation({
  * Update a note's chapter assignment.
  */
 export const updateChapter = mutation({
-  args: {
-    id: v.id("notes"),
-    chapter: v.number(),
-    paragraph: v.optional(v.number()),
-  },
+  args: { id: v.id("notes"), chapter: v.number(), paragraph: v.optional(v.number()) },
   handler: async (ctx, { id, chapter, paragraph }) => {
     return await ctx.db.patch(id, { chapter, paragraph });
   },
@@ -195,7 +183,7 @@ export const bulkCreate = mutation({
         content: v.string(),
         chapter: v.number(),
         paragraph: v.optional(v.number()),
-      })
+      }),
     ),
   },
   handler: async (ctx, { notes }) => {

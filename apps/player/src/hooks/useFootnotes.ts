@@ -83,7 +83,7 @@ export function useFootnotes(range: Location): Footnote[] {
     });
 
     setNotes(foundNotes);
-  }, [range.chapter, range.paragraph, range.endChapter, range.endParagraph]);
+  }, [range.chapter, range.paragraph, range.endChapter, range.endParagraph, allNotes]);
 
   return notes;
 }
