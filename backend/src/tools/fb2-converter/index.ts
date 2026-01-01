@@ -4,13 +4,10 @@ import { convertFb2 } from "./fb2Converter";
 import { convertHtmlToXml } from "./convertHtmlToXml";
 
 export const findFb2FilePath = (bookDataDirInput: string): string | null => {
+  if (!fs.existsSync(bookDataDirInput)) return null;
   const files = fs.readdirSync(bookDataDirInput);
   const fb2File = files.find((file) => file.toLowerCase().endsWith(".fb2"));
-  if (!fb2File) {
-    console.error(`No .fb2 file found in the ${bookDataDirInput}. Please check the directory and try again.`);
-    process.exit(1);
-  }
-
+  if (!fb2File) return null;
   return path.join(bookDataDirInput, fb2File);
 };
 

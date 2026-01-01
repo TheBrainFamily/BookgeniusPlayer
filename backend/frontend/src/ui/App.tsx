@@ -125,6 +125,7 @@ export default function App() {
   const [searchResults, setSearchResults] = useState<WolneLekturySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isDownloadingWL, setIsDownloadingWL] = useState(false);
+  const [isDownloadingSE, setIsDownloadingSE] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isStartingPipeline, setIsStartingPipeline] = useState(false);
@@ -139,10 +140,14 @@ export default function App() {
 
   // Current step tracking
   const currentStep = useMemo(() => {
-    if (isStartingPipeline || jobId) return "progress";
-    if (isUploading || (slug && chapters.length > 0)) return "editor";
-    return "upload";
-  }, [isStartingPipeline, jobId, isUploading, slug, chapters.length]);
+    const step = (() => {
+      if (isStartingPipeline || jobId) return "progress";
+      if (isUploading || isDownloadingSE || (slug && chapters.length > 0)) return "editor";
+      return "upload";
+    })();
+    console.log("[currentStep]", step, { isStartingPipeline, jobId, isUploading, isDownloadingSE, slug, chaptersLength: chapters.length });
+    return step;
+  }, [isStartingPipeline, jobId, isUploading, isDownloadingSE, slug, chapters.length]);
 
   const onDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -238,13 +243,47 @@ export default function App() {
     }
   }, []);
 
+  const downloadFromStandardEbooks = useCallback(async (bookSlug: string) => {
+    console.log("[SE] downloadFromStandardEbooks called with:", bookSlug);
+    setIsDownloadingSE(true);
+    try {
+      console.log("[SE] calling prepareFromStandardEbooks...");
+      const result = await trpc.prepareFromStandardEbooks.mutate({ slug: bookSlug });
+      console.log("[SE] result:", { slug: result.slug, richLength: result.rich?.length });
+      setSlug(result.slug);
+      setRich(result.rich);
+      const parsed = parseChapters(result.rich);
+      console.log("[SE] parsed chapters:", parsed.chapters.length);
+      setPreamble(parsed.preamble);
+      setChapters(parsed.chapters);
+      setPostamble(parsed.postamble);
+      setSelectedChapterIdx(0);
+      console.log("[SE] state updated, chapters:", parsed.chapters.length);
+    } catch (e) {
+      console.error("[SE] Download failed:", e);
+      alert(`Failed to prepare: ${e instanceof Error ? e.message : "Unknown error"}`);
+    } finally {
+      console.log("[SE] setting isDownloadingSE to false");
+      setIsDownloadingSE(false);
+    }
+  }, []);
+
   React.useEffect(() => {
     const bookSlug = searchParams.get("book");
+    const seBookSlug = searchParams.get("se-book");
+
+    console.log("[useEffect] bookSlug:", bookSlug, "seBookSlug:", seBookSlug, "slug:", slug, "isDownloadingWL:", isDownloadingWL, "isDownloadingSE:", isDownloadingSE);
+
     if (bookSlug && !slug && !isDownloadingWL) {
+      console.log("[useEffect] triggering downloadFromWolneLektury");
       setSearchParams({});
       downloadFromWolneLektury(bookSlug);
+    } else if (seBookSlug && !slug && !isDownloadingSE) {
+      console.log("[useEffect] triggering downloadFromStandardEbooks");
+      setSearchParams({});
+      downloadFromStandardEbooks(seBookSlug);
     }
-  }, [searchParams, setSearchParams, slug, isDownloadingWL, downloadFromWolneLektury]);
+  }, [searchParams, setSearchParams, slug, isDownloadingWL, isDownloadingSE, downloadFromWolneLektury, downloadFromStandardEbooks]);
 
   const startPipeline = useCallback(async () => {
     if (!slug) return;

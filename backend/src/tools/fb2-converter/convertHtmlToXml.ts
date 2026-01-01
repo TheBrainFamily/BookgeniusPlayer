@@ -6,10 +6,12 @@ export const convertHtmlToXml = (html: string) => {
 
   const mainSection = findMainSection(document);
 
-  // console.log("replying notes and brs again", mainSection);
   const result = mainSection
     .replace(/<note id="(\d+)">\[(\d+)\]<\/note>/g, '<a data-note="$1">[$2]</a>')
-    .replace(/<br\s*\/?>/g, "<br/>");
+    .replace(/<br\s*\/?>/g, "<br/>")
+    .replace(/<hr\s*\/?>/g, "<hr/>")
+    .replace(/<img([^>]*[^/])>/g, "<img$1/>")
+    .replace(/&nbsp;/g, "&#160;");
   return wrapMainSectionByXmlTags(result);
 };
 

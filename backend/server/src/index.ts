@@ -55,7 +55,21 @@ app.get("/preview/:slug/:filename", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
+
 // Serve packaged downloads
 const downloadsDir = path.join(__dirname, "../downloads");
 if (!fs.existsSync(downloadsDir)) fs.mkdirSync(downloadsDir, { recursive: true });
 app.use("/downloads", express.static(downloadsDir));
+
+// Serve Standard Ebooks covers directly
+app.get("/se-cover/:slug", (req, res) => {
+  const safeSlug = path.basename(req.params.slug);
+  const coverPath = path.join(__dirname, "../../standardebooks-data/books", safeSlug, "images", "cover.jpg");
+
+  if (!fs.existsSync(coverPath)) {
+    res.status(404).send("Cover not found");
+    return;
+  }
+
+  res.sendFile(coverPath);
+});

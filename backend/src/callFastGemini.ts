@@ -247,6 +247,69 @@ export const callSlowGeminiWithThinkingAndSchemaAndParsed = async <T>(
   return object as T;
 };
 
+export const callGeminiWithImage = async <T>(
+  prompt: string,
+  imageBase64: string,
+  mimeType: string = "image/jpeg",
+  zodSchema?: z.ZodSchema<T>,
+): Promise<T> => {
+  const model = google("gemini-3-flash-preview");
+
+  if (zodSchema) {
+    const { object } = await generateObject({
+      model,
+      schema: zodSchema,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "image", image: `data:${mimeType};base64,${imageBase64}` },
+            { type: "text", text: prompt },
+          ],
+        },
+      ],
+      providerOptions: {
+        google: {
+          safetySettings: [
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+          ],
+        },
+      },
+    });
+    return object as T;
+  }
+
+  const { text } = await generateText({
+    model,
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "image", image: `data:${mimeType};base64,${imageBase64}` },
+          { type: "text", text: prompt },
+        ],
+      },
+    ],
+    providerOptions: {
+      google: {
+        safetySettings: [
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+        ],
+      },
+    },
+  });
+
+  return text as unknown as T;
+};
+
 // if (require.main === module) {
 //   const doIt = async () => {
 //     const response = await callGeminiWithThinkingAndSchema(

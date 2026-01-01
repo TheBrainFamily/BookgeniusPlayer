@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./ui/App";
 import { CollectionsPage } from "./pages/CollectionsPage";
+import { StandardEbooksPage } from "./pages/StandardEbooksPage";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,16 @@ createRoot(document.getElementById("root")!).render(
               <Layout>
                 <main className="py-8 px-4 md:px-8 xl:px-48">
                   <CollectionsPage />
+                </main>
+              </Layout>
+            }
+          />
+          <Route
+            path="/standard-ebooks"
+            element={
+              <Layout>
+                <main className="py-8">
+                  <StandardEbooksPage />
                 </main>
               </Layout>
             }

@@ -17,6 +17,7 @@ import * as cheerio from "cheerio";
 import * as wl from "./wolne-lektury";
 import { readStyleSelection, getRemainingTimeMs, setUserStyleDescription, setUserStyleExpanded, setStyleChoice, setPreviewsGenerated } from "./style-selection";
 import { expandUserStyleDescription } from "../../src/tools/new-tooling/create-graphical-style";
+import { convertAndSaveSEBook } from "../../src/tools/se-converter/index";
 import { generateStylePreview } from "../../src/tools/new-tooling/generate-prompts-for-backgrounds";
 
 function slugify(input: string): string {
@@ -373,6 +374,89 @@ export const appRouter = router({
       result[slug] = (info as { readingTimeFormatted: string }).readingTimeFormatted;
     }
     return result;
+  }),
+
+  getStandardEbooksIndex: procedure.query(async () => {
+    const indexPath = path.resolve(__dirname, "../../standardebooks-data/index.json");
+    if (!fs.existsSync(indexPath)) {
+      return { books: [], groupedByAuthorLetter: {} };
+    }
+    const data = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+
+    const descriptionsPath = path.resolve(__dirname, "../../standardebooks-data/descriptions.json");
+    let descriptions: Record<string, { description: string; hook: string }> = {};
+    if (fs.existsSync(descriptionsPath)) {
+      descriptions = JSON.parse(fs.readFileSync(descriptionsPath, "utf-8"));
+    }
+
+    const books = (
+      data.books as { slug: string; title: string; author: string; authorFileAs: string; description: string; wordCount: number; language: string; subjects: string[] }[]
+    ).map((book) => {
+      const desc = descriptions[book.slug];
+      return { ...book, generatedDescription: desc?.description || book.description, generatedHook: desc?.hook || "" };
+    });
+
+    const groupedByAuthorLetter: Record<string, typeof books> = {};
+    for (const book of books) {
+      const firstLetter = (book.authorFileAs || book.author).charAt(0).toUpperCase();
+      if (!groupedByAuthorLetter[firstLetter]) {
+        groupedByAuthorLetter[firstLetter] = [];
+      }
+      groupedByAuthorLetter[firstLetter].push(book);
+    }
+
+    return { books, groupedByAuthorLetter };
+  }),
+
+  getStandardEbooksBook: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+    const bookDir = path.resolve(__dirname, `../../standardebooks-data/books/${input.slug}`);
+    const metadataPath = path.join(bookDir, "metadata.json");
+
+    if (!fs.existsSync(metadataPath)) {
+      throw new Error(`Book not found: ${input.slug}`);
+    }
+
+    const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+
+    const textDir = path.join(bookDir, "text");
+    const chapters: { filename: string; title: string; content: string }[] = [];
+
+    if (fs.existsSync(textDir)) {
+      const files = fs
+        .readdirSync(textDir)
+        .filter((f) => f.endsWith(".xhtml"))
+        .sort();
+      for (const file of files) {
+        const content = fs.readFileSync(path.join(textDir, file), "utf-8");
+        const titleMatch = content.match(/<title>([^<]+)<\/title>/);
+        chapters.push({ filename: file, title: titleMatch ? titleMatch[1] : file.replace(".xhtml", ""), content });
+      }
+    }
+
+    const coverPath = path.join(bookDir, "images", "cover.jpg");
+    const hasCover = fs.existsSync(coverPath);
+
+    return { metadata, chapters, hasCover };
+  }),
+
+  prepareFromStandardEbooks: procedure.input(z.object({ slug: z.string() })).mutation(async ({ input }) => {
+    const repoRoot = path.resolve(__dirname, "../../");
+    const seBookDir = path.join(repoRoot, "standardebooks-data/books", input.slug);
+    const metadataPath = path.join(seBookDir, "metadata.json");
+
+    if (!fs.existsSync(metadataPath)) {
+      throw new Error(`Standard Ebook not found: ${input.slug}`);
+    }
+
+    const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+
+    convertAndSaveSEBook(input.slug);
+
+    const bookRoot = path.join(repoRoot, "books-data", input.slug);
+    const richPath = path.join(bookRoot, "input", "rich.xml");
+    const rich = fs.readFileSync(richPath, "utf-8");
+
+    return { slug: input.slug, rich, title: metadata.title, author: metadata.author };
   }),
 
   getStyleSelectionStatus: procedure.input(z.object({ jobId: z.string() })).query(({ input }) => {

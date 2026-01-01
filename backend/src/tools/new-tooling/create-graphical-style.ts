@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { callGeminiWrapper } from "../../callClaude";
+import { callGeminiWithImage } from "../../callFastGemini";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
@@ -140,4 +141,65 @@ Return format:
 
   const response = await callGeminiWrapper(prompt, schema, 10);
   return response as GraphicalStyle;
+};
+
+export const createGraphicalStyleFromCover = async (
+  bookTitle: string,
+  bookText: string,
+  coverImageBase64: string,
+  coverArtist?: string,
+  mimeType: string = "image/jpeg",
+): Promise<GraphicalStyle> => {
+  const artistInfo = coverArtist ? `The cover art is by ${coverArtist}. ` : "";
+
+  const prompt = `You are analyzing this book cover to create a cohesive graphical style for an interactive ebook.
+
+Book: "${bookTitle}"
+${artistInfo}
+
+Analyze the cover image carefully:
+1. What is the artistic MEDIUM? (oil painting, watercolor, engraving, lithograph, photograph, etc.)
+2. What is the artistic style? (Impressionist, Realist, Art Nouveau, Romantic, Pre-Raphaelite, etc.)
+3. What is the color palette? (dominant colors, mood, warmth/coolness)
+4. What is the technique? (brushwork, texture, lighting, linework)
+5. What era/period does the art evoke?
+6. What mood does it convey?
+
+Now create a graphical style that matches this cover art for generating consistent background images and character avatars throughout the ebook.
+
+Here's a sample of the book's text to help you understand the period and setting:
+<bookText>
+${bookText.substring(0, 5000)}
+</bookText>
+
+Good examples of output format:
+${STYLE_EXAMPLES}
+
+CRITICAL REQUIREMENTS:
+- Your style MUST match the cover art's aesthetic AND medium
+- If the cover is an oil painting, describe an oil painting style
+- If the cover is a watercolor, describe a watercolor style  
+- If the cover is an engraving or etching, describe that technique
+- Do NOT default to "Digital painting" - match the actual medium of the cover
+- Do NOT name specific artists in the style descriptions (image generators don't know them)
+- Instead, describe the VISUAL QUALITIES: brushwork, color relationships, lighting approach, texture
+- backgroundStyle should start with the appropriate medium (e.g., "Oil painting for an ebook background...", "Watercolor illustration for an ebook background...", "Detailed engraving style for an ebook background...")
+- avatarStyle should use the same medium as backgroundStyle
+- periodStyle is for HISTORICAL ACCURACY - it tells the image generator what era the book is set in, so it doesn't add anachronistic elements (e.g., modern cars in 1890s London). Base this on the BOOK'S SETTING from the text, not the cover art's era.
+
+Return format:
+{
+  "backgroundStyle": "string - detailed style for background images matching cover aesthetic and medium",
+  "periodStyle": "string - the time period and location of the book's setting, e.g. 'Early 20th century Dublin', 'Victorian England', '1920s New York'",
+  "avatarStyle": "string - detailed style for character avatars matching cover aesthetic and medium"
+}`;
+
+  const schema = z.object({
+    backgroundStyle: z.string(),
+    periodStyle: z.string(),
+    avatarStyle: z.string(),
+  }) as z.ZodType<GraphicalStyle>;
+
+  const response = await callGeminiWithImage(prompt, coverImageBase64, mimeType, schema);
+  return response;
 };

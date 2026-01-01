@@ -19,7 +19,7 @@ import { makeRollingChapterSummaries } from "../../src/tools/new-tooling/get-cha
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import type { NewReferenceCardsResponse } from "../../src/types";
 import { generateBackgrounds, generateStylePreview } from "../../src/tools/new-tooling/generate-prompts-for-backgrounds";
-import { createGraphicalStyle, type GraphicalStyle } from "../../src/tools/new-tooling/create-graphical-style";
+import { createGraphicalStyle, createGraphicalStyleFromCover, type GraphicalStyle } from "../../src/tools/new-tooling/create-graphical-style";
 import { getBookSettings } from "../../src/helpers/getBookSettings";
 import { generateTagName } from "../../src/helpers/generateTagName";
 import { initProgress, markStepStarted, markStepComplete, markStepError, getStepIndex, getStepOrder } from "./pipeline-progress";
@@ -370,8 +370,8 @@ async function uploadGraphicalStyleToConvex(job: Job, tempOutputDir: string) {
 
 export async function startPipeline(input: { epubPath?: string; fb2Path?: string; slug?: string; ebookConvertBin?: string; fromStep?: Step }) {
   const { epubPath, fb2Path, slug: providedSlug, ebookConvertBin, fromStep } = input;
-  const baseName = epubPath ? path.basename(epubPath, path.extname(epubPath)) : providedSlug || "book";
-  const slug = slugify(providedSlug || baseName);
+  const baseName = epubPath ? path.basename(epubPath, path.extname(epubPath)) : null;
+  const slug = providedSlug || slugify(baseName || "book");
   const bookPath = `books/${slug}`;
 
   initProgress(slug);
@@ -499,7 +499,42 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
     generate_graphical_style: async () => {
       setBookArg(slug);
 
-      const autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
+      const seBookDir = path.join(repoRoot, "standardebooks-data/books", slug);
+      const seMetadataPath = path.join(seBookDir, "metadata.json");
+      const seCoverPath = path.join(seBookDir, "images", "cover.jpg");
+      const isStandardEbook = fs.existsSync(seMetadataPath) && fs.existsSync(seCoverPath);
+
+      let autoStyle: GraphicalStyle;
+
+      if (isStandardEbook) {
+        addLog(job, "Detected Standard Ebook - generating style from cover image");
+        const metadata = JSON.parse(fs.readFileSync(seMetadataPath, "utf-8"));
+        const coverBuffer = fs.readFileSync(seCoverPath);
+        const coverBase64 = coverBuffer.toString("base64");
+
+        const textDir = path.join(seBookDir, "text");
+        let bookText = metadata.longDescription || metadata.description || "";
+        if (fs.existsSync(textDir)) {
+          const textFiles = fs
+            .readdirSync(textDir)
+            .filter((f: string) => f.endsWith(".xhtml"))
+            .slice(0, 2);
+          for (const file of textFiles) {
+            const content = fs.readFileSync(path.join(textDir, file), "utf-8");
+            bookText += "\n" + content.replace(/<[^>]+>/g, " ").substring(0, 2000);
+            if (bookText.length > 4000) break;
+          }
+        }
+
+        autoStyle = await createGraphicalStyleFromCover(`${metadata.title} by ${metadata.author}`, bookText, coverBase64, metadata.coverArtist, "image/jpeg");
+
+        writeBookFile("graphicalStyle.json", JSON.stringify(autoStyle, null, 2), FILE_TYPE.TEMPORARY);
+        addLog(job, `Generated style from cover (artist: ${metadata.coverArtist || "unknown"})`);
+        await uploadGraphicalStyleToConvex(job, tempOutputDir);
+        return;
+      }
+
+      autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
       setAutoStyleComplete(bookRoot, autoStyle);
       addLog(job, "Auto style generated, awaiting user input");
 
