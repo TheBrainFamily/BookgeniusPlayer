@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Sparkles, User, Palette, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CheckCircle2, Sparkles, User, Palette } from "lucide-react";
 
 interface StyleInfo {
   backgroundStyle: string;
@@ -12,44 +11,28 @@ interface StyleInfo {
 
 interface StylePreviewComparisonProps {
   slug: string;
-  previews: { autoPreviewPath: string | null; userPreviewPath: string | null } | null;
+  previews: { autoPreviewPath: string | null; userPreviewPath: string | null; autoAvatarPath: string | null; userAvatarPath: string | null } | null;
   autoStyle: StyleInfo | null;
   userStyle: StyleInfo | null;
-  remainingTimeMs: number;
   onChoose: (choice: "auto" | "user") => void;
 }
 
-export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, remainingTimeMs, onChoose }: StylePreviewComparisonProps) {
-  const [timeLeft, setTimeLeft] = useState(Math.max(0, Math.ceil(remainingTimeMs / 1000)));
-
-  useEffect(() => {
-    setTimeLeft(Math.max(0, Math.ceil(remainingTimeMs / 1000)));
-  }, [remainingTimeMs]);
-
-  useEffect(() => {
-    if (timeLeft <= 0) return;
-    const timer = setInterval(() => {
-      setTimeLeft((t) => Math.max(0, t - 1));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
+export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, onChoose }: StylePreviewComparisonProps) {
   if (!previews) return null;
+
+  const [isAvatarHovered, setIsAvatarHovered] = useState(false);
 
   const serverURL = "http://localhost:4000";
 
-  const getPreviewUrl = (previewPath: string | null, styleType: "auto" | "user") => {
+  const getPreviewUrl = (previewPath: string | null, filename: string) => {
     if (!previewPath) return null;
-    return `${serverURL}/preview/${slug}/${styleType}-preview-chapter-1.webp`;
+    return `${serverURL}/preview/${slug}/${filename}`;
   };
 
-  const autoImageUrl = getPreviewUrl(previews.autoPreviewPath, "auto");
-  const userImageUrl = getPreviewUrl(previews.userPreviewPath, "user");
-
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-  const timeString = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  const isLowTime = timeLeft <= 30;
+  const autoImageUrl = getPreviewUrl(previews.autoPreviewPath, "auto-preview-chapter-1.webp");
+  const userImageUrl = getPreviewUrl(previews.userPreviewPath, "user-preview-chapter-1.webp");
+  const autoAvatarUrl = getPreviewUrl(previews.autoAvatarPath, "auto-preview-avatar.webp");
+  const userAvatarUrl = getPreviewUrl(previews.userAvatarPath, "user-preview-avatar.webp");
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in p-4 overflow-y-auto">
@@ -57,19 +40,6 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, r
         <div className="text-center space-y-2 text-white">
           <h2 className="text-3xl font-bold font-display tracking-tight">Choose Your Visual Style</h2>
           <p className="text-white/70 max-w-xl mx-auto">We've generated two options for your book. Select the one that best matches your vision.</p>
-          {timeLeft > 0 && (
-            <div
-              className={cn(
-                "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mt-2",
-                isLowTime ? "bg-red-500/20 text-red-300" : "bg-white/10 text-white/80",
-              )}
-            >
-              <Clock className={cn("w-4 h-4", isLowTime && "animate-pulse")} />
-              <span>
-                Auto-select {userStyle ? "your custom style" : "in"}: {timeString}
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -82,6 +52,17 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, r
                   <img src={autoImageUrl} alt="AI Generated Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-secondary/20">No preview available</div>
+                )}
+                {autoAvatarUrl && (
+                  <div
+                    onMouseEnter={() => setIsAvatarHovered(true)}
+                    onMouseLeave={() => setIsAvatarHovered(false)}
+                    className={`absolute bottom-3 right-3 rounded-full overflow-hidden border-2 border-white/50 shadow-lg transition-all duration-300 z-10 ${
+                      isAvatarHovered ? "w-32 h-32" : "w-20 h-20"
+                    }`}
+                  >
+                    <img src={autoAvatarUrl} alt="Character Avatar" className="w-full h-full object-cover" />
+                  </div>
                 )}
                 <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border border-white/10">
                   <Sparkles className="w-3 h-3 text-primary" />
@@ -125,6 +106,17 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, r
               <Card className="relative h-full flex flex-col border-purple-500/20 overflow-hidden bg-card/90 backdrop-blur hover:border-purple-500/50 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="aspect-video w-full overflow-hidden bg-muted relative">
                   <img src={userImageUrl} alt="Your Custom Style" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  {userAvatarUrl && (
+                    <div
+                      onMouseEnter={() => setIsAvatarHovered(true)}
+                      onMouseLeave={() => setIsAvatarHovered(false)}
+                      className={`absolute bottom-3 right-3 rounded-full overflow-hidden border-2 border-purple-300/50 shadow-lg transition-all duration-300 z-10 ${
+                        isAvatarHovered ? "w-32 h-32" : "w-20 h-20"
+                      }`}
+                    >
+                      <img src={userAvatarUrl} alt="Character Avatar" className="w-full h-full object-cover" />
+                    </div>
+                  )}
                   <div className="absolute top-3 left-3 bg-purple-900/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border border-white/10">
                     <User className="w-3 h-3 text-purple-300" />
                     Your Custom Style

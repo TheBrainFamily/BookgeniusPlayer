@@ -8,12 +8,13 @@ export const STEP_DEPENDENCIES: StepDependency[] = [
   { step: "generate_reference_cards", deps: ["create_settings"] },
   { step: "rewrite_paragraphs", deps: ["generate_reference_cards"] },
   { step: "generate_graphical_style", deps: ["create_settings"] },
+  { step: "generate_picture_prompts", deps: ["generate_reference_cards"] },
   { step: "make_chapter_summaries", deps: ["create_settings"] },
   { step: "map_summaries_to_paragraphs", deps: ["make_chapter_summaries"] },
   { step: "generate_embeddings", deps: ["map_summaries_to_paragraphs"] },
   { step: "upload_answer_server_data", deps: ["generate_embeddings"] },
   { step: "generate_backgrounds", deps: ["generate_graphical_style"] },
-  { step: "generate_entity_pictures", deps: ["generate_graphical_style", "generate_reference_cards"] },
+  { step: "generate_entity_pictures", deps: ["generate_graphical_style", "generate_picture_prompts"] },
 ];
 
 export function getStepDeps(step: Step): Step[] {

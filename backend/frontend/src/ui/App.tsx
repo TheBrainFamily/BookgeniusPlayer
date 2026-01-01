@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { trpc } from "../trpc";
 import { StepLabels, type Step } from "~shared/pipelineTypes";
 import Editor from "@monaco-editor/react";
@@ -28,6 +28,7 @@ import { Progress } from "@/components/ui/progress";
 
 import { StyleSelectionModal } from "@/components/StyleSelectionModal";
 import { StylePreviewComparison } from "@/components/StylePreviewComparison";
+import { BookReadyModal } from "@/components/BookReadyModal";
 type SourceMode = "upload" | "wolneLektury";
 
 type WolneLekturySearchResult = { title: string; author: string; slug: string; coverThumb: string; hasAudio: boolean; epoch: string; genre: string; kind: string };
@@ -52,7 +53,7 @@ type JobStatus = {
     remainingTimeMs: number;
     autoStyle: StyleInfo | null;
     userStyle: StyleInfo | null;
-    previews: { autoPreviewPath: string | null; userPreviewPath: string | null } | null;
+    previews: { autoPreviewPath: string | null; userPreviewPath: string | null; autoAvatarPath: string | null; userAvatarPath: string | null } | null;
     selected: "auto" | "user" | null;
   };
 };
@@ -107,6 +108,7 @@ function recompileXml(preamble: string, chapters: ChapterInfo[], postamble: stri
 
 export default function App() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [file, setFile] = useState<File | null>(null);
   const [upload, setUpload] = useState<UploadResult | null>(null);
@@ -126,6 +128,7 @@ export default function App() {
 
   const [isUploading, setIsUploading] = useState(false);
   const [isStartingPipeline, setIsStartingPipeline] = useState(false);
+  const [showBookReadyModal, setShowBookReadyModal] = useState(false);
 
   // Chapter management
   const [chapters, setChapters] = useState<ChapterInfo[]>([]);
@@ -235,6 +238,14 @@ export default function App() {
     }
   }, []);
 
+  React.useEffect(() => {
+    const bookSlug = searchParams.get("book");
+    if (bookSlug && !slug && !isDownloadingWL) {
+      setSearchParams({});
+      downloadFromWolneLektury(bookSlug);
+    }
+  }, [searchParams, setSearchParams, slug, isDownloadingWL, downloadFromWolneLektury]);
+
   const startPipeline = useCallback(async () => {
     if (!slug) return;
     setIsStartingPipeline(true);
@@ -287,6 +298,13 @@ export default function App() {
     };
   }, [polling, jobId]);
 
+  // Show book ready modal when pipeline completes
+  React.useEffect(() => {
+    if (status?.currentStep === "complete" && !showBookReadyModal) {
+      setShowBookReadyModal(true);
+    }
+  }, [status?.currentStep, showBookReadyModal]);
+
   const steps = status?.steps ?? [];
   const downloadHref = status?.downloadUrl ? `${serverURL}${status.downloadUrl}` : undefined;
   const completedSteps = steps.filter((s) => s.status === "done").length;
@@ -300,7 +318,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      {canAcceptStyleInput && status?.styleSelection && <StyleSelectionModal remainingTimeMs={status.styleSelection.remainingTimeMs} onSubmit={submitStyleDescription} />}
+      {canAcceptStyleInput && status?.styleSelection && <StyleSelectionModal onSubmit={submitStyleDescription} />}
 
       {showStyleComparison && status?.styleSelection && (
         <StylePreviewComparison
@@ -308,10 +326,11 @@ export default function App() {
           previews={status.styleSelection.previews}
           autoStyle={status.styleSelection.autoStyle}
           userStyle={status.styleSelection.userStyle}
-          remainingTimeMs={status.styleSelection.remainingTimeMs}
           onChoose={chooseStyle}
         />
       )}
+
+      {showBookReadyModal && slug && <BookReadyModal slug={slug} onClose={() => setShowBookReadyModal(false)} />}
 
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">

@@ -20,7 +20,9 @@ export const StyleSelectionStateSchema = z.object({
   autoStyle: z.object({ backgroundStyle: z.string(), periodStyle: z.string(), avatarStyle: z.string() }).nullable(),
   userPrompt: z.string().nullable(),
   userStyle: z.object({ backgroundStyle: z.string(), periodStyle: z.string(), avatarStyle: z.string() }).nullable(),
-  previews: z.object({ autoPreviewPath: z.string().nullable(), userPreviewPath: z.string().nullable() }).nullable(),
+  previews: z
+    .object({ autoPreviewPath: z.string().nullable(), userPreviewPath: z.string().nullable(), autoAvatarPath: z.string().nullable(), userAvatarPath: z.string().nullable() })
+    .nullable(),
   selected: z.enum(["auto", "user"]).nullable(),
   timeoutAt: z.number().nullable(),
   startedAt: z.number(),
@@ -31,7 +33,6 @@ export const StyleSelectionStateSchema = z.object({
 export type StyleSelectionState = z.infer<typeof StyleSelectionStateSchema>;
 
 const STYLE_SELECTION_FILE = "style-selection.json";
-const TIMEOUT_MS = 4 * 60 * 1000;
 
 function getStyleSelectionPath(bookRoot: string): string {
   return path.join(bookRoot, "temporary-output", STYLE_SELECTION_FILE);
@@ -46,7 +47,7 @@ export function initStyleSelection(bookRoot: string): StyleSelectionState {
     userStyle: null,
     previews: null,
     selected: null,
-    timeoutAt: now + TIMEOUT_MS,
+    timeoutAt: null,
     startedAt: now,
     updatedAt: now,
     error: null,
@@ -109,8 +110,14 @@ export function setUserStyleExpanded(bookRoot: string, userStyle: GraphicalStyle
   return updateStyleSelection(bookRoot, { userStyle, status: "generating_previews" });
 }
 
-export function setPreviewsGenerated(bookRoot: string, autoPreviewPath: string | null, userPreviewPath: string | null): StyleSelectionState {
-  return updateStyleSelection(bookRoot, { previews: { autoPreviewPath, userPreviewPath }, status: "awaiting_choice" });
+export function setPreviewsGenerated(
+  bookRoot: string,
+  autoPreviewPath: string | null,
+  userPreviewPath: string | null,
+  autoAvatarPath: string | null = null,
+  userAvatarPath: string | null = null,
+): StyleSelectionState {
+  return updateStyleSelection(bookRoot, { previews: { autoPreviewPath, userPreviewPath, autoAvatarPath, userAvatarPath }, status: "awaiting_choice" });
 }
 
 export function setStyleChoice(bookRoot: string, choice: "auto" | "user"): StyleSelectionState {

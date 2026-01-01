@@ -22,6 +22,19 @@ async function loadDescriptionsForCollection(slug: string): Promise<Map<string, 
   }
 }
 
+let readingTimesCache: Record<string, string> | null = null;
+
+async function loadReadingTimes(): Promise<Record<string, string>> {
+  if (readingTimesCache) return readingTimesCache;
+  try {
+    readingTimesCache = await trpc.getReadingTimes.query();
+    return readingTimesCache;
+  } catch (e) {
+    console.warn("Failed to load reading times:", e);
+    return {};
+  }
+}
+
 type Collection = { title: string; slug: string; url: string };
 
 type CollectionDetails = { url: string; title?: string; books: CollectionBook[] };
@@ -63,11 +76,16 @@ function CollectionRow({ collection, onSelectBook, onOpenModal }: { collection: 
       const fetchBooks = async () => {
         setIsLoading(true);
         try {
-          const [data, descriptions] = await Promise.all([trpc.getWolneLekturyCollection.query({ slug: collection.slug }), loadDescriptionsForCollection(collection.slug)]);
+          const [data, descriptions, readingTimes] = await Promise.all([
+            trpc.getWolneLekturyCollection.query({ slug: collection.slug }),
+            loadDescriptionsForCollection(collection.slug),
+            loadReadingTimes(),
+          ]);
 
           const enrichedBooks = data.books.map((book) => {
             const desc = descriptions.get(book.slug);
-            return desc ? { ...book, generatedDescription: desc.description, generatedHook: desc.hook } : book;
+            const readingTime = readingTimes[book.slug];
+            return { ...book, ...(desc && { generatedDescription: desc.description, generatedHook: desc.hook }), ...(readingTime && { readingTime }) };
           });
 
           setBooks(enrichedBooks);
@@ -118,7 +136,7 @@ function CollectionRow({ collection, onSelectBook, onOpenModal }: { collection: 
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => <div key={i} className="flex-shrink-0 w-[275px] h-[412px] bg-muted/30 rounded-xl animate-pulse snap-start" />)
             : books.map((book, i) => (
-                <div key={book.slug} className="flex-shrink-0 w-[275px] snap-start transition-transform duration-300">
+                <div key={book.slug} className={`flex-shrink-0 w-[275px] snap-start book-card-enter stagger-${Math.min(i + 1, 12)} hover:!z-50`}>
                   <BookCard book={book} index={i} totalColumns={6} onSelect={onSelectBook || (() => {})} onOpenModal={onOpenModal} />
                 </div>
               ))}
@@ -184,11 +202,16 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
     const loadCollection = async () => {
       setIsLoadingDetails(true);
       try {
-        const [data, descriptions] = await Promise.all([trpc.getWolneLekturyCollection.query({ slug: collectionSlug }), loadDescriptionsForCollection(collectionSlug)]);
+        const [data, descriptions, readingTimes] = await Promise.all([
+          trpc.getWolneLekturyCollection.query({ slug: collectionSlug }),
+          loadDescriptionsForCollection(collectionSlug),
+          loadReadingTimes(),
+        ]);
 
         const enrichedBooks = data.books.map((book) => {
           const desc = descriptions.get(book.slug);
-          return desc ? { ...book, generatedDescription: desc.description, generatedHook: desc.hook } : book;
+          const readingTime = readingTimes[book.slug];
+          return { ...book, ...(desc && { generatedDescription: desc.description, generatedHook: desc.hook }), ...(readingTime && { readingTime }) };
         });
 
         setCollectionDetails({ ...data, books: enrichedBooks });
@@ -210,9 +233,11 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
         } finally {
           setIsDownloading(false);
         }
+      } else {
+        navigate(`/?book=${encodeURIComponent(bookSlug)}`);
       }
     },
-    [onSelectBook],
+    [onSelectBook, navigate],
   );
 
   const handleOpenModal = useCallback((book: CollectionBook) => {
@@ -242,7 +267,7 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
 
   if (collectionSlug && collectionDetails) {
     return (
-      <div className="space-y-10 overflow-visible pb-24">
+      <div className="space-y-10 overflow-visible pb-24 page-enter">
         <div className="flex items-center gap-5">
           <Button variant="ghost" size="default" onClick={() => navigate("/collections")} className="gap-2">
             <ArrowLeft className="w-5 h-5" />
@@ -259,9 +284,11 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
             <Loader2 className="w-10 h-10 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid gap-5 overflow-visible" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
+          <div className="grid gap-5 overflow-visible page-enter" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
             {collectionDetails.books.map((book, index) => (
-              <BookCard key={book.slug} book={book} onSelect={handleBookSelect} onOpenModal={handleOpenModal} index={index} totalColumns={6} />
+              <div key={book.slug} className={`book-card-enter stagger-${Math.min((index % 12) + 1, 12)} hover:!z-50`}>
+                <BookCard book={book} onSelect={handleBookSelect} onOpenModal={handleOpenModal} index={index} totalColumns={6} />
+              </div>
             ))}
           </div>
         )}
@@ -279,7 +306,7 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
   }
 
   return (
-    <div className="pb-24">
+    <div className="pb-24 page-enter">
       <div className="flex items-center justify-between px-4 md:px-8 xl:px-48 mb-10">
         <div>
           <h2 className="text-4xl font-bold flex items-center gap-3">
@@ -295,8 +322,10 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
       </div>
 
       <div className="flex flex-col">
-        {collections.map((collection) => (
-          <CollectionRow key={collection.slug} collection={collection} onSelectBook={handleBookSelect} onOpenModal={handleOpenModal} />
+        {collections.map((collection, idx) => (
+          <div key={collection.slug} className={`animate-fade-in stagger-${Math.min(idx + 1, 6)}`}>
+            <CollectionRow collection={collection} onSelectBook={handleBookSelect} onOpenModal={handleOpenModal} />
+          </div>
         ))}
       </div>
       <BookModal book={modalBook} onClose={handleCloseModal} onSelect={handleBookSelect} />

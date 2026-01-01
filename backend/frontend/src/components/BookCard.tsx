@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { BookOpen, Play } from "lucide-react";
+import { BookOpen, Play, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -16,6 +16,7 @@ export type CollectionBook = {
   hasAudio: boolean;
   generatedDescription?: string;
   generatedHook?: string;
+  readingTime?: string;
 };
 
 export interface BookCardProps {
@@ -118,6 +119,12 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
         <div>
           <h3 className="font-bold text-lg text-foreground line-clamp-2 leading-tight tracking-tight">{book.title}</h3>
           <p className="text-base text-muted-foreground mt-1">{book.author}</p>
+          {book.readingTime && (
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{book.readingTime}</span>
+            </div>
+          )}
         </div>
 
         {book.generatedHook && (

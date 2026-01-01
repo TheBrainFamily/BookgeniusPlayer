@@ -14,7 +14,7 @@ import { writeBookFile } from "../../src/helpers/writeBookFile";
 import { FILE_TYPE, getFilePath } from "../../src/helpers/filesHelpers";
 import { readBookFile } from "../../src/helpers/readBookFile";
 import { identifyCharactersAndRewriteParagraphs } from "../../src/tools/identifyEntityAndRewriteParagraphs";
-import { generatePicturesForEntities } from "../../src/tools/new-tooling/generate-pictures-for-entities";
+import { generatePicturesForEntities, generatePicturePrompts } from "../../src/tools/new-tooling/generate-pictures-for-entities";
 import { makeRollingChapterSummaries } from "../../src/tools/new-tooling/get-chapter-by-chapter-summary";
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import type { NewReferenceCardsResponse } from "../../src/types";
@@ -26,7 +26,7 @@ import { initProgress, markStepStarted, markStepComplete, markStepError, getStep
 import { convex } from "./convex-client";
 import { generateEmbeddings } from "../../src/services/answer-server/create-paragraph-embeddings";
 import { uploadBookFolder } from "../../src/services/upload-books-to-r2";
-import { initStyleSelection, readStyleSelection, setAutoStyleComplete, setPreviewsGenerated, setTimedOut, setStyleChoice } from "./style-selection";
+import { initStyleSelection, readStyleSelection, setAutoStyleComplete, setPreviewsGenerated, setStyleChoice } from "./style-selection";
 import { STEP_DEPENDENCIES, getReadySteps, createSchedulerState, type ParallelSchedulerState } from "./parallel-scheduler";
 
 export type StyleSelectionCallback = { onUserStyleSubmitted?: (userStyle: GraphicalStyle | null) => void; onStyleChosen?: (choice: "auto" | "user") => void };
@@ -501,9 +501,7 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
 
       const autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
       setAutoStyleComplete(bookRoot, autoStyle);
-      addLog(job, "Auto style generated, awaiting user input or timeout");
-
-      const TIMEOUT_MS = 4 * 60 * 1000;
+      addLog(job, "Auto style generated, awaiting user input");
 
       let userStyleSubmitted = false;
       let userStyle: GraphicalStyle | null = null;
@@ -517,7 +515,7 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
           resolve(existingState.userStyle);
           return;
         }
-        if (existingState?.status === "timed_out" || existingState?.status === "generating_previews") {
+        if (existingState?.status === "generating_previews") {
           resolve(existingState.userStyle);
           return;
         }
@@ -532,28 +530,20 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
             styleChosen = true;
           },
         });
-
-        setTimeout(() => {
-          if (!userStyleSubmitted) {
-            addLog(job, "User input timeout - proceeding with auto style");
-            setTimedOut(bookRoot);
-            resolve(null);
-          }
-        }, TIMEOUT_MS);
       });
 
       await userStylePromise;
 
-      const state = readStyleSelection(bookRoot);
-      if (state?.status === "timed_out") {
-        addLog(job, "Generating preview with auto style only");
-        const autoPreview = await generateStylePreview(autoStyle, "auto", 1);
-        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null);
-        setStyleChoice(bookRoot, "auto");
-      } else if (userStyle) {
+      if (userStyle) {
         addLog(job, "Generating previews for both styles");
         const [autoPreview, userPreviewResult] = await Promise.all([generateStylePreview(autoStyle, "auto", 1), generateStylePreview(userStyle, "user", 1)]);
-        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, userPreviewResult?.imagePath || null);
+        setPreviewsGenerated(
+          bookRoot,
+          autoPreview?.imagePath || null,
+          userPreviewResult?.imagePath || null,
+          autoPreview?.avatarPath || null,
+          userPreviewResult?.avatarPath || null,
+        );
         addLog(job, "Previews generated, awaiting style choice");
 
         await new Promise<void>((resolve) => {
@@ -572,21 +562,11 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
               resolve();
             }
           }, 1000);
-
-          setTimeout(() => {
-            clearInterval(checkInterval);
-            if (!styleChosen) {
-              const defaultChoice = userStyle ? "user" : "auto";
-              addLog(job, `Style choice timeout - defaulting to ${defaultChoice}`);
-              setStyleChoice(bookRoot, defaultChoice);
-              resolve();
-            }
-          }, TIMEOUT_MS);
         });
       } else {
         addLog(job, "No user style provided, generating auto preview only");
         const autoPreview = await generateStylePreview(autoStyle, "auto", 1);
-        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null);
+        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null, autoPreview?.avatarPath || null, null);
         setStyleChoice(bookRoot, "auto");
       }
 
@@ -605,6 +585,14 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
       setBookArg(slug);
       await generateBackgrounds({});
       await uploadBackgroundsToConvex(job, outputDir);
+    },
+
+    generate_picture_prompts: async () => {
+      setBookArg(slug);
+      referenceCards = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
+      const prompts = await generatePicturePrompts(referenceCards);
+      writeBookFile("generated-prompts.json", JSON.stringify(prompts, null, 2), FILE_TYPE.TEMPORARY);
+      addLog(job, `Generated picture prompts for ${prompts.characters.length} characters`);
     },
 
     generate_entity_pictures: async () => {

@@ -20,7 +20,9 @@ export const StyleSelectionStateSchema = z.object({
   remainingTimeMs: z.number(),
   autoStyle: GraphicalStyleSchema.nullable(),
   userStyle: GraphicalStyleSchema.nullable(),
-  previews: z.object({ autoPreviewPath: z.string().nullable(), userPreviewPath: z.string().nullable() }).nullable(),
+  previews: z
+    .object({ autoPreviewPath: z.string().nullable(), userPreviewPath: z.string().nullable(), autoAvatarPath: z.string().nullable(), userAvatarPath: z.string().nullable() })
+    .nullable(),
   selected: z.enum(["auto", "user"]).nullable(),
 });
 
@@ -32,6 +34,7 @@ export const StepEnum = z.enum([
   "generate_reference_cards",
   "rewrite_paragraphs",
   "generate_graphical_style",
+  "generate_picture_prompts",
   "generate_backgrounds",
   "generate_entity_pictures",
   "make_chapter_summaries",
@@ -50,6 +53,7 @@ export const StepLabels: Record<Step, string> = {
   generate_reference_cards: "Generate Reference Cards",
   rewrite_paragraphs: "Rewrite Paragraphs",
   generate_graphical_style: "Generate Graphical Style",
+  generate_picture_prompts: "Generate Picture Prompts",
   generate_backgrounds: "Generate Backgrounds",
   generate_entity_pictures: "Generate Character Pictures",
   make_chapter_summaries: "Make Chapter Summaries",

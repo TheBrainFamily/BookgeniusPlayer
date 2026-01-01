@@ -283,7 +283,23 @@ export const appRouter = router({
       process.chdir(repoRoot);
     } catch {}
 
-    const { buffer, details } = await wl.downloadBookFb2(input.slug);
+    const multiVolumePath = path.join(repoRoot, "wolnelektury-data/multi-volume-mapping.json");
+    let downloadSlug = input.slug;
+    let parentTitle: string | null = null;
+
+    if (fs.existsSync(multiVolumePath)) {
+      const multiVolume = JSON.parse(fs.readFileSync(multiVolumePath, "utf-8"));
+      if (multiVolume[input.slug]) {
+        const children = multiVolume[input.slug].children;
+        if (children && children.length > 0) {
+          downloadSlug = children[0].slug;
+          parentTitle = multiVolume[input.slug].title;
+          console.log(`[downloadFromWolneLektury] Multi-volume work detected, using first volume: ${downloadSlug}`);
+        }
+      }
+    }
+
+    const { buffer, details } = await wl.downloadBookFb2(downloadSlug);
 
     const slug = input.slug;
     const bookRoot = path.join(repoRoot, "books-data", slug);
@@ -303,7 +319,7 @@ export const appRouter = router({
     const richPath = path.join(bookRoot, "input", "rich.xml");
     const rich = fs.readFileSync(richPath, "utf8");
 
-    return { slug, rich, title: details.title, authors: details.authors.map((a) => a.name) };
+    return { slug, rich, title: parentTitle || details.title, authors: details.authors.map((a) => a.name) };
   }),
 
   getWolneLekturyCollections: procedure.query(async () => {
@@ -344,6 +360,19 @@ export const appRouter = router({
         hook: book.generatedHook || "",
       })),
     };
+  }),
+
+  getReadingTimes: procedure.query(async () => {
+    const readingTimesPath = path.resolve(__dirname, "../../wolnelektury-data/reading-times.json");
+    if (!fs.existsSync(readingTimesPath)) {
+      return {};
+    }
+    const data = JSON.parse(fs.readFileSync(readingTimesPath, "utf-8"));
+    const result: Record<string, string> = {};
+    for (const [slug, info] of Object.entries(data)) {
+      result[slug] = (info as { readingTimeFormatted: string }).readingTimeFormatted;
+    }
+    return result;
   }),
 
   getStyleSelectionStatus: procedure.input(z.object({ jobId: z.string() })).query(({ input }) => {
@@ -456,9 +485,17 @@ export const appRouter = router({
       userPreview = await generateStylePreview(state.userStyle, "user", 1);
     }
 
-    setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, userPreview?.imagePath || null);
+    setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, userPreview?.imagePath || null, autoPreview?.avatarPath || null, userPreview?.avatarPath || null);
 
-    return { success: true, previews: { autoPreviewPath: autoPreview?.imagePath || null, userPreviewPath: userPreview?.imagePath || null } };
+    return {
+      success: true,
+      previews: {
+        autoPreviewPath: autoPreview?.imagePath || null,
+        userPreviewPath: userPreview?.imagePath || null,
+        autoAvatarPath: autoPreview?.avatarPath || null,
+        userAvatarPath: userPreview?.avatarPath || null,
+      },
+    };
   }),
 });
 

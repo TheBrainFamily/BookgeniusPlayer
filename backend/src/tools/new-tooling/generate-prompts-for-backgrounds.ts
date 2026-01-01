@@ -11,6 +11,9 @@ import { generateFluxImage } from "./generate-flux-schnel-image";
 import { GraphicalStyle } from "./create-graphical-style";
 import { callSonnet45 } from "../../callSonet45";
 import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { generateCharacterImageWithOpenAI } from "./generate-pictures-for-entities";
+import { bookFileExists } from "../../helpers/bookFileExists";
+import type { NewReferenceCardsResponse } from "../../types";
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("🚨 Unhandled Rejection at:", promise);
@@ -267,7 +270,7 @@ export const generateImageWithOpenAIToFolder = async (
   return filePath;
 };
 
-export type StylePreviewResult = { imagePath: string; styleType: "auto" | "user" };
+export type StylePreviewResult = { imagePath: string; avatarPath: string | null; styleType: "auto" | "user" };
 
 export const generateStylePreview = async (
   style: GraphicalStyle,
@@ -326,11 +329,44 @@ Chapter Text: <chapter>${chapter.content}</chapter>
     if (imagePath !== targetPath) {
       fs.renameSync(imagePath, targetPath);
     }
-    return { imagePath: targetPath, styleType };
   } catch (e) {
     logger.error(`Failed to rename preview file: ${e}`);
-    return { imagePath, styleType };
   }
+
+  const backgroundPath = fs.existsSync(targetPath) ? targetPath : imagePath;
+
+  let avatarPath: string | null = null;
+  try {
+    if (bookFileExists("single-summary-per-person.json", FILE_TYPE.PERMANENT)) {
+      const referenceCards = JSON.parse(
+        readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
+      ) as NewReferenceCardsResponse;
+
+      if (referenceCards.characters && referenceCards.characters.length > 0) {
+        const firstCharacter = referenceCards.characters[0];
+        logger.info(`Generating avatar preview for character: ${firstCharacter.name}`);
+
+        const avatarPrompt = `Portrait of ${firstCharacter.name}. ${firstCharacter.referenceCard}`;
+        const avatarBuffer = await generateCharacterImageWithOpenAI(
+          avatarPrompt,
+          firstCharacter.name,
+          style.avatarStyle,
+        );
+
+        if (avatarBuffer) {
+          const avatarFileName = `${styleType}-preview-avatar.webp`;
+          const avatarTargetPath = path.join(path.dirname(backgroundPath), avatarFileName);
+          fs.writeFileSync(avatarTargetPath, avatarBuffer);
+          avatarPath = avatarTargetPath;
+          logger.info(`Avatar preview saved to: ${avatarPath}`);
+        }
+      }
+    }
+  } catch (e) {
+    logger.error(`Failed to generate avatar preview: ${e}`);
+  }
+
+  return { imagePath: backgroundPath, avatarPath, styleType };
 };
 
 if (require.main === module) {
