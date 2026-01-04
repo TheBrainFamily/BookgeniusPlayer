@@ -6,10 +6,10 @@ export const getChapterTitle = (chapter: XMLElement): string => {
   let currentAct = "";
 
   if (chapter.getElementsByTagName("h2").length > 0) {
-    console.warn("h2 found in chapter, not supported yet", chapter);
+    console.warn("h2 found in chapter, not supported yet");
   }
   if (chapter.getElementsByTagName("h1").length > 0) {
-    console.warn("h1 found in chapter, not supported yet", chapter);
+    console.warn("h1 found in chapter, not supported yet");
   }
 
   const actElements =

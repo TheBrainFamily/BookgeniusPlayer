@@ -1,4 +1,6 @@
 import type { CharacterData } from "@player/types/book";
+import { useGraphicsSettings } from "@player/stores/graphicsSettings.store";
+
 const AVATAR_COLORS = ["#2563eb", "#db2777", "#059669", "#7c3aed", "#ea580c", "#0891b2", "#4f46e5", "#be185d", "#16a34a", "#ca8a04"];
 
 // Consistent color based on unique slug
@@ -17,14 +19,13 @@ export function getInitials(name: string) {
   return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0][0]?.toUpperCase() || "?";
 }
 
-/**
- * Returns the best available avatar source.
- * Falls back to a programmatically generated SVG if no URL exists.
- */
 export function getAvatarSource(character: CharacterData) {
+  const { qualityLevel } = useGraphicsSettings.getState();
+  const useSvgOnly = qualityLevel === "minimal";
+
   const url = character.media?.avatarUrl;
 
-  if (url) return url;
+  if (url && !useSvgOnly) return url;
 
   // Fallback Logic
   const initials = getInitials(character.characterName);

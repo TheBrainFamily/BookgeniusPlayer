@@ -5,7 +5,7 @@ export const getChaptersUpToWithChapters = (from: number, upTo: number, chapters
   // Parse chapters XML using cheerio
   const $ = cheerio.load(chapters, { xml: true });
 
-  console.log("chapters", chapters);
+  // console.log("chapters", chapters);
   // Extract all chapters
   const parsedChapters: Chapter[] = [];
   $("chapter").each((_, element) => {

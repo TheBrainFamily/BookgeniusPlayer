@@ -2,10 +2,12 @@ import { useEffect, useRef } from "react";
 import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
+import { useGraphicsSettings } from "@player/stores/graphicsSettings.store";
 
 export function useInlineAvatarSync() {
   const { optimisticAvatars } = useAvatarGenerationStore();
   const { characters, charactersData } = useBookConvex();
+  const { qualityLevel } = useGraphicsSettings();
   const previousAvatarUrlsRef = useRef<Map<string, string>>(new Map());
   const knownSlugsRef = useRef<Set<string>>(new Set());
 
@@ -63,6 +65,8 @@ export function useInlineAvatarSync() {
       return;
     }
 
+    const forceSvg = qualityLevel === "minimal";
+
     slugsToUpdate.forEach((slugLower) => {
       const char = characters.find((c) => c.slug.toLowerCase() === slugLower);
       const charData = charactersData.find((c) => c.slug.toLowerCase() === slugLower);
@@ -71,9 +75,14 @@ export function useInlineAvatarSync() {
       const serverUrl = char?.avatar?.url || char?.listens?.url;
       const displayName = charData?.characterName;
 
-      let newUrl = optimisticUrl || serverUrl;
-      if (!newUrl && displayName) {
+      let newUrl: string | undefined;
+      if (forceSvg && displayName) {
         newUrl = getAvatarSource({ slug: originalSlug, characterName: displayName, bookSlug: "", infoPerChapter: [] });
+      } else {
+        newUrl = optimisticUrl || serverUrl;
+        if (!newUrl && displayName) {
+          newUrl = getAvatarSource({ slug: originalSlug, characterName: displayName, bookSlug: "", infoPerChapter: [] });
+        }
       }
 
       if (!newUrl) return;
@@ -98,5 +107,5 @@ export function useInlineAvatarSync() {
 
     previousAvatarUrlsRef.current = currentAvatarUrls;
     knownSlugsRef.current = currentSlugs;
-  }, [optimisticAvatars, characters, charactersData]);
+  }, [optimisticAvatars, characters, charactersData, qualityLevel]);
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, memo, useMemo } from "react";
-import { List, Type, RotateCcw, ArrowLeft, History, Clock, Share2, Check, Mic, Loader2 } from "lucide-react";
+import { List, Type, RotateCcw, ArrowLeft, History, Clock, Share2, Check, Mic, Loader2, Monitor } from "lucide-react";
+import { useGraphicsSettingsModal } from "@player/stores/modals/graphicsSettingsModal.store";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
@@ -295,6 +296,25 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
             >
               <List className="mr-2 h-4 w-4" />
               {t("open_chapter")}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-left text-white hover:bg-white/10 hover:text-white border-white/20 cursor-pointer"
+              onPointerUp={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                useGraphicsSettingsModal.getState().openModal();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  useGraphicsSettingsModal.getState().openModal();
+                }
+              }}
+            >
+              <Monitor className="mr-2 h-4 w-4" />
+              {t("graphics_settings", "Graphics")}
             </Button>
             <Button
               variant="ghost"

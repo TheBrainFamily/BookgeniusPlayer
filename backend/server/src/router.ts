@@ -490,7 +490,8 @@ export const appRouter = router({
     const state = readStyleSelection(bookRoot);
 
     if (!state) throw new Error("Style selection not initialized");
-    if (state.status !== "awaiting_input" && state.status !== "generating_auto_style") {
+    const allowedStatuses = ["awaiting_input", "generating_auto_style", "generating_user_style"];
+    if (!allowedStatuses.includes(state.status)) {
       throw new Error(`Cannot submit style in status: ${state.status}`);
     }
 

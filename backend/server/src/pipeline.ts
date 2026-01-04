@@ -527,14 +527,10 @@ export async function startPipeline(input: { epubPath?: string; fb2Path?: string
         }
 
         autoStyle = await createGraphicalStyleFromCover(`${metadata.title} by ${metadata.author}`, bookText, coverBase64, metadata.coverArtist, "image/jpeg");
-
-        writeBookFile("graphicalStyle.json", JSON.stringify(autoStyle, null, 2), FILE_TYPE.TEMPORARY);
         addLog(job, `Generated style from cover (artist: ${metadata.coverArtist || "unknown"})`);
-        await uploadGraphicalStyleToConvex(job, tempOutputDir);
-        return;
+      } else {
+        autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
       }
-
-      autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
       setAutoStyleComplete(bookRoot, autoStyle);
       addLog(job, "Auto style generated, awaiting user input");
 

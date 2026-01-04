@@ -54,6 +54,7 @@ import { EditorToolbar } from "./components/EditorToolbar";
 import { useDraftMode } from "@player/context/DraftModeContext";
 import { useInlineAvatarSync } from "@player/hooks/useInlineAvatarSync";
 import { useEmbeddingsHeartbeat } from "@player/hooks/useEmbeddingsHeartbeat";
+import { useApplyGraphicsSettings } from "@player/hooks/useApplyGraphicsSettings";
 
 // =============================================================================
 // Convex Client
@@ -82,6 +83,7 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
   useBackgroundSongs();
   useInlineAvatarSync();
   useEmbeddingsHeartbeat();
+  useApplyGraphicsSettings();
 
   const { i18n: i18nInstance } = useTranslation();
   const { bookData } = useBookConvex();

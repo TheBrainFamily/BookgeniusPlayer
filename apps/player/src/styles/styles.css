@@ -1951,3 +1951,93 @@ section[data-chapter] [data-index].edit-hover {
 #right-notes .side-panel-modal .text-white\/60 {
   color: rgba(255, 255, 255, 0.6) !important;
 }
+
+/* ============================================ */
+/* Graphics Quality Mode Styles                 */
+/* ============================================ */
+
+#legacy.graphics-reduced,
+#legacy.graphics-minimal {
+  --bg-content-light: #000000;
+  --text-light: #f2e4c9;
+  --bg-notes-rgb: 0, 0, 0;
+  --gradient-opacity: 0;
+
+  .bg-element,
+  .bg-video {
+    display: none !important;
+  }
+
+  &::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-color: #1a1a1a;
+    z-index: -10;
+  }
+
+  #book-container {
+    mask-image: none !important;
+    background: #000000;
+    box-shadow:
+      0 4px 16px rgba(60, 60, 60, 0.5),
+      0 8px 32px rgba(40, 40, 40, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+  }
+
+  #content-container {
+    mask-image: none !important;
+    background: #000000 !important;
+  }
+}
+
+#legacy.graphics-bright {
+  --bg-content-light: #ffffff;
+  --text-light: #1a1a1a;
+  --bg-notes-rgb: 255, 255, 255;
+  --gradient-opacity: 0;
+
+  .bg-element,
+  .bg-video {
+    display: none !important;
+  }
+
+  &::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-color: #e8e4d9;
+    z-index: -10;
+  }
+
+  #book-container {
+    mask-image: none !important;
+    background: #fffef8;
+    box-shadow:
+      0 4px 16px rgba(180, 170, 140, 0.4),
+      0 8px 32px rgba(160, 150, 120, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+  }
+
+  #content-container {
+    mask-image: none !important;
+    background: #fffef8 !important;
+  }
+}
+
+/* Background blur effect */
+#legacy[data-bg-blur] .bg-element,
+#legacy[data-bg-blur] .bg-video {
+  filter: blur(var(--bg-blur-amount, 0px));
+}
+
+/* Animation speed modifiers */
+#legacy[data-animation-speed="2"] .bg-element.zooming {
+  animation-duration: 60s !important;
+}
+
+#legacy[data-animation-speed="0"] .bg-element.zooming {
+  animation-play-state: paused !important;
+}
