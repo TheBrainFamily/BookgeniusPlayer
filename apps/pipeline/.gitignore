@@ -10,7 +10,6 @@ seq-logs/
 public/april-frontend/
 build-answer-server/
 /*.txt
-/*.json
 src/standalone-scripts/create-song-titles-and-images/*.png
 **/.DS_Store
 books-data/**/*.mp3
