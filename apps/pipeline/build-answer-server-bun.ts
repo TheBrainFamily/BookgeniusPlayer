@@ -24,26 +24,6 @@ async function runBuild(): Promise<void> {
 
   await fs.copy("package-build-answer.json", path.join(buildDir, "package.json"));
 
-  const booksDataDir = path.resolve("books-data");
-  const outputBooksDataDir = path.resolve(buildDir, "books-data");
-  await fs.ensureDir(outputBooksDataDir);
-
-  if (await fs.pathExists(booksDataDir)) {
-    const bookSlugs = await fs.readdir(booksDataDir);
-    for (const bookSlug of bookSlugs) {
-      const embeddingsSrc = path.join(booksDataDir, bookSlug, "temporary-output", "embeddings.json");
-      const textSrc = path.join(booksDataDir, bookSlug, "input", "rich.xml");
-
-      if (await fs.pathExists(embeddingsSrc)) {
-        const destDir = path.join(outputBooksDataDir, bookSlug);
-        await fs.ensureDir(destDir);
-        await fs.copy(embeddingsSrc, path.join(destDir, "embeddings.json"));
-        await fs.copy(textSrc, path.join(destDir, "rich.xml"));
-        console.log(`📚 Copied ${bookSlug}`);
-      }
-    }
-  }
-
   console.log("✅ Build complete!");
 }
 

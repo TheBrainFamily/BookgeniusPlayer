@@ -144,7 +144,6 @@ export const convex = {
     const response = await fetch(uploadUrl, {
       method: backend === "r2" ? "PUT" : "POST",
       headers: { "Content-Type": args.contentType },
-      // @ts-expect-error - body is a Buffer or Uint8Array. TypeScript complaints but this works.
       body: args.content,
     });
 

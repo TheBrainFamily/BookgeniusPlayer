@@ -13,7 +13,6 @@ const apps = [
   { name: "platform-intl", sourceDir: path.join(projectRoot, "apps", "platform", "dist-intl"), targetDir: path.join(buildDir, "platform-app-intl") },
   { name: "platform-snapplify", sourceDir: path.join(projectRoot, "apps", "platform", "dist-snapplify"), targetDir: path.join(buildDir, "platform-app-snapplify") },
   { name: "platform-bookgeniusz", sourceDir: path.join(projectRoot, "apps", "platform", "dist"), targetDir: path.join(buildDir, "platform-app") },
-  { name: "wukong", sourceDir: path.join(projectRoot, "apps", "wukong", "dist"), targetDir: path.join(buildDir, "wukong-app") },
 ];
 
 // --- HELPER FUNCTIONS (unchanged) ---

@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { trpc } from "../trpc";
-import { StepLabels, type Step } from "~shared/pipelineTypes";
+import { StepLabels, type Step } from "~pipeline/src/shared/pipelineTypes";
 import Editor from "@monaco-editor/react";
 import {
   Upload,

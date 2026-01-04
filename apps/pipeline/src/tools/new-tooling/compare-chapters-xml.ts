@@ -294,30 +294,6 @@ export function restoreOriginalText(
 }
 
 if (require.main === module) {
-  // const original = fs.readFileSync(
-  //   "/Users/lukaszgandecki/projects/convert-books-trump/books-data/conrad-tajny-agent/temporary-output/rewritten-paragraphs-for-chapter-original-6.xml",
-  //   "utf8",
-  // );
-  // const changed = fs.readFileSync(
-  //   "/Users/lukaszgandecki/projects/convert-books-trump/books-data/conrad-tajny-agent/temporary-output/rewritten-paragraphs-for-chapter-broken-6-callGeminiWrapper.xml",
-  //   "utf8",
-  // );
-  // const allCharacters = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as {
-  //   characters: { name: string }[];
-  // };
-
-  // const original = fs.readFileSync(
-  //   "/Users/dominiklasek/Documents/BookGenius/bookgenius-server/books-data/macbeth/input/old.fb2",
-  //   "utf-8",
-  // );
-  // const changed = fs.readFileSync(
-  //   "/Users/dominiklasek/Documents/BookGenius/bookgenius-server/books-data/macbeth/input/new.fb2",
-  //   "utf-8",
-  // );
-
-  // const allCharactersNames = allCharacters.characters.map((c) => generateTagName(c.name)) as string[];
-  // const restored = restoreOriginalText(original, changed, allCharactersNames);
-
   // Test the function with both original and changed XML
 
   Array.from({ length: 19 }, (_, i) => i + 21).forEach((chapter) => {
@@ -331,5 +307,4 @@ if (require.main === module) {
   // compareXmlTextContent(original, restored);
 
   console.log("compared everything");
-  // compareXmlTextContent(original, original); // Keep this line if you want to test the identical case too
 }

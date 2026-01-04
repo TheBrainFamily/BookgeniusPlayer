@@ -5,5 +5,5 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   server: { port: 5173 },
-  resolve: { alias: { "@": path.resolve(__dirname, "./src"), "~shared": path.resolve(__dirname, "../shared"), "~server": path.resolve(__dirname, "../server/src") } },
+  resolve: { alias: { "@": path.resolve(__dirname, "./src"), "~pipeline": path.resolve(__dirname, "../pipeline") } },
 });
