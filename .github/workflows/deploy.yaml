@@ -106,13 +106,8 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
-      - name: Install dependencies (non-frozen)
-        run: bun install
-      - name: Debug lockfile changes
-        if: always()
-        run: |
-          git status --short
-          git diff -- bun.lock || true
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       #      - name: Build local artifacts (for S3 upload)
       #        run: pnpm build:docker
