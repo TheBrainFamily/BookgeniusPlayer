@@ -631,6 +631,22 @@ export function setupPageObserver(): {
 
   const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
 
+  const visibleSpacers = new Map<Element, number>();
+
+  const applySpacerBlur = (visibilityPercent: number) => {
+    const legacy = document.getElementById("legacy");
+    if (!legacy || !legacy.hasAttribute("data-bg-blur")) return;
+
+    const clampedVisibility = Math.max(0, Math.min(1, visibilityPercent));
+    const blurMultiplier = Math.max(0, 1 - clampedVisibility);
+    const baseBlurValue = Number.parseFloat(legacy.style.getPropertyValue("--bg-blur-base"));
+
+    if (!Number.isFinite(baseBlurValue)) return;
+
+    legacy.style.setProperty("--bg-blur-multiplier", blurMultiplier.toString());
+    legacy.style.setProperty("--bg-blur-amount", `${baseBlurValue * blurMultiplier}px`);
+  };
+
   const spacerObserver = new IntersectionObserver(
     (entries) => {
       // Skip processing during system navigation or viewport stabilization
@@ -638,6 +654,8 @@ export function setupPageObserver(): {
       if (isSystemNavigationInProgress() || scrollCoordinator.isNavigating) {
         return;
       }
+
+      let shouldApplyBlur = false;
 
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
@@ -650,6 +668,15 @@ export function setupPageObserver(): {
         const visibleBottom = Math.min(rootBounds.bottom, rect.bottom);
         const visibleHeight = Math.max(0, visibleBottom - visibleTop);
         const visibilityPercent = entry.intersectionRatio > 0 ? entry.intersectionRatio : rect.height > 0 ? visibleHeight / rect.height : 0;
+        const clampedVisibility = Math.max(0, Math.min(1, visibilityPercent));
+        const isVisible = visibleHeight > 0;
+
+        shouldApplyBlur = true;
+        if (isVisible) {
+          visibleSpacers.set(entry.target, clampedVisibility);
+        } else {
+          visibleSpacers.delete(entry.target);
+        }
 
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
@@ -744,6 +771,16 @@ export function setupPageObserver(): {
           hideScrollIndicator();
         }
       });
+
+      if (shouldApplyBlur) {
+        let maxVisibility = 0;
+        visibleSpacers.forEach((visibility) => {
+          if (visibility > maxVisibility) {
+            maxVisibility = visibility;
+          }
+        });
+        applySpacerBlur(maxVisibility);
+      }
     },
     { threshold: Array.from(Array(51).keys()).map((i) => i / 50) },
   );
