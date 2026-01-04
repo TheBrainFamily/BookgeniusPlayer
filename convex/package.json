@@ -1,1 +1,20 @@
-{}
+{
+  "name": "@bookgenius/convex",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Convex backend for BookGenius platform",
+  "main": "./_generated/api.js",
+  "types": "./_generated/api.d.ts",
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@convex-dev/r2": "^0.8.1",
+    "@xmldom/xmldom": "^0.9.8",
+    "jimp": "^1.6.0",
+    "music-metadata": "^11.10.3",
+    "openai": "^6.15.0"
+  }
+}

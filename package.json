@@ -63,15 +63,9 @@
       "pnpm prettier --write"
     ]
   },
-  "dependencies": {
-    "@convex-dev/r2": "^0.8.1",
-    "@jsquash/webp": "^1.4.0",
-    "@xmldom/xmldom": "^0.9.8",
-    "jimp": "^1.6.0",
-    "music-metadata": "^11.10.3",
-    "openai": "^6.15.0"
-  },
+  "dependencies": {},
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "convex"
   ]
 }

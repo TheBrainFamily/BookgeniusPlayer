@@ -6,9 +6,7 @@ import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
-import { useEditorMode } from "@player/hooks/useEditorMode";
 import { useBookConvex } from "@player/context/BookConvexContext";
-import { goToParagraph } from "@player/helpers/paragraphsNavigation";
 import { markLayoutUnstable, LAYOUT_UNSTABLE_VIRTUALIZER_MS } from "@player/helpers/locationCommitter";
 import { useLocation } from "@player/state/LocationContext";
 import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer, updateMountedChaptersInPlace } from "@player/logic/BookContentVirtualizer";
@@ -25,13 +23,12 @@ if (import.meta.hot) {
   });
 }
 
-const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 const containerId = "content-container";
 
 export function useBookContent() {
   const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded } = useBookConvex();
   const { location } = useLocation();
-  const { currentChapter, currentParagraph } = location;
+  const { currentChapter } = location;
   const bookForm = bookData?.metadata?.bookForm || "book";
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
@@ -49,8 +46,6 @@ export function useBookContent() {
     cleanup: () => void;
   } | null>(null);
   const currentChapterRef = useRef<number | undefined>(currentChapter);
-
-  useEditorMode(isEditorMode ? containerRef.current : null);
 
   const isPlayFormat = bookForm === "play" || bookForm === "mixed";
 
