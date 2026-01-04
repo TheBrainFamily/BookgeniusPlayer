@@ -338,6 +338,271 @@ describe("SE Converter", () => {
     });
   });
 
+  describe("play format (drama tables)", () => {
+    it("converts drama table to div[data-speaker] with speaker label and dialogue", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td epub:type="z3998:persona">First Witch</td>
+            <td>When shall we three meet again?</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Should have div with data-speaker attribute (slugified)
+      expect(result.textHtml).toContain('data-speaker="first-witch"');
+      // Should have speaker label paragraph with boolean attribute
+      expect(result.textHtml).toContain('data-speaker-label=""');
+      expect(result.textHtml).toContain(">FIRST WITCH<");
+      // Should have dialogue as paragraph
+      expect(result.textHtml).toContain("When shall we three meet again?");
+      // Table should be removed
+      expect(result.textHtml).not.toContain("<table");
+    });
+
+    it("converts stage directions with data-stage-direction and em wrapper", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td/>
+            <td><i epub:type="z3998:stage-direction">Thunder and lightning.</i></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Should have stage direction paragraph with boolean attribute
+      expect(result.textHtml).toContain('data-stage-direction=""');
+      // Content should be wrapped in em
+      expect(result.textHtml).toContain("<em>Thunder and lightning.</em>");
+    });
+
+    it("converts character mentions in stage directions with data-c and data-enters", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td/>
+            <td><i epub:type="z3998:stage-direction">Enter <b epub:type="z3998:persona">Macbeth</b> and <b epub:type="z3998:persona">Banquo</b>.</i></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Should have character mentions with data-c and data-enters
+      expect(result.textHtml).toContain('data-c="macbeth"');
+      expect(result.textHtml).toContain('data-enters=""');
+      expect(result.textHtml).toContain(">Macbeth<");
+      expect(result.textHtml).toContain('data-c="banquo"');
+      expect(result.textHtml).toContain(">Banquo<");
+      // Should be span elements, not b
+      expect(result.textHtml).toContain("<span");
+      expect(result.textHtml).not.toContain("<b ");
+    });
+
+    it("converts multi-line verse dialogue to multiple paragraph elements", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td epub:type="z3998:persona">First Witch</td>
+            <td epub:type="z3998:verse">
+              <p><span>When shall we three meet again</span><br/><span>In thunder, lightning, or in rain?</span></p>
+              <p><span>When the hurlyburly's done,</span><br/><span>When the battle's lost and won.</span></p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Should have data-speaker div
+      expect(result.textHtml).toContain('data-speaker="first-witch"');
+      // Should have multiple <p> elements for verse lines
+      expect(result.textHtml).toContain("When shall we three meet again");
+      expect(result.textHtml).toContain("When the hurlyburly");
+      // Count the paragraphs - should have speaker label + 2 verse paragraphs
+      const speakerDivMatch = result.textHtml.match(/data-speaker="first-witch"[\s\S]*?(?=<\/div>|$)/);
+      expect(speakerDivMatch).toBeTruthy();
+      const pCount = (speakerDivMatch![0].match(/<p/g) || []).length;
+      expect(pCount).toBeGreaterThanOrEqual(3); // 1 label + 2 verse lines
+    });
+
+    it("converts inline stage directions within dialogue to spans", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td epub:type="z3998:persona">Macbeth</td>
+            <td>Is this a dagger which I see before me, <i epub:type="z3998:stage-direction">Drawing his sword.</i> Come, let me clutch thee.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Inline stage direction should become span with class
+      expect(result.textHtml).toContain('class="inline-stage-direction"');
+      expect(result.textHtml).toContain("Drawing his sword.");
+      // The dialogue should still be present
+      expect(result.textHtml).toContain("Is this a dagger");
+      expect(result.textHtml).toContain("Come, let me clutch thee");
+    });
+
+    it("handles stage direction in first cell (single-cell row)", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td><i epub:type="z3998:stage-direction">Exeunt.</i></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.textHtml).toContain('data-stage-direction=""');
+      expect(result.textHtml).toContain("<em>Exeunt.</em>");
+    });
+
+    it("slugifies speaker names correctly", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td epub:type="z3998:persona">Lady Macbeth</td>
+            <td>Out, damned spot!</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Multi-word names should be slugified
+      expect(result.textHtml).toContain('data-speaker="lady-macbeth"');
+      expect(result.textHtml).toContain(">LADY MACBETH<");
+    });
+
+    it("preserves speaker name capitalization in label", () => {
+      const files = [
+        {
+          filename: "act-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="act-1" epub:type="chapter">
+      <h2>Act I</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td epub:type="z3998:persona">Macduff</td>
+            <td>Turn, hell-hound, turn!</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Speaker label should be uppercase
+      expect(result.textHtml).toContain(">MACDUFF<");
+    });
+  });
+
   describe("XML/HTML conversion", () => {
     it("converts epub:type to data-epub-type", () => {
       const files = [

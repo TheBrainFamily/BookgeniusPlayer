@@ -21,25 +21,88 @@ export function sanitizeHtml(html: string): string {
   return doc.body.innerHTML;
 }
 
+function processPlayContainer(container: Element, doc: Document, state: { lastSpeaker: string | null; alignment: "left" | "right" }): void {
+  const children = Array.from(container.children);
+
+  for (const child of children) {
+    const tagName = child.tagName.toLowerCase();
+
+    if (tagName === "section" && !child.hasAttribute("data-chapter")) {
+      processPlayContainer(child, doc, state);
+      continue;
+    }
+
+    if (child.hasAttribute("data-speaker")) {
+      const speakers = child.getAttribute("data-speaker") || "";
+      const firstSpeaker = speakers.split(/\s+/)[0];
+
+      if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
+        state.alignment = state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+        state.lastSpeaker = firstSpeaker;
+      }
+
+      const playRow = doc.createElement("div");
+      playRow.className = "play-row";
+      playRow.setAttribute("data-text-alignment", state.alignment);
+
+      const characterAvatar = doc.createElement("div");
+      characterAvatar.className = "character-avatar";
+      characterAvatar.setAttribute("data-speaker", speakers);
+
+      const characterText = doc.createElement("div");
+      characterText.className = "character-text";
+
+      for (const innerChild of Array.from(child.children)) {
+        if (innerChild.hasAttribute("data-speaker-label")) {
+          continue;
+        }
+        const p = innerChild.cloneNode(true) as Element;
+        p.setAttribute("data-text-alignment", state.alignment);
+        p.setAttribute("data-is-character", "true");
+        characterText.appendChild(p);
+      }
+
+      playRow.appendChild(characterAvatar);
+      playRow.appendChild(characterText);
+      container.replaceChild(playRow, child);
+    } else if (tagName === "p" && child.hasAttribute("data-stage-direction")) {
+      const playRow = doc.createElement("div");
+      playRow.className = "play-row didaskalia-row";
+
+      const didaskaliaText = doc.createElement("div");
+      didaskaliaText.className = "didaskalia-text";
+
+      const p = child.cloneNode(true) as Element;
+      p.setAttribute("data-is-didaskalia", "true");
+      didaskaliaText.appendChild(p);
+
+      playRow.appendChild(didaskaliaText);
+      container.replaceChild(playRow, child);
+    }
+  }
+}
+
+export function wrapPlayElements(section: Element, doc: Document): void {
+  const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
+  processPlayContainer(section, doc, state);
+}
+
 export function injectDataIndex(section: Element): void {
   const isPlayFormat = section.querySelector(".play-row") !== null;
 
   if (isPlayFormat) {
-    // For plays: index headings (h3, h4, h5) and paragraphs inside .character-text/.didaskalia-text
     let index = 0;
-    for (const child of Array.from(section.children)) {
-      const tagName = child.tagName.toLowerCase();
-      if (tagName === "h3" || tagName === "h4" || tagName === "h5") {
-        child.setAttribute("data-index", String(index++));
-      } else if (child.classList.contains("play-row")) {
-        // Index all <p> elements inside .character-text and .didaskalia-text
-        child.querySelectorAll(".character-text p, .didaskalia-text p").forEach((p) => {
+    const indexables = section.querySelectorAll("h2, h3, h4, h5, .play-row");
+    for (const el of Array.from(indexables)) {
+      if (el.classList.contains("play-row")) {
+        el.querySelectorAll(".character-text p, .didaskalia-text p").forEach((p) => {
           p.setAttribute("data-index", String(index++));
         });
+      } else {
+        el.setAttribute("data-index", String(index++));
       }
     }
   } else {
-    // For books: index direct children
     let index = 0;
     for (const child of Array.from(section.children)) {
       child.setAttribute("data-index", String(index++));
@@ -91,6 +154,7 @@ export function normalizeChapterHtml(html: string): string {
     return sanitized;
   }
 
+  wrapPlayElements(section, doc);
   injectDataIndex(section);
   injectAvatarShells(section, doc);
 
@@ -112,6 +176,7 @@ export function normalizeBookHtml(html: string): string {
   }
 
   sections.forEach((section) => {
+    wrapPlayElements(section, doc);
     injectDataIndex(section);
     injectAvatarShells(section, doc);
   });

@@ -98,26 +98,63 @@ function slugify(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-function getDialogueContent(cell: Element): string {
-  const stageDirections = cell.querySelectorAll('i[epub\\:type="z3998:stage-direction"]');
-  for (const sd of Array.from(stageDirections)) {
-    const span = cell.ownerDocument.createElement("span");
-    span.className = "stage-direction";
+function convertCharacterMentionsInStageDirection(element: Element): void {
+  const personas = element.querySelectorAll('b[epub\\:type="z3998:persona"]');
+  for (const persona of Array.from(personas)) {
+    const name = (persona.textContent || "").trim();
+    const slug = slugify(name);
+    const span = element.ownerDocument.createElement("span");
+    span.setAttribute("data-c", slug);
+    span.setAttribute("data-enters", "");
+    span.textContent = name;
+    persona.replaceWith(span);
+  }
+}
+
+function extractDialogueLines(cell: Element, doc: Document): Element[] {
+  const lines: Element[] = [];
+
+  const inlineStageDirections = cell.querySelectorAll('i[epub\\:type="z3998:stage-direction"]');
+  for (const sd of Array.from(inlineStageDirections)) {
+    const span = doc.createElement("span");
+    span.className = "inline-stage-direction";
     span.innerHTML = sd.innerHTML;
     sd.replaceWith(span);
   }
 
   const verseBlock = cell.querySelector('[epub\\:type="z3998:verse"], [data-epub-type="z3998:verse"]');
   if (verseBlock) {
-    return verseBlock.innerHTML;
+    const verseParagraphs = verseBlock.querySelectorAll("p");
+    if (verseParagraphs.length > 0) {
+      for (const vp of Array.from(verseParagraphs)) {
+        const p = doc.createElement("p");
+        p.innerHTML = vp.innerHTML;
+        lines.push(p);
+      }
+    } else {
+      const p = doc.createElement("p");
+      p.innerHTML = verseBlock.innerHTML;
+      lines.push(p);
+    }
+    return lines;
   }
 
   const directP = cell.querySelector(":scope > p");
   if (directP && cell.children.length === 1) {
-    return directP.innerHTML;
+    const p = doc.createElement("p");
+    p.innerHTML = directP.innerHTML;
+    lines.push(p);
+    return lines;
   }
 
-  return cell.innerHTML;
+  const text = (cell.textContent || "").trim();
+  if (text) {
+    const p = doc.createElement("p");
+    p.innerHTML = cell.innerHTML;
+    lines.push(p);
+  }
+
+  return lines;
 }
 
 function convertDramaTables(doc: Document): void {
@@ -144,28 +181,47 @@ function convertDramaTables(doc: Document): void {
         const speakerName = (firstCell.textContent || "").trim();
         const speakerSlug = slugify(speakerName);
 
-        const p = doc.createElement("p");
-        p.setAttribute("data-speaker", speakerSlug);
-        p.innerHTML = getDialogueContent(secondCell);
-        fragment.appendChild(p);
+        const speechDiv = doc.createElement("div");
+        speechDiv.setAttribute("data-speaker", speakerSlug);
+
+        const labelP = doc.createElement("p");
+        labelP.setAttribute("data-speaker-label", "");
+        labelP.textContent = speakerName.toUpperCase();
+        speechDiv.appendChild(labelP);
+
+        const dialogueLines = extractDialogueLines(secondCell, doc);
+        for (const line of dialogueLines) {
+          speechDiv.appendChild(line);
+        }
+
+        fragment.appendChild(speechDiv);
       } else if (secondCell) {
         const stageDirection = secondCell.querySelector('i[epub\\:type="z3998:stage-direction"]');
         if (stageDirection) {
+          convertCharacterMentionsInStageDirection(stageDirection);
           const p = doc.createElement("p");
-          p.className = "stage-direction";
-          p.innerHTML = stageDirection.innerHTML;
+          p.setAttribute("data-stage-direction", "");
+          const em = doc.createElement("em");
+          em.innerHTML = stageDirection.innerHTML;
+          p.appendChild(em);
           fragment.appendChild(p);
         } else if (secondCell.textContent?.trim()) {
           const p = doc.createElement("p");
-          p.innerHTML = getDialogueContent(secondCell);
+          const lines = extractDialogueLines(secondCell, doc);
+          if (lines.length > 0) {
+            p.innerHTML = lines[0].innerHTML;
+          }
           fragment.appendChild(p);
         }
       } else if (firstCell) {
         const stageDirection = firstCell.querySelector('i[epub\\:type="z3998:stage-direction"]');
         if (stageDirection) {
+          convertCharacterMentionsInStageDirection(stageDirection);
           const p = doc.createElement("p");
-          p.className = "stage-direction";
-          p.innerHTML = stageDirection.innerHTML;
+          p.setAttribute("data-stage-direction", "");
+          const em = doc.createElement("em");
+          em.innerHTML = stageDirection.innerHTML;
+          p.appendChild(em);
           fragment.appendChild(p);
         }
       }
