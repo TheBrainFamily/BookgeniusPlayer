@@ -13,6 +13,14 @@ const client = new ConvexHttpClient(CONVEX_URL);
 export type StepStatus = "pending" | "running" | "done" | "error" | "skipped";
 export type AvatarState = "generating" | "ready" | "error" | "none";
 
+function toArrayBufferView(content: Uint8Array): Uint8Array<ArrayBuffer> {
+  if (content.buffer instanceof ArrayBuffer) {
+    return new Uint8Array(content.buffer, content.byteOffset, content.byteLength);
+  }
+
+  return new Uint8Array(content);
+}
+
 export const convex = {
   async ensureBookStructure(args: {
     jobId: string;
@@ -141,10 +149,11 @@ export const convex = {
       extra: args.extra,
     });
 
+    const body = toArrayBufferView(args.content);
     const response = await fetch(uploadUrl, {
       method: backend === "r2" ? "PUT" : "POST",
       headers: { "Content-Type": args.contentType },
-      body: args.content,
+      body,
     });
 
     if (!response.ok) {
