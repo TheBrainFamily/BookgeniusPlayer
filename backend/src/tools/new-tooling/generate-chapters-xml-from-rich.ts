@@ -36,7 +36,7 @@ function collectChapterElements(root: XMLElement): Map<number, XMLElement> {
 
 export function generateChaptersXmlFromRich(bookText: string): string {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(bookText, "text/xml");
+  const doc = parser.parseFromString(bookText, "text/html");
   const root = doc.documentElement as XMLElement | null;
 
   if (!root) {
