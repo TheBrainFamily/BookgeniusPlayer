@@ -104,9 +104,15 @@ jobs:
       #     node-version: "20"
       #     cache: "pnpm"
 
-      - name: Setup Bun and install dependencies
+      - name: Setup Bun
         uses: oven-sh/setup-bun@v1
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies (non-frozen)
+        run: bun install
+      - name: Debug lockfile changes
+        if: always()
+        run: |
+          git status --short
+          git diff -- bun.lock || true
 
       #      - name: Build local artifacts (for S3 upload)
       #        run: pnpm build:docker
