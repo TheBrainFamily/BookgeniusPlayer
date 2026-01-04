@@ -46,19 +46,6 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
   "s3://${S3_BUCKET}/app/platform-snapplify/${ASSET_CONTEXT}/"
 
 
-# --- wukong app ---
-s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-  --cache-control "$short_cache" \
-  --content-type "text/html; charset=utf-8" \
-  build/wukong-app/index.html \
-  "s3://${S3_BUCKET}/app/wukong/${ASSET_CONTEXT}/index.html"
-
-s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-  --exclude "index.html" \
-  --cache-control "$long_cache" \
-  build/wukong-app/ \
-  "s3://${S3_BUCKET}/app/wukong/${ASSET_CONTEXT}/"
-
 
 # --- player app ---
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
@@ -120,7 +107,6 @@ fi
   if [[ "${ASSET_CONTEXT}" == "prod" ]]; then
     curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=platform&warm=1&host=bookgeniusz.pl" -H "x-preview-key: $PREVIEW_KEY"
     curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=platform-snapplify&warm=1&host=bookgenius.snapplify.com" -H "x-preview-key: $PREVIEW_KEY"
-    curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=wukong&warm=1&host=wukong.bookgenius.net" -H "x-preview-key: $PREVIEW_KEY"
   fi
 
   curl -X POST "https://bg-updater.bookgenius.net/?mode=recompute&ctx=${ASSET_CONTEXT}" -H "x-preview-key: $PREVIEW_KEY"
