@@ -11,7 +11,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "paths": { "@/*": ["./src/*"], "~pipeline/*": ["../pipeline/*"] }
+    "paths": { "@/*": ["./src/*"], "~pipeline/*": ["../pipeline/*"], "@bookgenius/convex/*": ["../../convex/*"] }
   },
   "include": ["src"]
 }

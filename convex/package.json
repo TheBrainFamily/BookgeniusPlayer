@@ -15,6 +15,9 @@
     "@xmldom/xmldom": "^0.9.8",
     "jimp": "^1.6.0",
     "music-metadata": "^11.10.3",
-    "openai": "^6.15.0"
+    "openai": "^6.15.0",
+    "@convex-dev/auth": "^0.0.90",
+    "convex": "^1.31.2",
+    "convex-test": "^0.0.41"
   }
 }
