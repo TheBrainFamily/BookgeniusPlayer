@@ -2,10 +2,21 @@ import fs from "fs";
 import path from "path";
 import { JSDOM } from "jsdom";
 
+export interface SEImageReference {
+  /** Original filename (e.g., "illustration-1.svg") */
+  filename: string;
+  /** Original src path in XHTML (e.g., "../images/illustration-1.svg") */
+  originalSrc: string;
+  /** New src path for web (e.g., "/api/storage/figures/illustration-1.svg") */
+  newSrc: string;
+}
+
 export interface SEConversionResult {
   textHtml: string;
   chaptersXml: string;
   lastChapter: number;
+  /** List of images referenced in the book content */
+  images: SEImageReference[];
 }
 
 // Files to skip - these are not actual book content
@@ -386,7 +397,10 @@ function extractChaptersFromFile(
   return { chapters, htmlParts, nextChapter: chapterCounter };
 }
 
-export function convertSeXhtmlToHtml(xhtmlFiles: { filename: string; content: string }[]): SEConversionResult {
+export function convertSeXhtmlToHtml(
+  xhtmlFiles: { filename: string; content: string }[],
+  options: { figuresBasePath?: string } = {},
+): SEConversionResult {
   const allChapters: { number: number; title: string; content: string }[] = [];
   const allHtmlParts: string[] = [];
   let chapterCounter = 1;
@@ -398,7 +412,38 @@ export function convertSeXhtmlToHtml(xhtmlFiles: { filename: string; content: st
     chapterCounter = result.nextChapter;
   }
 
-  const textHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${allHtmlParts.join("\n")}</body></html>`;
+  let textHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${allHtmlParts.join("\n")}</body></html>`;
+
+  // Extract and rewrite image references
+  const images: SEImageReference[] = [];
+  const imageMap = new Map<string, SEImageReference>();
+  const figuresBasePath = options.figuresBasePath || "/figures";
+
+  // Find all image src attributes (handles both ../images/ and images/ paths)
+  const imgRegex = /<img([^>]*)\ssrc="([^"]+)"([^>]*)>/gi;
+  let match;
+
+  while ((match = imgRegex.exec(textHtml)) !== null) {
+    const originalSrc = match[2];
+    // Extract filename from path like "../images/illustration-1.svg" or "images/illustration-1.svg"
+    const filename = path.basename(originalSrc);
+
+    if (!imageMap.has(filename)) {
+      const newSrc = `${figuresBasePath}/${filename}`;
+      const imageRef: SEImageReference = { filename, originalSrc, newSrc };
+      imageMap.set(filename, imageRef);
+      images.push(imageRef);
+    }
+  }
+
+  // Rewrite all image paths in the HTML
+  for (const img of images) {
+    // Replace both ../images/filename and images/filename patterns
+    textHtml = textHtml.replace(
+      new RegExp(`src="[^"]*${img.filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`, "g"),
+      `src="${img.newSrc}"`,
+    );
+  }
 
   const chaptersXml = `<chapters>\n${allChapters
     .map(
@@ -407,10 +452,13 @@ export function convertSeXhtmlToHtml(xhtmlFiles: { filename: string; content: st
     )
     .join("\n")}\n</chapters>`;
 
-  return { textHtml, chaptersXml, lastChapter: chapterCounter - 1 };
+  return { textHtml, chaptersXml, lastChapter: chapterCounter - 1, images };
 }
 
-export async function convertSEBook(bookSlug: string): Promise<SEConversionResult> {
+export async function convertSEBook(
+  bookSlug: string,
+  options: { figuresBasePath?: string } = {},
+): Promise<SEConversionResult> {
   const bookDir = path.resolve(__dirname, `../../../standardebooks-data/books/${bookSlug}`);
   const textDir = path.join(bookDir, "text");
 
@@ -445,7 +493,14 @@ export async function convertSEBook(bookSlug: string): Promise<SEConversionResul
     content: fs.readFileSync(path.join(textDir, filename), "utf-8"),
   }));
 
-  return convertSeXhtmlToHtml(xhtmlFiles);
+  return convertSeXhtmlToHtml(xhtmlFiles, options);
+}
+
+/**
+ * Get the path to the images directory for an SE book
+ */
+export function getSEBookImagesDir(bookSlug: string): string {
+  return path.resolve(__dirname, `../../../standardebooks-data/books/${bookSlug}/images`);
 }
 
 function wrapInRichXml(html: string): string {

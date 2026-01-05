@@ -16,7 +16,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@bookgenius/convex/_generated/api";
-import { convertSEBook } from "./index";
+import { convertSEBook, getSEBookImagesDir, type SEImageReference } from "./index";
 import { JSDOM } from "jsdom";
 
 const SE_BOOKS_DIR = path.resolve(__dirname, "../../../standardebooks-data/books");
@@ -171,6 +171,8 @@ function getContentType(filename: string): string {
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
     ".webp": "image/webp",
+    ".svg": "image/svg+xml",
+    ".gif": "image/gif",
     ".mp4": "video/mp4",
     ".webm": "video/webm",
     ".mp3": "audio/mpeg",
@@ -240,6 +242,7 @@ async function step1_CreateFolderStructure(bookPath: string, metadata: SEMetadat
   await createFolderIfNeeded(`${bookPath}/chapters-source`);
   await createFolderIfNeeded(`${bookPath}/backgrounds`);
   await createFolderIfNeeded(`${bookPath}/music`);
+  await createFolderIfNeeded(`${bookPath}/figures`);
 }
 
 async function step2_ImportCharacters(
@@ -304,6 +307,39 @@ async function step3_ImportChapters(
   return chapters.length;
 }
 
+async function step4_ImportFigures(bookPath: string, seSlug: string, images: SEImageReference[]): Promise<number> {
+  console.log("\n=== Step 4: Import Figures ===");
+
+  if (images.length === 0) {
+    console.log("  No figures to import");
+    return 0;
+  }
+
+  console.log(`  Found ${images.length} figures to import`);
+
+  const imagesDir = getSEBookImagesDir(seSlug);
+  if (!fs.existsSync(imagesDir)) {
+    console.log(`  Images directory not found: ${imagesDir}`);
+    return 0;
+  }
+
+  const figuresPath = `${bookPath}/figures`;
+  let uploaded = 0;
+
+  for (const img of images) {
+    const sourcePath = path.join(imagesDir, img.filename);
+    if (fs.existsSync(sourcePath)) {
+      const success = await uploadFile(figuresPath, img.filename, sourcePath);
+      if (success) uploaded++;
+    } else {
+      console.log(`  Warning: Image not found: ${img.filename}`);
+    }
+  }
+
+  console.log(`  Uploaded ${uploaded}/${images.length} figures`);
+  return uploaded;
+}
+
 async function main() {
   const { seSlug, targetSlug } = parseArgs();
   const bookPath = `books/${targetSlug}`;
@@ -324,8 +360,11 @@ async function main() {
   console.log(`  Author: ${metadata.author}`);
   console.log(`  Language: ${metadata.language}`);
 
-  const result = await convertSEBook(seSlug);
+  // Convert with figures path pointing to the book's figures folder
+  const figuresBasePath = `/${targetSlug}/figures`;
+  const result = await convertSEBook(seSlug, { figuresBasePath });
   console.log(`  Converted ${result.lastChapter} chapters`);
+  console.log(`  Found ${result.images.length} figures`);
 
   const characters = extractCharactersFromHtml(result.textHtml);
   console.log(`  Extracted ${characters.length} characters from play`);
@@ -341,10 +380,12 @@ async function main() {
   await step1_CreateFolderStructure(bookPath, metadata);
   const characterCount = await step2_ImportCharacters(bookPath, characters, hasLegacyAssets ? legacyAssetsDir : null);
   const chapterCount = await step3_ImportChapters(bookPath, chapters);
+  const figureCount = await step4_ImportFigures(bookPath, seSlug, result.images);
 
   console.log("\n✅ Import complete!");
   console.log(`   Characters: ${characterCount}`);
   console.log(`   Chapters: ${chapterCount}`);
+  console.log(`   Figures: ${figureCount}`);
   console.log(`\nNext steps:`);
   if (!hasLegacyAssets) {
     console.log(`   1. Generate character avatars in CMS`);
