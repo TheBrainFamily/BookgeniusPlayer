@@ -62,6 +62,10 @@ function injectAvatarShells(html: string): string {
     const speakers = el.getAttribute("data-speaker")?.split(/\s+/) ?? [];
     if (speakers.length === 0) return;
     el.classList.add("has-speaker");
+
+    const isInsideDramaTable = el.closest("table[data-drama]") !== null;
+    if (isInsideDramaTable) return;
+
     const shell = doc.createElement("span");
     shell.className = "character-placeholder character-talking start-of-paragraph";
     shell.setAttribute("data-character", speakers[0]);
@@ -365,6 +369,59 @@ describe("injectAvatarShells", () => {
     const input = '<section data-chapter="1"><p data-speaker="bob alice">Hello</p></section>';
     const result = injectAvatarShells(input);
     expect(result).toContain('data-character="bob"');
+  });
+
+  it("does NOT inject avatar shells into drama table rows but adds has-speaker class", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>Some prose before the drama.</p>
+        <table data-drama="">
+          <tbody>
+            <tr data-speaker="heffalump">
+              <td data-persona="">Heffalump</td>
+              <td>"Ho-ho!"</td>
+            </tr>
+            <tr data-speaker="piglet">
+              <td data-persona="">Piglet</td>
+              <td>"Tra-la-la."</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Some prose after.</p>
+      </section>
+    `;
+    const result = injectAvatarShells(input);
+    expect(result).toContain("data-drama");
+    expect(result).toContain('data-speaker="heffalump"');
+    expect(result).toContain('data-speaker="piglet"');
+    expect(result).toContain('<tr data-speaker="heffalump" class="has-speaker">');
+    expect(result).toContain('<tr data-speaker="piglet" class="has-speaker">');
+    const placeholderCount = (result.match(/character-placeholder/g) || []).length;
+    expect(placeholderCount).toBe(0);
+  });
+
+  it("injects avatar shells into prose paragraphs but not drama tables in mixed content", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="pooh">"Hello," said Pooh.</p>
+        <table data-drama="">
+          <tbody>
+            <tr data-speaker="heffalump">
+              <td data-persona="">Heffalump</td>
+              <td>"Ho-ho!"</td>
+            </tr>
+          </tbody>
+        </table>
+        <p data-speaker="piglet">"Goodbye," said Piglet.</p>
+      </section>
+    `;
+    const result = injectAvatarShells(input);
+    const placeholderMatches = result.match(/character-placeholder/g) || [];
+    expect(placeholderMatches.length).toBe(2);
+    expect(result).toContain('<p data-speaker="pooh" class="has-speaker"><span class="character-placeholder');
+    expect(result).toContain('<p data-speaker="piglet" class="has-speaker"><span class="character-placeholder');
+    expect(result).toContain('<tr data-speaker="heffalump" class="has-speaker">');
+    expect(result).not.toContain('<tr data-speaker="heffalump" class="has-speaker"><span');
   });
 });
 

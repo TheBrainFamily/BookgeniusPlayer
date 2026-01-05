@@ -6,6 +6,7 @@ import { getHighestChapterNumber } from "./getHighestChapterNumber";
 import { getLowestChapterNumber } from "./getLowestChapterNumber";
 import { generateChaptersXmlFromRich } from "../tools/new-tooling/generate-chapters-xml-from-rich";
 import { JSDOM } from "jsdom";
+import { type ChapterFormat } from "../tools/getChapterFormat";
 
 export type BookSettings = {
   numberOfChaptersIdentified: number;
@@ -14,6 +15,7 @@ export type BookSettings = {
   title?: string;
   author?: string;
   language?: string;
+  chapterFormats?: Record<number, ChapterFormat>;
 };
 
 function extractMetadataFromFb2(bookDir: string): { title?: string; author?: string; language?: string } {
@@ -38,6 +40,25 @@ function extractMetadataFromFb2(bookDir: string): { title?: string; author?: str
   return { title, author, language };
 }
 
+function extractChapterFormats(richXmlContent: string): Record<number, ChapterFormat> {
+  const dom = new JSDOM(richXmlContent, { contentType: "text/html" });
+  const doc = dom.window.document;
+  const formats: Record<number, ChapterFormat> = {};
+
+  const sections = doc.querySelectorAll("section[data-chapter]");
+  for (const section of Array.from(sections)) {
+    const chapterNum = parseInt(section.getAttribute("data-chapter") || "0", 10);
+    if (chapterNum > 0) {
+      const format = section.getAttribute("data-chapter-format") as ChapterFormat | null;
+      if (format === "play" || format === "mixed") {
+        formats[chapterNum] = format;
+      }
+    }
+  }
+
+  return formats;
+}
+
 export function createBookSettings() {
   const bookDir = resolveBookDir();
 
@@ -48,12 +69,14 @@ export function createBookSettings() {
   const lowestChapterNumber = getLowestChapterNumber(currentBookChapters);
 
   const metadata = extractMetadataFromFb2(bookDir);
+  const chapterFormats = extractChapterFormats(currentBookText);
 
   const bookSettings: BookSettings = {
     numberOfChaptersIdentified: highestChapterNumber - lowestChapterNumber + 1,
     numberOfChaptersToProcess: highestChapterNumber - lowestChapterNumber + 1,
     startFromChapter: lowestChapterNumber,
     ...metadata,
+    ...(Object.keys(chapterFormats).length > 0 && { chapterFormats }),
   };
 
   writeBookFile("bookSettings.json", JSON.stringify(bookSettings, null, 2));

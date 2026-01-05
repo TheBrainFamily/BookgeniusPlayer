@@ -21,6 +21,10 @@ export function sanitizeHtml(html: string): string {
   return doc.body.innerHTML;
 }
 
+function isDramaDialogue(element: Element): boolean {
+  return element.tagName.toLowerCase() === "div" && element.querySelector("[data-speaker-label]") !== null;
+}
+
 function processPlayContainer(container: Element, doc: Document, state: { lastSpeaker: string | null; alignment: "left" | "right" }): void {
   const children = Array.from(container.children);
 
@@ -32,7 +36,7 @@ function processPlayContainer(container: Element, doc: Document, state: { lastSp
       continue;
     }
 
-    if (child.hasAttribute("data-speaker")) {
+    if (child.hasAttribute("data-speaker") && isDramaDialogue(child)) {
       const speakers = child.getAttribute("data-speaker") || "";
       const firstSpeaker = speakers.split(/\s+/)[0];
 
@@ -87,26 +91,56 @@ export function wrapPlayElements(section: Element, doc: Document): void {
   processPlayContainer(section, doc, state);
 }
 
-export function injectDataIndex(section: Element): void {
-  const isPlayFormat = section.querySelector(".play-row") !== null;
+function indexPlayRowParagraphs(playRow: Element, startIndex: number): number {
+  let index = startIndex;
+  playRow.querySelectorAll(".character-text p, .didaskalia-text p").forEach((p) => {
+    p.setAttribute("data-index", String(index++));
+  });
+  return index;
+}
 
-  if (isPlayFormat) {
-    let index = 0;
-    const indexables = section.querySelectorAll("h2, h3, h4, h5, .play-row");
-    for (const el of Array.from(indexables)) {
-      if (el.classList.contains("play-row")) {
-        el.querySelectorAll(".character-text p, .didaskalia-text p").forEach((p) => {
-          p.setAttribute("data-index", String(index++));
-        });
-      } else {
-        el.setAttribute("data-index", String(index++));
+function indexMixedFormatChildren(section: Element): void {
+  let index = 0;
+  for (const child of Array.from(section.children)) {
+    const tagName = child.tagName.toLowerCase();
+
+    if (child.classList.contains("play-row")) {
+      index = indexPlayRowParagraphs(child, index);
+    } else if (tagName === "section" && !child.hasAttribute("data-chapter")) {
+      for (const nestedChild of Array.from(child.children)) {
+        if (nestedChild.classList.contains("play-row")) {
+          index = indexPlayRowParagraphs(nestedChild, index);
+        } else {
+          nestedChild.setAttribute("data-index", String(index++));
+        }
       }
-    }
-  } else {
-    let index = 0;
-    for (const child of Array.from(section.children)) {
+    } else {
       child.setAttribute("data-index", String(index++));
     }
+  }
+}
+
+function indexPurePlayFormat(section: Element): void {
+  let index = 0;
+  const indexables = section.querySelectorAll("h2, h3, h4, h5, .play-row");
+  for (const el of Array.from(indexables)) {
+    if (el.classList.contains("play-row")) {
+      index = indexPlayRowParagraphs(el, index);
+    } else {
+      el.setAttribute("data-index", String(index++));
+    }
+  }
+}
+
+export function injectDataIndex(section: Element): void {
+  const chapterFormat = section.getAttribute("data-chapter-format");
+  const hasPlayRows = section.querySelector(".play-row") !== null;
+  const isMixedOrProse = chapterFormat === "mixed" || !hasPlayRows;
+
+  if (isMixedOrProse) {
+    indexMixedFormatChildren(section);
+  } else {
+    indexPurePlayFormat(section);
   }
 }
 
@@ -116,6 +150,9 @@ export function injectAvatarShells(section: Element, doc: Document): void {
     if (speakers.length === 0) return;
 
     el.classList.add("has-speaker");
+
+    const isInsideDramaTable = el.closest("table[data-drama]") !== null;
+    if (isInsideDramaTable) return;
 
     const shell = doc.createElement("span");
     shell.className = "character-placeholder character-talking start-of-paragraph";

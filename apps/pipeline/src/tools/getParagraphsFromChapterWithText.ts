@@ -1,5 +1,18 @@
 import * as cheerio from "cheerio";
 
+function getElementAttributes($elem: ReturnType<cheerio.CheerioAPI>): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  const rawAttrs = $elem.attr();
+  if (rawAttrs) {
+    for (const [key, value] of Object.entries(rawAttrs)) {
+      if (value !== undefined) {
+        attrs[key] = value;
+      }
+    }
+  }
+  return attrs;
+}
+
 export const getParagraphsFromChapterWithText = (
   chapter: number,
   bookText: string,
@@ -11,10 +24,9 @@ export const getParagraphsFromChapterWithText = (
   return Array.from($(`[data-chapter="${chapter}"] > *`))
     .map((elem) => {
       const $elem = $(elem);
-      const elementType = ($elem.prop("tagName") ?? "unknown").toLowerCase(); // Get the tag name, provide default
-      // Clone the paragraph element to avoid modifying the original DOM structure if needed elsewhere
+      const elementType = ($elem.prop("tagName") ?? "unknown").toLowerCase();
+      const attributes = getElementAttributes($elem);
       const $clone = $elem.clone();
-      // Remove all anchor elements with the class 'anchor' from the clone
       if (clean) {
         $clone.find("note").remove();
         $clone.find("a").remove();
@@ -23,11 +35,10 @@ export const getParagraphsFromChapterWithText = (
       if (pureText) {
         text = $clone.text().trim();
       } else {
-        // Get clean text content without anchors
         text = $clone.html()?.trim() ?? "";
       }
 
-      return { text, elementType }; // Add elementType here
+      return { text, elementType, attributes };
     })
     .filter((element) => element?.text.length > 0)
     .map((pageText, index) => {
@@ -41,6 +52,6 @@ export const getParagraphsFromChapterWithText = (
         .replace(/\s+/g, " ")
         .replace(/\n\s*\n/g, "\n\n")
         .trim();
-      return { text, dataIndex: index, elementType: pageText.elementType }; // Keep elementType here
+      return { text, dataIndex: index, elementType: pageText.elementType, attributes: pageText.attributes };
     });
 };

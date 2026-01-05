@@ -414,6 +414,16 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
   const uniqueRows = [...new Set(playRowsOrParagraphs)];
   const activatedMedia = document.querySelectorAll<HTMLElement>("[data-activated-media='true']");
 
+  // Hydrate drama table persona cells for sections in range
+  const sectionsInRange = new Set<HTMLElement>();
+  paragraphsInRange.forEach((p) => {
+    const section = p.closest<HTMLElement>("section[data-chapter]");
+    if (section) sectionsInRange.add(section);
+  });
+  sectionsInRange.forEach((section) => {
+    hydrateInlineAvatarsInSection(section);
+  });
+
   uniqueRows.forEach((rowEl: HTMLElement) => {
     const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
     if (!characterPlaceholders.length) return;
@@ -548,5 +558,39 @@ export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
     const location = { chapter: chapterNumber, paragraph: paragraphIndex };
 
     populateInlineAvatarShell(shell, characterData, location);
+  });
+
+  const personaCells = section.querySelectorAll<HTMLElement>("table[data-drama] td[data-persona]:not(:has(.inline-avatar))");
+  personaCells.forEach((cell) => {
+    const row = cell.closest<HTMLElement>("tr[data-speaker]");
+    const characterSlug = row?.dataset.speaker;
+    if (!characterSlug) return;
+
+    const characterData = charactersBySlug.get(characterSlug);
+    if (!characterData) return;
+
+    const location = { chapter: chapterNumber, paragraph: 0 };
+    const snapshot = resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+    const displayName = snapshot.displayName;
+    const listeningSrc = snapshot.media.listening;
+    const talkingSrc = snapshot.media.talking;
+    let placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
+
+    if (!placeholderSrc) {
+      placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);
+    }
+
+    const container = document.createElement("span");
+    container.classList.add("inline-avatar");
+    container.dataset.character = characterSlug;
+    container.title = displayName;
+
+    const placeholderImg = document.createElement("img");
+    placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
+    placeholderImg.classList.add("rounded-full");
+    placeholderImg.alt = displayName;
+    container.appendChild(placeholderImg);
+
+    cell.insertBefore(container, cell.firstChild);
   });
 }

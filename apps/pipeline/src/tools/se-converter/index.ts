@@ -157,7 +157,60 @@ function extractDialogueLines(cell: Element, doc: Document): Element[] {
   return lines;
 }
 
-function convertDramaTables(doc: Document): void {
+function isDramaTable(table: Element): boolean {
+  const epubType = table.getAttribute("epub:type") || table.getAttribute("data-epub-type") || "";
+  if (epubType.includes("drama")) return true;
+  const hasPersonaCells =
+    table.querySelectorAll('td[epub\\:type*="persona"], td[data-epub-type*="persona"]').length > 0;
+  if (hasPersonaCells) return true;
+  const hasStageDirections =
+    table.querySelectorAll('i[epub\\:type*="stage-direction"], i[data-epub-type*="stage-direction"]').length > 0;
+  return hasStageDirections;
+}
+
+function detectChapterFormat(section: Element): "play" | "mixed" | "prose" {
+  const allTables = section.querySelectorAll("table");
+  const dramaTables = Array.from(allTables).filter(isDramaTable);
+  const hasDramaTables = dramaTables.length > 0;
+
+  const proseParas = Array.from(section.querySelectorAll("p")).filter((p) => {
+    const isInsideTable = p.closest("table");
+    return !isInsideTable;
+  });
+  const hasProse = proseParas.length > 0;
+
+  if (hasDramaTables && hasProse) return "mixed";
+  if (hasDramaTables) return "play";
+  return "prose";
+}
+
+function annotateDramaTables(doc: Document): void {
+  const tables = doc.querySelectorAll("table");
+
+  for (const table of Array.from(tables)) {
+    if (!isDramaTable(table)) continue;
+
+    table.setAttribute("data-drama", "");
+
+    const rows = table.querySelectorAll("tr");
+    for (const row of Array.from(rows)) {
+      const cells = row.querySelectorAll("td");
+      if (cells.length === 0) continue;
+
+      const firstCell = cells[0];
+      const personaType = firstCell?.getAttribute("epub:type") || firstCell?.getAttribute("data-epub-type") || "";
+
+      if (personaType.includes("z3998:persona")) {
+        const speakerName = (firstCell.textContent || "").trim();
+        const speakerSlug = slugify(speakerName);
+        row.setAttribute("data-speaker", speakerSlug);
+        firstCell.setAttribute("data-persona", "");
+      }
+    }
+  }
+}
+
+function convertDramaTablesToPlayFormat(doc: Document): void {
   const tables = doc.querySelectorAll("table");
 
   for (const table of Array.from(tables)) {
@@ -241,9 +294,14 @@ function extractChaptersFromFile(
 
   if (!body) return { chapters: [], htmlParts: [], nextChapter: startChapter };
 
-  convertDramaTables(doc);
-
   const article = body.querySelector("article, section") || body;
+  const chapterFormat = detectChapterFormat(article as Element);
+
+  if (chapterFormat === "play") {
+    convertDramaTablesToPlayFormat(doc);
+  } else {
+    annotateDramaTables(doc);
+  }
 
   const allNestedSections = article.querySelectorAll(":scope > section[data-epub-type], :scope > section[epub\\:type]");
   const nestedChapterSections = Array.from(allNestedSections).filter((section) => {
@@ -292,7 +350,8 @@ function extractChaptersFromFile(
         sectionHtml = htmlToValidXml(section.innerHTML);
       }
 
-      htmlParts.push(`<section data-chapter="${chapterCounter}">\n${sectionHtml}\n</section>`);
+      const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
+      htmlParts.push(`<section data-chapter="${chapterCounter}"${formatAttr}>\n${sectionHtml}\n</section>`);
       chapters.push({
         number: chapterCounter,
         title: escapeXml(title),
@@ -305,7 +364,8 @@ function extractChaptersFromFile(
     const title = titleEl ? extractTextContent(titleEl) : file.filename.replace(".xhtml", "");
 
     const innerHTML = htmlToValidXml(article.innerHTML);
-    htmlParts.push(`<section data-chapter="${chapterCounter}">\n${innerHTML}\n</section>`);
+    const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
+    htmlParts.push(`<section data-chapter="${chapterCounter}"${formatAttr}>\n${innerHTML}\n</section>`);
 
     chapters.push({
       number: chapterCounter,

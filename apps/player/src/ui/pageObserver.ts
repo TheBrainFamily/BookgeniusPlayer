@@ -6,7 +6,6 @@ import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator"
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
-// Cache isPlayFormat at module level to avoid repeated getBookData() calls
 let cachedIsPlayFormat: boolean | null = null;
 
 function getIsPlayFormat(): boolean {
@@ -742,7 +741,6 @@ export function setupPageObserver(): {
               rootEl.style.setProperty("--gradient-opacity", (1 - fadePercent).toString());
             } else {
               hideScrollIndicator();
-              // Less than 30% visible: full opacity
               rootEl.style.setProperty("--gradient-opacity", "1");
             }
           }

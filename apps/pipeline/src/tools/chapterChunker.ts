@@ -4,6 +4,7 @@ export interface Paragraph {
   text: string;
   dataIndex: number;
   elementType: string;
+  attributes?: Record<string, string>;
 }
 
 export interface ChapterChunk {
@@ -87,11 +88,23 @@ export function chunkParagraphs(paragraphs: Paragraph[], maxTokens: number = MAX
   return chunks;
 }
 
-/**
- * Build XML string for a chunk's paragraphs (for validation)
- */
+function buildAttributeString(attributes?: Record<string, string>): string {
+  if (!attributes || Object.keys(attributes).length === 0) return "";
+  return (
+    " " +
+    Object.entries(attributes)
+      .map(([key, value]) => `${key}="${value.replace(/"/g, "&quot;")}"`)
+      .join(" ")
+  );
+}
+
+export function buildParagraphXml(p: Paragraph): string {
+  const attrs = buildAttributeString(p.attributes);
+  return `<${p.elementType}${attrs}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`;
+}
+
 export function buildChunkXml(chapterId: number, paragraphs: Paragraph[]): string {
-  return paragraphs.map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`).join("\n");
+  return paragraphs.map(buildParagraphXml).join("\n");
 }
 
 /**

@@ -11,7 +11,7 @@ import { getBookSettings } from "../helpers/getBookSettings";
 import { FILE_TYPE } from "../helpers/filesHelpers";
 import { readBookFile } from "../helpers/readBookFile";
 import { generateTagName } from "../helpers/generateTagName";
-import { getBookForm } from "./getBookForm";
+import { getChapterFormat, type ChapterFormat } from "./getChapterFormat";
 import { doesBookFileExist } from "../helpers/readBookFile";
 import { callGpt5 } from "../callO3";
 import { sleep } from "./sleep";
@@ -19,6 +19,7 @@ import {
   needsChunking,
   chunkParagraphs,
   buildChunkXml,
+  buildParagraphXml,
   combineChunks,
   type Paragraph,
   type ChapterChunk,
@@ -51,9 +52,7 @@ function buildChunkedPrompt(
 ): string {
   const prompt = fs.readFileSync(path.join(__dirname, "NewRewriteParagraphsPromptBookChunked.md"), "utf8");
 
-  const paragraphsXml = `${paragraphs
-    .map((p) => `<${p.elementType}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`)
-    .join("\n")}`;
+  const paragraphsXml = paragraphs.map(buildParagraphXml).join("\n");
 
   let previousContextSection = "";
   let outputOnlyInstruction = "";
@@ -198,8 +197,9 @@ export const identifyAndRewriteParagraphs = async (
   const paragraphsFromChapter: { text: string; dataIndex: number; elementType: string }[] =
     getParagraphsFromChapter(chapter);
 
-  // Check if chapter needs chunking (only for books, not plays)
-  if (getBookForm() !== "play" && needsChunking(paragraphsFromChapter)) {
+  const chapterFormat = getChapterFormat(chapter);
+
+  if (chapterFormat !== "play" && needsChunking(paragraphsFromChapter)) {
     logger.info(`📦 Chapter ${chapter} exceeds token limit, using chunked processing`);
     return processChunkedChapter(chapter, charactersForChapter, paragraphsFromChapter);
   }
@@ -214,15 +214,13 @@ export const identifyAndRewriteParagraphs = async (
   }
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
-  const paragraphsForPage = `${paragraphsFromChapter
-    .map(
-      (paragraph) => `<${paragraph.elementType}>${paragraph.text.trim().replace(/"/g, "'")}</${paragraph.elementType}>`,
-    )
-    .join("\n")}`;
+  const paragraphsForPage = paragraphsFromChapter.map(buildParagraphXml).join("\n");
 
   let prompt = "";
-  if (getBookForm() === "play") {
+  if (chapterFormat === "play") {
     prompt = fs.readFileSync(path.join(__dirname, "RewriteParagraphsPromptPlay.md"), "utf8");
+  } else if (chapterFormat === "mixed") {
+    prompt = fs.readFileSync(path.join(__dirname, "RewriteParagraphsPromptMixed.md"), "utf8");
   } else {
     prompt = fs.readFileSync(path.join(__dirname, "NewRewriteParagraphsPromptBook.md"), "utf8");
   }
@@ -255,7 +253,8 @@ export const identifyAndRewriteParagraphs = async (
     }
 
     if (restored && compareXmlTextContent(paragraphsForPage, restored)) {
-      const finalRestored = `<section data-chapter="${chapter}">${restored}</section>`;
+      const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
+      const finalRestored = `<section data-chapter="${chapter}"${formatAttr}>${restored}</section>`;
       logger.info("✅ No changes to paragraphs for chapter " + chapter);
       writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`, finalRestored);
       writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, finalRestored);
@@ -282,7 +281,6 @@ interface ChapterData {
 
 export const identifyCharactersAndRewriteParagraphs = async (referenceCards: NewReferenceCardsResponse) => {
   const bookSettings = getBookSettings();
-  const isPlay = getBookForm() === "play";
 
   const charactersForChapter = referenceCards.characters.map((c) => ({ name: c.name, summary: c.referenceCard }));
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
@@ -301,7 +299,8 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
     }
 
     const paragraphs = getParagraphsFromChapter(chapter);
-    const shouldChunk = !isPlay && needsChunking(paragraphs);
+    const chapterFormat = getChapterFormat(chapter);
+    const shouldChunk = chapterFormat !== "play" && needsChunking(paragraphs);
     const chunks = shouldChunk ? chunkParagraphs(paragraphs) : [];
 
     return { chapter, paragraphs, chunks, jsonCharacters, needsChunking: shouldChunk };

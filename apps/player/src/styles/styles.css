@@ -421,6 +421,133 @@
         vertical-align: bottom;
       }
 
+      table[data-drama] {
+        --drama-padding-x: clamp(1.5rem, 4vw, 3rem);
+        border: none;
+        background: transparent;
+        width: calc(100% - 2 * var(--drama-padding-x));
+        max-width: calc(100% - 2 * var(--drama-padding-x));
+        margin: 1.5em var(--drama-padding-x);
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      table[data-drama] tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75em;
+      }
+
+      table[data-drama] tr {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75em;
+        border: none;
+      }
+
+      table[data-drama] tr[data-speaker] {
+        padding-left: 0.5em;
+      }
+
+      table[data-drama] td {
+        border: none;
+        padding: 0;
+        background: transparent;
+      }
+
+      table[data-drama] td[data-persona] {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4em;
+        flex-shrink: 0;
+        width: 8em;
+        font-weight: 600;
+        font-variant: small-caps;
+        text-transform: lowercase;
+        color: color-mix(in srgb, var(--text-light) 80%, transparent);
+      }
+
+      table[data-drama] td[data-persona] .inline-avatar {
+        --avatar-size: 2.5em;
+        flex-shrink: 0;
+        align-self: center;
+      }
+
+      table[data-drama] td:last-child {
+        flex: 1;
+      }
+
+      table[data-drama] td:last-child i[data-epub-type*="stage-direction"] {
+        font-style: italic;
+        color: color-mix(in srgb, var(--text-light) 70%, transparent);
+      }
+
+      @media (min-width: 640px) {
+        table[data-drama] td[data-persona] .inline-avatar {
+          transform: translateY(-15%);
+        }
+      }
+
+      /* @media (max-width: 639px) {
+        table[data-drama] {
+          --drama-padding-x: 1.5rem;
+          margin-left: 4.5rem;
+          width: calc(100% - 4.5rem - var(--drama-padding-x));
+          max-width: calc(100% - 4.5rem - var(--drama-padding-x));
+        }
+
+        table[data-drama] tr {
+          position: relative;
+        }
+
+        table[data-drama] td[data-persona] {
+          width: 6em;
+        }
+
+        table[data-drama] td[data-persona] .inline-avatar {
+          --avatar-size: 4rem;
+          position: absolute;
+          left: -4.5rem;
+        }
+
+        table[data-drama] td:last-child {
+          min-height: 3.2em;
+        }
+      } */
+
+      @media (max-width: 639px) {
+        table[data-drama] {
+          --drama-padding-x: 0.75rem;
+          margin-left: var(--drama-padding-x);
+          width: calc(100% - 2 * var(--drama-padding-x));
+          max-width: calc(100% - 2 * var(--drama-padding-x));
+        }
+
+        table[data-drama] tr {
+          flex-wrap: wrap;
+          align-items: flex-start;
+        }
+
+        table[data-drama] td[data-persona] {
+          width: auto;
+          order: 1;
+          align-items: center;
+        }
+
+        table[data-drama] td[data-persona] .inline-avatar {
+          --avatar-size: 4rem;
+          position: static;
+          order: -1;
+        }
+
+        table[data-drama] td:last-child {
+          order: 2;
+          flex-basis: calc(100% - 3.5rem);
+          min-height: 0;
+          margin-left: auto;
+        }
+      }
+
       /* Empty sections */
       section:empty {
         display: none;
@@ -1738,7 +1865,6 @@ section[data-chapter] [data-index].edit-hover {
     display: block;
   }
 
-  /* Mixed-form: stage-direction blocks should be justified, not centered */
   .play-row.didaskalia-row .didaskalia-text p[data-is-didaskalia="true"] {
     text-align: justify;
     text-indent: 1.4em;

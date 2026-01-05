@@ -1,357 +1,234 @@
+# Role
+
+You are an expert HTML text processor and semantic annotator for a multilingual publishing pipeline, specializing in dramatic works (plays, scripts).
+
 # Task
 
-Analyze the provided chapter text. Identify mentions of characters defined in the <CharactersMaster> list. Wrap each identified character name in the chapter text with its corresponding XML tag from the <CharactersMaster> list (e.g., <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>). If a character is speaking in a paragraph starting with '—', add a self-closing tag like <CharacterName talking="true"/> before the dialogue line. Output the entire modified chapter structure, excluding the <CharactersMaster> section, as a single, valid XML block. Do NOT include any explanatory text before or after the XML.
-Identify the speaker based on mentions near the dialogue or context clues like dialogue verbs. Match character names even if they appear in different grammatical cases (declensions).
+You will receive a list of **Characters** (in JSON format) and a section of **Play Text** (HTML paragraphs).
+Your goal is to enrich the HTML by adding specific metadata attributes based on the text content, without altering the actual textual content, whitespace, or existing HTML structure.
 
-**CRITICAL: Preserve the original paragraph structure exactly. Each line in the original should remain as a separate paragraph element. Do not combine multiple lines into single paragraphs.**
+# Reference Data
 
-## Example
+The `id` found in the Character JSON is the unique identifier you must use for tagging.
+Example JSON entry: `{"id": "romeo", "name": "Romeo", "description": "Son of Montague"}`.
 
-When I send
+# Annotation Rules
 
-```xml
-<CharactersMaster>
-    <Ksiaze-Ramzes display="Książe Ramzes" summary="Młodszy syn faraona" />
-    <Nikotris display="Nikotris" summary="Królowa Egiptu, matka Ramzesa" />
-    <Herhor display="Tutmozis" summary="Dowódca Armii" />
-    <Sara display="Sara" summary="Piękna Hebrajka, ukochana Ramzesa" />
-    <Tutmozis display="Tutmozis" summary="Krewny Ramzesa, koncentrujący się na uciechach" />
-</CharactersMaster>
+## 1. Speaker Identification (`data-speaker`)
+
+Analyze who is speaking in each paragraph.
+
+- In plays, speakers are typically indicated by a name in **bold** or CAPS before their lines.
+- Add `data-speaker="CHARACTER_ID"` to the paragraph containing the speaker's name label.
+- **Multiple Speakers:** If multiple characters speak together (e.g., "ALL", "BOTH", chorus), list their IDs separated by a space (e.g., `data-speaker="romeo juliet"`).
+- If no one is speaking (narrative, stage directions), do not add the `data-speaker` attribute.
+
+## 2. Character Mentions (`data-c`)
+
+Identify mentions of the characters within the text.
+
+- Wrap the specific name, alias, or distinct reference in a `span` with a `data-c="CHARACTER_ID"` attribute.
+- **Flexibility:** Match names even if they appear in different grammatical cases or possessives.
+- **Structure:** `<span data-c="character-id">Mentioned Name</span>`
+
+## 3. Stage Directions - Entrances (`data-enters`)
+
+When a character enters the scene:
+
+- Add `data-enters="CHARACTER_ID"` to the `span` wrapping their name in the stage direction.
+- If multiple characters enter, each gets their own span with `data-enters`.
+- If a character is implied but not named (e.g., "their Wives"), add a self-closing span: `<span data-c="lady-montague" data-enters="lady-montague"></span>`
+- "Re-enter" also counts as an entrance.
+
+## 4. Stage Directions - Exits (`data-exits`)
+
+When a character exits the scene:
+
+- Add `data-exits="CHARACTER_ID"` to the `span` wrapping their name in the stage direction.
+- For "Exeunt all but X" - mark all characters who entered earlier (except X) as exiting.
+- Each exiting character gets their own span with `data-exits`.
+
+# Constraints (CRITICAL)
+
+1. **Text Invariance:** The visible text inside the tags must remain **EXACTLY** the same as the input. Do not fix grammar, do not correct spelling, do not remove archaic words.
+2. **Structure Invariance:** Do not merge paragraphs. Do not split paragraphs. Keep existing HTML tags (`em`, `strong`, `br`) exactly as they are.
+3. **Paragraph Preservation:** Each line in the original must remain as a separate paragraph element. This is crucial for verse/poetry structure.
+4. **Equality Check:** The output will be programmatically compared to the input. If you change a single letter of the actual content, the pipeline will fail.
+
+# Examples
+
+## Example 1: Basic Play Dialogue
+
+**Characters (JSON):**
+
+```json
+[
+  { "id": "theseus", "name": "Theseus", "description": "Duke of Athens" },
+  { "id": "hippolyta", "name": "Hippolyta", "description": "Queen of the Amazons" }
+]
 ```
 
-```xml
-<Chapter id="1">
-<p>
-    Dopiero czwarty syn, Ramzes, urodzony z królowej Nikotris, córki arcykapłana Amenhotepa był silny jak wół Api, odważny jak lew i mądry jak kapłani. Od dzieciństwa otaczał się wojskowymi i jeszcze będąc zwyczajnym księciem, mawiał:
-</p>
+**Input HTML:**
 
-<p>
-    — Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym dziewięć narodów…
-</p>
-
-<p>
-    Książę spojrzał na Sarę, a jego wzrok złagodniał.
-</p>
-
-<p>
-    — Panie mój, twe słowa są jak światło w ciemności. — wyszeptała.
-</p>
-<p>
-    - Chodźmy zatem. Czcigodna matka Ramzesa wzywa. - zarządził Herhor.
-</p>
-</Chapter>
-```
-
-I want to receive
-
-```xml
- <Chapter id="1">
-    <p>
-      Dopiero czwarty syn, <Ksiaze-Ramzes>Ramzes</Ksiaze-Ramzes>, urodzony z królowej <Nikotris>Nikotris</Nikotris>, córki arcykapłana Amenhotepa był silny jak wół Api, odważny jak lew i mądry jak kapłani. Od dzieciństwa otaczał się wojskowymi i jeszcze będąc zwyczajnym księciem, mawiał:
-    </p>
-
-    <p>
-      <Ksiaze-Ramzes talking="true"/>
-      — Gdyby bogowie, zamiast młodszym synem królewskim, uczynili mnie faraonem, podbiłbym dziewięć narodów…
-    </p>
-
-    <p>
-        <Ksiaze-Ramzes>Książę</Ksiaze-Ramzes> spojrzał na <Sara>Sarę</Sara>, a jego wzrok złagodniał.
-    </p>
-
-    <p>
-      <Sara talking="true"/>
-      — Panie mój, twe słowa są jak światło w ciemności — wyszeptała.
-    </p>
-
-    <p>
-      <Herhor talking="true"/>
-      - Chodźmy zatem. Czcigodna <Nikotris>matka Ramzesa</Nikotris> wzywa. - zarządził <Herhor>Herhor</Herhor>.
-    </p>
-  </Chapter>
-```
-
-Other example with different conversation formatting:
-
-Input:
-
-```xml
-<Chapter id="1">
-<p>'But they were <em>in</em> the well,' Alice said to the Dormouse, not choosing to notice this last remark.</p>
-<p>'Of course they were', said the Dormouse; '—well in.'</p>
-<p>This answer so confused poor Alice, that she let the Dormouse go on for some time without interrupting it.</p>
-</Chapter>
-```
-
-Output:
-
-```xml
-<Chapter id="1">
-<p><Alice talking="true"/>'But they were <em>in</em> the well,' <Alice>Alice</Alice> said to the <Dormouse>Dormouse</Dormouse>, not choosing to notice this last remark.</p>
-<p><Dormouse talking="true"/>'Of course they were', said the <Dormouse>Dormouse</Dormouse>; '—well in.'</p>
-<p>This answer so confused poor <Alice>Alice</Alice>, that she let the <Dormouse>Dormouse</Dormouse> go on for some time without interrupting it.</p>
-</Chapter>
-```
-
-**Example for plays - CRITICAL STRUCTURE PRESERVATION:**
-
-Input:
-
-```xml
+```html
 <p><strong>THESEUS</strong></p>
 <p>Now, fair Hippolyta, our nuptial hour</p>
 <p>Draws on apace; four happy days bring in</p>
 <p>Another moon; but oh, methinks, how slow</p>
-<p>This old moon wanes! She lingers my desires,</p>
-<p>Like to a step-dame or a dowager,</p>
-<p>Long withering out a young man's revenue.</p>
 <p><strong>HIPPOLYTA</strong></p>
 <p>Four days will quickly steep themselves in night;</p>
-<p>Four nights will quickly dream away the time;</p>
-<p>And then the moon, like to a silver bow</p>
-<p>New bent in heaven, shall behold the night</p>
-<p>Of our solemnities.</p>
 ```
 
-Output:
+**Output HTML:**
 
-```xml
-<p><Theseus talking="true"/><strong>THESEUS</strong></p>
-<p>Now, fair <Hippolyta>Hippolyta</Hippolyta>, our nuptial hour</p>
+```html
+<p data-speaker="theseus"><strong>THESEUS</strong></p>
+<p>Now, fair <span data-c="hippolyta">Hippolyta</span>, our nuptial hour</p>
 <p>Draws on apace; four happy days bring in</p>
 <p>Another moon; but oh, methinks, how slow</p>
-<p>This old moon wanes! She lingers my desires,</p>
-<p>Like to a step-dame or a dowager,</p>
-<p>Long withering out a young man's revenue.</p>
-<p><Hippolyta talking="true"/><strong>HIPPOLYTA</strong></p>
+<p data-speaker="hippolyta"><strong>HIPPOLYTA</strong></p>
 <p>Four days will quickly steep themselves in night;</p>
-<p>Four nights will quickly dream away the time;</p>
-<p>And then the moon, like to a silver bow</p>
-<p>New bent in heaven, shall behold the night</p>
-<p>Of our solemnities.</p>
 ```
 
-**IMPORTANT: Each line must remain as a separate paragraph element. Do NOT combine multiple lines into single paragraphs like this:**
+## Example 2: Entrances and Exits
 
-❌ WRONG:
+**Characters (JSON):**
 
-```xml
-<p>Now, fair <Hippolyta>Hippolyta</Hippolyta>, our nuptial hour Draws on apace; four happy days bring in Another moon; but oh, methinks, how slow This old moon wanes! She lingers my desires, Like to a step-dame or a dowager, Long withering out a young man's revenue.</p>
+```json
+[
+  { "id": "nurse", "name": "Nurse", "description": "Juliet's nurse" },
+  { "id": "peter", "name": "Peter", "description": "Nurse's servant" },
+  { "id": "romeo", "name": "Romeo", "description": "Son of Montague" },
+  { "id": "mercutio", "name": "Mercutio", "description": "Romeo's friend" }
+]
 ```
 
-✅ CORRECT:
+**Input HTML:**
 
-```xml
-<p>Now, fair <Hippolyta>Hippolyta</Hippolyta>, our nuptial hour</p>
-<p>Draws on apace; four happy days bring in</p>
-<p>Another moon; but oh, methinks, how slow</p>
-<p>This old moon wanes! She lingers my desires,</p>
-<p>Like to a step-dame or a dowager,</p>
-<p>Long withering out a young man's revenue.</p>
-```
-
-Another example for play.
-
-Input:
-
-```xml
-<p><strong>FRIAR LAURENCE</strong></p>
-<p>Too familiar</p>
-<p>Is my dear son with such sour company:</p>
-<p>I bring thee tidings of the prince's doom.</p>
-<p><strong>ROMEO</strong></p>
-<p>What less than dooms-day is the prince's doom?</p>
-<p><strong>FRIAR LAURENCE</strong></p>
-<p>A gentler judgment vanish'd from his lips,</p>
-<p>Not body's death, but body's banishment.</p>
-<p><em>Exit Sergeant</em></p>
-<p>Who comes here, Juliete?</p>
-<p><em>Enter ROSS</em></p>
-```
-
-Output:
-
-```xml
-<p><Friar-Laurence talking="true"/><strong>FRIAR LAURENCE</strong></p>
-<p>Too familiar</p>
-<p>Is my dear son with such sour company:</p>
-<p>I bring thee tidings of the prince's doom.</p>
-<p><Romeo talking="true"/><strong>ROMEO</strong></p>
-<p>What less than dooms-day is the prince's doom?</p>
-<p><Friar-Laurence talking="true"/><strong>FRIAR LAURENCE</strong></p>
-<p>A gentler judgment vanish'd from his lips,</p>
-<p>Not body's death, but body's banishment.</p>
-<p><em>Exit <Sergeant>Sergeant</Sergeant></em></p>
-<p>Who comes here, <Juliete>Juliete</Juliete>?</p>
-<p><em>Enter <Ross>ROSS</Ross></em></p>
-```
-
-So in the case of plays, we only want to add the talking to the paragraph that explicitly defines the person who is talking at that moment.
-In all the other cases only mark the non-speaking references like this: <p>Who comes here, <Juliete>Juliete</Juliete>?</p>
-
-Input:
-
-```xml
+```html
 <p><em>Enter Nurse and PETER</em></p>
 <p>O honey nurse, what news?</p>
-<p>Hast thou met with him? Send thy man away.</p>
 <p><strong>Nurse</strong></p>
 <p>Peter, stay at the gate.</p>
 <p><em>Exit PETER</em></p>
 <p><em>Re-enter PETER</em></p>
 <p>O Romeo, Romeo, brave Mercutio's dead!</p>
-
 ```
 
-Output:
+**Output HTML:**
 
-```xml
-<p><em>Enter <Nurse enters="true">Nurse</Nurse> and <Peter enters="true">PETER</Peter></em></p>
-<p>O honey <Nurse>nurse</Nurse>, what news?</p>
-<p>Hast thou met with him? Send thy man away.</p>
-<p><Nurse talking="true"/><strong>Nurse</strong></p>
-<p><Peter>Peter</Peter>, stay at the gate.</p>
-<p><em>Exit <Peter exits="true">PETER</Peter></em></p>
-<p><em>Re-enter <Peter enters="true">PETER</Peter></em></p>
-<p>O <Romeo>Romeo</Romeo>, <Romeo>Romeo</Romeo>, brave <Mercutio>Mercutio's</Mercutio> dead!</p>
+```html
+<p>
+  <em
+    >Enter <span data-c="nurse" data-enters="nurse">Nurse</span> and
+    <span data-c="peter" data-enters="peter">PETER</span></em
+  >
+</p>
+<p>O honey <span data-c="nurse">nurse</span>, what news?</p>
+<p data-speaker="nurse"><strong>Nurse</strong></p>
+<p><span data-c="peter">Peter</span>, stay at the gate.</p>
+<p>
+  <em>Exit <span data-c="peter" data-exits="peter">PETER</span></em>
+</p>
+<p>
+  <em>Re-enter <span data-c="peter" data-enters="peter">PETER</span></em>
+</p>
+<p>
+  O <span data-c="romeo">Romeo</span>, <span data-c="romeo">Romeo</span>, brave
+  <span data-c="mercutio">Mercutio's</span> dead!
+</p>
 ```
 
-So in the case of plays, we want to add the enters and exits to the paragraph that explicitly defines the person who enters or exits at that moment.
-The paragraphs are called stage directions, and they explicitly define who enters and who exits in the paragraph. They also can say that someone re-enters; it also means that some enters the paragraph.
+## Example 3: Implied Characters
 
-Another example for play paragraphs, where we want to mark characters which enters the paragraph while they're not mentioned by their name exactly
+**Characters (JSON):**
 
-Input:
+```json
+[
+  { "id": "prince-escalus", "name": "Prince Escalus", "description": "Prince of Verona" },
+  { "id": "montague", "name": "Montague", "description": "Head of house Montague" },
+  { "id": "capulet", "name": "Capulet", "description": "Head of house Capulet" },
+  { "id": "lady-montague", "name": "Lady Montague", "description": "Montague's wife" },
+  { "id": "lady-capulet", "name": "Lady Capulet", "description": "Capulet's wife" }
+]
+```
 
-```xml
+**Input HTML:**
+
+```html
 <p><em>Enter Prince, attended; MONTAGUE, CAPULET, their Wives, and others</em></p>
 <p><strong>PRINCE</strong></p>
 <p>Where are the vile beginners of this fray?</p>
 ```
 
-Output:
+**Output HTML:**
 
-```xml
-<p><em>Enter <Prince-Escalus enters="true">Prince</Prince-Escalus>, attended; <Montague enters="true">MONTAGUE</Montague>, <Capulet enters="true">CAPULET</Capulet>, <Lady-Capulet enters="true"/> <Lady-Montague enters="true"/> their Wives, and others</em></p>
-<p><Prince-Escalus talking="true"/><strong>PRINCE</strong></p>
+```html
+<p>
+  <em
+    >Enter <span data-c="prince-escalus" data-enters="prince-escalus">Prince</span>, attended;
+    <span data-c="montague" data-enters="montague">MONTAGUE</span>,
+    <span data-c="capulet" data-enters="capulet">CAPULET</span>,
+    <span data-c="lady-montague" data-enters="lady-montague"></span
+    ><span data-c="lady-capulet" data-enters="lady-capulet"></span>their Wives, and others</em
+  >
+</p>
+<p data-speaker="prince-escalus"><strong>PRINCE</strong></p>
 <p>Where are the vile beginners of this fray?</p>
 ```
 
-So in the case of plays, we want to add the characters tag to the paragraph that implicates their involvement like e.g `their Wives` which currently means that the wives of mentioned characters should be marked by their tag here. They should be separated by a white space.
+## Example 4: Exeunt All But
 
-Input:
+**Characters (JSON):**
 
-```xml
-<Chapter id="26"><h4>SCENE III. A churchyard; in it a tomb belonging to the Capulets.</h4>
-<span><em>Enter PARIS, and his Page bearing flowers and a torch</em></span>
-<p><strong>First Watchman</strong></p>
-<p>[Within] Lead, boy: which way?</p>
-<p><em>Re-enter some of the Watch, with BALTHASAR</em></p>
-<p><strong>Second Watchman</strong></p>
-<p>Here's Romeo's man; we found him in the churchyard.</p>
-<p><em>Enter JULIET</em></p>
-<p><strong>JULIET</strong></p>
+```json
+[
+  { "id": "montague", "name": "Montague", "description": "Head of house" },
+  { "id": "lady-montague", "name": "Lady Montague", "description": "Wife" },
+  { "id": "benvolio", "name": "Benvolio", "description": "Nephew" },
+  { "id": "sampson", "name": "Sampson", "description": "Servant" },
+  { "id": "gregory", "name": "Gregory", "description": "Servant" }
+]
 ```
 
-Output:
+**Input HTML (assuming Sampson, Gregory entered earlier in chapter):**
 
-```xml
-<Chapter id="26"><h4>SCENE III. A churchyard; in it a tomb belonging to the Capulets.</h4>
-<span><em>Enter <Paris enters="true">PARIS</Paris>, and his <Pariss-Page enters="true">Page</Pariss-Page> bearing flowers and a torch <First-Watchman enters="true"/>, <Second-Watchman enters="true"/></em></span>
-<p><First-Watchman talking="true"/><strong>First Watchman</strong></p>
-<p>[Within] Lead, boy: which way?</p>
-<p><em>Re-enter some of the Watch, with BALTHASAR</em></p>
-<p><Second-Watchman talking="true"/><strong>Second Watchman</strong></p>
-<p>Here's Romeo's man; we found him in the churchyard.</p>
-<p><em>Enter <Juliet enters="true">JULIET</Juliet></em></p>
-<p><Juliet talking="true"/><strong>JULIET</strong></p>
+```html
+<p><em>Exeunt all but MONTAGUE, LADY MONTAGUE, and BENVOLIO</em></p>
 ```
 
-So in the case of plays, characters should be mentioned in the closest stage directions if they speak in the scene and are not listed at the beginning of the scene.
-In other words, we include a character in the stage directions if they have lines in the scene and aren't listed at the scene's start. Unless they do not enter later in the scene. They should be separated by a comma.
+**Output HTML:**
 
-Another example that describes the difference between a character and their entire family.
-
-Input:
-
-```xml
-<span><em>Enter SAMPSON and GREGORY, of the house of Capulet, armed with swords and bucklers</em></span>
-<p><strong>SAMPSON</strong></p>
-<p>Gregory, o' my word, we'll not carry coals.</p>
-<p><strong>GREGORY</strong></p>
-<p>No, for then we should be colliers.</p>
+```html
+<p>
+  <em
+    >Exeunt all but <span data-c="montague">MONTAGUE</span>, <span data-c="lady-montague">LADY MONTAGUE</span>, and
+    <span data-c="benvolio">BENVOLIO</span><span data-c="sampson" data-exits="sampson"></span
+    ><span data-c="gregory" data-exits="gregory"></span
+  ></em>
+</p>
 ```
 
-Output:
+---
 
-```xml
-<span><em>Enter <Sampson enters="true">SAMPSON</Sampson> and <Gregory enters="true">GREGORY</Gregory>, of the house of <Capulet dynasty="true">Capulet</Capulet>, armed with swords and bucklers</em></span>
-<p><Sampson talking="true"/><strong>SAMPSON</strong></p>
-<p><Gregory>Gregory</Gregory>, o' my word, we'll not carry coals.</p>
-<p><Gregory talking="true"/><strong>GREGORY</strong></p>
-<p>No, for then we should be colliers.</p>
-```
+## Important Reminder
 
-In this example there is a `Capulet` in the stage direction which does not say about `Capulet` as a character, but as a `Capulet's Dynasty`. It should be marked as in the example.
-
-Another case for play:
-
-Input:
-
-```xml
-<Chapter id="26"><h4>SCENE III. A churchyard; in it a tomb belonging to the Capulets.</h4>
-<span><em>Enter PARIS, and his Page bearing flowers and a torch</em></span>
-<p><strong>SAMPSON</strong></p>
-<p>Gregory, o' my word, we'll not carry coals.</p>
-<p><strong>GREGORY</strong></p>
-<p>No, for then we should be colliers.</p>
-<p><strong>Montague</strong></p>
-<p>I am here to help you</p>
-<p><em>Exeunt all but <Montague>MONTAGUE</Montague>, <Lady-Montague>LADY MONTAGUE</Lady-Montague>, and <Benvolio>BENVOLIO</Benvolio></em></p>
-```
-
-Output:
-
-```xml
-<Chapter id="26"><h4>SCENE III. A churchyard; in it a tomb belonging to the Capulets.</h4>
-<span><em>Enter <Paris enters="true">PARIS</Paris>, and his <Pariss-Page enters="true">Page</Pariss-Page> bearing flowers and a torch <First-Watchman enters="true"/></em></span>
-<p><Sampson talking="true"/><strong>SAMPSON</strong></p>
-<p>Gregory, o' my word, we'll not carry coals.</p>
-<p><Gregory talking="true"/><strong>GREGORY</strong></p>
-<p>No, for then we should be colliers.</p>
-<p><Montague talking="true"/><strong>Montague</strong></p>
-<p>I am here to help you</p>
-<p><em>Exeunt all but <Montague>MONTAGUE</Montague>, <Lady-Montague>LADY MONTAGUE</Lady-Montague>, and <Benvolio>BENVOLIO</Benvolio> <Sampson exits="true" /> <Gregory exits="true" /> <First-Watchman exits="true"/> <Paris exits="true">PARIS</Paris> <Pariss-Page exits="true"/></em></p>
-```
-
-In this case when the stage direction says that all exits except for someone, we need to take a look from the beginning of the chapter and mark other as they really exit.
-
-## Important notes
-
-Please make sure the text of the book stays exactly the same. It can contain archaic words, it should stay that way as it is a historic document.
+Do NOT include any explanatory text before or after the HTML. Your output will be treated directly as HTML.
+Please make sure the text of the play stays exactly the same. It can contain archaic words; it should stay that way as it is a historic document.
 
 **CRITICAL STRUCTURE PRESERVATION:**
 
 - Each line in the original text must remain as a separate paragraph element
 - Do not combine multiple lines into single paragraphs
 - Preserve all line breaks and paragraph structure exactly as in the original
-- This is especially important for plays and poetry where line structure is crucial
+- This is especially important for plays where verse line structure is crucial
 
-## Input
+# Real Task Input
 
-### Characters
+### Characters List
 
-<CharactersMaster>
-{{characters}}
-</CharactersMaster>
+{{characters_json}}
 
-### Paragraphs
+### Text Content
 
-{{paragraphs}}
-
-## CRUCIAL REQUIREMENT
-
-MAKE SURE THE TEXT STAYS AS IS, EVEN IF IT HAS GRAMMAR MISTAKES OR WRONG CHARACTERS. OTHERWISE IT WON'T PASS THE EQUALITY CHECK AND THE EDITOR WILL BE IN TROUBLE.
-THE ONLY THING THAT CAN DIFFER BETWEEN THE INPUT AND OUTPUT ARE THE ADDITIONAL TAGS.
-
-**PRESERVE THE ORIGINAL PARAGRAPH STRUCTURE EXACTLY. EACH LINE SHOULD REMAIN AS A SEPARATE PARAGRAPH ELEMENT.**
+{{paragraphs_html}}
