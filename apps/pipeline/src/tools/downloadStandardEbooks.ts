@@ -13,6 +13,7 @@ const indexPath = path.join(outputDir, "index.json");
 interface RepoInfo {
   name: string;
   description: string | null;
+  pushed_at: string;
 }
 
 interface BookMetadata {
@@ -44,12 +45,16 @@ function isBookRepo(name: string): boolean {
   return name.includes("_");
 }
 
-async function fetchAllRepos(): Promise<RepoInfo[]> {
+async function fetchAllRepos(recentOnly: boolean = false): Promise<RepoInfo[]> {
   const repos: RepoInfo[] = [];
   let page = 1;
+  const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
 
   while (true) {
-    const url = `${GITHUB_API}/orgs/${ORG}/repos?per_page=${PER_PAGE}&page=${page}&type=public`;
+    let url = `${GITHUB_API}/orgs/${ORG}/repos?per_page=${PER_PAGE}&page=${page}&type=public`;
+    if (recentOnly) {
+      url += "&sort=pushed&direction=desc";
+    }
     console.log(`Fetching repos page ${page}...`);
 
     const response = await fetch(url, {
@@ -68,9 +73,21 @@ async function fetchAllRepos(): Promise<RepoInfo[]> {
     const data = (await response.json()) as RepoInfo[];
     if (data.length === 0) break;
 
-    repos.push(...data);
-    page++;
+    if (recentOnly) {
+      // Filter to only repos pushed in the last 2 weeks
+      const recentRepos = data.filter((r) => new Date(r.pushed_at) > twoWeeksAgo);
+      repos.push(...recentRepos);
 
+      // If we found repos older than 2 weeks, stop fetching
+      if (recentRepos.length < data.length) {
+        console.log(`Found ${repos.length} repos pushed in the last 2 weeks`);
+        break;
+      }
+    } else {
+      repos.push(...data);
+    }
+
+    page++;
     await new Promise((r) => setTimeout(r, 100));
   }
 
@@ -241,6 +258,7 @@ async function downloadBook(repoName: string, skipExisting: boolean): Promise<Bo
 
 async function main() {
   const skipExisting = process.argv.includes("--skip-existing");
+  const recentOnly = process.argv.includes("--recent");
   const limitArg = process.argv.find((a) => a.startsWith("--limit="));
   const limit = limitArg ? parseInt(limitArg.split("=")[1]) : Infinity;
 
@@ -250,11 +268,12 @@ async function main() {
   console.log("STANDARD EBOOKS DOWNLOADER");
   console.log("=".repeat(60));
   console.log(`Skip existing: ${skipExisting}`);
+  console.log(`Recent only (last 2 weeks): ${recentOnly}`);
   console.log(`Limit: ${limit === Infinity ? "none" : limit}`);
   console.log("=".repeat(60));
 
   console.log("\nFetching repository list...");
-  const repos = await fetchAllRepos();
+  const repos = await fetchAllRepos(recentOnly);
   console.log(`Found ${repos.length} book repositories`);
 
   const booksToProcess = repos.slice(0, limit);
@@ -290,8 +309,21 @@ async function main() {
     await new Promise((r) => setTimeout(r, 100));
   }
 
+  // When using --recent, merge with existing index instead of replacing
+  let finalBooks: BookMetadata[] = allMetadata;
+  if (recentOnly && fs.existsSync(indexPath)) {
+    const existingIndex: BookIndex = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const existingBySlug = new Map(existingIndex.books.map((b) => [b.slug, b]));
+
+    // Update existing books with new metadata
+    for (const book of allMetadata) {
+      existingBySlug.set(book.slug, book);
+    }
+    finalBooks = Array.from(existingBySlug.values());
+  }
+
   const index: BookIndex = {
-    books: allMetadata.sort((a, b) => a.authorFileAs.localeCompare(b.authorFileAs)),
+    books: finalBooks.sort((a, b) => a.authorFileAs.localeCompare(b.authorFileAs)),
     downloadedAt: new Date().toISOString(),
   };
   fs.writeFileSync(indexPath, JSON.stringify(index, null, 2));
@@ -299,10 +331,11 @@ async function main() {
   console.log("\n" + "=".repeat(60));
   console.log("SUMMARY");
   console.log("=".repeat(60));
-  console.log(`Total books: ${allMetadata.length}`);
+  console.log(`Processed: ${allMetadata.length}`);
   console.log(`Downloaded: ${downloaded}`);
   console.log(`Skipped (existing): ${skipped}`);
   console.log(`Failed: ${failed}`);
+  console.log(`Total books in index: ${finalBooks.length}`);
   console.log(`Index saved to: ${indexPath}`);
 }
 

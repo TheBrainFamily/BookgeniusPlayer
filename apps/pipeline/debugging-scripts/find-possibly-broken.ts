@@ -5,8 +5,8 @@
  */
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
-const BOOKS_DIR = join(import.meta.dir, "../../../standardebooks-data/books");
-const OUTPUT_FILE = join(import.meta.dir, "../../../content-loss-analysis.txt");
+const BOOKS_DIR = join(import.meta.dir, "../standardebooks-data/books");
+const OUTPUT_FILE = join(import.meta.dir, "./content-loss-analysis-2.txt");
 interface ContentRisk {
   type: string;
   severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";

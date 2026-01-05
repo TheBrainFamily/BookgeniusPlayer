@@ -10,8 +10,8 @@
  */
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
-const BOOKS_DIR = join(import.meta.dir, "../../../standardebooks-data/books");
-const OUTPUT_FILE = join(import.meta.dir, "../../../list-of-play-books.txt");
+const BOOKS_DIR = join(import.meta.dir, "../standardebooks-data/books");
+const OUTPUT_FILE = join(import.meta.dir, "./list-of-play-books-2.txt");
 type BookCategory = "FULL_PLAY" | "EMBEDDED_DRAMA" | "HAS_CHARACTER_LIST";
 interface BookAnalysis {
   slug: string;
