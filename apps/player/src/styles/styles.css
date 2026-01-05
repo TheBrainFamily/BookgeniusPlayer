@@ -620,30 +620,18 @@
       margin-left: auto;
       margin-right: auto;
 
-      & > span,
-      & > h3,
-      & > h4,
-      & > h5,
+      & > *:not(.play-row):not(.transition-spacer) {
+        width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
       .play-row.didaskalia-row {
         width: 600px;
         margin-left: auto;
         margin-right: auto;
-      }
-
-      & > p:not(.play-row p) {
-        width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        padding-left: 0;
-        padding-right: 0;
-      }
-
-      & > blockquote {
-        width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        padding-left: 0;
-        padding-right: 0;
       }
 
       & > h3 {
@@ -858,16 +846,13 @@
       .play-container > section > section {
         max-width: 700px;
 
-        & > span,
-        & > h3,
-        & > h4,
-        & > h5,
-        .play-row.didaskalia-row {
+        & > *:not(.play-row):not(.transition-spacer) {
           width: 550px;
+          padding-left: 0;
+          padding-right: 0;
         }
 
-        & > p:not(.play-row p),
-        & > blockquote {
+        .play-row.didaskalia-row {
           width: 550px;
         }
 
@@ -889,16 +874,13 @@
       .play-container > section > section {
         max-width: 650px;
 
-        & > span,
-        & > h3,
-        & > h4,
-        & > h5,
-        .play-row.didaskalia-row {
+        & > *:not(.play-row):not(.transition-spacer) {
           width: 450px;
+          padding-left: 0;
+          padding-right: 0;
         }
 
-        & > p:not(.play-row p),
-        & > blockquote {
+        .play-row.didaskalia-row {
           width: 450px;
         }
 
@@ -936,12 +918,7 @@
       .play-container > section > section {
         max-width: 100%;
 
-        & > span,
-        & > h3,
-        & > h4,
-        & > h5,
-        & > p:not(.play-row p),
-        & > blockquote,
+        & > *:not(.play-row):not(.transition-spacer),
         .play-row.didaskalia-row {
           width: 100%;
         }

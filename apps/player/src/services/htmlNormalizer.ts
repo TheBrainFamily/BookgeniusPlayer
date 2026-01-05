@@ -256,6 +256,61 @@ function createPlayRowFromSpeakerParagraph(p: Element, doc: Document, state: { l
   return playRow;
 }
 
+function createPlayRowFromSpeakerGroup(
+  paragraphs: Element[],
+  doc: Document,
+  state: { lastSpeaker: string | null; alignment: "left" | "right" },
+  options: EnhancedProseOptions,
+): Element {
+  const firstPara = paragraphs[0];
+  const speakers = firstPara.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
+  const firstSpeaker = speakers[0] || "";
+
+  // Update alignment state based on speaker change
+  if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
+    state.alignment = state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+    state.lastSpeaker = firstSpeaker;
+  }
+
+  const playRow = doc.createElement("div");
+  playRow.className = "play-row";
+  playRow.setAttribute("data-text-alignment", state.alignment);
+  playRow.setAttribute("data-speaker", speakers.join(" "));
+
+  const characterAvatar = doc.createElement("div");
+  characterAvatar.className = "character-avatar";
+
+  const characterText = doc.createElement("div");
+  characterText.className = "character-text";
+
+  // Add speaker label ONCE (from first paragraph only)
+  const labelP = doc.createElement("p");
+  labelP.setAttribute("data-text-alignment", state.alignment);
+  labelP.setAttribute("data-is-character", "true");
+  labelP.setAttribute("data-is-didaskalia", "false");
+
+  const displayName = options.speakerDisplayNames?.get(firstSpeaker) ?? firstSpeaker.replace(/-/g, " ");
+  const strong = doc.createElement("strong");
+  strong.textContent = displayName;
+  labelP.appendChild(strong);
+  characterText.appendChild(labelP);
+
+  // Add all content paragraphs from the group
+  for (const para of paragraphs) {
+    const contentP = para.cloneNode(true) as Element;
+    contentP.removeAttribute("data-speaker");
+    contentP.setAttribute("data-text-alignment", state.alignment);
+    contentP.setAttribute("data-is-character", "false");
+    contentP.setAttribute("data-is-didaskalia", "false");
+    characterText.appendChild(contentP);
+  }
+
+  playRow.appendChild(characterAvatar);
+  playRow.appendChild(characterText);
+
+  return playRow;
+}
+
 function createDidaskaliaPlayRow(p: Element, doc: Document): Element {
   const playRow = doc.createElement("div");
   playRow.className = "play-row didaskalia-row";
@@ -282,20 +337,55 @@ function isPureEmParagraph(p: Element): boolean {
 function transformProseToPlayRows(section: Element, doc: Document, options: EnhancedProseOptions): void {
   const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
   const children = Array.from(section.children);
+  let i = 0;
 
-  for (const child of children) {
-    if (child.tagName.toLowerCase() !== "p") continue;
-    if (child.closest("table[data-drama]")) continue;
+  while (i < children.length) {
+    const child = children[i];
 
-    const hasSpeaker = child.hasAttribute("data-speaker");
+    if (child.tagName.toLowerCase() !== "p") {
+      i++;
+      continue;
+    }
+    if (child.closest("table[data-drama]")) {
+      i++;
+      continue;
+    }
+
+    const speaker = child.getAttribute("data-speaker");
     const isPureEm = isPureEmParagraph(child);
 
-    if (hasSpeaker) {
-      const playRow = createPlayRowFromSpeakerParagraph(child, doc, state, options);
-      section.replaceChild(playRow, child);
+    if (speaker) {
+      // Collect consecutive paragraphs with the same speaker
+      const group: Element[] = [child];
+      let j = i + 1;
+
+      while (j < children.length) {
+        const nextChild = children[j];
+        if (nextChild.tagName.toLowerCase() === "p" && nextChild.getAttribute("data-speaker") === speaker && !nextChild.closest("table[data-drama]")) {
+          group.push(nextChild);
+          j++;
+        } else {
+          break;
+        }
+      }
+
+      // Create single play-row for the group
+      const playRow = createPlayRowFromSpeakerGroup(group, doc, state, options);
+
+      // Replace first element with play-row, remove rest from DOM
+      section.replaceChild(playRow, group[0]);
+      for (let k = 1; k < group.length; k++) {
+        section.removeChild(group[k]);
+      }
+
+      // Skip past all grouped elements in the static children array
+      i += group.length;
     } else if (isPureEm) {
       const playRow = createDidaskaliaPlayRow(child, doc);
       section.replaceChild(playRow, child);
+      i++;
+    } else {
+      i++;
     }
   }
 }

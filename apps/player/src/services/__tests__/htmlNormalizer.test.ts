@@ -414,6 +414,122 @@ describe("normalizeChapterHtmlEnhanced", () => {
     expect(section.querySelector("tr[data-speaker='heffalump']")).toBeTruthy();
     expect(section.querySelectorAll(".play-row").length).toBe(1);
   });
+
+  describe("consecutive speaker grouping", () => {
+    it("groups consecutive paragraphs from the same speaker into single play-row", () => {
+      const input = `
+        <section data-chapter="1">
+          <p data-speaker="winnie-the-pooh">'Yes, but suppose Rabbit is out?'</p>
+          <p data-speaker="winnie-the-pooh">'Or suppose I get stuck...'</p>
+          <p data-speaker="winnie-the-pooh">'Because I know...'</p>
+        </section>
+      `;
+      const result = normalizeChapterHtmlEnhanced(input);
+      const { section } = parseSection(result);
+
+      // Should have only ONE play-row
+      const playRows = section.querySelectorAll(".play-row");
+      expect(playRows.length).toBe(1);
+
+      // Should have only ONE speaker label
+      const labels = section.querySelectorAll(".character-text p[data-is-character='true'] strong");
+      expect(labels.length).toBe(1);
+
+      // Should have all three content paragraphs inside character-text
+      const contentPs = section.querySelectorAll(".character-text p[data-is-character='false']");
+      expect(contentPs.length).toBe(3);
+
+      // Verify content is preserved
+      expect(result).toContain("Rabbit is out");
+      expect(result).toContain("get stuck");
+      expect(result).toContain("Because I know");
+    });
+
+    it("creates separate play-rows when speaker changes", () => {
+      const input = `
+        <section data-chapter="1">
+          <p data-speaker="winnie-the-pooh">'Hello Piglet!'</p>
+          <p data-speaker="piglet">'Hello Pooh!'</p>
+          <p data-speaker="winnie-the-pooh">'How are you?'</p>
+        </section>
+      `;
+      const result = normalizeChapterHtmlEnhanced(input);
+      const { section } = parseSection(result);
+
+      // Should have THREE play-rows (speaker changes each time)
+      const playRows = section.querySelectorAll(".play-row");
+      expect(playRows.length).toBe(3);
+
+      // Each should have its own speaker label
+      const labels = section.querySelectorAll(".character-text p[data-is-character='true'] strong");
+      expect(labels.length).toBe(3);
+    });
+
+    it("groups multiple consecutive then handles speaker change", () => {
+      const input = `
+        <section data-chapter="1">
+          <p data-speaker="pooh">'Line 1'</p>
+          <p data-speaker="pooh">'Line 2'</p>
+          <p data-speaker="piglet">'Response'</p>
+        </section>
+      `;
+      const result = normalizeChapterHtmlEnhanced(input);
+      const { section } = parseSection(result);
+
+      // Should have TWO play-rows (2 pooh grouped, 1 piglet)
+      const playRows = section.querySelectorAll(".play-row");
+      expect(playRows.length).toBe(2);
+
+      // First play-row should have 2 content paragraphs
+      const firstPlayRow = playRows[0];
+      const firstContentPs = firstPlayRow.querySelectorAll(".character-text p[data-is-character='false']");
+      expect(firstContentPs.length).toBe(2);
+
+      // Second play-row should have 1 content paragraph
+      const secondPlayRow = playRows[1];
+      const secondContentPs = secondPlayRow.querySelectorAll(".character-text p[data-is-character='false']");
+      expect(secondContentPs.length).toBe(1);
+    });
+
+    it("handles didaskalia between speaker groups correctly", () => {
+      const input = `
+        <section data-chapter="1">
+          <p data-speaker="pooh">'Hello!'</p>
+          <p data-speaker="pooh">'How are you?'</p>
+          <p><em>Piglet enters.</em></p>
+          <p data-speaker="piglet">'Hi there!'</p>
+        </section>
+      `;
+      const result = normalizeChapterHtmlEnhanced(input);
+      const { section } = parseSection(result);
+
+      // Should have: 1 grouped pooh play-row, 1 didaskalia, 1 piglet play-row
+      const playRows = section.querySelectorAll(".play-row:not(.didaskalia-row)");
+      expect(playRows.length).toBe(2);
+
+      const didaskaliaRows = section.querySelectorAll(".play-row.didaskalia-row");
+      expect(didaskaliaRows.length).toBe(1);
+    });
+
+    it("handles narration between speaker groups correctly", () => {
+      const input = `
+        <section data-chapter="1">
+          <p data-speaker="pooh">'Hello!'</p>
+          <p>Pooh paused and looked around.</p>
+          <p data-speaker="pooh">'Anyone there?'</p>
+        </section>
+      `;
+      const result = normalizeChapterHtmlEnhanced(input);
+      const { section } = parseSection(result);
+
+      // Should have TWO play-rows (narration breaks the group)
+      const playRows = section.querySelectorAll(".play-row");
+      expect(playRows.length).toBe(2);
+
+      // The narration paragraph should still exist
+      expect(result).toContain("paused and looked around");
+    });
+  });
 });
 
 describe("sanitizeHtml", () => {
