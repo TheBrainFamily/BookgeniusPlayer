@@ -108,9 +108,29 @@ export function buildChunkXml(chapterId: number, paragraphs: Paragraph[]): strin
 }
 
 /**
- * Combine multiple chunk XML outputs into a single chapter XML
+ * Build attribute string from a Record of attributes
  */
-export function combineChunks(chapterId: number, chunkOutputs: string[]): string {
-  // Combine into single chapter
-  return `<section data-chapter="${chapterId}">\n${chunkOutputs.join("\n")}\n</section>`;
+function buildSectionAttributeString(attributes?: Record<string, string>): string {
+  if (!attributes || Object.keys(attributes).length === 0) return "";
+  return (
+    " " +
+    Object.entries(attributes)
+      .map(([key, value]) => `${key}="${value.replace(/"/g, "&quot;")}"`)
+      .join(" ")
+  );
+}
+
+/**
+ * Combine multiple chunk XML outputs into a single chapter XML
+ * @param chapterId - The chapter number
+ * @param chunkOutputs - Array of chunk XML strings
+ * @param sectionAttributes - Optional section-level attributes to preserve (e.g., data-epub-type)
+ */
+export function combineChunks(
+  chapterId: number,
+  chunkOutputs: string[],
+  sectionAttributes?: Record<string, string>,
+): string {
+  const extraAttrs = buildSectionAttributeString(sectionAttributes);
+  return `<section data-chapter="${chapterId}"${extraAttrs}>\n${chunkOutputs.join("\n")}\n</section>`;
 }

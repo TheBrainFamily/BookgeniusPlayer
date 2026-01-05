@@ -1,5 +1,5 @@
 import { callClaude, callGeminiWrapper } from "../callClaude";
-import { getParagraphsFromChapter } from "./createParagraphsWithPageNumbers";
+import { getParagraphsFromChapter, getSectionAttributesFromChapter } from "./createParagraphsWithPageNumbers";
 import { logger } from "../logger";
 import fs from "fs";
 import { compareXmlTextContent } from "./new-tooling/compare-chapters-xml";
@@ -158,6 +158,7 @@ async function processChunkedChapter(
   chapter: number,
   charactersForChapter: { name: string; summary: string }[],
   paragraphs: Paragraph[],
+  sectionAttributes?: Record<string, string>,
 ): Promise<string> {
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
   const chunks = chunkParagraphs(paragraphs);
@@ -176,8 +177,8 @@ async function processChunkedChapter(
     processedChunks.push(result);
   }
 
-  // Combine all chunks into final output
-  const combined = combineChunks(chapter, processedChunks);
+  // Combine all chunks into final output, preserving section attributes
+  const combined = combineChunks(chapter, processedChunks, sectionAttributes);
   writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, combined, FILE_TYPE.TEMPORARY);
 
   logger.info(`✅ Chapter ${chapter} complete (${chunks.length} chunks combined)`);
@@ -199,9 +200,12 @@ export const identifyAndRewriteParagraphs = async (
 
   const chapterFormat = getChapterFormat(chapter);
 
+  // Get section-level attributes to preserve (e.g., data-epub-type for semantic styling)
+  const sectionAttributes = getSectionAttributesFromChapter(chapter);
+
   if (chapterFormat !== "play" && needsChunking(paragraphsFromChapter)) {
     logger.info(`📦 Chapter ${chapter} exceeds token limit, using chunked processing`);
-    return processChunkedChapter(chapter, charactersForChapter, paragraphsFromChapter);
+    return processChunkedChapter(chapter, charactersForChapter, paragraphsFromChapter, sectionAttributes);
   }
 
   // Original single-shot processing for shorter chapters
@@ -253,8 +257,13 @@ export const identifyAndRewriteParagraphs = async (
     }
 
     if (restored && compareXmlTextContent(paragraphsForPage, restored)) {
+      // Build section attributes string, including format and any preserved epub-type
       const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
-      const finalRestored = `<section data-chapter="${chapter}"${formatAttr}>${restored}</section>`;
+      const extraAttrs = Object.entries(sectionAttributes)
+        .filter(([key]) => key !== "data-chapter-format") // Don't duplicate format attr
+        .map(([key, value]) => ` ${key}="${value.replace(/"/g, "&quot;")}"`)
+        .join("");
+      const finalRestored = `<section data-chapter="${chapter}"${formatAttr}${extraAttrs}>${restored}</section>`;
       logger.info("✅ No changes to paragraphs for chapter " + chapter);
       writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`, finalRestored);
       writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, finalRestored);
@@ -277,6 +286,7 @@ interface ChapterData {
   chunks: ChapterChunk[];
   jsonCharacters: string;
   needsChunking: boolean;
+  sectionAttributes: Record<string, string>;
 }
 
 export const identifyCharactersAndRewriteParagraphs = async (referenceCards: NewReferenceCardsResponse) => {
@@ -295,15 +305,16 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
     // Check if already complete
     if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
       logger.info(`✅ Chapter ${chapter} already complete`);
-      return { chapter, paragraphs: [], chunks: [], jsonCharacters, needsChunking: false };
+      return { chapter, paragraphs: [], chunks: [], jsonCharacters, needsChunking: false, sectionAttributes: {} };
     }
 
     const paragraphs = getParagraphsFromChapter(chapter);
     const chapterFormat = getChapterFormat(chapter);
     const shouldChunk = chapterFormat !== "play" && needsChunking(paragraphs);
     const chunks = shouldChunk ? chunkParagraphs(paragraphs) : [];
+    const sectionAttributes = getSectionAttributesFromChapter(chapter);
 
-    return { chapter, paragraphs, chunks, jsonCharacters, needsChunking: shouldChunk };
+    return { chapter, paragraphs, chunks, jsonCharacters, needsChunking: shouldChunk, sectionAttributes };
   });
 
   // Separate chapters that need chunking from those that don't
@@ -374,7 +385,7 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
 
   // Combine all chunks for each chunked chapter
   for (const data of chunkedChapters) {
-    const { chapter, chunks } = data;
+    const { chapter, chunks, sectionAttributes } = data;
 
     // Check if already combined
     if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
@@ -384,7 +395,7 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
     const processedChunks = chunks.map((_, i) =>
       readBookFile(`rewritten-paragraphs-for-chapter-${chapter}-chunk-${i}.xml`, FILE_TYPE.TEMPORARY),
     );
-    const combined = combineChunks(chapter, processedChunks);
+    const combined = combineChunks(chapter, processedChunks, sectionAttributes);
     writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, combined, FILE_TYPE.TEMPORARY);
     logger.info(`✅ Chapter ${chapter} complete (${chunks.length} chunks combined)`);
   }

@@ -350,8 +350,13 @@ function extractChaptersFromFile(
         sectionHtml = htmlToValidXml(section.innerHTML);
       }
 
+      // Preserve section-level epub:type for CSS targeting (dedication, epigraph, etc.)
+      const sectionEpubType = section.getAttribute("epub:type") || section.getAttribute("data-epub-type") || "";
+      const epubTypeAttr = sectionEpubType ? ` data-epub-type="${sectionEpubType}"` : "";
       const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
-      htmlParts.push(`<section data-chapter="${chapterCounter}"${formatAttr}>\n${sectionHtml}\n</section>`);
+      htmlParts.push(
+        `<section data-chapter="${chapterCounter}"${formatAttr}${epubTypeAttr}>\n${sectionHtml}\n</section>`,
+      );
       chapters.push({
         number: chapterCounter,
         title: escapeXml(title),
@@ -364,8 +369,11 @@ function extractChaptersFromFile(
     const title = titleEl ? extractTextContent(titleEl) : file.filename.replace(".xhtml", "");
 
     const innerHTML = htmlToValidXml(article.innerHTML);
+    // Preserve article/section-level epub:type for CSS targeting (dedication, epigraph, etc.)
+    const articleEpubType = article.getAttribute("epub:type") || article.getAttribute("data-epub-type") || "";
+    const epubTypeAttr = articleEpubType ? ` data-epub-type="${articleEpubType}"` : "";
     const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
-    htmlParts.push(`<section data-chapter="${chapterCounter}"${formatAttr}>\n${innerHTML}\n</section>`);
+    htmlParts.push(`<section data-chapter="${chapterCounter}"${formatAttr}${epubTypeAttr}>\n${innerHTML}\n</section>`);
 
     chapters.push({
       number: chapterCounter,
