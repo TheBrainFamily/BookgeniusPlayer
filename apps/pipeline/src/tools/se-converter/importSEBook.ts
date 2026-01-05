@@ -232,7 +232,7 @@ async function step1_CreateFolderStructure(bookPath: string, metadata: SEMetadat
     title: metadata.title,
     author: metadata.author,
     language: metadata.language.split("-")[0],
-    form: "Play",
+    form: "Prose",
     description: metadata.description,
   };
   await createFolderIfNeeded(bookPath, bookExtra);

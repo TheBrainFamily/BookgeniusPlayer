@@ -423,16 +423,20 @@ export function setupPageObserver(): {
           const startInfo = newTopInfo; // Already derived
           const endInfo = newBottomInfo; // Already derived
 
+          // Allow location updates when we have valid start/end info.
+          // Fall back to startInfo if activeParagraph is null (e.g., when scrolling over figures/images)
+          const effectiveActiveParagraph = activeParagraph ?? startInfo;
+
           if (
-            activeParagraph &&
-            activeParagraph.chapter !== null &&
-            activeParagraph.paragraph !== null &&
             startInfo &&
             startInfo.chapter !== null &&
             startInfo.paragraph !== null &&
             endInfo &&
             endInfo.chapter !== null &&
-            endInfo.paragraph !== null
+            endInfo.paragraph !== null &&
+            effectiveActiveParagraph &&
+            effectiveActiveParagraph.chapter !== null &&
+            effectiveActiveParagraph.paragraph !== null
           ) {
             const rangeStartInfo = startInfo;
             const rangeEndInfo = endInfo;
@@ -449,8 +453,8 @@ export function setupPageObserver(): {
               paragraph: expandedStartParagraph,
               endChapter: rangeEndInfo.chapter,
               endParagraph: expandedEndParagraph,
-              currentChapter: activeParagraph.chapter,
-              currentParagraph: activeParagraph.paragraph,
+              currentChapter: effectiveActiveParagraph.chapter,
+              currentParagraph: effectiveActiveParagraph.paragraph,
             };
 
             if (!isSameLoc(lastSentLocation, nextLoc)) {
@@ -463,8 +467,8 @@ export function setupPageObserver(): {
                   paragraph: expandedStartParagraph,
                   endChapter: rangeEndInfo.chapter,
                   endParagraph: expandedEndParagraph,
-                  currentChapter: activeParagraph.chapter,
-                  currentParagraph: activeParagraph.paragraph,
+                  currentChapter: effectiveActiveParagraph.chapter,
+                  currentParagraph: effectiveActiveParagraph.paragraph,
                   earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
                   latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
                   earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
@@ -474,8 +478,9 @@ export function setupPageObserver(): {
               }
             }
           } else {
-            console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
+            console.warn("[Observer] Could not update location: start/end info is invalid.", {
               activePgh: activeParagraph,
+              effectiveActiveParagraph,
               startInfo: startInfo,
               endInfo: endInfo,
             });

@@ -61,6 +61,42 @@ export const getSpeaksUrlForListens = (listensUrl: string): string | null => {
   return listensToSpeaksRegistry.get(listensUrl) || null;
 };
 
+// =============================================================================
+// Figure URL Registry
+// =============================================================================
+// Maps figure paths like "/{bookSlug}/figures/{filename}" to Convex storage URLs
+
+let figureUrlRegistry: Map<string, string> | null = null;
+
+export const setFigureUrls = (urls: Map<string, string>) => {
+  figureUrlRegistry = urls;
+};
+
+export const clearFigureUrls = () => {
+  figureUrlRegistry = null;
+};
+
+/**
+ * Look up a figure URL by its path.
+ * Handles paths like "/Alice/figures/illustration-1.svg" or just "illustration-1.svg"
+ */
+export const getFigureUrl = (figurePath: string): string | null => {
+  if (!figureUrlRegistry) return null;
+
+  // Try exact match first
+  const exact = figureUrlRegistry.get(figurePath);
+  if (exact) return exact;
+
+  // Try just the filename (extract from path)
+  const filename = figurePath.split("/").pop();
+  if (filename) {
+    const byFilename = figureUrlRegistry.get(filename);
+    if (byFilename) return byFilename;
+  }
+
+  return null;
+};
+
 export const URL_SEGMENTS = { ASSETS: "assets", COMPILED: "compiled", AUDIO_EXT: ".mp3" };
 
 export function joinPath(...parts: string[]) {

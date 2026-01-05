@@ -427,6 +427,32 @@ export const listBackgrounds = query({
 });
 
 // =============================================================================
+// Figure Queries
+// =============================================================================
+
+/**
+ * List all figures/images for a book.
+ * Returns filename -> URL mapping for use in HTML img src transformation.
+ */
+export const listFigures = query({
+  args: { bookPath: v.string() },
+  handler: async (ctx, { bookPath }) => {
+    const figuresPath = `${bookPath}/figures`;
+
+    const files = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: figuresPath },
+    );
+
+    return files.map((file) => ({
+      filename: file.basename,
+      url: file.url,
+      contentType: file.contentType,
+    }));
+  },
+});
+
+// =============================================================================
 // Music Queries
 // =============================================================================
 

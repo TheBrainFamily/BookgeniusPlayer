@@ -22,7 +22,7 @@ import {
   type EnhancedProseOptions,
 } from "@player/services/htmlNormalizer";
 import { setBookDataStore, clearBookDataStore, type Note, type Variant } from "@player/state/bookDataStore";
-import { setListensToSpeaksUrls, setLiveAssetUrls } from "@player/utils/assetUrls";
+import { setListensToSpeaksUrls, setLiveAssetUrls, setFigureUrls, clearFigureUrls } from "@player/utils/assetUrls";
 import type { BackgroundForBook, BackgroundSongSection, CharacterData, CharacterMedia, BookData, Chapter as ChapterTitle } from "@player/types/book";
 import { bookIndex } from "@player/logic/BookIndex";
 import type { CharacterIndex, ChapterOccurrences } from "@convex/lib/characterDataV2";
@@ -214,6 +214,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
   const backgroundsQuery = useQuery(draftMode ? api.backgroundCues.listForPlayerWithDrafts : api.backgroundCues.listForPlayer, { bookPath });
   const musicQuery = useQuery(draftMode ? api.musicCues.listForPlayerWithDrafts : api.musicCues.listForPlayer, { bookPath });
+  const figuresQuery = useQuery(api.bookQueries.listFigures, { bookPath });
   const audiobookTracksQuery = useQuery(api.bookQueries.listAudiobookTracks, { bookPath });
   const cutScenesQuery = useQuery(api.bookQueries.listCutScenes, { bookPath });
   const notesQuery = useQuery(api.bookQueries.listNotes, { bookPath });
@@ -637,12 +638,38 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     setLiveAssetUrls(new Map(), videoToAvatar);
   }, [characters]);
 
+  // Set up figure URL registry for transforming img src in HTML
+  useEffect(() => {
+    if (!figuresQuery || figuresQuery.length === 0) {
+      clearFigureUrls();
+      return;
+    }
+
+    const figureMap = new Map<string, string>();
+    for (const fig of figuresQuery) {
+      // Map by filename for easy lookup
+      figureMap.set(fig.filename, fig.url);
+      // Also map by full path pattern: /{bookSlug}/figures/{filename}
+      figureMap.set(`/${bookSlug}/figures/${fig.filename}`, fig.url);
+    }
+
+    setFigureUrls(figureMap);
+    console.log(`[BookConvex] Registered ${figuresQuery.length} figure URLs`);
+
+    return () => clearFigureUrls();
+  }, [figuresQuery, bookSlug]);
+
   // =============================================================================
   // Loading state
   // =============================================================================
 
   const isLoading =
-    bookMetadata === undefined || htmlSourceChaptersQuery === undefined || charactersQuery === undefined || backgroundsQuery === undefined || musicQuery === undefined;
+    bookMetadata === undefined ||
+    htmlSourceChaptersQuery === undefined ||
+    charactersQuery === undefined ||
+    backgroundsQuery === undefined ||
+    musicQuery === undefined ||
+    figuresQuery === undefined;
 
   const isReady = !isLoading && !error && bookStringified !== null && initialLoadCompleteRef.current;
 

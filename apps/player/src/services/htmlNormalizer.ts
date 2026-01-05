@@ -1,3 +1,5 @@
+import { getFigureUrl } from "@player/utils/assetUrls";
+
 const BLOCKED_TAGS = new Set(["script", "style", "iframe", "object", "embed", "form", "input", "button", "textarea", "select", "link", "meta", "base", "noscript"]);
 
 export function sanitizeHtml(html: string): string {
@@ -406,11 +408,28 @@ export function normalizeChapterHtmlEnhanced(html: string, options: EnhancedPros
   wrapPlayElements(section, doc);
   injectDataIndex(section);
   injectAvatarShells(section, doc);
+  transformFigureUrls(section);
 
   const wrapper = doc.createElement("section");
   wrapper.appendChild(section.cloneNode(true));
 
   return wrapper.outerHTML;
+}
+
+/**
+ * Transform img src attributes to use resolved figure URLs from registry.
+ */
+export function transformFigureUrls(section: Element): void {
+  const images = section.querySelectorAll("img");
+  for (const img of Array.from(images)) {
+    const src = img.getAttribute("src");
+    if (src) {
+      const resolvedUrl = getFigureUrl(src);
+      if (resolvedUrl) {
+        img.setAttribute("src", resolvedUrl);
+      }
+    }
+  }
 }
 
 export function normalizeChapterHtml(html: string): string {
@@ -427,6 +446,7 @@ export function normalizeChapterHtml(html: string): string {
   wrapPlayElements(section, doc);
   injectDataIndex(section);
   injectAvatarShells(section, doc);
+  transformFigureUrls(section);
 
   const wrapper = doc.createElement("section");
   wrapper.appendChild(section.cloneNode(true));
@@ -449,6 +469,7 @@ export function normalizeBookHtml(html: string): string {
     wrapPlayElements(section, doc);
     injectDataIndex(section);
     injectAvatarShells(section, doc);
+    transformFigureUrls(section);
   });
 
   return doc.body.innerHTML;

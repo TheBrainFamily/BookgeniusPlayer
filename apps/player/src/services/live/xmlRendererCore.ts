@@ -7,6 +7,7 @@
 
 import { wrapPunctuationAdvanced } from "../wrapPunctuation";
 import { isElementNode, isTextNode, isLikelyCharacterTag, renderLineBreakSpan, renderEmElement } from "../xmlDomHelpers";
+import { getFigureUrl } from "@player/utils/assetUrls";
 
 // =============================================================================
 // Types
@@ -61,8 +62,12 @@ const renderStandardInlineElement = (element: Element, options: { bookSlug: stri
       return renderEmElement(element);
     case "img": {
       const src = element.getAttribute("src") || "";
-      const resolvedSrc = options.includeBookSlugInImgSrc ? `/books/${options.bookSlug}${src}` : src;
-      return `<img src="${resolvedSrc}" />`;
+      const alt = element.getAttribute("alt") || "";
+      // Try to resolve figure URL from registry (for SE book figures)
+      const figureUrl = getFigureUrl(src);
+      const resolvedSrc = figureUrl || (options.includeBookSlugInImgSrc ? `/books/${options.bookSlug}${src}` : src);
+      const altAttr = alt ? ` alt="${alt.replace(/"/g, "&quot;")}"` : "";
+      return `<img src="${resolvedSrc}"${altAttr} />`;
     }
     default: {
       const eid = element.getAttribute("id");
