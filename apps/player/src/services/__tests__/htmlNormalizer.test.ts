@@ -2,205 +2,27 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect } from "vitest";
+import { compareStructure, injectAvatarShells, injectDataIndex, normalizeChapterHtml, normalizeChapterHtmlEnhanced, sanitizeHtml, stripCharacterMarkup } from "../htmlNormalizer";
 
-function stripCharacterMarkup(html: string): string {
-  let result = html.replace(/<span\s+data-c="[^"]*">([^<]*)<\/span>/g, "$1");
-  result = result.replace(/\s+data-speaker="[^"]*"/g, "");
-  result = result.replace(/\s+/g, " ").trim();
-  return result;
-}
-
-function compareStructure(original: string, withCharacters: string): { match: boolean; originalNormalized: string; withCharactersNormalized: string } {
-  const originalNormalized = stripCharacterMarkup(original);
-  const withCharactersNormalized = stripCharacterMarkup(withCharacters);
-  return { match: originalNormalized === withCharactersNormalized, originalNormalized, withCharactersNormalized };
-}
-
-interface CharacterRef {
-  slug: string;
-  type: "speaker" | "mention";
-  text?: string;
-  paragraphIndex?: number;
-}
-
-function extractCharacterRefs(html: string): CharacterRef[] {
-  const refs: CharacterRef[] = [];
-  const speakerRegex = /data-speaker="([^"]*)"/g;
-  let match;
-  while ((match = speakerRegex.exec(html)) !== null) {
-    const slugs = match[1].split(/\s+/).filter(Boolean);
-    for (const slug of slugs) {
-      refs.push({ slug, type: "speaker" });
-    }
-  }
-  const mentionRegex = /<span\s+data-c="([^"]*)">([^<]*)<\/span>/g;
-  while ((match = mentionRegex.exec(html)) !== null) {
-    refs.push({ slug: match[1], type: "mention", text: match[2] });
-  }
-  return refs;
-}
-
-function injectDataIndex(html: string): string {
+const parseSection = (html: string): { doc: Document; section: Element } => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
   const section = doc.querySelector("section[data-chapter]");
-  if (!section) return html;
-  let index = 0;
-  for (const child of Array.from(section.children)) {
-    child.setAttribute("data-index", String(index++));
-  }
+  if (!section) throw new Error("Missing section[data-chapter] in test input");
+  return { doc, section };
+};
+
+const applyDataIndex = (html: string): string => {
+  const { section } = parseSection(html);
+  injectDataIndex(section);
   return section.outerHTML;
-}
+};
 
-function injectAvatarShells(html: string): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const section = doc.querySelector("section[data-chapter]");
-  if (!section) return html;
-
-  section.querySelectorAll("[data-speaker]").forEach((el) => {
-    const speakers = el.getAttribute("data-speaker")?.split(/\s+/) ?? [];
-    if (speakers.length === 0) return;
-    el.classList.add("has-speaker");
-
-    const isInsideDramaTable = el.closest("table[data-drama]") !== null;
-    if (isInsideDramaTable) return;
-
-    const shell = doc.createElement("span");
-    shell.className = "character-placeholder character-talking start-of-paragraph";
-    shell.setAttribute("data-character", speakers[0]);
-    shell.setAttribute("data-is-talking", "true");
-    el.insertBefore(shell, el.firstChild);
-  });
-
-  section.querySelectorAll("span[data-c]").forEach((el) => {
-    el.classList.add("character-highlighted");
-  });
-
+const applyAvatarShells = (html: string): string => {
+  const { doc, section } = parseSection(html);
+  injectAvatarShells(section, doc);
   return section.outerHTML;
-}
-
-function sanitizeHtml(html: string): string {
-  const BLOCKED_TAGS = new Set(["script", "style", "iframe", "object", "embed", "form", "input", "button", "textarea", "select", "link", "meta", "base", "noscript"]);
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-
-  for (const tag of BLOCKED_TAGS) {
-    doc.querySelectorAll(tag).forEach((el) => el.remove());
-  }
-
-  doc.querySelectorAll("*").forEach((el) => {
-    for (const attr of Array.from(el.attributes)) {
-      const name = attr.name.toLowerCase();
-      const value = attr.value.toLowerCase();
-      if (name.startsWith("on") || value.includes("javascript:") || value.includes("vbscript:")) {
-        el.removeAttribute(attr.name);
-      }
-    }
-  });
-
-  return doc.body.innerHTML;
-}
-
-function convertXmlToHtml(xml: string): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xml, "text/xml");
-  const chapter = doc.querySelector("Chapter");
-  if (!chapter) throw new Error("No Chapter element found");
-  const chapterId = chapter.getAttribute("id") || "1";
-  let html = `<section data-chapter="${chapterId}">`;
-  for (const child of Array.from(chapter.children)) {
-    html += convertElement(child);
-  }
-  html += "</section>";
-  return html;
-}
-
-function convertElement(el: Element): string {
-  const tag = el.tagName.toLowerCase();
-  if (isCharacterTag(el.tagName)) {
-    return convertCharacterElement(el);
-  }
-  switch (tag) {
-    case "h3":
-    case "h4":
-    case "h5":
-    case "p":
-    case "blockquote":
-    case "div":
-    case "em":
-    case "strong":
-    case "br":
-      return convertStandardElement(el, tag);
-    case "note":
-      return convertNote(el);
-    case "linebreak":
-      return "<br>";
-    default:
-      return convertStandardElement(el, "div");
-  }
-}
-
-function isCharacterTag(tagName: string): boolean {
-  const standardTags = new Set(["p", "h3", "h4", "h5", "em", "strong", "br", "div", "blockquote", "note", "linebreak", "chapter", "span", "i", "b"]);
-  return !standardTags.has(tagName.toLowerCase()) && /^[A-Z]/.test(tagName);
-}
-
-function convertCharacterElement(el: Element): string {
-  const slug = el.tagName.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-  const isTalking = el.getAttribute("talking") === "true";
-  const text = el.textContent || "";
-
-  if (isTalking && !text.trim()) {
-    return `__SPEAKER__${slug}__`;
-  }
-  if (isTalking && text.trim()) {
-    return `__SPEAKER__${slug}__<strong>${text}</strong>`;
-  }
-  if (text.trim()) {
-    return `<span data-c="${slug}">${text}</span>`;
-  }
-  return `__SPEAKER__${slug}__`;
-}
-
-function convertStandardElement(el: Element, htmlTag: string): string {
-  let inner = "";
-  const speakers: string[] = [];
-
-  for (const node of Array.from(el.childNodes)) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      inner += node.textContent || "";
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const converted = convertElement(node as Element);
-      const speakerMatch = converted.match(/^__SPEAKER__([^_]+)__(.*)$/);
-      if (speakerMatch) {
-        speakers.push(speakerMatch[1]);
-        inner += speakerMatch[2];
-      } else {
-        inner += converted;
-      }
-    }
-  }
-
-  const attrs: string[] = [];
-  if (speakers.length > 0) {
-    attrs.push(`data-speaker="${speakers.join(" ")}"`);
-  }
-  for (const attr of Array.from(el.attributes)) {
-    if (["id", "class"].includes(attr.name)) {
-      attrs.push(`${attr.name}="${attr.value}"`);
-    }
-  }
-
-  const attrStr = attrs.length ? " " + attrs.join(" ") : "";
-  return `<${htmlTag}${attrStr}>${inner}</${htmlTag}>`;
-}
-
-function convertNote(el: Element): string {
-  const id = el.getAttribute("id") || "";
-  const text = el.textContent || `[${id}]`;
-  return `<a data-note="${id}">${text}</a>`;
-}
+};
 
 describe("stripCharacterMarkup", () => {
   it("removes data-c spans preserving text", () => {
@@ -268,40 +90,40 @@ describe("compareStructure", () => {
   });
 });
 
-describe("extractCharacterRefs", () => {
-  it("extracts speaker from paragraph", () => {
-    const html = '<p data-speaker="bob">Hello</p>';
-    const refs = extractCharacterRefs(html);
-    expect(refs).toHaveLength(1);
-    expect(refs[0]).toEqual({ slug: "bob", type: "speaker" });
-  });
+// describe("extractCharacterRefs", () => {
+//   it("extracts speaker from paragraph", () => {
+//     const html = '<p data-speaker="bob">Hello</p>';
+//     const refs = extractCharacterRefs(html);
+//     expect(refs).toHaveLength(1);
+//     expect(refs[0]).toEqual({ slug: "bob", type: "speaker" });
+//   });
 
-  it("extracts multiple speakers", () => {
-    const html = '<p data-speaker="bob alice">Hello</p>';
-    const refs = extractCharacterRefs(html);
-    expect(refs).toHaveLength(2);
-    expect(refs[0]).toEqual({ slug: "bob", type: "speaker" });
-    expect(refs[1]).toEqual({ slug: "alice", type: "speaker" });
-  });
+//   it("extracts multiple speakers", () => {
+//     const html = '<p data-speaker="bob alice">Hello</p>';
+//     const refs = extractCharacterRefs(html);
+//     expect(refs).toHaveLength(2);
+//     expect(refs[0]).toEqual({ slug: "bob", type: "speaker" });
+//     expect(refs[1]).toEqual({ slug: "alice", type: "speaker" });
+//   });
 
-  it("extracts character mentions", () => {
-    const html = '<p>Hello <span data-c="alice">Alice</span>!</p>';
-    const refs = extractCharacterRefs(html);
-    expect(refs).toHaveLength(1);
-    expect(refs[0]).toEqual({ slug: "alice", type: "mention", text: "Alice" });
-  });
+//   it("extracts character mentions", () => {
+//     const html = '<p>Hello <span data-c="alice">Alice</span>!</p>';
+//     const refs = extractCharacterRefs(html);
+//     expect(refs).toHaveLength(1);
+//     expect(refs[0]).toEqual({ slug: "alice", type: "mention", text: "Alice" });
+//   });
 
-  it("extracts both speakers and mentions", () => {
-    const html = `
-      <p data-speaker="bob">Hello <span data-c="alice">Alice</span>!</p>
-      <p data-speaker="alice">Hi <span data-c="bob">Bob</span>!</p>
-    `;
-    const refs = extractCharacterRefs(html);
-    expect(refs).toHaveLength(4);
-    expect(refs.filter((r) => r.type === "speaker")).toHaveLength(2);
-    expect(refs.filter((r) => r.type === "mention")).toHaveLength(2);
-  });
-});
+//   it("extracts both speakers and mentions", () => {
+//     const html = `
+//       <p data-speaker="bob">Hello <span data-c="alice">Alice</span>!</p>
+//       <p data-speaker="alice">Hi <span data-c="bob">Bob</span>!</p>
+//     `;
+//     const refs = extractCharacterRefs(html);
+//     expect(refs).toHaveLength(4);
+//     expect(refs.filter((r) => r.type === "speaker")).toHaveLength(2);
+//     expect(refs.filter((r) => r.type === "mention")).toHaveLength(2);
+//   });
+// });
 
 describe("injectDataIndex", () => {
   it("assigns sequential data-index to all direct children", () => {
@@ -314,7 +136,7 @@ describe("injectDataIndex", () => {
         <div>Div</div>
       </section>
     `;
-    const result = injectDataIndex(input);
+    const result = applyDataIndex(input);
     expect(result).toContain('data-index="0"');
     expect(result).toContain('data-index="1"');
     expect(result).toContain('data-index="2"');
@@ -324,7 +146,7 @@ describe("injectDataIndex", () => {
 
   it("does not assign data-index to nested elements", () => {
     const input = `<section data-chapter="1"><p>Text with <em>nested</em> element</p></section>`;
-    const result = injectDataIndex(input);
+    const result = applyDataIndex(input);
     expect(result).toMatch(/<p data-index="0">/);
     expect(result).not.toContain("<em data-index");
   });
@@ -337,7 +159,7 @@ describe("injectDataIndex", () => {
         <p>Regular paragraph</p>
       </section>
     `;
-    const result = injectDataIndex(input);
+    const result = applyDataIndex(input);
     expect(result).toContain('data-index="0"');
     expect(result).toContain('data-index="1"');
     expect(result).toContain('data-index="2"');
@@ -347,7 +169,7 @@ describe("injectDataIndex", () => {
 describe("injectAvatarShells", () => {
   it("injects avatar shell for speaker", () => {
     const input = '<section data-chapter="1"><p data-speaker="bob">Hello</p></section>';
-    const result = injectAvatarShells(input);
+    const result = applyAvatarShells(input);
     expect(result).toContain("character-placeholder");
     expect(result).toContain('data-character="bob"');
     expect(result).toContain('data-is-talking="true"');
@@ -355,19 +177,93 @@ describe("injectAvatarShells", () => {
 
   it("adds has-speaker class", () => {
     const input = '<section data-chapter="1"><p data-speaker="bob">Hello</p></section>';
-    const result = injectAvatarShells(input);
+    const result = applyAvatarShells(input);
     expect(result).toContain("has-speaker");
   });
 
   it("adds character-highlighted to mentions", () => {
     const input = '<section data-chapter="1"><p>Hello <span data-c="bob">Bob</span></p></section>';
-    const result = injectAvatarShells(input);
+    const result = applyAvatarShells(input);
     expect(result).toContain("character-highlighted");
+  });
+
+  it("only highlights first occurrence of each character per paragraph", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>Hello <span data-c="bob">Bob</span>, said <span data-c="alice">Alice</span>. Then <span data-c="bob">Bob</span> replied.</p>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const bobSpans = doc.querySelectorAll('span[data-c="bob"]');
+    expect(bobSpans.length).toBe(2);
+    expect(bobSpans[0].classList.contains("character-highlighted")).toBe(true);
+    expect(bobSpans[1].classList.contains("character-highlighted")).toBe(false);
+
+    const aliceSpan = doc.querySelector('span[data-c="alice"]');
+    expect(aliceSpan?.classList.contains("character-highlighted")).toBe(true);
+  });
+
+  it("resets character tracking for each paragraph", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>First <span data-c="bob">Bob</span> mention.</p>
+        <p>Second <span data-c="bob">Bob</span> mention in new paragraph.</p>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const bobSpans = doc.querySelectorAll('span[data-c="bob"]');
+    expect(bobSpans.length).toBe(2);
+    expect(bobSpans[0].classList.contains("character-highlighted")).toBe(true);
+    expect(bobSpans[1].classList.contains("character-highlighted")).toBe(true);
+  });
+
+  it("does not highlight character mention when character is the speaker", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="piglet">'No,' said <span data-c="piglet">Piglet</span>, 'it's you who were out, <span data-c="winnie-the-pooh">Pooh</span>.'</p>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const pigletSpan = doc.querySelector('span[data-c="piglet"]');
+    expect(pigletSpan?.classList.contains("character-highlighted")).toBe(false);
+    expect(pigletSpan?.getAttribute("data-character")).toBe("piglet");
+
+    const poohSpan = doc.querySelector('span[data-c="winnie-the-pooh"]');
+    expect(poohSpan?.classList.contains("character-highlighted")).toBe(true);
+  });
+
+  it("does not highlight any speaker when multiple speakers on paragraph", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="alice bob">'Hello,' said <span data-c="alice">Alice</span> and <span data-c="bob">Bob</span> to <span data-c="charlie">Charlie</span>.</p>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const aliceSpan = doc.querySelector('span[data-c="alice"]');
+    expect(aliceSpan?.classList.contains("character-highlighted")).toBe(false);
+
+    const bobSpan = doc.querySelector('span[data-c="bob"]');
+    expect(bobSpan?.classList.contains("character-highlighted")).toBe(false);
+
+    const charlieSpan = doc.querySelector('span[data-c="charlie"]');
+    expect(charlieSpan?.classList.contains("character-highlighted")).toBe(true);
   });
 
   it("uses first speaker for avatar when multiple", () => {
     const input = '<section data-chapter="1"><p data-speaker="bob alice">Hello</p></section>';
-    const result = injectAvatarShells(input);
+    const result = applyAvatarShells(input);
     expect(result).toContain('data-character="bob"');
   });
 
@@ -390,7 +286,7 @@ describe("injectAvatarShells", () => {
         <p>Some prose after.</p>
       </section>
     `;
-    const result = injectAvatarShells(input);
+    const result = applyAvatarShells(input);
     expect(result).toContain("data-drama");
     expect(result).toContain('data-speaker="heffalump"');
     expect(result).toContain('data-speaker="piglet"');
@@ -415,7 +311,7 @@ describe("injectAvatarShells", () => {
         <p data-speaker="piglet">"Goodbye," said Piglet.</p>
       </section>
     `;
-    const result = injectAvatarShells(input);
+    const result = applyAvatarShells(input);
     const placeholderMatches = result.match(/character-placeholder/g) || [];
     expect(placeholderMatches.length).toBe(2);
     expect(result).toContain('<p data-speaker="pooh" class="has-speaker"><span class="character-placeholder');
@@ -425,73 +321,98 @@ describe("injectAvatarShells", () => {
   });
 });
 
-describe("convertXmlToHtml", () => {
-  it("converts Chapter wrapper to section", () => {
-    const xml = '<Chapter id="2"><p>Hello</p></Chapter>';
-    const html = convertXmlToHtml(xml);
-    expect(html).toContain('<section data-chapter="2">');
-    expect(html).toContain("</section>");
-  });
-
-  it("converts character with talking=true to data-speaker", () => {
-    const xml = '<Chapter id="1"><p><Bob talking="true"/>Hello world</p></Chapter>';
-    const html = convertXmlToHtml(xml);
-    expect(html).toContain('data-speaker="bob"');
-  });
-
-  it("converts character reference to data-c span", () => {
-    const xml = '<Chapter id="1"><p>Hello <Bob>Bob Smith</Bob>!</p></Chapter>';
-    const html = convertXmlToHtml(xml);
-    expect(html).toContain('<span data-c="bob">Bob Smith</span>');
-  });
-
-  it("converts note to anchor", () => {
-    const xml = '<Chapter id="1"><p>Text with<note id="23"></note> footnote</p></Chapter>';
-    const html = convertXmlToHtml(xml);
-    expect(html).toContain('<a data-note="23">');
-  });
-
-  it("preserves blockquotes and other elements", () => {
-    const xml = `
-      <Chapter id="1">
-        <h4>Title</h4>
-        <blockquote>A quote</blockquote>
-        <p>Normal text</p>
-      </Chapter>
+describe("normalizeChapterHtml (baseline)", () => {
+  it("preserves drama tables and does not wrap prose into play rows", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="pooh">"Hello," said Pooh.</p>
+        <table data-drama="">
+          <tbody>
+            <tr data-speaker="heffalump">
+              <td data-persona="">Heffalump</td>
+              <td>"Ho-ho!"</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>After the drama.</p>
+      </section>
     `;
-    const html = convertXmlToHtml(xml);
-    expect(html).toContain("<h4>Title</h4>");
-    expect(html).toContain("<blockquote>A quote</blockquote>");
-    expect(html).toContain("<p>Normal text</p>");
+    const result = normalizeChapterHtml(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const section = doc.querySelector("section[data-chapter]");
+
+    expect(section?.querySelector("table[data-drama]")).toBeTruthy();
+    expect(section?.querySelector("tr[data-speaker='heffalump']")).toBeTruthy();
+    expect(section?.querySelectorAll(".play-row").length).toBe(0);
+    expect(section?.querySelectorAll(".character-placeholder").length).toBe(1);
+  });
+});
+
+describe("normalizeChapterHtmlEnhanced", () => {
+  it("renders speaker paragraphs as play rows with labels", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="pooh">"Hello," said Pooh.</p>
+        <p>After the drama.</p>
+      </section>
+    `;
+    const result = normalizeChapterHtmlEnhanced(input, { speakerDisplayNames: new Map([["pooh", "Pooh"]]) });
+    const { section } = parseSection(result);
+
+    const playRow = section.querySelector(".play-row");
+    expect(playRow).toBeTruthy();
+
+    const label = playRow?.querySelector(".character-text p[data-is-character='true'] strong");
+    expect(label?.textContent).toBe("Pooh");
+
+    const content = playRow?.querySelector(".character-text p[data-is-character='false']");
+    expect(content?.textContent).toContain("Hello");
+
+    const placeholder = playRow?.querySelector(".character-avatar .character-placeholder");
+    expect(placeholder?.getAttribute("data-character")).toBe("pooh");
+
+    const narration = Array.from(section.querySelectorAll("p")).find((p) => p.textContent?.includes("After"));
+    expect(narration?.getAttribute("data-index")).toBeTruthy();
+    expect(section.getAttribute("data-chapter-format")).toBe("mixed");
   });
 
-  it("handles complex Lalka-style XML", () => {
-    const xml = `
-      <Chapter id="2">
-        <h4>II. Rządy starego subiekta</h4>
-        <p><Ignacy-Rzecki>Pan Ignacy</Ignacy-Rzecki> od dwudziestu pięciu lat mieszkał w pokoiku.</p>
-        <p><Ignacy-Rzecki talking="true"/>— Dzień dobry — rzekł <Ignacy-Rzecki>pan Ignacy</Ignacy-Rzecki>.</p>
-        <p>Tekst z <note id="23"></note> przypisem.</p>
-      </Chapter>
+  it("wraps pure em paragraphs as didaskalia rows", () => {
+    const input = `
+      <section data-chapter="1">
+        <p><em>Enter Pooh.</em></p>
+      </section>
     `;
-    const html = convertXmlToHtml(xml);
-    expect(html).toContain('<section data-chapter="2">');
-    expect(html).toContain('<span data-c="ignacy-rzecki">Pan Ignacy</span>');
-    expect(html).toContain('data-speaker="ignacy-rzecki"');
-    expect(html).toContain('<a data-note="23">');
+    const result = normalizeChapterHtmlEnhanced(input);
+    const { section } = parseSection(result);
 
-    const originalText = "Pan Ignacy od dwudziestu pięciu lat mieszkał w pokoiku";
-    expect(stripCharacterMarkup(html)).toContain(originalText);
+    const didaskaliaRow = section.querySelector(".play-row.didaskalia-row");
+    expect(didaskaliaRow).toBeTruthy();
+
+    const didaskaliaP = didaskaliaRow?.querySelector("p[data-is-didaskalia='true']");
+    expect(didaskaliaP?.textContent).toContain("Enter Pooh");
   });
 
-  it("handles multiple speakers in one paragraph", () => {
-    const xml = `
-      <Chapter id="1">
-        <p><Bob talking="true"/><Alice talking="true"/>— Hello! — they said.</p>
-      </Chapter>
+  it("keeps drama tables and adds play rows for speakers", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="pooh">"Hello," said Pooh.</p>
+        <table data-drama="">
+          <tbody>
+            <tr data-speaker="heffalump">
+              <td data-persona="">Heffalump</td>
+              <td>"Ho-ho!"</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     `;
-    const html = convertXmlToHtml(xml);
-    expect(html).toContain('data-speaker="bob alice"');
+    const result = normalizeChapterHtmlEnhanced(input);
+    const { section } = parseSection(result);
+
+    expect(section.querySelector("table[data-drama]")).toBeTruthy();
+    expect(section.querySelector("tr[data-speaker='heffalump']")).toBeTruthy();
+    expect(section.querySelectorAll(".play-row").length).toBe(1);
   });
 });
 

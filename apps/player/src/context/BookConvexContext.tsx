@@ -12,7 +12,15 @@ import React, { createContext, useContext, useMemo, useState, useEffect, useLayo
 import { useQuery, useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useDraftMode } from "./DraftModeContext";
-import { detectSourceFormat, normalizeChapterHtml, extractCharacterOccurrences, type CharacterOccurrence } from "@player/services/htmlNormalizer";
+import {
+  detectSourceFormat,
+  normalizeChapterHtml,
+  normalizeChapterHtmlEnhanced,
+  extractCharacterOccurrences,
+  type CharacterOccurrence,
+  type RenderMode,
+  type EnhancedProseOptions,
+} from "@player/services/htmlNormalizer";
 import { setBookDataStore, clearBookDataStore, type Note, type Variant } from "@player/state/bookDataStore";
 import { setListensToSpeaksUrls, setLiveAssetUrls } from "@player/utils/assetUrls";
 import type { BackgroundForBook, BackgroundSongSection, CharacterData, CharacterMedia, BookData, Chapter as ChapterTitle } from "@player/types/book";
@@ -79,23 +87,33 @@ const buildChapterPlaceholderHtml = (chapterNumber: number): string => {
   return `<section><section data-chapter="${chapterNumber}"></section></section>`;
 };
 
-const buildBookHtmlFromChapters = (chapters: ChapterHtmlEntry[], bookForm: string): string => {
+const getRenderModeFromUrl = (): RenderMode => {
+  if (typeof window === "undefined") return "default";
+  const params = new URLSearchParams(window.location.search);
+  return params.get("renderMode") === "enhancedProse" ? "enhancedProse" : "default";
+};
+
+const buildBookHtmlFromChapters = (chapters: ChapterHtmlEntry[], bookForm: string, renderMode: RenderMode, enhancedOptions: EnhancedProseOptions): string => {
+  const form = bookForm.toLowerCase();
+  const useEnhancedProse = renderMode === "enhancedProse" && form !== "play";
+
   let html = chapters
     .map((chapter) => {
       const chapterHtml = chapter.html ?? buildChapterPlaceholderHtml(chapter.chapterNumber);
       const format = detectSourceFormat(chapterHtml);
       if (format === "source") {
-        return normalizeChapterHtml(chapterHtml);
+        return useEnhancedProse ? normalizeChapterHtmlEnhanced(chapterHtml, enhancedOptions) : normalizeChapterHtml(chapterHtml);
       }
       return chapterHtml;
     })
     .join("");
 
-  const form = bookForm.toLowerCase();
   if (form === "play") {
     html = `<div class="play-container">${html}</div>`;
   } else if (form === "mixed") {
     html = `<div class="play-container mixed-container">${html}</div>`;
+  } else if (useEnhancedProse) {
+    html = `<div class="play-container">${html}</div>`;
   }
 
   return `<section>${html.trim()}</section>`;
@@ -120,6 +138,7 @@ interface BookConvexContextType {
   backgroundsForBook: BackgroundForBook[];
   backgroundSongsForBook: BackgroundSongSection[];
   bookData: BookData | null;
+  isPlayLayout: boolean;
   knownVideoFiles: string[];
   textVersion: number;
   getChapterContent: (versionId: string, url?: string) => Promise<string | null>;
@@ -148,6 +167,7 @@ const defaultContext: BookConvexContextType = {
   backgroundsForBook: [],
   backgroundSongsForBook: [],
   bookData: null,
+  isPlayLayout: false,
   knownVideoFiles: [],
   textVersion: 0,
   getChapterContent: async () => null,
@@ -300,6 +320,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     return videos;
   }, [characters]);
 
+  const renderMode = useMemo(() => getRenderModeFromUrl(), []);
+  const bookFormValue = useMemo(() => book?.extra?.form?.toLowerCase() || "book", [book?.extra?.form]);
+  const isPlayLayout = useMemo(() => bookFormValue === "play" || bookFormValue === "mixed" || renderMode === "enhancedProse", [bookFormValue, renderMode]);
+
   const bookData = useMemo<BookData | null>(() => {
     if (!book) return null;
     return {
@@ -382,8 +406,11 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
     console.log("[BookConvex] Building book HTML from cache", { cachedChapters: htmlSourceCacheRef.current.size });
 
-    const bookForm = book?.extra?.form?.toLowerCase() || "book";
-    const htmlResult = buildBookHtmlFromChapters(buildHtmlSourceChapterEntries(), bookForm);
+    const speakerDisplayNames = new Map<string, string>();
+    for (const char of characters) {
+      speakerDisplayNames.set(char.slug.toLowerCase(), char.extra.displayName ?? char.name);
+    }
+    const htmlResult = buildBookHtmlFromChapters(buildHtmlSourceChapterEntries(), bookFormValue, renderMode, { speakerDisplayNames });
     setBookStringified(htmlResult);
 
     const occurrencesByChapter: Record<number, ChapterOccurrences> = {};
@@ -410,7 +437,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       occurrencesByChapter[chapterNumber] = chapterOccurrences;
     }
 
-    const form = bookForm === "play" ? "play" : bookForm === "mixed" ? "mixed" : "prose";
+    const form = bookFormValue === "play" ? "play" : bookFormValue === "mixed" ? "mixed" : "prose";
     const characterIndex: CharacterIndex = { form, characters: {} };
     for (const char of characters) {
       characterIndex.characters[char.slug] = { name: char.extra.displayName ?? char.name, summary: char.extra.summary ?? "" };
@@ -643,6 +670,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       backgroundsForBook,
       backgroundSongsForBook,
       bookData,
+      isPlayLayout,
       knownVideoFiles,
       textVersion,
       getChapterContent,
@@ -670,6 +698,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       backgroundsForBook,
       backgroundSongsForBook,
       bookData,
+      isPlayLayout,
       knownVideoFiles,
       textVersion,
       getChapterContent,
@@ -696,6 +725,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       backgroundsForBook,
       backgroundSongsForBook,
       bookData,
+      isPlayLayout,
       knownVideoFiles,
       textVersion,
       notes: notesQuery ?? [],
@@ -718,6 +748,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     backgroundsForBook,
     backgroundSongsForBook,
     bookData,
+    isPlayLayout,
     knownVideoFiles,
     textVersion,
     notesQuery,

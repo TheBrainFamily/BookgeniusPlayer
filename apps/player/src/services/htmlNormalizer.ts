@@ -167,17 +167,160 @@ export function injectAvatarShells(section: Element, doc: Document): void {
     }
   });
 
+  // Process character mentions per paragraph - only highlight first occurrence of each character
+  // Skip highlighting if the character is the speaker of the paragraph
+  const paragraphElements = section.querySelectorAll("p, blockquote, h1, h2, h3, h4, h5, h6, li, td, th, div.character-text, div.didaskalia-text");
+  const processedSpans = new Set<Element>();
+
+  paragraphElements.forEach((paragraph) => {
+    const seenInParagraph = new Set<string>();
+    const speakerAttr = paragraph.closest("[data-speaker]")?.getAttribute("data-speaker") ?? paragraph.getAttribute("data-speaker");
+    const speakers = new Set(speakerAttr?.split(/\s+/).filter(Boolean) ?? []);
+
+    paragraph.querySelectorAll("span[data-c]").forEach((el) => {
+      if (processedSpans.has(el)) return;
+      processedSpans.add(el);
+
+      const slug = el.getAttribute("data-c");
+      if (slug) {
+        el.setAttribute("data-character", slug);
+        // Only highlight if: first occurrence AND not a speaker of this paragraph
+        if (!seenInParagraph.has(slug) && !speakers.has(slug)) {
+          el.classList.add("character-highlighted");
+        }
+        seenInParagraph.add(slug);
+      }
+    });
+  });
+
+  // Handle any spans not inside a paragraph element (fallback)
   section.querySelectorAll("span[data-c]").forEach((el) => {
-    el.classList.add("character-highlighted");
+    if (processedSpans.has(el)) return;
     const slug = el.getAttribute("data-c");
     if (slug) {
       el.setAttribute("data-character", slug);
+      el.classList.add("character-highlighted");
     }
   });
 }
 
 export function detectSourceFormat(html: string): "compiled" | "source" {
   return html.includes('data-index="') ? "compiled" : "source";
+}
+
+export type RenderMode = "default" | "enhancedProse";
+
+export type EnhancedProseOptions = { speakerDisplayNames?: Map<string, string> };
+
+function createPlayRowFromSpeakerParagraph(p: Element, doc: Document, state: { lastSpeaker: string | null; alignment: "left" | "right" }, options: EnhancedProseOptions): Element {
+  const speakers = p.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
+  const firstSpeaker = speakers[0] || "";
+
+  if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
+    state.alignment = state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+    state.lastSpeaker = firstSpeaker;
+  }
+
+  const playRow = doc.createElement("div");
+  playRow.className = "play-row";
+  playRow.setAttribute("data-text-alignment", state.alignment);
+  playRow.setAttribute("data-speaker", speakers.join(" "));
+
+  const characterAvatar = doc.createElement("div");
+  characterAvatar.className = "character-avatar";
+
+  const characterText = doc.createElement("div");
+  characterText.className = "character-text";
+
+  const labelP = doc.createElement("p");
+  labelP.setAttribute("data-text-alignment", state.alignment);
+  labelP.setAttribute("data-is-character", "true");
+  labelP.setAttribute("data-is-didaskalia", "false");
+
+  const displayName = options.speakerDisplayNames?.get(firstSpeaker) ?? firstSpeaker.replace(/-/g, " ");
+  const strong = doc.createElement("strong");
+  strong.textContent = displayName;
+  labelP.appendChild(strong);
+  characterText.appendChild(labelP);
+
+  const contentP = p.cloneNode(true) as Element;
+  contentP.removeAttribute("data-speaker");
+  contentP.setAttribute("data-text-alignment", state.alignment);
+  contentP.setAttribute("data-is-character", "false");
+  contentP.setAttribute("data-is-didaskalia", "false");
+  characterText.appendChild(contentP);
+
+  playRow.appendChild(characterAvatar);
+  playRow.appendChild(characterText);
+
+  return playRow;
+}
+
+function createDidaskaliaPlayRow(p: Element, doc: Document): Element {
+  const playRow = doc.createElement("div");
+  playRow.className = "play-row didaskalia-row";
+
+  const didaskaliaText = doc.createElement("div");
+  didaskaliaText.className = "didaskalia-text";
+
+  const contentP = p.cloneNode(true) as Element;
+  contentP.setAttribute("data-is-didaskalia", "true");
+  didaskaliaText.appendChild(contentP);
+
+  playRow.appendChild(didaskaliaText);
+  return playRow;
+}
+
+function isPureEmParagraph(p: Element): boolean {
+  const html = p.innerHTML.trim();
+  const emMatch = html.match(/^<em[^>]*>([\s\S]*)<\/em>$/);
+  if (!emMatch) return false;
+  const withoutEm = html.replace(/<em[^>]*>[\s\S]*<\/em>/g, "").trim();
+  return withoutEm.length === 0;
+}
+
+function transformProseToPlayRows(section: Element, doc: Document, options: EnhancedProseOptions): void {
+  const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
+  const children = Array.from(section.children);
+
+  for (const child of children) {
+    if (child.tagName.toLowerCase() !== "p") continue;
+    if (child.closest("table[data-drama]")) continue;
+
+    const hasSpeaker = child.hasAttribute("data-speaker");
+    const isPureEm = isPureEmParagraph(child);
+
+    if (hasSpeaker) {
+      const playRow = createPlayRowFromSpeakerParagraph(child, doc, state, options);
+      section.replaceChild(playRow, child);
+    } else if (isPureEm) {
+      const playRow = createDidaskaliaPlayRow(child, doc);
+      section.replaceChild(playRow, child);
+    }
+  }
+}
+
+export function normalizeChapterHtmlEnhanced(html: string, options: EnhancedProseOptions = {}): string {
+  const sanitized = sanitizeHtml(html);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(sanitized, "text/html");
+  const section = doc.querySelector("section[data-chapter]");
+
+  if (!section) {
+    console.warn("[normalizeChapterHtmlEnhanced] No section[data-chapter] found");
+    return sanitized;
+  }
+
+  transformProseToPlayRows(section, doc, options);
+  section.setAttribute("data-chapter-format", "mixed");
+  wrapPlayElements(section, doc);
+  injectDataIndex(section);
+  injectAvatarShells(section, doc);
+
+  const wrapper = doc.createElement("section");
+  wrapper.appendChild(section.cloneNode(true));
+
+  return wrapper.outerHTML;
 }
 
 export function normalizeChapterHtml(html: string): string {

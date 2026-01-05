@@ -1,19 +1,13 @@
 import { isSystemNavigationInProgress, setCurrentLocation } from "@player/helpers/paragraphsNavigation";
-import { getBookData } from "@player/state/bookDataStore";
+import { getIsPlayLayout } from "@player/state/bookDataStore";
 import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
-let cachedIsPlayFormat: boolean | null = null;
-
 function getIsPlayFormat(): boolean {
-  if (cachedIsPlayFormat === null) {
-    const bookData = getBookData();
-    cachedIsPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
-  }
-  return cachedIsPlayFormat;
+  return getIsPlayLayout();
 }
 
 let isSplashAnimationComplete = false;

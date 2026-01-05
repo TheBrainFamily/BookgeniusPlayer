@@ -13,6 +13,7 @@ import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualiz
 import { bookIndex } from "@player/logic/BookIndex";
 import { openPlayRowCharacterModal } from "@player/ui/activateMediaInRange";
 import { scrollCoordinator } from "@player/services/ScrollCoordinator";
+import { useBookForm } from "@player/hooks/useBookForm";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
@@ -29,7 +30,7 @@ export function useBookContent() {
   const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded } = useBookConvex();
   const { location } = useLocation();
   const { currentChapter } = location;
-  const bookForm = bookData?.metadata?.bookForm || "book";
+  const { isPlayFormat } = useBookForm();
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
   // Initialize to -1 so the first real version (0 or 1) is always detected as a change
@@ -46,8 +47,6 @@ export function useBookContent() {
     cleanup: () => void;
   } | null>(null);
   const currentChapterRef = useRef<number | undefined>(currentChapter);
-
-  const isPlayFormat = bookForm === "play" || bookForm === "mixed";
 
   useEffect(() => {
     if (typeof currentChapter !== "number") return;
@@ -146,13 +145,13 @@ export function useBookContent() {
   useEffect(() => {
     const bookContainer = document.getElementById("book-container");
     if (bookContainer) {
-      if (bookForm === "play" || bookForm === "mixed") {
+      if (isPlayFormat) {
         bookContainer.classList.add("play-mode");
       } else {
         bookContainer.classList.remove("play-mode");
       }
     }
-  }, [bookForm]);
+  }, [isPlayFormat]);
 
   useEffect(() => {
     currentChapterRef.current = currentChapter;

@@ -45,6 +45,7 @@ export interface BookDataStore {
   backgroundsForBook: BackgroundForBook[];
   backgroundSongsForBook: BackgroundSongSection[];
   bookData: BookData | null;
+  isPlayLayout: boolean;
   knownVideoFiles: string[];
 
   // Reactivity
@@ -133,6 +134,10 @@ export function getCharactersData(): CharacterData[] {
  */
 export function getBookData(): BookData | null {
   return _store?.bookData ?? null;
+}
+
+export function getIsPlayLayout(): boolean {
+  return _store?.isPlayLayout ?? false;
 }
 
 /**

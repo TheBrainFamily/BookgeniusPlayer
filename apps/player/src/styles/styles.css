@@ -630,6 +630,22 @@
         margin-right: auto;
       }
 
+      & > p:not(.play-row p) {
+        width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      & > blockquote {
+        width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
       & > h3 {
         margin-bottom: 3rem;
       }
@@ -850,6 +866,11 @@
           width: 550px;
         }
 
+        & > p:not(.play-row p),
+        & > blockquote {
+          width: 550px;
+        }
+
         /* Compressing characters when more than 4 */
         .character-avatar {
           .character-placeholder:nth-child(n + 2):nth-last-child(n + 4),
@@ -873,6 +894,11 @@
         & > h4,
         & > h5,
         .play-row.didaskalia-row {
+          width: 450px;
+        }
+
+        & > p:not(.play-row p),
+        & > blockquote {
           width: 450px;
         }
 
@@ -914,6 +940,8 @@
         & > h3,
         & > h4,
         & > h5,
+        & > p:not(.play-row p),
+        & > blockquote,
         .play-row.didaskalia-row {
           width: 100%;
         }
