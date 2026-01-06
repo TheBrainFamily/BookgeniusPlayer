@@ -1,0 +1,3 @@
+# Large data directories - exclude from Cursor indexing
+apps/pipeline/standardebooks-data
+apps/pipeline/wolnelektury-data

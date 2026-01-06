@@ -52,6 +52,7 @@ type TransportEvent =
 
 function setMicActiveSafe(active: boolean) {
   try {
+    // @ts-ignore
     navigator.mediaSession?.setMicrophoneActive?.(active);
   } catch (e) {
     console.debug("[mic] setMicrophoneActive suppressed:", (e as Error)?.name);

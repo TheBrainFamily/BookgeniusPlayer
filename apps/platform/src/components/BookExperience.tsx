@@ -15,6 +15,7 @@ import { Badge } from "@platform/components/ui/badge";
 import { books } from "@platform/books";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { detectLanguageFromDomain } from "@/utils/languageDetection";
 
 const BookExperience = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -73,7 +74,7 @@ const BookExperience = () => {
                   <Play className="h-16 w-16 text-white/80 drop-shadow-lg" />
                 </div>
                 <Badge className="absolute top-4 right-4 bg-library-gold/90 text-library-mahogany">
-                  {book.genre}
+                  {book.metadata[detectLanguageFromDomain()]?.genre}
                 </Badge>
                 {book.language === "pl" && (
                   <div className="absolute top-4 left-4">
@@ -130,7 +131,7 @@ const BookExperience = () => {
                 </div>
 
                 <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                  {book.description}
+                  {book.metadata[detectLanguageFromDomain()]?.description}
                 </p>
 
                 {/* Features */}
@@ -140,7 +141,7 @@ const BookExperience = () => {
                     Features
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {book.features.map((feature, index) => (
+                    {book.metadata[detectLanguageFromDomain()]?.features?.map((feature, index) => (
                       <Badge
                         key={index}
                         variant="outline"
@@ -167,7 +168,8 @@ const BookExperience = () => {
                   an atmospheric soundtrack.
                 </p>
                 <p className="mb-4">
-                  Originally published in {book.year}, this {book.genre.toLowerCase()} masterpiece
+                  Originally published in {book.year}, this{" "}
+                  {book.metadata[detectLanguageFromDomain()]?.genre?.toLowerCase()} masterpiece
                   continues to captivate readers worldwide. Our adaptation brings new life to the
                   story through carefully crafted animations and sound design that enhance the
                   narrative without compromising the original text's integrity.

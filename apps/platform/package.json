@@ -11,7 +11,7 @@
     "lint:ci": "eslint --cache --quiet src/",
     "prettier:check": "prettier --check src/ --quiet 2>&1 | grep -v 'Ignored unknown option'",
     "preview": "vite preview",
-    "typecheck": "tsgo --noEmit --incremental",
+    "typecheck": "tsgo --noEmit --incremental --pretty",
     "typecheck:ci": "tsgo --noEmit --incremental --pretty false"
   },
   "dependencies": {

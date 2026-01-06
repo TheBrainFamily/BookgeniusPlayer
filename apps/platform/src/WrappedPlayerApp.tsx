@@ -10,6 +10,7 @@ import Paywall from "./components/Paywall";
 import AuthRequiredModal from "./components/AuthRequiredModal";
 import { teardownPlayer } from "../../player/src/teardown";
 import { useAuth } from "./hooks/useAuth";
+import { detectLanguageFromDomain } from "@/utils/languageDetection";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
@@ -158,7 +159,7 @@ const WrappedPlayerApp = () => {
       if (shouldStartHere && book) {
         const meta = books.find((b) => b.slug === book);
         const title = meta?.title ?? "BookGenius";
-        const phrases = meta?.phrases ?? [];
+        const phrases = meta?.metadata?.[detectLanguageFromDomain()]?.phrases ?? [];
         const author = meta?.author ?? "";
 
         // For direct loads we DO NOT show Start yet; it appears only after appReady.
