@@ -27,7 +27,7 @@ const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/helpers/findSimplifiedSentence", (mod) => {
-    findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
+    if (mod) findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
     console.info("[HMR] findSimplifiedSentence updated");
   });
 }
@@ -69,6 +69,7 @@ export function useBookContent() {
   }, [currentChapter, ensureCompiledChaptersLoaded]);
 
   const handlePointerUp = useCallback(
+    // eslint-disable-next-line complexity
     (event: PointerEvent) => {
       if (event.metaKey || event.ctrlKey) return;
 
@@ -107,8 +108,12 @@ export function useBookContent() {
       }
 
       const currentSentenceScore = complexitySpan.getAttribute("data-current-score") || "100";
-      const { text: simplifiedSentence, score: simplifiedSentenceScore } =
-        findSimplifiedSentenceRef.current(currentSentenceId, parseInt(currentSentenceScore));
+      const simplificationResult = findSimplifiedSentenceRef.current(
+        currentSentenceId,
+        parseInt(currentSentenceScore),
+      );
+      const simplifiedSentence = simplificationResult?.text;
+      const simplifiedSentenceScore = simplificationResult?.score;
 
       const sentenceNumber = parseInt(
         complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1",
@@ -146,7 +151,7 @@ export function useBookContent() {
         isPlayFormat,
         isFirstSentence,
       );
-      complexitySpan.setAttribute("data-current-score", simplifiedSentenceScore.toString());
+      complexitySpan.setAttribute("data-current-score", String(simplifiedSentenceScore ?? 0));
       complexitySpan.setAttribute("data-simplified", "true");
 
       wrapSimplifiedSentenceTail(complexitySpan);

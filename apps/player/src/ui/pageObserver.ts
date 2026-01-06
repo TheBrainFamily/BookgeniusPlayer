@@ -350,7 +350,9 @@ export function setupPageObserver(): {
     rootEl.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
     });
-    chosenElement?.classList.add("active-paragraph");
+    if (chosenElement) {
+      (chosenElement as HTMLElement).classList.add("active-paragraph");
+    }
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       if (chosenElement) {

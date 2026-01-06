@@ -10,7 +10,7 @@ const implRef = { current: impl };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/ui/background", (mod) => {
-    implRef.current = mod.dealWithBackground;
+    if (mod) implRef.current = mod.dealWithBackground;
     console.info("[HMR] dealWithBackground updated");
   });
 }

@@ -281,6 +281,7 @@ export const dealWithBackground = ({
 
     /* ---------- main debounced handler ----------------------------------- */
     debouncedHandler = debounce(
+      // eslint-disable-next-line complexity
       async (currentLocation: { currentChapter: number; currentParagraph: number }) => {
         // Guards for lifecycle invalidation across teardown/re-entry
         const myToken = sessionToken; // snapshot current session
@@ -321,6 +322,11 @@ export const dealWithBackground = ({
           return;
         }
         const newSrc = getBookAssetUrl(newFile); // expected to resolve to the current book's absolute URL (or equivalent)
+        if (!newSrc) {
+          console.error("Failed to get asset URL for:", newFile);
+          transitionState = TransitionState.Idle;
+          return;
+        }
 
         const curType = legacy.dataset.type as "video" | "image";
         const curFrontId = legacy.dataset.front as "a" | "b";

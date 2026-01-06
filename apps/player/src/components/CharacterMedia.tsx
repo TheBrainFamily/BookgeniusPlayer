@@ -183,7 +183,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     <video
       key={`video-${state}`}
       {...commonAttrs}
-      src={src || null}
+      src={src || undefined} //TODO: why would this ever be undefined?
       className={cn(
         "absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out rounded-full",
         isActive ? "opacity-100" : "opacity-0",

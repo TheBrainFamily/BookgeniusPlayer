@@ -14,7 +14,7 @@ const implRef = { current: impl };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/deal-with-background-songs", (mod) => {
-    implRef.current = mod.dealWithBackgroundSongs;
+    if (mod) implRef.current = mod.dealWithBackgroundSongs;
     console.info("[HMR] useBackgroundSongs updated");
   });
 }

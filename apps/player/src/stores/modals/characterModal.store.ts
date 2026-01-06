@@ -16,7 +16,7 @@ const MODAL_ID = "character-modal";
 
 interface CharacterModalState {
   isOpen: boolean;
-  slug?: string | null;
+  slug?: string;
   isVideo: boolean;
   mediaSrc?: string;
   chapter?: number;
@@ -31,11 +31,11 @@ export const useCharacterModal = create<CharacterModalState>()(
   devtools(
     (set) => ({
       isOpen: false,
-      slug: null,
+      slug: undefined,
       isVideo: false,
-      mediaSrc: null,
-      chapter: null,
-      paragraph: null,
+      mediaSrc: undefined,
+      chapter: undefined,
+      paragraph: undefined,
       isTalking: false,
 
       openModal: ({
@@ -53,8 +53,8 @@ export const useCharacterModal = create<CharacterModalState>()(
             slug: characterSlug,
             isVideo,
             mediaSrc,
-            chapter: chapter ?? null,
-            paragraph: paragraph ?? null,
+            chapter,
+            paragraph,
             isTalking,
           });
         }
@@ -65,11 +65,11 @@ export const useCharacterModal = create<CharacterModalState>()(
         coordinator.releaseModal(MODAL_ID);
         set({
           isOpen: false,
-          slug: null,
+          slug: undefined,
           isVideo: false,
-          mediaSrc: null,
-          chapter: null,
-          paragraph: null,
+          mediaSrc: undefined,
+          chapter: undefined,
+          paragraph: undefined,
           isTalking: false,
         });
       },

@@ -14,10 +14,10 @@ export interface Location {
   currentChapter: number;
   currentParagraph: number;
   lastScrollTimestamp?: number;
-  earliestVisibleParagraph: number | null;
-  latestVisibleParagraph: number | null;
-  earliestVisibleChapter: number | null;
-  latestVisibleChapter: number | null;
+  earliestVisibleParagraph: number;
+  latestVisibleParagraph: number;
+  earliestVisibleChapter: number;
+  latestVisibleChapter: number;
 }
 
 export interface LocationWithMetadata {
@@ -34,10 +34,10 @@ export const DEFAULT_LOCATION: Location = {
   endParagraph: 1,
   currentChapter: 1,
   currentParagraph: 1,
-  earliestVisibleParagraph: null,
-  latestVisibleParagraph: null,
-  earliestVisibleChapter: null,
-  latestVisibleChapter: null,
+  earliestVisibleParagraph: 1,
+  latestVisibleParagraph: 1,
+  earliestVisibleChapter: 1,
+  latestVisibleChapter: 1,
 };
 
 /* ------------------------------------------------------------------ */

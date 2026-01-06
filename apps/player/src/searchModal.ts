@@ -155,7 +155,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
   const { textCache, isInitialized } = useBookContentStore.getState();
   const bookIsPlay =
     getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
-  let bookCharacters = [];
+  let bookCharacters: string[] = [];
   if (bookIsPlay) {
     bookCharacters = getCharactersData().map((character) => character.characterName.toLowerCase());
   }
@@ -706,8 +706,8 @@ export function findCharacterSentences(
   return { header, items, isLoading: false, isCharacterResults: true };
 }
 
-function stripHtmlTags(str) {
-  if (!str || typeof str !== "string") {
+function stripHtmlTags(str: string) {
+  if (!str) {
     return "";
   }
 
@@ -729,7 +729,7 @@ function extractSpeechContentFromLine(line: string): string {
   return line.slice(colonIndex + 1);
 }
 
-function filterParagraphByCharacter(paragraph, characterSlug) {
+function filterParagraphByCharacter(paragraph: string, characterSlug: string): string {
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = paragraph;
 
@@ -768,7 +768,7 @@ function filterParagraphByCharacter(paragraph, characterSlug) {
   return result;
 }
 
-function extractTextAroundMark(paragraph) {
+function extractTextAroundMark(paragraph: string): string | null {
   const markCloseTag = "</mark>";
   if (!paragraph.includes(markCloseTag)) {
     return null;
@@ -968,7 +968,7 @@ function buildSpotlightItems(
   return results.slice(0, limit);
 }
 
-function formatWithHangingIndent(text) {
+function formatWithHangingIndent(text: string) {
   const lines = text.split("\n").filter((line) => line.trim() !== "");
 
   if (lines.length === 0) return "";
