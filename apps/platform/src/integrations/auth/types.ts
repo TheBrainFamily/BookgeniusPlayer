@@ -5,7 +5,7 @@ export type AuthCtx = {
   isSignedIn: boolean;
   openSignIn: () => void;
   signOut?: () => void;
-  refreshToken?: () => Promise<string>;
+  refreshToken?: () => Promise<string | null | undefined>;
   getToken?: (options?: { skipCache?: boolean }) => Promise<string | null | undefined>;
   userId?: string;
   email?: string | null;

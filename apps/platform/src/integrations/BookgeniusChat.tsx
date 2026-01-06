@@ -9,7 +9,7 @@ function BookgeniusChatSafe() {
     if (!auth.ready) return;
 
     if (auth.isSignedIn) {
-      Intercom({ app_id: "zo3n2i5p", user_id: auth.userId, email: auth.email });
+      Intercom({ app_id: "zo3n2i5p", user_id: auth.userId, email: auth.email ?? undefined });
     } else {
       Intercom({ app_id: "zo3n2i5p" });
     }

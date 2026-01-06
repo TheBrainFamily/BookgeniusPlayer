@@ -85,8 +85,8 @@ const WrappedPlayerApp = () => {
       setBookTitle(event.detail.bookTitle);
     };
 
-    window.addEventListener("ShowPaywall", handleShowPaywall);
-    return () => window.removeEventListener("ShowPaywall", handleShowPaywall);
+    window.addEventListener("ShowPaywall", handleShowPaywall as EventListener);
+    return () => window.removeEventListener("ShowPaywall", handleShowPaywall as EventListener);
   }, []);
 
   // Listen for auth modal trigger from player

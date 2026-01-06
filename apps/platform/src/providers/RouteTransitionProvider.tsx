@@ -13,7 +13,7 @@ import { BookLoader } from "@platform/components/BookLoader";
 type LoaderMeta = {
   title: string;
   phrases: string[];
-  author?: string;
+  author: string;
   showStartButton?: boolean;
   onStartClick?: () => void;
 };

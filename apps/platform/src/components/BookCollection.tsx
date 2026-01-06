@@ -27,8 +27,8 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
       (book) =>
         book.title.toLowerCase().includes(query) ||
         book.author.toLowerCase().includes(query) ||
-        book.metadata[language].genre.toLowerCase().includes(query) ||
-        book.metadata[language].description.toLowerCase().includes(query),
+        book.metadata[language]?.genre.toLowerCase().includes(query) ||
+        book.metadata[language]?.description.toLowerCase().includes(query),
     );
   }, [searchQuery, language]);
 
@@ -38,7 +38,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
 
   const handleBookClick = (book: (typeof books)[0]) => {
     const title = book?.title ?? "BookGenius";
-    const phrases = book?.metadata[language].phrases;
+    const phrases = book?.metadata[language]?.phrases ?? [];
     const author = book?.author;
 
     // Indicate user came from platform for proper loader behavior
