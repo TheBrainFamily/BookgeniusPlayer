@@ -1,8 +1,22 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useLocation } from "react-router-dom";
 import { BookLoader } from "@platform/components/BookLoader";
 
-type LoaderMeta = { title: string; phrases: string[]; author?: string; showStartButton?: boolean; onStartClick?: () => void };
+type LoaderMeta = {
+  title: string;
+  phrases: string[];
+  author?: string;
+  showStartButton?: boolean;
+  onStartClick?: () => void;
+};
 
 type Ctx = {
   // starts the overlay with BookLoader, returns a cleanup you generally
@@ -47,7 +61,13 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   const location = useLocation(); // used to reset if user navigates away quickly
 
   const startTransition = useCallback((m: LoaderMeta) => {
-    setMeta({ title: m.title, phrases: m.phrases, author: m.author ?? "", showStartButton: m.showStartButton, onStartClick: m.onStartClick });
+    setMeta({
+      title: m.title,
+      phrases: m.phrases,
+      author: m.author ?? "",
+      showStartButton: m.showStartButton,
+      onStartClick: m.onStartClick,
+    });
     startTimeRef.current = performance.now();
     setShouldRenderOverlay(true);
     setNavigating(true);
@@ -91,8 +111,24 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   }, [location]);
 
   const value = useMemo(
-    () => ({ startTransition, finishTransition, cancelTransition, updateTransitionMeta, navigating, navigatedFromPlatform, setNavigatedFromPlatform }),
-    [finishTransition, navigating, startTransition, cancelTransition, updateTransitionMeta, navigatedFromPlatform, setNavigatedFromPlatform],
+    () => ({
+      startTransition,
+      finishTransition,
+      cancelTransition,
+      updateTransitionMeta,
+      navigating,
+      navigatedFromPlatform,
+      setNavigatedFromPlatform,
+    }),
+    [
+      finishTransition,
+      navigating,
+      startTransition,
+      cancelTransition,
+      updateTransitionMeta,
+      navigatedFromPlatform,
+      setNavigatedFromPlatform,
+    ],
   );
 
   return (
@@ -100,7 +136,10 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
       {children}
 
       {shouldRenderOverlay && (
-        <div className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`} aria-hidden={!navigating}>
+        <div
+          className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`}
+          aria-hidden={!navigating}
+        >
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d]" />
 
           <div className="relative z-10 flex h-full items-center justify-center">

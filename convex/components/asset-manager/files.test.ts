@@ -10,13 +10,10 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     const t = convexTest(schema, modules);
 
     // Insert fake file metadata into _storage for testing
-    const storageId = await t.action(
-      internal._testInsertFakeFile._testStoreFakeFile,
-      {
-        size: 1234,
-        contentType: "audio/mpeg",
-      },
-    );
+    const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+      size: 1234,
+      contentType: "audio/mpeg",
+    });
 
     const { assetId, versionId, version } = await t.mutation(
       api.assetManager.createVersionFromStorageId,
@@ -85,10 +82,10 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
   it("createVersionFromStorageId with publish=false creates a draft version only", async () => {
     const t = convexTest(schema, modules);
 
-    const storageId = await t.action(
-      internal._testInsertFakeFile._testStoreFakeFile,
-      { size: 42, contentType: "text/plain" },
-    );
+    const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+      size: 42,
+      contentType: "text/plain",
+    });
 
     const res = await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "drafts",
@@ -173,9 +170,7 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     });
 
     expect(versions.map((v) => v.version).sort()).toEqual([1, 2]);
-    const byVersion = Object.fromEntries(
-      versions.map((vv) => [vv.version, vv]),
-    );
+    const byVersion = Object.fromEntries(versions.map((vv) => [vv.version, vv]));
 
     const vv1 = byVersion[1];
     const vv2 = byVersion[2];
@@ -262,9 +257,7 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     const t = convexTest(schema, modules);
 
     // Create initial draft
-    const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 100,
-    });
+    const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 100 });
 
     await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "test",
@@ -274,9 +267,7 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     });
 
     // Update draft (reuse)
-    const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 200,
-    });
+    const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 200 });
 
     await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "test",
@@ -286,9 +277,7 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     });
 
     // Now publish - should create a NEW version (v2)
-    const s3 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 300,
-    });
+    const s3 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 300 });
 
     const published = await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "test",
@@ -319,15 +308,9 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
   it("listPublishedFilesInFolder returns only published assets for that folder", async () => {
     const t = convexTest(schema, modules);
 
-    const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 1,
-    });
-    const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 2,
-    });
-    const s3 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 3,
-    });
+    const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 1 });
+    const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 2 });
+    const s3 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 3 });
 
     // root published
     await t.mutation(api.assetManager.createVersionFromStorageId, {
@@ -351,14 +334,12 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
       publish: false,
     });
 
-    const rootFiles = await t.query(
-      api.assetManager.listPublishedFilesInFolder,
-      { folderPath: "" },
-    );
-    const backlogFiles = await t.query(
-      api.assetManager.listPublishedFilesInFolder,
-      { folderPath: "kanban/backlog" },
-    );
+    const rootFiles = await t.query(api.assetManager.listPublishedFilesInFolder, {
+      folderPath: "",
+    });
+    const backlogFiles = await t.query(api.assetManager.listPublishedFilesInFolder, {
+      folderPath: "kanban/backlog",
+    });
 
     const rootNames = rootFiles.map((f) => f.basename).sort();
     const backlogNames = backlogFiles.map((f) => f.basename).sort();

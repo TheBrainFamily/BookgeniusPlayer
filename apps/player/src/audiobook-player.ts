@@ -79,7 +79,8 @@ export async function loadTrack(trackId: string): Promise<boolean> {
   try {
     const res = await fetch(url);
     const isLocal = url.startsWith("/");
-    if (!(res.ok || (isLocal && res.status === 0))) throw new Error(`Fetch failed: HTTP ${res.status}`);
+    if (!(res.ok || (isLocal && res.status === 0)))
+      throw new Error(`Fetch failed: HTTP ${res.status}`);
 
     buf = await res.arrayBuffer();
     if (!buf.byteLength) throw new Error("Empty file");
@@ -92,7 +93,16 @@ export async function loadTrack(trackId: string): Promise<boolean> {
   try {
     const audioBuffer = await audioContext!.decodeAudioData(buf);
     console.log(`✅ decoded – ${audioBuffer.duration.toFixed(2)} s`);
-    tracks.push({ id: trackId, audioBuffer, duration: audioBuffer.duration, sourceNode: null, gainNode: null, playbackIntervalId: null, events: null, startTimeInContext: 0 });
+    tracks.push({
+      id: trackId,
+      audioBuffer,
+      duration: audioBuffer.duration,
+      sourceNode: null,
+      gainNode: null,
+      playbackIntervalId: null,
+      events: null,
+      startTimeInContext: 0,
+    });
     return true;
   } catch (e) {
     console.error("❌ decodeAudioData error:", e);
@@ -100,9 +110,16 @@ export async function loadTrack(trackId: string): Promise<boolean> {
   }
 }
 
-export function playTrack(trackId: string, startTime: number = 0, offset: number = 0, events?: AudiobookTrackEvent[]): boolean {
+export function playTrack(
+  trackId: string,
+  startTime: number = 0,
+  offset: number = 0,
+  events?: AudiobookTrackEvent[],
+): boolean {
   if (!audioContext || audioContext.state !== "running") {
-    console.error(`Cannot play track '${trackId}', AudioContext not ready/running. State: ${audioContext?.state}`);
+    console.error(
+      `Cannot play track '${trackId}', AudioContext not ready/running. State: ${audioContext?.state}`,
+    );
     initAudioContext(); // Attempt to re-init/resume
     // It's possible initAudioContext() doesn't make it ready immediately.
     // Consider returning false or re-checking state after a short delay if critical.
@@ -132,7 +149,9 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
   gainNode.connect(audiobookGainNode || audioContext.destination);
 
   const calculatedOffset = offset % state.audioBuffer.duration;
-  console.log(`offset: ${offset}, audioBufferDuration: ${state.audioBuffer.duration}, calculated offset: ${calculatedOffset}`);
+  console.log(
+    `offset: ${offset}, audioBufferDuration: ${state.audioBuffer.duration}, calculated offset: ${calculatedOffset}`,
+  );
 
   // Store events and reset triggered status
   if (events) {
@@ -146,14 +165,17 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
   }
 
   try {
-    const actualStartTimeInContext = audioContext.currentTime + (startTime > 0 ? startTime - audioContext.currentTime : 0);
+    const actualStartTimeInContext =
+      audioContext.currentTime + (startTime > 0 ? startTime - audioContext.currentTime : 0);
     source.start(actualStartTimeInContext, calculatedOffset);
 
     state.sourceNode = source;
     state.gainNode = gainNode;
     state.startTimeInContext = actualStartTimeInContext; // Store the context time when playback is scheduled to start
 
-    console.log(`Scheduled '${trackId}' @ ${actualStartTimeInContext.toFixed(2)}s (offset ${calculatedOffset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`);
+    console.log(
+      `Scheduled '${trackId}' @ ${actualStartTimeInContext.toFixed(2)}s (offset ${calculatedOffset.toFixed(2)}s). Duration: ${state.audioBuffer.duration.toFixed(2)}s`,
+    );
 
     if (state.events && state.events.length > 0) {
       if (state.playbackIntervalId) {
@@ -179,7 +201,10 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
             try {
               event.callback();
             } catch (e) {
-              console.error(`Error executing event callback for ${trackId} at ${event.timestamp}s:`, e);
+              console.error(
+                `Error executing event callback for ${trackId} at ${event.timestamp}s:`,
+                e,
+              );
             }
             event.triggered = true;
           }
@@ -200,7 +225,10 @@ export function playTrack(trackId: string, startTime: number = 0, offset: number
         try {
           state.events[state.events.length - 1].callback();
         } catch (e) {
-          console.error(`Error executing event callback for ${trackId} at ${state.audioBuffer.duration}s:`, e);
+          console.error(
+            `Error executing event callback for ${trackId} at ${state.audioBuffer.duration}s:`,
+            e,
+          );
         }
       }
       console.log(`Track '${trackId}' ended naturally.`);

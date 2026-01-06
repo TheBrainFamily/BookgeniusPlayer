@@ -10,5 +10,10 @@ export const FootnoteModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <FootnoteModal html={html} onClose={closeModal} />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && <FootnoteModal html={html} onClose={closeModal} />}
+    </AnimatePresence>,
+    document.body,
+  );
 };

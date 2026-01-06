@@ -62,7 +62,9 @@ export function ChaptersView({ onChapterSelect }: ChaptersViewProps) {
           </div>
           <div className="text-center">
             <h3 className="font-medium text-foreground">No chapters yet</h3>
-            <p className="text-sm text-muted-foreground mt-1">Create your first chapter to get started</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Create your first chapter to get started
+            </p>
           </div>
           <Button onClick={handleCreateClick}>
             <Plus className="h-4 w-4 mr-2" />
@@ -70,7 +72,12 @@ export function ChaptersView({ onChapterSelect }: ChaptersViewProps) {
           </Button>
         </div>
 
-        <CreateChapterDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} bookPath={bookPath} onCreated={handleChapterCreated} />
+        <CreateChapterDialog
+          open={createDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+          bookPath={bookPath}
+          onCreated={handleChapterCreated}
+        />
       </>
     );
   }
@@ -104,7 +111,12 @@ export function ChaptersView({ onChapterSelect }: ChaptersViewProps) {
             return (
               <button
                 key={chapter.path}
-                onClick={() => onChapterSelect({ folderPath: `${bookPath}/chapters`, basename: chapter.basename })}
+                onClick={() =>
+                  onChapterSelect({
+                    folderPath: `${bookPath}/chapters`,
+                    basename: chapter.basename,
+                  })
+                }
                 className={cn(
                   "w-full text-left p-4 rounded-lg border transition-all",
                   "hover:border-primary/50 hover:bg-accent/50",
@@ -131,7 +143,9 @@ export function ChaptersView({ onChapterSelect }: ChaptersViewProps) {
                         </Badge>
                       )}
                     </div>
-                    {chapter.title && <p className="text-sm text-muted-foreground truncate">{chapter.title}</p>}
+                    {chapter.title && (
+                      <p className="text-sm text-muted-foreground truncate">{chapter.title}</p>
+                    )}
                     <p className="text-xs text-muted-foreground mt-1">{chapter.basename}</p>
                   </div>
                 </div>
@@ -142,7 +156,12 @@ export function ChaptersView({ onChapterSelect }: ChaptersViewProps) {
       </ScrollArea>
 
       {/* Create Chapter Dialog */}
-      <CreateChapterDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} bookPath={bookPath} onCreated={handleChapterCreated} />
+      <CreateChapterDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        bookPath={bookPath}
+        onCreated={handleChapterCreated}
+      />
     </div>
   );
 }

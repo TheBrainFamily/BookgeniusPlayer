@@ -22,13 +22,19 @@ export async function deepResearchCall(searchQuery: string, location: Location):
 The user is looking at the following text:
 <VisibleText>${surroundingText}</VisibleText>`;
 
-  const params = new URLSearchParams({ question: compiledSearchQuery, filter: JSON.stringify(filter) });
+  const params = new URLSearchParams({
+    question: compiledSearchQuery,
+    filter: JSON.stringify(filter),
+  });
 
   const url = `${ANSWERS_SERVER_URL}/deepResearch?${params.toString()}`;
   const isDev = import.meta.env.MODE === "development";
   console.log(`Fetching deep research from: ${url}`); // Optional: for debugging
   try {
-    const response = await fetch(url, { method: "GET", headers: { ...(isDev && { "X-Dev-Token": import.meta.env.VITE_DEV_TOKEN }) } });
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { ...(isDev && { "X-Dev-Token": import.meta.env.VITE_DEV_TOKEN }) },
+    });
     if (!response.ok) {
       // Throw an error with status text for better debugging
       throw new Error(`HTTP error ${response.status}: ${response.statusText}`);

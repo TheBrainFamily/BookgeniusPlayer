@@ -6,11 +6,15 @@ import { motion, AnimatePresence } from "motion/react";
 
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useBackgroundEditModal } from "@player/stores/modals/backgroundEditModal.store";
-import { useBackgroundGenerationStore, createBackgroundKey } from "@player/stores/backgroundGeneration.store";
+import {
+  useBackgroundGenerationStore,
+  createBackgroundKey,
+} from "@player/stores/backgroundGeneration.store";
 
 const BackgroundEditModal: React.FC = () => {
   const { book } = useBookConvex();
-  const { isOpen, cueId, fileBasename, chapter, paragraph, currentBackgroundUrl, closeModal } = useBackgroundEditModal();
+  const { isOpen, cueId, fileBasename, chapter, paragraph, currentBackgroundUrl, closeModal } =
+    useBackgroundEditModal();
   const { startGeneration } = useBackgroundGenerationStore();
 
   const startBackgroundEdit = useAction(api.backgroundEditing.startBackgroundEdit);
@@ -22,7 +26,10 @@ const BackgroundEditModal: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!book?.path || !instructions.trim()) {
-      console.error("[BackgroundEditModal] Cannot submit: missing book path or instructions", { bookPath: book?.path, instructions });
+      console.error("[BackgroundEditModal] Cannot submit: missing book path or instructions", {
+        bookPath: book?.path,
+        instructions,
+      });
       return;
     }
 
@@ -33,7 +40,12 @@ const BackgroundEditModal: React.FC = () => {
     closeModal();
 
     try {
-      await startBackgroundEdit({ bookPath: book.path, cueId: cueId as Id<"backgroundCues">, fileBasename, instructions: instructions.trim() });
+      await startBackgroundEdit({
+        bookPath: book.path,
+        cueId: cueId as Id<"backgroundCues">,
+        fileBasename,
+        instructions: instructions.trim(),
+      });
     } catch (err) {
       console.error("[BackgroundEditModal] Failed to start background edit:", err);
     }
@@ -55,23 +67,40 @@ const BackgroundEditModal: React.FC = () => {
                 Chapter {chapter}, Paragraph {paragraph}
               </p>
             </div>
-            <button onClick={closeModal} disabled={isSubmitting} className="text-zinc-400 hover:text-white transition-colors p-2">
+            <button
+              onClick={closeModal}
+              disabled={isSubmitting}
+              className="text-zinc-400 hover:text-white transition-colors p-2"
+            >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           <div className="flex-1 min-h-0 mb-6 rounded-xl overflow-hidden border border-zinc-700">
             {currentBackgroundUrl ? (
-              <img src={currentBackgroundUrl} alt={fileBasename} className="w-full h-full object-contain bg-black" />
+              <img
+                src={currentBackgroundUrl}
+                alt={fileBasename}
+                className="w-full h-full object-contain bg-black"
+              />
             ) : (
-              <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-400">No preview available</div>
+              <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-400">
+                No preview available
+              </div>
             )}
           </div>
 
           <div>
-            <label className="text-xs text-zinc-400 mb-2 block">Describe how you want to modify this background:</label>
+            <label className="text-xs text-zinc-400 mb-2 block">
+              Describe how you want to modify this background:
+            </label>
             <div className="flex gap-6 items-center">
               <textarea
                 value={instructions}

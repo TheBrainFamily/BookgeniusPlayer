@@ -5,7 +5,12 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@player/lib/utils";
 import { useRealtime } from "@player/context/RealtimeContext";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@player/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@player/components/ui/tooltip";
 import { useLocation } from "@player/state/LocationContext";
 import { deepResearchCall } from "@player/deepResearchCall";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
@@ -22,9 +27,17 @@ import { MicrophoneVisualizer } from "./MicrophoneVisualizer";
 import DebugMicPlaybackButton from "./DebugMicPlaybackButton";
 import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 
-const hasReaderMetCharacter = (character: CharacterData, chapter: number, paragraph: number): boolean => {
+const hasReaderMetCharacter = (
+  character: CharacterData,
+  chapter: number,
+  paragraph: number,
+): boolean => {
   return character.infoPerChapter.some((infoPerChapter) => {
-    const encounteredParagraphs = [...infoPerChapter.paragraphsWhereSpotted, ...infoPerChapter.paragraphsWhereTalking, ...(infoPerChapter.paragraphsWhereEnters ?? [])];
+    const encounteredParagraphs = [
+      ...infoPerChapter.paragraphsWhereSpotted,
+      ...infoPerChapter.paragraphsWhereTalking,
+      ...(infoPerChapter.paragraphsWhereEnters ?? []),
+    ];
 
     if (infoPerChapter.chapter < chapter) {
       return encounteredParagraphs.length > 0;
@@ -44,7 +57,6 @@ interface BottomInputProps {
 
 const setMicActiveFromGesture = (active: boolean) => {
   try {
-    // @ts-expect-error experimental web API on iOS
     navigator.mediaSession?.setMicrophoneActive?.(active);
   } catch (err) {
     console.debug("[ptt] setMicrophoneActive (gesture) suppressed:", (err as Error)?.name);
@@ -79,8 +91,15 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const micButtonRef = useRef<HTMLButtonElement>(null);
   const shouldSelectAllRef = useRef(false);
 
-  const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } = useElementVisibilityStore();
-  const { openModal: openSearchModal, closeModal: closeSearchModal, isOpen: isSearchModalOpen, setQuery: setSearchQuery, clearModal } = useSearchModal();
+  const { pauseAllTimers, startAllTimers, showAllElements, setIsTimersPausedSticky } =
+    useElementVisibilityStore();
+  const {
+    openModal: openSearchModal,
+    closeModal: closeSearchModal,
+    isOpen: isSearchModalOpen,
+    setQuery: setSearchQuery,
+    clearModal,
+  } = useSearchModal();
   const {
     openModal: openDeepResearchModal,
     setContent: setDeepResearchContent,
@@ -97,7 +116,16 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { closeModal: closeCharacterModal, isOpen: isCharacterModalOpen } = useCharacterModal();
   // No local API key gating for voice; token fetched server-side
 
-  const { startRecording, stopRecording, setAskHandler, isRecording, isSessionReady, audioAnalyser, primeMicrophone, audioResponses } = useRealtime();
+  const {
+    startRecording,
+    stopRecording,
+    setAskHandler,
+    isRecording,
+    isSessionReady,
+    audioAnalyser,
+    primeMicrophone,
+    audioResponses,
+  } = useRealtime();
   const { location } = useLocation();
   const saved = getSavedLocation();
   const furthestLocation = saved ?? location;
@@ -119,12 +147,18 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const availableCharacterNames = useMemo(() => {
     if (!allCharacters.length) return [];
     return allCharacters
-      .filter((character) => hasReaderMetCharacter(character, furthestLocation.chapter, furthestLocation.paragraph))
+      .filter((character) =>
+        hasReaderMetCharacter(character, furthestLocation.chapter, furthestLocation.paragraph),
+      )
       .map((character) => character.characterName)
       .filter(Boolean);
   }, [allCharacters, furthestLocation.chapter, furthestLocation.paragraph]);
 
-  const [mentionState, setMentionState] = useState<{ isActive: boolean; query: string; startIndex: number }>({ isActive: false, query: "", startIndex: -1 });
+  const [mentionState, setMentionState] = useState<{
+    isActive: boolean;
+    query: string;
+    startIndex: number;
+  }>({ isActive: false, query: "", startIndex: -1 });
   const [highlightedMention, setHighlightedMention] = useState(0);
   const mentionListRef = useRef<HTMLUListElement | null>(null);
 
@@ -149,7 +183,16 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         }
       });
     },
-    [isDeepResearchActive, isRecording, setSearchQuery, openSearchModal, clearModal, isDeepResearchModalOpen, closeDeepResearchModal, clearDeepResearchModal],
+    [
+      isDeepResearchActive,
+      isRecording,
+      setSearchQuery,
+      openSearchModal,
+      clearModal,
+      isDeepResearchModalOpen,
+      closeDeepResearchModal,
+      clearDeepResearchModal,
+    ],
   );
 
   const filteredCharacters = useMemo(() => {
@@ -177,7 +220,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
 
     if (!isSearchModalOpen && (deepResearchContent || value.trim().length >= 2)) {
       if (deepResearchContent) {
-        openDeepResearchModal(deepResearchContent, true, true, isDeepResearchActive ? "deep" : "ask");
+        openDeepResearchModal(
+          deepResearchContent,
+          true,
+          true,
+          isDeepResearchActive ? "deep" : "ask",
+        );
       } else {
         openSearchModal(true, true, value.trim());
       }
@@ -255,7 +303,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     if (shouldSelectAllRef.current) return;
 
     openModalWithFocus();
-  }, [handleActivity, isDeepResearchActive, openModalWithFocus, deepResearchContent, shouldSelectAllRef]);
+  }, [
+    handleActivity,
+    isDeepResearchActive,
+    openModalWithFocus,
+    deepResearchContent,
+    shouldSelectAllRef,
+  ]);
 
   const executeDeepResearch = useCallback(
     (query: string) => {
@@ -322,7 +376,15 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     } finally {
       setDiveDeeperLoading(false);
     }
-  }, [location, setDeepResearchContent, setDiveDeeperHandler, setDiveDeeperLoading, setShowDiveDeeperCTA, t, setDeepResearchType]);
+  }, [
+    location,
+    setDeepResearchContent,
+    setDiveDeeperHandler,
+    setDiveDeeperLoading,
+    setShowDiveDeeperCTA,
+    t,
+    setDeepResearchType,
+  ]);
 
   const prepareAskUI = useCallback(
     (options: { skipModal: boolean }, query?: string) => {
@@ -343,7 +405,16 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       setDiveDeeperLoading(false);
       setDiveDeeperHandler(undefined);
     },
-    [openDeepResearchModal, setDeepResearchContent, setDeepResearchLoading, setShowDiveDeeperCTA, setDiveDeeperLoading, setDiveDeeperHandler, setDeepResearchType, setIsThinking],
+    [
+      openDeepResearchModal,
+      setDeepResearchContent,
+      setDeepResearchLoading,
+      setShowDiveDeeperCTA,
+      setDiveDeeperLoading,
+      setDiveDeeperHandler,
+      setDeepResearchType,
+      setIsThinking,
+    ],
   );
 
   const handleAsk = useCallback(
@@ -445,7 +516,15 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         executeDeepResearch(trimmed);
       }
     },
-    [handleActivity, value, isSearchModalOpen, isDeepResearchActive, executeDeepResearch, handleAsk, closeSearchModal],
+    [
+      handleActivity,
+      value,
+      isSearchModalOpen,
+      isDeepResearchActive,
+      executeDeepResearch,
+      handleAsk,
+      closeSearchModal,
+    ],
   );
 
   // Register handleAsk so Realtime tool can trigger the same flow
@@ -481,7 +560,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         const status = await navigator.permissions.query({ name: "microphone" as PermissionName });
         permissionState = status.state;
         if (status.state === "denied") {
-          showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
+          showMicToast(
+            t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."),
+            2600,
+          );
           return;
         }
       } catch {
@@ -498,22 +580,34 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       primeResult = await primeMicrophone();
     } catch (error) {
       console.warn("[ptt] primeMicrophone threw", error);
-      showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
+      showMicToast(
+        t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."),
+        2600,
+      );
       return;
     }
 
     const elapsed = performance.now() - tPrime0;
     if (primeResult === "failed") {
-      showMicToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."), 2600);
+      showMicToast(
+        t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."),
+        2600,
+      );
       return;
     }
 
     if (primeResult === "just_primed") {
-      const promptLikely = permissionState === "prompt" || permissionState === "denied" || (permissionState === "unknown" && isSafari && elapsed > 300);
+      const promptLikely =
+        permissionState === "prompt" ||
+        permissionState === "denied" ||
+        (permissionState === "unknown" && isSafari && elapsed > 300);
       if (promptLikely) {
         if (micToastDelayRef.current) clearTimeout(micToastDelayRef.current);
         micToastDelayRef.current = setTimeout(() => {
-          showMicToast(t("mic_ready_try_again", "Mic permissions ready. Press and hold again!"), 2200);
+          showMicToast(
+            t("mic_ready_try_again", "Mic permissions ready. Press and hold again!"),
+            2200,
+          );
           micToastDelayRef.current = null;
         }, 700);
         return;
@@ -529,7 +623,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     console.log("[ptt] calling startRecording() (will prime+connect in parallel)…");
     try {
       const mode = await startRecording();
-      console.log("[ptt] startRecording finished in", (performance.now() - t0).toFixed(1), "ms", "mode:", mode);
+      console.log(
+        "[ptt] startRecording finished in",
+        (performance.now() - t0).toFixed(1),
+        "ms",
+        "mode:",
+        mode,
+      );
       // Only show connecting UI if we are streaming immediately
       if (mode === "streaming_now") {
         setIsRealtimeConnecting(true);
@@ -540,13 +640,27 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       console.error("[ptt] Error starting recording:", error);
       setIsRealtimeConnecting(false);
     }
-  }, [handleActivity, isRecording, isRealtimeConnecting, isSearchModalOpen, setSearchQuery, startRecording, setValue, primeMicrophone, showMicToast, t]);
+  }, [
+    handleActivity,
+    isRecording,
+    isRealtimeConnecting,
+    isSearchModalOpen,
+    setSearchQuery,
+    startRecording,
+    setValue,
+    primeMicrophone,
+    showMicToast,
+    t,
+  ]);
 
   // Clear connecting state when both session and microphone are ready
   useEffect(() => {
     if (isSessionReady && isMicrophoneReady && isRealtimeConnecting) {
       setIsRealtimeConnecting(false);
-      console.log("[ptt] session+mic ready; clearing connecting state at", performance.now().toFixed(1));
+      console.log(
+        "[ptt] session+mic ready; clearing connecting state at",
+        performance.now().toFixed(1),
+      );
     }
   }, [isSessionReady, isMicrophoneReady, isRealtimeConnecting]);
 
@@ -570,7 +684,8 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   }, [isRealtimeConnecting, isRecording, isThinking, isDeepResearchActive, t]);
 
   const trimmedValue = value.trim();
-  const shouldShowSendButton = !isRecording && trimmedValue.length > 0 && trimmedValue !== lastSubmittedValueRef.current;
+  const shouldShowSendButton =
+    !isRecording && trimmedValue.length > 0 && trimmedValue !== lastSubmittedValueRef.current;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -635,7 +750,15 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         });
       }
     },
-    [closeMentions, mentionState.isActive, mentionState.query, mentionState.startIndex, setValue, updateSearchQueryForInput, value],
+    [
+      closeMentions,
+      mentionState.isActive,
+      mentionState.query,
+      mentionState.startIndex,
+      setValue,
+      updateSearchQueryForInput,
+      value,
+    ],
   );
 
   useEffect(() => {
@@ -657,7 +780,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         setHighlightedMention((prev) => (prev + 1) % filteredCharacters.length);
       } else if (event.key === "ArrowUp") {
         event.preventDefault();
-        setHighlightedMention((prev) => (prev - 1 + filteredCharacters.length) % filteredCharacters.length);
+        setHighlightedMention(
+          (prev) => (prev - 1 + filteredCharacters.length) % filteredCharacters.length,
+        );
       } else if (event.key === "Enter" || event.key === "Tab") {
         event.preventDefault();
         const selected = filteredCharacters[highlightedMention];
@@ -673,15 +798,28 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   return (
     <>
       {showMicDebug && <DebugMicPlaybackButton />}
-      <MicrophoneVisualizer isActive={isRecording || isRealtimeConnecting} audioAnalyser={audioAnalyser} onMicReady={setIsMicrophoneReady} />
-      <OptionalElement className={cn("w-full flex justify-center", className)} id="bottom-input-container">
+      <MicrophoneVisualizer
+        isActive={isRecording || isRealtimeConnecting}
+        audioAnalyser={audioAnalyser}
+        onMicReady={setIsMicrophoneReady}
+      />
+      <OptionalElement
+        className={cn("w-full flex justify-center", className)}
+        id="bottom-input-container"
+      >
         <motion.div
           className={cn(
             "relative bg-black/70 textured-bg border shadow-xl text-white border-white/30 w-full rounded-3xl px-2 py-[2px] md:py-[3px] md:px-3",
             isRecording && "recording-active",
             isRealtimeConnecting && "border-amber-300/70 shadow-[0_0_12px_rgba(250,204,21,0.25)]",
           )}
-          animate={isRecording ? "recordingContainer" : isRealtimeConnecting ? "connectingContainer" : "idle"}
+          animate={
+            isRecording
+              ? "recordingContainer"
+              : isRealtimeConnecting
+                ? "connectingContainer"
+                : "idle"
+          }
           initial="idle"
           variants={variants.container}
           ref={containerRef}
@@ -699,8 +837,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
               </motion.div>
             )}
           </AnimatePresence>
-          <motion.div key="expanded" variants={variants.expandedContainer} initial="initial" animate="animate" exit="exit">
-            <form onSubmit={handleSubmit} className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]">
+          <motion.div
+            key="expanded"
+            variants={variants.expandedContainer}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            <form
+              onSubmit={handleSubmit}
+              className="flex items-center space-x-2 min-w-[280px] sm:min-w-[350px]"
+            >
               <div className="relative flex-grow flex items-center">
                 <AnimatePresence mode="wait">
                   {isRecording && (
@@ -746,7 +893,10 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                         filteredCharacters.map((characterName, index) => (
                           <li
                             key={characterName}
-                            className={cn("px-3 py-2 cursor-pointer text-sm", index === highlightedMention ? "bg-white/15" : "bg-transparent")}
+                            className={cn(
+                              "px-3 py-2 cursor-pointer text-sm",
+                              index === highlightedMention ? "bg-white/15" : "bg-transparent",
+                            )}
                             onMouseDown={(e) => {
                               e.preventDefault();
                               insertMention(characterName);
@@ -757,7 +907,12 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                           </li>
                         ))
                       ) : (
-                        <li className="px-3 py-2 text-sm text-white/70">{t("mentions_no_characters_yet", "No characters have been introduced yet.")}</li>
+                        <li className="px-3 py-2 text-sm text-white/70">
+                          {t(
+                            "mentions_no_characters_yet",
+                            "No characters have been introduced yet.",
+                          )}
+                        </li>
                       )}
                     </motion.ul>
                   )}
@@ -803,7 +958,9 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                         <Telescope size={18} />
                       </motion.button>
                     </TooltipTrigger>
-                    <TooltipContent>{isThinking ? t("thinking") : t("deep_research")}</TooltipContent>
+                    <TooltipContent>
+                      {isThinking ? t("thinking") : t("deep_research")}
+                    </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 
@@ -816,14 +973,21 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                           type="submit"
                           aria-label="Send message"
                           disabled={isThinking}
-                          className={cn("p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400", isThinking ? "cursor-default" : "cursor-pointer")}
+                          className={cn(
+                            "p-2 rounded-full flex items-center justify-center cursor-pointer text-blue-400",
+                            isThinking ? "cursor-default" : "cursor-pointer",
+                          )}
                           whileHover="hover"
                           whileTap="tap"
                           variants={variants.button}
                           initial="idle"
                           animate="idle"
                         >
-                          {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                          {isThinking ? (
+                            <Loader2 size={18} className="animate-spin" />
+                          ) : (
+                            <Send size={18} />
+                          )}
                         </motion.button>
                       </TooltipTrigger>
                       <TooltipContent>{t("send_message")}</TooltipContent>
@@ -839,9 +1003,17 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                           disabled={isThinking}
                           className={cn(
                             "p-2 rounded-full flex items-center justify-center",
-                            isRecording ? "text-red-400 cursor-pointer" : isRealtimeConnecting ? "text-amber-300 cursor-wait animate-pulse" : "text-white/70 cursor-pointer",
+                            isRecording
+                              ? "text-red-400 cursor-pointer"
+                              : isRealtimeConnecting
+                                ? "text-amber-300 cursor-wait animate-pulse"
+                                : "text-white/70 cursor-pointer",
                           )}
-                          style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                          style={{
+                            touchAction: "none",
+                            WebkitUserSelect: "none",
+                            userSelect: "none",
+                          }}
                           whileHover={!isRecording && !isRealtimeConnecting ? "hover" : undefined}
                           whileTap="tapMic"
                           variants={variants.button}
@@ -873,7 +1045,13 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
                           <Mic size={18} />
                         </motion.button>
                       </TooltipTrigger>
-                      <TooltipContent>{isRecording ? t("stop_recording") : isRealtimeConnecting ? t("realtime_connecting", "Connecting…") : t("start_recording")}</TooltipContent>
+                      <TooltipContent>
+                        {isRecording
+                          ? t("stop_recording")
+                          : isRealtimeConnecting
+                            ? t("realtime_connecting", "Connecting…")
+                            : t("start_recording")}
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
@@ -890,47 +1068,116 @@ export default BottomInput;
 
 const variants: Record<string, Variants> = {
   button: {
-    hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
-    tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
+    hover: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      boxShadow: "0px 0px 8px rgba(255,255,255,0.5)",
+      transition: { duration: 0.2 },
+    },
+    tap: {
+      scale: 0.9,
+      backgroundColor: "rgba(255,255,255,0.3)",
+      transition: { type: "spring", stiffness: 400, damping: 10 },
+    },
     tapMic: { scale: 1.2 },
-    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(0,0,0,0)", transition: { duration: 0.2 } },
+    idle: {
+      scale: 1,
+      backgroundColor: "rgba(0,0,0,0)",
+      boxShadow: "0px 0px 0px rgba(0,0,0,0)",
+      transition: { duration: 0.2 },
+    },
     recording: {
       scale: [1, 1.1, 1],
-      backgroundColor: ["rgba(239, 68, 68, 0.2)", "rgba(239, 68, 68, 0.4)", "rgba(239, 68, 68, 0.2)"],
-      boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.4)", "0px 0px 15px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.4)"],
+      backgroundColor: [
+        "rgba(239, 68, 68, 0.2)",
+        "rgba(239, 68, 68, 0.4)",
+        "rgba(239, 68, 68, 0.2)",
+      ],
+      boxShadow: [
+        "0px 0px 0px rgba(239, 68, 68, 0.4)",
+        "0px 0px 15px rgba(239, 68, 68, 0.6)",
+        "0px 0px 0px rgba(239, 68, 68, 0.4)",
+      ],
       transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
     },
   },
   deepResearchButton: {
-    hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)", transition: { duration: 0.2 } },
-    tap: { scale: 0.9, backgroundColor: "rgba(255,255,255,0.3)", transition: { type: "spring", stiffness: 400, damping: 10 } },
-    idle: { scale: 1, backgroundColor: "rgba(0,0,0,0)", boxShadow: "0px 0px 0px rgba(0,0,0,0)", transition: { duration: 0.2 } },
+    hover: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      boxShadow: "0px 0px 8px rgba(255,255,255,0.5)",
+      transition: { duration: 0.2 },
+    },
+    tap: {
+      scale: 0.9,
+      backgroundColor: "rgba(255,255,255,0.3)",
+      transition: { type: "spring", stiffness: 400, damping: 10 },
+    },
+    idle: {
+      scale: 1,
+      backgroundColor: "rgba(0,0,0,0)",
+      boxShadow: "0px 0px 0px rgba(0,0,0,0)",
+      transition: { duration: 0.2 },
+    },
   },
   container: {
-    idle: { boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)", borderColor: "rgba(255, 255, 255, 0.3)" },
+    idle: {
+      boxShadow: "0px 0px 0px rgba(239, 68, 68, 0)",
+      borderColor: "rgba(255, 255, 255, 0.3)",
+    },
     connectingContainer: {
-      boxShadow: ["0px 0px 0px rgba(250, 204, 21, 0.2)", "0px 0px 12px rgba(250, 204, 21, 0.4)", "0px 0px 0px rgba(250, 204, 21, 0.2)"],
-      borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(250, 204, 21, 0.65)", "rgba(255, 255, 255, 0.3)"],
+      boxShadow: [
+        "0px 0px 0px rgba(250, 204, 21, 0.2)",
+        "0px 0px 12px rgba(250, 204, 21, 0.4)",
+        "0px 0px 0px rgba(250, 204, 21, 0.2)",
+      ],
+      borderColor: [
+        "rgba(255, 255, 255, 0.3)",
+        "rgba(250, 204, 21, 0.65)",
+        "rgba(255, 255, 255, 0.3)",
+      ],
       transition: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
     },
     recordingContainer: {
-      boxShadow: ["0px 0px 0px rgba(239, 68, 68, 0.2)", "0px 0px 12px rgba(239, 68, 68, 0.6)", "0px 0px 0px rgba(239, 68, 68, 0.2)"],
-      borderColor: ["rgba(255, 255, 255, 0.3)", "rgba(239, 68, 68, 0.6)", "rgba(255, 255, 255, 0.3)"],
+      boxShadow: [
+        "0px 0px 0px rgba(239, 68, 68, 0.2)",
+        "0px 0px 12px rgba(239, 68, 68, 0.6)",
+        "0px 0px 0px rgba(239, 68, 68, 0.2)",
+      ],
+      borderColor: [
+        "rgba(255, 255, 255, 0.3)",
+        "rgba(239, 68, 68, 0.6)",
+        "rgba(255, 255, 255, 0.3)",
+      ],
       transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
     },
   },
-  expandedContainer: { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.2 } }, exit: { opacity: 0, transition: { duration: 0.2 } } },
+  expandedContainer: {
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } },
+  },
   recordingIndicator: {
     initial: { opacity: 0, scale: 0.5 },
-    animate: { opacity: [0.5, 1, 0.5], scale: [1, 1.05, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } },
+    animate: {
+      opacity: [0.5, 1, 0.5],
+      scale: [1, 1.05, 1],
+      transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
+    },
     exit: { opacity: 0, scale: 0, transition: { duration: 0.2 } },
   },
   connectingIndicator: {
     initial: { opacity: 0, scale: 0.6 },
-    animate: { opacity: [0.4, 0.9, 0.4], scale: [1, 1.1, 1], transition: { duration: 1.2, repeat: Infinity, ease: "easeInOut" } },
+    animate: {
+      opacity: [0.4, 0.9, 0.4],
+      scale: [1, 1.1, 1],
+      transition: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
+    },
     exit: { opacity: 0, scale: 0.6, transition: { duration: 0.2 } },
   },
-  connectingLabel: { initial: { opacity: 0, y: -4 }, animate: { opacity: 1, y: 0, transition: { duration: 0.2 } }, exit: { opacity: 0, y: -4, transition: { duration: 0.15 } } },
+  connectingLabel: {
+    initial: { opacity: 0, y: -4 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+    exit: { opacity: 0, y: -4, transition: { duration: 0.15 } },
+  },
   mentionList: {
     initial: { opacity: 0, y: 6, transition: { duration: 0.2 } },
     animate: { opacity: 1, y: 0, transition: { duration: 0.2 } },

@@ -1,11 +1,5 @@
 // convex/assetFsHttp.ts
-import {
-  action,
-  internalAction,
-  internalQuery,
-  query,
-  QueryCtx,
-} from "./_generated/server";
+import { action, internalAction, internalQuery, query, QueryCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
@@ -37,9 +31,7 @@ async function getR2PublicUrl(ctx: QueryCtx, r2Key: string): Promise<string | nu
  * and return the blob data to the HTTP action.
  */
 export const getBlobForServing = action({
-  args: {
-    storageId: v.id("_storage"),
-  },
+  args: { storageId: v.id("_storage") },
   returns: v.union(v.null(), v.bytes()),
   handler: async (ctx, { storageId }): Promise<ArrayBuffer | null> => {
     const blob = await ctx.storage.get(storageId);
@@ -56,9 +48,7 @@ const SMALL_FILE_LIMIT = 20 * 1024 * 1024; // 20MB
  * Returns the storage URL which can be used to preview draft/archived versions.
  */
 export const getVersionPreviewUrl = query({
-  args: {
-    versionId: v.id("assetVersions"),
-  },
+  args: { versionId: v.id("assetVersions") },
   returns: v.union(
     v.null(),
     v.object({
@@ -82,11 +72,7 @@ export const getVersionPreviewUrl = query({
     }
     if (!url) return null;
 
-    return {
-      url,
-      contentType: version.contentType,
-      size: version.size,
-    };
+    return { url, contentType: version.contentType, size: version.size };
   },
 });
 
@@ -103,9 +89,7 @@ export const getVersionPreviewUrl = query({
  * - R2 storage: Redirect to public URL with immutable caching (Cloudflare CDN handles caching)
  */
 export const getVersionForServing = query({
-  args: {
-    versionId: v.id("assetVersions"),
-  },
+  args: { versionId: v.id("assetVersions") },
   returns: v.union(
     v.null(),
     v.object({
@@ -158,27 +142,14 @@ export const getVersionForServing = query({
     const url = await ctx.storage.getUrl(version.storageId!);
     if (!url) return null;
 
-    return {
-      kind: "redirect" as const,
-      location: url,
-      cacheControl: "public, max-age=60",
-    };
+    return { kind: "redirect" as const, location: url, cacheControl: "public, max-age=60" };
   },
 });
 
 type ServeVersionResult =
   | null
-  | {
-      kind: "blob";
-      storageId: Id<"_storage">;
-      contentType?: string;
-      cacheControl?: string;
-    }
-  | {
-      kind: "redirect";
-      location: string;
-      cacheControl?: string;
-    };
+  | { kind: "blob"; storageId: Id<"_storage">; contentType?: string; cacheControl?: string }
+  | { kind: "redirect"; location: string; cacheControl?: string };
 
 /**
  * Get the published version of an asset by path, ready for HTTP serving.
@@ -231,10 +202,7 @@ type ServeVersionResult =
  * ```
  */
 export const getPublishedFileForServing = query({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   returns: v.union(
     v.null(),
     v.object({
@@ -296,19 +264,12 @@ export const getPublishedFileForServing = query({
     const url = await ctx.storage.getUrl(version.storageId!);
     if (!url) return null;
 
-    return {
-      kind: "redirect" as const,
-      location: url,
-      cacheControl: "public, max-age=60",
-    };
+    return { kind: "redirect" as const, location: url, cacheControl: "public, max-age=60" };
   },
 });
 
 /** Result type for getTextContent action */
-type TextContentResult = {
-  content: string;
-  contentType?: string;
-} | null;
+type TextContentResult = { content: string; contentType?: string } | null;
 
 /**
  * Fetch text content from a version, bypassing CORS issues.
@@ -323,21 +284,14 @@ type TextContentResult = {
  * @returns The text content, or null if not found or not text
  */
 export const getTextContent = action({
-  args: {
-    versionId: v.id("assetVersions"),
-  },
+  args: { versionId: v.id("assetVersions") },
   returns: v.union(
     v.null(),
-    v.object({
-      content: v.string(),
-      contentType: v.optional(v.string()),
-    }),
+    v.object({ content: v.string(), contentType: v.optional(v.string()) }),
   ),
   handler: async (ctx, { versionId }): Promise<TextContentResult> => {
     // Get version info
-    const versionInfo = await ctx.runQuery(internal.assetFsHttp.getVersionInfo, {
-      versionId,
-    });
+    const versionInfo = await ctx.runQuery(internal.assetFsHttp.getVersionInfo, { versionId });
     if (!versionInfo) return null;
 
     let content: string | null = null;
@@ -361,10 +315,7 @@ export const getTextContent = action({
 
     if (content === null) return null;
 
-    return {
-      content,
-      contentType: versionInfo.contentType,
-    };
+    return { content, contentType: versionInfo.contentType };
   },
 });
 
@@ -372,9 +323,7 @@ export const getTextContent = action({
  * Internal query to get version info for text content fetching.
  */
 export const getVersionInfo = internalQuery({
-  args: {
-    versionId: v.id("assetVersions"),
-  },
+  args: { versionId: v.id("assetVersions") },
   returns: v.union(
     v.null(),
     v.object({
@@ -396,10 +345,6 @@ export const getVersionInfo = internalQuery({
       if (r2Url) url = r2Url;
     }
 
-    return {
-      storageId: version.storageId,
-      url,
-      contentType: version.contentType,
-    };
+    return { storageId: version.storageId, url, contentType: version.contentType };
   },
 });

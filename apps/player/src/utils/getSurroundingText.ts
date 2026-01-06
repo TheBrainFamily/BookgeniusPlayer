@@ -4,7 +4,12 @@ import { textCacheManager } from "@player/logic/TextCacheManager";
 import { getBookSlug } from "@player/state/bookDataStore";
 
 export function getSurroundingText(location: Location, expand: boolean = false): string {
-  const { earliestVisibleParagraph, latestVisibleParagraph, earliestVisibleChapter, latestVisibleChapter } = location;
+  const {
+    earliestVisibleParagraph,
+    latestVisibleParagraph,
+    earliestVisibleChapter,
+    latestVisibleChapter,
+  } = location;
 
   let earliestParagraphToConsider = earliestVisibleParagraph;
   if (expand) {

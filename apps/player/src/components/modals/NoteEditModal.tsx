@@ -20,7 +20,10 @@ const NoteEditModal: React.FC = () => {
 
   const effectiveBookPath = bookPath || book?.path;
 
-  const noteData = useQuery(api.notes.getFullNoteByNoteId, isOpen && effectiveBookPath && noteId ? { bookPath: effectiveBookPath, noteId } : "skip");
+  const noteData = useQuery(
+    api.notes.getFullNoteByNoteId,
+    isOpen && effectiveBookPath && noteId ? { bookPath: effectiveBookPath, noteId } : "skip",
+  );
 
   const updateNote = useMutation(api.notes.update);
   const deleteNote = useMutation(api.notes.remove);
@@ -62,7 +65,11 @@ const NoteEditModal: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await removeNoteFromChapter({ bookPath: effectiveBookPath, chapterNumber: noteData.chapter, noteNumber });
+      await removeNoteFromChapter({
+        bookPath: effectiveBookPath,
+        chapterNumber: noteData.chapter,
+        noteNumber,
+      });
       await deleteNote({ id: noteData._id });
       removeNoteElementFromDOM(noteNumber);
       invalidateFootnoteCache(noteId);
@@ -90,16 +97,27 @@ const NoteEditModal: React.FC = () => {
               <h2 className="text-xl font-semibold text-white">Edit Note</h2>
               <p className="text-zinc-400 text-sm mt-1">{noteId}</p>
             </div>
-            <button onClick={closeModal} disabled={isSubmitting} className="text-zinc-400 hover:text-white transition-colors p-2">
+            <button
+              onClick={closeModal}
+              disabled={isSubmitting}
+              className="text-zinc-400 hover:text-white transition-colors p-2"
+            >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           <div className="flex-1 mb-6">
             {isLoading ? (
-              <div className="flex items-center justify-center h-40 text-zinc-400">Loading note...</div>
+              <div className="flex items-center justify-center h-40 text-zinc-400">
+                Loading note...
+              </div>
             ) : (
               <div className="flex flex-col gap-2">
                 <label className="text-xs text-zinc-400">Note Content</label>

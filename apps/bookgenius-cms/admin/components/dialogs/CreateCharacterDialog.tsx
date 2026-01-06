@@ -9,7 +9,14 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +41,12 @@ interface CreateCharacterDialogProps {
 // Component
 // =============================================================================
 
-export function CreateCharacterDialog({ open, onOpenChange, bookPath, onCreated }: CreateCharacterDialogProps) {
+export function CreateCharacterDialog({
+  open,
+  onOpenChange,
+  bookPath,
+  onCreated,
+}: CreateCharacterDialogProps) {
   // Form state
   const [displayName, setDisplayName] = useState("");
   const [summary, setSummary] = useState("");
@@ -84,7 +96,10 @@ export function CreateCharacterDialog({ open, onOpenChange, bookPath, onCreated 
       const characterPath = `${bookPath}/characters/${slug}`;
 
       // Create character folder with metadata
-      await createFolder({ path: characterPath, extra: { type: "character", displayName: displayName.trim(), summary: summary.trim() } });
+      await createFolder({
+        path: characterPath,
+        extra: { type: "character", displayName: displayName.trim(), summary: summary.trim() },
+      });
 
       toast.success(`Character "${displayName}" created`);
       onOpenChange(false);
@@ -122,7 +137,10 @@ export function CreateCharacterDialog({ open, onOpenChange, bookPath, onCreated 
             <User className="h-5 w-5" />
             Create Character
           </DialogTitle>
-          <DialogDescription>Add a new character to this book. You can upload their avatar, speaks, and listens assets after creating.</DialogDescription>
+          <DialogDescription>
+            Add a new character to this book. You can upload their avatar, speaks, and listens
+            assets after creating.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -131,7 +149,13 @@ export function CreateCharacterDialog({ open, onOpenChange, bookPath, onCreated 
             <Label htmlFor="displayName">
               Display Name <span className="text-destructive">*</span>
             </Label>
-            <Input id="displayName" value={displayName} onChange={handleDisplayNameChange} placeholder="Winston Smith" disabled={isCreating} />
+            <Input
+              id="displayName"
+              value={displayName}
+              onChange={handleDisplayNameChange}
+              placeholder="Winston Smith"
+              disabled={isCreating}
+            />
           </div>
 
           {/* Slug */}
@@ -139,7 +163,14 @@ export function CreateCharacterDialog({ open, onOpenChange, bookPath, onCreated 
             <Label htmlFor="slug">
               Slug <span className="text-destructive">*</span>
             </Label>
-            <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="winston-smith" disabled={isCreating} className="font-mono text-sm" />
+            <Input
+              id="slug"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="winston-smith"
+              disabled={isCreating}
+              className="font-mono text-sm"
+            />
             <p className="text-xs text-muted-foreground">
               Used in folder path: {bookPath}/characters/
               <span className="text-foreground">{slug || "..."}</span>

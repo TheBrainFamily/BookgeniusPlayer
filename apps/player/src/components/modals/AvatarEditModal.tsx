@@ -10,7 +10,8 @@ type TabType = "edit" | "regenerate";
 
 const AvatarEditModal: React.FC = () => {
   const { book } = useBookConvex();
-  const { isOpen, characterSlug, characterDisplayName, currentAvatarUrl, aiPrompt, closeModal } = useAvatarEditModal();
+  const { isOpen, characterSlug, characterDisplayName, currentAvatarUrl, aiPrompt, closeModal } =
+    useAvatarEditModal();
   const { startOptimisticGeneration } = useAvatarGenerationStore();
 
   const startAvatarEdit = useAction(api.avatarEditing.startAvatarEdit);
@@ -33,7 +34,12 @@ const AvatarEditModal: React.FC = () => {
     closeModal();
 
     try {
-      await startAvatarEdit({ bookPath: book.path, characterSlug, characterDisplayName, instructions: instructions.trim() });
+      await startAvatarEdit({
+        bookPath: book.path,
+        characterSlug,
+        characterDisplayName,
+        instructions: instructions.trim(),
+      });
     } catch (err) {
       console.error("Failed to start avatar edit:", err);
     }
@@ -48,7 +54,12 @@ const AvatarEditModal: React.FC = () => {
     closeModal();
 
     try {
-      await startAvatarGeneration({ bookPath: book.path, characterSlug, characterDisplayName, visualPrompt: editablePrompt.trim() });
+      await startAvatarGeneration({
+        bookPath: book.path,
+        characterSlug,
+        characterDisplayName,
+        visualPrompt: editablePrompt.trim(),
+      });
     } catch (err) {
       console.error("Failed to start avatar regeneration:", err);
     }
@@ -59,9 +70,15 @@ const AvatarEditModal: React.FC = () => {
       <div className="w-96 flex flex-col gap-4">
         <div className="flex flex-col items-center gap-2">
           {currentAvatarUrl ? (
-            <img src={currentAvatarUrl} alt={characterDisplayName} className="w-32 h-32 rounded-full object-cover border-2 border-zinc-600" />
+            <img
+              src={currentAvatarUrl}
+              alt={characterDisplayName}
+              className="w-32 h-32 rounded-full object-cover border-2 border-zinc-600"
+            />
           ) : (
-            <div className="w-32 h-32 rounded-full bg-zinc-700 flex items-center justify-center text-4xl text-zinc-400">{characterDisplayName.charAt(0)}</div>
+            <div className="w-32 h-32 rounded-full bg-zinc-700 flex items-center justify-center text-4xl text-zinc-400">
+              {characterDisplayName.charAt(0)}
+            </div>
           )}
           <div className="text-white font-medium">{characterDisplayName}</div>
         </div>
@@ -85,7 +102,9 @@ const AvatarEditModal: React.FC = () => {
 
         {activeTab === "edit" ? (
           <div className="flex flex-col gap-3">
-            <div className="text-xs text-zinc-400">Describe how you want to modify the current avatar:</div>
+            <div className="text-xs text-zinc-400">
+              Describe how you want to modify the current avatar:
+            </div>
             <textarea
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
@@ -103,7 +122,9 @@ const AvatarEditModal: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <div className="text-xs text-zinc-400">Edit the visual description or write a new one:</div>
+            <div className="text-xs text-zinc-400">
+              Edit the visual description or write a new one:
+            </div>
             <textarea
               value={editablePrompt}
               onChange={(e) => setEditablePrompt(e.target.value)}

@@ -60,7 +60,9 @@ const isElementNode = (node: Node): node is Element => node.nodeType === 1;
 
 const OVERRIDE_REF_REGEX = /^ch(\d+)-p(\d+)$/i;
 
-const parseChapterParagraphRef = (ref?: string | null): { chapter: number; paragraph: number } | null => {
+const parseChapterParagraphRef = (
+  ref?: string | null,
+): { chapter: number; paragraph: number } | null => {
   if (!ref) return null;
   const normalized = ref.trim();
   const match = normalized.match(OVERRIDE_REF_REGEX);
@@ -73,7 +75,9 @@ const parseChapterParagraphRef = (ref?: string | null): { chapter: number; parag
   const paragraph = Number.parseInt(match[2], 10);
 
   if (Number.isNaN(chapter) || Number.isNaN(paragraph)) {
-    console.warn(`[characterExtractor] Unable to parse chapter/paragraph numbers from reference: "${ref}"`);
+    console.warn(
+      `[characterExtractor] Unable to parse chapter/paragraph numbers from reference: "${ref}"`,
+    );
     return null;
   }
 
@@ -93,7 +97,9 @@ const collectOverridesFromCharacterElement = (element: Element): CharacterOverri
 
     const fromRef = parseChapterParagraphRef(node.getAttribute("from"));
     if (!fromRef) {
-      console.warn(`[characterExtractor] Skipping override for ${element.tagName} due to missing or invalid "from" attribute.`);
+      console.warn(
+        `[characterExtractor] Skipping override for ${element.tagName} due to missing or invalid "from" attribute.`,
+      );
       continue;
     }
 
@@ -103,7 +109,9 @@ const collectOverridesFromCharacterElement = (element: Element): CharacterOverri
     const avatar = node.getAttribute("avatar") || undefined;
 
     if (!summary && !display && !avatar && !toRef) {
-      console.warn(`[characterExtractor] Override for ${element.tagName} at ${node.getAttribute("from") || "unknown"} has no payload; skipping.`);
+      console.warn(
+        `[characterExtractor] Override for ${element.tagName} at ${node.getAttribute("from") || "unknown"} has no payload; skipping.`,
+      );
       continue;
     }
 
@@ -171,7 +179,10 @@ export function getCharacterOverrides(doc: Document): Map<string, CharacterOverr
   return overridesMap;
 }
 
-const getSummaryForCharacter = (slug: string, bundlesBySlug: Map<string, CharacterBundleForExtractor>): string => {
+const getSummaryForCharacter = (
+  slug: string,
+  bundlesBySlug: Map<string, CharacterBundleForExtractor>,
+): string => {
   const bundle = bundlesBySlug.get(slug.toLowerCase());
   if (!bundle) {
     throw new Error(`Character bundle not found for slug: ${slug}`);
@@ -179,7 +190,10 @@ const getSummaryForCharacter = (slug: string, bundlesBySlug: Map<string, Charact
   return bundle.extra.summary ?? "";
 };
 
-const getDisplayForCharacter = (slug: string, bundlesBySlug: Map<string, CharacterBundleForExtractor>): string => {
+const getDisplayForCharacter = (
+  slug: string,
+  bundlesBySlug: Map<string, CharacterBundleForExtractor>,
+): string => {
   const bundle = bundlesBySlug.get(slug.toLowerCase());
   if (!bundle) {
     throw new Error(`Character bundle not found for slug: ${slug}`);
@@ -223,7 +237,11 @@ export function extractCharacterMetadata(
       characterName: getDisplayForCharacter(tag, bundlesBySlug),
       bookSlug,
       infoPerChapter: [],
-      media: { avatarUrl: bundle?.avatar?.url, listensUrl: bundle?.listens?.url, speaksUrl: bundle?.speaks?.url },
+      media: {
+        avatarUrl: bundle?.avatar?.url,
+        listensUrl: bundle?.listens?.url,
+        speaksUrl: bundle?.speaks?.url,
+      },
     };
 
     const overrides = characterOverrides?.get(tag);
@@ -252,7 +270,9 @@ export function extractCharacterMetadata(
 
       const chapterIdAttr = chapterElement.getAttribute("id");
       if (!chapterIdAttr || isNaN(parseInt(chapterIdAttr, 10))) {
-        console.warn(`Chapter element at index ${chapterIndex} is missing or has an invalid ID. Skipping.`);
+        console.warn(
+          `Chapter element at index ${chapterIndex} is missing or has an invalid ID. Skipping.`,
+        );
         continue;
       }
       const chapterId = parseInt(chapterIdAttr, 10);
@@ -300,7 +320,12 @@ export function extractCharacterMetadata(
 
             let chapterEntry = data.infoPerChapter.find((info) => info.chapter === chapterId);
             if (!chapterEntry) {
-              chapterEntry = { chapter: chapterId, summary: getSummaryForCharacter(charTag, bundlesBySlug), paragraphsWhereSpotted: [], paragraphsWhereTalking: [] };
+              chapterEntry = {
+                chapter: chapterId,
+                summary: getSummaryForCharacter(charTag, bundlesBySlug),
+                paragraphsWhereSpotted: [],
+                paragraphsWhereTalking: [],
+              };
               if (bookForm === "play" || bookForm === "mixed") {
                 chapterEntry.paragraphsWhereEnters = [];
                 chapterEntry.paragraphsWhereExits = [];

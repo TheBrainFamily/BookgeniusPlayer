@@ -13,7 +13,9 @@ async function uploadChapters(bookSlug: string) {
     process.exit(1);
   }
 
-  const files = fs.readdirSync(tempOutputDir).filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
+  const files = fs
+    .readdirSync(tempOutputDir)
+    .filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
 
   if (files.length === 0) {
     console.log("No chapter files found to upload");

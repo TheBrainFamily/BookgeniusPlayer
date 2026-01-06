@@ -21,15 +21,27 @@ interface SentenceModalProps {
   simplifiedSentenceScore?: number;
 }
 
-const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceId, currentSentence, simplifiedSentence, simplifiedSentenceScore }) => {
+const SentenceModal: React.FC<SentenceModalProps> = ({
+  onClose,
+  currentSentenceId,
+  currentSentence,
+  simplifiedSentence,
+  simplifiedSentenceScore,
+}) => {
   const { t } = useTranslation();
   const [currentSimplifiedSentence, setSimplifiedSentence] = useState(simplifiedSentence);
   const [currentSimplifiedScore, setSimplifiedSentenceScore] = useState(simplifiedSentenceScore);
-  const [isMoreSimplifiedSentence, setIsMoreSimplifiedSentence] = useState(Boolean(simplifiedSentence));
+  const [isMoreSimplifiedSentence, setIsMoreSimplifiedSentence] = useState(
+    Boolean(simplifiedSentence),
+  );
 
   const handleClick = () => {
     if (!currentSimplifiedSentence) return;
-    const { text, score: newScore, hasLower } = findSimplifiedSentence(currentSentenceId, currentSimplifiedScore);
+    const {
+      text,
+      score: newScore,
+      hasLower,
+    } = findSimplifiedSentence(currentSentenceId, currentSimplifiedScore);
 
     if (text) {
       setSimplifiedSentence(text);
@@ -125,7 +137,13 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
           </div>
 
           <div className="flex-shrink-0 pt-4 pb-2">
-            <motion.div className="flex justify-center gap-4" variants={variants.item} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+            <motion.div
+              className="flex justify-center gap-4"
+              variants={variants.item}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
               <Button
                 onClick={handleUndo}
                 size="lg"
@@ -146,8 +164,13 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
                 disabled={!isMoreSimplifiedSentence}
                 size="lg"
               >
-                <ArrowDownUp size={16} className={isMoreSimplifiedSentence ? "text-white" : "text-white/50"} />
-                {isMoreSimplifiedSentence ? t("get_simplified_sentence") : t("no_further_simplification")}
+                <ArrowDownUp
+                  size={16}
+                  className={isMoreSimplifiedSentence ? "text-white" : "text-white/50"}
+                />
+                {isMoreSimplifiedSentence
+                  ? t("get_simplified_sentence")
+                  : t("no_further_simplification")}
               </Button>
             </motion.div>
           </div>
@@ -160,10 +183,17 @@ const SentenceModal: React.FC<SentenceModalProps> = ({ onClose, currentSentenceI
 const variants: Record<string, Variants> = {
   container: {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut", staggerChildren: 0.1 } },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.3, ease: "easeOut", staggerChildren: 0.1 },
+    },
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   },
-  item: { hidden: { opacity: 0, y: 20, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } } },
+  item: {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+  },
 };
 
 export default SentenceModal;

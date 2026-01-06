@@ -68,7 +68,8 @@ const GenreExploration = () => {
             Explore Literary <span className="text-library-gold">Genres</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Navigate through our carefully curated collections, each offering a unique window into different realms of human experience.
+            Navigate through our carefully curated collections, each offering a unique window into
+            different realms of human experience.
           </p>
         </div>
 
@@ -86,15 +87,22 @@ const GenreExploration = () => {
                   >
                     <IconComponent className={`h-8 w-8 ${genre.color}`} />
                   </div>
-                  <CardTitle className="text-xl font-bold text-foreground group-hover:text-library-gold transition-colors">{genre.name}</CardTitle>
+                  <CardTitle className="text-xl font-bold text-foreground group-hover:text-library-gold transition-colors">
+                    {genre.name}
+                  </CardTitle>
                 </CardHeader>
 
                 <CardContent className="text-center space-y-4">
-                  <p className="text-muted-foreground text-sm leading-relaxed">{genre.description}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {genre.description}
+                  </p>
 
                   <div className="text-library-gold font-semibold">{genre.bookCount} books</div>
 
-                  <Button variant="ghost" className="w-full text-foreground hover:text-library-gold hover:bg-library-walnut/50 group/btn">
+                  <Button
+                    variant="ghost"
+                    className="w-full text-foreground hover:text-library-gold hover:bg-library-walnut/50 group/btn"
+                  >
                     Explore Collection
                     <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
@@ -105,7 +113,10 @@ const GenreExploration = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button size="lg" className="bg-library-gold hover:bg-library-gold-glow text-library-mahogany font-semibold px-8 py-3">
+          <Button
+            size="lg"
+            className="bg-library-gold hover:bg-library-gold-glow text-library-mahogany font-semibold px-8 py-3"
+          >
             View All Genres
           </Button>
         </div>

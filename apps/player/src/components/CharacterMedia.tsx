@@ -9,7 +9,12 @@ type VideoState = "listens" | "speaks";
 
 interface CharacterMediaProps {
   mediaSrc: string;
-  commonAttrs: { "data-original-src": string; "data-character-name": string; "data-summary": string; className: string };
+  commonAttrs: {
+    "data-original-src": string;
+    "data-character-name": string;
+    "data-summary": string;
+    className: string;
+  };
   isVideo: boolean;
   canonicalName: string;
   isTalking?: boolean;
@@ -93,7 +98,16 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
         setVideoListensSrc(mediaSrc);
       }
     }
-  }, [mediaSrc, isVideo, isListeningMode, videoListensSrc, videoSpeaksSrc, videoListensLoaded, videoSpeaksLoaded, isTalking]);
+  }, [
+    mediaSrc,
+    isVideo,
+    isListeningMode,
+    videoListensSrc,
+    videoSpeaksSrc,
+    videoListensLoaded,
+    videoSpeaksLoaded,
+    isTalking,
+  ]);
 
   const handleLoadedData = (videoState: VideoState) => {
     if (videoState === "listens") {
@@ -119,7 +133,15 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
     }
   };
 
-  return { videoListensSrc, videoSpeaksSrc, videoListensLoaded, videoSpeaksLoaded, isListeningMode, handleLoadedData, handleVideoError };
+  return {
+    videoListensSrc,
+    videoSpeaksSrc,
+    videoListensLoaded,
+    videoSpeaksLoaded,
+    isListeningMode,
+    handleLoadedData,
+    handleVideoError,
+  };
 };
 
 interface VideoPlayerProps {
@@ -132,15 +154,35 @@ interface VideoPlayerProps {
   isTalking?: boolean;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonAttrs, onLoaded, onError, isTalking }) => {
-  const stateValue = isTalking !== undefined ? (state === "listens" ? (isTalking ? "idle" : "talking") : isTalking ? "talking" : "idle") : "default";
+const VideoPlayer: React.FC<VideoPlayerProps> = ({
+  state,
+  src,
+  isActive,
+  commonAttrs,
+  onLoaded,
+  onError,
+  isTalking,
+}) => {
+  const stateValue =
+    isTalking !== undefined
+      ? state === "listens"
+        ? isTalking
+          ? "idle"
+          : "talking"
+        : isTalking
+          ? "talking"
+          : "idle"
+      : "default";
 
   return (
     <video
       key={`video-${state}`}
       {...commonAttrs}
       src={src || null}
-      className={cn("absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out rounded-full", isActive ? "opacity-100" : "opacity-0")}
+      className={cn(
+        "absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out rounded-full",
+        isActive ? "opacity-100" : "opacity-0",
+      )}
       autoPlay
       loop
       muted
@@ -152,22 +194,41 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonA
   );
 };
 
-const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, isVideo, canonicalName, isTalking }) => {
-  const { videoListensSrc, videoSpeaksSrc, isListeningMode, handleLoadedData, handleVideoError, videoListensLoaded, videoSpeaksLoaded } = useVideoState(
-    mediaSrc,
-    isVideo,
-    isTalking,
-  );
+const CharacterMedia: React.FC<CharacterMediaProps> = ({
+  mediaSrc,
+  commonAttrs,
+  isVideo,
+  canonicalName,
+  isTalking,
+}) => {
+  const {
+    videoListensSrc,
+    videoSpeaksSrc,
+    isListeningMode,
+    handleLoadedData,
+    handleVideoError,
+    videoListensLoaded,
+    videoSpeaksLoaded,
+  } = useVideoState(mediaSrc, isVideo, isTalking);
 
   if (!isVideo) {
-    return <img {...commonAttrs} src={mediaSrc || ""} alt={canonicalName} className="rounded-full w-full" />;
+    return (
+      <img
+        {...commonAttrs}
+        src={mediaSrc || ""}
+        alt={canonicalName}
+        className="rounded-full w-full"
+      />
+    );
   }
 
   const placeholderSrc = getPlaceholderFromVideoUrl(videoListensSrc || mediaSrc);
 
   // Determine video display logic based on new layering requirements
-  const hasBothVideos = videoListensSrc && videoSpeaksSrc && videoListensLoaded && videoSpeaksLoaded;
-  const hasOnlySpeakingVideo = videoSpeaksSrc && videoSpeaksLoaded && (!videoListensSrc || !videoListensLoaded);
+  const hasBothVideos =
+    videoListensSrc && videoSpeaksSrc && videoListensLoaded && videoSpeaksLoaded;
+  const hasOnlySpeakingVideo =
+    videoSpeaksSrc && videoSpeaksLoaded && (!videoListensSrc || !videoListensLoaded);
   const currentlyTalking = isTalking !== undefined ? isTalking : !isListeningMode;
 
   let showListensVideo = false;
@@ -191,7 +252,13 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
   return (
     <div className="relative w-full h-full">
       {placeholderSrc && (
-        <img src={placeholderSrc} alt={canonicalName} loading="eager" decoding="async" className="absolute top-0 left-0 w-full h-full object-cover rounded-full" />
+        <img
+          src={placeholderSrc}
+          alt={canonicalName}
+          loading="eager"
+          decoding="async"
+          className="absolute top-0 left-0 w-full h-full object-cover rounded-full"
+        />
       )}
       <VideoPlayer
         state="listens"

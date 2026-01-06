@@ -4,7 +4,8 @@ import { getParagraphsFromChapterWithText } from "../getParagraphsFromChapterWit
 import { getChapterTitle } from "./get-chapter-title";
 import * as cheerio from "cheerio";
 
-const escapeXml = (str: string) => str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const escapeXml = (str: string) =>
+  str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const isElement = (node: XMLNode): node is XMLElement => node.nodeType === 1; /* ELEMENT_NODE */
 
@@ -46,7 +47,9 @@ export function generateChaptersXmlFromRich(bookText: string): string {
   const chaptersMap = collectChapterElements(root);
 
   if (chaptersMap.size === 0) {
-    throw new Error("rich.xml does not contain any elements with data-chapter. The file is invalid.");
+    throw new Error(
+      "rich.xml does not contain any elements with data-chapter. The file is invalid.",
+    );
   }
 
   const chapterNumbers = Array.from(chaptersMap.keys()).sort((a, b) => a - b);

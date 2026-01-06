@@ -69,10 +69,23 @@ interface UseCharacterBundleResult {
  *   );
  * }
  */
-export function useCharacterBundle(characterPath: string | null | undefined): UseCharacterBundleResult {
-  const { data: bundle, isLoading, error } = useQuery({ ...convexQuery(api.bookQueries.getCharacterBundle, characterPath ? { characterPath } : "skip"), enabled: !!characterPath });
+export function useCharacterBundle(
+  characterPath: string | null | undefined,
+): UseCharacterBundleResult {
+  const {
+    data: bundle,
+    isLoading,
+    error,
+  } = useQuery({
+    ...convexQuery(api.bookQueries.getCharacterBundle, characterPath ? { characterPath } : "skip"),
+    enabled: !!characterPath,
+  });
 
-  return { bundle: bundle as CharacterBundle | null | undefined, isLoading, error: error as Error | null };
+  return {
+    bundle: bundle as CharacterBundle | null | undefined,
+    isLoading,
+    error: error as Error | null,
+  };
 }
 
 // =============================================================================
@@ -90,7 +103,9 @@ export function isCompleteBundle(bundle: CharacterBundle | null | undefined): bo
 /**
  * Get list of missing assets from a bundle.
  */
-export function getMissingAssets(bundle: CharacterBundle | null | undefined): ("avatar" | "speaks" | "listens")[] {
+export function getMissingAssets(
+  bundle: CharacterBundle | null | undefined,
+): ("avatar" | "speaks" | "listens")[] {
   if (!bundle) return ["avatar", "speaks", "listens"];
 
   const missing: ("avatar" | "speaks" | "listens")[] = [];

@@ -1,6 +1,9 @@
 {
   "characters": [
-    { "name": "Ramzes XII", "referenceCard": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu." },
+    {
+      "name": "Ramzes XII",
+      "referenceCard": "Faraon Egiptu w 33. roku panowania. Ojciec Ramzesa, następcy tronu."
+    },
     {
       "name": "Książę Ramzes",
       "referenceCard": "Syn zmarłego faraona Ramzesa XII, który jako następca tronu objął władzę jako Ramzes XIII. Młody władca, znany ze zwycięstwa nad Libijczykami i dążenia do wzmocnienia armii."
@@ -9,12 +12,18 @@
       "name": "Nikotris",
       "referenceCard": "Królowa, druga żona faraona Ramzesa XII, matka następcy tronu Ramzesa. Córka arcykapłana Amenhotepa."
     },
-    { "name": "Amenhotep", "referenceCard": "Arcykapłan, ojciec królowej Nikotris. Dziadek następcy tronu Ramzesa." },
+    {
+      "name": "Amenhotep",
+      "referenceCard": "Arcykapłan, ojciec królowej Nikotris. Dziadek następcy tronu Ramzesa."
+    },
     {
       "name": "Herhor",
       "referenceCard": "Minister wojny i arcykapłan. Wpływowa osobistość, mężczyzna w średnim wieku, opanowany i zamknięty w sobie."
     },
-    { "name": "Nitager", "referenceCard": "Generał, naczelny wódz armii strzegącej wschodnich granic Egiptu." },
+    {
+      "name": "Nitager",
+      "referenceCard": "Generał, naczelny wódz armii strzegącej wschodnich granic Egiptu."
+    },
     {
       "name": "Pentuer",
       "referenceCard": "Kapłan i pisarz ministra Herhora. Pochodzi z ludu, znany z wyjątkowych zdolności i pamięci, ma wygląd ascety."
@@ -47,7 +56,10 @@
       "name": "Mentezufis",
       "referenceCard": "Święty ojciec, kapłan towarzyszący Ramzesowi w podróży po Dolnym Egipcie jako doradca duchowy."
     },
-    { "name": "Hiram", "referenceCard": "Książę tyryjski, członek najwyższej rady i wpływowy kupiec fenicki." },
+    {
+      "name": "Hiram",
+      "referenceCard": "Książę tyryjski, członek najwyższej rady i wpływowy kupiec fenicki."
+    },
     {
       "name": "Sargon",
       "referenceCard": "Asyryjski poseł przybywający do Egiptu z darami. Ma zawrzeć traktat dotyczący podziału ziem między Asyrią a Egiptem."
@@ -56,7 +68,10 @@
       "name": "Phut (Beroes)",
       "referenceCard": "Tajemniczy podróżny z Harranu, podający się za Chetytę. Wygląda na mędrca lub kapłana."
     },
-    { "name": "Mefres", "referenceCard": "Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem." },
+    {
+      "name": "Mefres",
+      "referenceCard": "Arcykapłan świątyni Ptah w Memfis. Spotyka się potajemnie z Beroesem."
+    },
     {
       "name": "Kalipos",
       "referenceCard": "Naczelny wódz greckich pułków najemnych w służbie Egiptu. Zaufany dowódca Ramzesa XIII."
@@ -69,7 +84,10 @@
       "name": "Sem",
       "referenceCard": "Arcykapłan świątyni Ptah. Entuzjastycznie nastawiony do wojny prowadzonej przez Ramzesa."
     },
-    { "name": "Tehenna", "referenceCard": "Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt." },
+    {
+      "name": "Tehenna",
+      "referenceCard": "Syn wodza libijskiego Musawasy. Dowodzi korpusem atakującym Egipt."
+    },
     {
       "name": "Naczelnik policji w Pi-Bast",
       "referenceCard": "Szef policji miasta Pi-Bast. Odbył długą, prywatną rozmowę z księciem Ramzesem."
@@ -98,7 +116,10 @@
       "name": "Kapłan-astrolog",
       "referenceCard": "Kapłan-astrolog na dworze faraona, odpowiedzialny za składanie raportów o gwiazdach i przepowiedniach."
     },
-    { "name": "Adiutant (faraona)", "referenceCard": "Adiutant na dworze faraona, pełniący służbę przy jego osobie." },
+    {
+      "name": "Adiutant (faraona)",
+      "referenceCard": "Adiutant na dworze faraona, pełniący służbę przy jego osobie."
+    },
     {
       "name": "Prorocy (dwaj, asystujący Ramzesowi XII)",
       "referenceCard": "Dwaj kapłani-prorocy asystujący faraonowi Ramzesowi XII podczas jego ostatnich rytuałów."
@@ -188,12 +209,18 @@
       "name": "Menes (kapłan-gwiaździarz)",
       "referenceCard": "Stary, ubogi kapłan i mędrzec ze świątyni bogini Nut. Wybitny astronom i inżynier, nauczyciel Pentuera."
     },
-    { "name": "Głuchoniemy (sługa Menesa)", "referenceCard": "Głuchoniemy sługa starego kapłana Menesa." },
+    {
+      "name": "Głuchoniemy (sługa Menesa)",
+      "referenceCard": "Głuchoniemy sługa starego kapłana Menesa."
+    },
     {
       "name": "Naczelnik łuczników",
       "referenceCard": "Wysoki dowódca wojskowy w armii egipskiej, naczelnik łuczników."
     },
-    { "name": "Naczelnik konnicy", "referenceCard": "Wysoki dowódca wojskowy w armii egipskiej, naczelnik konnicy." },
+    {
+      "name": "Naczelnik konnicy",
+      "referenceCard": "Wysoki dowódca wojskowy w armii egipskiej, naczelnik konnicy."
+    },
     {
       "name": "Najwyższy sędzia Tebów",
       "referenceCard": "Najwyższy sędzia miasta Teb, uczestnik spisku przeciwko faraonowi Ramzesowi XIII."
@@ -222,7 +249,10 @@
       "name": "Nomarcha Aa",
       "referenceCard": "Nomarcha nomu Aa, uczestnik tajnych narad kapłańskich, zaniepokojony sytuacją w państwie i działaniami faraona."
     },
-    { "name": "Nomarcha Ament", "referenceCard": "Nomarcha nomu Ament, uczestnik tajnych narad kapłańskich." },
+    {
+      "name": "Nomarcha Ament",
+      "referenceCard": "Nomarcha nomu Ament, uczestnik tajnych narad kapłańskich."
+    },
     {
       "name": "Robotnik olbrzymiego wzrostu",
       "referenceCard": "Olbrzymi robotnik z pochodnią, przywódca tłumu atakującego świątynię Ptah w Memfis."

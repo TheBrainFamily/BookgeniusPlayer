@@ -7,7 +7,9 @@ import path from "path";
 const BookDescriptionSchema = z.object({
   description: z
     .string()
-    .describe("A catchy, engaging description (2-3 sentences max) that would make someone want to read this book"),
+    .describe(
+      "A catchy, engaging description (2-3 sentences max) that would make someone want to read this book",
+    ),
   hook: z.string().describe("A one-liner hook/tagline for the book"),
 });
 
@@ -95,7 +97,11 @@ async function processCollection(
             collectionTitle: collection.title,
           });
           console.log(`✓ [${i + 1}/${booksToProcess.length}] "${book.title}"`);
-          return { ...book, generatedDescription: description.description, generatedHook: description.hook };
+          return {
+            ...book,
+            generatedDescription: description.description,
+            generatedHook: description.hook,
+          };
         } catch (error) {
           console.error(`✗ [${i + 1}/${booksToProcess.length}] "${book.title}" - ${error}`);
           return { ...book, generatedDescription: "", generatedHook: "" };
@@ -120,7 +126,11 @@ async function processCollection(
         collectionTitle: collection.title,
       });
 
-      results.push({ ...book, generatedDescription: description.description, generatedHook: description.hook });
+      results.push({
+        ...book,
+        generatedDescription: description.description,
+        generatedHook: description.hook,
+      });
 
       console.log(`  Hook: "${description.hook}"`);
       console.log(`  Description: ${description.description}\n`);

@@ -17,9 +17,13 @@ export type StyleSelectionStatus = z.infer<typeof StyleSelectionStatusEnum>;
 
 export const StyleSelectionStateSchema = z.object({
   status: StyleSelectionStatusEnum,
-  autoStyle: z.object({ backgroundStyle: z.string(), periodStyle: z.string(), avatarStyle: z.string() }).nullable(),
+  autoStyle: z
+    .object({ backgroundStyle: z.string(), periodStyle: z.string(), avatarStyle: z.string() })
+    .nullable(),
   userPrompt: z.string().nullable(),
-  userStyle: z.object({ backgroundStyle: z.string(), periodStyle: z.string(), avatarStyle: z.string() }).nullable(),
+  userStyle: z
+    .object({ backgroundStyle: z.string(), periodStyle: z.string(), avatarStyle: z.string() })
+    .nullable(),
   previews: z
     .object({
       autoPreviewPath: z.string().nullable(),
@@ -82,7 +86,10 @@ export function readStyleSelection(bookRoot: string): StyleSelectionState | null
   }
 }
 
-export function updateStyleSelection(bookRoot: string, updates: Partial<StyleSelectionState>): StyleSelectionState {
+export function updateStyleSelection(
+  bookRoot: string,
+  updates: Partial<StyleSelectionState>,
+): StyleSelectionState {
   const current = readStyleSelection(bookRoot);
   if (!current) {
     throw new Error("Style selection state not initialized");
@@ -95,7 +102,10 @@ export function updateStyleSelection(bookRoot: string, updates: Partial<StyleSel
   return updated;
 }
 
-export function setAutoStyleComplete(bookRoot: string, autoStyle: GraphicalStyle): StyleSelectionState {
+export function setAutoStyleComplete(
+  bookRoot: string,
+  autoStyle: GraphicalStyle,
+): StyleSelectionState {
   const current = readStyleSelection(bookRoot);
   if (current?.status === "generating_auto_style") {
     return updateStyleSelection(bookRoot, { autoStyle, status: "awaiting_input" });
@@ -103,15 +113,25 @@ export function setAutoStyleComplete(bookRoot: string, autoStyle: GraphicalStyle
   return updateStyleSelection(bookRoot, { autoStyle });
 }
 
-export function setUserStyleDescription(bookRoot: string, userPrompt: string | null): StyleSelectionState {
+export function setUserStyleDescription(
+  bookRoot: string,
+  userPrompt: string | null,
+): StyleSelectionState {
   if (userPrompt === null) {
-    return updateStyleSelection(bookRoot, { userPrompt: null, userStyle: null, status: "generating_previews" });
+    return updateStyleSelection(bookRoot, {
+      userPrompt: null,
+      userStyle: null,
+      status: "generating_previews",
+    });
   }
 
   return updateStyleSelection(bookRoot, { userPrompt, status: "generating_user_style" });
 }
 
-export function setUserStyleExpanded(bookRoot: string, userStyle: GraphicalStyle): StyleSelectionState {
+export function setUserStyleExpanded(
+  bookRoot: string,
+  userStyle: GraphicalStyle,
+): StyleSelectionState {
   return updateStyleSelection(bookRoot, { userStyle, status: "generating_previews" });
 }
 

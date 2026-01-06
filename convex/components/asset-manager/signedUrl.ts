@@ -6,11 +6,7 @@ import { Id } from "./_generated/dataModel";
 
 // Use anyApi to avoid circular type references when calling internal queries
 // from actions in the same component
-const internal = anyApi as {
-  internalQueries: {
-    getVersionStorageInfo: any;
-  };
-};
+const internal = anyApi as { internalQueries: { getVersionStorageInfo: any } };
 
 // Validator for R2 config passed from app layer
 const r2ConfigValidator = v.object({
@@ -35,9 +31,7 @@ function isStoredOnConvex(
   return ref.storageId !== undefined;
 }
 
-function isStoredOnR2(
-  ref: StorageReference,
-): ref is StorageReference & { r2Key: string } {
+function isStoredOnR2(ref: StorageReference): ref is StorageReference & { r2Key: string } {
   return ref.r2Key !== undefined;
 }
 
@@ -66,10 +60,9 @@ export const getSignedUrl = action({
   },
   returns: v.union(v.null(), v.string()),
   handler: async (ctx, { versionId, expiresIn = 300, r2Config }) => {
-    const version = await ctx.runQuery(
-      internal.internalQueries.getVersionStorageInfo,
-      { versionId },
-    );
+    const version = await ctx.runQuery(internal.internalQueries.getVersionStorageInfo, {
+      versionId,
+    });
     if (!version) return null;
 
     if (isStoredOnConvex(version)) {

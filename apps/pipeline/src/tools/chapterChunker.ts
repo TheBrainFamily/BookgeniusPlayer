@@ -33,7 +33,10 @@ export function countParagraphsTokens(paragraphs: Paragraph[]): number {
 /**
  * Check if a chapter needs to be chunked based on token count
  */
-export function needsChunking(paragraphs: Paragraph[], maxTokens: number = MAX_TOKENS_PER_CHUNK): boolean {
+export function needsChunking(
+  paragraphs: Paragraph[],
+  maxTokens: number = MAX_TOKENS_PER_CHUNK,
+): boolean {
   const totalTokens = countParagraphsTokens(paragraphs);
   return totalTokens > maxTokens;
 }
@@ -42,7 +45,10 @@ export function needsChunking(paragraphs: Paragraph[], maxTokens: number = MAX_T
  * Split paragraphs into chunks of approximately maxTokens each.
  * Respects paragraph boundaries - never splits mid-paragraph.
  */
-export function chunkParagraphs(paragraphs: Paragraph[], maxTokens: number = MAX_TOKENS_PER_CHUNK): ChapterChunk[] {
+export function chunkParagraphs(
+  paragraphs: Paragraph[],
+  maxTokens: number = MAX_TOKENS_PER_CHUNK,
+): ChapterChunk[] {
   const totalTokens = countParagraphsTokens(paragraphs);
 
   // If under threshold, return single chunk
@@ -77,7 +83,12 @@ export function chunkParagraphs(paragraphs: Paragraph[], maxTokens: number = MAX
 
   // Don't forget the last chunk
   if (currentChunk.length > 0) {
-    chunks.push({ chunkIndex: chunks.length, totalChunks: 0, paragraphs: currentChunk, tokenCount: currentTokenCount });
+    chunks.push({
+      chunkIndex: chunks.length,
+      totalChunks: 0,
+      paragraphs: currentChunk,
+      tokenCount: currentTokenCount,
+    });
   }
 
   // Update totalChunks for all chunks

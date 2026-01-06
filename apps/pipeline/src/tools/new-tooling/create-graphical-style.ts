@@ -64,7 +64,10 @@ This one worked really great when the mood matches:
   "avatarStyle": "Digital painting in an Expressionist Graphic Noir style. High-contrast character rendering with sharp, dramatic lighting and deep shadows. The look is stylized and gritty, featuring a monochromatic palette with bold red highlights. Focuses on psychological depth and a sense of gravity or hidden conspiracy."
 }`;
 
-export const createGraphicalStyle = async (bookTitle: string, options?: { saveToFile?: boolean }) => {
+export const createGraphicalStyle = async (
+  bookTitle: string,
+  options?: { saveToFile?: boolean },
+) => {
   const bookText = getBookTextForStyleAnalysis();
   const shouldSave = options?.saveToFile ?? true;
 

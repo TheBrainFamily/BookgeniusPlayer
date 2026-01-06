@@ -12,7 +12,10 @@ const anthropic = new Anthropic({ timeout: 600000 * 3 });
  */
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
-const callClaudeWithStreamAndThinking = async (prompt: string, thinkingTokens: number): Promise<string> => {
+const callClaudeWithStreamAndThinking = async (
+  prompt: string,
+  thinkingTokens: number,
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     let result = "";
     try {
@@ -21,7 +24,8 @@ const callClaudeWithStreamAndThinking = async (prompt: string, thinkingTokens: n
         max_tokens: 40000,
         temperature: 1,
         messages: [{ role: "user", content: [{ type: "text", text: prompt }] }],
-        thinking: thinkingTokens > 0 ? { type: "enabled", budget_tokens: thinkingTokens } : undefined,
+        thinking:
+          thinkingTokens > 0 ? { type: "enabled", budget_tokens: thinkingTokens } : undefined,
       });
       stream
         .on("text", (text) => {
@@ -39,7 +43,11 @@ const callClaudeWithStreamAndThinking = async (prompt: string, thinkingTokens: n
   });
 };
 
-export const callGeminiWrapper = async <T>(prompt: string, schema?: z.ZodSchema<T>, maxRetries = 5) => {
+export const callGeminiWrapper = async <T>(
+  prompt: string,
+  schema?: z.ZodSchema<T>,
+  maxRetries = 5,
+) => {
   // return callOpenRouter(prompt, schema, maxRetries);
   const result = await callClaude(prompt, schema, maxRetries, 1024, true);
   return result;
@@ -91,7 +99,10 @@ export const callClaude = async <T = string>(
 
         // logger.info(`Response for prompt: ${prompt.substring(0, 50)}`, { response: replyText, prompt });
       } else if (useGeminiThinking) {
-        logger.debug(`Calling Gemini with prompt: ${prompt.substring(0, 50)}`, DEBUG ? { prompt } : undefined);
+        logger.debug(
+          `Calling Gemini with prompt: ${prompt.substring(0, 50)}`,
+          DEBUG ? { prompt } : undefined,
+        );
         if (schema) {
           const extracted = await callGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
           logger.success(`Received structured response for prompt: ${prompt.substring(0, 50)}`, {
@@ -121,7 +132,10 @@ export const callClaude = async <T = string>(
               cleanedText = replyText.replace(/^```json\n/, "").replace(/\n```$/, "");
               parsedContent = JSON.parse(cleanedText);
             } catch (e: unknown) {
-              logger.error(`Failed to parse JSON response: ${replyText}, cleanedText: ${cleanedText}`, model);
+              logger.error(
+                `Failed to parse JSON response: ${replyText}, cleanedText: ${cleanedText}`,
+                model,
+              );
               throw e;
             }
           }

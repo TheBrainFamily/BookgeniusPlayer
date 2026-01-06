@@ -1,7 +1,14 @@
 import { useState, useRef, useMemo } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +35,13 @@ interface UploadDialogProps {
   onUploadComplete?: (folderPath: string, basename: string, file: File) => void;
 }
 
-export function UploadDialog({ open, onOpenChange, folderPath, existingBasename, onUploadComplete }: UploadDialogProps) {
+export function UploadDialog({
+  open,
+  onOpenChange,
+  folderPath,
+  existingBasename,
+  onUploadComplete,
+}: UploadDialogProps) {
   const [file, setFile] = useState<File | null>(null);
   const [basename, setBasename] = useState(existingBasename || "");
   const [label, setLabel] = useState("");
@@ -76,7 +89,13 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename,
         const chapterNum = parseInt(chapter);
         const paragraphNum = parseInt(paragraph);
         if (!isNaN(chapterNum) && !isNaN(paragraphNum)) {
-          extra = { type: "background", chapter: chapterNum, paragraph: paragraphNum, backgroundColor, textColor };
+          extra = {
+            type: "background",
+            chapter: chapterNum,
+            paragraph: paragraphNum,
+            backgroundColor,
+            textColor,
+          };
         }
       } else if (assetType === "music") {
         const chapterNum = parseInt(chapter);
@@ -87,16 +106,30 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename,
       }
 
       // 1. Start upload to get intentId, uploadUrl, and backend type
-      const { intentId, uploadUrl, backend } = await startUpload({ folderPath, basename: finalBasename, publish: publishImmediately, label: label.trim() || undefined, extra });
+      const { intentId, uploadUrl, backend } = await startUpload({
+        folderPath,
+        basename: finalBasename,
+        publish: publishImmediately,
+        label: label.trim() || undefined,
+        extra,
+      });
 
       // 2. Upload file - method differs by backend (R2 uses PUT, Convex uses POST)
       let res: Response;
       try {
-        res = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": file.type }, body: file });
+        res = await fetch(uploadUrl, {
+          method: backend === "r2" ? "PUT" : "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
       } catch (fetchError) {
         // CORS errors show as generic "Failed to fetch" - make it clearer
         console.error("Upload fetch failed:", fetchError);
-        throw new Error(backend === "r2" ? "Upload to R2 failed - check CORS configuration on your R2 bucket" : "Upload failed - network error");
+        throw new Error(
+          backend === "r2"
+            ? "Upload to R2 failed - check CORS configuration on your R2 bucket"
+            : "Upload failed - network error",
+        );
       }
 
       if (!res.ok) {
@@ -108,7 +141,14 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename,
       const uploadResponse = backend === "convex" ? await res.json() : undefined;
 
       // 4. Finish the upload with file metadata (include folderPath/basename for post-upload hooks)
-      await finishUpload({ intentId, uploadResponse, size: file.size, contentType: file.type, folderPath, basename: finalBasename });
+      await finishUpload({
+        intentId,
+        uploadResponse,
+        size: file.size,
+        contentType: file.type,
+        folderPath,
+        basename: finalBasename,
+      });
 
       toast.success(`File uploaded${publishImmediately ? " and published" : " as draft"}`);
 
@@ -161,7 +201,11 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename,
           <div
             className={cn(
               "border-2 border-dashed rounded-lg p-6 transition-colors cursor-pointer",
-              dragOver ? "border-primary bg-primary/5" : file ? "border-success bg-success/5" : "border-border hover:border-primary/50",
+              dragOver
+                ? "border-primary bg-primary/5"
+                : file
+                  ? "border-success bg-success/5"
+                  : "border-border hover:border-primary/50",
             )}
             onDragOver={(e) => {
               e.preventDefault();
@@ -215,14 +259,24 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename,
           {!existingBasename && (
             <div className="space-y-2">
               <Label htmlFor="basename">Filename</Label>
-              <Input id="basename" placeholder="my-file.png" value={basename} onChange={(e) => setBasename(e.target.value)} />
+              <Input
+                id="basename"
+                placeholder="my-file.png"
+                value={basename}
+                onChange={(e) => setBasename(e.target.value)}
+              />
             </div>
           )}
 
           {/* Label */}
           <div className="space-y-2">
             <Label htmlFor="label">Version Label (optional)</Label>
-            <Input id="label" placeholder="Initial upload, Fixed typo, etc." value={label} onChange={(e) => setLabel(e.target.value)} />
+            <Input
+              id="label"
+              placeholder="Initial upload, Fixed typo, etc."
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+            />
           </div>
 
           {/* Background/Music Metadata Fields */}
@@ -231,14 +285,30 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename,
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="chapter">Chapter</Label>
-                  <Input id="chapter" type="number" min="0" placeholder="0" value={chapter} onChange={(e) => setChapter(e.target.value)} />
+                  <Input
+                    id="chapter"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={chapter}
+                    onChange={(e) => setChapter(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="paragraph">Paragraph</Label>
-                  <Input id="paragraph" type="number" min="0" placeholder="0" value={paragraph} onChange={(e) => setParagraph(e.target.value)} />
+                  <Input
+                    id="paragraph"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={paragraph}
+                    onChange={(e) => setParagraph(e.target.value)}
+                  />
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">Specify which chapter and paragraph this {assetType} appears at.</p>
+              <p className="text-xs text-muted-foreground">
+                Specify which chapter and paragraph this {assetType} appears at.
+              </p>
             </>
           )}
 
@@ -248,15 +318,37 @@ export function UploadDialog({ open, onOpenChange, folderPath, existingBasename,
               <div className="space-y-2">
                 <Label htmlFor="backgroundColor">Background Color</Label>
                 <div className="flex gap-2">
-                  <Input id="backgroundColor" type="color" value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} className="w-12 h-9 p-1 cursor-pointer" />
-                  <Input type="text" value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} className="flex-1 font-mono text-xs" />
+                  <Input
+                    id="backgroundColor"
+                    type="color"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="w-12 h-9 p-1 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="flex-1 font-mono text-xs"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="textColor">Text Color</Label>
                 <div className="flex gap-2">
-                  <Input id="textColor" type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="w-12 h-9 p-1 cursor-pointer" />
-                  <Input type="text" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="flex-1 font-mono text-xs" />
+                  <Input
+                    id="textColor"
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="w-12 h-9 p-1 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="flex-1 font-mono text-xs"
+                  />
                 </div>
               </div>
             </div>

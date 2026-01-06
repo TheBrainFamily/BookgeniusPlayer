@@ -13,7 +13,12 @@ const outputDir = path.resolve(__dirname, "../../standardebooks-data");
 const booksDir = path.join(outputDir, "books");
 const indexPath = path.join(outputDir, "index.json");
 
-const SKIP_FILES = new Set(["colophon.xhtml", "imprint.xhtml", "titlepage.xhtml", "uncopyright.xhtml"]);
+const SKIP_FILES = new Set([
+  "colophon.xhtml",
+  "imprint.xhtml",
+  "titlepage.xhtml",
+  "uncopyright.xhtml",
+]);
 
 interface BookMetadata {
   slug: string;
@@ -74,7 +79,9 @@ function getLocalBooks(): Set<string> {
   if (!fs.existsSync(booksDir)) {
     return new Set();
   }
-  const dirs = fs.readdirSync(booksDir).filter((d) => fs.statSync(path.join(booksDir, d)).isDirectory());
+  const dirs = fs
+    .readdirSync(booksDir)
+    .filter((d) => fs.statSync(path.join(booksDir, d)).isDirectory());
   return new Set(dirs);
 }
 
@@ -113,7 +120,9 @@ function downloadBookViaGit(slug: string): boolean {
     // Copy text files
     const clonedTextDir = path.join(tempDir, "src/epub/text");
     if (fs.existsSync(clonedTextDir)) {
-      const files = fs.readdirSync(clonedTextDir).filter((f) => f.endsWith(".xhtml") && !SKIP_FILES.has(f));
+      const files = fs
+        .readdirSync(clonedTextDir)
+        .filter((f) => f.endsWith(".xhtml") && !SKIP_FILES.has(f));
       for (const file of files) {
         fs.copyFileSync(path.join(clonedTextDir, file), path.join(bookDir, "text", file));
       }
@@ -171,7 +180,9 @@ function parseMetadataFromOpf(opfContent: string, repoName: string): BookMetadat
   };
 
   const getMeta = (property: string): string => {
-    const match = opfContent.match(new RegExp(`<meta[^>]*property="${property}"[^>]*>([^<]*)</meta>`));
+    const match = opfContent.match(
+      new RegExp(`<meta[^>]*property="${property}"[^>]*>([^<]*)</meta>`),
+    );
     return match ? match[1].trim() : "";
   };
 

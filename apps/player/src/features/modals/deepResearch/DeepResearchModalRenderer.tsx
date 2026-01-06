@@ -9,7 +9,12 @@ import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { useBookForm } from "@player/hooks/useBookForm";
 
-const getModalContainer = (isMobile: boolean, isPlayFormat: boolean, isLargeScreen: boolean, isMediumScreen: boolean): HTMLElement => {
+const getModalContainer = (
+  isMobile: boolean,
+  isPlayFormat: boolean,
+  isLargeScreen: boolean,
+  isMediumScreen: boolean,
+): HTMLElement => {
   if (typeof window === "undefined") return document.body;
 
   // Mobile or play format: centered modal in body
@@ -30,7 +35,17 @@ const getModalContainer = (isMobile: boolean, isPlayFormat: boolean, isLargeScre
 };
 
 export const DeepResearchModalRenderer: React.FC = () => {
-  const { isOpen, content, hideOverlay, isLoading, closeModal, showDiveDeeperCTA, isDiveDeeperLoading, diveDeeperHandler, type } = useDeepResearchModal();
+  const {
+    isOpen,
+    content,
+    hideOverlay,
+    isLoading,
+    closeModal,
+    showDiveDeeperCTA,
+    isDiveDeeperLoading,
+    diveDeeperHandler,
+    type,
+  } = useDeepResearchModal();
   const { isLargeScreen, isMediumScreen } = useScreenSize();
   const isMobile = useIsMobileOrTablet();
   const { enableContentShift, disableContentShift } = useContentShift();
@@ -60,7 +75,10 @@ export const DeepResearchModalRenderer: React.FC = () => {
     }
   }, [shouldUseContentShift, disableContentShift]);
 
-  const container = useMemo(() => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen), [isMobile, isPlayFormat, isLargeScreen, isMediumScreen]);
+  const container = useMemo(
+    () => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen),
+    [isMobile, isPlayFormat, isLargeScreen, isMediumScreen],
+  );
 
   return createPortal(
     <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>

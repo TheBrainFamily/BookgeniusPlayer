@@ -53,7 +53,10 @@ async function loadBookFromR2(bookSlug: string): Promise<CachedBookData> {
   const embeddingsFile = r2.file(`answer-server-data/${bookSlug}/embeddings.json`);
   const richXmlFile = r2.file(`answer-server-data/${bookSlug}/rich.xml`);
 
-  const [embeddingsExists, richXmlExists] = await Promise.all([embeddingsFile.exists(), richXmlFile.exists()]);
+  const [embeddingsExists, richXmlExists] = await Promise.all([
+    embeddingsFile.exists(),
+    richXmlFile.exists(),
+  ]);
 
   if (!embeddingsExists) {
     throw new Error(`Embeddings not found for book: ${bookSlug}`);
@@ -74,7 +77,9 @@ async function loadBookFromR2(bookSlug: string): Promise<CachedBookData> {
   const sizeBytes = (stat?.size || 0) + richXml.length;
   const loadTime = Date.now() - start;
 
-  console.log(`[EmbeddingManager] Loaded ${bookSlug} in ${loadTime}ms (${(sizeBytes / 1024 / 1024).toFixed(1)}MB)`);
+  console.log(
+    `[EmbeddingManager] Loaded ${bookSlug} in ${loadTime}ms (${(sizeBytes / 1024 / 1024).toFixed(1)}MB)`,
+  );
 
   return { embeddings, richXml, chapters, sizeBytes, loadedAt: Date.now() };
 }
@@ -92,7 +97,9 @@ export const bookCache = new LRUCache<string, CachedBookData>({
   allowStaleOnFetchRejection: true,
 
   dispose: (entry: CachedBookData, key: string, reason: string) => {
-    console.log(`[EmbeddingManager] Evicted ${key} (${(entry.sizeBytes / 1024 / 1024).toFixed(1)}MB) - ${reason}`);
+    console.log(
+      `[EmbeddingManager] Evicted ${key} (${(entry.sizeBytes / 1024 / 1024).toFixed(1)}MB) - ${reason}`,
+    );
   },
 });
 
@@ -117,7 +124,12 @@ export function invalidate(bookSlug: string): boolean {
   return bookCache.delete(normalized);
 }
 
-export function getCacheStats(): { cachedBooks: string[]; cacheSize: string; memoryUsage: string; itemCount: number } {
+export function getCacheStats(): {
+  cachedBooks: string[];
+  cacheSize: string;
+  memoryUsage: string;
+  itemCount: number;
+} {
   return {
     cachedBooks: [...bookCache.keys()],
     cacheSize: `${(bookCache.calculatedSize / 1024 / 1024).toFixed(1)}MB`,
@@ -177,7 +189,9 @@ export async function prefetchAllBooks(): Promise<void> {
       await bookCache.fetch(slug);
       successful++;
       const stats = getCacheStats();
-      console.log(`[EmbeddingManager] Loaded ${slug} (${successful}/${slugs.length}) - Cache: ${stats.cacheSize}`);
+      console.log(
+        `[EmbeddingManager] Loaded ${slug} (${successful}/${slugs.length}) - Cache: ${stats.cacheSize}`,
+      );
     } catch (err) {
       failed++;
       console.error(`[EmbeddingManager] Failed to load ${slug}:`, err);

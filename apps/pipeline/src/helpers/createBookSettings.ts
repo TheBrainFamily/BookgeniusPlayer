@@ -18,7 +18,11 @@ export type BookSettings = {
   chapterFormats?: Record<number, ChapterFormat>;
 };
 
-function extractMetadataFromFb2(bookDir: string): { title?: string; author?: string; language?: string } {
+function extractMetadataFromFb2(bookDir: string): {
+  title?: string;
+  author?: string;
+  language?: string;
+} {
   const inputDir = path.join(bookDir, "input");
   const fb2Files = fs.readdirSync(inputDir).filter((f) => f.endsWith(".fb2"));
 

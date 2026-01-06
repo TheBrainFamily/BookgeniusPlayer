@@ -10,7 +10,8 @@ import ModalUI from "./ModalUI";
 
 const MusicEditModal: React.FC = () => {
   const { book } = useBookConvex();
-  const { isOpen, cueId, fileBasename, currentMusicUrl, title, artist, closeModal } = useMusicEditModal();
+  const { isOpen, cueId, fileBasename, currentMusicUrl, title, artist, closeModal } =
+    useMusicEditModal();
 
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
@@ -58,7 +59,10 @@ const MusicEditModal: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!book?.path || !uploadedFile) {
-      console.error("[MusicEditModal] Cannot submit: missing book path or file", { bookPath: book?.path, file: uploadedFile?.name });
+      console.error("[MusicEditModal] Cannot submit: missing book path or file", {
+        bookPath: book?.path,
+        file: uploadedFile?.name,
+      });
       return;
     }
 
@@ -78,11 +82,19 @@ const MusicEditModal: React.FC = () => {
       const basename = uploadedFile.name;
 
       console.log("[MusicEditModal] Calling startUpload", { folderPath, basename });
-      const { intentId, uploadUrl, backend } = await startUpload({ folderPath, basename, publish: true });
+      const { intentId, uploadUrl, backend } = await startUpload({
+        folderPath,
+        basename,
+        publish: true,
+      });
       console.log("[MusicEditModal] Got upload URL", { intentId, backend });
 
       console.log("[MusicEditModal] Uploading file to", backend);
-      const res = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": uploadedFile.type }, body: uploadedFile });
+      const res = await fetch(uploadUrl, {
+        method: backend === "r2" ? "PUT" : "POST",
+        headers: { "Content-Type": uploadedFile.type },
+        body: uploadedFile,
+      });
 
       if (!res.ok) {
         const errorText = await res.text().catch(() => "");
@@ -92,7 +104,14 @@ const MusicEditModal: React.FC = () => {
 
       const uploadResponse = backend === "convex" ? await res.json() : undefined;
       console.log("[MusicEditModal] Calling finishUpload", { intentId });
-      await finishUpload({ intentId, uploadResponse, size: uploadedFile.size, contentType: uploadedFile.type, folderPath, basename });
+      await finishUpload({
+        intentId,
+        uploadResponse,
+        size: uploadedFile.size,
+        contentType: uploadedFile.type,
+        folderPath,
+        basename,
+      });
       console.log("[MusicEditModal] Upload finished");
 
       console.log("[MusicEditModal] Updating cue to new file", { cueId, fileBasename: basename });
@@ -118,19 +137,36 @@ const MusicEditModal: React.FC = () => {
           {currentMusicUrl && <audio src={currentMusicUrl} controls className="w-full mt-2" />}
         </div>
 
-        {error && <div className="bg-red-500/20 border border-red-500/50 rounded-lg px-3 py-2 text-red-300 text-sm">{error}</div>}
+        {error && (
+          <div className="bg-red-500/20 border border-red-500/50 rounded-lg px-3 py-2 text-red-300 text-sm">
+            {error}
+          </div>
+        )}
 
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-            isDragging ? "border-purple-500 bg-purple-500/10" : uploadedFile ? "border-green-500 bg-green-500/10" : "border-zinc-600 hover:border-zinc-500"
+            isDragging
+              ? "border-purple-500 bg-purple-500/10"
+              : uploadedFile
+                ? "border-green-500 bg-green-500/10"
+                : "border-zinc-600 hover:border-zinc-500"
           }`}
         >
-          <Upload size={32} className={`mx-auto mb-2 ${uploadedFile ? "text-green-400" : "text-zinc-400"}`} />
-          <div className={`text-sm mb-2 ${uploadedFile ? "text-green-300" : "text-zinc-400"}`}>{uploadedFile ? uploadedFile.name : "Drag and drop an MP3 file here"}</div>
-          {uploadedFile && <div className="text-zinc-500 text-xs mb-2">{(uploadedFile.size / 1024 / 1024).toFixed(2)} MB</div>}
+          <Upload
+            size={32}
+            className={`mx-auto mb-2 ${uploadedFile ? "text-green-400" : "text-zinc-400"}`}
+          />
+          <div className={`text-sm mb-2 ${uploadedFile ? "text-green-300" : "text-zinc-400"}`}>
+            {uploadedFile ? uploadedFile.name : "Drag and drop an MP3 file here"}
+          </div>
+          {uploadedFile && (
+            <div className="text-zinc-500 text-xs mb-2">
+              {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+            </div>
+          )}
           <label className="cursor-pointer text-purple-400 hover:text-purple-300 text-sm">
             or click to browse
             <input type="file" accept="audio/*" onChange={handleFileSelect} className="hidden" />

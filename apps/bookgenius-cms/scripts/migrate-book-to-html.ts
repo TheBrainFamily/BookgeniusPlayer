@@ -15,7 +15,9 @@ import { parseHTML } from "linkedom";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "../../../");
 
-const envPath = existsSync(join(rootDir, ".env")) ? join(rootDir, ".env") : join(rootDir, "backend/.env");
+const envPath = existsSync(join(rootDir, ".env"))
+  ? join(rootDir, ".env")
+  : join(rootDir, "backend/.env");
 
 config({ path: envPath });
 
@@ -33,7 +35,10 @@ const bookPath = `books/${bookSlug}`;
 type CharacterOccurrences = { s: number[]; t: number[]; e?: number[]; x?: number[] };
 type ChapterOccurrences = Record<string, CharacterOccurrences>;
 
-function convertCompiledHtmlToSource(compiledHtml: string, occurrences?: ChapterOccurrences): string {
+function convertCompiledHtmlToSource(
+  compiledHtml: string,
+  occurrences?: ChapterOccurrences,
+): string {
   const { document } = parseHTML(compiledHtml);
   const section = document.querySelector("section[data-chapter]");
 
@@ -55,7 +60,11 @@ function convertCompiledHtmlToSource(compiledHtml: string, occurrences?: Chapter
   return section.outerHTML;
 }
 
-function injectEntersExitsFromOccurrences(section: Element, occurrences: ChapterOccurrences, document: Document): void {
+function injectEntersExitsFromOccurrences(
+  section: Element,
+  occurrences: ChapterOccurrences,
+  document: Document,
+): void {
   const entersByParagraph = new Map<number, string[]>();
   const exitsByParagraph = new Map<number, string[]>();
 
@@ -87,7 +96,12 @@ function injectEntersExitsFromOccurrences(section: Element, occurrences: Chapter
   });
 }
 
-function wrapCharacterNameWithAttribute(container: Element, slug: string, attr: string, document: Document): void {
+function wrapCharacterNameWithAttribute(
+  container: Element,
+  slug: string,
+  attr: string,
+  document: Document,
+): void {
   const existing = container.querySelector(`[data-c="${slug}"], [data-character="${slug}"]`);
   if (existing) {
     existing.setAttribute(attr, "true");
@@ -98,7 +112,12 @@ function wrapCharacterNameWithAttribute(container: Element, slug: string, attr: 
     .split("-")
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
     .join(" ");
-  const variations = [displayName.toUpperCase(), displayName, slug.toUpperCase().replace(/-/g, " "), slug.replace(/-/g, " ")];
+  const variations = [
+    displayName.toUpperCase(),
+    displayName,
+    slug.toUpperCase().replace(/-/g, " "),
+    slug.replace(/-/g, " "),
+  ];
 
   const walker = document.createTreeWalker(container, 4 /* NodeFilter.SHOW_TEXT */);
   let node: Text | null;
@@ -145,7 +164,8 @@ function convertAvatarPlaceholdersToDataSpeaker(section: Element): void {
       const playRow = parent.closest(".play-row");
       const targetElement = playRow || parent;
 
-      const existingSpeakers = targetElement.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
+      const existingSpeakers =
+        targetElement.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
       if (!existingSpeakers.includes(slug)) {
         existingSpeakers.push(slug);
       }
@@ -193,7 +213,11 @@ function removeEmptyClassAttributes(section: Element): void {
   });
 }
 
-function extractChapterMetadata(html: string): { chapterNumber: number; title: string | null; paragraphCount: number } {
+function extractChapterMetadata(html: string): {
+  chapterNumber: number;
+  title: string | null;
+  paragraphCount: number;
+} {
   const { document } = parseHTML(html);
   const section = document.querySelector("section[data-chapter]");
 
@@ -214,7 +238,11 @@ function convexRun(command: string, args: Record<string, unknown>): string {
   const tempFile = join(rootDir, ".convex-args-temp.json");
   writeFileSync(tempFile, argsJson);
   try {
-    const result = execSync(`npx convex run ${command} "$(cat ${tempFile})"`, { encoding: "utf-8", cwd: rootDir, shell: "/bin/bash" });
+    const result = execSync(`npx convex run ${command} "$(cat ${tempFile})"`, {
+      encoding: "utf-8",
+      cwd: rootDir,
+      shell: "/bin/bash",
+    });
     return result;
   } finally {
     unlinkSync(tempFile);
@@ -296,7 +324,9 @@ async function main() {
       const metadata = extractChapterMetadata(sourceHtml);
 
       if (dryRun) {
-        console.log(`[DRY RUN] Would convert (${metadata.paragraphCount} paragraphs, title: "${metadata.title || "none"}")`);
+        console.log(
+          `[DRY RUN] Would convert (${metadata.paragraphCount} paragraphs, title: "${metadata.title || "none"}")`,
+        );
         results.push({ chapterNumber: chapter.chapterNumber, success: true });
         continue;
       }
@@ -309,11 +339,17 @@ async function main() {
         paragraphCount: metadata.paragraphCount,
       });
 
-      console.log(`Uploaded (${metadata.paragraphCount} paragraphs, title: "${metadata.title || "none"}")`);
+      console.log(
+        `Uploaded (${metadata.paragraphCount} paragraphs, title: "${metadata.title || "none"}")`,
+      );
       results.push({ chapterNumber: chapter.chapterNumber, success: true });
     } catch (err: unknown) {
       console.log(`FAILED: ${(err as Error).message}`);
-      results.push({ chapterNumber: chapter.chapterNumber, success: false, error: (err as Error).message });
+      results.push({
+        chapterNumber: chapter.chapterNumber,
+        success: false,
+        error: (err as Error).message,
+      });
     }
   }
 

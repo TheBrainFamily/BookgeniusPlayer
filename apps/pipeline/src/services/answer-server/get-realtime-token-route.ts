@@ -28,10 +28,17 @@ export async function handleGenerateRealtimeToken(
     const qsToken = new URL(req.url).searchParams.get("token") || undefined;
     const providedToken = bearer || cookieToken || qsToken || undefined;
     if (providedToken) {
-      const viewerHostHeader = (req.headers.get("x-viewer-host") || req.headers.get("host") || "").toLowerCase();
+      const viewerHostHeader = (
+        req.headers.get("x-viewer-host") ||
+        req.headers.get("host") ||
+        ""
+      ).toLowerCase();
       const viewerHost = viewerHostHeader.split(":")[0];
       let jwtKey = defaultJwtKey;
-      if (snapplifyJwtKey && (viewerHost.endsWith(".snapplify.com") || viewerHost === "bookgenius.snapplify.com")) {
+      if (
+        snapplifyJwtKey &&
+        (viewerHost.endsWith(".snapplify.com") || viewerHost === "bookgenius.snapplify.com")
+      ) {
         jwtKey = snapplifyJwtKey;
       }
       if (!jwtKey) {
@@ -51,7 +58,10 @@ export async function handleGenerateRealtimeToken(
       token = await generateToken();
     } catch (e) {
       console.error("Failed to create ephemeral token", e);
-      return new Response("Failed to create ephemeral token", { status: 500, headers: corsHeaders });
+      return new Response("Failed to create ephemeral token", {
+        status: 500,
+        headers: corsHeaders,
+      });
     }
     return new Response(token, { status: 200, headers: corsHeaders });
   } else {

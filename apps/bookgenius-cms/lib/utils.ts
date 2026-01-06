@@ -17,7 +17,9 @@ export function formatBytes(bytes: number, decimals = 2): string {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-export function getContentTypeCategory(contentType: string | undefined): "image" | "audio" | "video" | "text" | "json" | "other" {
+export function getContentTypeCategory(
+  contentType: string | undefined,
+): "image" | "audio" | "video" | "text" | "json" | "other" {
   if (!contentType) return "other";
   if (contentType.startsWith("image/")) return "image";
   if (contentType.startsWith("audio/")) return "audio";

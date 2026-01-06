@@ -11,13 +11,24 @@ interface StyleInfo {
 
 interface StylePreviewComparisonProps {
   slug: string;
-  previews: { autoPreviewPath: string | null; userPreviewPath: string | null; autoAvatarPath: string | null; userAvatarPath: string | null } | null;
+  previews: {
+    autoPreviewPath: string | null;
+    userPreviewPath: string | null;
+    autoAvatarPath: string | null;
+    userAvatarPath: string | null;
+  } | null;
   autoStyle: StyleInfo | null;
   userStyle: StyleInfo | null;
   onChoose: (choice: "auto" | "user") => void;
 }
 
-export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, onChoose }: StylePreviewComparisonProps) {
+export function StylePreviewComparison({
+  slug,
+  previews,
+  autoStyle,
+  userStyle,
+  onChoose,
+}: StylePreviewComparisonProps) {
   if (!previews) return null;
 
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
@@ -38,8 +49,12 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in p-4 overflow-y-auto">
       <div className="w-full max-w-5xl space-y-6 my-auto">
         <div className="text-center space-y-2 text-white">
-          <h2 className="text-3xl font-bold font-display tracking-tight">Choose Your Visual Style</h2>
-          <p className="text-white/70 max-w-xl mx-auto">We've generated two options for your book. Select the one that best matches your vision.</p>
+          <h2 className="text-3xl font-bold font-display tracking-tight">
+            Choose Your Visual Style
+          </h2>
+          <p className="text-white/70 max-w-xl mx-auto">
+            We've generated two options for your book. Select the one that best matches your vision.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -49,9 +64,15 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
             <Card className="relative h-full flex flex-col border-primary/20 overflow-hidden bg-card/90 backdrop-blur hover:border-primary/50 transition-all duration-300 transform hover:-translate-y-1">
               <div className="aspect-video w-full overflow-hidden bg-muted relative">
                 {autoImageUrl ? (
-                  <img src={autoImageUrl} alt="AI Generated Preview" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img
+                    src={autoImageUrl}
+                    alt="AI Generated Preview"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-secondary/20">No preview available</div>
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-secondary/20">
+                    No preview available
+                  </div>
                 )}
                 {autoAvatarUrl && (
                   <div
@@ -61,7 +82,11 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
                       isAvatarHovered ? "w-32 h-32" : "w-20 h-20"
                     }`}
                   >
-                    <img src={autoAvatarUrl} alt="Character Avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={autoAvatarUrl}
+                      alt="Character Avatar"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 )}
                 <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border border-white/10">
@@ -72,7 +97,9 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
 
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Content-Based Style</CardTitle>
-                <CardDescription className="line-clamp-2">Automatically derived from the book's text and era</CardDescription>
+                <CardDescription className="line-clamp-2">
+                  Automatically derived from the book's text and era
+                </CardDescription>
               </CardHeader>
 
               <CardContent className="flex-1 space-y-4">
@@ -90,7 +117,12 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
                 )}
 
                 <div className="pt-2 mt-auto">
-                  <Button onClick={() => onChoose("auto")} className="w-full gap-2" size="lg" variant="outline">
+                  <Button
+                    onClick={() => onChoose("auto")}
+                    className="w-full gap-2"
+                    size="lg"
+                    variant="outline"
+                  >
                     <CheckCircle2 className="w-4 h-4" />
                     Select This Style
                   </Button>
@@ -105,7 +137,11 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
               <div className="absolute -inset-0.5 bg-gradient-to-b from-purple-500/20 to-transparent rounded-2xl opacity-50 blur group-hover:opacity-100 transition duration-500"></div>
               <Card className="relative h-full flex flex-col border-purple-500/20 overflow-hidden bg-card/90 backdrop-blur hover:border-purple-500/50 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="aspect-video w-full overflow-hidden bg-muted relative">
-                  <img src={userImageUrl} alt="Your Custom Style" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img
+                    src={userImageUrl}
+                    alt="Your Custom Style"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                   {userAvatarUrl && (
                     <div
                       onMouseEnter={() => setIsAvatarHovered(true)}
@@ -114,7 +150,11 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
                         isAvatarHovered ? "w-32 h-32" : "w-20 h-20"
                       }`}
                     >
-                      <img src={userAvatarUrl} alt="Character Avatar" className="w-full h-full object-cover" />
+                      <img
+                        src={userAvatarUrl}
+                        alt="Character Avatar"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   )}
                   <div className="absolute top-3 left-3 bg-purple-900/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border border-white/10">
@@ -125,7 +165,9 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
 
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Customized Style</CardTitle>
-                  <CardDescription className="line-clamp-2">Based on your description and preferences</CardDescription>
+                  <CardDescription className="line-clamp-2">
+                    Based on your description and preferences
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent className="flex-1 space-y-4">
@@ -141,7 +183,11 @@ export function StylePreviewComparison({ slug, previews, autoStyle, userStyle, o
                   </div>
 
                   <div className="pt-2 mt-auto">
-                    <Button onClick={() => onChoose("user")} className="w-full gap-2 bg-purple-600 hover:bg-purple-700 text-white" size="lg">
+                    <Button
+                      onClick={() => onChoose("user")}
+                      className="w-full gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+                      size="lg"
+                    >
                       <CheckCircle2 className="w-4 h-4" />
                       Select This Style
                     </Button>

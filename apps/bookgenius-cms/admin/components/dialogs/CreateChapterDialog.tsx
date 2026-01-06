@@ -10,7 +10,14 @@ import { useState, useCallback, useMemo } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useBook } from "@/lib/contexts";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,7 +58,12 @@ function generateChapterTemplate(chapterNumber: number, title: string): string {
 // Component
 // =============================================================================
 
-export function CreateChapterDialog({ open, onOpenChange, bookPath, onCreated }: CreateChapterDialogProps) {
+export function CreateChapterDialog({
+  open,
+  onOpenChange,
+  bookPath,
+  onCreated,
+}: CreateChapterDialogProps) {
   // Form state
   const [chapterNumber, setChapterNumber] = useState("");
   const [title, setTitle] = useState("");
@@ -102,7 +114,11 @@ export function CreateChapterDialog({ open, onOpenChange, bookPath, onCreated }:
       });
 
       // Upload content
-      const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: blob });
+      const response = await fetch(uploadUrl, {
+        method: backend === "r2" ? "PUT" : "POST",
+        headers: { "Content-Type": contentType },
+        body: blob,
+      });
 
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.status}`);
@@ -126,7 +142,17 @@ export function CreateChapterDialog({ open, onOpenChange, bookPath, onCreated }:
     } finally {
       setIsCreating(false);
     }
-  }, [bookPath, chaptersPath, chapterNumber, title, filename, startUpload, finishUpload, onOpenChange, onCreated]);
+  }, [
+    bookPath,
+    chaptersPath,
+    chapterNumber,
+    title,
+    filename,
+    startUpload,
+    finishUpload,
+    onOpenChange,
+    onCreated,
+  ]);
 
   // Handle close
   const handleClose = useCallback(() => {
@@ -146,7 +172,10 @@ export function CreateChapterDialog({ open, onOpenChange, bookPath, onCreated }:
             <FileText className="h-5 w-5" />
             Create Chapter
           </DialogTitle>
-          <DialogDescription>Add a new chapter to this book. A template XML file will be created that you can edit in the chapter editor.</DialogDescription>
+          <DialogDescription>
+            Add a new chapter to this book. A template XML file will be created that you can edit in
+            the chapter editor.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -155,7 +184,15 @@ export function CreateChapterDialog({ open, onOpenChange, bookPath, onCreated }:
             <Label htmlFor="chapterNumber">
               Chapter Number <span className="text-destructive">*</span>
             </Label>
-            <Input id="chapterNumber" type="number" min="1" value={chapterNumber} onChange={(e) => setChapterNumber(e.target.value)} placeholder="1" disabled={isCreating} />
+            <Input
+              id="chapterNumber"
+              type="number"
+              min="1"
+              value={chapterNumber}
+              onChange={(e) => setChapterNumber(e.target.value)}
+              placeholder="1"
+              disabled={isCreating}
+            />
           </div>
 
           {/* Title */}
@@ -163,7 +200,13 @@ export function CreateChapterDialog({ open, onOpenChange, bookPath, onCreated }:
             <Label htmlFor="title">
               Title <span className="text-destructive">*</span>
             </Label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="The Beginning" disabled={isCreating} />
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="The Beginning"
+              disabled={isCreating}
+            />
           </div>
 
           {/* File preview */}

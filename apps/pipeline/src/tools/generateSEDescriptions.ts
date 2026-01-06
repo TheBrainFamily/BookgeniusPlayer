@@ -8,7 +8,9 @@ import PQueue from "p-queue";
 const BookDescriptionSchema = z.object({
   description: z
     .string()
-    .describe("A catchy, engaging description (2-3 sentences max) that would make someone want to read this book"),
+    .describe(
+      "A catchy, engaging description (2-3 sentences max) that would make someone want to read this book",
+    ),
   hook: z.string().describe("A one-liner hook/tagline for the book"),
 });
 

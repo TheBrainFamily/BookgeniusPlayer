@@ -1,7 +1,10 @@
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getCharactersData } from "@player/state/bookDataStore";
 import { highlightCharacter } from "@player/ui/highlightCharacter";
-import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils/characterOverrides";
+import {
+  resolveCharacterSnapshot,
+  parseChapterParagraphId,
+} from "@player/utils/characterOverrides";
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 
@@ -40,7 +43,9 @@ function extractLocationFromElement(el: HTMLElement): ChapterParagraphRef | null
 }
 
 export const activateCharacterInteractions = (element: HTMLElement) => {
-  const characterSpans = element.querySelectorAll<HTMLSpanElement>('.character-highlighted:not([data-click-listener-attached="true"])');
+  const characterSpans = element.querySelectorAll<HTMLSpanElement>(
+    '.character-highlighted:not([data-click-listener-attached="true"])',
+  );
 
   const alreadyHighlighted = [];
 

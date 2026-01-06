@@ -28,7 +28,9 @@ export function rebuildBook(bookPath: string) {
     });
 
     // Read and trim chapters
-    const chapters = chapterFiles.map((f) => fs.readFileSync(path.join(bookPath, contentDir, f), "utf8").trim());
+    const chapters = chapterFiles.map((f) =>
+      fs.readFileSync(path.join(bookPath, contentDir, f), "utf8").trim(),
+    );
 
     // Combine into book content
     const bookContent = metadata + "\n\n" + chapters.join("\n\n") + "\n\n" + closingTag + "\n";

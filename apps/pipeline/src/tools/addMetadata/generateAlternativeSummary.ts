@@ -13,7 +13,9 @@ export const generateAlternativeSummary = async (
     contextSections.push(`Story context: <storyContext>${chapterContext}</storyContext>`);
   }
 
-  contextSections.push(`Latest character background: <backgroundInfo>${latestCharacterSummary}</backgroundInfo>`);
+  contextSections.push(
+    `Latest character background: <backgroundInfo>${latestCharacterSummary}</backgroundInfo>`,
+  );
 
   contextSections.push(`Current page: <page>${pageWithTextUpToMention}</page>`);
 

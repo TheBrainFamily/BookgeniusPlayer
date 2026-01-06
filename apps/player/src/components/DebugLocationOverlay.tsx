@@ -90,12 +90,24 @@ export function DebugLocationOverlay() {
         border: "1px solid #333",
       }}
     >
-      <div style={{ fontWeight: "bold", marginBottom: "6px", color: "#fff", borderBottom: "1px solid #444", paddingBottom: "4px" }}>Debug Info</div>
-      <div>
-        <span style={{ color: "#888" }}>Chapter:</span> <span style={{ color: "#ff0" }}>{location.currentChapter}</span>
+      <div
+        style={{
+          fontWeight: "bold",
+          marginBottom: "6px",
+          color: "#fff",
+          borderBottom: "1px solid #444",
+          paddingBottom: "4px",
+        }}
+      >
+        Debug Info
       </div>
       <div>
-        <span style={{ color: "#888" }}>Paragraph:</span> <span style={{ color: "#ff0" }}>{location.currentParagraph}</span>
+        <span style={{ color: "#888" }}>Chapter:</span>{" "}
+        <span style={{ color: "#ff0" }}>{location.currentChapter}</span>
+      </div>
+      <div>
+        <span style={{ color: "#888" }}>Paragraph:</span>{" "}
+        <span style={{ color: "#ff0" }}>{location.currentParagraph}</span>
       </div>
       <div style={{ marginTop: "4px", paddingTop: "4px", borderTop: "1px solid #333" }}>
         <span style={{ color: "#888" }}>Range:</span>{" "}
@@ -104,13 +116,16 @@ export function DebugLocationOverlay() {
         </span>
       </div>
       <div style={{ marginTop: "4px", paddingTop: "4px", borderTop: "1px solid #333" }}>
-        <span style={{ color: "#888" }}>Mounted:</span> <span style={{ color: "#f0f" }}>[{mountedChapters.join(", ")}]</span>
+        <span style={{ color: "#888" }}>Mounted:</span>{" "}
+        <span style={{ color: "#f0f" }}>[{mountedChapters.join(", ")}]</span>
       </div>
       <div>
-        <span style={{ color: "#888" }}>Spacer:</span> <span style={{ color: "#f80" }}>{spacerHeight}px</span>
+        <span style={{ color: "#888" }}>Spacer:</span>{" "}
+        <span style={{ color: "#f80" }}>{spacerHeight}px</span>
       </div>
       <div>
-        <span style={{ color: "#888" }}>Scroll:</span> <span style={{ color: "#8f8" }}>{scrollTop}px</span>
+        <span style={{ color: "#888" }}>Scroll:</span>{" "}
+        <span style={{ color: "#8f8" }}>{scrollTop}px</span>
       </div>
     </div>
   );

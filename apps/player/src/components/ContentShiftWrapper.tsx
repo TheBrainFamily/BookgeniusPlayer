@@ -32,7 +32,8 @@ export const ContentShiftWrapper: React.FC = () => {
   const [isWideScreen, setIsWideScreen] = useState(() => getInitialScreenSizes().wide);
 
   const { bookData } = useBookConvex();
-  const isPlayFormat = bookData?.metadata?.bookForm === "play" || bookData?.metadata?.bookForm === "mixed";
+  const isPlayFormat =
+    bookData?.metadata?.bookForm === "play" || bookData?.metadata?.bookForm === "mixed";
   const isMobileOrTabletDevice = useIsMobileOrTablet();
 
   useEffect(() => {

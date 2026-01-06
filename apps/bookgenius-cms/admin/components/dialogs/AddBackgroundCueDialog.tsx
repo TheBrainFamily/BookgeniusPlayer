@@ -11,7 +11,14 @@ import { useState, useCallback } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useBook, useBackgroundCues } from "@/lib/contexts";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,7 +53,12 @@ function isImageFile(filename: string): boolean {
 // Component
 // =============================================================================
 
-export function AddBackgroundCueDialog({ open, onOpenChange, chapter, onCreated }: AddBackgroundCueDialogProps) {
+export function AddBackgroundCueDialog({
+  open,
+  onOpenChange,
+  chapter,
+  onCreated,
+}: AddBackgroundCueDialogProps) {
   const { bookPath } = useBook();
   const { files } = useBackgroundCues();
 
@@ -102,7 +114,17 @@ export function AddBackgroundCueDialog({ open, onOpenChange, chapter, onCreated 
     } finally {
       setIsCreating(false);
     }
-  }, [bookPath, selectedFile, chapter, paragraph, backgroundColor, textColor, createCue, onOpenChange, onCreated]);
+  }, [
+    bookPath,
+    selectedFile,
+    chapter,
+    paragraph,
+    backgroundColor,
+    textColor,
+    createCue,
+    onOpenChange,
+    onCreated,
+  ]);
 
   // Handle close
   const handleClose = useCallback(() => {
@@ -127,7 +149,10 @@ export function AddBackgroundCueDialog({ open, onOpenChange, chapter, onCreated 
             <Video className="h-5 w-5" />
             Add Background Cue
           </DialogTitle>
-          <DialogDescription>Add a background to Chapter {chapter}. Select a file and set the paragraph where it should start.</DialogDescription>
+          <DialogDescription>
+            Add a background to Chapter {chapter}. Select a file and set the paragraph where it
+            should start.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -154,20 +179,44 @@ export function AddBackgroundCueDialog({ open, onOpenChange, chapter, onCreated 
                       >
                         {/* Preview - priority: video preview > webp thumbnail > original */}
                         {file.previewMp4Url ? (
-                          <video className="h-10 w-16 object-cover rounded border" autoPlay loop muted playsInline poster={file.previewWebpUrl}>
+                          <video
+                            className="h-10 w-16 object-cover rounded border"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            poster={file.previewWebpUrl}
+                          >
                             <source src={file.previewMp4Url} type="video/mp4" />
                           </video>
                         ) : file.previewWebpUrl ? (
-                          <img src={file.previewWebpUrl} alt={file.basename} className="h-10 w-16 object-cover rounded border" />
+                          <img
+                            src={file.previewWebpUrl}
+                            alt={file.basename}
+                            className="h-10 w-16 object-cover rounded border"
+                          />
                         ) : file.url ? (
                           isImage ? (
-                            <img src={file.url} alt={file.basename} className="h-10 w-16 object-cover rounded border" />
+                            <img
+                              src={file.url}
+                              alt={file.basename}
+                              className="h-10 w-16 object-cover rounded border"
+                            />
                           ) : (
-                            <video src={file.url} className="h-10 w-16 object-cover rounded border" muted preload="metadata" />
+                            <video
+                              src={file.url}
+                              className="h-10 w-16 object-cover rounded border"
+                              muted
+                              preload="metadata"
+                            />
                           )
                         ) : (
                           <div className="h-10 w-16 bg-muted rounded border flex items-center justify-center">
-                            {isImage ? <ImageIcon className="h-4 w-4 text-muted-foreground" /> : <Video className="h-4 w-4 text-muted-foreground" />}
+                            {isImage ? (
+                              <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <Video className="h-4 w-4 text-muted-foreground" />
+                            )}
                           </div>
                         )}
                         {/* Name */}
@@ -180,7 +229,9 @@ export function AddBackgroundCueDialog({ open, onOpenChange, chapter, onCreated 
                 </div>
               </ScrollArea>
             ) : (
-              <div className="h-24 border rounded-md flex items-center justify-center text-sm text-muted-foreground">No background files available. Upload some files first.</div>
+              <div className="h-24 border rounded-md flex items-center justify-center text-sm text-muted-foreground">
+                No background files available. Upload some files first.
+              </div>
             )}
           </div>
 
@@ -189,7 +240,16 @@ export function AddBackgroundCueDialog({ open, onOpenChange, chapter, onCreated 
             <Label htmlFor="paragraph">
               Paragraph <span className="text-destructive">*</span>
             </Label>
-            <Input id="paragraph" type="number" min="0" value={paragraph} onChange={(e) => setParagraph(e.target.value)} placeholder="0" disabled={isCreating} className="w-32" />
+            <Input
+              id="paragraph"
+              type="number"
+              min="0"
+              value={paragraph}
+              onChange={(e) => setParagraph(e.target.value)}
+              placeholder="0"
+              disabled={isCreating}
+              className="w-32"
+            />
             <p className="text-xs text-muted-foreground">0 = start of chapter</p>
           </div>
 
@@ -198,15 +258,37 @@ export function AddBackgroundCueDialog({ open, onOpenChange, chapter, onCreated 
             <div className="space-y-2">
               <Label htmlFor="backgroundColor">Background Color</Label>
               <div className="flex gap-2">
-                <Input id="backgroundColor" value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} placeholder="#1a1a1a" disabled={isCreating} />
-                {backgroundColor && <div className="h-9 w-9 rounded border shrink-0" style={{ backgroundColor: backgroundColor }} />}
+                <Input
+                  id="backgroundColor"
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                  placeholder="#1a1a1a"
+                  disabled={isCreating}
+                />
+                {backgroundColor && (
+                  <div
+                    className="h-9 w-9 rounded border shrink-0"
+                    style={{ backgroundColor: backgroundColor }}
+                  />
+                )}
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="textColor">Text Color</Label>
               <div className="flex gap-2">
-                <Input id="textColor" value={textColor} onChange={(e) => setTextColor(e.target.value)} placeholder="#f2e4c9" disabled={isCreating} />
-                {textColor && <div className="h-9 w-9 rounded border shrink-0" style={{ backgroundColor: textColor }} />}
+                <Input
+                  id="textColor"
+                  value={textColor}
+                  onChange={(e) => setTextColor(e.target.value)}
+                  placeholder="#f2e4c9"
+                  disabled={isCreating}
+                />
+                {textColor && (
+                  <div
+                    className="h-9 w-9 rounded border shrink-0"
+                    style={{ backgroundColor: textColor }}
+                  />
+                )}
               </div>
             </div>
           </div>

@@ -61,7 +61,10 @@ export const runBoomerang = (options: BoomerangOptions, executionPath: string): 
   }
 
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python3", [scriptPath, ...scriptArgs], { cwd: executionPath, stdio: "inherit" });
+    const pythonProcess = spawn("python3", [scriptPath, ...scriptArgs], {
+      cwd: executionPath,
+      stdio: "inherit",
+    });
 
     pythonProcess.on("close", (code) => {
       if (code === 0) {
@@ -92,7 +95,10 @@ export const processBoomerangOnFile = async (file: string, directoryPath: string
   console.log(`  - Outputting to temporary file: ${tempOutputFilename}`);
 
   try {
-    await runBoomerang({ input: file, output: tempOutputFilename, slowdown: 1.7, crf: "20" }, directoryPath);
+    await runBoomerang(
+      { input: file, output: tempOutputFilename, slowdown: 1.7, crf: "20" },
+      directoryPath,
+    );
 
     console.log(`  - Boomerang script finished. Renaming ${tempOutputFilename} to ${file}`);
     await fs.rename(tempOutputFilePath, originalFilePath);
@@ -152,7 +158,9 @@ export const processBoomerangInDirectory = async (directoryPath: string) => {
     const batchSize = 8;
     for (let i = 0; i < sortedMp4Files.length; i += batchSize) {
       const batch = sortedMp4Files.slice(i, i + batchSize);
-      console.log(`\nProcessing batch ${i / batchSize + 1} of ${Math.ceil(sortedMp4Files.length / batchSize)}...`);
+      console.log(
+        `\nProcessing batch ${i / batchSize + 1} of ${Math.ceil(sortedMp4Files.length / batchSize)}...`,
+      );
 
       const processingPromises = batch.map((file) => processBoomerangOnFile(file, directoryPath));
       await Promise.all(processingPromises);

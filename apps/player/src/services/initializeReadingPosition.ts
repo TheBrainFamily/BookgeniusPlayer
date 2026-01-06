@@ -1,5 +1,10 @@
 import { getLatestPosition, getCurrentPlatformAndBook } from "./readingPositionApi";
-import { getSavedLocation, setCurrentLocation, setSavedLocation, type ExtendedLocation } from "@player/helpers/paragraphsNavigation";
+import {
+  getSavedLocation,
+  setCurrentLocation,
+  setSavedLocation,
+  type ExtendedLocation,
+} from "@player/helpers/paragraphsNavigation";
 import { initCommitter } from "@player/helpers/locationCommitter";
 
 const normalizeTimestamp = (ts: unknown): number => {

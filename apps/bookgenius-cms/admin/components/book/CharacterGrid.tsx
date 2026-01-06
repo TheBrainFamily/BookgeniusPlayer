@@ -48,7 +48,9 @@ export function CharacterGrid({ onCharacterSelect, onCreateCharacter }: Characte
     if (!characters) return [];
     if (!searchQuery) return characters;
     const query = searchQuery.toLowerCase();
-    return characters.filter((c) => c.name.toLowerCase().includes(query) || c.slug.toLowerCase().includes(query));
+    return characters.filter(
+      (c) => c.name.toLowerCase().includes(query) || c.slug.toLowerCase().includes(query),
+    );
   }, [characters, searchQuery]);
 
   if (isLoading) {
@@ -64,7 +66,9 @@ export function CharacterGrid({ onCharacterSelect, onCreateCharacter }: Characte
           </div>
           <div className="text-center">
             <h3 className="font-medium text-foreground">No characters yet</h3>
-            <p className="text-sm text-muted-foreground mt-1">Create a character folder with avatar, speaks, and listens assets</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Create a character folder with avatar, speaks, and listens assets
+            </p>
           </div>
           <Button onClick={handleCreateClick}>
             <Plus className="h-4 w-4 mr-2" />
@@ -73,7 +77,12 @@ export function CharacterGrid({ onCharacterSelect, onCreateCharacter }: Characte
         </div>
 
         {/* Create Character Dialog */}
-        <CreateCharacterDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} bookPath={bookPath} onCreated={handleCharacterCreated} />
+        <CreateCharacterDialog
+          open={createDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+          bookPath={bookPath}
+          onCreated={handleCharacterCreated}
+        />
       </>
     );
   }
@@ -98,9 +107,17 @@ export function CharacterGrid({ onCharacterSelect, onCreateCharacter }: Characte
         {characters.length > 6 && (
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search characters..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 pr-9" />
+            <Input
+              placeholder="Search characters..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9"
+            />
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
                 <X className="h-4 w-4" />
               </button>
             )}
@@ -124,14 +141,23 @@ export function CharacterGrid({ onCharacterSelect, onCreateCharacter }: Characte
         ) : (
           <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {filteredCharacters.map((character) => (
-              <CharacterBundleView key={character.path} characterPath={character.path} onClick={() => onCharacterSelect(character.path)} />
+              <CharacterBundleView
+                key={character.path}
+                characterPath={character.path}
+                onClick={() => onCharacterSelect(character.path)}
+              />
             ))}
           </div>
         )}
       </ScrollArea>
 
       {/* Create Character Dialog */}
-      <CreateCharacterDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} bookPath={bookPath} onCreated={handleCharacterCreated} />
+      <CreateCharacterDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        bookPath={bookPath}
+        onCreated={handleCharacterCreated}
+      />
     </div>
   );
 }

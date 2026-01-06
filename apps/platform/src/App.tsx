@@ -48,8 +48,26 @@ const AppWithAuth = () => {
             <Route path="/GenreExploration" element={<GenreExploration />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/sign-in" element={<AuthComponentsWrapper componentName="SignIn" useAuth={useAuth} fallbackComponent={NotFound} />} />
-            <Route path="/sign-up" element={<AuthComponentsWrapper componentName="SignUp" useAuth={useAuth} fallbackComponent={NotFound} />} />
+            <Route
+              path="/sign-in"
+              element={
+                <AuthComponentsWrapper
+                  componentName="SignIn"
+                  useAuth={useAuth}
+                  fallbackComponent={NotFound}
+                />
+              }
+            />
+            <Route
+              path="/sign-up"
+              element={
+                <AuthComponentsWrapper
+                  componentName="SignUp"
+                  useAuth={useAuth}
+                  fallbackComponent={NotFound}
+                />
+              }
+            />
             <Route
               path="/reader/"
               element={

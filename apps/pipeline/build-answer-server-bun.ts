@@ -5,7 +5,13 @@ async function runBuild(): Promise<void> {
   const buildDir = path.resolve("build-answer-server");
   await fs.ensureDir(buildDir);
 
-  const result = await Bun.build({ entrypoints: ["src/services/answer-server/answer-server.ts"], outdir: buildDir, target: "bun", sourcemap: "linked", minify: false });
+  const result = await Bun.build({
+    entrypoints: ["src/services/answer-server/answer-server.ts"],
+    outdir: buildDir,
+    target: "bun",
+    sourcemap: "linked",
+    minify: false,
+  });
 
   if (!result.success) {
     console.error("❌ Build failed:", result.logs);

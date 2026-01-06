@@ -5,7 +5,9 @@ import { NewReferenceCardsResponse } from "../../types";
 
 import { generateTagName } from "../../helpers/generateTagName";
 
-export const generateCharactersMaster = (singleSummaryPerPerson = "single-summary-per-person.json") => {
+export const generateCharactersMaster = (
+  singleSummaryPerPerson = "single-summary-per-person.json",
+) => {
   const referenceCards = JSON.parse(
     readBookFile(singleSummaryPerPerson, FILE_TYPE.PERMANENT),
   ) as NewReferenceCardsResponse;

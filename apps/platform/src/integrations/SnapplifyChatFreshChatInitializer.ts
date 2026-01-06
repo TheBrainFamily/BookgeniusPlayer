@@ -22,7 +22,10 @@ function initFreshChat() {
 }
 
 export function snapplifyChatInitializer(i, t) {
-  console.log("[SnapplifyChat] snapplifyChatInitializer called with:", { document: !!i, target: t });
+  console.log("[SnapplifyChat] snapplifyChatInitializer called with:", {
+    document: !!i,
+    target: t,
+  });
   let e;
 
   if (i.getElementById(t)) {

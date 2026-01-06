@@ -150,8 +150,12 @@ async function main() {
 
   const allTimes = Object.values(results);
   const totalWords = allTimes.reduce((sum, r) => sum + r.wordCount, 0);
-  const avgMinutes = Math.round(allTimes.reduce((sum, r) => sum + r.readingTimeMinutes, 0) / allTimes.length);
-  const maxBook = allTimes.reduce((max, r) => (r.readingTimeMinutes > max.readingTimeMinutes ? r : max));
+  const avgMinutes = Math.round(
+    allTimes.reduce((sum, r) => sum + r.readingTimeMinutes, 0) / allTimes.length,
+  );
+  const maxBook = allTimes.reduce((max, r) =>
+    r.readingTimeMinutes > max.readingTimeMinutes ? r : max,
+  );
   const minBook = allTimes
     .filter((r) => r.wordCount > 0)
     .reduce((min, r) => (r.readingTimeMinutes < min.readingTimeMinutes ? r : min));

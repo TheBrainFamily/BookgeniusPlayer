@@ -18,7 +18,11 @@
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@player/*": ["../apps/player/src/*"],
+      "@convex/*": ["./*"]
+    }
   },
   "include": ["./**/*"],
   "exclude": ["./_generated"]

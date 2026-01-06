@@ -27,7 +27,10 @@ export function StyleSelectionModal({ onSubmit }: StyleSelectionModalProps) {
             <Wand2 className="w-5 h-5 text-primary" />
             Customize Visual Style
           </CardTitle>
-          <CardDescription>Describe the visual atmosphere for your book's illustrations. The AI will use this to generate backgrounds and characters.</CardDescription>
+          <CardDescription>
+            Describe the visual atmosphere for your book's illustrations. The AI will use this to
+            generate backgrounds and characters.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -38,7 +41,9 @@ export function StyleSelectionModal({ onSubmit }: StyleSelectionModalProps) {
               className="w-full min-h-[120px] p-3 rounded-md border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none text-sm placeholder:text-muted-foreground/70"
               autoFocus
             />
-            <p className="text-xs text-muted-foreground">If you skip, we'll automatically generate a style based on the book's content.</p>
+            <p className="text-xs text-muted-foreground">
+              If you skip, we'll automatically generate a style based on the book's content.
+            </p>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-2">

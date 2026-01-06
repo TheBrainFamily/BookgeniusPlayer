@@ -11,10 +11,16 @@ const getSupabaseClient = () => {
     return null;
   }
 
-  return createClient<Database>(url, anonKey, { auth: { storage: localStorage, persistSession: true, autoRefreshToken: true } });
+  return createClient<Database>(url, anonKey, {
+    auth: { storage: localStorage, persistSession: true, autoRefreshToken: true },
+  });
 };
 
-const startCheckout: PaymentsModule["startCheckout"] = async (paymentType: PaymentType, bookSlug: string, user: { id: string; email?: string | null }) => {
+const startCheckout: PaymentsModule["startCheckout"] = async (
+  paymentType: PaymentType,
+  bookSlug: string,
+  user: { id: string; email?: string | null },
+) => {
   if (!user) {
     throw new Error("User must be logged in to start checkout");
   }
@@ -25,7 +31,9 @@ const startCheckout: PaymentsModule["startCheckout"] = async (paymentType: Payme
   }
 
   try {
-    const { data, error } = await supabase.functions.invoke("create-payment", { body: { userId: user.id, email: user.email, bookSlug, paymentType } });
+    const { data, error } = await supabase.functions.invoke("create-payment", {
+      body: { userId: user.id, email: user.email, bookSlug, paymentType },
+    });
 
     if (error) throw error;
 
@@ -41,7 +49,10 @@ const startCheckout: PaymentsModule["startCheckout"] = async (paymentType: Payme
   }
 };
 
-const checkAccess: PaymentsModule["checkAccess"] = async (bookSlug: string, user: { id: string }) => {
+const checkAccess: PaymentsModule["checkAccess"] = async (
+  bookSlug: string,
+  user: { id: string },
+) => {
   if (!user) return false;
 
   const supabase = getSupabaseClient();
@@ -51,7 +62,9 @@ const checkAccess: PaymentsModule["checkAccess"] = async (bookSlug: string, user
   }
 
   try {
-    const { data, error } = await supabase.functions.invoke("verify-purchase", { body: { userId: user.id, bookSlug } });
+    const { data, error } = await supabase.functions.invoke("verify-purchase", {
+      body: { userId: user.id, bookSlug },
+    });
 
     if (error) throw error;
 

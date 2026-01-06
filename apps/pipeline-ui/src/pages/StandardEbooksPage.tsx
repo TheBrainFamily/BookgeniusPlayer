@@ -109,12 +109,22 @@ function AuthorLetterRow({
             scrollbarWidth: "none",
             msOverflowStyle: "none",
             maskImage: "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
-            WebkitMaskImage: "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
           }}
         >
           {collectionBooks.map((book, i) => (
-            <div key={book.slug} className={`flex-shrink-0 w-[275px] snap-start book-card-enter stagger-${Math.min(i + 1, 12)} hover:!z-50`}>
-              <BookCard book={book} index={i} totalColumns={6} onSelect={onSelectBook} onOpenModal={onOpenModal} />
+            <div
+              key={book.slug}
+              className={`flex-shrink-0 w-[275px] snap-start book-card-enter stagger-${Math.min(i + 1, 12)} hover:!z-50`}
+            >
+              <BookCard
+                book={book}
+                index={i}
+                totalColumns={6}
+                onSelect={onSelectBook}
+                onOpenModal={onOpenModal}
+              />
             </div>
           ))}
         </div>
@@ -178,7 +188,9 @@ export function StandardEbooksPage() {
             <BookOpen className="w-10 h-10 text-primary" />
             Standard Ebooks
           </h2>
-          <p className="text-lg text-muted-foreground mt-2">{totalBooks} professionally formatted public domain books</p>
+          <p className="text-lg text-muted-foreground mt-2">
+            {totalBooks} professionally formatted public domain books
+          </p>
         </div>
         <Button variant="ghost" size="default" onClick={() => navigate("/")} className="gap-2">
           <ArrowLeft className="w-5 h-5" />
@@ -189,7 +201,12 @@ export function StandardEbooksPage() {
       <div className="flex flex-col">
         {sortedLetters.map((letter, idx) => (
           <div key={letter} className={`animate-fade-in stagger-${Math.min(idx + 1, 6)}`}>
-            <AuthorLetterRow letter={letter} books={groupedBooks[letter]} onSelectBook={handleBookSelect} onOpenModal={handleOpenModal} />
+            <AuthorLetterRow
+              letter={letter}
+              books={groupedBooks[letter]}
+              onSelectBook={handleBookSelect}
+              onOpenModal={handleOpenModal}
+            />
           </div>
         ))}
       </div>

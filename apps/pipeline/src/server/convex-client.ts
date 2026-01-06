@@ -31,7 +31,13 @@ export const convex = {
     return await client.mutation(api.generator.ensureBookStructure, args);
   },
 
-  async reportProgress(args: { bookPath: string; step: string; status: StepStatus; message?: string; error?: string }) {
+  async reportProgress(args: {
+    bookPath: string;
+    step: string;
+    status: StepStatus;
+    message?: string;
+    error?: string;
+  }) {
     return await client.mutation(api.generator.reportProgress, args);
   },
 
@@ -103,7 +109,13 @@ export const convex = {
   },
 
   async uploadNotes(args: {
-    notes: { bookPath: string; noteId: string; content: string; chapter: number; paragraph?: number }[];
+    notes: {
+      bookPath: string;
+      noteId: string;
+      content: string;
+      chapter: number;
+      paragraph?: number;
+    }[];
   }) {
     if (args.notes.length === 0) return [];
     return await client.mutation(api.notes.bulkCreate, args);
@@ -179,7 +191,10 @@ export interface CharacterReferenceCard {
   summary: string;
 }
 
-export async function getChapterXml(bookPath: string, chapterNumber: number): Promise<string | null> {
+export async function getChapterXml(
+  bookPath: string,
+  chapterNumber: number,
+): Promise<string | null> {
   const versions = await client.query(api.cli.getAssetVersions, {
     folderPath: `${bookPath}/chapters`,
     basename: `chapter-${chapterNumber}.xml`,
@@ -199,7 +214,9 @@ export async function getChapterXml(bookPath: string, chapterNumber: number): Pr
   return result?.content ?? null;
 }
 
-export async function getCharacterReferenceCards(bookPath: string): Promise<CharacterReferenceCard[]> {
+export async function getCharacterReferenceCards(
+  bookPath: string,
+): Promise<CharacterReferenceCard[]> {
   const folders = await client.query(api.cli.listFolders, { parentPath: `${bookPath}/characters` });
 
   if (!folders || folders.length === 0) {

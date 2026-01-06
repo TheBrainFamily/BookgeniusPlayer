@@ -18,15 +18,34 @@ const extractText = (text: string): string => {
   }
 };
 
-export const parseSearchParagraphsServerResponse = (response: SearchParagraphsServerResponse[]): SearchParagraphsFunctionResponse[] => {
+export const parseSearchParagraphsServerResponse = (
+  response: SearchParagraphsServerResponse[],
+): SearchParagraphsFunctionResponse[] => {
   return response.map((r) => {
     const summary = extractSummary(r.text);
     const text = extractText(r.text);
-    return { chapter: r.chapter, paragraphNumber: r.paragraphNumber, text: text, summary: summary, score: r.score };
+    return {
+      chapter: r.chapter,
+      paragraphNumber: r.paragraphNumber,
+      text: text,
+      summary: summary,
+      score: r.score,
+    };
   });
 };
-export type SearchParagraphsServerResponse = { chapter: number; paragraphNumber: number; text: string; score: number };
-export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumber: number; text: string; summary: string; score: number };
+export type SearchParagraphsServerResponse = {
+  chapter: number;
+  paragraphNumber: number;
+  text: string;
+  score: number;
+};
+export type SearchParagraphsFunctionResponse = {
+  chapter: number;
+  paragraphNumber: number;
+  text: string;
+  summary: string;
+  score: number;
+};
 
 /**
  * Fetches search results from the backend server.
@@ -34,7 +53,10 @@ export type SearchParagraphsFunctionResponse = { chapter: number; paragraphNumbe
  * @param location The current location (chapter and paragraph) to determine the search range.
  * @returns A promise that resolves with the search results from the server.
  */
-export async function searchParagraphsFromServer(searchQuery: string, location: Location): Promise<SearchParagraphsFunctionResponse[]> {
+export async function searchParagraphsFromServer(
+  searchQuery: string,
+  location: Location,
+): Promise<SearchParagraphsFunctionResponse[]> {
   const baseUrl = `${ANSWERS_SERVER_URL}/getParagraphsForSearch`;
   const slug = getBookSlug();
   if (!slug) throw new Error("[searchParagraphsFromServer] Book slug not available");

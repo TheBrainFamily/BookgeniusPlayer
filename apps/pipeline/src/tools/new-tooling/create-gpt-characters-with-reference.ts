@@ -163,12 +163,17 @@ const doIt = async () => {
       };
 
       try {
-        const nextOutput = (await replicate.run("openai/gpt-image-1.5", { input: nextInput })) as ReplicateOutput;
+        const nextOutput = (await replicate.run("openai/gpt-image-1.5", {
+          input: nextInput,
+        })) as ReplicateOutput;
 
         // To access the file URL:
         console.log(nextOutput[0].url()); //=> "http://example.com"
 
-        downloadAndSave(nextOutput[0].url(), `${generateTagName(character.characterName)}-more_images.png`);
+        downloadAndSave(
+          nextOutput[0].url(),
+          `${generateTagName(character.characterName)}-more_images.png`,
+        );
       } catch (e) {
         console.log(e);
       }

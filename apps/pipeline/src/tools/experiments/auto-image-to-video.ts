@@ -41,7 +41,9 @@ const getCreditsBalance = async () => {
 
     return details.creditBalance;
   } catch (error) {
-    throw new Error(`Failed to get credits balance: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to get credits balance: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 };
 
@@ -73,7 +75,11 @@ const fetchTaskStatus = async (taskId: string) => {
   }
 };
 
-const downloadAndSaveVideo = async (videoUrl: string, fileName: string, videoOutputsPath: string): Promise<void> => {
+const downloadAndSaveVideo = async (
+  videoUrl: string,
+  fileName: string,
+  videoOutputsPath: string,
+): Promise<void> => {
   try {
     const response = await axios.get(videoUrl, { responseType: "arraybuffer" });
     const videoData = response.data as Buffer;
@@ -114,7 +120,9 @@ const hasEnoughCreditsAvailable = async (imagesMetadata: ImageMetadata[]): Promi
     );
     return true;
   } else {
-    console.warn(`You have only ${credits} and need ${creditsNeeded} credits to convert all images. Exiting...`);
+    console.warn(
+      `You have only ${credits} and need ${creditsNeeded} credits to convert all images. Exiting...`,
+    );
     return false;
   }
 };
@@ -184,7 +192,10 @@ const getImagesToConvert = (bookDir: string): ImageMetadata[] => {
   });
 };
 
-export const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: string): Promise<void> => {
+export const processVideoTasks = async (
+  tasks: VideoTask[],
+  videoOutputsPath: string,
+): Promise<void> => {
   const tasksWithId = tasks.filter((task) => task.id);
 
   let allTasksCompleted = false;
@@ -194,7 +205,9 @@ export const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: st
   const boomerangProcesses: Promise<void>[] = [];
 
   while (!allTasksCompleted) {
-    const taskResponses = await Promise.all(tasksWithId.map((task) => fetchTaskStatus(task.id as string)));
+    const taskResponses = await Promise.all(
+      tasksWithId.map((task) => fetchTaskStatus(task.id as string)),
+    );
 
     for (const response of taskResponses) {
       const task = tasks.find((t) => t.id === response.id);
@@ -203,7 +216,9 @@ export const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: st
         console.log(`Task ${task.fileName} (ID: ${task.id}) status: ${task.status}`);
 
         if (task.status === "FAILED") {
-          console.warn(`The task ${task.fileName} (ID: ${task.id}) failed with message: ${response.failure}`);
+          console.warn(
+            `The task ${task.fileName} (ID: ${task.id}) failed with message: ${response.failure}`,
+          );
         }
 
         if (response.output && !task.isDownloaded) {
@@ -227,14 +242,20 @@ export const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: st
       }
     }
 
-    allTasksCompleted = tasks.every((task) => task.status === "SUCCEEDED" || task.status === "FAILED");
+    allTasksCompleted = tasks.every(
+      (task) => task.status === "SUCCEEDED" || task.status === "FAILED",
+    );
 
     if (!allTasksCompleted) {
-      console.log(`Some tasks are still processing. Checking again in ${retryDelay / 1000} seconds...`);
+      console.log(
+        `Some tasks are still processing. Checking again in ${retryDelay / 1000} seconds...`,
+      );
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
       retryDelay = Math.min(retryDelay + retryIncrement, maxRetryDelay);
     } else {
-      console.log("All video generation tasks completed. Waiting for boomerang post-processing to finish...");
+      console.log(
+        "All video generation tasks completed. Waiting for boomerang post-processing to finish...",
+      );
       await fs.promises.writeFile(
         path.join(videoOutputsPath, "video-tasks-completed.json"),
         JSON.stringify(tasks, null, 2),
@@ -258,7 +279,9 @@ if (require.main === module) {
 
       if (bookTitle && bookTitle.trim() !== "") {
         // @ts-expect-error - bookTitle is not undefined , typescript error.
-        const hasBookExisted = books.find((book) => book.name.toLowerCase().trim() === bookTitle.toLowerCase().trim());
+        const hasBookExisted = books.find(
+          (book) => book.name.toLowerCase().trim() === bookTitle.toLowerCase().trim(),
+        );
         if (!hasBookExisted) {
           console.log(
             `The book ${bookTitle} was not found. Please ensure a directory for this book exists in the ./books−data folder and that you have provided the exact directory name.`,

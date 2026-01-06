@@ -104,7 +104,9 @@ function attachGlobalGuardsOnce() {
 
   window.addEventListener("scroll", dismissNow, { passive: true, capture: true });
   window.addEventListener("resize", dismissNow, { passive: true, capture: true });
-  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), { capture: true });
+  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), {
+    capture: true,
+  });
 }
 
 function showFloatingFootnote(anchorEl: HTMLElement, html: string) {
@@ -173,7 +175,10 @@ export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
   initializedFootnotes.add(linkNoteEl);
   linkNoteEl.classList.add("footnote-activated");
 
-  const supportsHover = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(hover: hover)").matches;
+  const supportsHover =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(hover: hover)").matches;
 
   if (supportsHover) {
     linkNoteEl.addEventListener("pointerenter", () => {
@@ -181,7 +186,10 @@ export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
       if (!content) return;
       if (hoverDebounceTimeout) clearTimeout(hoverDebounceTimeout);
       if (HOVER_DEBOUNCE_MS > 0) {
-        hoverDebounceTimeout = window.setTimeout(() => showFloatingFootnote(linkNoteEl, content), HOVER_DEBOUNCE_MS);
+        hoverDebounceTimeout = window.setTimeout(
+          () => showFloatingFootnote(linkNoteEl, content),
+          HOVER_DEBOUNCE_MS,
+        );
       } else {
         showFloatingFootnote(linkNoteEl, content);
       }

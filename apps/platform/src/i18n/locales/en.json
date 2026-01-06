@@ -7,8 +7,18 @@
     "startReading": "Start Reading",
     "viewCollection": "View Collection"
   },
-  "navigation": { "search": "Search visual novels, authors...", "searchMobile": "Search novels...", "signOut": "Sign Out", "signIn": "Sign In", "signUp": "Sign Up" },
-  "stats": { "visualNovels": "Visual Novels", "immersive": "Immersive", "productions": "Productions" },
+  "navigation": {
+    "search": "Search visual novels, authors...",
+    "searchMobile": "Search novels...",
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
+  },
+  "stats": {
+    "visualNovels": "Visual Novels",
+    "immersive": "Immersive",
+    "productions": "Productions"
+  },
   "featured": {
     "featuredMasterpieces": "Featured Masterpieces",
     "description": "Experience two legendary works of literature like never before. Each story features cinematic visuals, professional voice acting, and immersive soundscapes that transform reading into a complete sensory journey."
@@ -50,7 +60,11 @@
     "hours": "hrs",
     "minutes": "m"
   },
-  "notFound": { "title": "Page Not Found", "returnHome": "Return to Library", "description": "It seems this page has been lost in the vast library of the internet." },
+  "notFound": {
+    "title": "Page Not Found",
+    "returnHome": "Return to Library",
+    "description": "It seems this page has been lost in the vast library of the internet."
+  },
   "title": "Immersive Visual Novel",
   "continueReading": "Continue Reading",
   "reachedFreePreview": "You've reached the end of the free preview.",

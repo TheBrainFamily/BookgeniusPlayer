@@ -1,5 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Play, Pause, SkipForward, SkipBack, ListMusic, BookHeadphones, Volume2, VolumeX, Download } from "lucide-react";
+import {
+  Play,
+  Pause,
+  SkipForward,
+  SkipBack,
+  ListMusic,
+  BookHeadphones,
+  Volume2,
+  VolumeX,
+  Download,
+} from "lucide-react";
 import { motion, AnimatePresence, Variants, Transition, Easing } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
 import { useTranslation } from "react-i18next";
@@ -42,7 +52,9 @@ const AudioPlayer = () => {
   const speakerButtonRef = useRef<HTMLDivElement | null>(null);
   const fadeOutTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [volume, setVolume] = useLocalStorageState("volume", { defaultValue: getMasterVolume() ?? 0.5 });
+  const [volume, setVolume] = useLocalStorageState("volume", {
+    defaultValue: getMasterVolume() ?? 0.5,
+  });
   const [balance, setBalance] = useLocalStorageState("balance", { defaultValue: 0.5 });
   const [isMuted, setIsMuted] = useLocalStorageState("isMuted", { defaultValue: false });
 
@@ -53,7 +65,9 @@ const AudioPlayer = () => {
   const [isBigPlayerOpen, setIsBigPlayerOpen] = useState(false);
   const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
   const [showSongNotification, setShowSongNotification] = useState(false);
-  const [playlistTracks, setPlaylistTracks] = useState<{ id: string; title: string; duration: number }[]>([]);
+  const [playlistTracks, setPlaylistTracks] = useState<
+    { id: string; title: string; duration: number }[]
+  >([]);
   const [currentTrackIdFromState, setCurrentTrackIdFromState] = useState<string | null>(null);
   const areElementsVisible = useOptionalElementVisibility();
   const [hasBackgroundSongs, setHasBackgroundSongs] = useState(false);
@@ -175,7 +189,9 @@ const AudioPlayer = () => {
   }, [hideSpeakerButtonWithFadeOut, showSpeakerButton]);
 
   useEffect(() => {
-    const available = Array.isArray(backgroundSongsForBook) && backgroundSongsForBook.some((s) => Array.isArray(s.files) && s.files.length > 0);
+    const available =
+      Array.isArray(backgroundSongsForBook) &&
+      backgroundSongsForBook.some((s) => Array.isArray(s.files) && s.files.length > 0);
     setHasBackgroundSongs(available);
   }, [backgroundSongsForBook]);
 
@@ -219,7 +235,9 @@ const AudioPlayer = () => {
   }, [isPlaying, isBigPlayerOpen]);
 
   useEffect(() => {
-    const handlePlaylistChange = (event: CustomEvent<{ id: string; title: string; duration: number }[] | null>) => {
+    const handlePlaylistChange = (
+      event: CustomEvent<{ id: string; title: string; duration: number }[] | null>,
+    ) => {
       console.log("AudioPlayer: Received playlist change event", event.detail);
       setPlaylistTracks(event.detail || []);
       if (!event.detail || event.detail.length === 0) {
@@ -291,9 +309,12 @@ const AudioPlayer = () => {
   }, []);
 
   // Determine current track position within playlist to disable prev/next at boundaries
-  const currentTrackIndexInPlaylist = playlistTracks.findIndex((track) => track.id === currentTrackIdFromState);
+  const currentTrackIndexInPlaylist = playlistTracks.findIndex(
+    (track) => track.id === currentTrackIdFromState,
+  );
   const isFirstTrack = playlistTracks.length > 0 && currentTrackIndexInPlaylist === 0;
-  const isLastTrack = playlistTracks.length > 0 && currentTrackIndexInPlaylist === playlistTracks.length - 1;
+  const isLastTrack =
+    playlistTracks.length > 0 && currentTrackIndexInPlaylist === playlistTracks.length - 1;
 
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];
@@ -457,9 +478,21 @@ const AudioPlayer = () => {
                   animate="animate"
                   exit="exit"
                 >
-                  <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.05 }}>
+                  <motion.div
+                    variants={variants.volumeMenuItem}
+                    initial="initial"
+                    animate="animate"
+                    transition={{ delay: 0.05 }}
+                  >
                     <div className="flex justify-between text-xs my-2">{t("volume")}</div>
-                    <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} variant="secondary" />
+                    <Slider
+                      value={[isMuted ? 0 : volume]}
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      onValueChange={handleVolumeChange}
+                      variant="secondary"
+                    />
                     <div className="flex justify-between text-xs mt-2">
                       <span>0%</span>
                       <span>100%</span>
@@ -467,9 +500,21 @@ const AudioPlayer = () => {
                   </motion.div>
 
                   {hasAudiobook && (
-                    <motion.div variants={variants.volumeMenuItem} initial="initial" animate="animate" transition={{ delay: 0.1 }}>
+                    <motion.div
+                      variants={variants.volumeMenuItem}
+                      initial="initial"
+                      animate="animate"
+                      transition={{ delay: 0.1 }}
+                    >
                       <div className="flex justify-between text-xs my-2">{t("balance")}</div>
-                      <Slider value={[balance]} min={0} max={1} step={0.01} onValueChange={handleBalanceChange} variant="secondary" />
+                      <Slider
+                        value={[balance]}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        onValueChange={handleBalanceChange}
+                        variant="secondary"
+                      />
                       <div className="flex justify-between text-xs mt-2">
                         <span>{t("audiobook")}</span>
                         <span>{t("music")}</span>
@@ -493,10 +538,18 @@ const AudioPlayer = () => {
                   variants={variants.buttonHover}
                 >
                   <BookHeadphones className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                  <motion.div className="absolute bottom-0 right-0">{isPlayingAudioBook ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}</motion.div>
+                  <motion.div className="absolute bottom-0 right-0">
+                    {isPlayingAudioBook ? (
+                      <Pause className="w-3 h-3" />
+                    ) : (
+                      <Play className="w-3 h-3" />
+                    )}
+                  </motion.div>
                 </motion.button>
               </TooltipTrigger>
-              <TooltipContent>{isPlayingAudioBook ? t("stop_audiobook") : t("play_audiobook")}</TooltipContent>
+              <TooltipContent>
+                {isPlayingAudioBook ? t("stop_audiobook") : t("play_audiobook")}
+              </TooltipContent>
             </Tooltip>
           )}
 
@@ -539,7 +592,9 @@ const AudioPlayer = () => {
               <ListMusic className="w-[14px] h-[14px] md:w-4 md:h-4 lg:w-5 lg:h-5" />
             </motion.button>
             {/* Invisible bridge to cover the gap */}
-            {isBigPlayerOpen && <div className="absolute top-full left-0 w-full min-w-[240px] sm:min-w-2xs md:min-w-xs h-2 z-5" />}
+            {isBigPlayerOpen && (
+              <div className="absolute top-full left-0 w-full min-w-[240px] sm:min-w-2xs md:min-w-xs h-2 z-5" />
+            )}
             <AnimatePresence>
               {isBigPlayerOpen && (
                 <motion.div
@@ -550,7 +605,12 @@ const AudioPlayer = () => {
                   exit="exit"
                 >
                   <div className="player-left">
-                    <motion.div className="flex justify-center pt-4 mb-4" variants={variants.popUpItem} initial="closed" animate="open">
+                    <motion.div
+                      className="flex justify-center pt-4 mb-4"
+                      variants={variants.popUpItem}
+                      initial="closed"
+                      animate="open"
+                    >
                       <div className="relative group w-26 h-26 md:w-32 md:h-32">
                         <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-white/40 shadow-2xl backdrop-blur-sm bg-white/15">
                           <CoverArt src={currentTrackData?.coverArtUrl} />
@@ -558,23 +618,50 @@ const AudioPlayer = () => {
                       </div>
                     </motion.div>
 
-                    <motion.div className="text-md md:text-lg mb-4 text-center current-track-title" variants={variants.popUpItem} initial="closed" animate="open">
+                    <motion.div
+                      className="text-md md:text-lg mb-4 text-center current-track-title"
+                      variants={variants.popUpItem}
+                      initial="closed"
+                      animate="open"
+                    >
                       {currentTrackData?.title}
                     </motion.div>
                   </div>
                   <div className="player-right p-1">
-                    <motion.div className="mb-2 music-progress-bar" variants={variants.popUpItem} initial="closed" animate="open">
+                    <motion.div
+                      className="mb-2 music-progress-bar"
+                      variants={variants.popUpItem}
+                      initial="closed"
+                      animate="open"
+                    >
                       <div className="w-full group hover:opacity-100">
-                        <Slider value={[currentTime]} min={0} max={currentTrackData?.duration || 100} step={0.1} onValueChange={handleProgressChange} variant="secondary" />
+                        <Slider
+                          value={[currentTime]}
+                          min={0}
+                          max={currentTrackData?.duration || 100}
+                          step={0.1}
+                          onValueChange={handleProgressChange}
+                          variant="secondary"
+                        />
                       </div>
                     </motion.div>
 
-                    <motion.div className="flex justify-between text-xs mb-4 music-progress-bar-labels" variants={variants.popUpItem} initial="closed" animate="open">
+                    <motion.div
+                      className="flex justify-between text-xs mb-4 music-progress-bar-labels"
+                      variants={variants.popUpItem}
+                      initial="closed"
+                      animate="open"
+                    >
                       <span>{formatTime(currentTime)}</span>
                       <span>{formatTime(currentTrackData?.duration)}</span>
                     </motion.div>
 
-                    <motion.div className="flex justify-center items-center gap-8 mb-4 relative" variants={variants.popUpItem} initial="closed" animate="open">
+                    <motion.div
+                      className="flex justify-center items-center gap-8 mb-4 relative"
+                      variants={variants.popUpItem}
+                      initial="closed"
+                      animate="open"
+                    >
                       {playlistTracks.length > 1 && (
                         <motion.button
                           onClick={(e) => {
@@ -582,7 +669,10 @@ const AudioPlayer = () => {
                             if (isFirstTrack) return;
                             skipToPrevious();
                           }}
-                          className={cn("hover:text-white/80 p-2 rounded-full", isFirstTrack ? "opacity-40 cursor-not-allowed" : "cursor-pointer")}
+                          className={cn(
+                            "hover:text-white/80 p-2 rounded-full",
+                            isFirstTrack ? "opacity-40 cursor-not-allowed" : "cursor-pointer",
+                          )}
                           whileHover="hover"
                           whileTap="tap"
                           variants={variants.navButtonHover}
@@ -607,11 +697,23 @@ const AudioPlayer = () => {
                         >
                           <AnimatePresence mode="wait" initial={false}>
                             {isPlaying ? (
-                              <motion.div key="pause" variants={variants.iconRotatePause} initial="initial" animate="animate" exit="exit">
+                              <motion.div
+                                key="pause"
+                                variants={variants.iconRotatePause}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                              >
                                 <Pause className="w-6 h-6" />
                               </motion.div>
                             ) : (
-                              <motion.div key="play" variants={variants.iconRotatePlay} initial="initial" animate="animate" exit="exit">
+                              <motion.div
+                                key="play"
+                                variants={variants.iconRotatePlay}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                              >
                                 <Play className="w-6 h-6" />
                               </motion.div>
                             )}
@@ -626,7 +728,10 @@ const AudioPlayer = () => {
                             if (isLastTrack) return;
                             skipToNext();
                           }}
-                          className={cn("hover:text-white/80 p-2 rounded-full", isLastTrack ? "opacity-40 cursor-not-allowed" : "cursor-pointer")}
+                          className={cn(
+                            "hover:text-white/80 p-2 rounded-full",
+                            isLastTrack ? "opacity-40 cursor-not-allowed" : "cursor-pointer",
+                          )}
                           whileHover="hover"
                           whileTap="tap"
                           variants={variants.navButtonHover}
@@ -639,8 +744,15 @@ const AudioPlayer = () => {
                     </motion.div>
 
                     {playlistTracks.length > 0 && (
-                      <motion.div className="space-y-2 pb-3" variants={variants.popUpItem} initial="closed" animate="open">
-                        <div className="text-xs md:text-sm font-medium mb-2 playlist-header">Playlist:</div>
+                      <motion.div
+                        className="space-y-2 pb-3"
+                        variants={variants.popUpItem}
+                        initial="closed"
+                        animate="open"
+                      >
+                        <div className="text-xs md:text-sm font-medium mb-2 playlist-header">
+                          Playlist:
+                        </div>
                         {playlistTracks.map((track) => (
                           <motion.div
                             key={track.id}
@@ -655,9 +767,15 @@ const AudioPlayer = () => {
                               transitionToTrack(track.id, { manual: true });
                             }}
                           >
-                            <span className={"text-sm md:text-md text-white/70 playlist-item-title"}>{track.title}</span>
+                            <span
+                              className={"text-sm md:text-md text-white/70 playlist-item-title"}
+                            >
+                              {track.title}
+                            </span>
                             <div className="flex items-center gap-2">
-                              <span className="text-white/70 playlist-item-duration">{formatTime(track.duration)}</span>
+                              <span className="text-white/70 playlist-item-duration">
+                                {formatTime(track.duration)}
+                              </span>
                               <button
                                 className="text-white/70 hover:text-white p-2 rounded-full transition hover:bg-black/40 cursor-pointer"
                                 title="Download track"
@@ -685,7 +803,9 @@ const AudioPlayer = () => {
       <AnimatePresence>
         {showSongNotification && currentTrackData && (
           <motion.div
-            className={cn("song-notification absolute z-50 top-4 right-2 lg:right-4 w-60 md:w-70 lg:w-80 hidden sm:block")}
+            className={cn(
+              "song-notification absolute z-50 top-4 right-2 lg:right-4 w-60 md:w-70 lg:w-80 hidden sm:block",
+            )}
             variants={variants.songNotificationTop}
             initial="initial"
             animate="animate"
@@ -709,9 +829,14 @@ const AudioPlayer = () => {
                   </div>
                 </div>
               </motion.div>
-              <motion.div variants={variants.notificationContent} className="flex flex-col flex-1 min-w-0">
+              <motion.div
+                variants={variants.notificationContent}
+                className="flex flex-col flex-1 min-w-0"
+              >
                 <div className="text-xs font-medium">{t("now_playing")}</div>
-                <div className="text-xs lg:text-sm font-medium truncate ">{currentTrackData.title || t("unknown_track")}</div>
+                <div className="text-xs lg:text-sm font-medium truncate ">
+                  {currentTrackData.title || t("unknown_track")}
+                </div>
               </motion.div>
             </div>
           </motion.div>
@@ -724,7 +849,11 @@ const AudioPlayer = () => {
           ref={speakerButtonRef}
           className={cn(
             "fixed top-4 z-50 bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center",
-            showBookgeniusChat ? (bookForm === "play" || bookForm === "mixed" ? "right-13 md:right-15 lg:right-4" : "right-13 md:right-15 lg:right-16 xl:right-4") : "right-4",
+            showBookgeniusChat
+              ? bookForm === "play" || bookForm === "mixed"
+                ? "right-13 md:right-15 lg:right-4"
+                : "right-13 md:right-15 lg:right-16 xl:right-4"
+              : "right-4",
           )}
         >
           <Tooltip>
@@ -771,60 +900,160 @@ const AudioPlayer = () => {
 };
 
 const transitions = {
-  spring: (options?: { stiffness?: number; damping?: number; duration?: number; delay?: number }): Transition => ({
+  spring: (options?: {
+    stiffness?: number;
+    damping?: number;
+    duration?: number;
+    delay?: number;
+  }): Transition => ({
     type: "spring",
     stiffness: options?.stiffness ?? 350,
     damping: options?.damping ?? 30,
     duration: options?.duration ?? 0.25,
     delay: options?.delay ?? 0,
   }),
-  ease: (options?: { duration?: number; ease?: Easing | Easing[] }): Transition => ({ duration: options?.duration ?? 0.25, ease: options?.ease ?? "easeInOut" }),
+  ease: (options?: { duration?: number; ease?: Easing | Easing[] }): Transition => ({
+    duration: options?.duration ?? 0.25,
+    ease: options?.ease ?? "easeInOut",
+  }),
 };
 
 const variants: Record<string, Variants> = {
   // Button hover animations
-  buttonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)" }, tap: { scale: 0.9 } },
-  playButtonHover: { initial: { scale: 0.9 }, hover: { backgroundColor: "rgba(255,255,255,0.6)", boxShadow: "0 0 18px rgba(255, 255, 255, 0.5)" }, tap: { scale: 0.95 } },
-  navButtonHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)" }, tap: { scale: 0.95 } },
+  buttonHover: {
+    initial: {},
+    hover: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      boxShadow: "0px 0px 8px rgba(255,255,255,0.5)",
+    },
+    tap: { scale: 0.9 },
+  },
+  playButtonHover: {
+    initial: { scale: 0.9 },
+    hover: {
+      backgroundColor: "rgba(255,255,255,0.6)",
+      boxShadow: "0 0 18px rgba(255, 255, 255, 0.5)",
+    },
+    tap: { scale: 0.95 },
+  },
+  navButtonHover: {
+    initial: {},
+    hover: { backgroundColor: "rgba(255,255,255,0.1)" },
+    tap: { scale: 0.95 },
+  },
   // Icon animations
   iconFadeScale: {
     initial: { opacity: 0, scale: 1 },
-    animate: { opacity: 1, scale: 1.05, transition: transitions.ease({ duration: 0.15, ease: "linear" }) },
-    exit: { opacity: 0, scale: 1, transition: transitions.ease({ duration: 0.15, ease: "linear" }) },
+    animate: {
+      opacity: 1,
+      scale: 1.05,
+      transition: transitions.ease({ duration: 0.15, ease: "linear" }),
+    },
+    exit: {
+      opacity: 0,
+      scale: 1,
+      transition: transitions.ease({ duration: 0.15, ease: "linear" }),
+    },
   },
   iconRotatePause: {
     initial: { opacity: 0, scale: 0.8, rotateZ: 10 },
-    animate: { opacity: 1, scale: 1, rotateZ: 0, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
-    exit: { opacity: 0, scale: 0.8, rotateZ: -10, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      rotateZ: 0,
+      transition: transitions.ease({ duration: 0.2, ease: "linear" }),
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      rotateZ: -10,
+      transition: transitions.ease({ duration: 0.2, ease: "linear" }),
+    },
   },
   iconRotatePlay: {
     initial: { opacity: 0, scale: 0.8, rotateZ: -10 },
-    animate: { opacity: 1, scale: 1, rotateZ: 0, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
-    exit: { opacity: 0, scale: 0.8, rotateZ: 10, transition: transitions.ease({ duration: 0.2, ease: "linear" }) },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      rotateZ: 0,
+      transition: transitions.ease({ duration: 0.2, ease: "linear" }),
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      rotateZ: 10,
+      transition: transitions.ease({ duration: 0.2, ease: "linear" }),
+    },
   },
   // Container animations for dropdowns and panels
   dropdownContainer: {
     initial: { opacity: 0, y: -10, scale: 0.95 },
-    animate: { opacity: 1, y: 0, scale: 1, transition: transitions.spring({ stiffness: 300, damping: 25, duration: 0.4 }) },
-    exit: { opacity: 0, y: -5, scale: 0.98, transition: transitions.ease({ duration: 0.2, ease: "easeIn" }) },
+    animate: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: transitions.spring({ stiffness: 300, damping: 25, duration: 0.4 }),
+    },
+    exit: {
+      opacity: 0,
+      y: -5,
+      scale: 0.98,
+      transition: transitions.ease({ duration: 0.2, ease: "easeIn" }),
+    },
   },
   popUpItem: {
-    open: { opacity: 1, y: 0, scale: 1, transition: transitions.spring({ stiffness: 350, damping: 15, duration: 0.4 }) },
-    closed: { opacity: 0, y: 10, scale: 0.95, transition: transitions.ease({ duration: 0.25, ease: "easeIn" }) },
+    open: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: transitions.spring({ stiffness: 350, damping: 15, duration: 0.4 }),
+    },
+    closed: {
+      opacity: 0,
+      y: 10,
+      scale: 0.95,
+      transition: transitions.ease({ duration: 0.25, ease: "easeIn" }),
+    },
   },
-  volumeMenuItem: { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0, transition: transitions.ease({ duration: 0.2 }) } },
+  volumeMenuItem: {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0, transition: transitions.ease({ duration: 0.2 }) },
+  },
   // Track item hover effect
-  trackItemHover: { initial: {}, hover: { backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "6px", boxShadow: "0 0 5px rgba(255, 255, 255, 0.2)" } },
+  trackItemHover: {
+    initial: {},
+    hover: {
+      backgroundColor: "rgba(255,255,255,0.1)",
+      borderRadius: "6px",
+      boxShadow: "0 0 5px rgba(255, 255, 255, 0.2)",
+    },
+  },
   // Song notification animation
-  notificationContent: { initial: { opacity: 0, y: -5, scale: 0.98 }, animate: { opacity: 1, y: -0, scale: 1 }, exit: { opacity: 0, y: -5, scale: 0.98 } },
+  notificationContent: {
+    initial: { opacity: 0, y: -5, scale: 0.98 },
+    animate: { opacity: 1, y: -0, scale: 1 },
+    exit: { opacity: 0, y: -5, scale: 0.98 },
+  },
   songNotificationTop: {
     initial: { opacity: 0, scale: 0.98, y: -5, filter: "blur(1px)" },
-    animate: { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", transition: { when: "beforeChildren", duration: 0.25 } },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      filter: "blur(0px)",
+      transition: { when: "beforeChildren", duration: 0.25 },
+    },
     exit: { opacity: 0, scale: 0.98, y: -5, filter: "blur(1px)" },
   },
   songNotificationRight: {
     initial: { opacity: 0, scale: 0.98, x: 5, filter: "blur(1px)" },
-    animate: { opacity: 1, scale: 1, x: 0, filter: "blur(0px)", transition: { when: "beforeChildren", duration: 0.25 } },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      x: 0,
+      filter: "blur(0px)",
+      transition: { when: "beforeChildren", duration: 0.25 },
+    },
     exit: { opacity: 0, scale: 0.98, x: 5, filter: "blur(1px)" },
   },
 };

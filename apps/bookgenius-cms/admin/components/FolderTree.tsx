@@ -3,12 +3,26 @@ import { useQuery } from "convex/react";
 import { useQuery as useTanstackQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@convex/_generated/api";
 import { queries } from "@/lib/queries";
-import { ChevronRight, ChevronDown, Plus, Pencil, Trash2, Grid3X3, PanelLeftClose } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronDown,
+  Plus,
+  Pencil,
+  Trash2,
+  Grid3X3,
+  PanelLeftClose,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { detectFolderType, getFolderIcon } from "../../lib/utils/folderPatterns";
 import type { FolderExtra } from "../../lib/types/book";
 import { Button } from "@/components/ui/button";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@/components/ui/context-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FolderTreeProps {
@@ -37,7 +51,15 @@ interface FolderItemProps {
   onPrefetch: (path: string) => void;
 }
 
-function FolderItem({ folder, depth, selectedFolderPath, onFolderSelect, onCreateFolder, onRenameFolder, onPrefetch }: FolderItemProps) {
+function FolderItem({
+  folder,
+  depth,
+  selectedFolderPath,
+  onFolderSelect,
+  onCreateFolder,
+  onRenameFolder,
+  onPrefetch,
+}: FolderItemProps) {
   const isSelected = selectedFolderPath === folder.path;
   // Auto-expand if this folder is an ancestor of the selected path
   const isAncestorOfSelected = selectedFolderPath.startsWith(folder.path + "/");
@@ -71,12 +93,21 @@ function FolderItem({ folder, depth, selectedFolderPath, onFolderSelect, onCreat
             onMouseEnter={handleMouseEnter}
             className={cn(
               "w-full flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors",
-              isSelected ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+              isSelected
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
             )}
             style={{ paddingLeft: `${12 + depth * 16}px` }}
           >
-            <span onClick={handleChevronClick} className="cursor-pointer hover:bg-accent rounded p-0.5 -m-0.5">
-              {isExpanded ? <ChevronDown className="h-3 w-3 shrink-0" /> : <ChevronRight className="h-3 w-3 shrink-0" />}
+            <span
+              onClick={handleChevronClick}
+              className="cursor-pointer hover:bg-accent rounded p-0.5 -m-0.5"
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-3 w-3 shrink-0" />
+              ) : (
+                <ChevronRight className="h-3 w-3 shrink-0" />
+              )}
             </span>
             <span className="text-sm shrink-0" role="img" aria-label="folder icon">
               {getFolderIcon(detectFolderType(folder.path, folder.extra))}
@@ -122,7 +153,13 @@ function FolderItem({ folder, depth, selectedFolderPath, onFolderSelect, onCreat
   );
 }
 
-export function FolderTree({ selectedFolderPath, onFolderSelect, onCreateFolder, onRenameFolder, onToggleCollapse }: FolderTreeProps) {
+export function FolderTree({
+  selectedFolderPath,
+  onFolderSelect,
+  onCreateFolder,
+  onRenameFolder,
+  onToggleCollapse,
+}: FolderTreeProps) {
   const queryClient = useQueryClient();
 
   // Query root folders - non-suspense so SSR renders instantly with loading state
@@ -162,9 +199,17 @@ export function FolderTree({ selectedFolderPath, onFolderSelect, onCreateFolder,
       {/* Quick Filters */}
       <div className="p-3 border-b border-sidebar-border">
         <div className="flex items-center justify-between mb-2 px-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quick Filters</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Quick Filters
+          </p>
           {onToggleCollapse && (
-            <Button variant="ghost" size="icon-sm" className="h-6 w-6 -mr-1" onClick={onToggleCollapse} title="Collapse sidebar">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-6 w-6 -mr-1"
+              onClick={onToggleCollapse}
+              title="Collapse sidebar"
+            >
               <PanelLeftClose className="h-3.5 w-3.5" />
             </Button>
           )}
@@ -174,7 +219,9 @@ export function FolderTree({ selectedFolderPath, onFolderSelect, onCreateFolder,
             onClick={() => onFolderSelect("")}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-1.5 text-sm rounded-md transition-colors",
-              selectedFolderPath === "" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+              selectedFolderPath === ""
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
             )}
           >
             <Grid3X3 className="h-4 w-4" />
@@ -188,13 +235,22 @@ export function FolderTree({ selectedFolderPath, onFolderSelect, onCreateFolder,
         <ScrollArea className="h-full">
           <div className="p-3">
             <div className="flex items-center justify-between mb-2 px-3">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Folders</p>
-              <Button variant="ghost" size="icon-sm" className="h-6 w-6" onClick={() => onCreateFolder("")}>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Folders
+              </p>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="h-6 w-6"
+                onClick={() => onCreateFolder("")}
+              >
                 <Plus className="h-3.5 w-3.5" />
               </Button>
             </div>
             {rootFolders.length === 0 ? (
-              <p className="text-xs text-muted-foreground px-3 py-2">No folders yet. Click + to create one.</p>
+              <p className="text-xs text-muted-foreground px-3 py-2">
+                No folders yet. Click + to create one.
+              </p>
             ) : (
               <div className="space-y-0.5">
                 {rootFolders.map((folder) => (
@@ -224,9 +280,17 @@ export function FolderTreeSkeleton({ onToggleCollapse }: { onToggleCollapse?: ()
     <aside className="h-full bg-sidebar border-r border-sidebar-border flex flex-col">
       <div className="p-3 border-b border-sidebar-border">
         <div className="flex items-center justify-between mb-2 px-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quick Filters</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Quick Filters
+          </p>
           {onToggleCollapse && (
-            <Button variant="ghost" size="icon-sm" className="h-6 w-6 -mr-1" onClick={onToggleCollapse} title="Collapse sidebar">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-6 w-6 -mr-1"
+              onClick={onToggleCollapse}
+              title="Collapse sidebar"
+            >
               <PanelLeftClose className="h-3.5 w-3.5" />
             </Button>
           )}
@@ -240,14 +304,19 @@ export function FolderTreeSkeleton({ onToggleCollapse }: { onToggleCollapse?: ()
       </div>
       <div className="flex-1 p-3">
         <div className="flex items-center justify-between mb-2 px-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Folders</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Folders
+          </p>
         </div>
         <div className="space-y-2 px-3">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="h-3 w-3 rounded bg-muted animate-pulse" />
               <div className="h-4 w-4 rounded bg-muted animate-pulse" />
-              <div className="h-4 flex-1 rounded bg-muted animate-pulse" style={{ maxWidth: `${60 + i * 10}%` }} />
+              <div
+                className="h-4 flex-1 rounded bg-muted animate-pulse"
+                style={{ maxWidth: `${60 + i * 10}%` }}
+              />
             </div>
           ))}
         </div>

@@ -17,20 +17,47 @@ type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInP
 
 type CaptionMode = "always" | "hover" | "hover-title" | "never";
 
-type CharacterCardProps = { entity: ParsedParagraphRange; currentSpeakers: string[]; disableHighlight?: boolean; imageOnly?: boolean; captionMode?: CaptionMode };
+type CharacterCardProps = {
+  entity: ParsedParagraphRange;
+  currentSpeakers: string[];
+  disableHighlight?: boolean;
+  imageOnly?: boolean;
+  captionMode?: CaptionMode;
+};
 
-const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, disableHighlight = false, imageOnly = false, captionMode = "always" }) => {
+const CharacterCard: React.FC<CharacterCardProps> = ({
+  entity,
+  currentSpeakers,
+  disableHighlight = false,
+  imageOnly = false,
+  captionMode = "always",
+}) => {
   const { openModal } = useCharacterModal();
   const { highlightParagraphs, isScrollingLocked } = useHighlight();
   const { charactersData } = useBookConvex();
-  const optimisticAvatar = useAvatarGenerationStore((state) => state.optimisticAvatars[entity.slug.toLowerCase()]);
+  const optimisticAvatar = useAvatarGenerationStore(
+    (state) => state.optimisticAvatars[entity.slug.toLowerCase()],
+  );
 
-  const characterData = useMemo(() => charactersData.find((character) => character.slug === entity.slug), [entity.slug, charactersData]);
+  const characterData = useMemo(
+    () => charactersData.find((character) => character.slug === entity.slug),
+    [entity.slug, charactersData],
+  );
 
-  const locationRef = useMemo(() => ({ chapter: entity.chapterNumber, paragraph: entity.paragraphNumber }), [entity.chapterNumber, entity.paragraphNumber]);
+  const locationRef = useMemo(
+    () => ({ chapter: entity.chapterNumber, paragraph: entity.paragraphNumber }),
+    [entity.chapterNumber, entity.paragraphNumber],
+  );
 
   const snapshot = useMemo(
-    () => (characterData ? resolveCharacterSnapshot(characterData, { location: locationRef, baseSummary: entity.summary, fallbackDisplayName: entity.characterName }) : null),
+    () =>
+      characterData
+        ? resolveCharacterSnapshot(characterData, {
+            location: locationRef,
+            baseSummary: entity.summary,
+            fallbackDisplayName: entity.characterName,
+          })
+        : null,
     [characterData, locationRef, entity.summary, entity.characterName],
   );
 
@@ -41,13 +68,37 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   const rafIdRef = useRef<number | null>(null);
 
   const apps = useMemo<Appearance[]>(
-    () => [{ chapterNumber: entity.chapterNumber, paragraphNumber: entity.paragraphNumber, isTalkingInParagraph: entity.isTalkingInFirstParagraph }, ...entity.otherAppearances],
-    [entity.chapterNumber, entity.paragraphNumber, entity.isTalkingInFirstParagraph, entity.otherAppearances],
+    () => [
+      {
+        chapterNumber: entity.chapterNumber,
+        paragraphNumber: entity.paragraphNumber,
+        isTalkingInParagraph: entity.isTalkingInFirstParagraph,
+      },
+      ...entity.otherAppearances,
+    ],
+    [
+      entity.chapterNumber,
+      entity.paragraphNumber,
+      entity.isTalkingInFirstParagraph,
+      entity.otherAppearances,
+    ],
   );
 
-  const isTalkingInCurrentRange = useMemo(() => currentSpeakers.includes(entity.slug), [currentSpeakers, entity.slug]);
+  const isTalkingInCurrentRange = useMemo(
+    () => currentSpeakers.includes(entity.slug),
+    [currentSpeakers, entity.slug],
+  );
 
-  const svgFallback = useMemo(() => getAvatarSource({ slug: entity.slug, characterName: displayName, bookSlug: "", infoPerChapter: [] }), [entity.slug, displayName]);
+  const svgFallback = useMemo(
+    () =>
+      getAvatarSource({
+        slug: entity.slug,
+        characterName: displayName,
+        bookSlug: "",
+        infoPerChapter: [],
+      }),
+    [entity.slug, displayName],
+  );
 
   const mediaSrc = useMemo(() => {
     if (optimisticAvatar) return optimisticAvatar;
@@ -88,7 +139,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
     };
   }, []);
 
-  const commonAttrs = { "data-original-src": mediaSrc, "data-character-name": displayName, "data-summary": summary ?? "", className: "w-full h-full object-cover block" } as const;
+  const commonAttrs = {
+    "data-original-src": mediaSrc,
+    "data-character-name": displayName,
+    "data-summary": summary ?? "",
+    className: "w-full h-full object-cover block",
+  } as const;
 
   const isHoverish = captionMode === "hover" || captionMode === "hover-title";
   const captionVisibilityClasses =
@@ -101,22 +157,40 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
   return (
     <div
       ref={cardRef}
-      className={cn("group w-[clamp(60px,20vw,200px)] max-w-[200px] mx-auto relative pb-4 cursor-pointer")}
+      className={cn(
+        "group w-[clamp(60px,20vw,200px)] max-w-[200px] mx-auto relative pb-4 cursor-pointer",
+      )}
       data-canonical-name={entity.slug}
       data-appearances={JSON.stringify(apps)}
       onMouseEnter={() => requestToggle(true)}
       onMouseLeave={() => requestToggle(false)}
       aria-label={displayName}
       title={displayName}
-      onClick={() => openModal({ characterSlug: entity.slug, isVideo: modalIsVideo, mediaSrc: modalMediaSrc, chapter: entity.chapterNumber, paragraph: entity.paragraphNumber })}
+      onClick={() =>
+        openModal({
+          characterSlug: entity.slug,
+          isVideo: modalIsVideo,
+          mediaSrc: modalMediaSrc,
+          chapter: entity.chapterNumber,
+          paragraph: entity.paragraphNumber,
+        })
+      }
     >
       <motion.div
         className={cn(
           "relative rounded-full aspect-square isolate overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10",
-          !disableHighlight && isTalkingInCurrentRange && "z-10 animate-pulse-glow overflow-visible border-2 border-white/30",
+          !disableHighlight &&
+            isTalkingInCurrentRange &&
+            "z-10 animate-pulse-glow overflow-visible border-2 border-white/30",
         )}
       >
-        <CharacterMedia mediaSrc={mediaSrc} commonAttrs={commonAttrs} isVideo={isVideo} canonicalName={entity.slug} isTalking={isTalkingInCurrentRange} />
+        <CharacterMedia
+          mediaSrc={mediaSrc}
+          commonAttrs={commonAttrs}
+          isVideo={isVideo}
+          canonicalName={entity.slug}
+          isTalking={isTalkingInCurrentRange}
+        />
       </motion.div>
 
       {captionMode !== "never" && (
@@ -137,7 +211,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ entity, currentSpeakers, 
               {entity.label || displayName}
             </h4>
             {summary && captionMode !== "hover-title" && (
-              <p className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[7px] sm:text-[9px] md:text-xs italic text-gray-200">{summary}</p>
+              <p className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[7px] sm:text-[9px] md:text-xs italic text-gray-200">
+                {summary}
+              </p>
             )}
           </div>
         </div>

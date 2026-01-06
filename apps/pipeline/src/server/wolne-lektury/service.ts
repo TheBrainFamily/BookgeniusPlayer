@@ -34,7 +34,9 @@ export async function searchBooks(query: string): Promise<WLBook[]> {
   const allBooks = (await response.json()) as WLBook[];
   const lowerQuery = query.toLowerCase();
   return allBooks.filter(
-    (book) => book.title.toLowerCase().includes(lowerQuery) || book.author.toLowerCase().includes(lowerQuery),
+    (book) =>
+      book.title.toLowerCase().includes(lowerQuery) ||
+      book.author.toLowerCase().includes(lowerQuery),
   );
 }
 
@@ -49,7 +51,9 @@ export async function getBookBySlug(slug: string): Promise<WLBookDetails> {
   return response.json();
 }
 
-export async function downloadBookFb2(slug: string): Promise<{ buffer: Buffer; details: WLBookDetails }> {
+export async function downloadBookFb2(
+  slug: string,
+): Promise<{ buffer: Buffer; details: WLBookDetails }> {
   const details = await getBookBySlug(slug);
   if (!details.fb2) {
     throw new Error(`Book "${slug}" does not have FB2 format available`);

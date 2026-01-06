@@ -3,7 +3,12 @@ import { ChapterStructure } from "@player/components/ProgressBars";
 /**
  * Unified function to calculate reading progress for any given chapter/paragraph position
  */
-export const calculateReadProgress = (chaptersStructure: ChapterStructure[], targetChapter: number, targetParagraph: number, totalParagraphs: number): number => {
+export const calculateReadProgress = (
+  chaptersStructure: ChapterStructure[],
+  targetChapter: number,
+  targetParagraph: number,
+  totalParagraphs: number,
+): number => {
   if (totalParagraphs === 0 || chaptersStructure.length === 0) {
     return 0;
   }
@@ -26,7 +31,9 @@ export const calculateReadProgress = (chaptersStructure: ChapterStructure[], tar
  * Calculate chapter progress as a percentage based on user scroll position
  */
 export const calculateChapterProgress = (currentChapter: number): number => {
-  const activeChapter = document.querySelector(`section[data-chapter="${currentChapter}"]`) as HTMLElement | null;
+  const activeChapter = document.querySelector(
+    `section[data-chapter="${currentChapter}"]`,
+  ) as HTMLElement | null;
   if (!activeChapter) {
     return 0;
   }

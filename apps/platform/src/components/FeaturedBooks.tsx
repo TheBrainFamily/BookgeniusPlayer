@@ -30,13 +30,21 @@ const FeaturedBooks = () => {
   };
 
   return (
-    <section className="py-16 px-4 min-h-[80vh] flex items-center justify-center" id="featured-books">
+    <section
+      className="py-16 px-4 min-h-[80vh] flex items-center justify-center"
+      id="featured-books"
+    >
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            {t("featured.featuredMasterpieces").split(" ")[0]} <span className="text-library-gold">{t("featured.featuredMasterpieces").split(" ")[1]}</span>
+            {t("featured.featuredMasterpieces").split(" ")[0]}{" "}
+            <span className="text-library-gold">
+              {t("featured.featuredMasterpieces").split(" ")[1]}
+            </span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t("featured.description")}</p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            {t("featured.description")}
+          </p>
         </div>
 
         <div className="flex flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 max-w-4xl mx-auto items-stretch">

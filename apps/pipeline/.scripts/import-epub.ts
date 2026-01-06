@@ -40,7 +40,9 @@ async function runEbookConvert(bin: string, inputPath: string, outputPath: strin
 async function main() {
   const args = process.argv.slice(2);
   if (args.length < 1) {
-    console.error("Usage: tsx .scripts/import-epub.ts <path-to-epub> [--bin /path/to/ebook-convert]");
+    console.error(
+      "Usage: tsx .scripts/import-epub.ts <path-to-epub> [--bin /path/to/ebook-convert]",
+    );
     process.exit(1);
   }
 
@@ -57,7 +59,10 @@ async function main() {
 
   // Optional override for ebook-convert binary
   const binFlagIndex = args.indexOf("--bin");
-  const ebookConvertBin = binFlagIndex !== -1 && args[binFlagIndex + 1] ? args[binFlagIndex + 1] : process.env.EBOOK_CONVERT_BIN || DEFAULT_EBOOK_CONVERT;
+  const ebookConvertBin =
+    binFlagIndex !== -1 && args[binFlagIndex + 1]
+      ? args[binFlagIndex + 1]
+      : process.env.EBOOK_CONVERT_BIN || DEFAULT_EBOOK_CONVERT;
 
   const baseName = path.basename(epubPath, path.extname(epubPath));
   const slug = slugify(baseName);
@@ -75,7 +80,10 @@ async function main() {
 
   // Run Calibre conversion to FB2
   if (!fs.existsSync(ebookConvertBin)) {
-    console.error(`ebook-convert not found at "${ebookConvertBin}".\n` + `Install Calibre or provide the binary via --bin or EBOOK_CONVERT_BIN.`);
+    console.error(
+      `ebook-convert not found at "${ebookConvertBin}".\n` +
+        `Install Calibre or provide the binary via --bin or EBOOK_CONVERT_BIN.`,
+    );
     process.exit(1);
   }
 

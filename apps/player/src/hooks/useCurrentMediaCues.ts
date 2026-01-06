@@ -4,7 +4,11 @@ import { api } from "@convex/_generated/api";
 
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useLocation } from "@player/state/LocationContext";
-import { useEditorToolbar, type CurrentBackgroundCue, type CurrentMusicCue } from "@player/stores/editorToolbar.store";
+import {
+  useEditorToolbar,
+  type CurrentBackgroundCue,
+  type CurrentMusicCue,
+} from "@player/stores/editorToolbar.store";
 
 export function useCurrentMediaCues() {
   const { book } = useBookConvex();
@@ -21,7 +25,11 @@ export function useCurrentMediaCues() {
   const currentBackground = useMemo<CurrentBackgroundCue | null>(() => {
     if (!backgroundCues || backgroundCues.length === 0) return null;
 
-    const applicable = backgroundCues.filter((cue) => cue.chapter < currentChapter || (cue.chapter === currentChapter && cue.paragraph <= currentParagraph));
+    const applicable = backgroundCues.filter(
+      (cue) =>
+        cue.chapter < currentChapter ||
+        (cue.chapter === currentChapter && cue.paragraph <= currentParagraph),
+    );
 
     if (applicable.length === 0) return null;
 
@@ -51,7 +59,11 @@ export function useCurrentMediaCues() {
   const currentMusic = useMemo<CurrentMusicCue | null>(() => {
     if (!musicCues || musicCues.length === 0) return null;
 
-    const applicable = musicCues.filter((cue) => cue.chapter < currentChapter || (cue.chapter === currentChapter && cue.paragraph <= currentParagraph));
+    const applicable = musicCues.filter(
+      (cue) =>
+        cue.chapter < currentChapter ||
+        (cue.chapter === currentChapter && cue.paragraph <= currentParagraph),
+    );
 
     if (applicable.length === 0) return null;
 

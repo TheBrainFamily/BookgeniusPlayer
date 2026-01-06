@@ -17,7 +17,16 @@ declare global {
   }
 }
 
-type SnapplifyJwtData = { sub: string; user_id: number; given_name: string; family_name: string; name: string; email: string; iat: number; exp: number };
+type SnapplifyJwtData = {
+  sub: string;
+  user_id: number;
+  given_name: string;
+  family_name: string;
+  name: string;
+  email: string;
+  iat: number;
+  exp: number;
+};
 function getSnapplifyDataFromJwt(): SnapplifyJwtData | null {
   console.log("[SnapplifyChat] Getting Snapplify data from JWT...");
 
@@ -100,10 +109,17 @@ function SnapplifyChatSafe() {
   }, []);
 
   useEffect(() => {
-    console.log("[SnapplifyChat] Auth/FC state change effect triggered:", { authReady: auth.ready, isSignedIn: auth.isSignedIn, fcReady: fcReady });
+    console.log("[SnapplifyChat] Auth/FC state change effect triggered:", {
+      authReady: auth.ready,
+      isSignedIn: auth.isSignedIn,
+      fcReady: fcReady,
+    });
 
     if (!auth.ready || !fcReady) {
-      console.log("[SnapplifyChat] Skipping user properties - not ready:", { authReady: auth.ready, fcReady: fcReady });
+      console.log("[SnapplifyChat] Skipping user properties - not ready:", {
+        authReady: auth.ready,
+        fcReady: fcReady,
+      });
       return;
     }
 
@@ -152,7 +168,10 @@ function SnapplifyChatSafe() {
 
 export function SnapplifyChat() {
   console.log("[SnapplifyChat] SnapplifyChat component rendering...");
-  console.log("[SnapplifyChat] Environment checks:", { isSSR: import.meta.env.SSR, authProvider: import.meta.env.VITE_AUTH_PROVIDER });
+  console.log("[SnapplifyChat] Environment checks:", {
+    isSSR: import.meta.env.SSR,
+    authProvider: import.meta.env.VITE_AUTH_PROVIDER,
+  });
 
   if (!import.meta.env.SSR && import.meta.env.VITE_AUTH_PROVIDER === "snapplify") {
     console.log("[SnapplifyChat] Conditions met, rendering SnapplifyChatSafe");

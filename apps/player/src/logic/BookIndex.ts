@@ -1,6 +1,10 @@
 import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLastChapter";
 import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
-import { getBackgroundsForBook, getBookStringified, getCharactersData } from "@player/state/bookDataStore";
+import {
+  getBackgroundsForBook,
+  getBookStringified,
+  getCharactersData,
+} from "@player/state/bookDataStore";
 
 /**
  * Pre-render inline avatar shell spans inside character placeholders.
@@ -74,11 +78,19 @@ class BookIndex {
   }
 
   setParagraphCountOverrides(structure: ChaptersStructureEntry[]): void {
-    this.paragraphCountOverrides = new Map(structure.map((entry) => [entry.chapterNumber, entry.paragraphCount]));
-    const missing = structure.filter((entry) => entry.paragraphCount <= 0).map((entry) => entry.chapterNumber);
+    this.paragraphCountOverrides = new Map(
+      structure.map((entry) => [entry.chapterNumber, entry.paragraphCount]),
+    );
+    const missing = structure
+      .filter((entry) => entry.paragraphCount <= 0)
+      .map((entry) => entry.chapterNumber);
 
     if (!this.initialized) {
-      console.log("[BookIndex] paragraph overrides set (deferred)", { chapters: structure.length, missingCount: missing.length, missingSample: missing.slice(0, 5) });
+      console.log("[BookIndex] paragraph overrides set (deferred)", {
+        chapters: structure.length,
+        missingCount: missing.length,
+        missingSample: missing.slice(0, 5),
+      });
       return;
     }
 
@@ -91,7 +103,12 @@ class BookIndex {
       }
     }
 
-    console.log("[BookIndex] paragraph overrides applied", { chapters: structure.length, updated, missingCount: missing.length, missingSample: missing.slice(0, 5) });
+    console.log("[BookIndex] paragraph overrides applied", {
+      chapters: structure.length,
+      updated,
+      missingCount: missing.length,
+      missingSample: missing.slice(0, 5),
+    });
   }
 
   /**
@@ -115,7 +132,9 @@ class BookIndex {
 
     const bookStringified = getBookStringified();
     if (!bookStringified) {
-      throw new Error("[BookIndex] bookStringified is null - store not initialized. This usually means ensureInitialized was called before BookConvexProvider set the store.");
+      throw new Error(
+        "[BookIndex] bookStringified is null - store not initialized. This usually means ensureInitialized was called before BookConvexProvider set the store.",
+      );
     }
 
     this._parseAndInitialize(bookStringified);

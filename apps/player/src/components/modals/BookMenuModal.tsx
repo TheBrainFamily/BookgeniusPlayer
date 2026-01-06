@@ -1,5 +1,17 @@
 import React, { useEffect, useState, useRef, memo, useMemo } from "react";
-import { List, Type, RotateCcw, ArrowLeft, History, Clock, Share2, Check, Mic, Loader2, Monitor } from "lucide-react";
+import {
+  List,
+  Type,
+  RotateCcw,
+  ArrowLeft,
+  History,
+  Clock,
+  Share2,
+  Check,
+  Mic,
+  Loader2,
+  Monitor,
+} from "lucide-react";
 import { useGraphicsSettingsModal } from "@player/stores/modals/graphicsSettingsModal.store";
 import { useTranslation } from "react-i18next";
 import useLocalStorageState from "use-local-storage-state";
@@ -11,28 +23,41 @@ import { Slider } from "@player/components/ui/slider";
 import { cn } from "@player/lib/utils";
 import ModalUI from "./ModalUI";
 import { useRealtime } from "@player/context/RealtimeContext";
-import { getCurrentLocation, systemNavigateTo, getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import {
+  getCurrentLocation,
+  systemNavigateTo,
+  getSavedLocation,
+} from "@player/helpers/paragraphsNavigation";
 import { getPositionHistory, getCurrentPlatformAndBook } from "@player/services/readingPositionApi";
 import { calculateReadingStats, formatReadingTime } from "@player/helpers/calculateReadingStats";
 import { getReadableBuildInfo } from "@player/helpers/buildInfo";
 
-const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(({ value, isChanging }) => {
-  const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
-  const motionValue = useMotionValue(currentDisplayValue);
-  const spring = useSpring(motionValue, { stiffness: 50, damping: 15, mass: 1, restDelta: 0.001 });
-  const rounded = useTransform(spring, (latest) => Math.round(latest * 10) / 10);
+const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(
+  ({ value, isChanging }) => {
+    const [currentDisplayValue, setCurrentDisplayValue] = useState(value);
+    const motionValue = useMotionValue(currentDisplayValue);
+    const spring = useSpring(motionValue, {
+      stiffness: 50,
+      damping: 15,
+      mass: 1,
+      restDelta: 0.001,
+    });
+    const rounded = useTransform(spring, (latest) => Math.round(latest * 10) / 10);
 
-  useEffect(() => {
-    setCurrentDisplayValue(value);
-    motionValue.set(value);
-  }, [value, motionValue]);
+    useEffect(() => {
+      setCurrentDisplayValue(value);
+      motionValue.set(value);
+    }, [value, motionValue]);
 
-  return (
-    <span className={`transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-blue-300"}`}>
-      <motion.span>{rounded}</motion.span>x
-    </span>
-  );
-});
+    return (
+      <span
+        className={`transition-colors duration-300 ${isChanging ? "text-blue-300" : "text-blue-300"}`}
+      >
+        <motion.span>{rounded}</motion.span>x
+      </span>
+    );
+  },
+);
 
 interface BookMenuModalProps {
   onClose: () => void;
@@ -44,10 +69,18 @@ interface BookMenuModalProps {
 
 // Build version formatting moved to helper
 
-const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterModal, openApiKeyModal, openPositionHistoryModal, resetFurthestPageLocation }) => {
+const BookMenuModal: React.FC<BookMenuModalProps> = ({
+  onClose,
+  openBookChapterModal,
+  openApiKeyModal,
+  openPositionHistoryModal,
+  resetFurthestPageLocation,
+}) => {
   const { t } = useTranslation();
 
-  const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
+  const [currentFontSize, setCurrentFontSize] = useLocalStorageState("fontSize", {
+    defaultValue: 1,
+  });
 
   const { primeMicrophone, connectConversation, isConnected } = useRealtime();
   const [hideOverlay, setHideOverlay] = useState(false);
@@ -73,7 +106,10 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   const bookLocation = useRef(getCurrentLocation());
 
   // Reading stats state
-  const [readingStats, setReadingStats] = useState<{ estimatedTimeRemaining: string; totalReadingTime: string } | null>(null);
+  const [readingStats, setReadingStats] = useState<{
+    estimatedTimeRemaining: string;
+    totalReadingTime: string;
+  } | null>(null);
 
   // Load reading stats on mount
   useEffect(() => {
@@ -86,7 +122,10 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
         const stats = calculateReadingStats(history, currentProgress);
 
-        setReadingStats({ estimatedTimeRemaining: formatReadingTime(stats.estimatedMinutesRemaining), totalReadingTime: formatReadingTime(stats.totalReadingTimeMinutes) });
+        setReadingStats({
+          estimatedTimeRemaining: formatReadingTime(stats.estimatedMinutesRemaining),
+          totalReadingTime: formatReadingTime(stats.totalReadingTimeMinutes),
+        });
       } catch (error) {
         console.warn("Failed to load reading stats:", error);
       }
@@ -123,7 +162,13 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
 
     setTimeout(() => {
       setCurrentFontSize(fontSize);
-      systemNavigateTo({ currentChapter: bookLocation.current.currentChapter, currentParagraph: bookLocation.current.currentParagraph }, { wait: true });
+      systemNavigateTo(
+        {
+          currentChapter: bookLocation.current.currentChapter,
+          currentParagraph: bookLocation.current.currentParagraph,
+        },
+        { wait: true },
+      );
     }, 200);
 
     if (!hideOverlay) {
@@ -213,7 +258,9 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
     try {
       const result = await primeMicrophone();
       if (result === "failed") {
-        showToast(t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."));
+        showToast(
+          t("mic_permission_blocked", "Microphone access blocked. Allow mic and try again."),
+        );
         return;
       }
       if (!isConnected) {
@@ -252,8 +299,10 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
   // removed dialog-based share flow
 
   const currentShareableLocation = getCurrentLocation();
-  const currentChapterLabel = currentShareableLocation.currentChapter ?? currentShareableLocation.chapter ?? 0;
-  const currentParagraphLabel = currentShareableLocation.currentParagraph ?? currentShareableLocation.paragraph ?? 0;
+  const currentChapterLabel =
+    currentShareableLocation.currentChapter ?? currentShareableLocation.chapter ?? 0;
+  const currentParagraphLabel =
+    currentShareableLocation.currentParagraph ?? currentShareableLocation.paragraph ?? 0;
 
   return (
     <>
@@ -353,8 +402,14 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
                 }
               }}
             >
-              {isPreparingRealtime ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mic className="mr-2 h-4 w-4" />}
-              {isPreparingRealtime ? t("preparing_voice_session", "Preparing voice session…") : t("prepare_voice_session", "Warm up voice session")}
+              {isPreparingRealtime ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Mic className="mr-2 h-4 w-4" />
+              )}
+              {isPreparingRealtime
+                ? t("preparing_voice_session", "Preparing voice session…")
+                : t("prepare_voice_session", "Warm up voice session")}
             </Button>
             <Button
               variant="ghost"
@@ -416,13 +471,23 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
               </span>
               {shareJustCopied
                 ? t("copied") || "Copied!"
-                : t("share_link_label", { chapter: currentChapterLabel, paragraph: currentParagraphLabel }) ||
+                : t("share_link_label", {
+                    chapter: currentChapterLabel,
+                    paragraph: currentParagraphLabel,
+                  }) ||
                   `Share link to Chapter: ${currentChapterLabel}, paragraph: ${currentParagraphLabel}`}
             </Button>
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/20 bg-black/40 px-3 py-2" data-keep-modal-open="true">
+            <div
+              className="flex items-center justify-between gap-4 rounded-lg border border-white/20 bg-black/40 px-3 py-2"
+              data-keep-modal-open="true"
+            >
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-white">{t("menu_audio_responses", "Audio responses")}</span>
-                <span className="text-xs text-white/60">{t("menu_audio_responses_hint", "Toggle spoken answers and reload to apply.")}</span>
+                <span className="text-sm font-medium text-white">
+                  {t("menu_audio_responses", "Audio responses")}
+                </span>
+                <span className="text-xs text-white/60">
+                  {t("menu_audio_responses_hint", "Toggle spoken answers and reload to apply.")}
+                </span>
               </div>
               <button
                 type="button"
@@ -438,7 +503,12 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
                   audioResponsesEnabled ? "bg-blue-500" : "bg-white/20",
                 )}
               >
-                <span className={cn("inline-block h-5 w-5 transform rounded-full bg-white transition-transform", audioResponsesEnabled ? "translate-x-5" : "translate-x-1")} />
+                <span
+                  className={cn(
+                    "inline-block h-5 w-5 transform rounded-full bg-white transition-transform",
+                    audioResponsesEnabled ? "translate-x-5" : "translate-x-1",
+                  )}
+                />
               </button>
             </div>
           </div>
@@ -452,11 +522,15 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm text-white">
                 <div>
-                  <div className="text-xs text-gray-400">{t("time_remaining") || "Time Remaining"}</div>
+                  <div className="text-xs text-gray-400">
+                    {t("time_remaining") || "Time Remaining"}
+                  </div>
                   <div className="font-medium">{readingStats.estimatedTimeRemaining}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-400">{t("total_reading_time") || "Total Reading Time"}</div>
+                  <div className="text-xs text-gray-400">
+                    {t("total_reading_time") || "Total Reading Time"}
+                  </div>
                   <div className="font-medium">{readingStats.totalReadingTime}</div>
                 </div>
               </div>
@@ -464,12 +538,17 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           )}
 
           <div className="flex flex-col gap-2 book-settings-container">
-            <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box")}>
+            <div
+              className={cn(
+                "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full book-settings-control-box",
+              )}
+            >
               <div className="space-y-4 book-settings-control-box-inner">
                 <div className="flex items-center gap-2">
                   <Type className="h-4 w-4 text-white" />
                   <Label htmlFor="font-size" className="text-sm font-medium text-white">
-                    {t("text_size")}: <AnimatedFontSize value={currentFontSize} isChanging={isFontSizeChanging} />
+                    {t("text_size")}:{" "}
+                    <AnimatedFontSize value={currentFontSize} isChanging={isFontSizeChanging} />
                   </Label>
                 </div>
                 <Slider
@@ -485,13 +564,22 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
                   className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
                 />
                 <div className="flex justify-between text-xs text-gray-300">
-                  <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(0.5)}>
+                  <span
+                    className="cursor-pointer hover:text-white transition-colors"
+                    onClick={() => handleFontSizePreset(0.5)}
+                  >
                     {t("small")}
                   </span>
-                  <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.0)}>
+                  <span
+                    className="cursor-pointer hover:text-white transition-colors"
+                    onClick={() => handleFontSizePreset(1.0)}
+                  >
                     {t("default")}
                   </span>
-                  <span className="cursor-pointer hover:text-white transition-colors" onClick={() => handleFontSizePreset(1.5)}>
+                  <span
+                    className="cursor-pointer hover:text-white transition-colors"
+                    onClick={() => handleFontSizePreset(1.5)}
+                  >
                     {t("large")}
                   </span>
                 </div>
@@ -501,7 +589,8 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({ onClose, openBookChapterM
           <div className="text-xs text-gray-500 mt-4 text-right book-settings-version flex items-center justify-between gap-2">
             <span>Beta</span>
             <span>
-              {t("version")}: {getReadableBuildInfo(import.meta.env.VITE_BUILD_TIME as string | undefined)}
+              {t("version")}:{" "}
+              {getReadableBuildInfo(import.meta.env.VITE_BUILD_TIME as string | undefined)}
             </span>
           </div>
         </div>

@@ -88,13 +88,21 @@ interface BookProviderProps {
 
 export function BookProvider({ bookPath, children }: BookProviderProps) {
   // Queries for book data - each component subscribes independently
-  const { data: metadata, isLoading: metadataLoading } = useQuery(convexQuery(api.bookQueries.getBookMetadata, { bookPath }));
+  const { data: metadata, isLoading: metadataLoading } = useQuery(
+    convexQuery(api.bookQueries.getBookMetadata, { bookPath }),
+  );
 
-  const { data: characters, isLoading: charactersLoading } = useQuery(convexQuery(api.bookQueries.listCharacters, { bookPath }));
+  const { data: characters, isLoading: charactersLoading } = useQuery(
+    convexQuery(api.bookQueries.listCharacters, { bookPath }),
+  );
 
-  const { data: chapters, isLoading: chaptersLoading } = useQuery(convexQuery(api.bookQueries.listChapters, { bookPath }));
+  const { data: chapters, isLoading: chaptersLoading } = useQuery(
+    convexQuery(api.bookQueries.listChapters, { bookPath }),
+  );
 
-  const { data: stats, isLoading: statsLoading } = useQuery(convexQuery(api.bookQueries.getBookStats, { bookPath }));
+  const { data: stats, isLoading: statsLoading } = useQuery(
+    convexQuery(api.bookQueries.getBookStats, { bookPath }),
+  );
 
   const isLoading = metadataLoading || charactersLoading || chaptersLoading || statsLoading;
 
@@ -166,8 +174,12 @@ export function useBookStats() {
  */
 export function useBackgroundCues() {
   const { bookPath } = useBook();
-  const { data: cues, isLoading } = useQuery(convexQuery(api.backgroundCues.listByBook, { bookPath }));
-  const { data: files, isLoading: filesLoading } = useQuery(convexQuery(api.backgroundCues.listFiles, { bookPath }));
+  const { data: cues, isLoading } = useQuery(
+    convexQuery(api.backgroundCues.listByBook, { bookPath }),
+  );
+  const { data: files, isLoading: filesLoading } = useQuery(
+    convexQuery(api.backgroundCues.listFiles, { bookPath }),
+  );
 
   return { cues, files, isLoading: isLoading || filesLoading };
 }
@@ -178,7 +190,9 @@ export function useBackgroundCues() {
 export function useMusicCues() {
   const { bookPath } = useBook();
   const { data: cues, isLoading } = useQuery(convexQuery(api.musicCues.listByBook, { bookPath }));
-  const { data: files, isLoading: filesLoading } = useQuery(convexQuery(api.musicCues.listFiles, { bookPath }));
+  const { data: files, isLoading: filesLoading } = useQuery(
+    convexQuery(api.musicCues.listFiles, { bookPath }),
+  );
 
   return { cues, files, isLoading: isLoading || filesLoading };
 }

@@ -1,5 +1,8 @@
 import { callClaude, callGeminiWrapper } from "../callClaude";
-import { getParagraphsFromChapter, getSectionAttributesFromChapter } from "./createParagraphsWithPageNumbers";
+import {
+  getParagraphsFromChapter,
+  getSectionAttributesFromChapter,
+} from "./createParagraphsWithPageNumbers";
 import { logger } from "../logger";
 import fs from "fs";
 import { compareXmlTextContent } from "./new-tooling/compare-chapters-xml";
@@ -50,7 +53,10 @@ function buildChunkedPrompt(
   jsonCharacters: string,
   previousChunkOutput: string | null,
 ): string {
-  const prompt = fs.readFileSync(path.join(__dirname, "NewRewriteParagraphsPromptBookChunked.md"), "utf8");
+  const prompt = fs.readFileSync(
+    path.join(__dirname, "NewRewriteParagraphsPromptBookChunked.md"),
+    "utf8",
+  );
 
   const paragraphsXml = paragraphs.map(buildParagraphXml).join("\n");
 
@@ -108,17 +114,27 @@ async function processChunk(
     throw new Error(`Too many attempts for chapter ${chapter} chunk ${chunkIndex}`);
   }
 
-  const compiledPrompt = buildChunkedPrompt(chunk.paragraphs, chapter, jsonCharacters, previousChunkOutput);
+  const compiledPrompt = buildChunkedPrompt(
+    chunk.paragraphs,
+    chapter,
+    jsonCharacters,
+    previousChunkOutput,
+  );
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-chunk-${chunkIndex}.md`, compiledPrompt);
 
   const llmProviders = [callGeminiWrapper, callClaude, callGpt5, callGrok];
 
   try {
     const selectedProvider = llmProviders[attempt % llmProviders.length];
-    logger.info(`Using provider for chapter ${chapter} chunk ${chunkIndex}: ${selectedProvider.name}`);
+    logger.info(
+      `Using provider for chapter ${chapter} chunk ${chunkIndex}: ${selectedProvider.name}`,
+    );
 
     const originalChunkXml = buildChunkXml(chapter, chunk.paragraphs);
-    writeBookFile(`original-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`, originalChunkXml);
+    writeBookFile(
+      `original-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`,
+      originalChunkXml,
+    );
 
     const response = (await selectedProvider(compiledPrompt, undefined, 1)) as string;
     logger.info(`Response for chapter ${chapter} chunk ${chunkIndex}:`, response.slice(0, 50));
@@ -143,11 +159,25 @@ async function processChunk(
         clearedResponse,
       );
       logger.info(`❌ Validation failed for chapter ${chapter} chunk ${chunkIndex}, retrying...`);
-      return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, attempt + 1);
+      return processChunk(
+        chapter,
+        chunkIndex,
+        chunk,
+        jsonCharacters,
+        previousChunkOutput,
+        attempt + 1,
+      );
     }
   } catch (e) {
     logger.error(`Error for chapter ${chapter} chunk ${chunkIndex}`, e);
-    return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, attempt + 1);
+    return processChunk(
+      chapter,
+      chunkIndex,
+      chunk,
+      jsonCharacters,
+      previousChunkOutput,
+      attempt + 1,
+    );
   }
 }
 
@@ -171,7 +201,9 @@ async function processChunkedChapter(
     const chunk = chunks[i];
     const previousChunkOutput = i > 0 ? processedChunks[i - 1] : null;
 
-    logger.info(`📦 Processing chapter ${chapter} chunk ${i + 1}/${chunks.length} (${chunk.tokenCount} tokens)`);
+    logger.info(
+      `📦 Processing chapter ${chapter} chunk ${i + 1}/${chunks.length} (${chunk.tokenCount} tokens)`,
+    );
 
     const result = await processChunk(chapter, i, chunk, jsonCharacters, previousChunkOutput);
     processedChunks.push(result);
@@ -205,7 +237,12 @@ export const identifyAndRewriteParagraphs = async (
 
   if (chapterFormat !== "play" && needsChunking(paragraphsFromChapter)) {
     logger.info(`📦 Chapter ${chapter} exceeds token limit, using chunked processing`);
-    return processChunkedChapter(chapter, charactersForChapter, paragraphsFromChapter, sectionAttributes);
+    return processChunkedChapter(
+      chapter,
+      charactersForChapter,
+      paragraphsFromChapter,
+      sectionAttributes,
+    );
   }
 
   // Original single-shot processing for shorter chapters
@@ -243,11 +280,14 @@ export const identifyAndRewriteParagraphs = async (
     logger.info("Using provider: " + selectedProvider.name);
     writeBookFile(`original-paragraphs-for-chapter-${chapter}.xml`, paragraphsForPage);
     const response = (await selectedProvider(compiledPrompt, undefined, 1)) as string;
-    logger.info("identify entities for paragraph response for chapter " + chapter, response.slice(0, 50));
+    logger.info(
+      "identify entities for paragraph response for chapter " + chapter,
+      response.slice(0, 50),
+    );
     const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
-    const allCharacters = JSON.parse(readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)) as {
-      characters: { name: string }[];
-    };
+    const allCharacters = JSON.parse(
+      readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
+    ) as { characters: { name: string }[] };
 
     let restored = clearedResponse;
     try {
@@ -265,10 +305,16 @@ export const identifyAndRewriteParagraphs = async (
         .join("");
       const finalRestored = `<section data-chapter="${chapter}"${formatAttr}${extraAttrs}>${restored}</section>`;
       logger.info("✅ No changes to paragraphs for chapter " + chapter);
-      writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`, finalRestored);
+      writeBookFile(
+        `rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`,
+        finalRestored,
+      );
       writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, finalRestored);
     } else {
-      writeBookFile(`broken-rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`, clearedResponse);
+      writeBookFile(
+        `broken-rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`,
+        clearedResponse,
+      );
 
       logger.info("❌ Changes to paragraphs for chapter " + chapter);
       return identifyAndRewriteParagraphs(chapter, charactersForChapter, attempt + 1);
@@ -289,10 +335,15 @@ interface ChapterData {
   sectionAttributes: Record<string, string>;
 }
 
-export const identifyCharactersAndRewriteParagraphs = async (referenceCards: NewReferenceCardsResponse) => {
+export const identifyCharactersAndRewriteParagraphs = async (
+  referenceCards: NewReferenceCardsResponse,
+) => {
   const bookSettings = getBookSettings();
 
-  const charactersForChapter = referenceCards.characters.map((c) => ({ name: c.name, summary: c.referenceCard }));
+  const charactersForChapter = referenceCards.characters.map((c) => ({
+    name: c.name,
+    summary: c.referenceCard,
+  }));
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
   // Prepare all chapter data
@@ -305,7 +356,14 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
     // Check if already complete
     if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
       logger.info(`✅ Chapter ${chapter} already complete`);
-      return { chapter, paragraphs: [], chunks: [], jsonCharacters, needsChunking: false, sectionAttributes: {} };
+      return {
+        chapter,
+        paragraphs: [],
+        chunks: [],
+        jsonCharacters,
+        needsChunking: false,
+        sectionAttributes: {},
+      };
     }
 
     const paragraphs = getParagraphsFromChapter(chapter);
@@ -314,17 +372,28 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
     const chunks = shouldChunk ? chunkParagraphs(paragraphs) : [];
     const sectionAttributes = getSectionAttributesFromChapter(chapter);
 
-    return { chapter, paragraphs, chunks, jsonCharacters, needsChunking: shouldChunk, sectionAttributes };
+    return {
+      chapter,
+      paragraphs,
+      chunks,
+      jsonCharacters,
+      needsChunking: shouldChunk,
+      sectionAttributes,
+    };
   });
 
   // Separate chapters that need chunking from those that don't
   const chunkedChapters = chapterDataList.filter((c) => c.needsChunking && c.chunks.length > 0);
   const simpleChapters = chapterDataList.filter((c) => !c.needsChunking && c.paragraphs.length > 0);
 
-  logger.info(`📦 Processing ${chunkedChapters.length} chunked chapters and ${simpleChapters.length} simple chapters`);
+  logger.info(
+    `📦 Processing ${chunkedChapters.length} chunked chapters and ${simpleChapters.length} simple chapters`,
+  );
 
   // Process simple chapters in parallel (no chunking needed)
-  const simplePromises = simpleChapters.map((data) => identifyAndRewriteParagraphs(data.chapter, charactersForChapter));
+  const simplePromises = simpleChapters.map((data) =>
+    identifyAndRewriteParagraphs(data.chapter, charactersForChapter),
+  );
 
   // PHASE 1: Process all chunk 0s AND chunk 1s in parallel
   // Chunk 1 gets RAW chunk 0 text as context (not tagged output)
@@ -368,15 +437,25 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
           `rewritten-paragraphs-for-chapter-${chapter}-chunk-${currentChunkIndex - 1}.xml`,
           FILE_TYPE.TEMPORARY,
         );
-        logger.info(`📦 Queueing chapter ${chapter} chunk ${currentChunkIndex}/${chunks.length} (with TAGGED context)`);
+        logger.info(
+          `📦 Queueing chapter ${chapter} chunk ${currentChunkIndex}/${chunks.length} (with TAGGED context)`,
+        );
         phasePromises.push(
-          processChunk(chapter, currentChunkIndex, chunks[currentChunkIndex], jsonCharacters, taggedPreviousChunk),
+          processChunk(
+            chapter,
+            currentChunkIndex,
+            chunks[currentChunkIndex],
+            jsonCharacters,
+            taggedPreviousChunk,
+          ),
         );
       }
     }
 
     if (phasePromises.length > 0) {
-      logger.info(`🚀 Phase ${currentChunkIndex}: Running ${phasePromises.length} chunk tasks in parallel`);
+      logger.info(
+        `🚀 Phase ${currentChunkIndex}: Running ${phasePromises.length} chunk tasks in parallel`,
+      );
       await Promise.all(phasePromises);
     }
 
@@ -393,7 +472,10 @@ export const identifyCharactersAndRewriteParagraphs = async (referenceCards: New
     }
 
     const processedChunks = chunks.map((_, i) =>
-      readBookFile(`rewritten-paragraphs-for-chapter-${chapter}-chunk-${i}.xml`, FILE_TYPE.TEMPORARY),
+      readBookFile(
+        `rewritten-paragraphs-for-chapter-${chapter}-chunk-${i}.xml`,
+        FILE_TYPE.TEMPORARY,
+      ),
     );
     const combined = combineChunks(chapter, processedChunks, sectionAttributes);
     writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, combined, FILE_TYPE.TEMPORARY);

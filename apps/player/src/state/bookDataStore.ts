@@ -15,8 +15,20 @@
  * For React components, prefer using the useBookConvex() hook directly.
  */
 
-import type { BackgroundForBook, BackgroundSongSection, CharacterData, BookData, Chapter as ChapterTitle } from "@player/types/book";
-import type { CharacterBundle, BackgroundInfo, MusicInfo, BookMetadata, ChapterInfo } from "@player/context/BookConvexContext";
+import type {
+  BackgroundForBook,
+  BackgroundSongSection,
+  CharacterData,
+  BookData,
+  Chapter as ChapterTitle,
+} from "@player/types/book";
+import type {
+  CharacterBundle,
+  BackgroundInfo,
+  MusicInfo,
+  BookMetadata,
+  ChapterInfo,
+} from "@player/context/BookConvexContext";
 
 // Re-export types for convenience
 export type { CharacterBundle, BackgroundInfo, MusicInfo, BookMetadata, ChapterInfo };
@@ -94,7 +106,10 @@ export function getFullStore(): BookDataStore {
           "Ensure your component tree is wrapped in <BookConvexProvider>.",
       );
     }
-    throw new Error("[bookDataStore] Store is null but was previously initialized. " + "This might mean the provider unmounted unexpectedly.");
+    throw new Error(
+      "[bookDataStore] Store is null but was previously initialized. " +
+        "This might mean the provider unmounted unexpectedly.",
+    );
   }
   return _store;
 }

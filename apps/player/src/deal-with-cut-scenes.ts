@@ -2,7 +2,13 @@ import { getCutScenesForBook, getBookSlug } from "./state/bookDataStore";
 import { CutSceneForBook } from "./types/book";
 import "./styles/cutscene-video.css";
 
-export const dealWithCutScenes = ({ currentChapter, currentParagraph }: { currentChapter: number; currentParagraph: number }) => {
+export const dealWithCutScenes = ({
+  currentChapter,
+  currentParagraph,
+}: {
+  currentChapter: number;
+  currentParagraph: number;
+}) => {
   const cutScenesDefined = getCutScenesForBook() as CutSceneForBook[];
 
   const cutSceneToApply = cutScenesDefined.find((cutscene) => {

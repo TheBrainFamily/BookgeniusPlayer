@@ -1,10 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export const storageBackendValidator = v.union(
-  v.literal("convex"),
-  v.literal("r2"),
-);
+export const storageBackendValidator = v.union(v.literal("convex"), v.literal("r2"));
 
 const schema = defineSchema({
   /**
@@ -75,11 +72,7 @@ const schema = defineSchema({
   assetVersions: defineTable({
     assetId: v.id("assets"),
     version: v.number(),
-    state: v.union(
-      v.literal("draft"),
-      v.literal("published"),
-      v.literal("archived"),
-    ),
+    state: v.union(v.literal("draft"), v.literal("published"), v.literal("archived")),
 
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
@@ -88,9 +81,7 @@ const schema = defineSchema({
     storageId: v.optional(v.id("_storage")),
     r2Key: v.optional(v.string()),
     originalFilename: v.optional(v.string()),
-    uploadStatus: v.optional(
-      v.union(v.literal("pending"), v.literal("ready")),
-    ),
+    uploadStatus: v.optional(v.union(v.literal("pending"), v.literal("ready"))),
     size: v.optional(v.number()),
     contentType: v.optional(v.string()),
     sha256: v.optional(v.string()),

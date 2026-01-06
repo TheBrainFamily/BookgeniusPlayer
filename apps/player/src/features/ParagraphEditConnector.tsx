@@ -3,16 +3,25 @@ import { useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useEditorModeModal } from "@player/stores/modals/editorModeModal.store";
 import { useBookConvex } from "@player/context/BookConvexContext";
-import { setOpenTalkingCharacterModal, setOpenEditCharacterTagModal, setOpenWrapWithCharacterModal } from "@player/ui/paragraphHighlighting";
+import {
+  setOpenTalkingCharacterModal,
+  setOpenEditCharacterTagModal,
+  setOpenWrapWithCharacterModal,
+} from "@player/ui/paragraphHighlighting";
 import { useEditModeGlobalSync } from "@player/context/EditModeContext";
-import { optimisticWrapTextWithCharacter, optimisticModifyCharacterTag, optimisticSetTalkingCharacter } from "@player/ui/optimisticDom";
+import {
+  optimisticWrapTextWithCharacter,
+  optimisticModifyCharacterTag,
+  optimisticSetTalkingCharacter,
+} from "@player/ui/optimisticDom";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
 import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
 
 export function ParagraphEditConnector() {
   useEditModeGlobalSync();
 
-  const { openTalkingCharacterModal, openEditCharacterTagModal, openWrapWithCharacterModal } = useEditorModeModal();
+  const { openTalkingCharacterModal, openEditCharacterTagModal, openWrapWithCharacterModal } =
+    useEditorModeModal();
   const { book, characters } = useBookConvex();
   const { optimisticAvatars } = useAvatarGenerationStore();
   const setParagraphSpeaker = useAction(api.paragraphEditor.setParagraphSpeaker);
@@ -26,12 +35,19 @@ export function ParagraphEditConnector() {
       if (optimisticAvatar) {
         return optimisticAvatar;
       }
-      const character = characters.find((c) => c.slug.toLowerCase() === characterSlug.toLowerCase());
+      const character = characters.find(
+        (c) => c.slug.toLowerCase() === characterSlug.toLowerCase(),
+      );
       if (character?.avatar?.url) {
         return character.avatar.url;
       }
       if (characterName) {
-        return getAvatarSource({ slug: characterSlug, characterName, bookSlug: book?.slug || "", infoPerChapter: [] });
+        return getAvatarSource({
+          slug: characterSlug,
+          characterName,
+          bookSlug: book?.slug || "",
+          infoPerChapter: [],
+        });
       }
       return undefined;
     },
@@ -42,7 +58,12 @@ export function ParagraphEditConnector() {
     async (characterName: string, chapterNumber: number, paragraphIndex: number) => {
       const bookPath = book?.path;
       if (!bookPath) throw new Error("Book path not available");
-      const result = await createCharacterAction({ bookPath, characterName, chapterNumber, paragraphIndex });
+      const result = await createCharacterAction({
+        bookPath,
+        characterName,
+        chapterNumber,
+        paragraphIndex,
+      });
       return { slug: result.slug, displayName: result.displayName };
     },
     [book?.path, createCharacterAction],
@@ -62,9 +83,19 @@ export function ParagraphEditConnector() {
         currentSpeaker,
         async (characterSlug?: string) => {
           const avatarUrl = characterSlug ? getAvatarUrl(characterSlug) : undefined;
-          const revert = optimisticSetTalkingCharacter(chapterNumber, paragraphIndex, characterSlug, avatarUrl);
+          const revert = optimisticSetTalkingCharacter(
+            chapterNumber,
+            paragraphIndex,
+            characterSlug,
+            avatarUrl,
+          );
           try {
-            await setParagraphSpeaker({ bookPath, chapterNumber, paragraphIndex, characterSlug: characterSlug || undefined });
+            await setParagraphSpeaker({
+              bookPath,
+              chapterNumber,
+              paragraphIndex,
+              characterSlug: characterSlug || undefined,
+            });
           } catch (error) {
             revert?.();
             throw error;
@@ -73,7 +104,13 @@ export function ParagraphEditConnector() {
         handleCreateCharacter,
       );
     },
-    [book?.path, openTalkingCharacterModal, setParagraphSpeaker, getAvatarUrl, handleCreateCharacter],
+    [
+      book?.path,
+      openTalkingCharacterModal,
+      setParagraphSpeaker,
+      getAvatarUrl,
+      handleCreateCharacter,
+    ],
   );
 
   const handleOpenEditCharacterTagModal = useCallback(
@@ -90,7 +127,13 @@ export function ParagraphEditConnector() {
         characterSlug,
         textContent,
         async (newCharacterSlug?: string) => {
-          const revert = optimisticModifyCharacterTag(chapterNumber, paragraphIndex, characterSlug, textContent, newCharacterSlug);
+          const revert = optimisticModifyCharacterTag(
+            chapterNumber,
+            paragraphIndex,
+            characterSlug,
+            textContent,
+            newCharacterSlug,
+          );
           try {
             await modifyCharacterTag({
               bookPath,
@@ -112,7 +155,12 @@ export function ParagraphEditConnector() {
   );
 
   const handleOpenWrapWithCharacterModal = useCallback(
-    (chapterNumber: number, paragraphIndex: number, selectedText: string, occurrenceIndex: number) => {
+    (
+      chapterNumber: number,
+      paragraphIndex: number,
+      selectedText: string,
+      occurrenceIndex: number,
+    ) => {
       const bookPath = book?.path;
       if (!bookPath) {
         console.error("[ParagraphEditConnector] Book path not available");
@@ -126,9 +174,22 @@ export function ParagraphEditConnector() {
         occurrenceIndex,
         async (characterSlug?: string) => {
           if (!characterSlug) return;
-          const revert = optimisticWrapTextWithCharacter(chapterNumber, paragraphIndex, selectedText, occurrenceIndex, characterSlug);
+          const revert = optimisticWrapTextWithCharacter(
+            chapterNumber,
+            paragraphIndex,
+            selectedText,
+            occurrenceIndex,
+            characterSlug,
+          );
           try {
-            await wrapTextWithCharacter({ bookPath, chapterNumber, paragraphIndex, textToWrap: selectedText, occurrenceIndex, characterSlug });
+            await wrapTextWithCharacter({
+              bookPath,
+              chapterNumber,
+              paragraphIndex,
+              textToWrap: selectedText,
+              occurrenceIndex,
+              characterSlug,
+            });
           } catch (error) {
             revert?.();
             throw error;

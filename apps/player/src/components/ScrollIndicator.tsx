@@ -21,7 +21,9 @@ export const ScrollIndicator = () => {
       }
       const detail = event.detail as { targetChapter?: number | null } | undefined;
       const nextTarget = detail?.targetChapter;
-      setTargetChapter(typeof nextTarget === "number" && Number.isFinite(nextTarget) ? nextTarget : null);
+      setTargetChapter(
+        typeof nextTarget === "number" && Number.isFinite(nextTarget) ? nextTarget : null,
+      );
 
       if (hideTimeoutRef.current !== null) {
         window.clearTimeout(hideTimeoutRef.current);
@@ -64,7 +66,9 @@ export const ScrollIndicator = () => {
       return;
     }
 
-    const chapterElement = contentContainer.querySelector(`section[data-chapter="${targetChapter}"]`);
+    const chapterElement = contentContainer.querySelector(
+      `section[data-chapter="${targetChapter}"]`,
+    );
     if (!(chapterElement instanceof HTMLElement)) {
       return;
     }
@@ -95,7 +99,9 @@ export const ScrollIndicator = () => {
     <button
       type="button"
       className={`flex flex-col items-center fixed bottom-40 left-1/2 -translate-x-1/2 text-white cursor-pointer ${isMobileOrTablet ? "scroll-indicator-swipe-up" : "scroll-indicator-keep-scrolling"}`}
-      aria-label={isMobileOrTablet ? t("scroll_indicator-swipe-up") : t("scroll_indicator-keep-scrolling")}
+      aria-label={
+        isMobileOrTablet ? t("scroll_indicator-swipe-up") : t("scroll_indicator-keep-scrolling")
+      }
       onClick={handleClick}
     >
       {isMobileOrTablet ? <MobileScrollIndicator /> : <DesktopScrollIndicator />}

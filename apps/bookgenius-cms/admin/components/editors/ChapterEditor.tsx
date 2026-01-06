@@ -74,11 +74,19 @@ function useXmlContent(versionId: string) {
           throw new Error("Content not found");
         }
         if (!cancelled) {
-          console.log("[useXmlContent] Got content", { contentLength: result.content?.length, prevContentLength: content?.length, contentChanged: content !== result.content });
+          console.log("[useXmlContent] Got content", {
+            contentLength: result.content?.length,
+            prevContentLength: content?.length,
+            contentChanged: content !== result.content,
+          });
           // Only update content if it actually changed (prevents cursor jump)
           setContent((prev) => {
             const changed = prev !== result.content;
-            console.log("[useXmlContent] setContent called", { changed, prevLength: prev?.length, newLength: result.content?.length });
+            console.log("[useXmlContent] setContent called", {
+              changed,
+              prevLength: prev?.length,
+              newLength: result.content?.length,
+            });
             return changed ? result.content : prev;
           });
         }
@@ -112,7 +120,11 @@ function useXmlContent(versionId: string) {
 // =============================================================================
 
 function createCharacterCompletionProvider(characters: CharacterInfo[]) {
-  return (monaco: typeof import("monaco-editor"), model: editor.ITextModel, position: Position): languages.CompletionItem[] => {
+  return (
+    monaco: typeof import("monaco-editor"),
+    model: editor.ITextModel,
+    position: Position,
+  ): languages.CompletionItem[] => {
     const lineContent = model.getLineContent(position.lineNumber);
     const textBeforeCursor = lineContent.substring(0, position.column - 1);
 
@@ -136,7 +148,12 @@ function createCharacterCompletionProvider(characters: CharacterInfo[]) {
           detail: `Character: ${char.name}`,
           insertText: `${tagName} talking="true"/>`,
           insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          range: { startLineNumber: position.lineNumber, startColumn: position.column, endLineNumber: position.lineNumber, endColumn: position.column },
+          range: {
+            startLineNumber: position.lineNumber,
+            startColumn: position.column,
+            endLineNumber: position.lineNumber,
+            endColumn: position.column,
+          },
         };
       });
     }
@@ -151,14 +168,24 @@ function createCharacterCompletionProvider(characters: CharacterInfo[]) {
             kind: monaco.languages.CompletionItemKind.Value,
             insertText: "true",
             detail: "Character is speaking",
-            range: { startLineNumber: position.lineNumber, startColumn: position.column, endLineNumber: position.lineNumber, endColumn: position.column },
+            range: {
+              startLineNumber: position.lineNumber,
+              startColumn: position.column,
+              endLineNumber: position.lineNumber,
+              endColumn: position.column,
+            },
           },
           {
             label: "false",
             kind: monaco.languages.CompletionItemKind.Value,
             insertText: "false",
             detail: "Character is listening",
-            range: { startLineNumber: position.lineNumber, startColumn: position.column, endLineNumber: position.lineNumber, endColumn: position.column },
+            range: {
+              startLineNumber: position.lineNumber,
+              startColumn: position.column,
+              endLineNumber: position.lineNumber,
+              endColumn: position.column,
+            },
           },
         ];
       }
@@ -172,7 +199,13 @@ function createCharacterCompletionProvider(characters: CharacterInfo[]) {
 // Component
 // =============================================================================
 
-export function ChapterEditor({ folderPath, basename, versionId, readOnly = false, onSaveComplete }: ChapterEditorProps) {
+export function ChapterEditor({
+  folderPath,
+  basename,
+  versionId,
+  readOnly = false,
+  onSaveComplete,
+}: ChapterEditorProps) {
   const { content, isLoading, error } = useXmlContent(versionId);
   const { characters: rawCharacters, isLoading: charactersLoading } = useCharacters();
 
@@ -222,7 +255,11 @@ export function ChapterEditor({ folderPath, basename, versionId, readOnly = fals
       const contentType = "application/xml";
       const blob = new Blob([xmlContent], { type: contentType });
 
-      const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: blob });
+      const response = await fetch(uploadUrl, {
+        method: backend === "r2" ? "PUT" : "POST",
+        headers: { "Content-Type": contentType },
+        body: blob,
+      });
 
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.status}`);
@@ -334,13 +371,21 @@ export function ChapterEditor({ folderPath, basename, versionId, readOnly = fals
       {/* Character count indicator */}
       {characters.length > 0 && (
         <div className="px-3 py-1 border-b border-border bg-surface-1 text-xs text-muted-foreground">
-          {characters.length} characters available for autocomplete (type <code className="bg-muted px-1 rounded">&lt;</code> to see suggestions)
+          {characters.length} characters available for autocomplete (type{" "}
+          <code className="bg-muted px-1 rounded">&lt;</code> to see suggestions)
         </div>
       )}
 
       {/* Editor */}
       <div className="flex-1">
-        <XmlEditor value={content} onAutoSave={handleAutoSave} onSave={handleSave} completionProvider={completionProvider} readOnly={readOnly} isSaving={isSaving} />
+        <XmlEditor
+          value={content}
+          onAutoSave={handleAutoSave}
+          onSave={handleSave}
+          completionProvider={completionProvider}
+          readOnly={readOnly}
+          isSaving={isSaving}
+        />
       </div>
     </div>
   );
@@ -387,7 +432,11 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
       const contentType = "application/xml";
       const blob = new Blob([xmlContent], { type: contentType });
 
-      const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: blob });
+      const response = await fetch(uploadUrl, {
+        method: backend === "r2" ? "PUT" : "POST",
+        headers: { "Content-Type": contentType },
+        body: blob,
+      });
 
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.status}`);
@@ -449,5 +498,13 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
     );
   }
 
-  return <XmlEditor value={content} onAutoSave={handleAutoSave} onSave={handleSave} readOnly={props.readOnly} isSaving={isSaving} />;
+  return (
+    <XmlEditor
+      value={content}
+      onAutoSave={handleAutoSave}
+      onSave={handleSave}
+      readOnly={props.readOnly}
+      isSaving={isSaving}
+    />
+  );
 }

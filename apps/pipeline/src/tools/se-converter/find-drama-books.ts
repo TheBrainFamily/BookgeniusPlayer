@@ -63,7 +63,10 @@ async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
       }
 
       // Check for scene sections (full play indicator)
-      if (content.includes('epub:type="z3998:scene"') || content.includes("epub:type='z3998:scene'")) {
+      if (
+        content.includes('epub:type="z3998:scene"') ||
+        content.includes("epub:type='z3998:scene'")
+      ) {
         analysis.hasSceneSections = true;
         hasAnyDramaContent = true;
       }

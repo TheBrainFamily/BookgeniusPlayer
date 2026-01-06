@@ -53,7 +53,10 @@ interface DealWithAudiobookTracksParams {
   currentParagraph: number;
 }
 
-export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph }: DealWithAudiobookTracksParams): Promise<void> => {
+export const dealWithAudiobookTracks = async ({
+  currentChapter,
+  currentParagraph,
+}: DealWithAudiobookTracksParams): Promise<void> => {
   if (isProcessingAudiobookTracks) {
     console.log("dealWithAudiobookTracks: Already processing, skipping this call.");
     return;
@@ -63,18 +66,25 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
   console.log("dealWithAudiobookTracks invoked with:", { currentChapter, currentParagraph });
 
   try {
-    console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
+    console.log(
+      `Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`,
+    );
 
     const bookTracks = getAudiobookTracksForBook() as AudiobookTracksSection[];
     if (!bookTracks || bookTracks.length === 0) {
-      console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`);
+      console.log(
+        `No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`,
+      );
       isProcessingAudiobookTracks = false;
       return;
     }
 
     const foundAudiobookSections = bookTracks
       .filter((section: AudiobookTracksSection) => {
-        return section.chapter === currentChapter - 1 || (section.chapter === currentChapter && section.paragraph <= currentParagraph);
+        return (
+          section.chapter === currentChapter - 1 ||
+          (section.chapter === currentChapter && section.paragraph <= currentParagraph)
+        );
       })
       .sort((a: AudiobookTracksSection, b: AudiobookTracksSection) => {
         if (b.chapter !== a.chapter) return b.chapter - a.chapter;
@@ -96,10 +106,14 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
         const createEventsForAudiobook = () => {
           const sectionsToApply = bookTracks.filter(
-            (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
+            (section: AudiobookTracksSection) =>
+              section.chapter === currentChapter ||
+              (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
           if (!sectionsToApply || sectionsToApply.length === 0) {
-            console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`);
+            console.log(
+              `No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`,
+            );
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }
@@ -147,10 +161,14 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
         const createWordLevelEvents = () => {
           const sectionsToApply = bookTracks.filter(
-            (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
+            (section: AudiobookTracksSection) =>
+              section.chapter === currentChapter ||
+              (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
           if (!sectionsToApply || sectionsToApply.length === 0) {
-            console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`);
+            console.log(
+              `No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`,
+            );
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }
@@ -208,7 +226,13 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                     const paragraphElement = document.querySelector(paragraphSelector);
 
                     if (paragraphElement) {
-                      paragraphElement.innerHTML = highlightNthOccurrence(paragraphElement.innerHTML, wordStr, occurrenceIndex, "current-word", isLastWord);
+                      paragraphElement.innerHTML = highlightNthOccurrence(
+                        paragraphElement.innerHTML,
+                        wordStr,
+                        occurrenceIndex,
+                        "current-word",
+                        isLastWord,
+                      );
                     }
                   },
                   triggered: false,

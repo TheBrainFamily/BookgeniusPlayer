@@ -31,11 +31,26 @@ import { StylePreviewComparison } from "@/components/StylePreviewComparison";
 import { BookReadyModal } from "@/components/BookReadyModal";
 type SourceMode = "upload" | "wolneLektury";
 
-type WolneLekturySearchResult = { title: string; author: string; slug: string; coverThumb: string; hasAudio: boolean; epoch: string; genre: string; kind: string };
+type WolneLekturySearchResult = {
+  title: string;
+  author: string;
+  slug: string;
+  coverThumb: string;
+  hasAudio: boolean;
+  epoch: string;
+  genre: string;
+  kind: string;
+};
 
 type UploadResult = { path: string };
 
-type StepState = { step: Step; status: "pending" | "running" | "done" | "error"; startedAt?: number; endedAt?: number; message?: string };
+type StepState = {
+  step: Step;
+  status: "pending" | "running" | "done" | "error";
+  startedAt?: number;
+  endedAt?: number;
+  message?: string;
+};
 
 type StyleInfo = { backgroundStyle: string; periodStyle: string; avatarStyle: string };
 
@@ -49,11 +64,24 @@ type JobStatus = {
   error?: string;
   downloadUrl?: string;
   styleSelection?: {
-    status: "not_started" | "awaiting_input" | "generating_auto_style" | "generating_user_style" | "generating_previews" | "awaiting_choice" | "complete" | "timed_out";
+    status:
+      | "not_started"
+      | "awaiting_input"
+      | "generating_auto_style"
+      | "generating_user_style"
+      | "generating_previews"
+      | "awaiting_choice"
+      | "complete"
+      | "timed_out";
     remainingTimeMs: number;
     autoStyle: StyleInfo | null;
     userStyle: StyleInfo | null;
-    previews: { autoPreviewPath: string | null; userPreviewPath: string | null; autoAvatarPath: string | null; userAvatarPath: string | null } | null;
+    previews: {
+      autoPreviewPath: string | null;
+      userPreviewPath: string | null;
+      autoAvatarPath: string | null;
+      userAvatarPath: string | null;
+    } | null;
     selected: "auto" | "user" | null;
   };
 };
@@ -65,7 +93,11 @@ const serverURL = "http://localhost:4000";
 const statusIcons = { pending: Circle, running: Loader2, done: CheckCircle2, error: AlertCircle };
 
 // Parse chapters from rich XML
-function parseChapters(xml: string): { preamble: string; chapters: ChapterInfo[]; postamble: string } {
+function parseChapters(xml: string): {
+  preamble: string;
+  chapters: ChapterInfo[];
+  postamble: string;
+} {
   const sectionRegex = /<section\s+data-chapter="(\d+)"[^>]*>([\s\S]*?)<\/section>/g;
   const chapters: ChapterInfo[] = [];
   let match;
@@ -83,7 +115,9 @@ function parseChapters(xml: string): { preamble: string; chapters: ChapterInfo[]
     const content = match[0];
     // Try to extract a title from the first heading or first line
     const titleMatch = content.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i);
-    let title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "").trim() : `Chapter ${originalIndex}`;
+    let title = titleMatch
+      ? titleMatch[1].replace(/<[^>]+>/g, "").trim()
+      : `Chapter ${originalIndex}`;
     if (title.length > 50) title = title.slice(0, 47) + "...";
 
     chapters.push({ originalIndex, content, title, selected: true });
@@ -145,7 +179,14 @@ export default function App() {
       if (isUploading || isDownloadingSE || (slug && chapters.length > 0)) return "editor";
       return "upload";
     })();
-    console.log("[currentStep]", step, { isStartingPipeline, jobId, isUploading, isDownloadingSE, slug, chaptersLength: chapters.length });
+    console.log("[currentStep]", step, {
+      isStartingPipeline,
+      jobId,
+      isUploading,
+      isDownloadingSE,
+      slug,
+      chaptersLength: chapters.length,
+    });
     return step;
   }, [isStartingPipeline, jobId, isUploading, isDownloadingSE, slug, chapters.length]);
 
@@ -272,7 +313,18 @@ export default function App() {
     const bookSlug = searchParams.get("book");
     const seBookSlug = searchParams.get("se-book");
 
-    console.log("[useEffect] bookSlug:", bookSlug, "seBookSlug:", seBookSlug, "slug:", slug, "isDownloadingWL:", isDownloadingWL, "isDownloadingSE:", isDownloadingSE);
+    console.log(
+      "[useEffect] bookSlug:",
+      bookSlug,
+      "seBookSlug:",
+      seBookSlug,
+      "slug:",
+      slug,
+      "isDownloadingWL:",
+      isDownloadingWL,
+      "isDownloadingSE:",
+      isDownloadingSE,
+    );
 
     if (bookSlug && !slug && !isDownloadingWL) {
       console.log("[useEffect] triggering downloadFromWolneLektury");
@@ -283,7 +335,15 @@ export default function App() {
       setSearchParams({});
       downloadFromStandardEbooks(seBookSlug);
     }
-  }, [searchParams, setSearchParams, slug, isDownloadingWL, isDownloadingSE, downloadFromWolneLektury, downloadFromStandardEbooks]);
+  }, [
+    searchParams,
+    setSearchParams,
+    slug,
+    isDownloadingWL,
+    isDownloadingSE,
+    downloadFromWolneLektury,
+    downloadFromStandardEbooks,
+  ]);
 
   const startPipeline = useCallback(async () => {
     if (!slug) return;
@@ -351,13 +411,19 @@ export default function App() {
   const selectedCount = chapters.filter((c) => c.selected).length;
   const currentChapter = chapters[selectedChapterIdx];
 
-  const canAcceptStyleInput = ["generating_auto_style", "awaiting_input"].includes(status?.styleSelection?.status || "");
+  const canAcceptStyleInput = ["generating_auto_style", "awaiting_input"].includes(
+    status?.styleSelection?.status || "",
+  );
   const showStyleComparison = status?.styleSelection?.status === "awaiting_choice";
-  const isProcessingUserStyle = ["generating_user_style", "generating_previews"].includes(status?.styleSelection?.status || "");
+  const isProcessingUserStyle = ["generating_user_style", "generating_previews"].includes(
+    status?.styleSelection?.status || "",
+  );
 
   return (
     <div className="min-h-screen bg-background">
-      {canAcceptStyleInput && status?.styleSelection && <StyleSelectionModal onSubmit={submitStyleDescription} />}
+      {canAcceptStyleInput && status?.styleSelection && (
+        <StyleSelectionModal onSubmit={submitStyleDescription} />
+      )}
 
       {showStyleComparison && status?.styleSelection && (
         <StylePreviewComparison
@@ -369,7 +435,9 @@ export default function App() {
         />
       )}
 
-      {showBookReadyModal && slug && <BookReadyModal slug={slug} onClose={() => setShowBookReadyModal(false)} />}
+      {showBookReadyModal && slug && (
+        <BookReadyModal slug={slug} onClose={() => setShowBookReadyModal(false)} />
+      )}
 
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
@@ -379,11 +447,20 @@ export default function App() {
                 <BookOpen className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-display font-semibold text-gradient">BookGenius Pipeline</h1>
-                <p className="text-sm text-muted-foreground">Transform your EPUB into an interactive experience</p>
+                <h1 className="text-2xl font-display font-semibold text-gradient">
+                  BookGenius Pipeline
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Transform your EPUB into an interactive experience
+                </p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/collections")} className="gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/collections")}
+              className="gap-2"
+            >
               <LayoutGrid className="w-4 h-4" />
               Browse Collections
             </Button>
@@ -396,11 +473,21 @@ export default function App() {
           <Card className="animate-fade-in border-border/50 max-w-2xl mx-auto">
             <CardHeader>
               <div className="flex gap-2 mb-4">
-                <Button variant={sourceMode === "upload" ? "default" : "ghost"} size="sm" onClick={() => setSourceMode("upload")} className="gap-2">
+                <Button
+                  variant={sourceMode === "upload" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setSourceMode("upload")}
+                  className="gap-2"
+                >
                   <Upload className="w-4 h-4" />
                   Upload EPUB
                 </Button>
-                <Button variant={sourceMode === "wolneLektury" ? "default" : "ghost"} size="sm" onClick={() => setSourceMode("wolneLektury")} className="gap-2">
+                <Button
+                  variant={sourceMode === "wolneLektury" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setSourceMode("wolneLektury")}
+                  className="gap-2"
+                >
                   <Library className="w-4 h-4" />
                   Wolne Lektury
                 </Button>
@@ -419,7 +506,9 @@ export default function App() {
                 )}
               </CardTitle>
               <CardDescription>
-                {sourceMode === "upload" ? "Drag and drop your EPUB file or click to browse" : "Search and select a book from the Polish digital library"}
+                {sourceMode === "upload"
+                  ? "Drag and drop your EPUB file or click to browse"
+                  : "Search and select a book from the Polish digital library"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -434,19 +523,37 @@ export default function App() {
                     onDragLeave={() => setIsDragging(false)}
                     className={cn(
                       "relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200",
-                      isDragging ? "border-primary bg-primary/5 scale-[1.02]" : "border-border hover:border-muted-foreground/50",
+                      isDragging
+                        ? "border-primary bg-primary/5 scale-[1.02]"
+                        : "border-border hover:border-muted-foreground/50",
                       file && "border-success/50 bg-success/5",
                     )}
                   >
-                    <input type="file" accept=".epub" onChange={onSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    <input
+                      type="file"
+                      accept=".epub"
+                      onChange={onSelect}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
                     <div className="space-y-3">
-                      <div className={cn("mx-auto w-12 h-12 rounded-full flex items-center justify-center transition-colors", file ? "bg-success/20" : "bg-muted")}>
-                        {file ? <CheckCircle2 className="w-6 h-6 text-success" /> : <FileText className="w-6 h-6 text-muted-foreground" />}
+                      <div
+                        className={cn(
+                          "mx-auto w-12 h-12 rounded-full flex items-center justify-center transition-colors",
+                          file ? "bg-success/20" : "bg-muted",
+                        )}
+                      >
+                        {file ? (
+                          <CheckCircle2 className="w-6 h-6 text-success" />
+                        ) : (
+                          <FileText className="w-6 h-6 text-muted-foreground" />
+                        )}
                       </div>
                       {file ? (
                         <div>
                           <p className="font-medium text-foreground">{file.name}</p>
-                          <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                          <p className="text-sm text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
                         </div>
                       ) : (
                         <div>
@@ -476,8 +583,15 @@ export default function App() {
                       placeholder="Search by title or author..."
                       className="flex-1 px-3 py-2 rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
-                    <Button onClick={searchWolneLektury} disabled={isSearching || !searchQuery.trim()}>
-                      {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    <Button
+                      onClick={searchWolneLektury}
+                      disabled={isSearching || !searchQuery.trim()}
+                    >
+                      {isSearching ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Search className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
 
@@ -497,7 +611,11 @@ export default function App() {
                           className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all"
                         >
                           {book.coverThumb ? (
-                            <img src={book.coverThumb} alt={book.title} className="w-12 h-16 object-cover rounded" />
+                            <img
+                              src={book.coverThumb}
+                              alt={book.title}
+                              className="w-12 h-16 object-cover rounded"
+                            />
                           ) : (
                             <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
                               <BookOpen className="w-6 h-6 text-muted-foreground" />
@@ -524,11 +642,14 @@ export default function App() {
                     </div>
                   )}
 
-                  {!isDownloadingWL && !isSearching && searchResults.length === 0 && searchQuery && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>No books found. Try a different search term.</p>
-                    </div>
-                  )}
+                  {!isDownloadingWL &&
+                    !isSearching &&
+                    searchResults.length === 0 &&
+                    searchQuery && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p>No books found. Try a different search term.</p>
+                      </div>
+                    )}
 
                   {!isDownloadingWL && !searchQuery && (
                     <div className="text-center py-8 text-muted-foreground">
@@ -547,7 +668,12 @@ export default function App() {
         {currentStep === "editor" && (
           <div className="animate-fade-in flex gap-4">
             {/* Chapter Sidebar */}
-            <div className={cn("shrink-0 transition-all duration-200", sidebarCollapsed ? "w-12" : "w-72")}>
+            <div
+              className={cn(
+                "shrink-0 transition-all duration-200",
+                sidebarCollapsed ? "w-12" : "w-72",
+              )}
+            >
               <Card className="border-border/50 h-[calc(100vh-180px)] flex flex-col">
                 <CardHeader className="p-3 border-b border-border/50">
                   <div className="flex items-center justify-between">
@@ -565,16 +691,35 @@ export default function App() {
                         </CardDescription>
                       </div>
                     )}
-                    <Button variant="ghost" size="icon-sm" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} disabled={isUploading}>
-                      {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                      disabled={isUploading}
+                    >
+                      {sidebarCollapsed ? (
+                        <ChevronRight className="w-4 h-4" />
+                      ) : (
+                        <ChevronLeft className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                   {!sidebarCollapsed && !isUploading && (
                     <div className="flex gap-2 mt-2">
-                      <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7 px-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={selectAll}
+                        className="text-xs h-7 px-2"
+                      >
                         Select All
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={deselectAll} className="text-xs h-7 px-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={deselectAll}
+                        className="text-xs h-7 px-2"
+                      >
                         Deselect All
                       </Button>
                     </div>
@@ -585,7 +730,11 @@ export default function App() {
                     // Skeleton loading state
                     <div className="space-y-2">
                       {[...Array(8)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-2 p-2 animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 p-2 animate-fade-in"
+                          style={{ animationDelay: `${i * 0.05}s` }}
+                        >
                           <div className="w-4 h-4 rounded bg-muted animate-pulse" />
                           <div className="w-6 h-4 rounded bg-muted animate-pulse" />
                           <div className="flex-1 h-4 rounded bg-muted animate-pulse" />
@@ -618,14 +767,18 @@ export default function App() {
                           <span
                             className={cn(
                               "w-6 h-6 rounded text-xs flex items-center justify-center",
-                              chapter.selected ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground",
+                              chapter.selected
+                                ? "bg-primary/20 text-primary"
+                                : "bg-muted text-muted-foreground",
                             )}
                           >
                             {idx + 1}
                           </span>
                         ) : (
                           <>
-                            <span className="text-xs text-muted-foreground shrink-0 w-6">{idx + 1}.</span>
+                            <span className="text-xs text-muted-foreground shrink-0 w-6">
+                              {idx + 1}.
+                            </span>
                             <span className="text-sm truncate flex-1">{chapter.title}</span>
                           </>
                         )}
@@ -642,12 +795,18 @@ export default function App() {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2 text-lg">
-                      {isUploading ? <Loader2 className="w-5 h-5 text-primary animate-spin" /> : <FileText className="w-5 h-5 text-primary" />}
+                      {isUploading ? (
+                        <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                      ) : (
+                        <FileText className="w-5 h-5 text-primary" />
+                      )}
                       {isUploading ? "Preparing Book..." : currentChapter?.title || "XML Editor"}
                     </CardTitle>
                     <CardDescription>
                       {isUploading ? (
-                        <span className="animate-pulse">Converting EPUB and extracting chapters...</span>
+                        <span className="animate-pulse">
+                          Converting EPUB and extracting chapters...
+                        </span>
                       ) : (
                         <>
                           <span className="font-mono text-primary">{slug}</span>
@@ -665,7 +824,11 @@ export default function App() {
                       )}
                     </CardDescription>
                   </div>
-                  <Button onClick={startPipeline} disabled={selectedCount === 0 || isUploading} className="gap-2">
+                  <Button
+                    onClick={startPipeline}
+                    disabled={selectedCount === 0 || isUploading}
+                    className="gap-2"
+                  >
                     <Play className="w-4 h-4" />
                     Start Pipeline ({selectedCount} chapters)
                   </Button>
@@ -677,7 +840,14 @@ export default function App() {
                     // Skeleton for editor
                     <div className="h-[calc(100vh-280px)] p-4 space-y-3">
                       {[...Array(20)].map((_, i) => (
-                        <div key={i} className="h-4 rounded bg-muted/30 animate-pulse" style={{ width: `${Math.random() * 40 + 60}%`, animationDelay: `${i * 0.03}s` }} />
+                        <div
+                          key={i}
+                          className="h-4 rounded bg-muted/30 animate-pulse"
+                          style={{
+                            width: `${Math.random() * 40 + 60}%`,
+                            animationDelay: `${i * 0.03}s`,
+                          }}
+                        />
                       ))}
                     </div>
                   ) : (
@@ -712,7 +882,11 @@ export default function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    {status?.currentStep === "complete" ? <CheckCircle2 className="w-5 h-5 text-success" /> : <Loader2 className="w-5 h-5 text-primary animate-spin" />}
+                    {status?.currentStep === "complete" ? (
+                      <CheckCircle2 className="w-5 h-5 text-success" />
+                    ) : (
+                      <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                    )}
                     Pipeline Progress
                   </CardTitle>
                   <CardDescription>
@@ -725,8 +899,24 @@ export default function App() {
                           : `Processing ${status.slug}...`}
                   </CardDescription>
                 </div>
-                <Badge variant={!status ? "info" : status.currentStep === "complete" ? "success" : status.currentStep === "failed" ? "destructive" : "info"}>
-                  {!status ? "Starting" : status.currentStep === "complete" ? "Complete" : status.currentStep === "failed" ? "Failed" : "In Progress"}
+                <Badge
+                  variant={
+                    !status
+                      ? "info"
+                      : status.currentStep === "complete"
+                        ? "success"
+                        : status.currentStep === "failed"
+                          ? "destructive"
+                          : "info"
+                  }
+                >
+                  {!status
+                    ? "Starting"
+                    : status.currentStep === "complete"
+                      ? "Complete"
+                      : status.currentStep === "failed"
+                        ? "Failed"
+                        : "In Progress"}
                 </Badge>
               </div>
             </CardHeader>
@@ -735,7 +925,9 @@ export default function App() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Progress</span>
-                  <span className="text-foreground font-medium">{Math.round(progressPercent)}%</span>
+                  <span className="text-foreground font-medium">
+                    {Math.round(progressPercent)}%
+                  </span>
                 </div>
                 <Progress value={progressPercent} className="h-2" />
               </div>
@@ -749,10 +941,14 @@ export default function App() {
                       <Wand2 className="w-3 h-3 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">AI Style Generation in Progress</p>
+                      <p className="text-sm font-medium text-foreground">
+                        AI Style Generation in Progress
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        {status?.styleSelection?.status === "generating_user_style" && "Processing your style description..."}
-                        {status?.styleSelection?.status === "generating_previews" && "Rendering preview images..."}
+                        {status?.styleSelection?.status === "generating_user_style" &&
+                          "Processing your style description..."}
+                        {status?.styleSelection?.status === "generating_previews" &&
+                          "Rendering preview images..."}
                       </p>
                     </div>
                   </div>
@@ -764,7 +960,11 @@ export default function App() {
                 {!status
                   ? // Skeleton while starting
                     [...Array(5)].map((_, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-3 rounded-lg animate-fade-in"
+                        style={{ animationDelay: `${i * 0.05}s` }}
+                      >
                         <div className="w-5 h-5 rounded-full bg-muted animate-pulse" />
                         <div className="flex-1 h-4 rounded bg-muted animate-pulse" />
                         <div className="w-16 h-5 rounded bg-muted animate-pulse" />
@@ -829,7 +1029,10 @@ export default function App() {
               {/* Logs Section */}
               {status?.logs && status.logs.length > 0 && (
                 <div className="space-y-2">
-                  <button onClick={() => setShowLogs(!showLogs)} className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                  <button
+                    onClick={() => setShowLogs(!showLogs)}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  >
                     {showLogs ? "▼" : "▶"} Logs ({status.logs.length} entries)
                   </button>
                   {showLogs && (

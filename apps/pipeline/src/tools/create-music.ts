@@ -21,7 +21,9 @@ import { callClaude } from "../callClaude";
 // then if yes, remove the return from line around 44 to process all.
 
 async function main() {
-  const summariesForAllChapters = JSON.parse(readBookFile("summaries-with-paragraphs.json", FILE_TYPE.TEMPORARY)) as {
+  const summariesForAllChapters = JSON.parse(
+    readBookFile("summaries-with-paragraphs.json", FILE_TYPE.TEMPORARY),
+  ) as {
     chapterSummary: {
       contextSummary: string;
       chapterBulletPoints: { paragraphNumbers: number[]; paragraphsSummary: string }[];
@@ -34,7 +36,10 @@ async function main() {
     numberOfChaptersToProcess: number;
     startFromChapter: number;
   };
-  const chaptersToParse = Array.from({ length: bookSettings.numberOfChaptersToProcess }, (_, i) => i);
+  const chaptersToParse = Array.from(
+    { length: bookSettings.numberOfChaptersToProcess },
+    (_, i) => i,
+  );
   console.log(`chapters to parse: ${chaptersToParse.join(", ")}`);
   const allResponses: { songTitle: string; songStyle: string }[] = [];
   await Promise.all(
@@ -108,7 +113,10 @@ async function main() {
       const response = await callClaude(prompt, schema, 5, 1024 * 3, true, true);
       console.log(`Chapter ${chapterNumber}: ${JSON.stringify(response, null, 2)}`);
       response?.forEach((song) => {
-        allResponses.push({ songTitle: `${chapterNumber}-${song.startParagraph}`, songStyle: song.prompt });
+        allResponses.push({
+          songTitle: `${chapterNumber}-${song.startParagraph}`,
+          songStyle: song.prompt,
+        });
       });
     }),
   );
@@ -121,7 +129,11 @@ async function main() {
     }
     return aParagraph - bParagraph;
   });
-  writeBookFile("music-prompts.json", JSON.stringify(allResponsesSorted, null, 2), FILE_TYPE.TEMPORARY);
+  writeBookFile(
+    "music-prompts.json",
+    JSON.stringify(allResponsesSorted, null, 2),
+    FILE_TYPE.TEMPORARY,
+  );
 }
 
 main();

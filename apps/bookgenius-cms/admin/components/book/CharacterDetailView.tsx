@@ -17,7 +17,17 @@ import { queries } from "@/lib/queries";
 import { useCharacterBundle, type CharacterBundle } from "@/lib/hooks/useCharacterBundle";
 import { MetadataEditor } from "../editors/MetadataEditor";
 import { getVersionUrl } from "@/lib/assetUrl";
-import { ArrowLeft, User, Image as ImageIcon, Video, Upload, Check, AlertCircle, Loader2, Pencil } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Image as ImageIcon,
+  Video,
+  Upload,
+  Check,
+  AlertCircle,
+  Loader2,
+  Pencil,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -79,7 +89,14 @@ function AssetSlot({ label, icon, asset, onUpload, accept, isImage = false }: As
             {isImage ? (
               <img src={asset.url} alt={label} className="w-full h-full object-cover" />
             ) : (
-              <video src={asset.url} className="w-full h-full object-cover" muted loop autoPlay playsInline />
+              <video
+                src={asset.url}
+                className="w-full h-full object-cover"
+                muted
+                loop
+                autoPlay
+                playsInline
+              />
             )}
             {/* Overlay with replace button */}
             <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -104,13 +121,20 @@ function AssetSlot({ label, icon, asset, onUpload, accept, isImage = false }: As
 // Main Component
 // =============================================================================
 
-export function CharacterDetailView({ characterPath, onBack, onUploadAsset, optimisticAvatarUrl }: CharacterDetailViewProps) {
+export function CharacterDetailView({
+  characterPath,
+  onBack,
+  onUploadAsset,
+  optimisticAvatarUrl,
+}: CharacterDetailViewProps) {
   const { bundle, isLoading, error } = useCharacterBundle(characterPath);
   const [showMetadataEditor, setShowMetadataEditor] = useState(false);
 
   const characterSlug = characterPath.split("/").pop() || "";
 
-  const displayAvatar = optimisticAvatarUrl ? { url: optimisticAvatarUrl, versionId: "optimistic", contentType: "image/png" } : bundle?.avatar;
+  const displayAvatar = optimisticAvatarUrl
+    ? { url: optimisticAvatarUrl, versionId: "optimistic", contentType: "image/png" }
+    : bundle?.avatar;
 
   // Loading state
   if (isLoading) {
@@ -150,7 +174,9 @@ export function CharacterDetailView({ characterPath, onBack, onUploadAsset, opti
   }
 
   // Get character metadata from extra
-  const extra = bundle.extra as { type?: string; displayName?: string; summary?: string } | undefined;
+  const extra = bundle.extra as
+    | { type?: string; displayName?: string; summary?: string }
+    | undefined;
   const displayName = extra?.displayName || bundle.name;
   const summary = extra?.summary;
 
@@ -169,7 +195,11 @@ export function CharacterDetailView({ characterPath, onBack, onUploadAsset, opti
             </div>
             <p className="text-sm text-muted-foreground truncate">{characterPath}</p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => setShowMetadataEditor(!showMetadataEditor)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowMetadataEditor(!showMetadataEditor)}
+          >
             <Pencil className="h-4 w-4 mr-2" />
             {showMetadataEditor ? "Hide" : "Edit"} Details
           </Button>
@@ -199,8 +229,20 @@ export function CharacterDetailView({ characterPath, onBack, onUploadAsset, opti
                   accept="image/*"
                   isImage
                 />
-                <AssetSlot label="Speaks" icon={<Video className="h-4 w-4" />} asset={bundle.speaks} onUpload={() => onUploadAsset("speaks.mp4")} accept="video/*" />
-                <AssetSlot label="Listens" icon={<Video className="h-4 w-4" />} asset={bundle.listens} onUpload={() => onUploadAsset("listens.mp4")} accept="video/*" />
+                <AssetSlot
+                  label="Speaks"
+                  icon={<Video className="h-4 w-4" />}
+                  asset={bundle.speaks}
+                  onUpload={() => onUploadAsset("speaks.mp4")}
+                  accept="video/*"
+                />
+                <AssetSlot
+                  label="Listens"
+                  icon={<Video className="h-4 w-4" />}
+                  asset={bundle.listens}
+                  onUpload={() => onUploadAsset("listens.mp4")}
+                  accept="video/*"
+                />
               </div>
             </div>
 
@@ -208,12 +250,22 @@ export function CharacterDetailView({ characterPath, onBack, onUploadAsset, opti
             <div className="bg-surface-1 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-sm font-medium">Bundle Status</span>
-                {bundle.avatar && bundle.speaks && bundle.listens ? <Badge variant="success">Complete</Badge> : <Badge variant="warning">Incomplete</Badge>}
+                {bundle.avatar && bundle.speaks && bundle.listens ? (
+                  <Badge variant="success">Complete</Badge>
+                ) : (
+                  <Badge variant="warning">Incomplete</Badge>
+                )}
               </div>
               <div className="flex gap-4 text-sm text-muted-foreground">
-                <span className={bundle.avatar ? "text-success" : ""}>{bundle.avatar ? "✓" : "○"} Avatar</span>
-                <span className={bundle.speaks ? "text-success" : ""}>{bundle.speaks ? "✓" : "○"} Speaks</span>
-                <span className={bundle.listens ? "text-success" : ""}>{bundle.listens ? "✓" : "○"} Listens</span>
+                <span className={bundle.avatar ? "text-success" : ""}>
+                  {bundle.avatar ? "✓" : "○"} Avatar
+                </span>
+                <span className={bundle.speaks ? "text-success" : ""}>
+                  {bundle.speaks ? "✓" : "○"} Speaks
+                </span>
+                <span className={bundle.listens ? "text-success" : ""}>
+                  {bundle.listens ? "✓" : "○"} Listens
+                </span>
               </div>
             </div>
           </div>

@@ -1,7 +1,12 @@
 // Types for better code readability
 type ParsedElement = { text: string; whitespace: string };
 
-type TagInfo = { tagContent: string; tagEndIndex: number; isSelfClosing: boolean; tagName?: string };
+type TagInfo = {
+  tagContent: string;
+  tagEndIndex: number;
+  isSelfClosing: boolean;
+  tagName?: string;
+};
 
 // Helper functions for HTML parsing
 const isSelfClosingTag = (tagContent: string): boolean => {
@@ -49,7 +54,12 @@ export const parseHtmlText = (text: string): ParsedElement[] => {
       if (tagEndIndex === -1) break;
 
       const tagContent = text.slice(currentIndex, tagEndIndex + 1);
-      const tagInfo: TagInfo = { tagContent, tagEndIndex, isSelfClosing: isSelfClosingTag(tagContent), tagName: extractTagName(tagContent) };
+      const tagInfo: TagInfo = {
+        tagContent,
+        tagEndIndex,
+        isSelfClosing: isSelfClosingTag(tagContent),
+        tagName: extractTagName(tagContent),
+      };
 
       if (tagInfo.isSelfClosing) {
         result.push({ text: tagInfo.tagContent, whitespace: "" });
@@ -68,7 +78,10 @@ export const parseHtmlText = (text: string): ParsedElement[] => {
         result.push({ text: tagInfo.tagContent, whitespace: "" });
         currentIndex = tagEndIndex + 1;
       } else {
-        const fullTag = text.slice(currentIndex, nextClosingTagIndex + `</${tagInfo.tagName}>`.length);
+        const fullTag = text.slice(
+          currentIndex,
+          nextClosingTagIndex + `</${tagInfo.tagName}>`.length,
+        );
         result.push({ text: fullTag, whitespace: "" });
         currentIndex = nextClosingTagIndex + `</${tagInfo.tagName}>`.length;
       }

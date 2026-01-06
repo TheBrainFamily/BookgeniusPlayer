@@ -62,8 +62,12 @@ const client = new ConvexHttpClient(CONVEX_URL);
 function parseArgs(): { seSlug: string; targetSlug: string } {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.error("Usage: bun run src/tools/se-converter/importSEBook.ts <se-book-slug> [--target-slug <slug>]");
-    console.error("Example: bun run src/tools/se-converter/importSEBook.ts william-shakespeare_macbeth");
+    console.error(
+      "Usage: bun run src/tools/se-converter/importSEBook.ts <se-book-slug> [--target-slug <slug>]",
+    );
+    console.error(
+      "Example: bun run src/tools/se-converter/importSEBook.ts william-shakespeare_macbeth",
+    );
     process.exit(1);
   }
 
@@ -129,7 +133,9 @@ function extractCharactersFromHtml(html: string): { slug: string; displayName: s
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 
-function splitHtmlIntoChapters(html: string): { chapterNumber: number; html: string; title: string | null }[] {
+function splitHtmlIntoChapters(
+  html: string,
+): { chapterNumber: number; html: string; title: string | null }[] {
   const dom = new JSDOM(html);
   const doc = dom.window.document;
 
@@ -180,7 +186,11 @@ function getContentType(filename: string): string {
   return types[ext] || "application/octet-stream";
 }
 
-async function uploadFile(folderPath: string, basename: string, filePath: string): Promise<boolean> {
+async function uploadFile(
+  folderPath: string,
+  basename: string,
+  filePath: string,
+): Promise<boolean> {
   if (!fs.existsSync(filePath)) {
     return false;
   }
@@ -189,11 +199,10 @@ async function uploadFile(folderPath: string, basename: string, filePath: string
   const contentType = getContentType(basename);
 
   try {
-    const { intentId, uploadUrl, backend } = await client.mutation(api.generateUploadUrl.startUpload, {
-      folderPath,
-      basename,
-      publish: true,
-    });
+    const { intentId, uploadUrl, backend } = await client.mutation(
+      api.generateUploadUrl.startUpload,
+      { folderPath, basename, publish: true },
+    );
 
     const response = await fetch(uploadUrl, {
       method: backend === "r2" ? "PUT" : "POST",
@@ -257,7 +266,11 @@ async function step2_ImportCharacters(
     console.log(`  Processing: ${char.displayName} (${char.slug})`);
 
     const charPath = `${bookPath}/characters/${char.slug}`;
-    const charExtra: CharacterFolderExtra = { type: "character", displayName: char.displayName, summary: "" };
+    const charExtra: CharacterFolderExtra = {
+      type: "character",
+      displayName: char.displayName,
+      summary: "",
+    };
     await createFolderIfNeeded(charPath, charExtra);
 
     if (legacyAssetsDir) {
@@ -307,7 +320,11 @@ async function step3_ImportChapters(
   return chapters.length;
 }
 
-async function step4_ImportFigures(bookPath: string, seSlug: string, images: SEImageReference[]): Promise<number> {
+async function step4_ImportFigures(
+  bookPath: string,
+  seSlug: string,
+  images: SEImageReference[],
+): Promise<number> {
   console.log("\n=== Step 4: Import Figures ===");
 
   if (images.length === 0) {
@@ -378,7 +395,11 @@ async function main() {
   }
 
   await step1_CreateFolderStructure(bookPath, metadata);
-  const characterCount = await step2_ImportCharacters(bookPath, characters, hasLegacyAssets ? legacyAssetsDir : null);
+  const characterCount = await step2_ImportCharacters(
+    bookPath,
+    characters,
+    hasLegacyAssets ? legacyAssetsDir : null,
+  );
   const chapterCount = await step3_ImportChapters(bookPath, chapters);
   const figureCount = await step4_ImportFigures(bookPath, seSlug, result.images);
 

@@ -14,7 +14,11 @@ function getConvexSiteUrl(): string | undefined {
 /**
  * Build a URL for a specific file version.
  */
-export function getVersionUrl(options: { versionId: string; basename?: string; basePath?: string }): string {
+export function getVersionUrl(options: {
+  versionId: string;
+  basename?: string;
+  basePath?: string;
+}): string {
   const { versionId } = options;
   const basename = options.basename ?? "file";
 

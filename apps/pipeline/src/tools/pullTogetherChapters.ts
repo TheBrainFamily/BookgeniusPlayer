@@ -12,10 +12,16 @@ export const pullTogetherChapters = () => {
     let chapterText;
 
     try {
-      chapterText = readBookFile(`rewritten-paragraphs-for-chapter-${i}-callOpenRouter.xml`, FILE_TYPE.TEMPORARY);
+      chapterText = readBookFile(
+        `rewritten-paragraphs-for-chapter-${i}-callOpenRouter.xml`,
+        FILE_TYPE.TEMPORARY,
+      );
     } catch {
       try {
-        chapterText = readBookFile(`rewritten-paragraphs-for-chapter-${i}-callClaude.xml`, FILE_TYPE.TEMPORARY);
+        chapterText = readBookFile(
+          `rewritten-paragraphs-for-chapter-${i}-callClaude.xml`,
+          FILE_TYPE.TEMPORARY,
+        );
       } catch {
         try {
           chapterText = readBookFile(
@@ -24,10 +30,16 @@ export const pullTogetherChapters = () => {
           );
         } catch {
           try {
-            chapterText = readBookFile(`rewritten-paragraphs-for-chapter-${i}-callO3.xml`, FILE_TYPE.TEMPORARY);
+            chapterText = readBookFile(
+              `rewritten-paragraphs-for-chapter-${i}-callO3.xml`,
+              FILE_TYPE.TEMPORARY,
+            );
           } catch {
             try {
-              chapterText = readBookFile(`rewritten-paragraphs-for-chapter-${i}.xml`, FILE_TYPE.TEMPORARY);
+              chapterText = readBookFile(
+                `rewritten-paragraphs-for-chapter-${i}.xml`,
+                FILE_TYPE.TEMPORARY,
+              );
             } catch {
               throw new Error(`rewritten-paragraphs-for-chapter-${i}.xml not found`);
             }

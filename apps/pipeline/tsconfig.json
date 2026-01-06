@@ -12,7 +12,13 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "resolveJsonModule": true,
-    "paths": { "@bookgenius/convex/*": ["../../convex/*"], "*": ["./*"] }
+    "jsx": "react-jsx",
+    "paths": {
+      "@bookgenius/convex/*": ["../../convex/*"],
+      "@convex/*": ["../../convex/*"],
+      "@player/*": ["../player/src/*"],
+      "*": ["./*"]
+    }
   },
   "include": ["src"],
   "exclude": [

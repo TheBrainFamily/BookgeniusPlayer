@@ -11,12 +11,7 @@ export const createBoard = mutation({
   args: { boardSlug: v.string() },
   returns: v.object({
     boardSlug: v.string(),
-    columns: v.array(
-      v.object({
-        slug: v.string(),
-        path: v.string(),
-      }),
-    ),
+    columns: v.array(v.object({ slug: v.string(), path: v.string() })),
   }),
   handler: async (ctx, { boardSlug }) => {
     await requireAuth(ctx);
@@ -24,20 +19,16 @@ export const createBoard = mutation({
     const basePath = `kanban/${boardSlug}`;
 
     // create root + columns using your folder API
-    await ctx.runMutation(
-      components.assetManager.assetManager.createFolderByPath,
-      { path: basePath },
-    );
+    await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      path: basePath,
+    });
 
     const columns = [];
     for (const col of KANBAN_COLUMNS) {
       const columnPath = `${basePath}/${col}`;
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        {
-          path: columnPath,
-        },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: columnPath,
+      });
       columns.push({ slug: col, path: columnPath });
     }
 
@@ -47,21 +38,13 @@ export const createBoard = mutation({
 
 export const listColumns = query({
   args: { boardSlug: v.string() },
-  returns: v.array(
-    v.object({
-      slug: v.string(),
-      path: v.string(),
-    }),
-  ),
+  returns: v.array(v.object({ slug: v.string(), path: v.string() })),
   handler: async (ctx, { boardSlug }) => {
     const basePath = `kanban/${boardSlug}`;
 
-    const children = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      {
-        parentPath: basePath,
-      },
-    );
+    const children = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: basePath,
+    });
 
     // Only keep known Kanban columns, and map to slug/path
     const bySlug: Record<string, string> = {};
@@ -70,10 +53,9 @@ export const listColumns = query({
       bySlug[col] = p;
     }
 
-    return KANBAN_COLUMNS.map((slug) => ({
-      slug,
-      path: bySlug[slug],
-    })).filter((col) => children.some((f) => f.path === col.path));
+    return KANBAN_COLUMNS.map((slug) => ({ slug, path: bySlug[slug] })).filter((col) =>
+      children.some((f) => f.path === col.path),
+    );
   },
 });
 
@@ -99,34 +81,20 @@ export const createCard = mutation({
     const folderPath = `kanban/${args.boardSlug}/${args.column}`;
     const basename = slugify(args.title);
 
-    const { version } = await ctx.runMutation(
-      components.assetManager.assetManager.commitVersion,
-      {
-        folderPath,
-        basename,
-        publish: true,
-        label: args.title,
-        extra: {
-          title: args.title,
-          description: args.description ?? "",
-        },
-      },
-    );
-
-    return {
-      boardSlug: args.boardSlug,
-      column: args.column,
+    const { version } = await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
+      folderPath,
       basename,
-      version,
-    };
+      publish: true,
+      label: args.title,
+      extra: { title: args.title, description: args.description ?? "" },
+    });
+
+    return { boardSlug: args.boardSlug, column: args.column, basename, version };
   },
 });
 
 export const listColumnCards = query({
-  args: {
-    boardSlug: v.string(),
-    column: v.string(),
-  },
+  args: { boardSlug: v.string(), column: v.string() },
   returns: v.array(
     v.object({
       boardSlug: v.string(),
@@ -150,10 +118,7 @@ export const listColumnCards = query({
     );
 
     return assets.map((asset) => {
-      const extra = (asset.extra ?? {}) as {
-        title?: string;
-        description?: string;
-      };
+      const extra = (asset.extra ?? {}) as { title?: string; description?: string };
 
       return {
         boardSlug: args.boardSlug,
@@ -190,26 +155,15 @@ export const updateCard = mutation({
     const folderPath = `kanban/${args.boardSlug}/${args.column}`;
 
     // commitVersion with same basename creates a new version
-    const { version } = await ctx.runMutation(
-      components.assetManager.assetManager.commitVersion,
-      {
-        folderPath,
-        basename: args.basename,
-        publish: true,
-        label: args.title,
-        extra: {
-          title: args.title,
-          description: args.description,
-        },
-      },
-    );
-
-    return {
-      boardSlug: args.boardSlug,
-      column: args.column,
+    const { version } = await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
+      folderPath,
       basename: args.basename,
-      version,
-    };
+      publish: true,
+      label: args.title,
+      extra: { title: args.title, description: args.description },
+    });
+
+    return { boardSlug: args.boardSlug, column: args.column, basename: args.basename, version };
   },
 });
 
@@ -220,11 +174,7 @@ export const moveCard = mutation({
     toColumn: v.string(),
     basename: v.string(),
   },
-  returns: v.object({
-    boardSlug: v.string(),
-    column: v.string(),
-    basename: v.string(),
-  }),
+  returns: v.object({ boardSlug: v.string(), column: v.string(), basename: v.string() }),
   handler: async (ctx, args) => {
     await requireAuth(ctx);
     if (!KANBAN_COLUMNS.includes(args.fromColumn as KanbanColumn)) {
@@ -243,20 +193,12 @@ export const moveCard = mutation({
       toFolderPath: toPath,
     });
 
-    return {
-      boardSlug: args.boardSlug,
-      column: args.toColumn,
-      basename: args.basename,
-    };
+    return { boardSlug: args.boardSlug, column: args.toColumn, basename: args.basename };
   },
 });
 
 export const getCard = query({
-  args: {
-    boardSlug: v.string(),
-    column: v.string(),
-    basename: v.string(),
-  },
+  args: { boardSlug: v.string(), column: v.string(), basename: v.string() },
   returns: v.union(
     v.null(),
     v.object({
@@ -268,7 +210,7 @@ export const getCard = query({
       version: v.number(),
       createdAt: v.number(),
       publishedAt: v.optional(v.number()),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     if (!KANBAN_COLUMNS.includes(args.column as KanbanColumn)) {
@@ -279,16 +221,13 @@ export const getCard = query({
 
     const assets = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath }
+      { folderPath },
     );
 
     const asset = assets.find((a) => a.basename === args.basename);
     if (!asset) return null;
 
-    const extra = (asset.extra ?? {}) as {
-      title?: string;
-      description?: string;
-    };
+    const extra = (asset.extra ?? {}) as { title?: string; description?: string };
 
     return {
       boardSlug: args.boardSlug,
@@ -304,11 +243,7 @@ export const getCard = query({
 });
 
 export const getCardHistory = query({
-  args: {
-    boardSlug: v.string(),
-    column: v.string(),
-    basename: v.string(),
-  },
+  args: { boardSlug: v.string(), column: v.string(), basename: v.string() },
   returns: v.array(
     v.object({
       type: v.string(),
@@ -320,10 +255,10 @@ export const getCardHistory = query({
   handler: async (ctx, args) => {
     const folderPath = `kanban/${args.boardSlug}/${args.column}`;
 
-    const events = await ctx.runQuery(
-      components.assetManager.assetManager.listAssetEvents,
-      { folderPath, basename: args.basename },
-    );
+    const events = await ctx.runQuery(components.assetManager.assetManager.listAssetEvents, {
+      folderPath,
+      basename: args.basename,
+    });
 
     return events.map((e) => ({
       type: e.type,

@@ -1,13 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { useOptionalElementVisibility, useLastHideReason, useElementVisibilityStore } from "@player/stores/elementVisibility.store";
+import {
+  useOptionalElementVisibility,
+  useLastHideReason,
+  useElementVisibilityStore,
+} from "@player/stores/elementVisibility.store";
 
 interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
 }
 
-export const OptionalElement: React.FC<OptionalElementProps> = ({ children, className, ...props }) => {
+export const OptionalElement: React.FC<OptionalElementProps> = ({
+  children,
+  className,
+  ...props
+}) => {
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
 

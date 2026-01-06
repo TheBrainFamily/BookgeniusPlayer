@@ -4,7 +4,10 @@ import { api } from "@convex/_generated/api";
 
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useBackgroundAddModal } from "@player/stores/modals/backgroundAddModal.store";
-import { useBackgroundGenerationStore, createBackgroundKey } from "@player/stores/backgroundGeneration.store";
+import {
+  useBackgroundGenerationStore,
+  createBackgroundKey,
+} from "@player/stores/backgroundGeneration.store";
 import ModalUI from "./ModalUI";
 
 const BackgroundAddModal: React.FC = () => {
@@ -21,7 +24,10 @@ const BackgroundAddModal: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!book?.path || !prompt.trim()) {
-      console.error("[BackgroundAddModal] Cannot submit: missing book path or prompt", { bookPath: book?.path, prompt });
+      console.error("[BackgroundAddModal] Cannot submit: missing book path or prompt", {
+        bookPath: book?.path,
+        prompt,
+      });
       return;
     }
 
@@ -32,7 +38,12 @@ const BackgroundAddModal: React.FC = () => {
     closeModal();
 
     try {
-      await startBackgroundGeneration({ bookPath: book.path, chapter, paragraph, prompt: prompt.trim() });
+      await startBackgroundGeneration({
+        bookPath: book.path,
+        chapter,
+        paragraph,
+        prompt: prompt.trim(),
+      });
     } catch (err) {
       console.error("[BackgroundAddModal] Failed to start background generation:", err);
     }
@@ -46,7 +57,10 @@ const BackgroundAddModal: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="text-xs text-zinc-400">Describe the scene you want. Context from surrounding paragraphs will be added automatically.</div>
+          <div className="text-xs text-zinc-400">
+            Describe the scene you want. Context from surrounding paragraphs will be added
+            automatically.
+          </div>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}

@@ -5,7 +5,13 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import dotenv from "dotenv";
 import { startPipeline } from "./pipeline";
-import { readProgress, getNextStep, createRetroactiveProgress, isValidStep, getStepOrder } from "./pipeline-progress";
+import {
+  readProgress,
+  getNextStep,
+  createRetroactiveProgress,
+  isValidStep,
+  getStepOrder,
+} from "./pipeline-progress";
 import { Step, StepLabels } from "../shared/pipelineTypes";
 
 dotenv.config();
@@ -25,10 +31,14 @@ async function main() {
       describe: "Path to book folder (e.g., books-data/1765303791319-player-of-games)",
       type: "string",
     })
-    .option("from-step", { type: "string", describe: "Override auto-detect and start from this step" })
+    .option("from-step", {
+      type: "string",
+      describe: "Override auto-detect and start from this step",
+    })
     .option("mark-completed", {
       type: "string",
-      describe: "Create/update progress file marking all steps up to and including this step as completed",
+      describe:
+        "Create/update progress file marking all steps up to and including this step as completed",
     })
     .option("list-steps", { type: "boolean", describe: "List all available step slugs and exit" })
     .option("status", { type: "boolean", describe: "Show current progress status and exit" })
@@ -107,7 +117,9 @@ async function main() {
     console.log(`Creating retroactive progress for ${slug}`);
     console.log(`Marking steps up to and including "${stepToMark}" as completed`);
     const progress = createRetroactiveProgress(slug, stepToMark as Step);
-    console.log(`Progress file created at: books-data/${slug}/temporary-output/pipeline-progress.json`);
+    console.log(
+      `Progress file created at: books-data/${slug}/temporary-output/pipeline-progress.json`,
+    );
     console.log(`\nCompleted steps:`);
     Object.keys(progress.completedSteps).forEach((step) => {
       console.log(`  ✔ ${step}`);

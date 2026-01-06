@@ -28,7 +28,8 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
 
   const chapters = useMemo(() => {
     if (!bookData) return [];
-    const maxDemoChapter = bookData.metadata.bookForm === "play" ? MAX_DEMO_CHAPTER_PLAY : MAX_DEMO_CHAPTER_DEFAULT;
+    const maxDemoChapter =
+      bookData.metadata.bookForm === "play" ? MAX_DEMO_CHAPTER_PLAY : MAX_DEMO_CHAPTER_DEFAULT;
 
     return bookData.chapters.map((chapter, index) => {
       return {
@@ -77,7 +78,8 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
             >
               <div className="grid w-full min-w-0 grid-cols-[1fr_auto] items-start gap-3">
                 <div className="flex items-center gap-2">
-                  {hasDemoAccess && (isLocked ? <Lock className="w-3 h-3" /> : <LockOpen className="w-3 h-3" />)}
+                  {hasDemoAccess &&
+                    (isLocked ? <Lock className="w-3 h-3" /> : <LockOpen className="w-3 h-3" />)}
                   <span
                     className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2 leading-snug"
                     title={chapter.title}
@@ -86,7 +88,9 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
                     {chapter.title}
                   </span>
                 </div>
-                <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{chapter.page}</span>
+                <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
+                  {chapter.page}
+                </span>
               </div>
             </Button>
           );

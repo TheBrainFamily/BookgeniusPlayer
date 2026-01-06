@@ -58,12 +58,18 @@ export const preloadBackgrounds = async () => {
   const bookBackgrounds = getBackgroundsForBook();
   if (!bookBackgrounds || bookBackgrounds.length === 0) {
     const bookData = getBookData();
-    console.log(`No backgrounds definitions found for book ${bookData?.slug ?? "unknown"}. Cannot preload.`);
+    console.log(
+      `No backgrounds definitions found for book ${bookData?.slug ?? "unknown"}. Cannot preload.`,
+    );
     return false;
   }
 
-  const sectionsToConsider = bookBackgrounds.filter((section) => chaptersToConsider.includes(section.chapter));
-  const matchingSections = sectionsToConsider.filter((section) => section.chapter === currentChapter && section.paragraph <= currentParagraph);
+  const sectionsToConsider = bookBackgrounds.filter((section) =>
+    chaptersToConsider.includes(section.chapter),
+  );
+  const matchingSections = sectionsToConsider.filter(
+    (section) => section.chapter === currentChapter && section.paragraph <= currentParagraph,
+  );
   const matchingSection = matchingSections[matchingSections.length - 1];
 
   const sectionsToPreload: BackgroundForBook[] = [];
@@ -163,13 +169,20 @@ export const preloadBackgrounds = async () => {
   try {
     const preloadPromises = sectionsToPreload.map((section) => loadBackground(section.file));
     const results = await Promise.allSettled(preloadPromises);
-    const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
+    const successful = results.filter(
+      (result) => result.status === "fulfilled" && result.value === true,
+    ).length;
     const failed = results.length - successful;
 
-    console.log(`Backgrounds preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
+    console.log(
+      `Backgrounds preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`,
+    );
 
     if (failed > 0) {
-      const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));
+      const failedResults = results.filter(
+        (result) =>
+          result.status === "rejected" || (result.status === "fulfilled" && result.value === false),
+      );
       console.warn("Some backgrounds failed to preload:", failedResults);
     }
 

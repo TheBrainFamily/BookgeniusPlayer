@@ -7,9 +7,17 @@ import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHt
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 import { useBookConvex } from "@player/context/BookConvexContext";
-import { markLayoutUnstable, LAYOUT_UNSTABLE_VIRTUALIZER_MS } from "@player/helpers/locationCommitter";
+import {
+  markLayoutUnstable,
+  LAYOUT_UNSTABLE_VIRTUALIZER_MS,
+} from "@player/helpers/locationCommitter";
 import { useLocation } from "@player/state/LocationContext";
-import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer, updateMountedChaptersInPlace } from "@player/logic/BookContentVirtualizer";
+import {
+  disposeVirtualizer,
+  ensureChapterWindow,
+  initializeBookContentVirtualizer,
+  updateMountedChaptersInPlace,
+} from "@player/logic/BookContentVirtualizer";
 import { bookIndex } from "@player/logic/BookIndex";
 import { openPlayRowCharacterModal } from "@player/ui/activateMediaInRange";
 import { scrollCoordinator } from "@player/services/ScrollCoordinator";
@@ -27,7 +35,8 @@ if (import.meta.hot) {
 const containerId = "content-container";
 
 export function useBookContent() {
-  const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded } = useBookConvex();
+  const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded } =
+    useBookConvex();
   const { location } = useLocation();
   const { currentChapter } = location;
   const { isPlayFormat } = useBookForm();
@@ -67,7 +76,14 @@ export function useBookContent() {
 
       const complexitySpan = target.closest("span[id^='ch']") as HTMLElement;
 
-      if (!complexitySpan && !isCharacterText && !isInlineAvatar && !isCharacterHighlighted && !isCharacterPlaceholder) return;
+      if (
+        !complexitySpan &&
+        !isCharacterText &&
+        !isInlineAvatar &&
+        !isCharacterHighlighted &&
+        !isCharacterPlaceholder
+      )
+        return;
 
       event.preventDefault();
       event.stopPropagation();
@@ -86,9 +102,13 @@ export function useBookContent() {
       }
 
       const currentSentenceScore = complexitySpan.getAttribute("data-current-score") || "100";
-      const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(currentSentenceId, parseInt(currentSentenceScore));
+      const { text: simplifiedSentence, score: simplifiedSentenceScore } =
+        findSimplifiedSentenceRef.current(currentSentenceId, parseInt(currentSentenceScore));
 
-      const sentenceNumber = parseInt(complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1", 10);
+      const sentenceNumber = parseInt(
+        complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1",
+        10,
+      );
       const isFirstSentence = sentenceNumber === 1;
 
       // Handle case when no further simplification is available
@@ -97,7 +117,11 @@ export function useBookContent() {
 
         // Reset to original sentence
         const originalSentence = complexitySpan.getAttribute("data-original-sentence") || "";
-        complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(originalSentence, isPlayFormat, isFirstSentence);
+        complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(
+          originalSentence,
+          isPlayFormat,
+          isFirstSentence,
+        );
         complexitySpan.removeAttribute("data-current-score");
         complexitySpan.setAttribute("data-simplified", "false");
 
@@ -112,7 +136,11 @@ export function useBookContent() {
       }
 
       // Update content
-      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence, isPlayFormat, isFirstSentence);
+      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(
+        simplifiedSentence,
+        isPlayFormat,
+        isFirstSentence,
+      );
       complexitySpan.setAttribute("data-current-score", simplifiedSentenceScore.toString());
       complexitySpan.setAttribute("data-simplified", "true");
 
@@ -198,8 +226,14 @@ export function useBookContent() {
 
     const initializeVirtualizer = async () => {
       try {
-        await initializeBookContentVirtualizer({ container, onContentChanged: handleContentChanged });
-        const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
+        await initializeBookContentVirtualizer({
+          container,
+          onContentChanged: handleContentChanged,
+        });
+        const initialChapter =
+          typeof currentChapterRef.current === "number"
+            ? currentChapterRef.current
+            : (bookIndex.getFirstChapter() ?? 1);
         await ensureChapterWindow(initialChapter, { force: true });
         if (!cancelled) {
           virtualizerInitializedRef.current = true;
@@ -221,7 +255,6 @@ export function useBookContent() {
       disposeVirtualizer();
       virtualizerInitializedRef.current = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- bookStringified intentionally excluded
     // We only want to initialize ONCE when first ready. Content updates are handled
     // by the textVersion effect using updateMountedChaptersInPlace().
     // Including bookStringified would cause cleanup to run (disposing virtualizer)
@@ -273,7 +306,11 @@ export function useBookContent() {
     const prevVersion = previousTextVersionRef.current;
     const textVersionChanged = prevVersion !== textVersion;
 
-    console.log("[Convex:Flow] useBookContent textVersion effect", { textVersionChanged, prevVersion, newVersion: textVersion });
+    console.log("[Convex:Flow] useBookContent textVersion effect", {
+      textVersionChanged,
+      prevVersion,
+      newVersion: textVersion,
+    });
 
     // Only update ref AFTER we've checked for change (fixes React strict mode double-invoke)
     if (!textVersionChanged) {

@@ -1,9 +1,28 @@
 import { formatDistanceToNow } from "date-fns";
-import { Image, Music, Video, FileText, FileJson, Package, MoreVertical, Eye, Upload, Pencil, CheckCircle, AlertCircle, Circle } from "lucide-react";
+import {
+  Image,
+  Music,
+  Video,
+  FileText,
+  FileJson,
+  Package,
+  MoreVertical,
+  Eye,
+  Upload,
+  Pencil,
+  CheckCircle,
+  AlertCircle,
+  Circle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getContentTypeCategory, formatBytes } from "@/lib/utils";
 import type { AssetData } from "./AssetCard";
 
@@ -15,9 +34,20 @@ interface AssetListRowProps {
   onRename?: () => void;
 }
 
-const typeIcons = { image: Image, audio: Music, video: Video, text: FileText, json: FileJson, other: Package };
+const typeIcons = {
+  image: Image,
+  audio: Music,
+  video: Video,
+  text: FileText,
+  json: FileJson,
+  other: Package,
+};
 
-function getAssetStatus(asset: AssetData): { label: string; icon: typeof CheckCircle; color: string } {
+function getAssetStatus(asset: AssetData): {
+  label: string;
+  icon: typeof CheckCircle;
+  color: string;
+} {
   if (asset.versionCounter === 0) {
     return { label: "Empty", icon: Circle, color: "text-muted-foreground" };
   }
@@ -33,7 +63,13 @@ function getAssetStatus(asset: AssetData): { label: string; icon: typeof CheckCi
   return { label: "Unknown", icon: Circle, color: "text-muted-foreground" };
 }
 
-export function AssetListRow({ asset, publishedInfo, onClick, onUpload, onRename }: AssetListRowProps) {
+export function AssetListRow({
+  asset,
+  publishedInfo,
+  onClick,
+  onUpload,
+  onRename,
+}: AssetListRowProps) {
   const contentType = publishedInfo?.contentType;
   const category = getContentTypeCategory(contentType);
   const Icon = typeIcons[category];
@@ -44,10 +80,21 @@ export function AssetListRow({ asset, publishedInfo, onClick, onUpload, onRename
   const isImage = category === "image" && publishedInfo?.url;
 
   return (
-    <div className="group flex items-center gap-4 px-4 py-3 border-b border-border hover:bg-accent/50 cursor-pointer transition-colors animate-fade-in" onClick={onClick}>
+    <div
+      className="group flex items-center gap-4 px-4 py-3 border-b border-border hover:bg-accent/50 cursor-pointer transition-colors animate-fade-in"
+      onClick={onClick}
+    >
       {/* Thumbnail */}
       <div className="w-12 h-12 rounded-lg bg-surface-2 flex items-center justify-center overflow-hidden shrink-0">
-        {isImage ? <img src={publishedInfo.url} alt={asset.basename} className="w-full h-full object-cover" /> : <Icon className="h-6 w-6 text-muted-foreground/50" />}
+        {isImage ? (
+          <img
+            src={publishedInfo.url}
+            alt={asset.basename}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <Icon className="h-6 w-6 text-muted-foreground/50" />
+        )}
       </div>
 
       {/* Name */}
@@ -61,7 +108,9 @@ export function AssetListRow({ asset, publishedInfo, onClick, onUpload, onRename
       </div>
 
       {/* Size */}
-      <div className="hidden md:block text-xs text-muted-foreground w-20 text-right">{publishedInfo?.size ? formatBytes(publishedInfo.size) : "-"}</div>
+      <div className="hidden md:block text-xs text-muted-foreground w-20 text-right">
+        {publishedInfo?.size ? formatBytes(publishedInfo.size) : "-"}
+      </div>
 
       {/* Status */}
       <div className="hidden sm:flex items-center gap-2 w-28">
@@ -70,10 +119,14 @@ export function AssetListRow({ asset, publishedInfo, onClick, onUpload, onRename
       </div>
 
       {/* Version */}
-      <div className="hidden lg:block text-xs text-muted-foreground w-12 text-center">v{asset.versionCounter}</div>
+      <div className="hidden lg:block text-xs text-muted-foreground w-12 text-center">
+        v{asset.versionCounter}
+      </div>
 
       {/* Updated */}
-      <div className="hidden lg:block text-xs text-muted-foreground w-32 text-right">{formatDistanceToNow(new Date(asset.updatedAt), { addSuffix: true })}</div>
+      <div className="hidden lg:block text-xs text-muted-foreground w-32 text-right">
+        {formatDistanceToNow(new Date(asset.updatedAt), { addSuffix: true })}
+      </div>
 
       {/* Actions */}
       <div className="opacity-0 group-hover:opacity-100 transition-opacity">

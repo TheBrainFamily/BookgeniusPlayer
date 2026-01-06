@@ -6,7 +6,13 @@
  */
 
 import { wrapPunctuationAdvanced } from "../wrapPunctuation";
-import { isElementNode, isTextNode, isLikelyCharacterTag, renderLineBreakSpan, renderEmElement } from "../xmlDomHelpers";
+import {
+  isElementNode,
+  isTextNode,
+  isLikelyCharacterTag,
+  renderLineBreakSpan,
+  renderEmElement,
+} from "../xmlDomHelpers";
 import { getFigureUrl } from "@player/utils/assetUrls";
 
 // =============================================================================
@@ -28,11 +34,22 @@ import type { Node as XmlDomNode } from "@xmldom/xmldom";
 
 type AnyNode = Node | XmlDomNode;
 
-export type XmlSerializerLike = { serializeToString(node: AnyNode, nodeFilter?: (node: AnyNode) => boolean): string };
+export type XmlSerializerLike = {
+  serializeToString(node: AnyNode, nodeFilter?: (node: AnyNode) => boolean): string;
+};
 
-export type RenderOptions = { bookSlug: string; bookLang: string; bookForm: string; characterBundles: CharacterBundleInfo[]; serializer: XmlSerializerLike };
+export type RenderOptions = {
+  bookSlug: string;
+  bookLang: string;
+  bookForm: string;
+  characterBundles: CharacterBundleInfo[];
+  serializer: XmlSerializerLike;
+};
 
-export type RenderBookResult = { htmlResult: string; chapterTitles: Array<{ id: string; title: string }> };
+export type RenderBookResult = {
+  htmlResult: string;
+  chapterTitles: Array<{ id: string; title: string }>;
+};
 
 export type RenderChapterResult = { html: string; title: string; chapterId: string };
 
@@ -40,11 +57,15 @@ export type RenderChapterResult = { html: string; title: string; chapterId: stri
 // Helper Functions
 // =============================================================================
 
-const startsWithUppercase = (value: string): boolean => value.charAt(0) === value.charAt(0).toUpperCase();
+const startsWithUppercase = (value: string): boolean =>
+  value.charAt(0) === value.charAt(0).toUpperCase();
 
 const getTitleText = (el?: Element | null) => (el ? (el.textContent || "").trim() : "");
 
-const renderStandardInlineElement = (element: Element, options: { bookSlug: string; includeBookSlugInImgSrc?: boolean }): string => {
+const renderStandardInlineElement = (
+  element: Element,
+  options: { bookSlug: string; includeBookSlugInImgSrc?: boolean },
+): string => {
   const tagName = element.tagName.toLowerCase();
   switch (tagName) {
     case "note":
@@ -65,7 +86,8 @@ const renderStandardInlineElement = (element: Element, options: { bookSlug: stri
       const alt = element.getAttribute("alt") || "";
       // Try to resolve figure URL from registry (for SE book figures)
       const figureUrl = getFigureUrl(src);
-      const resolvedSrc = figureUrl || (options.includeBookSlugInImgSrc ? `/books/${options.bookSlug}${src}` : src);
+      const resolvedSrc =
+        figureUrl || (options.includeBookSlugInImgSrc ? `/books/${options.bookSlug}${src}` : src);
       const altAttr = alt ? ` alt="${alt.replace(/"/g, "&quot;")}"` : "";
       return `<img src="${resolvedSrc}"${altAttr} />`;
     }
@@ -80,7 +102,11 @@ const renderStandardInlineElement = (element: Element, options: { bookSlug: stri
 type CharacterRenderOptions = { isAtParagraphStart: boolean };
 type CharacterRenderResult = { html: string; isTalking: boolean; slug: string };
 
-const renderCharacterElement = (element: Element, characterMap: Map<string, CharacterInfo>, options: CharacterRenderOptions): CharacterRenderResult => {
+const renderCharacterElement = (
+  element: Element,
+  characterMap: Map<string, CharacterInfo>,
+  options: CharacterRenderOptions,
+): CharacterRenderResult => {
   const tagName = element.tagName;
   const slug = tagName.toLowerCase(); // Lowercase to match Convex folder slugs
   const isTalking = element.getAttribute("talking") === "true";
@@ -102,19 +128,32 @@ const renderCharacterElement = (element: Element, characterMap: Map<string, Char
   const charInfo = characterMap.get(tagName) ?? characterMap.get(slug);
   const displayText = element.textContent || (charInfo?.display ?? tagName);
 
-  return { html: `<span class="character-highlighted" data-character="${slug}">${displayText}</span>`, isTalking: false, slug };
+  return {
+    html: `<span class="character-highlighted" data-character="${slug}">${displayText}</span>`,
+    isTalking: false,
+    slug,
+  };
 };
 
-type ParagraphRenderContext = { characterMap: Map<string, CharacterInfo>; isLikelyCharacterTag: (tag: string) => boolean; bookSlug: string };
+type ParagraphRenderContext = {
+  characterMap: Map<string, CharacterInfo>;
+  isLikelyCharacterTag: (tag: string) => boolean;
+  bookSlug: string;
+};
 
 type ParagraphRenderResult = { content: string; hasTalkingCharacter: boolean };
 
-const renderParagraphContent = (paragraph: Element, context: ParagraphRenderContext): ParagraphRenderResult => {
+const renderParagraphContent = (
+  paragraph: Element,
+  context: ParagraphRenderContext,
+): ParagraphRenderResult => {
   let hasSignificantTextContent = false;
   let hasTalkingCharacter = false;
 
   const appendCharacterHtml = (element: Element): string => {
-    const result = renderCharacterElement(element, context.characterMap, { isAtParagraphStart: !hasSignificantTextContent });
+    const result = renderCharacterElement(element, context.characterMap, {
+      isAtParagraphStart: !hasSignificantTextContent,
+    });
     if (result.isTalking) {
       hasTalkingCharacter = true;
     }
@@ -142,7 +181,9 @@ const renderParagraphContent = (paragraph: Element, context: ParagraphRenderCont
           continue;
         }
 
-        const looksLikeCharacter = context.characterMap.has(subNode.tagName) || context.isLikelyCharacterTag(subNode.tagName);
+        const looksLikeCharacter =
+          context.characterMap.has(subNode.tagName) ||
+          context.isLikelyCharacterTag(subNode.tagName);
         if (looksLikeCharacter) {
           inner += appendCharacterHtml(subNode);
           continue;
@@ -177,14 +218,18 @@ const renderParagraphContent = (paragraph: Element, context: ParagraphRenderCont
         continue;
       }
 
-      const looksLikeCharacter = context.characterMap.has(node.tagName) || context.isLikelyCharacterTag(node.tagName);
+      const looksLikeCharacter =
+        context.characterMap.has(node.tagName) || context.isLikelyCharacterTag(node.tagName);
       if (looksLikeCharacter) {
         paragraphContent += appendCharacterHtml(node);
         continue;
       }
 
       hasSignificantTextContent = true;
-      paragraphContent += renderStandardInlineElement(node, { bookSlug: context.bookSlug, includeBookSlugInImgSrc: true });
+      paragraphContent += renderStandardInlineElement(node, {
+        bookSlug: context.bookSlug,
+        includeBookSlugInImgSrc: true,
+      });
     }
   }
 
@@ -287,7 +332,10 @@ const isDidaskaliaHTML = (html: string): boolean => {
   return em.length > 0 && (outside.length === 0 || em.length > outside.length * 2);
 };
 
-const findFirstTalkingCharacterSlug = (root: Element, characterMap: Map<string, unknown>): string | null => {
+const findFirstTalkingCharacterSlug = (
+  root: Element,
+  characterMap: Map<string, unknown>,
+): string | null => {
   const stack: Node[] = Array.from(root.childNodes);
 
   while (stack.length) {
@@ -396,7 +444,8 @@ const removeLeadingWhitespaceTextNodes = (element: Element): void => {
   while (
     element.firstChild &&
     isTextNode(element.firstChild) &&
-    ((element.firstChild.textContent || "").trim().length === 0 || /^(\s|\u00A0)+$/.test(element.firstChild.textContent || ""))
+    ((element.firstChild.textContent || "").trim().length === 0 ||
+      /^(\s|\u00A0)+$/.test(element.firstChild.textContent || ""))
   ) {
     element.removeChild(element.firstChild);
   }
@@ -419,7 +468,12 @@ const createTalkingLabelParagraph = (doc: Document, slug: string, displayName: s
 // Mixed Format Preprocessing
 // =============================================================================
 
-const preprocessMixedChapter = (chapter: Element, characterMap: Map<string, CharacterInfo>, doc: Document, serializer: XmlSerializerLike): void => {
+const preprocessMixedChapter = (
+  chapter: Element,
+  characterMap: Map<string, CharacterInfo>,
+  doc: Document,
+  serializer: XmlSerializerLike,
+): void => {
   let current: Node | null = chapter.firstChild;
 
   while (current) {
@@ -436,7 +490,9 @@ const preprocessMixedChapter = (chapter: Element, characterMap: Map<string, Char
         let shouldInsertLabel = true;
 
         if (previousElement?.tagName.toLowerCase() === "p") {
-          const previousSpeakerSlug = previousElement.getAttribute("data-mixed-linked-speaker") || previousElement.getAttribute("data-mixed-speaker");
+          const previousSpeakerSlug =
+            previousElement.getAttribute("data-mixed-linked-speaker") ||
+            previousElement.getAttribute("data-mixed-speaker");
           if (previousSpeakerSlug === slug) {
             shouldInsertLabel = false;
           }
@@ -445,7 +501,9 @@ const preprocessMixedChapter = (chapter: Element, characterMap: Map<string, Char
         const parentEl = firstTalkingElement.parentNode as Element | null;
         let hasStrongLabelParent = false;
         if (parentEl && isElementNode(parentEl) && parentEl.tagName.toLowerCase() === "span") {
-          hasStrongLabelParent = Array.from(parentEl.childNodes).some((n) => isElementNode(n) && n.tagName.toLowerCase() === "strong");
+          hasStrongLabelParent = Array.from(parentEl.childNodes).some(
+            (n) => isElementNode(n) && n.tagName.toLowerCase() === "strong",
+          );
           if (hasStrongLabelParent) {
             shouldInsertLabel = false;
           }
@@ -510,7 +568,9 @@ const preprocessMixedChapter = (chapter: Element, characterMap: Map<string, Char
     );
     const rawHtml = extractInnerHTML(paragraph, serializer);
     const isPureDidaskalia = isDidaskaliaHTML(rawHtml);
-    const containsTalkingCharacter = Boolean(findFirstTalkingCharacterSlug(paragraph, characterMap));
+    const containsTalkingCharacter = Boolean(
+      findFirstTalkingCharacterSlug(paragraph, characterMap),
+    );
 
     if (paragraph.hasAttribute("data-mixed-linked-speaker")) {
       flushEligibleRun();
@@ -530,7 +590,11 @@ const preprocessMixedChapter = (chapter: Element, characterMap: Map<string, Char
   flushEligibleRun();
 };
 
-const preprocessMixedDocument = (xmlDoc: Document, characterMap: Map<string, CharacterInfo>, serializer: XmlSerializerLike): void => {
+const preprocessMixedDocument = (
+  xmlDoc: Document,
+  characterMap: Map<string, CharacterInfo>,
+  serializer: XmlSerializerLike,
+): void => {
   const chapters = xmlDoc.getElementsByTagName("Chapter");
   for (const chapter of Array.from(chapters)) {
     preprocessMixedChapter(chapter, characterMap, xmlDoc, serializer);
@@ -541,7 +605,10 @@ const preprocessMixedDocument = (xmlDoc: Document, characterMap: Map<string, Cha
 // Character Map Extraction
 // =============================================================================
 
-const buildCharacterMapFromBundles = (bundles: CharacterBundleInfo[], xmlDoc: Document): Map<string, CharacterInfo> => {
+const buildCharacterMapFromBundles = (
+  bundles: CharacterBundleInfo[],
+  xmlDoc: Document,
+): Map<string, CharacterInfo> => {
   const characterMap = new Map<string, CharacterInfo>();
 
   const bundleBySlug = new Map<string, CharacterBundleInfo>();
@@ -566,9 +633,17 @@ const buildCharacterMapFromBundles = (bundles: CharacterBundleInfo[], xmlDoc: Do
 // Paragraph Metadata & Rendering
 // =============================================================================
 
-type ParagraphMetadata = { rawHtml: string; isPureDidaskalia: boolean; firstSpeakerSlug: string | null };
+type ParagraphMetadata = {
+  rawHtml: string;
+  isPureDidaskalia: boolean;
+  firstSpeakerSlug: string | null;
+};
 
-const getParagraphMetadata = (chapter: Element, characterMap: Map<string, CharacterInfo>, serializer: XmlSerializerLike): ParagraphMetadata[] =>
+const getParagraphMetadata = (
+  chapter: Element,
+  characterMap: Map<string, CharacterInfo>,
+  serializer: XmlSerializerLike,
+): ParagraphMetadata[] =>
   Array.from(chapter.childNodes)
     .filter(isElementNode)
     .filter((el) => el.tagName.toLowerCase() === "p")
@@ -582,11 +657,21 @@ const renderParagraph = (
   paragraph: Element,
   metadata: ParagraphMetadata[],
   metadataIndex: number,
-  state: { dataIndex: number; currentCharacterAlignment: "left" | "right"; lastSpeakerSlug: string | null; playRowState: PlayRowState | null },
+  state: {
+    dataIndex: number;
+    currentCharacterAlignment: "left" | "right";
+    lastSpeakerSlug: string | null;
+    playRowState: PlayRowState | null;
+  },
   isPlayFormat: boolean,
   bookSlug: string,
   characterMap: Map<string, CharacterInfo>,
-): { html: string; dataIndex: number; currentCharacterAlignment: "left" | "right"; lastSpeakerSlug: string | null } => {
+): {
+  html: string;
+  dataIndex: number;
+  currentCharacterAlignment: "left" | "right";
+  lastSpeakerSlug: string | null;
+} => {
   const segments: string[] = [];
   let { dataIndex, currentCharacterAlignment, lastSpeakerSlug } = state;
 
@@ -603,7 +688,11 @@ const renderParagraph = (
     lastSpeakerSlug = speakerSlug;
   }
 
-  const paragraphRender = renderParagraphContent(paragraph, { characterMap, isLikelyCharacterTag, bookSlug });
+  const paragraphRender = renderParagraphContent(paragraph, {
+    characterMap,
+    isLikelyCharacterTag,
+    bookSlug,
+  });
 
   if (paragraphRender.hasTalkingCharacter) {
     forceNewRow = true;
@@ -638,7 +727,9 @@ const renderParagraph = (
     const isDidaskaliaParagraph = isPureDidaskalia && !currentCharacterContinues;
     if (isDidaskaliaParagraph) {
       segments.push(state.playRowState.ensureDidaskaliaRow());
-      segments.push(`\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${clean}\n    </p>`);
+      segments.push(
+        `\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${clean}\n    </p>`,
+      );
 
       const nextMeta = metadata[metadataIndex + 1];
       if (!nextMeta || !nextMeta.isPureDidaskalia) {
@@ -657,7 +748,9 @@ const renderParagraph = (
 
     if (isSoloNarrationBreak) {
       segments.push(state.playRowState.ensureDidaskaliaRow());
-      segments.push(`\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${clean}\n    </p>`);
+      segments.push(
+        `\n    <p data-index="${dataIndex++}" data-is-didaskalia="true">\n      ${clean}\n    </p>`,
+      );
       segments.push(state.playRowState.closeDidaskaliaRow());
       return { html: segments.join(""), dataIndex, currentCharacterAlignment, lastSpeakerSlug };
     }
@@ -666,7 +759,13 @@ const renderParagraph = (
     const isMixedLabelParagraph = paragraph.getAttribute("data-mixed-label") === "true";
 
     if (!state.playRowState.isRowOpen() || forceNewRow) {
-      segments.push(state.playRowState.openCharacterRow(currentCharacterAlignment, hasAvatar, characterPlaceholderSpans.join("")));
+      segments.push(
+        state.playRowState.openCharacterRow(
+          currentCharacterAlignment,
+          hasAvatar,
+          characterPlaceholderSpans.join(""),
+        ),
+      );
     }
 
     const wrappedByEm = /^<em[\s>][\s\S]*<\/em>$/.test(rawHtml.trim());
@@ -694,9 +793,18 @@ const renderParagraph = (
 
 export const getChapterTitle = (chapter: Element): string => {
   let currentAct = "";
-  const actElements = chapter.getElementsByTagName("h3").length > 0 ? chapter.getElementsByTagName("h3") : chapter.getElementsByTagName("Act");
-  const titleElements = chapter.getElementsByTagName("h4").length > 0 ? chapter.getElementsByTagName("h4") : chapter.getElementsByTagName("Title");
-  const subtitleElements = chapter.getElementsByTagName("h5").length > 0 ? chapter.getElementsByTagName("h5") : chapter.getElementsByTagName("Subtitle");
+  const actElements =
+    chapter.getElementsByTagName("h3").length > 0
+      ? chapter.getElementsByTagName("h3")
+      : chapter.getElementsByTagName("Act");
+  const titleElements =
+    chapter.getElementsByTagName("h4").length > 0
+      ? chapter.getElementsByTagName("h4")
+      : chapter.getElementsByTagName("Title");
+  const subtitleElements =
+    chapter.getElementsByTagName("h5").length > 0
+      ? chapter.getElementsByTagName("h5")
+      : chapter.getElementsByTagName("Subtitle");
 
   if (actElements.length > 0) {
     currentAct = getTitleText(actElements[0]);
@@ -705,12 +813,20 @@ export const getChapterTitle = (chapter: Element): string => {
   const titleText = getTitleText(titleElements[0]);
   const subtitleText = getTitleText(subtitleElements[0]);
 
-  const chapterTitle = [currentAct, titleText && subtitleText ? titleText.replace(/\.$/, "") : titleText, subtitleText].filter(Boolean).join(", ");
+  const chapterTitle = [
+    currentAct,
+    titleText && subtitleText ? titleText.replace(/\.$/, "") : titleText,
+    subtitleText,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return chapterTitle;
 };
 
-const getChapterTitles = (chapters: HTMLCollectionOf<Element>): Array<{ id: string; title: string }> => {
+const getChapterTitles = (
+  chapters: HTMLCollectionOf<Element>,
+): Array<{ id: string; title: string }> => {
   const chapterTitles: Array<{ id: string; title: string }> = [];
 
   for (const chapter of Array.from(chapters)) {
@@ -724,7 +840,13 @@ const getChapterTitles = (chapters: HTMLCollectionOf<Element>): Array<{ id: stri
   return chapterTitles;
 };
 
-const renderChapter = (chapter: Element, characterMap: Map<string, CharacterInfo>, isPlayFormat: boolean, bookSlug: string, serializer: XmlSerializerLike): string => {
+const renderChapter = (
+  chapter: Element,
+  characterMap: Map<string, CharacterInfo>,
+  isPlayFormat: boolean,
+  bookSlug: string,
+  serializer: XmlSerializerLike,
+): string => {
   let currentCharacterAlignment: "left" | "right" = "left";
   let lastSpeakerSlug: string | null = null;
 
@@ -787,7 +909,8 @@ const renderChapter = (chapter: Element, characterMap: Map<string, CharacterInfo
 };
 
 const ensureProperPolishTextBreaking = (html: string): string => {
-  const conjunctions = "a|i|o|u|w|z|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani";
+  const conjunctions =
+    "a|i|o|u|w|z|na|do|od|za|po|we|ku|ze|co|że|bo|iż|ni|nad|pod|bez|dla|oraz|ale|lub|czy|ani";
   const conjunctionsRegex = new RegExp(`(?<=\\s|&nbsp;)(${conjunctions})\\s`, "gi");
 
   return html.replace(/>([^<]+)</g, (_match, textContent) => {
@@ -804,7 +927,10 @@ const normalizeBookForm = (bookForm: string): string => bookForm.toLowerCase();
 
 const normalizeBookLang = (bookLang: string): string => bookLang.toLowerCase();
 
-export const renderBookFromXmlDocument = (xmlDoc: Document, options: RenderOptions): RenderBookResult => {
+export const renderBookFromXmlDocument = (
+  xmlDoc: Document,
+  options: RenderOptions,
+): RenderBookResult => {
   const { bookSlug, bookLang, bookForm, characterBundles, serializer } = options;
 
   const characterMap = buildCharacterMapFromBundles(characterBundles, xmlDoc);
@@ -852,7 +978,10 @@ export const renderBookFromXmlDocument = (xmlDoc: Document, options: RenderOptio
   return { htmlResult: wrappedHtml, chapterTitles: getChapterTitles(chapters) };
 };
 
-export const renderChapterFromXmlDocument = (xmlDoc: Document, options: RenderOptions): RenderChapterResult => {
+export const renderChapterFromXmlDocument = (
+  xmlDoc: Document,
+  options: RenderOptions,
+): RenderChapterResult => {
   const { bookSlug, bookLang, bookForm, characterBundles, serializer } = options;
 
   const characterMap = buildCharacterMapFromBundles(characterBundles, xmlDoc);

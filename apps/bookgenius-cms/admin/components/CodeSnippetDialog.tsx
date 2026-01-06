@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -26,10 +32,15 @@ function CodeBlock({ code }: { code: string }) {
     <div className="relative group">
       <Highlight theme={themes.nightOwl} code={code} language="tsx">
         {({ style, tokens, getLineProps, getTokenProps }) => (
-          <pre className="p-4 rounded-lg border border-border overflow-x-auto text-sm" style={{ ...style, margin: 0 }}>
+          <pre
+            className="p-4 rounded-lg border border-border overflow-x-auto text-sm"
+            style={{ ...style, margin: 0 }}
+          >
             {tokens.map((line, i) => (
               <div key={i} {...getLineProps({ line })}>
-                <span className="inline-block w-8 text-right mr-4 select-none opacity-50 text-xs">{i + 1}</span>
+                <span className="inline-block w-8 text-right mr-4 select-none opacity-50 text-xs">
+                  {i + 1}
+                </span>
                 {line.map((token, key) => (
                   <span key={key} {...getTokenProps({ token })} />
                 ))}
@@ -38,7 +49,12 @@ function CodeBlock({ code }: { code: string }) {
           </pre>
         )}
       </Highlight>
-      <Button variant="ghost" size="icon-sm" className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleCopy}>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={handleCopy}
+      >
         {copied ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
       </Button>
     </div>
@@ -143,7 +159,8 @@ const url = getVersionUrl({
         <DialogHeader>
           <DialogTitle>Frontend Code Snippets</DialogTitle>
           <DialogDescription>
-            Copy these snippets to use assets from <code className="text-primary">{folderPath || "(root)"}</code> in your frontend
+            Copy these snippets to use assets from{" "}
+            <code className="text-primary">{folderPath || "(root)"}</code> in your frontend
           </DialogDescription>
         </DialogHeader>
 
@@ -157,22 +174,30 @@ const url = getVersionUrl({
 
           <div className="flex-1 overflow-auto py-4">
             <TabsContent value="basic" className="mt-0">
-              <p className="text-sm text-muted-foreground mb-3">List all published files in this folder:</p>
+              <p className="text-sm text-muted-foreground mb-3">
+                List all published files in this folder:
+              </p>
               <CodeBlock code={querySnippet} />
             </TabsContent>
 
             <TabsContent value="images" className="mt-0">
-              <p className="text-sm text-muted-foreground mb-3">Display images from this folder in a grid:</p>
+              <p className="text-sm text-muted-foreground mb-3">
+                Display images from this folder in a grid:
+              </p>
               <CodeBlock code={imageGallerySnippet} />
             </TabsContent>
 
             <TabsContent value="audio" className="mt-0">
-              <p className="text-sm text-muted-foreground mb-3">Play audio files from this folder:</p>
+              <p className="text-sm text-muted-foreground mb-3">
+                Play audio files from this folder:
+              </p>
               <CodeBlock code={audioPlayerSnippet} />
             </TabsContent>
 
             <TabsContent value="version" className="mt-0">
-              <p className="text-sm text-muted-foreground mb-3">Get a URL for a specific version (from version history):</p>
+              <p className="text-sm text-muted-foreground mb-3">
+                Get a URL for a specific version (from version history):
+              </p>
               <CodeBlock code={versionUrlSnippet} />
             </TabsContent>
           </div>

@@ -72,9 +72,20 @@ export const ajSearchGuest = arcjet({
   key: ARCJET_KEY,
   rules: [
     // Global non-logged: 40k / hour (token bucket for burst)
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 40_000, interval: 3600, capacity: 40_000 }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 40_000,
+      interval: 3600,
+      capacity: 40_000,
+    }),
     // Per-non-logged (clearance): 100 / 4h (sliding for smooth)
-    slidingWindow({ mode: "LIVE", characteristics: ["ip.src"], interval: 4 * 3600, max: 100 * conferenceMultiplier }),
+    slidingWindow({
+      mode: "LIVE",
+      characteristics: ["ip.src"],
+      interval: 4 * 3600,
+      max: 100 * conferenceMultiplier,
+    }),
     // Fallback no cookie: strict IP-only low limit
     // fixedWindow({ mode: "LIVE", characteristics: ["ip.src"], window: "1h", max: 2 }),
   ],
@@ -85,9 +96,20 @@ export const ajSearchUser = arcjet({
   key: ARCJET_KEY,
   rules: [
     // Global logged: 40k / hour (token bucket)
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 40_000, interval: 3600, capacity: 40_000 }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 40_000,
+      interval: 3600,
+      capacity: 40_000,
+    }),
     // Per-user: 100 / 10 min (sliding)
-    slidingWindow({ mode: "LIVE", characteristics: ["userId"], interval: 10 * 60, max: 100 * conferenceMultiplier }),
+    slidingWindow({
+      mode: "LIVE",
+      characteristics: ["userId"],
+      interval: 10 * 60,
+      max: 100 * conferenceMultiplier,
+    }),
     // Per-user day cap: 1,000 / day (fixed)
     fixedWindow({ mode: "LIVE", characteristics: ["userId"], window: "1d", max: 1000 }),
   ],
@@ -99,10 +121,27 @@ export const ajAskGuest = arcjet({
   key: ARCJET_KEY,
   rules: [
     // Global non-logged: 50k / day (token bucket) + 2k / hour (token bucket)
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 50_000, interval: 86_400, capacity: 50_000 }),
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 2_000, interval: 3600, capacity: 2_000 }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 50_000,
+      interval: 86_400,
+      capacity: 50_000,
+    }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 2_000,
+      interval: 3600,
+      capacity: 2_000,
+    }),
     // Per-non-logged (clearance): 5 / hour (sliding) + 10 / day (fixed)
-    slidingWindow({ mode: "LIVE", characteristics: ["ip.src"], interval: 3600, max: 5 * conferenceMultiplier }),
+    slidingWindow({
+      mode: "LIVE",
+      characteristics: ["ip.src"],
+      interval: 3600,
+      max: 5 * conferenceMultiplier,
+    }),
     fixedWindow({ mode: "LIVE", characteristics: ["ip.src"], window: "1d", max: 10 }),
     // Fallback no cookie: strict IP-only
     // fixedWindow({ mode: "LIVE", characteristics: ["ip.src"], window: "1h", max: 1 }),
@@ -114,9 +153,20 @@ export const ajAskUser = arcjet({
   key: ARCJET_KEY,
   rules: [
     // Global logged: 2k / hour (token bucket)
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 2_000, interval: 3600, capacity: 2_000 }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 2_000,
+      interval: 3600,
+      capacity: 2_000,
+    }),
     // Per-user: 15 / 30 min (sliding) + 100 / day (fixed)
-    slidingWindow({ mode: "LIVE", characteristics: ["userId"], interval: 30 * 60, max: 15 * conferenceMultiplier }),
+    slidingWindow({
+      mode: "LIVE",
+      characteristics: ["userId"],
+      interval: 30 * 60,
+      max: 15 * conferenceMultiplier,
+    }),
     fixedWindow({ mode: "LIVE", characteristics: ["userId"], window: "1d", max: 100 }),
   ],
 });
@@ -127,8 +177,20 @@ export const ajDeepGuest = arcjet({
   key: ARCJET_KEY,
   rules: [
     // Global non-logged: 20k / day (token bucket) + 1k / hour (token bucket)
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 20_000, interval: 86_400, capacity: 20_000 }),
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 1_000, interval: 3600, capacity: 1_000 }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 20_000,
+      interval: 86_400,
+      capacity: 20_000,
+    }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 1_000,
+      interval: 3600,
+      capacity: 1_000,
+    }),
     // Per-non-logged (clearance): 2 / 60 min (token bucket for burst) + 4 / day (fixed)
     tokenBucket({
       mode: "LIVE",
@@ -137,7 +199,12 @@ export const ajDeepGuest = arcjet({
       interval: 60 * 60,
       capacity: 2 * conferenceMultiplier,
     }),
-    fixedWindow({ mode: "LIVE", characteristics: ["ip.src"], window: "1d", max: 4 * conferenceMultiplier }),
+    fixedWindow({
+      mode: "LIVE",
+      characteristics: ["ip.src"],
+      window: "1d",
+      max: 4 * conferenceMultiplier,
+    }),
     // Fallback no cookie: strict IP-only
     // fixedWindow({ mode: "LIVE", characteristics: ["ip.src"], window: "1h", max: 1 }),
   ],
@@ -148,7 +215,13 @@ export const ajDeepUser = arcjet({
   key: ARCJET_KEY,
   rules: [
     // Global logged: 1k / hour (token bucket)
-    tokenBucket({ mode: "LIVE", characteristics: [], refillRate: 1_000, interval: 3600, capacity: 1_000 }),
+    tokenBucket({
+      mode: "LIVE",
+      characteristics: [],
+      refillRate: 1_000,
+      interval: 3600,
+      capacity: 1_000,
+    }),
     // Per-user: 2 / minute (token bucket for burst) + 50 / day (fixed)
     tokenBucket({
       mode: "LIVE",
@@ -157,11 +230,18 @@ export const ajDeepUser = arcjet({
       interval: 60,
       capacity: 2 * conferenceMultiplier,
     }),
-    fixedWindow({ mode: "LIVE", characteristics: ["userId"], window: "1d", max: 50 * conferenceMultiplier }),
+    fixedWindow({
+      mode: "LIVE",
+      characteristics: ["userId"],
+      window: "1d",
+      max: 50 * conferenceMultiplier,
+    }),
   ],
 });
 
-export type EnforceResult = { allowed: true; headers: Record<string, string> } | { allowed: false; response: Response };
+export type EnforceResult =
+  | { allowed: true; headers: Record<string, string> }
+  | { allowed: false; response: Response };
 
 export async function enforce(
   kind: "search" | "ask" | "deep",
@@ -171,7 +251,11 @@ export async function enforce(
 ): Promise<EnforceResult> {
   const tier = tierOf(ctx);
   const limiter =
-    kind === "search" ? RateLimit.search[tier] : kind === "ask" ? RateLimit.ask[tier] : RateLimit.deep[tier];
+    kind === "search"
+      ? RateLimit.search[tier]
+      : kind === "ask"
+        ? RateLimit.ask[tier]
+        : RateLimit.deep[tier];
 
   const decision = await limiter.protect(req, protectProps(ctx, requested));
 

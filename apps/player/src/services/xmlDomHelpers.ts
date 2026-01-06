@@ -9,7 +9,8 @@
 // Constants
 // =============================================================================
 
-export const LINE_BREAK_SPAN = '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>';
+export const LINE_BREAK_SPAN =
+  '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>';
 
 // =============================================================================
 // Type Guards

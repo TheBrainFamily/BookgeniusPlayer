@@ -12,12 +12,20 @@ const Ctx = createContext<AuthCtx>({ ready: false, isSignedIn: false, openSignIn
 const WidgetCtx = createContext<React.ComponentType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<ClerkProviderProps> | null>(null);
-  const [SignInComponent, setSignInComponent] = useState<React.ComponentType | undefined>(undefined);
-  const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | undefined>(undefined);
-  const [hooks, setHooks] = useState<{ useUser: () => UseUserReturn; useClerk: () => LoadedClerk; UserButton?: React.ComponentType; useClerkAuth: () => UseAuthReturn } | null>(
-    null,
+  const [ClerkProvider, setClerkProvider] =
+    useState<React.ComponentType<ClerkProviderProps> | null>(null);
+  const [SignInComponent, setSignInComponent] = useState<React.ComponentType | undefined>(
+    undefined,
   );
+  const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | undefined>(
+    undefined,
+  );
+  const [hooks, setHooks] = useState<{
+    useUser: () => UseUserReturn;
+    useClerk: () => LoadedClerk;
+    UserButton?: React.ComponentType;
+    useClerkAuth: () => UseAuthReturn;
+  } | null>(null);
   const [loadingState, setLoadingState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
@@ -33,7 +41,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         setSignInComponent(() => router.SignIn);
         setSignUpComponent(() => router.SignUp);
 
-        setHooks({ useUser: react.useUser, useClerk: react.useClerk, UserButton: react.UserButton, useClerkAuth: react.useAuth });
+        setHooks({
+          useUser: react.useUser,
+          useClerk: react.useClerk,
+          UserButton: react.UserButton,
+          useClerkAuth: react.useAuth,
+        });
         setLoadingState("ready");
       })
       .catch((e) => {
@@ -212,6 +225,11 @@ const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     </Button>
   );
 };
-const mod: AuthModule = { AuthProvider: AuthProviderSafe, useAuth, useUserWidget, useSignInWidget: () => SignInWidget };
+const mod: AuthModule = {
+  AuthProvider: AuthProviderSafe,
+  useAuth,
+  useUserWidget,
+  useSignInWidget: () => SignInWidget,
+};
 
 export default mod;

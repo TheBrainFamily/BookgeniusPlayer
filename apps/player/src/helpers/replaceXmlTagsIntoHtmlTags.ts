@@ -1,7 +1,11 @@
 import { getCharactersData } from "@player/state/bookDataStore";
 import { getAvatarSource } from "./svgAvatars";
 
-export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, isFirstSentence: boolean = true) => {
+export const replaceXmlTagsIntoHtmlTags = (
+  text: string,
+  isPlayFormat: boolean,
+  isFirstSentence: boolean = true,
+) => {
   const characters = getCharactersData(); // Get characters data once
   const characterSlugs = characters.map((char) => char.slug); // Get all valid slugs
 
@@ -26,14 +30,21 @@ export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, 
 
   if (characterTagPattern) {
     outputText = outputText.replace(regex, (match, tagName, content) => {
-      const foundCharacter = characters.find((char) => char.slug.toLowerCase() === tagName.toLowerCase());
+      const foundCharacter = characters.find(
+        (char) => char.slug.toLowerCase() === tagName.toLowerCase(),
+      );
 
       if (!foundCharacter) {
-        console.warn(`Internal error: Character data not found for tag: ${tagName}. This should not happen with the dynamic regex.`);
+        console.warn(
+          `Internal error: Character data not found for tag: ${tagName}. This should not happen with the dynamic regex.`,
+        );
         return match;
       }
 
-      const newAttributes = { class: "character-highlighted", "data-character": foundCharacter.slug };
+      const newAttributes = {
+        class: "character-highlighted",
+        "data-character": foundCharacter.slug,
+      };
 
       const attributeString = Object.entries(newAttributes)
         .map(([key, value]) => `${key}="${value}"`)
@@ -45,12 +56,19 @@ export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, 
 
   // Handle self-closing tags like <alice talking="true" />
   if (!isPlayFormat) {
-    const selfClosingRegex = new RegExp(`<(${characterTagPattern})\\s+(talking|listening)="true"\\s*\\/>`, "gi");
+    const selfClosingRegex = new RegExp(
+      `<(${characterTagPattern})\\s+(talking|listening)="true"\\s*\\/>`,
+      "gi",
+    );
     outputText = outputText.replace(selfClosingRegex, (match, tagName, attribute) => {
-      const foundCharacter = characters.find((char) => char.slug.toLowerCase() === tagName.toLowerCase());
+      const foundCharacter = characters.find(
+        (char) => char.slug.toLowerCase() === tagName.toLowerCase(),
+      );
 
       if (!foundCharacter) {
-        console.warn(`Internal error: Character data not found for tag: ${tagName}. This should not happen with the dynamic regex.`);
+        console.warn(
+          `Internal error: Character data not found for tag: ${tagName}. This should not happen with the dynamic regex.`,
+        );
         return match;
       }
 
@@ -75,7 +93,10 @@ export const replaceXmlTagsIntoHtmlTags = (text: string, isPlayFormat: boolean, 
     });
   }
   // Handle LineBreak tags
-  outputText = outputText.replace(/<LineBreak\s*\/>/g, '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>');
+  outputText = outputText.replace(
+    /<LineBreak\s*\/>/g,
+    '<span style="display:block; height:0; margin:0; padding:0; line-height:1.2em;"></span>',
+  );
 
   return outputText;
 };

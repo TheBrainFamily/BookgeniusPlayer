@@ -12,7 +12,11 @@ export const getPictureFileNameForName = (name: string) => {
   return `${getFileNameForName(name)}.png`;
 };
 
-export const getListeningMediaFilePathForName = (name: string, _bookSlug: string, forceKnown = false) => {
+export const getListeningMediaFilePathForName = (
+  name: string,
+  _bookSlug: string,
+  forceKnown = false,
+) => {
   const listensPath = `${getFileNameForName(name)}-listens.mp4`;
   const knownVideos = getKnownVideoFiles();
 
@@ -22,7 +26,11 @@ export const getListeningMediaFilePathForName = (name: string, _bookSlug: string
   return getBookAssetUrl(getPictureFileNameForName(name));
 };
 
-export const getTalkingMediaFilePathForName = (name: string, bookSlug: string, forceKnown = false) => {
+export const getTalkingMediaFilePathForName = (
+  name: string,
+  bookSlug: string,
+  forceKnown = false,
+) => {
   const speaksPath = `${getFileNameForName(name)}-speaks.mp4`;
   const knownVideos = getKnownVideoFiles();
 

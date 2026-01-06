@@ -15,13 +15,21 @@ export function askStream(query: string, location: Location, handlers: Handlers)
   const slug = getBookSlug();
   if (!slug) throw new Error("[askStream] Book slug not available");
 
-  const filter: Filter = { chapterFrom: 1, chapterTo: location.endChapter, paragraphTo: location.endParagraph, bookSlug: slug };
+  const filter: Filter = {
+    chapterFrom: 1,
+    chapterTo: location.endChapter,
+    paragraphTo: location.endParagraph,
+    bookSlug: slug,
+  };
 
   const surroundingText = getSurroundingText(location);
 
   const compiledSearchQuery = `<userQuery>${query}</userQuery>\n\nThe user is looking at the following text:\n<VisibleText>${surroundingText}</VisibleText>`;
 
-  const params = new URLSearchParams({ question: compiledSearchQuery, filter: JSON.stringify(filter) });
+  const params = new URLSearchParams({
+    question: compiledSearchQuery,
+    filter: JSON.stringify(filter),
+  });
   const url = `${ANSWERS_SERVER_URL}/ask/stream?${params.toString()}`;
 
   const es = new EventSource(url);

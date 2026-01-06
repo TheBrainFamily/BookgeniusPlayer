@@ -13,13 +13,20 @@ interface BookStatus {
   backgroundSongs: { status: "success" | "error"; output: string };
 }
 
-function runScript(scriptName: string, bookPath: string): { status: "success" | "error"; output: string } {
+function runScript(
+  scriptName: string,
+  bookPath: string,
+): { status: "success" | "error"; output: string } {
   try {
-    const output = execSync(`npx tsx scripts/${scriptName}.ts ${bookPath}`, { encoding: "utf8", cwd: process.cwd() });
+    const output = execSync(`npx tsx scripts/${scriptName}.ts ${bookPath}`, {
+      encoding: "utf8",
+      cwd: process.cwd(),
+    });
     return { status: "success", output };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const errorOutput = (error as { stdout?: string })?.stdout || errorMessage || "Unknown error occurred";
+    const errorOutput =
+      (error as { stdout?: string })?.stdout || errorMessage || "Unknown error occurred";
     return { status: "error", output: errorOutput };
   }
 }
@@ -40,7 +47,12 @@ function checkBookStatus(bookPath: string): BookStatus {
   console.log("\n🎵 Checking background songs...");
   const backgroundSongs = runScript("check-background-songs", bookPath);
 
-  return { bookName: bookPath.split("/").pop() || bookPath, characterAssets, backgroundAssets, backgroundSongs };
+  return {
+    bookName: bookPath.split("/").pop() || bookPath,
+    characterAssets,
+    backgroundAssets,
+    backgroundSongs,
+  };
 }
 
 function printBookStatus(status: BookStatus): void {
@@ -86,7 +98,11 @@ function printBookStatus(status: BookStatus): void {
     const output = status.backgroundSongs.output;
     if (output.includes("✅ All background songs are present with complete metadata")) {
       console.log("   🎉 All background songs are complete!");
-    } else if (output.includes("❌ Missing MP3 Files") || output.includes("⚠️  No Title") || output.includes("⚠️  No Cover Art")) {
+    } else if (
+      output.includes("❌ Missing MP3 Files") ||
+      output.includes("⚠️  No Title") ||
+      output.includes("⚠️  No Cover Art")
+    ) {
       console.log("   ⚠️  Some background songs have issues");
     }
   } else {
@@ -96,7 +112,10 @@ function printBookStatus(status: BookStatus): void {
 
   // Overall assessment
   console.log(`\n💡 OVERALL ASSESSMENT:`);
-  const allSuccessful = status.characterAssets.status === "success" && status.backgroundAssets.status === "success" && status.backgroundSongs.status === "success";
+  const allSuccessful =
+    status.characterAssets.status === "success" &&
+    status.backgroundAssets.status === "success" &&
+    status.backgroundSongs.status === "success";
 
   if (allSuccessful) {
     console.log("   🎉 All asset checks completed successfully!");

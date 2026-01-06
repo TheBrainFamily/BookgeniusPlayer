@@ -135,7 +135,9 @@ function parseMetadataFromOpf(opfContent: string, repoName: string): BookMetadat
   };
 
   const getMeta = (property: string): string => {
-    const match = opfContent.match(new RegExp(`<meta[^>]*property="${property}"[^>]*>([^<]*)</meta>`));
+    const match = opfContent.match(
+      new RegExp(`<meta[^>]*property="${property}"[^>]*>([^<]*)</meta>`),
+    );
     return match ? match[1].trim() : "";
   };
 
@@ -225,7 +227,8 @@ async function downloadBook(repoName: string, skipExisting: boolean): Promise<Bo
   const textFiles = await listDirectory(repoName, "src/epub/text");
   const chapterFiles = textFiles.filter(
     (f) =>
-      f.endsWith(".xhtml") && !["colophon.xhtml", "imprint.xhtml", "titlepage.xhtml", "uncopyright.xhtml"].includes(f),
+      f.endsWith(".xhtml") &&
+      !["colophon.xhtml", "imprint.xhtml", "titlepage.xhtml", "uncopyright.xhtml"].includes(f),
   );
 
   let downloadedChapters = 0;
@@ -243,7 +246,9 @@ async function downloadBook(repoName: string, skipExisting: boolean): Promise<Bo
   }
 
   const imageFiles = await listDirectory(repoName, "src/epub/images");
-  const internalImages = imageFiles.filter((f) => !["cover.svg", "logo.svg", "titlepage.svg"].includes(f));
+  const internalImages = imageFiles.filter(
+    (f) => !["cover.svg", "logo.svg", "titlepage.svg"].includes(f),
+  );
 
   for (const file of internalImages) {
     const content = await fetchBinaryFile(repoName, `src/epub/images/${file}`);
@@ -284,7 +289,9 @@ async function main() {
 
   for (let i = 0; i < booksToProcess.length; i++) {
     const repo = booksToProcess[i];
-    process.stdout.write(`\r[${i + 1}/${booksToProcess.length}] ${repo.name.substring(0, 50).padEnd(50)}`);
+    process.stdout.write(
+      `\r[${i + 1}/${booksToProcess.length}] ${repo.name.substring(0, 50).padEnd(50)}`,
+    );
 
     try {
       const metadata = await downloadBook(repo.name, skipExisting);

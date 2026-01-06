@@ -9,7 +9,11 @@ function findParagraphElement(chapterNumber: number, paragraphIndex: number): HT
   return section.querySelector<HTMLElement>(`[data-index="${paragraphIndex}"]`);
 }
 
-function findTextNodeWithOccurrence(container: Node, searchText: string, occurrenceIndex: number): { textNode: Text; startOffset: number } | null {
+function findTextNodeWithOccurrence(
+  container: Node,
+  searchText: string,
+  occurrenceIndex: number,
+): { textNode: Text; startOffset: number } | null {
   let currentOccurrence = 0;
 
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
@@ -93,9 +97,9 @@ export function optimisticModifyCharacterTag(
   const paragraph = findParagraphElement(chapterNumber, paragraphIndex);
   if (!paragraph) return null;
 
-  const characterSpan = Array.from(paragraph.querySelectorAll<HTMLElement>(`[data-character="${currentCharacterSlug}"]`)).find(
-    (el) => el.textContent?.trim() === textContent.trim(),
-  );
+  const characterSpan = Array.from(
+    paragraph.querySelectorAll<HTMLElement>(`[data-character="${currentCharacterSlug}"]`),
+  ).find((el) => el.textContent?.trim() === textContent.trim());
 
   if (!characterSpan) {
     console.warn("[optimisticDom] Character span not found");
@@ -129,10 +133,20 @@ export function optimisticModifyCharacterTag(
 
 function generateFallbackAvatarUrl(characterSlug: string): string {
   const displayName = characterSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return getAvatarSource({ slug: characterSlug, characterName: displayName, bookSlug: "", infoPerChapter: [] });
+  return getAvatarSource({
+    slug: characterSlug,
+    characterName: displayName,
+    bookSlug: "",
+    infoPerChapter: [],
+  });
 }
 
-export function optimisticSetTalkingCharacter(chapterNumber: number, paragraphIndex: number, characterSlug: string | undefined, avatarUrl?: string): RevertFunction | null {
+export function optimisticSetTalkingCharacter(
+  chapterNumber: number,
+  paragraphIndex: number,
+  characterSlug: string | undefined,
+  avatarUrl?: string,
+): RevertFunction | null {
   const paragraph = findParagraphElement(chapterNumber, paragraphIndex);
   if (!paragraph) return null;
 

@@ -7,28 +7,47 @@ let scrollDebounce: NodeJS.Timeout;
 let currentEditHoverElement: HTMLElement | null = null;
 let currentHoveredParagraph: HTMLElement | null = null;
 
-export type OpenTalkingCharacterModalFn = (chapterNumber: number, paragraphIndex: number, currentSpeaker: string | null) => void;
+export type OpenTalkingCharacterModalFn = (
+  chapterNumber: number,
+  paragraphIndex: number,
+  currentSpeaker: string | null,
+) => void;
 let openTalkingCharacterModalFn: OpenTalkingCharacterModalFn | null = null;
 
 export function setOpenTalkingCharacterModal(fn: OpenTalkingCharacterModalFn): void {
   openTalkingCharacterModalFn = fn;
 }
 
-export type OpenEditCharacterTagModalFn = (chapterNumber: number, paragraphIndex: number, characterSlug: string, textContent: string) => void;
+export type OpenEditCharacterTagModalFn = (
+  chapterNumber: number,
+  paragraphIndex: number,
+  characterSlug: string,
+  textContent: string,
+) => void;
 let openEditCharacterTagModalFn: OpenEditCharacterTagModalFn | null = null;
 
 export function setOpenEditCharacterTagModal(fn: OpenEditCharacterTagModalFn): void {
   openEditCharacterTagModalFn = fn;
 }
 
-export type OpenWrapWithCharacterModalFn = (chapterNumber: number, paragraphIndex: number, selectedText: string, occurrenceIndex: number) => void;
+export type OpenWrapWithCharacterModalFn = (
+  chapterNumber: number,
+  paragraphIndex: number,
+  selectedText: string,
+  occurrenceIndex: number,
+) => void;
 let openWrapWithCharacterModalFn: OpenWrapWithCharacterModalFn | null = null;
 
 export function setOpenWrapWithCharacterModal(fn: OpenWrapWithCharacterModalFn): void {
   openWrapWithCharacterModalFn = fn;
 }
 
-function getSelectionInfo(): { chapterNumber: number; paragraphIndex: number; selectedText: string; occurrenceIndex: number } | null {
+function getSelectionInfo(): {
+  chapterNumber: number;
+  paragraphIndex: number;
+  selectedText: string;
+  occurrenceIndex: number;
+} | null {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed || !selection.toString().trim()) {
     return null;
@@ -38,7 +57,8 @@ function getSelectionInfo(): { chapterNumber: number; paragraphIndex: number; se
   const range = selection.getRangeAt(0);
   const container = range.commonAncestorContainer;
 
-  const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : (container as HTMLElement);
+  const element =
+    container.nodeType === Node.TEXT_NODE ? container.parentElement : (container as HTMLElement);
   if (!element) return null;
 
   const paragraph = element.closest<HTMLElement>("section[data-chapter] [data-index]");
@@ -137,7 +157,9 @@ export function setupParagraphHighlighting() {
     }
 
     const relatedTarget = event.relatedTarget as HTMLElement | null;
-    const stillInParagraph = relatedTarget?.closest<HTMLElement>("section[data-chapter] [data-index]");
+    const stillInParagraph = relatedTarget?.closest<HTMLElement>(
+      "section[data-chapter] [data-index]",
+    );
     if (!stillInParagraph) {
       currentHoveredParagraph = null;
     }
@@ -151,7 +173,8 @@ export function setupParagraphHighlighting() {
 
     if (getGlobalEditModeActive()) {
       const selection = window.getSelection();
-      const hasTextSelection = selection && !selection.isCollapsed && selection.toString().trim().length > 0;
+      const hasTextSelection =
+        selection && !selection.isCollapsed && selection.toString().trim().length > 0;
       if (hasTextSelection) {
         return;
       }
@@ -159,9 +182,13 @@ export function setupParagraphHighlighting() {
       // Skip inline avatars - they should trigger set-talking-character, not edit-character-tag
       const isInlineAvatarClick = target.closest(".inline-avatar");
       if (!isInlineAvatarClick) {
-        const characterSpan = target.closest<HTMLElement>("[data-character]:not([data-is-talking])");
+        const characterSpan = target.closest<HTMLElement>(
+          "[data-character]:not([data-is-talking])",
+        );
         if (characterSpan && openEditCharacterTagModalFn) {
-          const paragraph = characterSpan.closest<HTMLElement>("section[data-chapter] [data-index]");
+          const paragraph = characterSpan.closest<HTMLElement>(
+            "section[data-chapter] [data-index]",
+          );
           const section = paragraph?.closest<HTMLElement>("section[data-chapter]");
           if (paragraph && section) {
             const chapterNumber = parseInt(section.dataset.chapter || "0");
@@ -197,7 +224,9 @@ export function setupParagraphHighlighting() {
       }
     }
 
-    const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement | null);
+    const linkNote = target.classList.contains("link-note")
+      ? target
+      : (target.closest(".link-note") as HTMLElement | null);
 
     if (linkNote) {
       console.log("1148 linkNote", linkNote);
@@ -256,8 +285,14 @@ export function setupParagraphHighlighting() {
             // and wrap the note itself to prevent internal breaks.
             const originalHTML = noteElement.innerHTML;
             const modifiedHTML = originalHTML
-              .replace(/\s*(\[przypis edytorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>')
-              .replace(/\s*(\[przypis autorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>');
+              .replace(
+                /\s*(\[przypis edytorski\])/g,
+                ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>',
+              )
+              .replace(
+                /\s*(\[przypis autorski\])/g,
+                ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>',
+              );
             modalContent.innerHTML = modifiedHTML; // Use innerHTML to preserve formatting
             modal.classList.add("visible"); // Use class
             modalOverlay.classList.add("visible"); // Use class
@@ -297,7 +332,12 @@ export function setupParagraphHighlighting() {
       if (openWrapWithCharacterModalFn) {
         const selectionInfo = getSelectionInfo();
         if (selectionInfo) {
-          openWrapWithCharacterModalFn(selectionInfo.chapterNumber, selectionInfo.paragraphIndex, selectionInfo.selectedText, selectionInfo.occurrenceIndex);
+          openWrapWithCharacterModalFn(
+            selectionInfo.chapterNumber,
+            selectionInfo.paragraphIndex,
+            selectionInfo.selectedText,
+            selectionInfo.occurrenceIndex,
+          );
           window.getSelection()?.removeAllRanges();
         }
       }

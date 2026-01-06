@@ -4,8 +4,17 @@ import { History, RotateCcw, TrendingUp } from "lucide-react";
 
 import ModalUI from "@player/components/modals/ModalUI";
 import { Button } from "../ui/button";
-import { getPositionHistory, getCurrentPlatformAndBook, promotePosition, type ReadingPosition } from "@player/services/readingPositionApi";
-import { processPositionHistory, formatTimestamp, type ProcessedSession } from "@player/helpers/processPositionHistory";
+import {
+  getPositionHistory,
+  getCurrentPlatformAndBook,
+  promotePosition,
+  type ReadingPosition,
+} from "@player/services/readingPositionApi";
+import {
+  processPositionHistory,
+  formatTimestamp,
+  type ProcessedSession,
+} from "@player/helpers/processPositionHistory";
 import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { initializeReadingPosition } from "@player/services/initializeReadingPosition";
 
@@ -48,7 +57,10 @@ const PositionHistoryModal: React.FC<PositionHistoryModalProps> = ({ onClose }) 
       await initializeReadingPosition();
 
       // Navigate to the position
-      systemNavigateTo({ currentChapter: position.chapter, currentParagraph: position.paragraph }, { history: "push" });
+      systemNavigateTo(
+        { currentChapter: position.chapter, currentParagraph: position.paragraph },
+        { history: "push" },
+      );
 
       onClose();
     } catch (err) {
@@ -66,7 +78,9 @@ const PositionHistoryModal: React.FC<PositionHistoryModalProps> = ({ onClose }) 
   if (loading) {
     return (
       <ModalUI title={t("position_history") || "Reading History"} onClose={onClose}>
-        <div className="container max-h-[60vh] overflow-y-auto scrollbar-search text-white text-center py-8">Loading...</div>
+        <div className="container max-h-[60vh] overflow-y-auto scrollbar-search text-white text-center py-8">
+          Loading...
+        </div>
       </ModalUI>
     );
   }
@@ -74,7 +88,9 @@ const PositionHistoryModal: React.FC<PositionHistoryModalProps> = ({ onClose }) 
   if (error) {
     return (
       <ModalUI title={t("position_history") || "Reading History"} onClose={onClose}>
-        <div className="container max-h-[60vh] overflow-y-auto scrollbar-search text-white text-center py-8">{error}</div>
+        <div className="container max-h-[60vh] overflow-y-auto scrollbar-search text-white text-center py-8">
+          {error}
+        </div>
       </ModalUI>
     );
   }
@@ -82,7 +98,9 @@ const PositionHistoryModal: React.FC<PositionHistoryModalProps> = ({ onClose }) 
   if (sessions.length === 0) {
     return (
       <ModalUI title={t("position_history") || "Reading History"} onClose={onClose}>
-        <div className="container max-h-[60vh] overflow-y-auto scrollbar-search text-white text-center py-8">No reading history available</div>
+        <div className="container max-h-[60vh] overflow-y-auto scrollbar-search text-white text-center py-8">
+          No reading history available
+        </div>
       </ModalUI>
     );
   }
@@ -98,16 +116,33 @@ const PositionHistoryModal: React.FC<PositionHistoryModalProps> = ({ onClose }) 
             </div>
 
             {/* Session Start */}
-            <PositionEntry position={session.sessionStart} label="Started" onReset={handleResetToPosition} formatProgress={formatProgress} />
+            <PositionEntry
+              position={session.sessionStart}
+              label="Started"
+              onReset={handleResetToPosition}
+              formatProgress={formatProgress}
+            />
 
             {/* Significant Jumps */}
             {session.significantJumps.map((jump, jumpIdx) => (
-              <PositionEntry key={jumpIdx} position={jump} label="Jump" onReset={handleResetToPosition} formatProgress={formatProgress} isJump />
+              <PositionEntry
+                key={jumpIdx}
+                position={jump}
+                label="Jump"
+                onReset={handleResetToPosition}
+                formatProgress={formatProgress}
+                isJump
+              />
             ))}
 
             {/* Session End (if different from start) */}
             {session.sessionEnd.id !== session.sessionStart.id && (
-              <PositionEntry position={session.sessionEnd} label="Ended" onReset={handleResetToPosition} formatProgress={formatProgress} />
+              <PositionEntry
+                position={session.sessionEnd}
+                label="Ended"
+                onReset={handleResetToPosition}
+                formatProgress={formatProgress}
+              />
             )}
           </div>
         ))}
@@ -124,7 +159,13 @@ interface PositionEntryProps {
   isJump?: boolean;
 }
 
-const PositionEntry: React.FC<PositionEntryProps> = ({ position, label, onReset, formatProgress, isJump = false }) => {
+const PositionEntry: React.FC<PositionEntryProps> = ({
+  position,
+  label,
+  onReset,
+  formatProgress,
+  isJump = false,
+}) => {
   return (
     <div className={`mb-2 pl-4 ${isJump ? "border-l-2 border-yellow-500/50" : ""}`}>
       <Button

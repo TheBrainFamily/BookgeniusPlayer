@@ -11,7 +11,14 @@ import { useState, useCallback } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useBook, useMusicCues } from "@/lib/contexts";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +44,12 @@ interface AddMusicCueDialogProps {
 // Component
 // =============================================================================
 
-export function AddMusicCueDialog({ open, onOpenChange, chapter, onCreated }: AddMusicCueDialogProps) {
+export function AddMusicCueDialog({
+  open,
+  onOpenChange,
+  chapter,
+  onCreated,
+}: AddMusicCueDialogProps) {
   const { bookPath } = useBook();
   const { files } = useMusicCues();
 
@@ -102,7 +114,10 @@ export function AddMusicCueDialog({ open, onOpenChange, chapter, onCreated }: Ad
             <Music className="h-5 w-5" />
             Add Music Cue
           </DialogTitle>
-          <DialogDescription>Add a music track to Chapter {chapter}. Select a file and set the paragraph where it should start.</DialogDescription>
+          <DialogDescription>
+            Add a music track to Chapter {chapter}. Select a file and set the paragraph where it
+            should start.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -129,7 +144,11 @@ export function AddMusicCueDialog({ open, onOpenChange, chapter, onCreated }: Ad
                         {/* Cover art or icon */}
                         <div className="h-10 w-10 rounded border overflow-hidden shrink-0">
                           {file.coverUrl ? (
-                            <img src={file.coverUrl} alt={file.basename} className="h-full w-full object-cover" />
+                            <img
+                              src={file.coverUrl}
+                              alt={file.basename}
+                              className="h-full w-full object-cover"
+                            />
                           ) : (
                             <div className="h-full w-full bg-muted flex items-center justify-center">
                               <Music className="h-5 w-5 text-muted-foreground" />
@@ -139,7 +158,11 @@ export function AddMusicCueDialog({ open, onOpenChange, chapter, onCreated }: Ad
                         {/* Name and artist */}
                         <div className="flex-1 min-w-0">
                           <div className="text-sm truncate">{file.title || file.basename}</div>
-                          {file.artist && <div className="text-xs text-muted-foreground truncate">{file.artist}</div>}
+                          {file.artist && (
+                            <div className="text-xs text-muted-foreground truncate">
+                              {file.artist}
+                            </div>
+                          )}
                         </div>
                         {/* Selected indicator */}
                         {isSelected && <Check className="h-4 w-4 text-primary shrink-0" />}
@@ -149,7 +172,9 @@ export function AddMusicCueDialog({ open, onOpenChange, chapter, onCreated }: Ad
                 </div>
               </ScrollArea>
             ) : (
-              <div className="h-24 border rounded-md flex items-center justify-center text-sm text-muted-foreground">No music files available. Upload some files first.</div>
+              <div className="h-24 border rounded-md flex items-center justify-center text-sm text-muted-foreground">
+                No music files available. Upload some files first.
+              </div>
             )}
           </div>
 
@@ -158,7 +183,16 @@ export function AddMusicCueDialog({ open, onOpenChange, chapter, onCreated }: Ad
             <Label htmlFor="paragraph">
               Paragraph <span className="text-destructive">*</span>
             </Label>
-            <Input id="paragraph" type="number" min="0" value={paragraph} onChange={(e) => setParagraph(e.target.value)} placeholder="0" disabled={isCreating} className="w-32" />
+            <Input
+              id="paragraph"
+              type="number"
+              min="0"
+              value={paragraph}
+              onChange={(e) => setParagraph(e.target.value)}
+              placeholder="0"
+              disabled={isCreating}
+              className="w-32"
+            />
             <p className="text-xs text-muted-foreground">0 = start of chapter</p>
           </div>
 

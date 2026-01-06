@@ -32,18 +32,13 @@ interface Scenario {
 // Supports both legacy path (comics/scenarios/{name}.json) and
 // story-scoped path (comics/stories/{storySlug}/scenarios/{name}.json)
 export const startGeneration = mutation({
-  args: {
-    scenarioPath: v.string(),
-    storySlug: v.optional(v.string()),
-  },
+  args: { scenarioPath: v.string(), storySlug: v.optional(v.string()) },
   handler: async (ctx, args) => {
     // Build the full path if storySlug is provided
     let scenarioPath = args.scenarioPath;
     if (args.storySlug && !args.scenarioPath.includes("/stories/")) {
       // Convert from simple name to story-scoped path
-      const scenarioName = args.scenarioPath
-        .replace("comics/scenarios/", "")
-        .replace(".json", "");
+      const scenarioName = args.scenarioPath.replace("comics/scenarios/", "").replace(".json", "");
       scenarioPath = `comics/stories/${args.storySlug}/scenarios/${scenarioName}.json`;
     }
 
@@ -57,14 +52,10 @@ export const startGeneration = mutation({
     });
 
     // Schedule the generation action
-    await ctx.scheduler.runAfter(
-      0,
-      internal.comicGeneration.generateComicStrip,
-      {
-        submissionId,
-        scenarioPath,
-      },
-    );
+    await ctx.scheduler.runAfter(0, internal.comicGeneration.generateComicStrip, {
+      submissionId,
+      scenarioPath,
+    });
 
     return submissionId;
   },
@@ -72,10 +63,7 @@ export const startGeneration = mutation({
 
 // Internal action that performs the actual generation
 export const generateComicStrip = internalAction({
-  args: {
-    submissionId: v.id("comicSubmissions"),
-    scenarioPath: v.string(),
-  },
+  args: { submissionId: v.id("comicSubmissions"), scenarioPath: v.string() },
   handler: async (ctx, args) => {
     const { submissionId, scenarioPath } = args;
 
@@ -90,12 +78,8 @@ export const generateComicStrip = internalAction({
       // Parse the scenario path to determine if it's story-scoped
       // Story-scoped: comics/stories/{storySlug}/scenarios/{name}.json
       // Legacy: comics/scenarios/{name}.json
-      const storyMatch = scenarioPath.match(
-        /^comics\/stories\/([^/]+)\/scenarios\/([^/]+)\.json$/,
-      );
-      const legacyMatch = scenarioPath.match(
-        /^comics\/scenarios\/([^/]+)\.json$/,
-      );
+      const storyMatch = scenarioPath.match(/^comics\/stories\/([^/]+)\/scenarios\/([^/]+)\.json$/);
+      const legacyMatch = scenarioPath.match(/^comics\/scenarios\/([^/]+)\.json$/);
 
       let scenario: Scenario;
 
@@ -114,9 +98,7 @@ export const generateComicStrip = internalAction({
       } else if (legacyMatch) {
         // Legacy scenario path
         const [, scenarioName] = legacyMatch;
-        const scenarioData = await ctx.runQuery(api.comics.getScenario, {
-          scenarioName,
-        });
+        const scenarioData = await ctx.runQuery(api.comics.getScenario, { scenarioName });
 
         if (!scenarioData?.scenario) {
           throw new Error(`Scenario not found: ${scenarioPath}`);
@@ -143,15 +125,10 @@ export const generateComicStrip = internalAction({
       });
 
       // Build the prompt parts
-      const parts: Array<{
-        text?: string;
-        inlineData?: { data: string; mimeType: string };
-      }> = [];
+      const parts: Array<{ text?: string; inlineData?: { data: string; mimeType: string } }> = [];
 
       // Add character references with images
-      for (const [charKey, imageType] of Object.entries(
-        scenario.characterImages,
-      )) {
+      for (const [charKey, imageType] of Object.entries(scenario.characterImages)) {
         const character = characterMap.get(charKey);
         if (!character) {
           console.warn(`Character not found: ${charKey}`);
@@ -175,9 +152,7 @@ export const generateComicStrip = internalAction({
 
         // Add superhero version
         if (loadSuperhero && character.superheroImageUrl) {
-          const imageData = await fetchImageAsBase64(
-            character.superheroImageUrl,
-          );
+          const imageData = await fetchImageAsBase64(character.superheroImageUrl);
           if (imageData) {
             parts.push({
               text: `Reference character: ${metadata?.name ?? charKey} (superhero version)`,
@@ -218,22 +193,12 @@ export const generateComicStrip = internalAction({
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${apiKey}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts,
-              },
-            ],
+            contents: [{ role: "user", parts }],
             generationConfig: {
               responseModalities: ["TEXT", "IMAGE"],
-              imageConfig: {
-                aspectRatio: "9:16",
-                imageSize: "2K",
-              },
+              imageConfig: { aspectRatio: "9:16", imageSize: "2K" },
             },
           }),
         },
@@ -278,9 +243,7 @@ export const generateComicStrip = internalAction({
       });
 
       // Convert base64 to blob and upload to component storage
-      const binaryData = Uint8Array.from(atob(imageData.data), (c) =>
-        c.charCodeAt(0),
-      );
+      const binaryData = Uint8Array.from(atob(imageData.data), (c) => c.charCodeAt(0));
       const blob = new Blob([binaryData], { type: imageData.mimeType });
 
       // Require story-scoped scenarios
@@ -295,10 +258,10 @@ export const generateComicStrip = internalAction({
       const basename = `${scenarioName}.png`;
 
       // Check if strips already exist (if so, this is a regeneration, not first strip)
-      const { saved: stripsExist } = await ctx.runMutation(
-        internal.comics.checkFirstStripExists,
-        { storySlug, scenarioName },
-      );
+      const { saved: stripsExist } = await ctx.runMutation(internal.comics.checkFirstStripExists, {
+        storySlug,
+        scenarioName,
+      });
       const shouldAutoSave = !stripsExist;
 
       // Start upload to get URL to component's storage
@@ -308,9 +271,7 @@ export const generateComicStrip = internalAction({
           folderPath,
           basename,
           publish: shouldAutoSave, // Auto-publish for first strips
-          label: shouldAutoSave
-            ? `Auto-saved at ${new Date().toISOString()}`
-            : undefined,
+          label: shouldAutoSave ? `Auto-saved at ${new Date().toISOString()}` : undefined,
         },
       );
 
@@ -329,15 +290,12 @@ export const generateComicStrip = internalAction({
       const uploadResponse = backend === "convex" ? await uploadRes.json() : undefined;
 
       // Finish the upload to create the asset version
-      const { versionId } = await ctx.runMutation(
-        internal.generateUploadUrl.finishUploadInternal,
-        {
-          intentId,
-          uploadResponse,
-          size: blob.size,
-          contentType: imageData.mimeType,
-        },
-      );
+      const { versionId } = await ctx.runMutation(internal.generateUploadUrl.finishUploadInternal, {
+        intentId,
+        uploadResponse,
+        size: blob.size,
+        contentType: imageData.mimeType,
+      });
 
       // Mark submission as complete with the versionId
       await ctx.runMutation(internal.comicSubmissions.completeWithVersion, {
@@ -348,9 +306,7 @@ export const generateComicStrip = internalAction({
       // For auto-saved first strips, remove the submission UI
       if (shouldAutoSave) {
         console.log(`Auto-saved first strip for ${storySlug}/${scenarioName}`);
-        await ctx.runMutation(internal.comicSubmissions.removeInternal, {
-          id: submissionId,
-        });
+        await ctx.runMutation(internal.comicSubmissions.removeInternal, { id: submissionId });
       }
     } catch (error) {
       console.error("Generation failed:", error);
@@ -375,9 +331,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 }
 
 // Helper function to fetch image and convert to base64
-async function fetchImageAsBase64(
-  url: string,
-): Promise<{ data: string; mimeType: string } | null> {
+async function fetchImageAsBase64(url: string): Promise<{ data: string; mimeType: string } | null> {
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -389,10 +343,7 @@ async function fetchImageAsBase64(
     const arrayBuffer = await response.arrayBuffer();
     const base64 = arrayBufferToBase64(arrayBuffer);
 
-    return {
-      data: base64,
-      mimeType: contentType,
-    };
+    return { data: base64, mimeType: contentType };
   } catch (error) {
     console.warn(`Error fetching image ${url}:`, error);
     return null;
@@ -406,12 +357,9 @@ function buildFramesText(
 ): string {
   return scenario.frames
     .map((frame, i) => {
-      const character = characterMap.get(
-        frame.speaker.replace("-superhero", ""),
-      );
+      const character = characterMap.get(frame.speaker.replace("-superhero", ""));
       const speakerName = character?.metadata?.name || frame.speaker;
-      const imageTypeLabel =
-        frame.imageType === "superhero" ? " (superhero version)" : "";
+      const imageTypeLabel = frame.imageType === "superhero" ? " (superhero version)" : "";
 
       return `### Frame ${i + 1}
 - **Scene**: ${frame.scene}
@@ -532,10 +480,7 @@ function buildStoryOutputSchema(characterKeys: string[]) {
     type: "object",
     required: ["storyName", "storyDescription", "scenarios"],
     properties: {
-      storyName: {
-        type: "string",
-        description: "Catchy story name (2-4 words)",
-      },
+      storyName: { type: "string", description: "Catchy story name (2-4 words)" },
       storyDescription: {
         type: "string",
         description: "Brief refined story description (1-2 sentences)",
@@ -547,14 +492,8 @@ function buildStoryOutputSchema(characterKeys: string[]) {
           type: "object",
           required: ["name", "description", "characterImages", "frames"],
           properties: {
-            name: {
-              type: "string",
-              description: "Scenario name (lowercase with hyphens)",
-            },
-            description: {
-              type: "string",
-              description: "Brief description of this scenario",
-            },
+            name: { type: "string", description: "Scenario name (lowercase with hyphens)" },
+            description: { type: "string", description: "Brief description of this scenario" },
             characterImages: {
               type: "array",
               description: "Which character images to use",
@@ -562,14 +501,8 @@ function buildStoryOutputSchema(characterKeys: string[]) {
                 type: "object",
                 required: ["character", "imageType"],
                 properties: {
-                  character: {
-                    type: "string",
-                    enum: characterKeys,
-                  },
-                  imageType: {
-                    type: "string",
-                    enum: ["comic", "superhero", "both"],
-                  },
+                  character: { type: "string", enum: characterKeys },
+                  imageType: { type: "string", enum: ["comic", "superhero", "both"] },
                 },
               },
             },
@@ -578,40 +511,24 @@ function buildStoryOutputSchema(characterKeys: string[]) {
               description: "Array of 3-5 frames",
               items: {
                 type: "object",
-                required: [
-                  "scene",
-                  "characters",
-                  "speaker",
-                  "dialogue",
-                  "imageType",
-                ],
+                required: ["scene", "characters", "speaker", "dialogue", "imageType"],
                 properties: {
                   scene: {
                     type: "string",
-                    description:
-                      "Visual description for the AI image generator",
+                    description: "Visual description for the AI image generator",
                   },
                   characters: {
                     type: "array",
                     description: "Character keys present in this frame",
-                    items: {
-                      type: "string",
-                      enum: characterKeys,
-                    },
+                    items: { type: "string", enum: characterKeys },
                   },
                   speaker: {
                     type: "string",
                     description: "Character key of who is speaking",
                     enum: characterKeys,
                   },
-                  dialogue: {
-                    type: "string",
-                    description: "Dialogue text in Polish",
-                  },
-                  imageType: {
-                    type: "string",
-                    enum: ["comic", "superhero"],
-                  },
+                  dialogue: { type: "string", description: "Dialogue text in Polish" },
+                  imageType: { type: "string", enum: ["comic", "superhero"] },
                 },
               },
             },
@@ -624,9 +541,7 @@ function buildStoryOutputSchema(characterKeys: string[]) {
 
 // Public mutation to start story generation
 export const startStoryGeneration = mutation({
-  args: {
-    description: v.string(),
-  },
+  args: { description: v.string() },
   handler: async (ctx, args) => {
     // Create a tracking record
     const generationId = await ctx.db.insert("comicSubmissions", {
@@ -638,14 +553,10 @@ export const startStoryGeneration = mutation({
     });
 
     // Schedule the internal action
-    await ctx.scheduler.runAfter(
-      0,
-      internal.comicGeneration.generateStoryFromDescription,
-      {
-        generationId,
-        description: args.description,
-      },
-    );
+    await ctx.scheduler.runAfter(0, internal.comicGeneration.generateStoryFromDescription, {
+      generationId,
+      description: args.description,
+    });
 
     return generationId;
   },
@@ -653,10 +564,7 @@ export const startStoryGeneration = mutation({
 
 // Internal action that generates a story from description using Gemini
 export const generateStoryFromDescription = internalAction({
-  args: {
-    generationId: v.id("comicSubmissions"),
-    description: v.string(),
-  },
+  args: { generationId: v.id("comicSubmissions"), description: v.string() },
   handler: async (ctx, args) => {
     const { generationId, description } = args;
 
@@ -734,9 +642,7 @@ export const generateStoryFromDescription = internalAction({
         throw new Error("No text response from Gemini");
       }
 
-      const storyOutput: GeminiStoryOutput = JSON.parse(
-        result.candidates[0].content.parts[0].text,
-      );
+      const storyOutput: GeminiStoryOutput = JSON.parse(result.candidates[0].content.parts[0].text);
 
       await ctx.runMutation(internal.comicSubmissions.updateProgress, {
         id: generationId,
@@ -764,9 +670,7 @@ export const generateStoryFromDescription = internalAction({
       const scenarioNames: string[] = [];
       for (const geminiScenario of storyOutput.scenarios) {
         // Convert characterImages from array to object format
-        const characterImages = convertCharacterImagesToObject(
-          geminiScenario.characterImages,
-        );
+        const characterImages = convertCharacterImagesToObject(geminiScenario.characterImages);
 
         const scenario: Scenario = {
           name: geminiScenario.name,
@@ -801,23 +705,16 @@ export const generateStoryFromDescription = internalAction({
         const scenarioPath = `comics/stories/${slug}/scenarios/${scenarioName}.json`;
 
         // Create submission record for strip generation
-        const stripSubmissionId = await ctx.runMutation(
-          internal.comicSubmissions.createInternal,
-          {
-            scenarioPath,
-            progressMessage: "Waiting for the artist...",
-          },
-        );
+        const stripSubmissionId = await ctx.runMutation(internal.comicSubmissions.createInternal, {
+          scenarioPath,
+          progressMessage: "Waiting for the artist...",
+        });
 
         // Schedule the strip generation
-        await ctx.scheduler.runAfter(
-          0,
-          internal.comicGeneration.generateComicStrip,
-          {
-            submissionId: stripSubmissionId,
-            scenarioPath,
-          },
-        );
+        await ctx.scheduler.runAfter(0, internal.comicGeneration.generateComicStrip, {
+          submissionId: stripSubmissionId,
+          scenarioPath,
+        });
       }
 
       // 10. Mark story generation as complete

@@ -19,10 +19,7 @@ import * as mm from "music-metadata";
  * Get metadata for a specific music file.
  */
 export const getByFile = query({
-  args: {
-    bookPath: v.string(),
-    fileBasename: v.string(),
-  },
+  args: { bookPath: v.string(), fileBasename: v.string() },
   handler: async (ctx, { bookPath, fileBasename }) => {
     const metadata = await ctx.db
       .query("musicFileMetadata")
@@ -34,15 +31,13 @@ export const getByFile = query({
     }
 
     // Get cover URL
-    const coverFiles = await ctx.runQuery(components.assetManager.assetManager.listPublishedFilesInFolder, {
-      folderPath: `${bookPath}/music-covers`,
-    });
+    const coverFiles = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: `${bookPath}/music-covers` },
+    );
     const coverFile = coverFiles.find((f) => f.basename === metadata.coverBasename);
 
-    return {
-      ...metadata,
-      coverUrl: coverFile?.url,
-    };
+    return { ...metadata, coverUrl: coverFile?.url };
   },
 });
 
@@ -62,9 +57,10 @@ export const listByBook = query({
     }
 
     // Get all cover URLs in one query
-    const coverFiles = await ctx.runQuery(components.assetManager.assetManager.listPublishedFilesInFolder, {
-      folderPath: `${bookPath}/music-covers`,
-    });
+    const coverFiles = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: `${bookPath}/music-covers` },
+    );
     const coverMap = new Map(coverFiles.map((f) => [f.basename, f.url]));
 
     return allMetadata.map((m) => ({
@@ -93,7 +89,9 @@ export const upsertMetadata = internalMutation({
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("musicFileMetadata")
-      .withIndex("by_book_file", (q) => q.eq("bookPath", args.bookPath).eq("fileBasename", args.fileBasename))
+      .withIndex("by_book_file", (q) =>
+        q.eq("bookPath", args.bookPath).eq("fileBasename", args.fileBasename),
+      )
       .first();
 
     if (existing) {
@@ -141,18 +139,16 @@ function getR2Config() {
  * Scheduled after upload to music/ folder.
  */
 export const extractFromFile = internalAction({
-  args: {
-    bookPath: v.string(),
-    fileBasename: v.string(),
-  },
+  args: { bookPath: v.string(), fileBasename: v.string() },
   handler: async (ctx, { bookPath, fileBasename }) => {
     console.log(`[musicMetadata] Extracting metadata from ${bookPath}/music/${fileBasename}`);
 
     try {
       // Get the file URL from asset-manager
-      const files = await ctx.runQuery(components.assetManager.assetManager.listPublishedFilesInFolder, {
-        folderPath: `${bookPath}/music`,
-      });
+      const files = await ctx.runQuery(
+        components.assetManager.assetManager.listPublishedFilesInFolder,
+        { folderPath: `${bookPath}/music` },
+      );
       const file = files.find((f) => f.basename === fileBasename);
 
       if (!file?.url) {
@@ -161,9 +157,7 @@ export const extractFromFile = internalAction({
       }
 
       // Fetch first 512KB of the file (ID3v2 tags are at the start)
-      const response = await fetch(file.url, {
-        headers: { Range: "bytes=0-524287" },
-      });
+      const response = await fetch(file.url, { headers: { Range: "bytes=0-524287" } });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch file: ${response.status}`);
@@ -180,7 +174,9 @@ export const extractFromFile = internalAction({
       const duration = metadata.format.duration;
       const picture = metadata.common.picture?.[0];
 
-      console.log(`[musicMetadata] Parsed: title="${title}", artist="${artist}", duration=${duration}, hasCover=${!!picture}`);
+      console.log(
+        `[musicMetadata] Parsed: title="${title}", artist="${artist}", duration=${duration}, hasCover=${!!picture}`,
+      );
 
       let coverBasename: string | undefined;
 
@@ -198,11 +194,14 @@ export const extractFromFile = internalAction({
         // Upload to music-covers/ folder
         const coversPath = `${bookPath}/music-covers`;
 
-        const { intentId, uploadUrl, backend } = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
-          folderPath: coversPath,
-          basename: coverBasename,
-          publish: true, // Auto-publish covers
-        });
+        const { intentId, uploadUrl, backend } = await ctx.runMutation(
+          internal.generateUploadUrl.startUploadInternal,
+          {
+            folderPath: coversPath,
+            basename: coverBasename,
+            publish: true, // Auto-publish covers
+          },
+        );
 
         const uploadRes = await fetch(uploadUrl, {
           method: backend === "r2" ? "PUT" : "POST",
@@ -253,10 +252,7 @@ export const extractFromFile = internalAction({
  * Useful for re-extracting or processing existing files.
  */
 export const triggerExtraction = mutation({
-  args: {
-    bookPath: v.string(),
-    fileBasename: v.string(),
-  },
+  args: { bookPath: v.string(), fileBasename: v.string() },
   handler: async (ctx, { bookPath, fileBasename }) => {
     await ctx.scheduler.runAfter(0, internal.musicMetadata.extractFromFile, {
       bookPath,
@@ -272,9 +268,10 @@ export const triggerExtraction = mutation({
 export const triggerExtractionForBook = mutation({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
-    const files = await ctx.runQuery(components.assetManager.assetManager.listPublishedFilesInFolder, {
-      folderPath: `${bookPath}/music`,
-    });
+    const files = await ctx.runQuery(
+      components.assetManager.assetManager.listPublishedFilesInFolder,
+      { folderPath: `${bookPath}/music` },
+    );
 
     const mp3Files = files.filter((f) => f.basename.toLowerCase().endsWith(".mp3"));
 

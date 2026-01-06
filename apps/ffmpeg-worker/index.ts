@@ -57,17 +57,43 @@ async function main() {
     ]);
 
     // Extract first frame as WebP thumbnail
-    Bun.spawnSync(["ffmpeg", "-y", "-i", mp4Output, "-vf", "select=eq(n\\,0)", "-frames:v", "1", "-vcodec", "libwebp", "-quality", "30", webpOutput]);
+    Bun.spawnSync([
+      "ffmpeg",
+      "-y",
+      "-i",
+      mp4Output,
+      "-vf",
+      "select=eq(n\\,0)",
+      "-frames:v",
+      "1",
+      "-vcodec",
+      "libwebp",
+      "-quality",
+      "30",
+      webpOutput,
+    ]);
 
     // POST to Convex HTTP endpoint with auth
     const formData = new FormData();
-    formData.append("mp4", new Blob([await Bun.file(mp4Output).arrayBuffer()]), `${baseName}_preview.mp4`);
-    formData.append("webp", new Blob([await Bun.file(webpOutput).arrayBuffer()]), `${baseName}_preview.webp`);
+    formData.append(
+      "mp4",
+      new Blob([await Bun.file(mp4Output).arrayBuffer()]),
+      `${baseName}_preview.mp4`,
+    );
+    formData.append(
+      "webp",
+      new Blob([await Bun.file(webpOutput).arrayBuffer()]),
+      `${baseName}_preview.webp`,
+    );
     formData.append("bookPath", bookPath);
     formData.append("fileBasename", fileBasename);
 
     console.log(`🚀 POSTing to ${webhookUrl}/upload-background-preview`);
-    const res = await fetch(`${webhookUrl}/upload-background-preview`, { method: "POST", body: formData, headers: { Authorization: `Bearer ${webhookSecret}` } });
+    const res = await fetch(`${webhookUrl}/upload-background-preview`, {
+      method: "POST",
+      body: formData,
+      headers: { Authorization: `Bearer ${webhookSecret}` },
+    });
 
     if (!res.ok) {
       throw new Error(`Webhook failed: ${res.status} ${await res.text()}`);

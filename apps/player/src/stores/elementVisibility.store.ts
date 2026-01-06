@@ -63,10 +63,16 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       // Simple actions
       setElementsVisible: (visible) => set({ areElementsVisible: visible }),
       setScrollMode: (scrollMode) => set({ isScrollMode: scrollMode }),
-      setTouchStart: (y, x, time) => set((state) => ({ touch: { ...state.touch, startY: y, startX: x, startTime: time, isScrolling: false } })),
-      setTouchScrolling: (scrolling) => set((state) => ({ touch: { ...state.touch, isScrolling: scrolling } })),
-      setInactivityTimer: (timerId) => set((state) => ({ timers: { ...state.timers, inactivityTimerId: timerId } })),
-      setScrollTimer: (timerId) => set((state) => ({ timers: { ...state.timers, scrollTimerId: timerId } })),
+      setTouchStart: (y, x, time) =>
+        set((state) => ({
+          touch: { ...state.touch, startY: y, startX: x, startTime: time, isScrolling: false },
+        })),
+      setTouchScrolling: (scrolling) =>
+        set((state) => ({ touch: { ...state.touch, isScrolling: scrolling } })),
+      setInactivityTimer: (timerId) =>
+        set((state) => ({ timers: { ...state.timers, inactivityTimerId: timerId } })),
+      setScrollTimer: (timerId) =>
+        set((state) => ({ timers: { ...state.timers, scrollTimerId: timerId } })),
 
       // Timer management
       clearInactivityTimer: () => {
@@ -74,7 +80,10 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
 
         if (internalTimers.inactivityTimerRef) {
           clearTimeout(internalTimers.inactivityTimerRef);
-          set((state) => ({ internalTimers: { ...state.internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
+          set((state) => ({
+            internalTimers: { ...state.internalTimers, inactivityTimerRef: null },
+            timers: { ...state.timers, inactivityTimerId: null },
+          }));
         }
       },
 
@@ -88,10 +97,16 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
         const timerId = window.setTimeout(() => {
           const { hideAllElements } = useElementVisibilityStore.getState();
           hideAllElements("inactivity");
-          set((state) => ({ internalTimers: { ...state.internalTimers, inactivityTimerRef: null }, timers: { ...state.timers, inactivityTimerId: null } }));
+          set((state) => ({
+            internalTimers: { ...state.internalTimers, inactivityTimerRef: null },
+            timers: { ...state.timers, inactivityTimerId: null },
+          }));
         }, INACTIVITY_TIMEOUT);
 
-        set((state) => ({ internalTimers: { ...state.internalTimers, inactivityTimerRef: timerId }, timers: { ...state.timers, inactivityTimerId: timerId } }));
+        set((state) => ({
+          internalTimers: { ...state.internalTimers, inactivityTimerRef: timerId },
+          timers: { ...state.timers, inactivityTimerId: timerId },
+        }));
       },
 
       pauseAllTimers: () => {
@@ -104,11 +119,15 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
           clearTimeout(internalTimers.scrollTimerRef);
         }
 
-        set({ internalTimers: { inactivityTimerRef: null, scrollTimerRef: null }, timers: { inactivityTimerId: null, scrollTimerId: null } });
+        set({
+          internalTimers: { inactivityTimerRef: null, scrollTimerRef: null },
+          timers: { inactivityTimerId: null, scrollTimerId: null },
+        });
       },
 
       startAllTimers: () => {
-        const { areElementsVisible, isScrollMode, resetInactivityTimer, isTimersPausedSticky } = get();
+        const { areElementsVisible, isScrollMode, resetInactivityTimer, isTimersPausedSticky } =
+          get();
 
         if (isTimersPausedSticky) return;
 
@@ -121,9 +140,11 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       setIsTimersPausedSticky: (sticky) => set({ isTimersPausedSticky: sticky }),
 
       // Complex actions
-      showAllElements: () => set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null }),
+      showAllElements: () =>
+        set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null }),
 
-      hideAllElements: (reason = null) => set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason }),
+      hideAllElements: (reason = null) =>
+        set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason }),
 
       handleScreenTap: () => {
         const { areElementsVisible, isScrollMode, clearInactivityTimer } = get();
@@ -151,7 +172,8 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
   ),
 );
 
-export const useOptionalElementVisibility = () => useElementVisibilityStore((state) => state.areElementsVisible);
+export const useOptionalElementVisibility = () =>
+  useElementVisibilityStore((state) => state.areElementsVisible);
 
 export const useLastHideReason = () => useElementVisibilityStore((state) => state.lastHideReason);
 

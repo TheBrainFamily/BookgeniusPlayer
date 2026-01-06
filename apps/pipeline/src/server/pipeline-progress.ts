@@ -86,7 +86,12 @@ export function markStepStarted(slug: string, step: Step): void {
   writeProgress(slug, progress);
 }
 
-export function markStepComplete(slug: string, step: Step, startedAt: number, endedAt: number): void {
+export function markStepComplete(
+  slug: string,
+  step: Step,
+  startedAt: number,
+  endedAt: number,
+): void {
   const progress = readProgress(slug) || initProgress(slug);
   progress.completedSteps[step] = {
     status: "done",
@@ -98,7 +103,13 @@ export function markStepComplete(slug: string, step: Step, startedAt: number, en
   writeProgress(slug, progress);
 }
 
-export function markStepError(slug: string, step: Step, error: string, startedAt: number, endedAt: number): void {
+export function markStepError(
+  slug: string,
+  step: Step,
+  error: string,
+  startedAt: number,
+  endedAt: number,
+): void {
   const progress = readProgress(slug) || initProgress(slug);
   progress.completedSteps[step] = {
     status: "error",

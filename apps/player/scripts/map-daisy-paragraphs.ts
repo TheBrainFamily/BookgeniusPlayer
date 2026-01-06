@@ -62,7 +62,9 @@ async function main() {
   // ---------- import the tracks array dynamically ----------------------------
   const tracksModule = await import(path.resolve(tracksPath));
   // Ensure AudiobookTracksDefined is correctly accessed, assuming it's a named export
-  const AudiobookTracksDefined: Track[] | undefined = tracksModule.AudiobookTracksDefined || (tracksModule.default && tracksModule.default.AudiobookTracksDefined);
+  const AudiobookTracksDefined: Track[] | undefined =
+    tracksModule.AudiobookTracksDefined ||
+    (tracksModule.default && tracksModule.default.AudiobookTracksDefined);
 
   if (!AudiobookTracksDefined) {
     console.error(

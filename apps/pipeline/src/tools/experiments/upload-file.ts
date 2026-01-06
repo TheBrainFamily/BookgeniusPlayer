@@ -3,7 +3,11 @@ import { Bucket, Storage } from "@google-cloud/storage";
 
 const storage = new Storage();
 
-export const uploadFileToBucket = async (bucketName: string, pathString: string, fileName: string) => {
+export const uploadFileToBucket = async (
+  bucketName: string,
+  pathString: string,
+  fileName: string,
+) => {
   try {
     const options = { destination: fileName, public: true };
     await storage.bucket(bucketName).upload(pathString, options);

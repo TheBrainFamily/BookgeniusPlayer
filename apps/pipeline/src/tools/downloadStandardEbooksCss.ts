@@ -38,7 +38,9 @@ async function main() {
     const cssDir = path.join(booksDir, repoName, "css");
     const cssPath = path.join(cssDir, "local.css");
 
-    process.stdout.write(`\r[${i + 1}/${bookFolders.length}] ${repoName.substring(0, 50).padEnd(50)}`);
+    process.stdout.write(
+      `\r[${i + 1}/${bookFolders.length}] ${repoName.substring(0, 50).padEnd(50)}`,
+    );
 
     // Skip if already downloaded
     if (fs.existsSync(cssPath)) {

@@ -11,7 +11,11 @@ export const findFb2FilePath = (bookDataDirInput: string): string | null => {
   return path.join(bookDataDirInput, fb2File);
 };
 
-export const convertBook = (bookSlug: string, startFromChapter: number = 0, startFromNoteId: number = 0) => {
+export const convertBook = (
+  bookSlug: string,
+  startFromChapter: number = 0,
+  startFromNoteId: number = 0,
+) => {
   const bookDataDirInput = `./books-data/${bookSlug}/input`;
 
   const bookFb2FilePath = findFb2FilePath(`${bookDataDirInput}`);

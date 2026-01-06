@@ -44,19 +44,41 @@ interface AssetDetailProps {
   onUploadNew: () => void;
 }
 
-const typeIcons = { image: Image, audio: Music, video: Video, text: FileText, json: FileJson, other: Package };
+const typeIcons = {
+  image: Image,
+  audio: Music,
+  video: Video,
+  text: FileText,
+  json: FileJson,
+  other: Package,
+};
 
 function copyToClipboard(text: string, label: string) {
   navigator.clipboard.writeText(text);
   toast.success(`${label} copied to clipboard`);
 }
 
-export function AssetDetail({ folderPath, basename, selectedVersionId, onVersionSelect, onClose, onUploadNew }: AssetDetailProps) {
+export function AssetDetail({
+  folderPath,
+  basename,
+  selectedVersionId,
+  onVersionSelect,
+  onClose,
+  onUploadNew,
+}: AssetDetailProps) {
   const [metadataExpanded, setMetadataExpanded] = useState(false);
 
   // Non-suspense queries so SSR renders instantly with loading state
-  const { data: asset, isLoading: assetLoading, refetch: refetchAsset } = useQuery(queries.asset(folderPath, basename));
-  const { data: versions, isLoading: versionsLoading, refetch: refetchVersions } = useQuery(queries.assetVersions(folderPath, basename));
+  const {
+    data: asset,
+    isLoading: assetLoading,
+    refetch: refetchAsset,
+  } = useQuery(queries.asset(folderPath, basename));
+  const {
+    data: versions,
+    isLoading: versionsLoading,
+    refetch: refetchVersions,
+  } = useQuery(queries.assetVersions(folderPath, basename));
   const { data: publishedFile } = useQuery(queries.publishedFile(folderPath, basename));
 
   const publishDraft = useMutation(api.cli.publishDraft);
@@ -67,7 +89,10 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
   const hasEditableMetadata =
     folderPath.endsWith("/music") ||
     folderPath.endsWith("/backgrounds") ||
-    versions?.some((v: { extra?: { type?: string } }) => v.extra?.type === "music" || v.extra?.type === "background");
+    versions?.some(
+      (v: { extra?: { type?: string } }) =>
+        v.extra?.type === "music" || v.extra?.type === "background",
+    );
 
   // Auto-select published version when no version is selected in URL
   // Must be called before any conditional returns (Rules of Hooks)
@@ -79,7 +104,9 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
 
   // Get the selected version data - compute before early return
   const selectedVersion = versions?.find((v: { _id: string }) => v._id === selectedVersionId);
-  const previewUrl = selectedVersion?.storageId ? getVersionUrl({ versionId: selectedVersion._id, basename }) : publishedFile?.url;
+  const previewUrl = selectedVersion?.storageId
+    ? getVersionUrl({ versionId: selectedVersion._id, basename })
+    : publishedFile?.url;
   const previewContentType = selectedVersion?.contentType || publishedFile?.contentType;
   const category = getContentTypeCategory(previewContentType);
   const Icon = typeIcons[category];
@@ -151,7 +178,11 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
               </div>
               <div className="rounded-lg overflow-hidden border border-border bg-surface-2">
                 {category === "image" && previewUrl ? (
-                  <img src={previewUrl} alt={basename} className="w-full h-auto max-h-64 object-contain" />
+                  <img
+                    src={previewUrl}
+                    alt={basename}
+                    className="w-full h-auto max-h-64 object-contain"
+                  />
                 ) : category === "audio" && previewUrl ? (
                   <div className="p-4">
                     <audio controls className="w-full" src={previewUrl} key={previewUrl} />
@@ -200,12 +231,19 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
             {/* Metadata Section (for music, background assets) */}
             {hasEditableMetadata && (
               <div className="border border-border rounded-lg overflow-hidden">
-                <button onClick={() => setMetadataExpanded(!metadataExpanded)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors">
+                <button
+                  onClick={() => setMetadataExpanded(!metadataExpanded)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors"
+                >
                   <div className="flex items-center gap-2">
                     <Settings className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">Edit Metadata</span>
                   </div>
-                  {metadataExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  {metadataExpanded ? (
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  )}
                 </button>
                 {metadataExpanded && (
                   <div className="border-t border-border">
@@ -231,7 +269,11 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
               {publishedFile?.url && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => copyToClipboard(publishedFile.url!, "Published URL")}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => copyToClipboard(publishedFile.url!, "Published URL")}
+                    >
                       <Copy className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -242,7 +284,12 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="outline" size="icon" asChild>
-                      <a href={publishedFile.url} download={basename} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={publishedFile.url}
+                        download={basename}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <Download className="h-4 w-4" />
                       </a>
                     </Button>
@@ -256,11 +303,14 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
             <div>
               <h3 className="text-sm font-medium text-foreground mb-3">Version History</h3>
               {versions.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No versions yet. Upload a file to create the first version.</p>
+                <p className="text-sm text-muted-foreground">
+                  No versions yet. Upload a file to create the first version.
+                </p>
               ) : (
                 <div className="space-y-2">
                   {[...versions].reverse().map((version) => {
-                    const versionUrl = version.storageId && getVersionUrl({ versionId: version._id, basename });
+                    const versionUrl =
+                      version.storageId && getVersionUrl({ versionId: version._id, basename });
                     const isSelected = selectedVersionId === version._id;
 
                     return (
@@ -269,7 +319,9 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
                         onClick={() => onVersionSelect(version._id)}
                         className={cn(
                           "w-full text-left p-3 rounded-lg border transition-all",
-                          isSelected ? "ring-2 ring-primary ring-offset-1" : "hover:border-primary/50",
+                          isSelected
+                            ? "ring-2 ring-primary ring-offset-1"
+                            : "hover:border-primary/50",
                           version.state === "published"
                             ? "border-success/30 bg-success/5"
                             : version.state === "draft"
@@ -313,7 +365,13 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
                             {versionUrl && (
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon-sm" className="h-6 w-6" onClick={(e) => e.stopPropagation()} asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    className="h-6 w-6"
+                                    onClick={(e) => e.stopPropagation()}
+                                    asChild
+                                  >
                                     <a href={versionUrl} target="_blank" rel="noopener noreferrer">
                                       <ExternalLink className="h-3 w-3" />
                                     </a>
@@ -330,7 +388,9 @@ export function AssetDetail({ folderPath, basename, selectedVersionId, onVersion
                             {version.size && <span>{formatBytes(version.size)}</span>}
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {formatDistanceToNow(new Date(version.createdAt), { addSuffix: true })}
+                              {formatDistanceToNow(new Date(version.createdAt), {
+                                addSuffix: true,
+                              })}
                             </span>
                           </div>
                         </div>

@@ -32,7 +32,12 @@ export const shouldAllowDocument = (doc: Document, filter?: Filter) => {
     return false;
   }
 
-  if (chapterTo !== undefined && docChapter === chapterTo && paragraphTo !== undefined && docParagraph > paragraphTo) {
+  if (
+    chapterTo !== undefined &&
+    docChapter === chapterTo &&
+    paragraphTo !== undefined &&
+    docParagraph > paragraphTo
+  ) {
     return false;
   }
 

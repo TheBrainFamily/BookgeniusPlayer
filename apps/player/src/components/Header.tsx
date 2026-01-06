@@ -17,7 +17,10 @@ const Header = () => {
           variants={headerVariants}
           initial="hidden"
           animate="visible"
-          className={cn("fixed top-0 inset-x-0 z-50 flex items-center max-w-[120rem] w-full mx-auto", "gap-1 md:gap-2 px-2 lg:px-4 pt-4")}
+          className={cn(
+            "fixed top-0 inset-x-0 z-50 flex items-center max-w-[120rem] w-full mx-auto",
+            "gap-1 md:gap-2 px-2 lg:px-4 pt-4",
+          )}
         >
           <MenuButton />
           <AudioPlayer />
@@ -30,4 +33,7 @@ const Header = () => {
 
 export default Header;
 
-const headerVariants: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 4, delay: 2 } } };
+const headerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 4, delay: 2 } },
+};

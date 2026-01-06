@@ -42,7 +42,14 @@ app.get("/preview/:slug/:filename", (req, res) => {
   const { slug, filename } = req.params;
   const safeName = path.basename(filename);
   const safeSlug = path.basename(slug);
-  const filePath = path.join(__dirname, "../../books-data", safeSlug, "output", "style-previews", safeName);
+  const filePath = path.join(
+    __dirname,
+    "../../books-data",
+    safeSlug,
+    "output",
+    "style-previews",
+    safeName,
+  );
 
   if (!fs.existsSync(filePath)) {
     res.status(404).json({ error: "Preview not found" });
@@ -64,7 +71,13 @@ app.use("/downloads", express.static(downloadsDir));
 // Serve Standard Ebooks covers directly
 app.get("/se-cover/:slug", (req, res) => {
   const safeSlug = path.basename(req.params.slug);
-  const coverPath = path.join(__dirname, "../../standardebooks-data/books", safeSlug, "images", "cover.jpg");
+  const coverPath = path.join(
+    __dirname,
+    "../../standardebooks-data/books",
+    safeSlug,
+    "images",
+    "cover.jpg",
+  );
 
   if (!fs.existsSync(coverPath)) {
     res.status(404).send("Cover not found");

@@ -6,7 +6,9 @@ import { BookCard, CollectionBook } from "../components/BookCard";
 import { BookModal } from "../components/BookModal";
 import { Button } from "@/components/ui/button";
 
-async function loadDescriptionsForCollection(slug: string): Promise<Map<string, { description: string; hook: string }>> {
+async function loadDescriptionsForCollection(
+  slug: string,
+): Promise<Map<string, { description: string; hook: string }>> {
   try {
     const data = await trpc.getBookDescriptions.query({ collectionSlug: slug });
     const descriptions = new Map<string, { description: string; hook: string }>();
@@ -39,7 +41,15 @@ type Collection = { title: string; slug: string; url: string };
 
 type CollectionDetails = { url: string; title?: string; books: CollectionBook[] };
 
-function CollectionRow({ collection, onSelectBook, onOpenModal }: { collection: Collection; onSelectBook?: (slug: string) => void; onOpenModal?: (book: CollectionBook) => void }) {
+function CollectionRow({
+  collection,
+  onSelectBook,
+  onOpenModal,
+}: {
+  collection: Collection;
+  onSelectBook?: (slug: string) => void;
+  onOpenModal?: (book: CollectionBook) => void;
+}) {
   const [books, setBooks] = useState<CollectionBook[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
@@ -85,7 +95,11 @@ function CollectionRow({ collection, onSelectBook, onOpenModal }: { collection: 
           const enrichedBooks = data.books.map((book) => {
             const desc = descriptions.get(book.slug);
             const readingTime = readingTimes[book.slug];
-            return { ...book, ...(desc && { generatedDescription: desc.description, generatedHook: desc.hook }), ...(readingTime && { readingTime }) };
+            return {
+              ...book,
+              ...(desc && { generatedDescription: desc.description, generatedHook: desc.hook }),
+              ...(readingTime && { readingTime }),
+            };
           });
 
           setBooks(enrichedBooks);
@@ -114,10 +128,18 @@ function CollectionRow({ collection, onSelectBook, onOpenModal }: { collection: 
   return (
     <div ref={containerRef} className="mb-10 space-y-5 min-h-[460px]">
       <div className="flex items-center justify-between px-4 md:px-8 xl:px-48 group">
-        <h3 className="text-3xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/collections/${collection.slug}`)}>
+        <h3
+          className="text-3xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors"
+          onClick={() => navigate(`/collections/${collection.slug}`)}
+        >
           {collection.title}
         </h3>
-        <Button variant="ghost" size="default" onClick={() => navigate(`/collections/${collection.slug}`)} className="gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+        <Button
+          variant="ghost"
+          size="default"
+          onClick={() => navigate(`/collections/${collection.slug}`)}
+          className="gap-2 opacity-40 group-hover:opacity-100 transition-opacity"
+        >
           View All <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
@@ -130,14 +152,29 @@ function CollectionRow({ collection, onSelectBook, onOpenModal }: { collection: 
             scrollbarWidth: "none",
             msOverflowStyle: "none",
             maskImage: "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
-            WebkitMaskImage: "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 0%, black 98%, transparent)",
           }}
         >
           {isLoading
-            ? Array.from({ length: 6 }).map((_, i) => <div key={i} className="flex-shrink-0 w-[275px] h-[412px] bg-muted/30 rounded-xl animate-pulse snap-start" />)
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[275px] h-[412px] bg-muted/30 rounded-xl animate-pulse snap-start"
+                />
+              ))
             : books.map((book, i) => (
-                <div key={book.slug} className={`flex-shrink-0 w-[275px] snap-start book-card-enter stagger-${Math.min(i + 1, 12)} hover:!z-50`}>
-                  <BookCard book={book} index={i} totalColumns={6} onSelect={onSelectBook || (() => {})} onOpenModal={onOpenModal} />
+                <div
+                  key={book.slug}
+                  className={`flex-shrink-0 w-[275px] snap-start book-card-enter stagger-${Math.min(i + 1, 12)} hover:!z-50`}
+                >
+                  <BookCard
+                    book={book}
+                    index={i}
+                    totalColumns={6}
+                    onSelect={onSelectBook || (() => {})}
+                    onOpenModal={onOpenModal}
+                  />
                 </div>
               ))}
         </div>
@@ -211,7 +248,11 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
         const enrichedBooks = data.books.map((book) => {
           const desc = descriptions.get(book.slug);
           const readingTime = readingTimes[book.slug];
-          return { ...book, ...(desc && { generatedDescription: desc.description, generatedHook: desc.hook }), ...(readingTime && { readingTime }) };
+          return {
+            ...book,
+            ...(desc && { generatedDescription: desc.description, generatedHook: desc.hook }),
+            ...(readingTime && { readingTime }),
+          };
         });
 
         setCollectionDetails({ ...data, books: enrichedBooks });
@@ -269,7 +310,12 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
     return (
       <div className="space-y-10 overflow-visible pb-24 page-enter">
         <div className="flex items-center gap-5">
-          <Button variant="ghost" size="default" onClick={() => navigate("/collections")} className="gap-2">
+          <Button
+            variant="ghost"
+            size="default"
+            onClick={() => navigate("/collections")}
+            className="gap-2"
+          >
             <ArrowLeft className="w-5 h-5" />
             Back to Collections
           </Button>
@@ -284,10 +330,22 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
             <Loader2 className="w-10 h-10 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid gap-5 overflow-visible page-enter" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
+          <div
+            className="grid gap-5 overflow-visible page-enter"
+            style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}
+          >
             {collectionDetails.books.map((book, index) => (
-              <div key={book.slug} className={`book-card-enter stagger-${Math.min((index % 12) + 1, 12)} hover:!z-50`}>
-                <BookCard book={book} onSelect={handleBookSelect} onOpenModal={handleOpenModal} index={index} totalColumns={6} />
+              <div
+                key={book.slug}
+                className={`book-card-enter stagger-${Math.min((index % 12) + 1, 12)} hover:!z-50`}
+              >
+                <BookCard
+                  book={book}
+                  onSelect={handleBookSelect}
+                  onOpenModal={handleOpenModal}
+                  index={index}
+                  totalColumns={6}
+                />
               </div>
             ))}
           </div>
@@ -313,7 +371,9 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
             <Library className="w-10 h-10 text-primary" />
             Collections
           </h2>
-          <p className="text-lg text-muted-foreground mt-2">Browse curated book collections from Wolne Lektury</p>
+          <p className="text-lg text-muted-foreground mt-2">
+            Browse curated book collections from Wolne Lektury
+          </p>
         </div>
         <Button variant="ghost" size="default" onClick={() => navigate("/")} className="gap-2">
           <ArrowLeft className="w-5 h-5" />
@@ -324,7 +384,11 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
       <div className="flex flex-col">
         {collections.map((collection, idx) => (
           <div key={collection.slug} className={`animate-fade-in stagger-${Math.min(idx + 1, 6)}`}>
-            <CollectionRow collection={collection} onSelectBook={handleBookSelect} onOpenModal={handleOpenModal} />
+            <CollectionRow
+              collection={collection}
+              onSelectBook={handleBookSelect}
+              onOpenModal={handleOpenModal}
+            />
           </div>
         ))}
       </div>

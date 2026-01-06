@@ -150,7 +150,9 @@ async function main() {
 
   const allBookSlugs = new Set<string>();
   for (const file of collectionFiles) {
-    const collection: CollectionData = JSON.parse(fs.readFileSync(path.join(collectionsDir, file), "utf-8"));
+    const collection: CollectionData = JSON.parse(
+      fs.readFileSync(path.join(collectionsDir, file), "utf-8"),
+    );
     for (const book of collection.books) {
       allBookSlugs.add(book.slug);
     }
@@ -179,7 +181,9 @@ async function main() {
     const batchNum = Math.floor(i / concurrency) + 1;
     const totalBatches = Math.ceil(bookSlugs.length / concurrency);
 
-    process.stdout.write(`\rBatch ${batchNum}/${totalBatches} (${i + batch.length}/${bookSlugs.length} books)...`);
+    process.stdout.write(
+      `\rBatch ${batchNum}/${totalBatches} (${i + batch.length}/${bookSlugs.length} books)...`,
+    );
 
     const results = await Promise.all(
       batch.map((slug) => downloadFb2(slug, multiVolumeMapping).then((r) => ({ slug, ...r }))),
@@ -187,7 +191,10 @@ async function main() {
 
     for (const result of results) {
       if (result.success) {
-        if (result.reason === "already exists" || result.reason === "multi-volume already downloaded") {
+        if (
+          result.reason === "already exists" ||
+          result.reason === "multi-volume already downloaded"
+        ) {
           skipped++;
         } else if (result.reason?.includes("multi-volume")) {
           multiVolume++;

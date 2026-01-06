@@ -6,7 +6,13 @@
  */
 
 import { wrapPunctuationAdvanced } from "../wrapPunctuation";
-import { renderBookFromXmlDocument, renderChapterFromXmlDocument, type CharacterBundleInfo, type RenderBookResult, type RenderChapterResult } from "./xmlRendererCore";
+import {
+  renderBookFromXmlDocument,
+  renderChapterFromXmlDocument,
+  type CharacterBundleInfo,
+  type RenderBookResult,
+  type RenderChapterResult,
+} from "./xmlRendererCore";
 
 // Re-export for convenience
 export { wrapPunctuationAdvanced };
@@ -49,11 +55,23 @@ const normalizeChapterXml = (chapterXml: string, fallbackChapterId?: string | nu
  * @param bookSlug - The book's slug (e.g., "1984-English")
  * @param bookLang - The book's language ("english", "polish", etc.)
  */
-export const xmlToComplexHtml = (xmlString: string, bookSlug: string, bookLang: string, characterBundles: CharacterBundleInfo[], bookForm: string): RenderBookResult => {
+export const xmlToComplexHtml = (
+  xmlString: string,
+  bookSlug: string,
+  bookLang: string,
+  characterBundles: CharacterBundleInfo[],
+  bookForm: string,
+): RenderBookResult => {
   const xmlDoc = parseXmlString(xmlString);
   const serializer = new XMLSerializer();
 
-  return renderBookFromXmlDocument(xmlDoc, { bookSlug, bookLang, bookForm, characterBundles, serializer });
+  return renderBookFromXmlDocument(xmlDoc, {
+    bookSlug,
+    bookLang,
+    bookForm,
+    characterBundles,
+    serializer,
+  });
 };
 
 /**
@@ -83,5 +101,11 @@ export const renderChapterXmlToHtml = (
     chapter.setAttribute("id", String(fallbackChapterId));
   }
 
-  return renderChapterFromXmlDocument(xmlDoc, { bookSlug, bookLang, bookForm, characterBundles, serializer });
+  return renderChapterFromXmlDocument(xmlDoc, {
+    bookSlug,
+    bookLang,
+    bookForm,
+    characterBundles,
+    serializer,
+  });
 };

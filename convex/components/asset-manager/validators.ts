@@ -48,11 +48,7 @@ export const assetVersionFields = {
   _creationTime: v.number(),
   assetId: v.id("assets"),
   version: v.number(),
-  state: v.union(
-    v.literal("draft"),
-    v.literal("published"),
-    v.literal("archived"),
-  ),
+  state: v.union(v.literal("draft"), v.literal("published"), v.literal("archived")),
   label: v.optional(v.string()),
   extra: v.optional(v.any()),
   storageId: v.optional(v.id("_storage")),

@@ -4,11 +4,13 @@ import type { Document } from "../embeddingManager";
 
 describe("shouldAllowDocument", () => {
   // Helper to create a mock document
-  const createDoc = ({ chapter, paragraphNumber }: { chapter: number; paragraphNumber: number }): Document => ({
+  const createDoc = ({
     chapter,
     paragraphNumber,
-    text: `C${chapter}P${paragraphNumber}`,
-  });
+  }: {
+    chapter: number;
+    paragraphNumber: number;
+  }): Document => ({ chapter, paragraphNumber, text: `C${chapter}P${paragraphNumber}` });
 
   // --- Basic Cases --- //
   test("should allow document when no filter is provided", () => {
@@ -24,7 +26,13 @@ describe("shouldAllowDocument", () => {
   });
 
   test("my test", () => {
-    const filter: Filter = { chapterFrom: 1, chapterTo: 2, paragraphFrom: 1, paragraphTo: 5, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 1,
+      chapterTo: 2,
+      paragraphFrom: 1,
+      paragraphTo: 5,
+      bookSlug: "test",
+    };
     const doc = createDoc({ chapter: 1, paragraphNumber: 10 });
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
@@ -56,92 +64,182 @@ describe("shouldAllowDocument", () => {
   // --- Combined Chapter and Paragraph Filtering --- //
   test("should allow document fully within chapter and paragraph range", () => {
     const doc = createDoc({ chapter: 5, paragraphNumber: 10 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should allow document in intermediate chapter, regardless of paragraph numbers", () => {
     const doc = createDoc({ chapter: 4, paragraphNumber: 1 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should allow document in intermediate chapter (high paragraph), regardless of paragraph numbers", () => {
     const doc = createDoc({ chapter: 6, paragraphNumber: 20 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should disallow document before chapterFrom (combined filter)", () => {
     const doc = createDoc({ chapter: 2, paragraphNumber: 10 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
   test("should disallow document after chapterTo (combined filter)", () => {
     const doc = createDoc({ chapter: 8, paragraphNumber: 10 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
   test("should disallow document in chapterFrom but before paragraphFrom", () => {
     const doc = createDoc({ chapter: 3, paragraphNumber: 4 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
   test("should allow document in chapterFrom at paragraphFrom boundary", () => {
     const doc = createDoc({ chapter: 3, paragraphNumber: 5 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should allow document in chapterFrom after paragraphFrom boundary", () => {
     const doc = createDoc({ chapter: 3, paragraphNumber: 6 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should disallow document in chapterTo but after paragraphTo", () => {
     const doc = createDoc({ chapter: 7, paragraphNumber: 16 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
   test("should allow document in chapterTo at paragraphTo boundary", () => {
     const doc = createDoc({ chapter: 7, paragraphNumber: 15 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should allow document in chapterTo before paragraphTo boundary", () => {
     const doc = createDoc({ chapter: 7, paragraphNumber: 14 });
-    const filter: Filter = { chapterFrom: 3, paragraphFrom: 5, chapterTo: 7, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 3,
+      paragraphFrom: 5,
+      chapterTo: 7,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   // --- Single Chapter Filtering --- //
   test("should allow document within single chapter and paragraph range", () => {
     const doc = createDoc({ chapter: 5, paragraphNumber: 10 });
-    const filter: Filter = { chapterFrom: 5, paragraphFrom: 5, chapterTo: 5, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 5,
+      paragraphFrom: 5,
+      chapterTo: 5,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should disallow document before paragraphFrom in single chapter", () => {
     const doc = createDoc({ chapter: 5, paragraphNumber: 4 });
-    const filter: Filter = { chapterFrom: 5, paragraphFrom: 5, chapterTo: 5, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 5,
+      paragraphFrom: 5,
+      chapterTo: 5,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
   test("should disallow document after paragraphTo in single chapter", () => {
     const doc = createDoc({ chapter: 5, paragraphNumber: 16 });
-    const filter: Filter = { chapterFrom: 5, paragraphFrom: 5, chapterTo: 5, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 5,
+      paragraphFrom: 5,
+      chapterTo: 5,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
   test("should disallow document in different chapter (single chapter filter)", () => {
     const doc = createDoc({ chapter: 6, paragraphNumber: 10 });
-    const filter: Filter = { chapterFrom: 5, paragraphFrom: 5, chapterTo: 5, paragraphTo: 15, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 5,
+      paragraphFrom: 5,
+      chapterTo: 5,
+      paragraphTo: 15,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
@@ -172,19 +270,34 @@ describe("shouldAllowDocument", () => {
 
   test("should allow document when only chapterFrom and paragraphFrom are set (doc chapter > chapterFrom)", () => {
     const doc = createDoc({ chapter: 6, paragraphNumber: 2 });
-    const filter: Filter = { chapterFrom: 5, paragraphFrom: 5, chapterTo: Infinity, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 5,
+      paragraphFrom: 5,
+      chapterTo: Infinity,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should allow document when only chapterFrom and paragraphFrom are set (doc chapter = chapterFrom, doc para >= paragraphFrom)", () => {
     const doc = createDoc({ chapter: 5, paragraphNumber: 6 });
-    const filter: Filter = { chapterFrom: 5, paragraphFrom: 5, chapterTo: Infinity, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 5,
+      paragraphFrom: 5,
+      chapterTo: Infinity,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(true);
   });
 
   test("should disallow document when only chapterFrom and paragraphFrom are set (doc chapter = chapterFrom, doc para < paragraphFrom)", () => {
     const doc = createDoc({ chapter: 5, paragraphNumber: 4 });
-    const filter: Filter = { chapterFrom: 5, paragraphFrom: 5, chapterTo: Infinity, bookSlug: "test" };
+    const filter: Filter = {
+      chapterFrom: 5,
+      paragraphFrom: 5,
+      chapterTo: Infinity,
+      bookSlug: "test",
+    };
     expect(shouldAllowDocument(doc, filter)).toBe(false);
   });
 
@@ -242,7 +355,13 @@ describe("shouldAllowDocument", () => {
 // Original failing test
 test("filterLogic", () => {
   const doc = { chapter: 1, paragraphNumber: 1, text: "test" };
-  const filter = { paragraphFrom: 2, chapterFrom: 2, chapterTo: 3, paragraphTo: 3, bookSlug: "test" };
+  const filter = {
+    paragraphFrom: 2,
+    chapterFrom: 2,
+    chapterTo: 3,
+    paragraphTo: 3,
+    bookSlug: "test",
+  };
   const result = shouldAllowDocument(doc, filter);
   expect(result).toBe(false);
 });

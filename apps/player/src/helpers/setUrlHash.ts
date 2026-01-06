@@ -1,4 +1,8 @@
-export const setUrlHash = (chapter: number, paragraph: number, mode: "push" | "replace" = "replace") => {
+export const setUrlHash = (
+  chapter: number,
+  paragraph: number,
+  mode: "push" | "replace" = "replace",
+) => {
   const url = new URL(window.location.href);
   url.hash = `${chapter}-${paragraph}`;
   if (mode === "push") {

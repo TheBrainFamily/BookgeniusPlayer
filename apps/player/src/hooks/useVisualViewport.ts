@@ -9,7 +9,11 @@ export function useVisualViewport(): VisualViewportState {
       : {
           height: window.visualViewport?.height ?? window.innerHeight,
           top: window.visualViewport?.offsetTop ?? 0,
-          isKeyboardOpen: window.innerHeight - ((window.visualViewport?.height ?? window.innerHeight) + (window.visualViewport?.offsetTop ?? 0)) > 80,
+          isKeyboardOpen:
+            window.innerHeight -
+              ((window.visualViewport?.height ?? window.innerHeight) +
+                (window.visualViewport?.offsetTop ?? 0)) >
+            80,
         };
 
   const [viewportState, setViewportState] = useState<VisualViewportState>(initialState);

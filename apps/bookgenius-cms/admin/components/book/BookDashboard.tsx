@@ -16,7 +16,17 @@ import { isBookFolder, type BookFolderExtra } from "@/lib/types/book";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookOpen, Users, FileText, Film, Music, ArrowRight, Sparkles, Globe, Loader2 } from "lucide-react";
+import {
+  BookOpen,
+  Users,
+  FileText,
+  Film,
+  Music,
+  ArrowRight,
+  Sparkles,
+  Globe,
+  Loader2,
+} from "lucide-react";
 
 interface BookDashboardProps {
   onNavigate: (path: string) => void;
@@ -42,10 +52,38 @@ export function BookDashboard({ onNavigate }: BookDashboardProps) {
   const extra = isBookFolder(metadata.extra) ? (metadata.extra as BookFolderExtra) : null;
 
   const sections = [
-    { id: "characters", label: "Characters", icon: Users, count: stats?.characterCount ?? 0, path: `${bookPath}/characters`, description: "Character avatars and animations" },
-    { id: "chapters", label: "Chapters", icon: FileText, count: stats?.chapterCount ?? 0, path: `${bookPath}/chapters`, description: "Story content and dialogue" },
-    { id: "backgrounds", label: "Backgrounds", icon: Film, count: stats?.backgroundCount ?? 0, path: `${bookPath}/backgrounds`, description: "Scene backgrounds and videos" },
-    { id: "music", label: "Music", icon: Music, count: stats?.musicCount ?? 0, path: `${bookPath}/music`, description: "Background music and sound" },
+    {
+      id: "characters",
+      label: "Characters",
+      icon: Users,
+      count: stats?.characterCount ?? 0,
+      path: `${bookPath}/characters`,
+      description: "Character avatars and animations",
+    },
+    {
+      id: "chapters",
+      label: "Chapters",
+      icon: FileText,
+      count: stats?.chapterCount ?? 0,
+      path: `${bookPath}/chapters`,
+      description: "Story content and dialogue",
+    },
+    {
+      id: "backgrounds",
+      label: "Backgrounds",
+      icon: Film,
+      count: stats?.backgroundCount ?? 0,
+      path: `${bookPath}/backgrounds`,
+      description: "Scene backgrounds and videos",
+    },
+    {
+      id: "music",
+      label: "Music",
+      icon: Music,
+      count: stats?.musicCount ?? 0,
+      path: `${bookPath}/music`,
+      description: "Background music and sound",
+    },
   ];
 
   return (
@@ -115,7 +153,11 @@ export function BookDashboard({ onNavigate }: BookDashboardProps) {
         <div className="pt-4 border-t border-border">
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Quick Actions</h2>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={() => onNavigate(`${bookPath}/characters`)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onNavigate(`${bookPath}/characters`)}
+            >
               <Users className="h-4 w-4 mr-2" />
               Add Character
             </Button>

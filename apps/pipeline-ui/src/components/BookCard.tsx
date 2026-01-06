@@ -81,10 +81,22 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
     <div className="relative flex-shrink-0" style={{ width: "100%" }}>
       <div
         className="aspect-[2/3] overflow-hidden mb-3 transition-[border-radius] duration-300 rounded-xl"
-        style={{ backgroundColor: book.coverColor || "#333", borderRadius: isExpanded ? (isRightSide ? "0 0.75rem 0.75rem 0" : "0.75rem 0 0 0.75rem") : "0.75rem" }}
+        style={{
+          backgroundColor: book.coverColor || "#333",
+          borderRadius: isExpanded
+            ? isRightSide
+              ? "0 0.75rem 0.75rem 0"
+              : "0.75rem 0 0 0.75rem"
+            : "0.75rem",
+        }}
       >
         {book.cover ? (
-          <img src={book.cover} alt={book.title} className="w-full h-full object-cover" loading="lazy" />
+          <img
+            src={book.cover}
+            alt={book.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <BookOpen className="w-14 h-14 text-white/50" />
@@ -117,7 +129,9 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
     >
       <div className="h-full p-5 flex flex-col" style={{ width: panelWidth }}>
         <div>
-          <h3 className="font-bold text-lg text-foreground line-clamp-2 leading-tight tracking-tight">{book.title}</h3>
+          <h3 className="font-bold text-lg text-foreground line-clamp-2 leading-tight tracking-tight">
+            {book.title}
+          </h3>
           <p className="text-base text-muted-foreground mt-1">{book.author}</p>
           {book.readingTime && (
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1.5">
@@ -130,7 +144,9 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
         {book.generatedHook && (
           <div className="flex-1 flex items-center py-4">
             <div className="relative pl-4 border-l-2 border-primary/40">
-              <p className="text-base font-medium text-primary italic leading-snug">"{book.generatedHook}"</p>
+              <p className="text-base font-medium text-primary italic leading-snug">
+                "{book.generatedHook}"
+              </p>
             </div>
           </div>
         )}
@@ -138,23 +154,36 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
         <div className="mt-auto">
           <div className="flex flex-wrap gap-2 mb-4">
             {book.epoch && (
-              <Badge variant="outline" className="text-xs px-2.5 py-0.5 h-6 font-normal bg-secondary/20 border-secondary-foreground/10 text-secondary-foreground">
+              <Badge
+                variant="outline"
+                className="text-xs px-2.5 py-0.5 h-6 font-normal bg-secondary/20 border-secondary-foreground/10 text-secondary-foreground"
+              >
                 {book.epoch}
               </Badge>
             )}
             {book.genre && (
-              <Badge variant="outline" className="text-xs px-2.5 py-0.5 h-6 font-normal bg-secondary/20 border-secondary-foreground/10 text-secondary-foreground">
+              <Badge
+                variant="outline"
+                className="text-xs px-2.5 py-0.5 h-6 font-normal bg-secondary/20 border-secondary-foreground/10 text-secondary-foreground"
+              >
                 {book.genre}
               </Badge>
             )}
             {book.kind && (
-              <Badge variant="outline" className="text-xs px-2.5 py-0.5 h-6 font-normal bg-secondary/20 border-secondary-foreground/10 text-secondary-foreground">
+              <Badge
+                variant="outline"
+                className="text-xs px-2.5 py-0.5 h-6 font-normal bg-secondary/20 border-secondary-foreground/10 text-secondary-foreground"
+              >
                 {book.kind}
               </Badge>
             )}
           </div>
 
-          <Button className="w-full gap-2 font-medium shadow-sm hover:shadow-md transition-all" size="default" onClick={handleStartClick}>
+          <Button
+            className="w-full gap-2 font-medium shadow-sm hover:shadow-md transition-all"
+            size="default"
+            onClick={handleStartClick}
+          >
             <Play className="w-4 h-4 fill-current" />
             Read Now
           </Button>
@@ -192,7 +221,10 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
     >
       <div
         className="transition-transform duration-300 ease-out will-change-transform"
-        style={{ transform: isHovered ? "scale(1.02)" : "scale(1)", transformOrigin: isRightSide ? "right top" : "left top" }}
+        style={{
+          transform: isHovered ? "scale(1.02)" : "scale(1)",
+          transformOrigin: isRightSide ? "right top" : "left top",
+        }}
       >
         <div className="flex" style={{ justifyContent: isRightSide ? "flex-end" : "flex-start" }}>
           {isRightSide ? (
@@ -211,8 +243,16 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
         </div>
 
         <div className="h-[72px] mt-3">
-          <h3 className={`text-base font-medium line-clamp-2 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}>{book.title}</h3>
-          <p className={`text-sm text-muted-foreground line-clamp-1 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}>{book.author}</p>
+          <h3
+            className={`text-base font-medium line-clamp-2 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}
+          >
+            {book.title}
+          </h3>
+          <p
+            className={`text-sm text-muted-foreground line-clamp-1 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}
+          >
+            {book.author}
+          </p>
         </div>
       </div>
     </div>

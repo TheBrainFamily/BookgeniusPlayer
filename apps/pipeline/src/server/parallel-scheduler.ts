@@ -14,7 +14,10 @@ export const STEP_DEPENDENCIES: StepDependency[] = [
   { step: "generate_embeddings", deps: ["map_summaries_to_paragraphs"] },
   { step: "upload_answer_server_data", deps: ["generate_embeddings"] },
   { step: "generate_backgrounds", deps: ["generate_graphical_style"] },
-  { step: "generate_entity_pictures", deps: ["generate_graphical_style", "generate_picture_prompts"] },
+  {
+    step: "generate_entity_pictures",
+    deps: ["generate_graphical_style", "generate_picture_prompts"],
+  },
 ];
 
 export function getStepDeps(step: Step): Step[] {
@@ -26,9 +29,14 @@ export function canRunStep(step: Step, completedSteps: Set<Step>): boolean {
   return deps.every((dep) => completedSteps.has(dep));
 }
 
-export function getReadySteps(allSteps: Step[], completedSteps: Set<Step>, runningSteps: Set<Step>): Step[] {
+export function getReadySteps(
+  allSteps: Step[],
+  completedSteps: Set<Step>,
+  runningSteps: Set<Step>,
+): Step[] {
   return allSteps.filter(
-    (step) => !completedSteps.has(step) && !runningSteps.has(step) && canRunStep(step, completedSteps),
+    (step) =>
+      !completedSteps.has(step) && !runningSteps.has(step) && canRunStep(step, completedSteps),
   );
 }
 
@@ -40,5 +48,10 @@ export type ParallelSchedulerState = {
 };
 
 export function createSchedulerState(): ParallelSchedulerState {
-  return { completedSteps: new Set(), runningSteps: new Set(), failedSteps: new Set(), stepPromises: new Map() };
+  return {
+    completedSteps: new Set(),
+    runningSteps: new Set(),
+    failedSteps: new Set(),
+    stepPromises: new Map(),
+  };
 }

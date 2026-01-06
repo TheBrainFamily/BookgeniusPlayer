@@ -9,8 +9,11 @@
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": { "@player/*": ["./src/*"], "@books-generator/*": ["../books-generator/src/*"], "@convex/*": ["../../convex/*"] },
+    "paths": {
+      "@player/*": ["./src/*"],
+      "@books-generator/*": ["../books-generator/src/*"],
+      "@convex/*": ["../../convex/*"]
+    },
     "jsx": "react-jsx",
     "types": ["vite/client", "jest"],
     "allowJs": true,

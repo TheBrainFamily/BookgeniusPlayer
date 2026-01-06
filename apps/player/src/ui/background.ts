@@ -6,13 +6,27 @@ import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
 import { getBookSlug } from "@player/state/bookDataStore";
 import { getBookFromUrl } from "@player/getBookFromUrl";
 
-export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number; backgroundColor?: string; textColor?: string };
+export type Background = {
+  startChapter: number;
+  startParagraph: number;
+  file: string;
+  endChapter: number;
+  endParagraph: number;
+  backgroundColor?: string;
+  textColor?: string;
+};
 
 // ---- globals ----------------------------------------------------------------
 
-type DebouncedLike<F extends (...args: unknown[]) => unknown> = F & { cancel: () => void; flush?: () => void; pending?: () => boolean };
+type DebouncedLike<F extends (...args: unknown[]) => unknown> = F & {
+  cancel: () => void;
+  flush?: () => void;
+  pending?: () => boolean;
+};
 
-let debouncedHandler: DebouncedLike<(currentLocation: { currentChapter: number; currentParagraph: number }) => void> | null = null;
+let debouncedHandler: DebouncedLike<
+  (currentLocation: { currentChapter: number; currentParagraph: number }) => void
+> | null = null;
 
 enum TransitionState {
   Idle = "idle", // nothing in progress
@@ -126,7 +140,13 @@ function isDarkColor(hex: string, threshold: number = 0.5): boolean {
   return getColorLuminance(hex) < threshold;
 }
 
-function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: string; textColor?: string }) {
+function applyScopedColors({
+  backgroundColor,
+  textColor,
+}: {
+  backgroundColor?: string;
+  textColor?: string;
+}) {
   const scope = document.getElementById("player-scope") as HTMLElement | null;
   if (!scope) return;
 
@@ -205,7 +225,13 @@ const FADE_DURATION_MS = 800; // fallback
 const COLOR_DELAY_MS = 120; // slight delay to let background start appearing first
 
 // ---- Main Function ----------------------------------------------------------
-export const dealWithBackground = ({ currentChapter, currentParagraph }: { currentChapter: number; currentParagraph: number }) => {
+export const dealWithBackground = ({
+  currentChapter,
+  currentParagraph,
+}: {
+  currentChapter: number;
+  currentParagraph: number;
+}) => {
   const legacy = document.getElementById("legacy")!;
   const videoA = document.getElementById("bg-video-a") as HTMLVideoElement;
   const videoB = document.getElementById("bg-video-b") as HTMLVideoElement;
@@ -240,7 +266,11 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
     const initialFrontEl = elements[initialType][initialFrontId];
     initialFrontEl.style.zIndex = Z_INDEX_FRONT;
     initialFrontEl.classList.remove("faded");
-    if (initialType === "image" && legacy.dataset.currentFile && getFileType(legacy.dataset.currentFile) === "image") {
+    if (
+      initialType === "image" &&
+      legacy.dataset.currentFile &&
+      getFileType(legacy.dataset.currentFile) === "image"
+    ) {
       initialFrontEl.classList.add("zooming");
     }
 
@@ -260,7 +290,11 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         const backgrounds = getBackgrounds() as Background[];
 
         const foundAll = backgrounds.filter((bg) => {
-          return (currentLocation.currentChapter == bg.startChapter && currentLocation.currentParagraph >= bg.startParagraph) || currentLocation.currentChapter > bg.startChapter;
+          return (
+            (currentLocation.currentChapter == bg.startChapter &&
+              currentLocation.currentParagraph >= bg.startParagraph) ||
+            currentLocation.currentChapter > bg.startChapter
+          );
         });
 
         const found = foundAll[foundAll.length - 1];
@@ -313,7 +347,10 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           const canReusePreload =
             pre instanceof HTMLVideoElement &&
             pre.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA &&
-            sameUrl(new URL(pre.src, window.location.href).href, new URL(newSrc, window.location.href).href);
+            sameUrl(
+              new URL(pre.src, window.location.href).href,
+              new URL(newSrc, window.location.href).href,
+            );
 
           if (canReusePreload) {
             vid.src = pre.src;
@@ -443,7 +480,9 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
       },
       150,
       { leading: true, trailing: true, maxWait: 150 },
-    ) as DebouncedLike<(currentLocation: { currentChapter: number; currentParagraph: number }) => void>; // cast to our local DebouncedLike
+    ) as DebouncedLike<
+      (currentLocation: { currentChapter: number; currentParagraph: number }) => void
+    >; // cast to our local DebouncedLike
   }
 
   /* ---------- invoke the handler ----------------------------------------- */

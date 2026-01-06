@@ -29,7 +29,11 @@ export async function uploadBookFolder(
   const richXmlSrc = path.join(resolvedPath, "input", "rich.xml");
 
   if (!(await fs.pathExists(embeddingsSrc))) {
-    return { success: false, bookSlug: slug, error: `embeddings.json not found at ${embeddingsSrc}` };
+    return {
+      success: false,
+      bookSlug: slug,
+      error: `embeddings.json not found at ${embeddingsSrc}`,
+    };
   }
   if (!(await fs.pathExists(richXmlSrc))) {
     return { success: false, bookSlug: slug, error: `rich.xml not found at ${richXmlSrc}` };
@@ -43,7 +47,9 @@ export async function uploadBookFolder(
     const embeddingsContent = await fs.readFile(embeddingsSrc);
     const embeddingsFile = r2.file(embeddingsKey);
     await embeddingsFile.write(embeddingsContent);
-    console.log(`  ✅ Uploaded ${embeddingsKey} (${(embeddingsContent.length / 1024 / 1024).toFixed(2)} MB)`);
+    console.log(
+      `  ✅ Uploaded ${embeddingsKey} (${(embeddingsContent.length / 1024 / 1024).toFixed(2)} MB)`,
+    );
 
     const richXmlKey = `answer-server-data/${slug}/rich.xml`;
     const richXmlContent = await fs.readFile(richXmlSrc);
@@ -140,7 +146,9 @@ Environment variables required:
   const resolvedPath = path.resolve(targetPath);
   const stat = await fs.stat(resolvedPath);
 
-  const hasEmbeddings = await fs.pathExists(path.join(resolvedPath, "temporary-output", "embeddings.json"));
+  const hasEmbeddings = await fs.pathExists(
+    path.join(resolvedPath, "temporary-output", "embeddings.json"),
+  );
 
   if (hasEmbeddings) {
     console.log(`📤 Uploading single book: ${path.basename(resolvedPath)}\n`);

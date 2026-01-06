@@ -3,7 +3,11 @@ import { AnimatePresence, motion, Variants } from "motion/react";
 import { UndoDot } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { shouldShowReturnButton, systemNavigateTo, getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import {
+  shouldShowReturnButton,
+  systemNavigateTo,
+  getSavedLocation,
+} from "@player/helpers/paragraphsNavigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@player/components/ui/tooltip";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { OptionalElement } from "./OptionalElement";
@@ -38,7 +42,10 @@ const ReturnToLocationButton = () => {
 
     // Smooth navigation with full chapter range between current and saved.
     systemNavigateTo(
-      { currentChapter: savedLocation.currentChapter, currentParagraph: savedLocation.currentParagraph },
+      {
+        currentChapter: savedLocation.currentChapter,
+        currentParagraph: savedLocation.currentParagraph,
+      },
       { behavior: "smooth", expandChapterRange: true, history: "push" },
     );
 
@@ -88,8 +95,17 @@ const ReturnToLocationButton = () => {
 };
 
 const variants: Record<string, Variants> = {
-  container: { hidden: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } }, visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } } },
-  button: { hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)" }, tap: { scale: 0.9 } },
+  container: {
+    hidden: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+  },
+  button: {
+    hover: {
+      backgroundColor: "rgba(255,255,255,0.2)",
+      boxShadow: "0px 0px 8px rgba(255,255,255,0.5)",
+    },
+    tap: { scale: 0.9 },
+  },
 };
 
 export default ReturnToLocationButton;

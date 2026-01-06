@@ -181,7 +181,9 @@ async function runStep(job: Job, step: Step, fn: () => Promise<void>) {
     addLog(job, stack || "");
 
     markStepError(job.slug, step, job.error, s.startedAt!, s.endedAt);
-    await convex.reportProgress({ bookPath: job.bookPath, step, status: "error", error: errorMessage }).catch(() => {});
+    await convex
+      .reportProgress({ bookPath: job.bookPath, step, status: "error", error: errorMessage })
+      .catch(() => {});
     await convex.markFailed({ bookPath: job.bookPath, error: errorMessage }).catch(() => {});
 
     console.error(`Step ${step} failed:`, e);
@@ -190,7 +192,9 @@ async function runStep(job: Job, step: Step, fn: () => Promise<void>) {
 }
 
 async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
-  const files = fs.readdirSync(tempOutputDir).filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
+  const files = fs
+    .readdirSync(tempOutputDir)
+    .filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
 
   for (const file of files) {
     const match = file.match(/chapter-(\d+)/);
@@ -227,13 +231,21 @@ async function uploadCharactersToConvex(
   tempOutputDir: string,
 ) {
   const generatedPromptsPath = path.join(tempOutputDir, "generated-prompts.json");
-  let generatedPrompts: { characters: { name: string; visualGuide: string }[] } = { characters: [] };
+  let generatedPrompts: { characters: { name: string; visualGuide: string }[] } = {
+    characters: [],
+  };
   if (fs.existsSync(generatedPromptsPath)) {
     try {
       generatedPrompts = JSON.parse(fs.readFileSync(generatedPromptsPath, "utf-8"));
-      addLog(job, `Loaded ${generatedPrompts.characters.length} AI prompts from generated-prompts.json`);
+      addLog(
+        job,
+        `Loaded ${generatedPrompts.characters.length} AI prompts from generated-prompts.json`,
+      );
     } catch (e) {
-      addLog(job, `⚠ Failed to parse generated-prompts.json: ${e instanceof Error ? e.message : String(e)}`);
+      addLog(
+        job,
+        `⚠ Failed to parse generated-prompts.json: ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
   }
 
@@ -285,7 +297,9 @@ async function uploadBackgroundsToConvex(job: Job, outputDir: string) {
   const backgroundsDir = path.join(outputDir, "backgrounds");
   if (!fs.existsSync(backgroundsDir)) return;
 
-  const files = fs.readdirSync(backgroundsDir).filter((f) => /\.(png|jpg|jpeg|webp|mp4|webm)$/i.test(f));
+  const files = fs
+    .readdirSync(backgroundsDir)
+    .filter((f) => /\.(png|jpg|jpeg|webp|mp4|webm)$/i.test(f));
 
   for (const file of files) {
     const filePath = path.join(backgroundsDir, file);
@@ -306,7 +320,12 @@ async function uploadBackgroundsToConvex(job: Job, outputDir: string) {
       if (match) {
         const chapter = parseInt(match[1], 10);
         const paragraph = parseInt(match[2], 10);
-        await convex.upsertBackgroundCue({ bookPath: job.bookPath, chapter, paragraph, fileBasename: file });
+        await convex.upsertBackgroundCue({
+          bookPath: job.bookPath,
+          chapter,
+          paragraph,
+          fileBasename: file,
+        });
       }
 
       addLog(job, `✔ Background ${file} uploaded`);
@@ -345,7 +364,9 @@ async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
   for (const section of Array.from(sections)) {
     const id = section.getAttribute("id");
     const content =
-      section.querySelector("p")?.innerHTML?.replace(' xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"', "") || "";
+      section
+        .querySelector("p")
+        ?.innerHTML?.replace(' xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"', "") || "";
     if (id && content) {
       noteMap.set(id, content);
     }
@@ -359,11 +380,13 @@ async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
   addLog(job, `Found ${noteMap.size} notes in FB2`);
 
   const richXml = fs.readFileSync(richXmlPath, "utf-8");
-  const notesToUpload: { bookPath: string; noteId: string; content: string; chapter: number }[] = [];
+  const notesToUpload: { bookPath: string; noteId: string; content: string; chapter: number }[] =
+    [];
   const usedNoteIds = new Set<string>();
 
   // Regex: match <section data-chapter="N"> and capture chapter content until next section or end
-  const chapterRegex = /<section[^>]*data-chapter="(\d+)"[^>]*>([\s\S]*?)(?=<section[^>]*data-chapter="|$)/g;
+  const chapterRegex =
+    /<section[^>]*data-chapter="(\d+)"[^>]*>([\s\S]*?)(?=<section[^>]*data-chapter="|$)/g;
   // Match both <note id="X"> and <a data-note="X"> formats
   const noteRefRegex = /(?:<note\s+id=['"]([^'"]+)['"]|<a\s+data-note=['"]([^'"]+)['"])/g;
 
@@ -542,7 +565,9 @@ export async function startPipeline(input: {
       const filePath = getFilePath(fileName, FILE_TYPE.PERMANENT);
 
       if (fs.existsSync(filePath)) {
-        referenceCards = JSON.parse(readBookFile(fileName, FILE_TYPE.PERMANENT)) as NewReferenceCardsResponse;
+        referenceCards = JSON.parse(
+          readBookFile(fileName, FILE_TYPE.PERMANENT),
+        ) as NewReferenceCardsResponse;
         addLog(job, "Using existing reference cards");
       } else {
         referenceCards = await getReferenceCardsForWholeBook();
@@ -686,7 +711,13 @@ export async function startPipeline(input: {
       } else {
         addLog(job, "No user style provided, generating auto preview only");
         const autoPreview = await generateStylePreview(autoStyle, "auto", 1);
-        setPreviewsGenerated(bookRoot, autoPreview?.imagePath || null, null, autoPreview?.avatarPath || null, null);
+        setPreviewsGenerated(
+          bookRoot,
+          autoPreview?.imagePath || null,
+          null,
+          autoPreview?.avatarPath || null,
+          null,
+        );
         setStyleChoice(bookRoot, "auto");
       }
 
@@ -695,7 +726,11 @@ export async function startPipeline(input: {
       const finalState = readStyleSelection(bookRoot);
       const selectedChoice = finalState?.selected || "auto";
       const finalStyle = selectedChoice === "user" && userStyle ? userStyle : autoStyle;
-      writeBookFile("graphicalStyle.json", JSON.stringify(finalStyle, null, 2), FILE_TYPE.TEMPORARY);
+      writeBookFile(
+        "graphicalStyle.json",
+        JSON.stringify(finalStyle, null, 2),
+        FILE_TYPE.TEMPORARY,
+      );
       addLog(job, `Final style selected: ${selectedChoice}`);
 
       await uploadGraphicalStyleToConvex(job, tempOutputDir);
@@ -713,7 +748,11 @@ export async function startPipeline(input: {
         readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
       ) as NewReferenceCardsResponse;
       const prompts = await generatePicturePrompts(referenceCards);
-      writeBookFile("generated-prompts.json", JSON.stringify(prompts, null, 2), FILE_TYPE.TEMPORARY);
+      writeBookFile(
+        "generated-prompts.json",
+        JSON.stringify(prompts, null, 2),
+        FILE_TYPE.TEMPORARY,
+      );
       addLog(job, `Generated picture prompts for ${prompts.characters.length} characters`);
     },
 
@@ -806,8 +845,15 @@ export async function startPipeline(input: {
     }
 
     const runScheduler = async () => {
-      while (schedulerState.completedSteps.size + schedulerState.failedSteps.size < stepsToRun.length) {
-        const readySteps = getReadySteps(stepsToRun, schedulerState.completedSteps, schedulerState.runningSteps);
+      while (
+        schedulerState.completedSteps.size + schedulerState.failedSteps.size <
+        stepsToRun.length
+      ) {
+        const readySteps = getReadySteps(
+          stepsToRun,
+          schedulerState.completedSteps,
+          schedulerState.runningSteps,
+        );
 
         if (readySteps.length === 0 && schedulerState.runningSteps.size === 0) {
           throw new Error("Pipeline deadlock: no steps ready and none running");

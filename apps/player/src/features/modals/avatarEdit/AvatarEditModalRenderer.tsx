@@ -10,5 +10,8 @@ export const AvatarEditModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <AvatarEditModal />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>{isOpen && <AvatarEditModal />}</AnimatePresence>,
+    document.body,
+  );
 };

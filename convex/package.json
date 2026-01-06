@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "convex dev",
     "deploy": "convex deploy",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit --incremental"
   },
   "dependencies": {
     "@convex-dev/r2": "^0.8.1",

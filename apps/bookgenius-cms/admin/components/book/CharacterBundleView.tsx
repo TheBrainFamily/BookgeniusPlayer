@@ -17,7 +17,15 @@ import { isCharacterFolder, type CharacterFolderExtra } from "@/lib/types/book";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { User, Image as ImageIcon, Video, AlertCircle, CheckCircle2, Play, Volume2 } from "lucide-react";
+import {
+  User,
+  Image as ImageIcon,
+  Video,
+  AlertCircle,
+  CheckCircle2,
+  Play,
+  Volume2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CharacterBundleViewProps {
@@ -81,7 +89,10 @@ export function CharacterBundleView({ characterPath, onClick }: CharacterBundleV
           <div className="absolute top-2 right-2">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/50">
+                <Badge
+                  variant="outline"
+                  className="bg-amber-500/10 text-amber-600 border-amber-500/50"
+                >
                   <AlertCircle className="h-3 w-3 mr-1" />
                   Incomplete
                 </Badge>
@@ -96,7 +107,9 @@ export function CharacterBundleView({ characterPath, onClick }: CharacterBundleV
 
       {/* Info */}
       <div className="p-3">
-        <div className="font-medium truncate group-hover:text-primary transition-colors">{displayName}</div>
+        <div className="font-medium truncate group-hover:text-primary transition-colors">
+          {displayName}
+        </div>
         {summary && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{summary}</p>}
         <div className="flex items-center gap-1 mt-2">
           <Badge variant="secondary" className="text-xs">
@@ -115,14 +128,27 @@ export function CharacterBundleView({ characterPath, onClick }: CharacterBundleV
 }
 
 // Asset indicator pill
-function AssetIndicator({ type, available, url }: { type: "avatar" | "speaks" | "listens"; available: boolean; url?: string }) {
+function AssetIndicator({
+  type,
+  available,
+  url,
+}: {
+  type: "avatar" | "speaks" | "listens";
+  available: boolean;
+  url?: string;
+}) {
   const icons = { avatar: ImageIcon, speaks: Play, listens: Volume2 };
   const Icon = icons[type];
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", available ? "bg-green-500/20 text-green-600" : "bg-muted text-muted-foreground")}>
+        <div
+          className={cn(
+            "w-6 h-6 rounded-full flex items-center justify-center",
+            available ? "bg-green-500/20 text-green-600" : "bg-muted text-muted-foreground",
+          )}
+        >
           <Icon className="h-3 w-3" />
         </div>
       </TooltipTrigger>

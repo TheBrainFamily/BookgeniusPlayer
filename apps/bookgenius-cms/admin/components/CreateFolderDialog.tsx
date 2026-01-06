@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,7 +77,9 @@ export function CreateFolderDialog({ open, onOpenChange, parentPath }: CreateFol
               }}
               autoFocus
             />
-            <p className="text-xs text-muted-foreground">The folder path will be automatically generated from the name</p>
+            <p className="text-xs text-muted-foreground">
+              The folder path will be automatically generated from the name
+            </p>
           </div>
         </div>
         <DialogFooter>

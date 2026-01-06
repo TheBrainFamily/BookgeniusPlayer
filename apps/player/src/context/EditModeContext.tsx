@@ -60,7 +60,9 @@ export function EditModeProvider({ children }: EditModeProviderProps) {
     };
   }, [handleKeyDown, handleKeyUp, handleBlur, handleVisibilityChange]);
 
-  return <EditModeContext.Provider value={{ isEditModeActive }}>{children}</EditModeContext.Provider>;
+  return (
+    <EditModeContext.Provider value={{ isEditModeActive }}>{children}</EditModeContext.Provider>
+  );
 }
 
 export function useEditMode(): EditModeContextType {

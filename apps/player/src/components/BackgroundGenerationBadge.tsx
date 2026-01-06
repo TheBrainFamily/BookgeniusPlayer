@@ -4,7 +4,12 @@ import { api } from "@convex/_generated/api";
 import { motion, AnimatePresence } from "motion/react";
 
 import { useBookConvex } from "@player/context/BookConvexContext";
-import { useBackgroundGenerationStore, GeneratingBackground, ReadyBackground, createBackgroundKey } from "@player/stores/backgroundGeneration.store";
+import {
+  useBackgroundGenerationStore,
+  GeneratingBackground,
+  ReadyBackground,
+  createBackgroundKey,
+} from "@player/stores/backgroundGeneration.store";
 
 const GeneratingBanner: React.FC<{ bg: GeneratingBackground }> = ({ bg }) => (
   <motion.div
@@ -17,7 +22,8 @@ const GeneratingBanner: React.FC<{ bg: GeneratingBackground }> = ({ bg }) => (
   >
     <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
     <span className="text-sm text-zinc-300">
-      {bg.type === "add" ? "Generating" : "Editing"} background at Ch {bg.chapter}, P {bg.paragraph}...
+      {bg.type === "add" ? "Generating" : "Editing"} background at Ch {bg.chapter}, P {bg.paragraph}
+      ...
     </span>
   </motion.div>
 );
@@ -36,7 +42,10 @@ const ReadyBanner: React.FC<{ bg: ReadyBackground; onClick: () => void }> = ({ b
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="group relative flex items-center gap-3 bg-gradient-to-r from-emerald-900/95 to-green-900/95 backdrop-blur-md border border-emerald-500/50 rounded-full px-4 py-2.5 shadow-lg cursor-pointer"
-      style={{ boxShadow: "0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255,255,255,0.1)" }}
+      style={{
+        boxShadow:
+          "0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255,255,255,0.1)",
+      }}
     >
       <motion.div
         className="absolute inset-0 rounded-full pointer-events-none"
@@ -50,7 +59,12 @@ const ReadyBanner: React.FC<{ bg: ReadyBackground; onClick: () => void }> = ({ b
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-5 h-5 text-emerald-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
       </svg>
 
@@ -61,8 +75,17 @@ const ReadyBanner: React.FC<{ bg: ReadyBackground; onClick: () => void }> = ({ b
         </span>
       </span>
 
-      <motion.div className="ml-1" animate={{ x: isHovered ? 2 : 0 }} transition={{ type: "spring", stiffness: 400 }}>
-        <svg className="w-4 h-4 text-emerald-300/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <motion.div
+        className="ml-1"
+        animate={{ x: isHovered ? 2 : 0 }}
+        transition={{ type: "spring", stiffness: 400 }}
+      >
+        <svg
+          className="w-4 h-4 text-emerald-300/70"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </motion.div>
@@ -84,7 +107,9 @@ const BackgroundOptionsModal: React.FC<BackgroundOptionsModalProps> = ({ bg, bgK
   const [prompt, setPrompt] = useState(bg.prompt);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const backgroundUrl = backgroundsForBook.find((b) => b.chapter === bg.chapter && b.paragraph === bg.paragraph)?.file;
+  const backgroundUrl = backgroundsForBook.find(
+    (b) => b.chapter === bg.chapter && b.paragraph === bg.paragraph,
+  )?.file;
 
   const handleRegenerate = async () => {
     if (!book?.path || !prompt.trim()) return;
@@ -93,10 +118,20 @@ const BackgroundOptionsModal: React.FC<BackgroundOptionsModalProps> = ({ bg, bgK
     dismissReady(bgKey);
 
     const newKey = createBackgroundKey(bg.chapter, bg.paragraph);
-    startGeneration(newKey, { chapter: bg.chapter, paragraph: bg.paragraph, prompt: prompt.trim(), type: "add" });
+    startGeneration(newKey, {
+      chapter: bg.chapter,
+      paragraph: bg.paragraph,
+      prompt: prompt.trim(),
+      type: "add",
+    });
 
     try {
-      await startBackgroundGeneration({ bookPath: book.path, chapter: bg.chapter, paragraph: bg.paragraph, prompt: prompt.trim() });
+      await startBackgroundGeneration({
+        bookPath: book.path,
+        chapter: bg.chapter,
+        paragraph: bg.paragraph,
+        prompt: prompt.trim(),
+      });
       onClose();
     } catch (err) {
       console.error("Failed to regenerate background:", err);
@@ -123,12 +158,18 @@ const BackgroundOptionsModal: React.FC<BackgroundOptionsModalProps> = ({ bg, bgK
 
         {backgroundUrl && (
           <div className="flex-1 min-h-0 mb-6 rounded-xl overflow-hidden border border-zinc-700">
-            <img src={backgroundUrl} alt="Generated background" className="w-full h-full object-contain bg-black" />
+            <img
+              src={backgroundUrl}
+              alt="Generated background"
+              className="w-full h-full object-contain bg-black"
+            />
           </div>
         )}
 
         <div>
-          <label className="text-xs text-zinc-400 mb-2 block">Not happy? Modify the prompt and regenerate:</label>
+          <label className="text-xs text-zinc-400 mb-2 block">
+            Not happy? Modify the prompt and regenerate:
+          </label>
           <div className="flex gap-6 items-center">
             <textarea
               value={prompt}
@@ -162,13 +203,16 @@ const BackgroundOptionsModal: React.FC<BackgroundOptionsModalProps> = ({ bg, bgK
 
 export const BackgroundGenerationBadge: React.FC = () => {
   const { backgroundsForBook } = useBookConvex();
-  const { generatingBackgrounds, readyBackgrounds, completeGeneration, dismissReady } = useBackgroundGenerationStore();
+  const { generatingBackgrounds, readyBackgrounds, completeGeneration, dismissReady } =
+    useBackgroundGenerationStore();
   const [selectedBg, setSelectedBg] = useState<{ bg: ReadyBackground; key: string } | null>(null);
 
   const prevBackgroundsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    const currentKeys = new Set(backgroundsForBook.map((b) => createBackgroundKey(b.chapter, b.paragraph)));
+    const currentKeys = new Set(
+      backgroundsForBook.map((b) => createBackgroundKey(b.chapter, b.paragraph)),
+    );
 
     for (const [key] of generatingBackgrounds) {
       if (currentKeys.has(key) && !prevBackgroundsRef.current.has(key)) {
@@ -208,7 +252,15 @@ export const BackgroundGenerationBadge: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      <AnimatePresence>{selectedBg && <BackgroundOptionsModal bg={selectedBg.bg} bgKey={selectedBg.key} onClose={handleCloseModal} />}</AnimatePresence>
+      <AnimatePresence>
+        {selectedBg && (
+          <BackgroundOptionsModal
+            bg={selectedBg.bg}
+            bgKey={selectedBg.key}
+            onClose={handleCloseModal}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

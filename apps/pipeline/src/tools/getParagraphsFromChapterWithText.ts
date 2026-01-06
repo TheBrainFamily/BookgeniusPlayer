@@ -55,7 +55,12 @@ export const getParagraphsFromChapterWithText = (
         .replace(/\s+/g, " ")
         .replace(/\n\s*\n/g, "\n\n")
         .trim();
-      return { text, dataIndex: index, elementType: pageText.elementType, attributes: pageText.attributes };
+      return {
+        text,
+        dataIndex: index,
+        elementType: pageText.elementType,
+        attributes: pageText.attributes,
+      };
     });
 };
 

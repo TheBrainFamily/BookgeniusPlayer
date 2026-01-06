@@ -101,7 +101,12 @@ export type GenerateBackgroundsOptions = {
 };
 
 export const generateBackgrounds = async (options: GenerateBackgroundsOptions = {}) => {
-  const { customStyle, chapterNumbers, outputSubfolder = "backgrounds", skipCache = false } = options;
+  const {
+    customStyle,
+    chapterNumbers,
+    outputSubfolder = "backgrounds",
+    skipCache = false,
+  } = options;
 
   const bookSettings = getBookSettings();
   let chapters = getChaptersUpTo(
@@ -114,11 +119,16 @@ export const generateBackgrounds = async (options: GenerateBackgroundsOptions = 
   }
 
   const genericPrompt =
-    customStyle ?? (JSON.parse(readBookFile("graphicalStyle.json", FILE_TYPE.TEMPORARY)) as GraphicalStyle);
+    customStyle ??
+    (JSON.parse(readBookFile("graphicalStyle.json", FILE_TYPE.TEMPORARY)) as GraphicalStyle);
 
-  let cleanedPrompts: { chapter: number; sceneDescription: string; startingParagraph: number }[] = [];
+  let cleanedPrompts: { chapter: number; sceneDescription: string; startingParagraph: number }[] =
+    [];
 
-  let initialPrompts: { chapter: number; response: { sceneDescription: string; startingParagraph: number }[] }[] = [];
+  let initialPrompts: {
+    chapter: number;
+    response: { sceneDescription: string; startingParagraph: number }[];
+  }[] = [];
 
   if (!skipCache) {
     try {
@@ -131,7 +141,9 @@ export const generateBackgrounds = async (options: GenerateBackgroundsOptions = 
     }
   }
 
-  const chaptersNeedingPrompts = chapters.filter((c) => !initialPrompts.some((p) => p.chapter === c.number));
+  const chaptersNeedingPrompts = chapters.filter(
+    (c) => !initialPrompts.some((p) => p.chapter === c.number),
+  );
 
   if (chaptersNeedingPrompts.length > 0) {
     const newPrompts = await Promise.all(
@@ -163,7 +175,11 @@ export const generateBackgrounds = async (options: GenerateBackgroundsOptions = 
   }
 
   if (!chapterNumbers || chapterNumbers.length === 0) {
-    writeBookFile("initial-prompts.json", JSON.stringify(initialPrompts, null, 2), FILE_TYPE.TEMPORARY);
+    writeBookFile(
+      "initial-prompts.json",
+      JSON.stringify(initialPrompts, null, 2),
+      FILE_TYPE.TEMPORARY,
+    );
   }
 
   cleanedPrompts = initialPrompts.flatMap((p) =>
@@ -270,7 +286,11 @@ export const generateImageWithOpenAIToFolder = async (
   return filePath;
 };
 
-export type StylePreviewResult = { imagePath: string; avatarPath: string | null; styleType: "auto" | "user" };
+export type StylePreviewResult = {
+  imagePath: string;
+  avatarPath: string | null;
+  styleType: "auto" | "user";
+};
 
 export const generateStylePreview = async (
   style: GraphicalStyle,

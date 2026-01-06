@@ -177,7 +177,10 @@ export async function fixLowercaseTags(
 export async function fixLowercaseTagsForBook(
   bookPath: string,
   options: { dryRun?: boolean; chapters?: number[] } = {},
-): Promise<{ success: boolean; results: { chapter: number; fixed: boolean; replacements: number }[] }> {
+): Promise<{
+  success: boolean;
+  results: { chapter: number; fixed: boolean; replacements: number }[];
+}> {
   const results: { chapter: number; fixed: boolean; replacements: number }[] = [];
 
   const chapters = options.chapters || Array.from({ length: 50 }, (_, i) => i + 1);
@@ -187,7 +190,11 @@ export async function fixLowercaseTagsForBook(
     if (result.error?.includes("not found")) {
       continue;
     }
-    results.push({ chapter, fixed: result.fixed || false, replacements: result.replacements?.length || 0 });
+    results.push({
+      chapter,
+      fixed: result.fixed || false,
+      replacements: result.replacements?.length || 0,
+    });
   }
 
   return { success: true, results };
@@ -216,7 +223,9 @@ if (require.main === module) {
         console.log("No lowercase tags found in any chapter");
       } else {
         for (const r of fixed) {
-          console.log(`Chapter ${r.chapter}: ${r.replacements} tags ${r.fixed ? "fixed" : "would be fixed"}`);
+          console.log(
+            `Chapter ${r.chapter}: ${r.replacements} tags ${r.fixed ? "fixed" : "would be fixed"}`,
+          );
         }
       }
       process.exit(0);

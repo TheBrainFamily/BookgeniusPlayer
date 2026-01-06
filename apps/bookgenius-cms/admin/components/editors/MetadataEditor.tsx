@@ -16,7 +16,15 @@ import { useMutation } from "convex/react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@convex/_generated/api";
 import { queries } from "@/lib/queries";
-import { type BookFolderExtra, type CharacterFolderExtra, type ChapterExtra, type BackgroundExtra, type MusicExtra, isBookFolder, isCharacterFolder } from "@/lib/types/book";
+import {
+  type BookFolderExtra,
+  type CharacterFolderExtra,
+  type ChapterExtra,
+  type BackgroundExtra,
+  type MusicExtra,
+  isBookFolder,
+  isCharacterFolder,
+} from "@/lib/types/book";
 import { detectFolderType, type DetectedFolderType } from "@/lib/utils/folderPatterns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,13 +66,23 @@ const BOOK_FIELDS: FormField[] = [
   { name: "author", label: "Author", type: "text", required: true },
   { name: "language", label: "Language", type: "text", placeholder: "English" },
   { name: "form", label: "Form", type: "text", placeholder: "Novel, Short Story, etc." },
-  { name: "visualStyle", label: "Visual Style", type: "text", placeholder: "Realistic, Cartoon, etc." },
+  {
+    name: "visualStyle",
+    label: "Visual Style",
+    type: "text",
+    placeholder: "Realistic, Cartoon, etc.",
+  },
 ];
 
 const CHARACTER_FIELDS: FormField[] = [
   { name: "displayName", label: "Display Name", type: "text", required: true },
   { name: "summary", label: "Summary", type: "textarea", required: true },
-  { name: "aiPrompt", label: "AI Prompt", type: "textarea", placeholder: "Instructions for AI generation..." },
+  {
+    name: "aiPrompt",
+    label: "AI Prompt",
+    type: "textarea",
+    placeholder: "Instructions for AI generation...",
+  },
 ];
 
 const CHAPTER_FIELDS: FormField[] = [
@@ -112,11 +130,32 @@ function FieldRenderer({ field, value, onChange, disabled }: FieldRendererProps)
         {field.required && <span className="text-destructive ml-1">*</span>}
       </Label>
       {field.type === "textarea" ? (
-        <Textarea id={field.name} value={String(value)} onChange={handleChange} placeholder={field.placeholder} disabled={disabled} className="min-h-[80px]" />
+        <Textarea
+          id={field.name}
+          value={String(value)}
+          onChange={handleChange}
+          placeholder={field.placeholder}
+          disabled={disabled}
+          className="min-h-[80px]"
+        />
       ) : field.type === "color" ? (
         <div className="flex items-center gap-2">
-          <Input id={field.name} type="color" value={String(value)} onChange={handleChange} disabled={disabled} className="w-12 h-10 p-1 cursor-pointer" />
-          <Input type="text" value={String(value)} onChange={handleChange} placeholder="#000000" disabled={disabled} className="flex-1 font-mono" />
+          <Input
+            id={field.name}
+            type="color"
+            value={String(value)}
+            onChange={handleChange}
+            disabled={disabled}
+            className="w-12 h-10 p-1 cursor-pointer"
+          />
+          <Input
+            type="text"
+            value={String(value)}
+            onChange={handleChange}
+            placeholder="#000000"
+            disabled={disabled}
+            className="flex-1 font-mono"
+          />
         </div>
       ) : (
         <Input
@@ -146,10 +185,16 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
   });
 
   // Get asset data if editing asset metadata
-  const { data: asset, isLoading: assetLoading } = useQuery({ ...queries.asset(folderPath, basename || ""), enabled: !!basename });
+  const { data: asset, isLoading: assetLoading } = useQuery({
+    ...queries.asset(folderPath, basename || ""),
+    enabled: !!basename,
+  });
 
   // Get asset versions for version extra
-  const { data: versions, isLoading: versionsLoading } = useQuery({ ...queries.assetVersions(folderPath, basename || ""), enabled: !!basename });
+  const { data: versions, isLoading: versionsLoading } = useQuery({
+    ...queries.assetVersions(folderPath, basename || ""),
+    enabled: !!basename,
+  });
 
   // Form state
   const [formData, setFormData] = useState<Record<string, string | number>>({});
@@ -191,7 +236,13 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
         return {
           entityType: "background" as const,
           fields: BACKGROUND_FIELDS,
-          currentExtra: (extra as BackgroundExtra) || { type: "background", chapter: 0, paragraph: 0, backgroundColor: "#000000", textColor: "#ffffff" },
+          currentExtra: (extra as BackgroundExtra) || {
+            type: "background",
+            chapter: 0,
+            paragraph: 0,
+            backgroundColor: "#000000",
+            textColor: "#ffffff",
+          },
           publishedVersionId: publishedVersion?._id,
           draftVersionId: draftVersion?._id,
         };
@@ -227,7 +278,13 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
       };
     }
 
-    return { entityType: null, fields: [], currentExtra: undefined, publishedVersionId: undefined, draftVersionId: undefined };
+    return {
+      entityType: null,
+      fields: [],
+      currentExtra: undefined,
+      publishedVersionId: undefined,
+      draftVersionId: undefined,
+    };
   }, [folderPath, folder?.extra, basename, versions]);
 
   // Initialize form data from current extra
@@ -276,7 +333,8 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
         const value = formData[field.name];
         if (field.type === "number") {
           // Convert to number, default to 0 if empty or invalid
-          processedData[field.name] = value === "" || value === undefined ? 0 : parseInt(String(value), 10) || 0;
+          processedData[field.name] =
+            value === "" || value === undefined ? 0 : parseInt(String(value), 10) || 0;
         } else {
           processedData[field.name] = value ?? "";
         }
@@ -312,7 +370,17 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
     } finally {
       setIsSaving(false);
     }
-  }, [entityType, fields, formData, folderPath, updateFolder, updateVersionExtra, publishedVersionId, draftVersionId, onSaveComplete]);
+  }, [
+    entityType,
+    fields,
+    formData,
+    folderPath,
+    updateFolder,
+    updateVersionExtra,
+    publishedVersionId,
+    draftVersionId,
+    onSaveComplete,
+  ]);
 
   // Loading state
   const isLoading = folderLoading || (basename && (assetLoading || versionsLoading));
@@ -353,7 +421,11 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
             </Button>
           )}
           <Button size="sm" onClick={handleSave} disabled={!hasChanges || isSaving}>
-            {isSaving ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}
+            {isSaving ? (
+              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+            ) : (
+              <Save className="h-3 w-3 mr-1" />
+            )}
             Save
           </Button>
         </div>
@@ -363,7 +435,13 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
           {fields.map((field) => (
-            <FieldRenderer key={field.name} field={field} value={formData[field.name] ?? (field.type === "number" ? 0 : "")} onChange={handleFieldChange} disabled={isSaving} />
+            <FieldRenderer
+              key={field.name}
+              field={field}
+              value={formData[field.name] ?? (field.type === "number" ? 0 : "")}
+              onChange={handleFieldChange}
+              disabled={isSaving}
+            />
           ))}
         </div>
       </ScrollArea>

@@ -15,7 +15,11 @@ import { franc } from "franc";
 import { getLanguageName } from "../getLanguageName";
 import { getBookForm } from "../getBookForm";
 
-type ChapterBulletPoint = { mainParagraphNumber: number; paragraphNumbers: number[]; paragraphsSummary: string };
+type ChapterBulletPoint = {
+  mainParagraphNumber: number;
+  paragraphNumbers: number[];
+  paragraphsSummary: string;
+};
 
 type ChapterSummary = { chapterBulletPoints: ChapterBulletPoint[] };
 
@@ -29,14 +33,25 @@ export const generateIntroSummary = async (summaries: NewReferenceCardsResponse)
   const bookSlug = currentBook.match(/[^/]*$/)?.[0];
 
   if (!bookSlug) {
-    logger.error(`No book slug found for ${currentBook}. Please provide the argument as 'books-data/BOOK_TITLE'`);
+    logger.error(
+      `No book slug found for ${currentBook}. Please provide the argument as 'books-data/BOOK_TITLE'`,
+    );
     process.exit(1);
   }
 
   const { xmlDoc, bookString } = generateBookFiles(currentBook);
 
-  const charactersMetadata = generateCharacterMetadata(xmlDoc as unknown as XMLDocument, bookString, "play", bookSlug);
-  writeBookFile(`characters-metadata.json`, JSON.stringify(charactersMetadata, null, 2), FILE_TYPE.PERMANENT);
+  const charactersMetadata = generateCharacterMetadata(
+    xmlDoc as unknown as XMLDocument,
+    bookString,
+    "play",
+    bookSlug,
+  );
+  writeBookFile(
+    `characters-metadata.json`,
+    JSON.stringify(charactersMetadata, null, 2),
+    FILE_TYPE.PERMANENT,
+  );
 
   // await connectDB();
   const introSummaries: { characterName: string; summary: string }[] = [];
@@ -52,12 +67,16 @@ export const generateIntroSummary = async (summaries: NewReferenceCardsResponse)
       }
       const paragraphs = getParagraphsFromChapter(chapterWhenFirstSpotted);
 
-      const firstSpottedParagraphNumber = characterMetadata.infoPerChapter[0].paragraphsWhereSpotted[0];
+      const firstSpottedParagraphNumber =
+        characterMetadata.infoPerChapter[0].paragraphsWhereSpotted[0];
       let firstActionData: ChapterData | null;
       try {
         firstActionData = JSON.parse(
           // fs.readFileSync(`summaries-with-paragraphs-${chapterWhenFirstSpotted}.json`, "utf8"),
-          readBookFile(`summaries-with-paragraphs-${chapterWhenFirstSpotted}.json`, FILE_TYPE.TEMPORARY),
+          readBookFile(
+            `summaries-with-paragraphs-${chapterWhenFirstSpotted}.json`,
+            FILE_TYPE.TEMPORARY,
+          ),
         ) as ChapterData;
       } catch (error) {
         logger.error(
@@ -70,9 +89,10 @@ export const generateIntroSummary = async (summaries: NewReferenceCardsResponse)
       const additionalContext = [];
 
       if (firstActionData) {
-        indexOfFirstSceneWithCharacter = firstActionData.chapterSummary.chapterBulletPoints.findIndex((bulletPoint) =>
-          bulletPoint.paragraphNumbers.includes(firstSpottedParagraphNumber),
-        );
+        indexOfFirstSceneWithCharacter =
+          firstActionData.chapterSummary.chapterBulletPoints.findIndex((bulletPoint) =>
+            bulletPoint.paragraphNumbers.includes(firstSpottedParagraphNumber),
+          );
 
         if (indexOfFirstSceneWithCharacter === -1) {
           // {"msg":"No main bullet point related to first spotted paragraph for Ramzes XII chapter 1, paragraph 1"}
@@ -81,23 +101,35 @@ export const generateIntroSummary = async (summaries: NewReferenceCardsResponse)
           );
 
           console.log(JSON.stringify(firstActionData.chapterSummary.chapterBulletPoints, null, 2));
-          introSummaries.push({ characterName: characterMetadata.characterName, summary: secondSummary });
+          introSummaries.push({
+            characterName: characterMetadata.characterName,
+            summary: secondSummary,
+          });
           return;
         }
 
         if (
-          firstActionData.chapterSummary.chapterBulletPoints[indexOfFirstSceneWithCharacter].mainParagraphNumber <
-          firstSpottedParagraphNumber
+          firstActionData.chapterSummary.chapterBulletPoints[indexOfFirstSceneWithCharacter]
+            .mainParagraphNumber < firstSpottedParagraphNumber
         ) {
-          if (firstActionData.chapterSummary.chapterBulletPoints.length > indexOfFirstSceneWithCharacter + 1) {
+          if (
+            firstActionData.chapterSummary.chapterBulletPoints.length >
+            indexOfFirstSceneWithCharacter + 1
+          ) {
             const nextBulletPoint =
-              firstActionData.chapterSummary.chapterBulletPoints[indexOfFirstSceneWithCharacter + 1];
+              firstActionData.chapterSummary.chapterBulletPoints[
+                indexOfFirstSceneWithCharacter + 1
+              ];
             if (
               nextBulletPoint.paragraphNumbers.some((paragraphNumber) =>
-                characterMetadata.infoPerChapter[0].paragraphsWhereSpotted.includes(paragraphNumber),
+                characterMetadata.infoPerChapter[0].paragraphsWhereSpotted.includes(
+                  paragraphNumber,
+                ),
               ) ||
               nextBulletPoint.paragraphNumbers.some((paragraphNumber) =>
-                characterMetadata.infoPerChapter[0].paragraphsWhereTalking.includes(paragraphNumber),
+                characterMetadata.infoPerChapter[0].paragraphsWhereTalking.includes(
+                  paragraphNumber,
+                ),
               )
             ) {
               indexOfSecondSceneWithCharacter = indexOfFirstSceneWithCharacter + 1;
@@ -146,7 +178,9 @@ export const generateIntroSummary = async (summaries: NewReferenceCardsResponse)
       let introSummary = (await callGeminiWrapper(prompt)) as string;
       logger.info(`Intro summary for ${characterMetadata.characterName}: ${introSummary}`);
       if (!introSummary || introSummary.trim().length === 0) {
-        logger.warning(`Intro summary for ${characterMetadata.characterName} is empty, retrying...`);
+        logger.warning(
+          `Intro summary for ${characterMetadata.characterName} is empty, retrying...`,
+        );
         introSummary = (await callGeminiWrapper(prompt)) as string;
         logger.info(`Intro summary for ${characterMetadata.characterName}: ${introSummary}`);
         if (!introSummary || introSummary.trim().length === 0) {
@@ -156,7 +190,10 @@ export const generateIntroSummary = async (summaries: NewReferenceCardsResponse)
       }
 
       characterMetadata.infoPerChapter[0].summary = introSummary;
-      introSummaries.push({ characterName: characterMetadata.characterName, summary: introSummary });
+      introSummaries.push({
+        characterName: characterMetadata.characterName,
+        summary: introSummary,
+      });
       // await characterMetadata.save();
       // writeBookFile(`intro-summary-${characterMetadata.characterName}.txt`, introSummary, FILE_TYPE.PERMANENT);
     }),
@@ -167,7 +204,11 @@ export const generateIntroSummary = async (summaries: NewReferenceCardsResponse)
     referenceCard: introSummary.summary.replace(/\n/g, " "),
   }));
 
-  writeBookFile(`intro-summary-all.json`, JSON.stringify({ characters: result }, null, 2), FILE_TYPE.PERMANENT);
+  writeBookFile(
+    `intro-summary-all.json`,
+    JSON.stringify({ characters: result }, null, 2),
+    FILE_TYPE.PERMANENT,
+  );
   generateCharactersMaster("intro-summary-all.json");
 };
 
@@ -196,7 +237,11 @@ const getBookChapters = (currentBook: string): string | null => {
 
 const getCharactersMaster = (currentBook: string): string | null => {
   const charactersMasterPath = `./${currentBook}/output/characters-master-summaries.xml`;
-  return getOrGenerateFile(charactersMasterPath, generateCharactersMaster, "characters-master-summaries.xml");
+  return getOrGenerateFile(
+    charactersMasterPath,
+    generateCharactersMaster,
+    "characters-master-summaries.xml",
+  );
 };
 
 const generateBookFiles = (currentBook: string) => {

@@ -18,7 +18,15 @@ interface PaywallProps {
   loading: string | null;
 }
 
-export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onClose, openSignIn, isUserLoggedIn, handlePayment, loading }) => {
+export const PaywallInner: React.FC<PaywallProps> = ({
+  bookSlug,
+  bookTitle,
+  onClose,
+  openSignIn,
+  isUserLoggedIn,
+  handlePayment,
+  loading,
+}) => {
   const { t } = useTranslation();
 
   const handleSignIn = () => {
@@ -41,9 +49,21 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
   };
 
   return (
-    <div className="opened-modal fixed inset-0 bg-black/80 backdrop-blur-sm z-100 flex items-center justify-center p-4" onClick={handleOverlayClick} data-keep-modal-open="true">
-      <div className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={handleContentClick}>
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white" onClick={onClose}>
+    <div
+      className="opened-modal fixed inset-0 bg-black/80 backdrop-blur-sm z-100 flex items-center justify-center p-4"
+      onClick={handleOverlayClick}
+      data-keep-modal-open="true"
+    >
+      <div
+        className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={handleContentClick}
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white"
+          onClick={onClose}
+        >
           <X className="h-5 w-5" />
         </Button>
 
@@ -51,13 +71,17 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
           <CardHeader className="text-center space-y-4">
             <div className="relative mx-auto w-16 h-16 bg-gradient-to-br from-library-gold to-library-walnut rounded-full flex items-center justify-center">
               <Lock className="h-8 w-8 text-white" />
-              <span className="absolute -right-2 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">Beta</span>
+              <span className="absolute -right-2 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">
+                Beta
+              </span>
             </div>
             <CardTitle className="text-3xl font-bold">
               {t("continueReading")} <span className="text-library-gold">{bookTitle}</span>
             </CardTitle>
             {/*<p className="text-muted-foreground text-lg max-w-2xl mx-auto">You've reached the end of the free preview. Choose how you'd like to continue your literary journey.</p>*/}
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t("reachedFreePreview")}</p>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              {t("reachedFreePreview")}
+            </p>
           </CardHeader>
 
           <CardContent className="space-y-8">
@@ -65,7 +89,10 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
               <div className="text-center space-y-4 p-6 bg-library-gold/10 rounded-lg border border-library-gold/20">
                 <h3 className="text-xl font-semibold">{t("bestAccessAvailable")}</h3>
                 <p className="text-muted-foreground">{t("youreInvited")}</p>
-                <Button onClick={handleSignIn} className="bg-library-gold hover:bg-library-gold/90 text-library-mahogany">
+                <Button
+                  onClick={handleSignIn}
+                  className="bg-library-gold hover:bg-library-gold/90 text-library-mahogany"
+                >
                   {t("navigation.signIn")} / {t("navigation.signUp")}
                 </Button>
               </div>
@@ -190,7 +217,11 @@ export const PaywallInner: React.FC<PaywallProps> = ({ bookSlug, bookTitle, onCl
   );
 };
 
-export default function Paywall(props: { bookSlug: string; bookTitle: string; onClose: () => void }) {
+export default function Paywall(props: {
+  bookSlug: string;
+  bookTitle: string;
+  onClose: () => void;
+}) {
   const { authMod, paymentsMod } = useIntegrations();
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -216,5 +247,13 @@ export default function Paywall(props: { bookSlug: string; bookTitle: string; on
     }
   };
 
-  return <PaywallInner {...props} openSignIn={openSignIn} isUserLoggedIn={ready && isSignedIn} handlePayment={handlePayment} loading={loading} />;
+  return (
+    <PaywallInner
+      {...props}
+      openSignIn={openSignIn}
+      isUserLoggedIn={ready && isSignedIn}
+      handlePayment={handlePayment}
+      loading={loading}
+    />
+  );
 }

@@ -98,7 +98,11 @@ describe("locateQuotes()", () => {
   };
 
   it("finds the correct paragraph", () => {
-    const hits = locateQuotes(['"Masz moją wdzięczność i przekonasz się, że jest coś warta"'], [para], { chapter: 1, paragraph: 999 });
+    const hits = locateQuotes(
+      ['"Masz moją wdzięczność i przekonasz się, że jest coś warta"'],
+      [para],
+      { chapter: 1, paragraph: 999 },
+    );
     expect(hits.length).toBe(1);
     expect(hits[0].chapter).toBe(1);
     expect(hits[0].index).toBe(42);

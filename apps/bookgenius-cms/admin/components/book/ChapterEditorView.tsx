@@ -19,11 +19,28 @@ import { MetadataEditor } from "../editors/MetadataEditor";
 import { BookProvider, useBook } from "@/lib/contexts";
 import { getBookPathFromAny } from "@/lib/utils/folderPatterns";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeft, CheckCircle, AlertCircle, Clock, Archive, PanelRightClose, PanelRight, Loader2, Settings, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  Archive,
+  PanelRightClose,
+  PanelRight,
+  Loader2,
+  Settings,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle, usePanelRef } from "@/components/ui/resizable";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+  usePanelRef,
+} from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 
 // =============================================================================
@@ -42,7 +59,13 @@ interface ChapterEditorViewProps {
 // Inner Component (uses BookProvider context)
 // =============================================================================
 
-function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersionSelect, onBack }: ChapterEditorViewProps) {
+function ChapterEditorContent({
+  folderPath,
+  basename,
+  selectedVersionId,
+  onVersionSelect,
+  onBack,
+}: ChapterEditorViewProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarSizeBeforeCollapse, setSidebarSizeBeforeCollapse] = useState<number | null>(null);
   const [metadataExpanded, setMetadataExpanded] = useState(true);
@@ -67,7 +90,11 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
 
   // Query asset and versions
   const { data: asset, isLoading: assetLoading } = useQuery(queries.asset(folderPath, basename));
-  const { data: versions, isLoading: versionsLoading, refetch: refetchVersions } = useQuery(queries.assetVersions(folderPath, basename));
+  const {
+    data: versions,
+    isLoading: versionsLoading,
+    refetch: refetchVersions,
+  } = useQuery(queries.assetVersions(folderPath, basename));
 
   // Get the selected version (or latest published)
   const selectedVersion = useMemo(() => {
@@ -136,7 +163,9 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
               </Button>
               <div className="min-w-0">
                 <h1 className="font-semibold truncate">{basename}</h1>
-                <p className="text-xs text-muted-foreground truncate">{bookMetadata?.name || folderPath}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {bookMetadata?.name || folderPath}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -145,8 +174,17 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
                   v{selectedVersion.version} ({selectedVersion.state})
                 </Badge>
               )}
-              <Button variant="ghost" size="icon" onClick={toggleSidebar} title={sidebarCollapsed ? "Show version history" : "Hide version history"}>
-                {sidebarCollapsed ? <PanelRight className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                title={sidebarCollapsed ? "Show version history" : "Hide version history"}
+              >
+                {sidebarCollapsed ? (
+                  <PanelRight className="h-4 w-4" />
+                ) : (
+                  <PanelRightClose className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -154,9 +192,17 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
           {/* Editor */}
           <div className="flex-1 min-h-0">
             {hasContent && selectedVersion ? (
-              <ChapterEditor folderPath={folderPath} basename={basename} versionId={selectedVersion._id} readOnly={isReadOnly} onSaveComplete={handleSaveComplete} />
+              <ChapterEditor
+                folderPath={folderPath}
+                basename={basename}
+                versionId={selectedVersion._id}
+                readOnly={isReadOnly}
+                onSaveComplete={handleSaveComplete}
+              />
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">No content available. Upload a file first.</div>
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                No content available. Upload a file first.
+              </div>
             )}
           </div>
         </div>
@@ -180,16 +226,27 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
         <div className="h-full border-l border-border bg-card flex flex-col">
           {/* Metadata Section */}
           <div className="border-b border-border">
-            <button onClick={() => setMetadataExpanded(!metadataExpanded)} className="w-full flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors">
+            <button
+              onClick={() => setMetadataExpanded(!metadataExpanded)}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors"
+            >
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4 text-muted-foreground" />
                 <h2 className="font-medium text-sm">Chapter Metadata</h2>
               </div>
-              {metadataExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+              {metadataExpanded ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}
             </button>
             {metadataExpanded && (
               <div className="border-t border-border">
-                <MetadataEditor folderPath={folderPath} basename={basename} onSaveComplete={refetchVersions} />
+                <MetadataEditor
+                  folderPath={folderPath}
+                  basename={basename}
+                  onSaveComplete={refetchVersions}
+                />
               </div>
             )}
           </div>
@@ -202,7 +259,9 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
             <div className="p-3 space-y-2">
               {versions && versions.length > 0 ? (
                 [...versions].reverse().map((version) => {
-                  const isSelected = selectedVersionId === version._id || (!selectedVersionId && version.state === "published");
+                  const isSelected =
+                    selectedVersionId === version._id ||
+                    (!selectedVersionId && version.state === "published");
 
                   return (
                     <button
@@ -210,7 +269,9 @@ function ChapterEditorContent({ folderPath, basename, selectedVersionId, onVersi
                       onClick={() => onVersionSelect(version._id)}
                       className={cn(
                         "w-full text-left p-2 rounded-lg border transition-all text-sm",
-                        isSelected ? "ring-2 ring-primary ring-offset-1" : "hover:border-primary/50",
+                        isSelected
+                          ? "ring-2 ring-primary ring-offset-1"
+                          : "hover:border-primary/50",
                         version.state === "published"
                           ? "border-success/30 bg-success/5"
                           : version.state === "draft"

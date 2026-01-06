@@ -10,5 +10,8 @@ export const PositionHistoryModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <PositionHistoryModal onClose={closeModal} />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>{isOpen && <PositionHistoryModal onClose={closeModal} />}</AnimatePresence>,
+    document.body,
+  );
 };

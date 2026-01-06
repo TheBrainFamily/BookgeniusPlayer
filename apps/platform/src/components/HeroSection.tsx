@@ -14,7 +14,10 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-[calc(100vh-128px)] md:min-h-[calc(100vh-72px)] flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImage})` }}>
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      >
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/95" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
       </div>
@@ -90,10 +93,16 @@ const HeroSection = () => {
           <div className="absolute -top-8 left-1/4 animate-float -z-10">
             <Sparkles className="h-6 w-6 text-library-gold opacity-60" />
           </div>
-          <div className="absolute -top-4 right-1/3 animate-float -z-10" style={{ animationDelay: "2s" }}>
+          <div
+            className="absolute -top-4 right-1/3 animate-float -z-10"
+            style={{ animationDelay: "2s" }}
+          >
             <Sparkles className="h-4 w-4 text-library-gold opacity-40" />
           </div>
-          <div className="absolute top-8 left-3/4 animate-float -z-10" style={{ animationDelay: "4s" }}>
+          <div
+            className="absolute top-8 left-3/4 animate-float -z-10"
+            style={{ animationDelay: "4s" }}
+          >
             <Sparkles className="h-5 w-5 text-library-gold opacity-50" />
           </div>
         </div>

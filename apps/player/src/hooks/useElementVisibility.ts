@@ -39,7 +39,8 @@ export const useElementVisibility = () => {
   const isSplashHidden = useSplashHidden();
 
   // Store actions (these don't change, so they won't cause re-renders)
-  const { showAllElements, clearInactivityTimer, resetInactivityTimer } = useElementVisibilityStore();
+  const { showAllElements, clearInactivityTimer, resetInactivityTimer } =
+    useElementVisibilityStore();
 
   const rafIdRef = useRef<number | null>(null);
   const lastTapTimeRef = useRef(0);
@@ -174,7 +175,14 @@ export const useElementVisibility = () => {
 
       clearInactivityTimer();
     };
-  }, [isSplashHidden, stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, clearInactivityTimer]);
+  }, [
+    isSplashHidden,
+    stableHandleTap,
+    stableHandleTouchStart,
+    stableHandleTouchMove,
+    stableHandleTouchEnd,
+    clearInactivityTimer,
+  ]);
 
   return { areElementsVisible, isScrollMode };
 };

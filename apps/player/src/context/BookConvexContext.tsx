@@ -8,7 +8,16 @@
  * Run: bun apps/bookgenius-cms/scripts/migrate-book-to-html.ts <book-slug>
  */
 
-import React, { createContext, useContext, useMemo, useState, useEffect, useLayoutEffect, useCallback, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+} from "react";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useDraftMode } from "./DraftModeContext";
@@ -21,9 +30,26 @@ import {
   type RenderMode,
   type EnhancedProseOptions,
 } from "@player/services/htmlNormalizer";
-import { setBookDataStore, clearBookDataStore, type Note, type Variant } from "@player/state/bookDataStore";
-import { setListensToSpeaksUrls, setLiveAssetUrls, setFigureUrls, clearFigureUrls } from "@player/utils/assetUrls";
-import type { BackgroundForBook, BackgroundSongSection, CharacterData, CharacterMedia, BookData, Chapter as ChapterTitle } from "@player/types/book";
+import {
+  setBookDataStore,
+  clearBookDataStore,
+  type Note,
+  type Variant,
+} from "@player/state/bookDataStore";
+import {
+  setListensToSpeaksUrls,
+  setLiveAssetUrls,
+  setFigureUrls,
+  clearFigureUrls,
+} from "@player/utils/assetUrls";
+import type {
+  BackgroundForBook,
+  BackgroundSongSection,
+  CharacterData,
+  CharacterMedia,
+  BookData,
+  Chapter as ChapterTitle,
+} from "@player/types/book";
 import { bookIndex } from "@player/logic/BookIndex";
 import type { CharacterIndex, ChapterOccurrences } from "@convex/lib/characterDataV2";
 import { mergeV2ToCharacterData } from "@convex/lib/characterDataV2";
@@ -43,13 +69,27 @@ export interface ChapterInfo {
   hasDraft?: boolean;
 }
 
-type HtmlSourceChapterQueryItem = { basename: string; url: string; versionId: string; chapterNumber: number; title?: string; paragraphCount?: number; sourceFormat: string };
+type HtmlSourceChapterQueryItem = {
+  basename: string;
+  url: string;
+  versionId: string;
+  chapterNumber: number;
+  title?: string;
+  paragraphCount?: number;
+  sourceFormat: string;
+};
 
 export interface CharacterBundle {
   path: string;
   slug: string;
   name: string;
-  extra: { displayName?: string; summary?: string; aiPrompt?: string; avatarGenerationState?: "generating" | "ready" | "error" | "none"; avatarProposalUrls?: string[] };
+  extra: {
+    displayName?: string;
+    summary?: string;
+    aiPrompt?: string;
+    avatarGenerationState?: "generating" | "ready" | "error" | "none";
+    avatarProposalUrls?: string[];
+  };
   avatar?: { url: string; versionId: string; contentType?: string };
   avatarLarge?: { url: string; versionId: string; contentType?: string };
   speaks?: { url: string; versionId: string; contentType?: string };
@@ -93,7 +133,12 @@ const getRenderModeFromUrl = (): RenderMode => {
   return params.get("renderMode") === "enhancedProse" ? "enhancedProse" : "default";
 };
 
-const buildBookHtmlFromChapters = (chapters: ChapterHtmlEntry[], bookForm: string, renderMode: RenderMode, enhancedOptions: EnhancedProseOptions): string => {
+const buildBookHtmlFromChapters = (
+  chapters: ChapterHtmlEntry[],
+  bookForm: string,
+  renderMode: RenderMode,
+  enhancedOptions: EnhancedProseOptions,
+): string => {
   const form = bookForm.toLowerCase();
   const useEnhancedProse = renderMode === "enhancedProse" && form !== "play";
 
@@ -102,7 +147,9 @@ const buildBookHtmlFromChapters = (chapters: ChapterHtmlEntry[], bookForm: strin
       const chapterHtml = chapter.html ?? buildChapterPlaceholderHtml(chapter.chapterNumber);
       const format = detectSourceFormat(chapterHtml);
       if (format === "source") {
-        return useEnhancedProse ? normalizeChapterHtmlEnhanced(chapterHtml, enhancedOptions) : normalizeChapterHtml(chapterHtml);
+        return useEnhancedProse
+          ? normalizeChapterHtmlEnhanced(chapterHtml, enhancedOptions)
+          : normalizeChapterHtml(chapterHtml);
       }
       return chapterHtml;
     })
@@ -198,7 +245,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const [error, setError] = useState<string | null>(null);
 
   const chapterContentCache = useRef<Map<string, string>>(new Map());
-  const htmlSourceCacheRef = useRef<Map<number, { versionId: string; html: string; occurrences: CharacterOccurrence[] }>>(new Map());
+  const htmlSourceCacheRef = useRef<
+    Map<number, { versionId: string; html: string; occurrences: CharacterOccurrence[] }>
+  >(new Map());
   const prevContentSignatureRef = useRef<string>("");
   const initialLoadCompleteRef = useRef(false);
   const lastRequestedChaptersRef = useRef<number[]>([]);
@@ -210,10 +259,19 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   // =============================================================================
 
   const bookMetadata = useQuery(api.bookQueries.getBookMetadata, { bookPath });
-  const htmlSourceChaptersQuery = useQuery(api.bookQueries.listHtmlSourceChapters, { bookPath }) as HtmlSourceChapterQueryItem[] | null | undefined;
+  const htmlSourceChaptersQuery = useQuery(api.bookQueries.listHtmlSourceChapters, { bookPath }) as
+    | HtmlSourceChapterQueryItem[]
+    | null
+    | undefined;
   const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
-  const backgroundsQuery = useQuery(draftMode ? api.backgroundCues.listForPlayerWithDrafts : api.backgroundCues.listForPlayer, { bookPath });
-  const musicQuery = useQuery(draftMode ? api.musicCues.listForPlayerWithDrafts : api.musicCues.listForPlayer, { bookPath });
+  const backgroundsQuery = useQuery(
+    draftMode ? api.backgroundCues.listForPlayerWithDrafts : api.backgroundCues.listForPlayer,
+    { bookPath },
+  );
+  const musicQuery = useQuery(
+    draftMode ? api.musicCues.listForPlayerWithDrafts : api.musicCues.listForPlayer,
+    { bookPath },
+  );
   const figuresQuery = useQuery(api.bookQueries.listFigures, { bookPath });
   const audiobookTracksQuery = useQuery(api.bookQueries.listAudiobookTracks, { bookPath });
   const cutScenesQuery = useQuery(api.bookQueries.listCutScenes, { bookPath });
@@ -228,7 +286,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const book = useMemo<BookMetadata | null>(() => {
     if (!bookMetadata) return null;
-    return { path: bookMetadata.path, slug: bookMetadata.slug, name: bookMetadata.name, extra: bookMetadata.extra as BookMetadata["extra"] };
+    return {
+      path: bookMetadata.path,
+      slug: bookMetadata.slug,
+      name: bookMetadata.name,
+      extra: bookMetadata.extra as BookMetadata["extra"],
+    };
   }, [bookMetadata]);
 
   const htmlSourceByNumber = useMemo(() => {
@@ -256,7 +319,11 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   }, [htmlSourceChaptersQuery]);
 
   const chapterStructure = useMemo(
-    () => chapters.map((chapter) => ({ chapterNumber: chapter.chapterNumber, paragraphCount: htmlSourceByNumber.get(chapter.chapterNumber)?.paragraphCount ?? 0 })),
+    () =>
+      chapters.map((chapter) => ({
+        chapterNumber: chapter.chapterNumber,
+        paragraphCount: htmlSourceByNumber.get(chapter.chapterNumber)?.paragraphCount ?? 0,
+      })),
     [chapters, htmlSourceByNumber],
   );
 
@@ -264,7 +331,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     if (draftMode || chapterStructure.length === 0) return;
     bookIndex.setParagraphCountOverrides(chapterStructure);
     const totalParagraphs = chapterStructure.reduce((sum, entry) => sum + entry.paragraphCount, 0);
-    console.log("[BookConvex] Paragraph counts set", { chapters: chapterStructure.length, totalParagraphs });
+    console.log("[BookConvex] Paragraph counts set", {
+      chapters: chapterStructure.length,
+      totalParagraphs,
+    });
   }, [draftMode, chapterStructure]);
 
   const characters = useMemo<CharacterBundle[]>(() => {
@@ -296,14 +366,26 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const music = useMemo<MusicInfo[]>(() => {
     if (!musicQuery) return [];
-    return musicQuery.map((m) => ({ path: "", basename: m.files[0]?.split("/").pop() ?? "", url: m.files[0], chapter: m.chapter, paragraph: m.paragraph }));
+    return musicQuery.map((m) => ({
+      path: "",
+      basename: m.files[0]?.split("/").pop() ?? "",
+      url: m.files[0],
+      chapter: m.chapter,
+      paragraph: m.paragraph,
+    }));
   }, [musicQuery]);
 
   const backgroundsForBook = useMemo<BackgroundForBook[]>(() => {
     if (!backgroundsQuery) return [];
     return backgroundsQuery
       .filter((b) => b.url)
-      .map((b) => ({ chapter: b.startChapter, paragraph: b.startParagraph, file: b.url!, backgroundColor: b.backgroundColor, textColor: b.textColor }));
+      .map((b) => ({
+        chapter: b.startChapter,
+        paragraph: b.startParagraph,
+        file: b.url!,
+        backgroundColor: b.backgroundColor,
+        textColor: b.textColor,
+      }));
   }, [backgroundsQuery]);
 
   const backgroundSongsForBook = useMemo<BackgroundSongSection[]>(() => {
@@ -314,7 +396,11 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const knownVideoFiles = useMemo<string[]>(() => {
     const videos: string[] = [];
     for (const char of characters) {
-      const pattern = char.slug.toLowerCase().replace(/ /g, "-").replace(/"/g, "").replace(/[()]/g, "");
+      const pattern = char.slug
+        .toLowerCase()
+        .replace(/ /g, "-")
+        .replace(/"/g, "")
+        .replace(/[()]/g, "");
       if (char.speaks) videos.push(`${pattern}-speaks.mp4`);
       if (char.listens) videos.push(`${pattern}-listens.mp4`);
     }
@@ -322,14 +408,25 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   }, [characters]);
 
   const renderMode = useMemo(() => getRenderModeFromUrl(), []);
-  const bookFormValue = useMemo(() => book?.extra?.form?.toLowerCase() || "book", [book?.extra?.form]);
-  const isPlayLayout = useMemo(() => bookFormValue === "play" || bookFormValue === "mixed" || renderMode === "enhancedProse", [bookFormValue, renderMode]);
+  const bookFormValue = useMemo(
+    () => book?.extra?.form?.toLowerCase() || "book",
+    [book?.extra?.form],
+  );
+  const isPlayLayout = useMemo(
+    () => bookFormValue === "play" || bookFormValue === "mixed" || renderMode === "enhancedProse",
+    [bookFormValue, renderMode],
+  );
 
   const bookData = useMemo<BookData | null>(() => {
     if (!book) return null;
     return {
       slug: bookSlug,
-      metadata: { title: book.name, author: book.extra.author, language: book.extra.language, bookForm: book.extra.form?.toLowerCase() },
+      metadata: {
+        title: book.name,
+        author: book.extra.author,
+        language: book.extra.language,
+        bookForm: book.extra.form?.toLowerCase(),
+      },
       chapters: chaptersData,
       hasAudiobook: false,
     };
@@ -386,7 +483,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const buildHtmlSourceSignature = useCallback((): string => {
     if (chapterOrder.length === 0) return "";
-    const chapterSig = chapterOrder.map((n) => htmlSourceCacheRef.current.get(n)?.versionId ?? "missing").join("|");
+    const chapterSig = chapterOrder
+      .map((n) => htmlSourceCacheRef.current.get(n)?.versionId ?? "missing")
+      .join("|");
     return `${chapterSig}:chars=${characters.length}`;
   }, [chapterOrder, characters]);
 
@@ -405,13 +504,20 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       return;
     }
 
-    console.log("[BookConvex] Building book HTML from cache", { cachedChapters: htmlSourceCacheRef.current.size });
+    console.log("[BookConvex] Building book HTML from cache", {
+      cachedChapters: htmlSourceCacheRef.current.size,
+    });
 
     const speakerDisplayNames = new Map<string, string>();
     for (const char of characters) {
       speakerDisplayNames.set(char.slug.toLowerCase(), char.extra.displayName ?? char.name);
     }
-    const htmlResult = buildBookHtmlFromChapters(buildHtmlSourceChapterEntries(), bookFormValue, renderMode, { speakerDisplayNames });
+    const htmlResult = buildBookHtmlFromChapters(
+      buildHtmlSourceChapterEntries(),
+      bookFormValue,
+      renderMode,
+      { speakerDisplayNames },
+    );
     setBookStringified(htmlResult);
 
     const occurrencesByChapter: Record<number, ChapterOccurrences> = {};
@@ -441,13 +547,20 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     const form = bookFormValue === "play" ? "play" : bookFormValue === "mixed" ? "mixed" : "prose";
     const characterIndex: CharacterIndex = { form, characters: {} };
     for (const char of characters) {
-      characterIndex.characters[char.slug] = { name: char.extra.displayName ?? char.name, summary: char.extra.summary ?? "" };
+      characterIndex.characters[char.slug] = {
+        name: char.extra.displayName ?? char.name,
+        summary: char.extra.summary ?? "",
+      };
     }
 
     const merged = mergeV2ToCharacterData(characterIndex, occurrencesByChapter, bookSlug);
     const mediaBySlug = new Map<string, CharacterMedia>();
     for (const char of characters) {
-      mediaBySlug.set(char.slug.toLowerCase(), { avatarUrl: char.avatar?.url, listensUrl: char.listens?.url, speaksUrl: char.speaks?.url });
+      mediaBySlug.set(char.slug.toLowerCase(), {
+        avatarUrl: char.avatar?.url,
+        listensUrl: char.listens?.url,
+        speaksUrl: char.speaks?.url,
+      });
     }
     for (const char of merged) {
       const media = mediaBySlug.get(char.slug.toLowerCase());
@@ -464,7 +577,14 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     }
 
     setTextVersion((v) => v + 1);
-  }, [book, bookSlug, bookStringified, buildHtmlSourceChapterEntries, buildHtmlSourceSignature, characters]);
+  }, [
+    book,
+    bookSlug,
+    bookStringified,
+    buildHtmlSourceChapterEntries,
+    buildHtmlSourceSignature,
+    characters,
+  ]);
 
   const normalizeRequestedChapters = useCallback(
     (chapterNumbers: number[]): number[] => {
@@ -506,7 +626,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
               const parser = new DOMParser();
               const doc = parser.parseFromString(normalizedHtml, "text/html");
               const section = doc.querySelector("section[data-chapter]");
-              const occurrences = section ? extractCharacterOccurrences(section, chapterNumber) : [];
+              const occurrences = section
+                ? extractCharacterOccurrences(section, chapterNumber)
+                : [];
               return { chapterNumber, versionId: entry.versionId, html, occurrences };
             } catch {
               return null;
@@ -514,7 +636,16 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
           }),
         );
 
-        const successful = results.filter((r): r is { chapterNumber: number; versionId: string; html: string; occurrences: CharacterOccurrence[] } => Boolean(r));
+        const successful = results.filter(
+          (
+            r,
+          ): r is {
+            chapterNumber: number;
+            versionId: string;
+            html: string;
+            occurrences: CharacterOccurrence[];
+          } => Boolean(r),
+        );
 
         if (successful.length === 0 && htmlSourceCacheRef.current.size === 0) {
           setError("Failed to load any chapters");
@@ -522,7 +653,11 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         }
 
         for (const result of successful) {
-          htmlSourceCacheRef.current.set(result.chapterNumber, { versionId: result.versionId, html: result.html, occurrences: result.occurrences });
+          htmlSourceCacheRef.current.set(result.chapterNumber, {
+            versionId: result.versionId,
+            html: result.html,
+            occurrences: result.occurrences,
+          });
         }
       }
 
@@ -587,13 +722,23 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
     if (htmlSourceChaptersQuery === null || htmlSourceChaptersQuery.length === 0) {
       console.error("[BookConvex] No HTML source chapters found - book needs migration");
-      console.error("[BookConvex] Run: bun apps/bookgenius-cms/scripts/migrate-book-to-html.ts", bookSlug);
-      setError(`Book "${bookSlug}" has not been migrated to HTML source format. Run the migration script.`);
+      console.error(
+        "[BookConvex] Run: bun apps/bookgenius-cms/scripts/migrate-book-to-html.ts",
+        bookSlug,
+      );
+      setError(
+        `Book "${bookSlug}" has not been migrated to HTML source format. Run the migration script.`,
+      );
       return;
     }
 
     const titleMap = new Map(htmlSourceChaptersQuery.map((c) => [c.chapterNumber, c.title]));
-    setChaptersData(chapterOrder.map((chapterNumber) => ({ id: String(chapterNumber), title: titleMap.get(chapterNumber) ?? "" })));
+    setChaptersData(
+      chapterOrder.map((chapterNumber) => ({
+        id: String(chapterNumber),
+        title: titleMap.get(chapterNumber) ?? "",
+      })),
+    );
   }, [htmlSourceChaptersQuery, chapterOrder, bookSlug]);
 
   useEffect(() => {
@@ -609,8 +754,15 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         return {
           ...char,
           characterName: bundle.extra.displayName ?? bundle.name,
-          infoPerChapter: char.infoPerChapter.map((chapterInfo) => ({ ...chapterInfo, summary: bundle.extra.summary ?? "" })),
-          media: { avatarUrl: bundle.avatar?.url, listensUrl: bundle.listens?.url, speaksUrl: bundle.speaks?.url },
+          infoPerChapter: char.infoPerChapter.map((chapterInfo) => ({
+            ...chapterInfo,
+            summary: bundle.extra.summary ?? "",
+          })),
+          media: {
+            avatarUrl: bundle.avatar?.url,
+            listensUrl: bundle.listens?.url,
+            speaksUrl: bundle.speaks?.url,
+          },
         };
       });
     });
@@ -671,7 +823,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     musicQuery === undefined ||
     figuresQuery === undefined;
 
-  const isReady = !isLoading && !error && bookStringified !== null && initialLoadCompleteRef.current;
+  const isReady =
+    !isLoading && !error && bookStringified !== null && initialLoadCompleteRef.current;
 
   // =============================================================================
   // Context value

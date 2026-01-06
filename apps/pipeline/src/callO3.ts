@@ -21,7 +21,11 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
  * @returns The LLM response, either as a string or parsed according to the provided schema
  */
 
-export const callO3WithSchema = async <T>(prompt: string, zodSchema: z.ZodSchema<T>, model: string = "o3") => {
+export const callO3WithSchema = async <T>(
+  prompt: string,
+  zodSchema: z.ZodSchema<T>,
+  model: string = "o3",
+) => {
   const { object } = await generateObject({
     model: openai(model),
     schema: zodSchema,
@@ -34,7 +38,11 @@ export const callO3WithSchema = async <T>(prompt: string, zodSchema: z.ZodSchema
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const callGpt5 = async <T = string>(prompt: string, schema?: z.ZodSchema<T>, _maxRetries = 2) => {
+export const callGpt5 = async <T = string>(
+  prompt: string,
+  schema?: z.ZodSchema<T>,
+  _maxRetries = 2,
+) => {
   const chatCompletion = await client.chat.completions.create({
     messages: [{ role: "user", content: prompt }],
     model: "gpt-5.1",

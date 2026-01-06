@@ -5,5 +5,11 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   server: { port: 5173 },
-  resolve: { alias: { "@": path.resolve(__dirname, "./src"), "~pipeline": path.resolve(__dirname, "../pipeline"), "@bookgenius/convex": path.resolve(__dirname, "../../convex") } },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      "~pipeline": path.resolve(__dirname, "../pipeline"),
+      "@bookgenius/convex": path.resolve(__dirname, "../../convex"),
+    },
+  },
 });

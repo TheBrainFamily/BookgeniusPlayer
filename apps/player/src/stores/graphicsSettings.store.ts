@@ -16,7 +16,11 @@ interface GraphicsSettingsState {
   resetToDefaults: () => void;
 }
 
-const DEFAULT_STATE = { qualityLevel: "full" as GraphicsQualityLevel, backgroundBlur: 3, animationSpeed: 1 as AnimationSpeed };
+const DEFAULT_STATE = {
+  qualityLevel: "full" as GraphicsQualityLevel,
+  backgroundBlur: 3,
+  animationSpeed: 1 as AnimationSpeed,
+};
 
 export const useGraphicsSettings = create<GraphicsSettingsState>()(
   devtools(

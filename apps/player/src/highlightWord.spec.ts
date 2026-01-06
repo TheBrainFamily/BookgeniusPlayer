@@ -116,7 +116,8 @@ describe("highlightNthOccurrence", () => {
     });
 
     test("should preserve attributes and other classes of the wrapped existing SPAN", () => {
-      const html = '<p>Text <span class="char-hl other-class" data-id="123" style="color: blue;">pan Verloc</span> end.</p>';
+      const html =
+        '<p>Text <span class="char-hl other-class" data-id="123" style="color: blue;">pan Verloc</span> end.</p>';
       const expected = `<p>Text <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}><span class="char-hl other-class" data-id="123" style="color: blue;">pan Verloc</span></span> end.</p>`;
       const result = highlightNthOccurrence(html, "pan", 0, DEFAULT_CLASS);
       expect(result).toBe(expected);
@@ -142,10 +143,12 @@ describe("highlightNthOccurrence", () => {
     });
 
     test("should create specific inner span for word directly in a SPAN tag with additional word that it's looking", () => {
-      const currentWordSpan = (innerElement: string) => `<span class="current-word" data-highlight-generated="true">${innerElement}</span>`;
+      const currentWordSpan = (innerElement: string) =>
+        `<span class="current-word" data-highlight-generated="true">${innerElement}</span>`;
       const paniVerlocHtml =
         '<span class="character-highlighted character-highlighted-activated" data-character="Winnie-Verloc" data-src-listening="/Conrad-Tajny-Agent/winnie-verloc.png" data-click-listener-attached="true">pani Verloc</span>';
-      const winniVerlocHtml = '<span class="character-highlighted" data-character="Winnie-Verloc" data-src-listening="/Conrad-Tajny-Agent/winnie-verloc.png">Winnie Verloc</span>';
+      const winniVerlocHtml =
+        '<span class="character-highlighted" data-character="Winnie-Verloc" data-src-listening="/Conrad-Tajny-Agent/winnie-verloc.png">Winnie Verloc</span>';
 
       const html = `czasem na wezwanie pękniętego dzwonka ukazywałą się ${paniVerlocHtml}. ${winniVerlocHtml} była młodą kobietą`;
       const expected = `czasem na wezwanie pękniętego dzwonka ukazywałą się ${currentWordSpan(paniVerlocHtml)}. ${winniVerlocHtml} była młodą kobietą`;
@@ -188,7 +191,8 @@ describe("highlightNthOccurrence", () => {
     });
 
     test("should add fade class to the outer wrapper span if last word is inside an existing SPAN", () => {
-      const html = '<p>The story concludes with <span class="ending-phrase">The Final Word</span>.</p>';
+      const html =
+        '<p>The story concludes with <span class="ending-phrase">The Final Word</span>.</p>';
       const expected = `<p>The story concludes with <span class="${DEFAULT_CLASS} ${FADE_CLASS}" ${GENERATED_MARKER_HTML}><span class="ending-phrase">The Final Word</span></span>.</p>`;
       const result = highlightNthOccurrence(html, "Word", 0, DEFAULT_CLASS, true); // "Word" is 1st (index 0)
       expect(result).toBe(expected);
@@ -200,30 +204,42 @@ describe("highlightNthOccurrence", () => {
     test("highlighting A then B (both generated spans), removes span from A, adds to B", () => {
       const html = "<p>wordOne wordTwo</p>";
       let result = highlightNthOccurrence(html, "wordOne", 0, DEFAULT_CLASS);
-      expect(result).toBe(`<p><span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>wordOne</span> wordTwo</p>`);
+      expect(result).toBe(
+        `<p><span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>wordOne</span> wordTwo</p>`,
+      );
 
       result = highlightNthOccurrence(result, "wordTwo", 0, DEFAULT_CLASS);
-      expect(result).toBe(`<p>wordOne <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>wordTwo</span></p>`);
+      expect(result).toBe(
+        `<p>wordOne <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>wordTwo</span></p>`,
+      );
     });
 
     test("highlighting A in S1 (S1 wrapped), then B (plain), S1 wrapper removed, S1 preserved", () => {
       const html = '<p><span id="S1">wordA</span> wordB</p>';
       let result = highlightNthOccurrence(html, "wordA", 0, DEFAULT_CLASS); // Wraps S1
-      expect(result).toBe(`<p><span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}><span id="S1">wordA</span></span> wordB</p>`);
+      expect(result).toBe(
+        `<p><span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}><span id="S1">wordA</span></span> wordB</p>`,
+      );
 
       result = highlightNthOccurrence(result, "wordB", 0, DEFAULT_CLASS); // wordB gets its own span
-      expect(result).toBe(`<p><span id="S1">wordA</span> <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>wordB</span></p>`);
+      expect(result).toBe(
+        `<p><span id="S1">wordA</span> <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>wordB</span></p>`,
+      );
     });
 
     test("fade class is correctly added and removed during cleanup cycle", () => {
       const html = "<p>Highlight last then next.</p>";
       // Highlight "last" as the last word (gets fade class)
       let result = highlightNthOccurrence(html, "last", 0, DEFAULT_CLASS, true);
-      expect(result).toBe(`<p>Highlight <span class="${DEFAULT_CLASS} ${FADE_CLASS}" ${GENERATED_MARKER_HTML}>last</span> then next.</p>`);
+      expect(result).toBe(
+        `<p>Highlight <span class="${DEFAULT_CLASS} ${FADE_CLASS}" ${GENERATED_MARKER_HTML}>last</span> then next.</p>`,
+      );
 
       // Highlight "next" (not last). Previous highlight (and its fade class) should be gone.
       result = highlightNthOccurrence(result, "next", 0, DEFAULT_CLASS, false);
-      expect(result).toBe(`<p>Highlight last then <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>next</span>.</p>`);
+      expect(result).toBe(
+        `<p>Highlight last then <span class="${DEFAULT_CLASS}" ${GENERATED_MARKER_HTML}>next</span>.</p>`,
+      );
     });
   });
 

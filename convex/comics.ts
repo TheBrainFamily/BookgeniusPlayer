@@ -1,11 +1,6 @@
 // convex/comics.ts
 import { v } from "convex/values";
-import {
-  query,
-  mutation,
-  internalMutation,
-  MutationCtx,
-} from "./_generated/server";
+import { query, mutation, internalMutation, MutationCtx } from "./_generated/server";
 import { components } from "./_generated/api";
 import { requireAuth } from "./authHelpers";
 
@@ -29,9 +24,7 @@ const characterImageTypeValidator = v.union(
 const frameValidator = v.object({
   scene: v.string(),
   characters: v.array(v.string()),
-  characterImageTypes: v.optional(
-    v.record(v.string(), characterImageTypeValidator),
-  ),
+  characterImageTypes: v.optional(v.record(v.string(), characterImageTypeValidator)),
   speaker: v.string(),
   dialogue: v.string(),
   imageType: v.union(v.literal("comic"), v.literal("superhero")),
@@ -58,10 +51,9 @@ export const listCharacters = query({
   args: {},
   handler: async (ctx) => {
     // List all folders under /comics/characters/
-    const characterFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: "comics/characters" },
-    );
+    const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: "comics/characters",
+    });
 
     const characters = await Promise.all(
       characterFolders.map(async (folder) => {
@@ -80,17 +72,14 @@ export const listCharacters = query({
         );
 
         // Find metadata from assets
-        const metadataAsset = publishedAssets.find(
-          (a) => a.basename === "metadata.json",
-        );
+        const metadataAsset = publishedAssets.find((a) => a.basename === "metadata.json");
 
         // Find images from files
         const comicImage = publishedFiles.find(
           (f) => f.basename === "comic.png" || f.basename === "comic.jpg",
         );
         const superheroImage = publishedFiles.find(
-          (f) =>
-            f.basename === "superhero.png" || f.basename === "superhero.jpg",
+          (f) => f.basename === "superhero.png" || f.basename === "superhero.jpg",
         );
 
         return {
@@ -102,10 +91,7 @@ export const listCharacters = query({
             ? { versionId: comicImage.versionId, basename: comicImage.basename }
             : null,
           superheroImage: superheroImage
-            ? {
-                versionId: superheroImage.versionId,
-                basename: superheroImage.basename,
-              }
+            ? { versionId: superheroImage.versionId, basename: superheroImage.basename }
             : null,
           // Keep raw URLs for server-side use (e.g., image generation)
           comicImageUrl: comicImage?.url ?? null,
@@ -129,27 +115,23 @@ type CharacterMetadata = {
 
 // Get a single character with full details
 export const getCharacter = query({
-  args: {
-    characterKey: v.string(),
-  },
+  args: { characterKey: v.string() },
   handler: async (ctx, args) => {
     const folderPath = `comics/characters/${args.characterKey}`;
 
     // Check if folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
       return null;
     }
 
     // Get all assets in the character folder
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath },
-    );
+    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath,
+    });
 
     // Get published assets (includes extra/metadata)
     const publishedAssets = await ctx.runQuery(
@@ -164,9 +146,7 @@ export const getCharacter = query({
     );
 
     // Find metadata from assets
-    const metadataAsset = publishedAssets.find(
-      (a) => a.basename === "metadata.json",
-    );
+    const metadataAsset = publishedAssets.find((a) => a.basename === "metadata.json");
 
     // Find images from files
     const comicFile = publishedFiles.find(
@@ -190,27 +170,22 @@ export const getCharacter = query({
 
 // Update character metadata
 export const updateCharacterMetadata = mutation({
-  args: {
-    characterKey: v.string(),
-    metadata: characterMetadataValidator,
-  },
+  args: { characterKey: v.string(), metadata: characterMetadataValidator },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
     const folderPath = `comics/characters/${args.characterKey}`;
 
     // Check if character folder exists, create if not
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
       // Create the character folder structure
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        { path: folderPath },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: folderPath,
+      });
     }
 
     // Create or update metadata using commitVersion
@@ -263,9 +238,7 @@ type ScenarioData = {
 
 // Get a single scenario
 export const getScenario = query({
-  args: {
-    scenarioName: v.string(),
-  },
+  args: { scenarioName: v.string() },
   handler: async (ctx, args) => {
     const basename = args.scenarioName.endsWith(".json")
       ? args.scenarioName
@@ -293,10 +266,7 @@ export const getScenario = query({
 
 // Create a new scenario
 export const createScenario = mutation({
-  args: {
-    name: v.string(),
-    scenario: scenarioValidator,
-  },
+  args: { name: v.string(), scenario: scenarioValidator },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
@@ -304,23 +274,21 @@ export const createScenario = mutation({
     const basename = `${args.name}.json`;
 
     // Ensure the scenarios folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        { path: folderPath },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: folderPath,
+      });
     }
 
     // Check if scenario already exists
-    const existing = await ctx.runQuery(
-      components.assetManager.assetManager.getAsset,
-      { folderPath, basename },
-    );
+    const existing = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+      folderPath,
+      basename,
+    });
 
     if (existing) {
       throw new Error(`Scenario "${args.name}" already exists`);
@@ -340,10 +308,7 @@ export const createScenario = mutation({
 
 // Update an existing scenario
 export const updateScenario = mutation({
-  args: {
-    scenarioName: v.string(),
-    scenario: scenarioValidator,
-  },
+  args: { scenarioName: v.string(), scenario: scenarioValidator },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
@@ -353,10 +318,10 @@ export const updateScenario = mutation({
       : `${args.scenarioName}.json`;
 
     // Check if scenario exists
-    const existing = await ctx.runQuery(
-      components.assetManager.assetManager.getAsset,
-      { folderPath, basename },
-    );
+    const existing = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+      folderPath,
+      basename,
+    });
 
     if (!existing) {
       throw new Error(`Scenario "${args.scenarioName}" not found`);
@@ -378,19 +343,14 @@ export const updateScenario = mutation({
 
 // List generated comic strips from /comics/strips/
 export const listGeneratedStrips = query({
-  args: {
-    scenarioName: v.optional(v.string()),
-  },
+  args: { scenarioName: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    const folderPath = args.scenarioName
-      ? `comics/strips/${args.scenarioName}`
-      : "comics/strips";
+    const folderPath = args.scenarioName ? `comics/strips/${args.scenarioName}` : "comics/strips";
 
     // First check if the folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
       return [];
@@ -420,10 +380,9 @@ export const listGeneratedStrips = query({
     }
 
     // Otherwise list all scenario folders - get most recently published strip per scenario
-    const scenarioFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: folderPath },
-    );
+    const scenarioFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: folderPath,
+    });
 
     const allStrips = await Promise.all(
       scenarioFolders.map(async (folder) => {
@@ -458,18 +417,15 @@ export const listGeneratedStrips = query({
 
 // Get all versions of a generated strip for a scenario
 export const getStripVersions = query({
-  args: {
-    scenarioName: v.string(),
-    basename: v.optional(v.string()),
-  },
+  args: { scenarioName: v.string(), basename: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const folderPath = `comics/strips/${args.scenarioName}`;
     const stripBasename = args.basename ?? `${args.scenarioName}.png`;
 
-    const versions = await ctx.runQuery(
-      components.assetManager.assetManager.getAssetVersions,
-      { folderPath, basename: stripBasename },
-    );
+    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+      folderPath,
+      basename: stripBasename,
+    });
 
     return versions;
   },
@@ -486,9 +442,7 @@ export const getScenarioOrder = query({
       { folderPath: "comics/config" },
     );
 
-    const orderAsset = publishedAssets.find(
-      (a) => a.basename === "scenario-order.json",
-    );
+    const orderAsset = publishedAssets.find((a) => a.basename === "scenario-order.json");
 
     if (!orderAsset?.extra) {
       return null;
@@ -500,25 +454,21 @@ export const getScenarioOrder = query({
 
 // Save the scenario order
 export const saveScenarioOrder = mutation({
-  args: {
-    order: v.array(v.string()),
-  },
+  args: { order: v.array(v.string()) },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
     const folderPath = "comics/config";
 
     // Ensure config folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        { path: folderPath },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: folderPath,
+      });
     }
 
     // Save the order using commitVersion
@@ -537,38 +487,31 @@ export const saveScenarioOrder = mutation({
 
 // Ensure strip folder exists and return the correct basename for the scenario
 export const ensureStripFolder = mutation({
-  args: {
-    scenarioName: v.string(),
-  },
+  args: { scenarioName: v.string() },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
     const folderPath = `comics/strips/${args.scenarioName}`;
 
     // Check if folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     // Create folder if it doesn't exist
     if (!folder) {
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        { path: folderPath },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: folderPath,
+      });
     }
 
     // Check for existing strip assets to get the correct basename
-    const existingAssets = await ctx.runQuery(
-      components.assetManager.assetManager.listAssets,
-      { folderPath },
-    );
+    const existingAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+      folderPath,
+    });
 
     // Find any existing image asset
-    const existingImage = existingAssets.find((a) =>
-      /\.(png|jpg|jpeg|webp)$/i.test(a.basename),
-    );
+    const existingImage = existingAssets.find((a) => /\.(png|jpg|jpeg|webp)$/i.test(a.basename));
 
     // Return existing basename or default to .png
     const basename = existingImage?.basename ?? `${args.scenarioName}.png`;
@@ -592,10 +535,9 @@ export const listStories = query({
   args: {},
   handler: async (ctx) => {
     // List all folders under /comics/stories/
-    const storyFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: "comics/stories" },
-    );
+    const storyFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: "comics/stories",
+    });
 
     const stories = await Promise.all(
       storyFolders.map(async (folder) => {
@@ -605,9 +547,7 @@ export const listStories = query({
           { folderPath: folder.path },
         );
 
-        const metadataAsset = publishedAssets.find(
-          (a) => a.basename === "metadata.json",
-        );
+        const metadataAsset = publishedAssets.find((a) => a.basename === "metadata.json");
 
         // Get scenario count
         const scenariosPath = `${folder.path}/scenarios`;
@@ -615,16 +555,13 @@ export const listStories = query({
           components.assetManager.assetManager.listPublishedAssetsInFolder,
           { folderPath: scenariosPath },
         );
-        const scenarioCount = scenarioAssets.filter((a) =>
-          a.basename.endsWith(".json"),
-        ).length;
+        const scenarioCount = scenarioAssets.filter((a) => a.basename.endsWith(".json")).length;
 
         // Get the newest strip from the first scenario as thumbnail
         const stripsPath = `${folder.path}/strips`;
-        const stripFolders = await ctx.runQuery(
-          components.assetManager.assetManager.listFolders,
-          { parentPath: stripsPath },
-        );
+        const stripFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+          parentPath: stripsPath,
+        });
 
         let thumbnailVersionId: string | null = null;
         let thumbnailBasename: string | null = null;
@@ -671,17 +608,14 @@ export const listStories = query({
 
 // Get a single story
 export const getStory = query({
-  args: {
-    slug: v.string(),
-  },
+  args: { slug: v.string() },
   handler: async (ctx, args) => {
     const folderPath = `comics/stories/${args.slug}`;
 
     // Check if folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
       return null;
@@ -693,9 +627,7 @@ export const getStory = query({
       { folderPath },
     );
 
-    const metadataAsset = publishedAssets.find(
-      (a) => a.basename === "metadata.json",
-    );
+    const metadataAsset = publishedAssets.find((a) => a.basename === "metadata.json");
 
     const metadata = metadataAsset?.extra as StoryMetadata | undefined;
 
@@ -717,10 +649,9 @@ async function createStoryCore(
   const folderPath = `comics/stories/${args.slug}`;
 
   // Check if story already exists
-  const existing = await ctx.runQuery(
-    components.assetManager.assetManager.getFolder,
-    { path: folderPath },
-  );
+  const existing = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+    path: folderPath,
+  });
 
   if (existing) {
     throw new Error(`Story "${args.slug}" already exists`);
@@ -729,22 +660,19 @@ async function createStoryCore(
   const now = Date.now();
 
   // Create story folder
-  await ctx.runMutation(
-    components.assetManager.assetManager.createFolderByPath,
-    { path: folderPath },
-  );
+  await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+    path: folderPath,
+  });
 
   // Create scenarios subfolder
-  await ctx.runMutation(
-    components.assetManager.assetManager.createFolderByPath,
-    { path: `${folderPath}/scenarios` },
-  );
+  await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+    path: `${folderPath}/scenarios`,
+  });
 
   // Create strips subfolder
-  await ctx.runMutation(
-    components.assetManager.assetManager.createFolderByPath,
-    { path: `${folderPath}/strips` },
-  );
+  await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+    path: `${folderPath}/strips`,
+  });
 
   // Save metadata
   await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
@@ -765,11 +693,7 @@ async function createStoryCore(
 
 // Create a new story (public, requires auth)
 export const createStory = mutation({
-  args: {
-    slug: v.string(),
-    name: v.string(),
-    description: v.string(),
-  },
+  args: { slug: v.string(), name: v.string(), description: v.string() },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
     return createStoryCore(ctx, args);
@@ -778,11 +702,7 @@ export const createStory = mutation({
 
 // Create a new story (internal, no auth - for scheduled actions)
 export const createStoryInternal = internalMutation({
-  args: {
-    slug: v.string(),
-    name: v.string(),
-    description: v.string(),
-  },
+  args: { slug: v.string(), name: v.string(), description: v.string() },
   handler: async (ctx, args) => {
     return createStoryCore(ctx, args);
   },
@@ -790,21 +710,16 @@ export const createStoryInternal = internalMutation({
 
 // Update a story
 export const updateStory = mutation({
-  args: {
-    slug: v.string(),
-    name: v.optional(v.string()),
-    description: v.optional(v.string()),
-  },
+  args: { slug: v.string(), name: v.optional(v.string()), description: v.optional(v.string()) },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
     const folderPath = `comics/stories/${args.slug}`;
 
     // Check if story exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
       throw new Error(`Story "${args.slug}" not found`);
@@ -816,9 +731,7 @@ export const updateStory = mutation({
       { folderPath },
     );
 
-    const metadataAsset = publishedAssets.find(
-      (a) => a.basename === "metadata.json",
-    );
+    const metadataAsset = publishedAssets.find((a) => a.basename === "metadata.json");
 
     const currentMetadata = (metadataAsset?.extra as StoryMetadata) ?? {
       slug: args.slug,
@@ -850,9 +763,7 @@ export const updateStory = mutation({
 
 // List scenarios for a story
 export const listStoryScenarios = query({
-  args: {
-    storySlug: v.string(),
-  },
+  args: { storySlug: v.string() },
   handler: async (ctx, args) => {
     const folderPath = `comics/stories/${args.storySlug}/scenarios`;
 
@@ -874,10 +785,7 @@ export const listStoryScenarios = query({
 
 // Get a single scenario from a story
 export const getStoryScenario = query({
-  args: {
-    storySlug: v.string(),
-    scenarioName: v.string(),
-  },
+  args: { storySlug: v.string(), scenarioName: v.string() },
   handler: async (ctx, args) => {
     const folderPath = `comics/stories/${args.storySlug}/scenarios`;
     const basename = args.scenarioName.endsWith(".json")
@@ -912,23 +820,21 @@ async function createStoryScenarioCore(
   const basename = `${args.name}.json`;
 
   // Ensure the scenarios folder exists
-  const folder = await ctx.runQuery(
-    components.assetManager.assetManager.getFolder,
-    { path: folderPath },
-  );
+  const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+    path: folderPath,
+  });
 
   if (!folder) {
-    await ctx.runMutation(
-      components.assetManager.assetManager.createFolderByPath,
-      { path: folderPath },
-    );
+    await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      path: folderPath,
+    });
   }
 
   // Check if scenario already exists
-  const existing = await ctx.runQuery(
-    components.assetManager.assetManager.getAsset,
-    { folderPath, basename },
-  );
+  const existing = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+    folderPath,
+    basename,
+  });
 
   if (existing) {
     throw new Error(`Scenario "${args.name}" already exists in this story`);
@@ -947,11 +853,7 @@ async function createStoryScenarioCore(
 
 // Create a scenario in a story (public, requires auth)
 export const createStoryScenario = mutation({
-  args: {
-    storySlug: v.string(),
-    name: v.string(),
-    scenario: scenarioValidator,
-  },
+  args: { storySlug: v.string(), name: v.string(), scenario: scenarioValidator },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
     return createStoryScenarioCore(
@@ -963,11 +865,7 @@ export const createStoryScenario = mutation({
 
 // Create a scenario in a story (internal, no auth - for scheduled actions)
 export const createStoryScenarioInternal = internalMutation({
-  args: {
-    storySlug: v.string(),
-    name: v.string(),
-    scenario: scenarioValidator,
-  },
+  args: { storySlug: v.string(), name: v.string(), scenario: scenarioValidator },
   handler: async (ctx, args) => {
     return createStoryScenarioCore(
       ctx,
@@ -978,11 +876,7 @@ export const createStoryScenarioInternal = internalMutation({
 
 // Update a scenario in a story
 export const updateStoryScenario = mutation({
-  args: {
-    storySlug: v.string(),
-    scenarioName: v.string(),
-    scenario: scenarioValidator,
-  },
+  args: { storySlug: v.string(), scenarioName: v.string(), scenario: scenarioValidator },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
@@ -992,15 +886,13 @@ export const updateStoryScenario = mutation({
       : `${args.scenarioName}.json`;
 
     // Check if scenario exists
-    const existing = await ctx.runQuery(
-      components.assetManager.assetManager.getAsset,
-      { folderPath, basename },
-    );
+    const existing = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+      folderPath,
+      basename,
+    });
 
     if (!existing) {
-      throw new Error(
-        `Scenario "${args.scenarioName}" not found in this story`,
-      );
+      throw new Error(`Scenario "${args.scenarioName}" not found in this story`);
     }
 
     // Update by creating new version
@@ -1019,21 +911,15 @@ export const updateStoryScenario = mutation({
 
 // List generated strips for a story
 export const listStoryStrips = query({
-  args: {
-    storySlug: v.string(),
-    scenarioName: v.optional(v.string()),
-  },
+  args: { storySlug: v.string(), scenarioName: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const basePath = `comics/stories/${args.storySlug}/strips`;
-    const folderPath = args.scenarioName
-      ? `${basePath}/${args.scenarioName}`
-      : basePath;
+    const folderPath = args.scenarioName ? `${basePath}/${args.scenarioName}` : basePath;
 
     // Check if folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     if (!folder) {
       return [];
@@ -1063,10 +949,9 @@ export const listStoryStrips = query({
     }
 
     // Otherwise list all scenario folders - get most recently published strip per scenario
-    const scenarioFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: folderPath },
-    );
+    const scenarioFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: folderPath,
+    });
 
     const allStrips = await Promise.all(
       scenarioFolders.map(async (folder) => {
@@ -1103,9 +988,7 @@ export const listStoryStrips = query({
 
 // Get scenario order for a story
 export const getStoryScenarioOrder = query({
-  args: {
-    storySlug: v.string(),
-  },
+  args: { storySlug: v.string() },
   handler: async (ctx, args) => {
     const folderPath = `comics/stories/${args.storySlug}`;
 
@@ -1114,9 +997,7 @@ export const getStoryScenarioOrder = query({
       { folderPath },
     );
 
-    const orderAsset = publishedAssets.find(
-      (a) => a.basename === "scenario-order.json",
-    );
+    const orderAsset = publishedAssets.find((a) => a.basename === "scenario-order.json");
 
     if (!orderAsset?.extra) {
       return null;
@@ -1134,10 +1015,9 @@ async function saveStoryScenarioOrderCore(
   const folderPath = `comics/stories/${args.storySlug}`;
 
   // Ensure story folder exists
-  const folder = await ctx.runQuery(
-    components.assetManager.assetManager.getFolder,
-    { path: folderPath },
-  );
+  const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+    path: folderPath,
+  });
 
   if (!folder) {
     throw new Error(`Story "${args.storySlug}" not found`);
@@ -1156,10 +1036,7 @@ async function saveStoryScenarioOrderCore(
 
 // Save scenario order for a story
 export const saveStoryScenarioOrder = mutation({
-  args: {
-    storySlug: v.string(),
-    order: v.array(v.string()),
-  },
+  args: { storySlug: v.string(), order: v.array(v.string()) },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
     return saveStoryScenarioOrderCore(ctx, args);
@@ -1168,10 +1045,7 @@ export const saveStoryScenarioOrder = mutation({
 
 // Internal version for scheduled actions
 export const saveStoryScenarioOrderInternal = internalMutation({
-  args: {
-    storySlug: v.string(),
-    order: v.array(v.string()),
-  },
+  args: { storySlug: v.string(), order: v.array(v.string()) },
   handler: async (ctx, args) => {
     return saveStoryScenarioOrderCore(ctx, args);
   },
@@ -1185,28 +1059,23 @@ async function ensureStoryStripFolderCore(
   const folderPath = `comics/stories/${args.storySlug}/strips/${args.scenarioName}`;
 
   // Check if folder exists
-  const folder = await ctx.runQuery(
-    components.assetManager.assetManager.getFolder,
-    { path: folderPath },
-  );
+  const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+    path: folderPath,
+  });
 
   // Create folder if it doesn't exist
   if (!folder) {
-    await ctx.runMutation(
-      components.assetManager.assetManager.createFolderByPath,
-      { path: folderPath },
-    );
+    await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      path: folderPath,
+    });
   }
 
   // Check for existing strip assets
-  const existingAssets = await ctx.runQuery(
-    components.assetManager.assetManager.listAssets,
-    { folderPath },
-  );
+  const existingAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+    folderPath,
+  });
 
-  const existingImage = existingAssets.find((a) =>
-    /\.(png|jpg|jpeg|webp)$/i.test(a.basename),
-  );
+  const existingImage = existingAssets.find((a) => /\.(png|jpg|jpeg|webp)$/i.test(a.basename));
 
   const basename = existingImage?.basename ?? `${args.scenarioName}.png`;
 
@@ -1215,10 +1084,7 @@ async function ensureStoryStripFolderCore(
 
 // Ensure strip folder exists for a story scenario (public, requires auth)
 export const ensureStoryStripFolder = mutation({
-  args: {
-    storySlug: v.string(),
-    scenarioName: v.string(),
-  },
+  args: { storySlug: v.string(), scenarioName: v.string() },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
     return ensureStoryStripFolderCore(ctx, args);
@@ -1227,10 +1093,7 @@ export const ensureStoryStripFolder = mutation({
 
 // Internal version for scheduled actions (no auth required)
 export const ensureStoryStripFolderInternal = internalMutation({
-  args: {
-    storySlug: v.string(),
-    scenarioName: v.string(),
-  },
+  args: { storySlug: v.string(), scenarioName: v.string() },
   handler: async (ctx, args) => {
     return ensureStoryStripFolderCore(ctx, args);
   },
@@ -1239,25 +1102,20 @@ export const ensureStoryStripFolderInternal = internalMutation({
 // Check if first strip already exists (and ensure folder exists)
 // Returns { saved: true } if strips exist (meaning this is a regeneration, not first strip)
 export const checkFirstStripExists = internalMutation({
-  args: {
-    storySlug: v.string(),
-    scenarioName: v.string(),
-  },
+  args: { storySlug: v.string(), scenarioName: v.string() },
   handler: async (ctx, args) => {
     const folderPath = `comics/stories/${args.storySlug}/strips/${args.scenarioName}`;
 
     // Check if folder exists
-    const folder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: folderPath },
-    );
+    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: folderPath,
+    });
 
     // Create folder if it doesn't exist
     if (!folder) {
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        { path: folderPath },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: folderPath,
+      });
       // Folder just created, no strips can exist
       return { saved: false };
     }
@@ -1268,9 +1126,7 @@ export const checkFirstStripExists = internalMutation({
       { folderPath },
     );
 
-    const existingStrips = publishedFiles.filter((f) =>
-      /\.(png|jpg|jpeg|webp)$/i.test(f.basename),
-    );
+    const existingStrips = publishedFiles.filter((f) => /\.(png|jpg|jpeg|webp)$/i.test(f.basename));
 
     return { saved: existingStrips.length > 0 };
   },
@@ -1280,10 +1136,7 @@ export const checkFirstStripExists = internalMutation({
 
 // Migrate existing data to story-based structure
 export const migrateToStories = mutation({
-  args: {
-    targetStorySlug: v.optional(v.string()),
-    targetStoryName: v.optional(v.string()),
-  },
+  args: { targetStorySlug: v.optional(v.string()), targetStoryName: v.optional(v.string()) },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
@@ -1293,10 +1146,9 @@ export const migrateToStories = mutation({
     const storyPath = `comics/stories/${storySlug}`;
 
     // Check if story already exists
-    const existingStory = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: storyPath },
-    );
+    const existingStory = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: storyPath,
+    });
 
     if (existingStory) {
       return { success: false, message: `Story "${storySlug}" already exists` };
@@ -1307,18 +1159,15 @@ export const migrateToStories = mutation({
     const migratedStrips: string[] = [];
 
     // 1. Create story folder structure
-    await ctx.runMutation(
-      components.assetManager.assetManager.createFolderByPath,
-      { path: storyPath },
-    );
-    await ctx.runMutation(
-      components.assetManager.assetManager.createFolderByPath,
-      { path: `${storyPath}/scenarios` },
-    );
-    await ctx.runMutation(
-      components.assetManager.assetManager.createFolderByPath,
-      { path: `${storyPath}/strips` },
-    );
+    await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      path: storyPath,
+    });
+    await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      path: `${storyPath}/scenarios`,
+    });
+    await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      path: `${storyPath}/strips`,
+    });
 
     // 2. Create story metadata
     await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
@@ -1339,19 +1188,14 @@ export const migrateToStories = mutation({
       components.assetManager.assetManager.listPublishedAssetsInFolder,
       { folderPath: "comics/config" },
     );
-    const orderAsset = configAssets.find(
-      (a) => a.basename === "scenario-order.json",
-    );
+    const orderAsset = configAssets.find((a) => a.basename === "scenario-order.json");
     if (orderAsset?.extra) {
-      await ctx.runMutation(
-        components.assetManager.assetManager.commitVersion,
-        {
-          folderPath: storyPath,
-          basename: "scenario-order.json",
-          publish: true,
-          extra: orderAsset.extra,
-        },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
+        folderPath: storyPath,
+        basename: "scenario-order.json",
+        publish: true,
+        extra: orderAsset.extra,
+      });
     }
 
     // 4. Migrate scenarios
@@ -1362,34 +1206,29 @@ export const migrateToStories = mutation({
 
     for (const asset of scenarioAssets) {
       if (asset.basename.endsWith(".json") && asset.extra) {
-        await ctx.runMutation(
-          components.assetManager.assetManager.commitVersion,
-          {
-            folderPath: `${storyPath}/scenarios`,
-            basename: asset.basename,
-            publish: true,
-            extra: asset.extra,
-          },
-        );
+        await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
+          folderPath: `${storyPath}/scenarios`,
+          basename: asset.basename,
+          publish: true,
+          extra: asset.extra,
+        });
         migratedScenarios.push(asset.basename);
       }
     }
 
     // 5. Migrate strips using createVersionFromStorageId (zero-copy)
-    const stripFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: "comics/strips" },
-    );
+    const stripFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: "comics/strips",
+    });
 
     for (const folder of stripFolders) {
       const scenarioName = folder.name;
       const newStripPath = `${storyPath}/strips/${scenarioName}`;
 
       // Create strip folder in new location
-      await ctx.runMutation(
-        components.assetManager.assetManager.createFolderByPath,
-        { path: newStripPath },
-      );
+      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+        path: newStripPath,
+      });
 
       // Get published files with storageId
       const publishedFiles = await ctx.runQuery(
@@ -1400,16 +1239,13 @@ export const migrateToStories = mutation({
       // Copy each image to new location (same storageId = zero-copy)
       for (const file of publishedFiles) {
         if (/\.(png|jpg|jpeg|webp)$/i.test(file.basename) && file.storageId) {
-          await ctx.runMutation(
-            components.assetManager.assetManager.createVersionFromStorageId,
-            {
-              folderPath: newStripPath,
-              basename: file.basename,
-              storageId: file.storageId,
-              publish: true,
-              label: "Migrated from legacy",
-            },
-          );
+          await ctx.runMutation(components.assetManager.assetManager.createVersionFromStorageId, {
+            folderPath: newStripPath,
+            basename: file.basename,
+            storageId: file.storageId,
+            publish: true,
+            label: "Migrated from legacy",
+          });
           migratedStrips.push(`${scenarioName}/${file.basename}`);
         }
       }
@@ -1428,19 +1264,16 @@ export const migrateToStories = mutation({
 
 // Migrate strips to an existing story (patch for already-migrated stories)
 export const migrateStripsToStory = mutation({
-  args: {
-    storySlug: v.string(),
-  },
+  args: { storySlug: v.string() },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
     const storyPath = `comics/stories/${args.storySlug}`;
 
     // Check if story exists
-    const storyFolder = await ctx.runQuery(
-      components.assetManager.assetManager.getFolder,
-      { path: storyPath },
-    );
+    const storyFolder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+      path: storyPath,
+    });
 
     if (!storyFolder) {
       return { success: false, message: `Story "${args.storySlug}" not found` };
@@ -1449,26 +1282,23 @@ export const migrateStripsToStory = mutation({
     const migratedStrips: string[] = [];
 
     // Get all legacy strip folders
-    const stripFolders = await ctx.runQuery(
-      components.assetManager.assetManager.listFolders,
-      { parentPath: "comics/strips" },
-    );
+    const stripFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
+      parentPath: "comics/strips",
+    });
 
     for (const folder of stripFolders) {
       const scenarioName = folder.name;
       const newStripPath = `${storyPath}/strips/${scenarioName}`;
 
       // Ensure folder exists
-      const existingFolder = await ctx.runQuery(
-        components.assetManager.assetManager.getFolder,
-        { path: newStripPath },
-      );
+      const existingFolder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+        path: newStripPath,
+      });
 
       if (!existingFolder) {
-        await ctx.runMutation(
-          components.assetManager.assetManager.createFolderByPath,
-          { path: newStripPath },
-        );
+        await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+          path: newStripPath,
+        });
       }
 
       // Get published files with storageId
@@ -1480,22 +1310,19 @@ export const migrateStripsToStory = mutation({
       for (const file of publishedFiles) {
         if (/\.(png|jpg|jpeg|webp)$/i.test(file.basename) && file.storageId) {
           // Check if already exists in destination
-          const existingAsset = await ctx.runQuery(
-            components.assetManager.assetManager.getAsset,
-            { folderPath: newStripPath, basename: file.basename },
-          );
+          const existingAsset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+            folderPath: newStripPath,
+            basename: file.basename,
+          });
 
           if (!existingAsset) {
-            await ctx.runMutation(
-              components.assetManager.assetManager.createVersionFromStorageId,
-              {
-                folderPath: newStripPath,
-                basename: file.basename,
-                storageId: file.storageId,
-                publish: true,
-                label: "Migrated from legacy",
-              },
-            );
+            await ctx.runMutation(components.assetManager.assetManager.createVersionFromStorageId, {
+              folderPath: newStripPath,
+              basename: file.basename,
+              storageId: file.storageId,
+              publish: true,
+              label: "Migrated from legacy",
+            });
             migratedStrips.push(`${scenarioName}/${file.basename}`);
           }
         }

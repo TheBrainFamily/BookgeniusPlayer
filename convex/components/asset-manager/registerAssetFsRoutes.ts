@@ -9,17 +9,8 @@ type AssetManagerComponent = {
       "internal",
       { versionId: string },
       | null
-      | {
-          kind: "blob";
-          storageId: string;
-          contentType?: string;
-          cacheControl?: string;
-        }
-      | {
-          kind: "redirect";
-          location: string;
-          cacheControl?: string;
-        }
+      | { kind: "blob"; storageId: string; contentType?: string; cacheControl?: string }
+      | { kind: "redirect"; location: string; cacheControl?: string }
     >;
     getBlobForServing: FunctionReference<
       "action",
@@ -49,10 +40,7 @@ export const registerAssetFsRoutes = (
     method: "OPTIONS",
     pathPrefix: `${basePath}/v/`,
     handler: httpActionGeneric(async () => {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders,
-      });
+      return new Response(null, { status: 204, headers: corsHeaders });
     }),
   });
 
@@ -64,16 +52,10 @@ export const registerAssetFsRoutes = (
       const versionId = parseVersionIdFromPath(pathname, basePath);
 
       if (!versionId) {
-        return new Response("Missing versionId", {
-          status: 400,
-          headers: corsHeaders,
-        });
+        return new Response("Missing versionId", { status: 400, headers: corsHeaders });
       }
 
-      const result = await ctx.runQuery(
-        component.assetFsHttp.getVersionForServing,
-        { versionId },
-      );
+      const result = await ctx.runQuery(component.assetFsHttp.getVersionForServing, { versionId });
 
       console.log("[registerAssetFsRoutes] result:", result);
       if (!result) {
@@ -84,16 +66,12 @@ export const registerAssetFsRoutes = (
         // Call the component's action to get the blob from component storage.
         // HTTP actions can only access main app storage, not component storage,
         // so we need to use an action inside the component to fetch the blob.
-        const arrayBuffer = await ctx.runAction(
-          component.assetFsHttp.getBlobForServing,
-          { storageId: result.storageId },
-        );
+        const arrayBuffer = await ctx.runAction(component.assetFsHttp.getBlobForServing, {
+          storageId: result.storageId,
+        });
 
         if (!arrayBuffer) {
-          return new Response("Not found", {
-            status: 404,
-            headers: corsHeaders,
-          });
+          return new Response("Not found", { status: 404, headers: corsHeaders });
         }
 
         const headers = new Headers(corsHeaders);
@@ -108,10 +86,7 @@ export const registerAssetFsRoutes = (
       }
 
       // redirect - include CORS headers
-      const headers = new Headers({
-        ...corsHeaders,
-        Location: result.location,
-      });
+      const headers = new Headers({ ...corsHeaders, Location: result.location });
       if (result.cacheControl) {
         headers.set("Cache-Control", result.cacheControl);
       }

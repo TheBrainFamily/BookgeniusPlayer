@@ -14,7 +14,11 @@ i18n
     supportedLngs: ["en", "pl"],
     defaultNS: "translation",
     interpolation: { escapeValue: false },
-    detection: { order: ["querystring", "localStorage", "navigator", "htmlTag"], lookupQuerystring: "lng", caches: ["localStorage"] },
+    detection: {
+      order: ["querystring", "localStorage", "navigator", "htmlTag"],
+      lookupQuerystring: "lng",
+      caches: ["localStorage"],
+    },
   });
 
 export default i18n;

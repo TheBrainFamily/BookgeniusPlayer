@@ -154,11 +154,14 @@ describe("restoreOriginalTextInHtml", () => {
 
     test("handles nested spans (data-c inside em)", () => {
       const original = "<p>She said <em>Alice was right</em>.</p>";
-      const model = '<p data-speaker="bob">She said <em><span data-c="alice">Alice</span> was rigt</em>.</p>';
+      const model =
+        '<p data-speaker="bob">She said <em><span data-c="alice">Alice</span> was rigt</em>.</p>';
 
       const result = restoreOriginalTextInHtml(original, model);
 
-      expect(result).toBe('<p data-speaker="bob">She said <em><span data-c="alice">Alice</span> was right</em>.</p>');
+      expect(result).toBe(
+        '<p data-speaker="bob">She said <em><span data-c="alice">Alice</span> was right</em>.</p>',
+      );
     });
   });
 

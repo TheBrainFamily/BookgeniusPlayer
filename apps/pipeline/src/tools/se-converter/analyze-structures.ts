@@ -29,7 +29,9 @@ function extractStructure(content: string, filename: string): FileStructure {
   const topLevelEpubType = topLevelMatch?.[2] || "none";
 
   const nestedSectionMatches = [...content.matchAll(/<section[^>]*epub:type="([^"]*)"/g)];
-  const nestedSectionTypes = nestedSectionMatches.map((m) => m[1]).filter((t) => t !== topLevelEpubType);
+  const nestedSectionTypes = nestedSectionMatches
+    .map((m) => m[1])
+    .filter((t) => t !== topLevelEpubType);
 
   const headingMatches = [...content.matchAll(/<(h[1-6])[^>]*>/g)];
   const headingLevels = [...new Set(headingMatches.map((m) => m[1]))];
@@ -73,7 +75,14 @@ function analyzeBook(slug: string): BookStructure | null {
     } catch {}
   }
 
-  return { slug, fileCount: files.length, hasContentOpf, files: fileStructures, uniqueEpubTypes, uniqueNestedTypes };
+  return {
+    slug,
+    fileCount: files.length,
+    hasContentOpf,
+    files: fileStructures,
+    uniqueEpubTypes,
+    uniqueNestedTypes,
+  };
 }
 
 interface Anomaly {
@@ -105,7 +114,9 @@ function detectAnomalies(book: BookStructure): Anomaly[] {
 
   const hasSubchapters = book.uniqueNestedTypes.has("z3998:subchapter");
   if (hasSubchapters) {
-    const filesWithSubchapters = book.files.filter((f) => f.nestedSectionTypes.includes("z3998:subchapter"));
+    const filesWithSubchapters = book.files.filter((f) =>
+      f.nestedSectionTypes.includes("z3998:subchapter"),
+    );
     anomalies.push({
       slug: book.slug,
       type: "HAS_SUBCHAPTERS",

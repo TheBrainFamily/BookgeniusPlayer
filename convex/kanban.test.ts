@@ -13,39 +13,23 @@ describe("Kanban over asset manager", () => {
     const t = convexTest(schema, modules);
     t.registerComponent("assetManager", componentSchema, componentModules);
 
-    const board = await t.mutation(api.kanban.createBoard, {
-      boardSlug: "demo",
-    });
+    const board = await t.mutation(api.kanban.createBoard, { boardSlug: "demo" });
 
     // createBoard returns boardSlug + columns for convenience
     expect(board.boardSlug).toBe("demo");
-    expect(board.columns.map((c: any) => c.slug)).toEqual([
-      "backlog",
-      "doing",
-      "review",
-      "done",
-    ]);
+    expect(board.columns.map((c: any) => c.slug)).toEqual(["backlog", "doing", "review", "done"]);
 
     // And listColumns sees the same structure
-    const columns = await t.query(api.kanban.listColumns, {
-      boardSlug: "demo",
-    });
+    const columns = await t.query(api.kanban.listColumns, { boardSlug: "demo" });
 
-    expect(columns.map((c: any) => c.slug)).toEqual([
-      "backlog",
-      "doing",
-      "review",
-      "done",
-    ]);
+    expect(columns.map((c: any) => c.slug)).toEqual(["backlog", "doing", "review", "done"]);
   });
 
   it("createCard creates a published card in the given column", async () => {
     const t = convexTest(schema, modules);
     t.registerComponent("assetManager", componentSchema, componentModules);
 
-    await t.mutation(api.kanban.createBoard, {
-      boardSlug: "demo",
-    });
+    await t.mutation(api.kanban.createBoard, { boardSlug: "demo" });
 
     const card = await t.mutation(api.kanban.createCard, {
       boardSlug: "demo",
@@ -75,9 +59,7 @@ describe("Kanban over asset manager", () => {
     const t = convexTest(schema, modules);
     t.registerComponent("assetManager", componentSchema, componentModules);
 
-    await t.mutation(api.kanban.createBoard, {
-      boardSlug: "demo",
-    });
+    await t.mutation(api.kanban.createBoard, { boardSlug: "demo" });
 
     const card = await t.mutation(api.kanban.createCard, {
       boardSlug: "demo",
@@ -113,9 +95,7 @@ describe("Kanban over asset manager", () => {
     const t = convexTest(schema, modules);
     t.registerComponent("assetManager", componentSchema, componentModules);
 
-    await t.mutation(api.kanban.createBoard, {
-      boardSlug: "demo",
-    });
+    await t.mutation(api.kanban.createBoard, { boardSlug: "demo" });
 
     const card = await t.mutation(api.kanban.createCard, {
       boardSlug: "demo",
@@ -149,10 +129,7 @@ describe("Kanban over asset manager", () => {
       boardSlug: "demo",
       column: "backlog",
     });
-    doingCards = await t.query(api.kanban.listColumnCards, {
-      boardSlug: "demo",
-      column: "doing",
-    });
+    doingCards = await t.query(api.kanban.listColumnCards, { boardSlug: "demo", column: "doing" });
 
     expect(backlogCards).toHaveLength(0);
     expect(doingCards).toHaveLength(1);

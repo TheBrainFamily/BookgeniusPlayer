@@ -1,4 +1,9 @@
-import { GenerateContentConfig, GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
+import {
+  GenerateContentConfig,
+  GoogleGenAI,
+  HarmBlockThreshold,
+  HarmCategory,
+} from "@google/genai";
 import { z } from "zod";
 import { google } from "@ai-sdk/google";
 import { generateObject, generateText, streamText, wrapLanguageModel } from "ai";
@@ -7,7 +12,10 @@ import "dotenv/config";
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import type { LanguageModelV2Middleware } from "@ai-sdk/provider";
 
-export const callFastGemini = async (prompt: string, streamCallback?: (text: string, isFinal: boolean) => void) => {
+export const callFastGemini = async (
+  prompt: string,
+  streamCallback?: (text: string, isFinal: boolean) => void,
+) => {
   // TODO This had 0 thinking enabled budget
   const { textStream } = streamText({
     model: google("gemini-3-flash-preview"),
@@ -82,13 +90,26 @@ export const callGeminiWithThinking = async (prompt: string) => {
   const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-    { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
   ];
 
   console.log("before response", model);
-  const response = await ai.models.generateContent({ model, config: { ...config, safetySettings }, contents });
+  const response = await ai.models.generateContent({
+    model,
+    config: { ...config, safetySettings },
+    contents,
+  });
 
   console.log("after response");
 
@@ -106,9 +127,18 @@ export const callGeminiWithThinkingAndSchema = async <T>(
   const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-    { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
   ];
 
   const config: GenerateContentConfig = {
@@ -139,11 +169,26 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
     providerOptions: {
       google: {
         safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
         ],
       },
     },
@@ -192,11 +237,15 @@ export const anthropicThinkingSchemaMiddleware: LanguageModelV2Middleware = {
     console.log("result", result);
     // Extract tool call from content array and convert to text response
     if (result.content && result.content.length > 0) {
-      const toolCallContent = result.content.find((item) => item.type === "tool-call" && item.toolName === "json");
+      const toolCallContent = result.content.find(
+        (item) => item.type === "tool-call" && item.toolName === "json",
+      );
       if (toolCallContent && toolCallContent.type === "tool-call") {
         // Parse the input string to get the actual JSON object
         const parsedInput =
-          typeof toolCallContent.input === "string" ? JSON.parse(toolCallContent.input) : toolCallContent.input;
+          typeof toolCallContent.input === "string"
+            ? JSON.parse(toolCallContent.input)
+            : toolCallContent.input;
 
         // Replace content with text content containing the JSON
         result.content = [{ type: "text", text: JSON.stringify(parsedInput, null, 2) }];
@@ -206,7 +255,9 @@ export const anthropicThinkingSchemaMiddleware: LanguageModelV2Middleware = {
             {
               type: "text",
               // @ts-expect-error(TODO FIX LATER, IT WORKS)
-              text: result.content[result.content.length - 1].text.replace(/^```json\n/, "").replace(/\n```$/, ""),
+              text: result.content[result.content.length - 1].text
+                .replace(/^```json\n/, "")
+                .replace(/\n```$/, ""),
             },
           ];
         } catch (e) {
@@ -224,21 +275,41 @@ export const callSlowGeminiWithThinkingAndSchemaAndParsed = async <T>(
   zodSchema: z.ZodSchema<T>,
   model: string = "google/gemini-3-flash-preview",
 ) => {
-  const claudeModel = wrapLanguageModel({ model: openrouter(model), middleware: anthropicThinkingSchemaMiddleware });
+  const claudeModel = wrapLanguageModel({
+    model: openrouter(model),
+    middleware: anthropicThinkingSchemaMiddleware,
+  });
   const { object } = await generateObject({
     model:
-      model.includes("claude") || model.includes("minimax") || model.includes("kimi") ? claudeModel : openrouter(model),
+      model.includes("claude") || model.includes("minimax") || model.includes("kimi")
+        ? claudeModel
+        : openrouter(model),
     schema: zodSchema,
     prompt: prompt,
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
     providerOptions: {
       openrouter: {
         safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
         ],
       },
     },
@@ -271,11 +342,26 @@ export const callGeminiWithImage = async <T>(
       providerOptions: {
         google: {
           safetySettings: [
-            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+            {
+              category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
           ],
         },
       },
@@ -297,11 +383,26 @@ export const callGeminiWithImage = async <T>(
     providerOptions: {
       google: {
         safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.BLOCK_NONE },
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
         ],
       },
     },

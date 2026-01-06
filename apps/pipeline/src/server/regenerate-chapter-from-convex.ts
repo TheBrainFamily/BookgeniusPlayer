@@ -39,7 +39,10 @@ function setBookArg(slug: string) {
 function deleteExistingChapterFiles(chapter: number): string[] {
   const deletedFiles: string[] = [];
 
-  const mainFile = getFilePath(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
+  const mainFile = getFilePath(
+    `rewritten-paragraphs-for-chapter-${chapter}.xml`,
+    FILE_TYPE.TEMPORARY,
+  );
   if (fs.existsSync(mainFile)) {
     fs.unlinkSync(mainFile);
     deletedFiles.push(mainFile);
@@ -79,7 +82,9 @@ export async function regenerateChapterFromConvex(
   if (characterCards.length === 0) {
     return { success: false, error: "No character reference cards found in Convex" };
   }
-  console.log(`[regenerateChapterFromConvex] Found ${characterCards.length} character reference cards`);
+  console.log(
+    `[regenerateChapterFromConvex] Found ${characterCards.length} character reference cards`,
+  );
 
   const repoRoot = getRepoRoot();
   process.chdir(repoRoot);
@@ -95,12 +100,20 @@ export async function regenerateChapterFromConvex(
   writeBookFile("rich.xml", richXmlContent, FILE_TYPE.INPUT);
   console.log(`[regenerateChapterFromConvex] Wrote rich.xml to input folder`);
 
-  const referenceCardsJson = { characters: characterCards.map((c) => ({ name: c.name, referenceCard: c.summary })) };
-  writeBookFile("single-summary-per-person.json", JSON.stringify(referenceCardsJson, null, 2), FILE_TYPE.PERMANENT);
+  const referenceCardsJson = {
+    characters: characterCards.map((c) => ({ name: c.name, referenceCard: c.summary })),
+  };
+  writeBookFile(
+    "single-summary-per-person.json",
+    JSON.stringify(referenceCardsJson, null, 2),
+    FILE_TYPE.PERMANENT,
+  );
   console.log(`[regenerateChapterFromConvex] Wrote reference cards JSON`);
 
   const deletedFiles = deleteExistingChapterFiles(chapterNumber);
-  console.log(`[regenerateChapterFromConvex] Deleted ${deletedFiles.length} existing chapter files`);
+  console.log(
+    `[regenerateChapterFromConvex] Deleted ${deletedFiles.length} existing chapter files`,
+  );
 
   const charactersForChapter = characterCards.map((c) => ({ name: c.name, summary: c.summary }));
 
@@ -149,7 +162,9 @@ if (require.main === module) {
 
   if (args.length < 2) {
     console.log("Usage: tsx regenerate-chapter-from-convex.ts <book-path> <chapter-number>");
-    console.log("Example: tsx regenerate-chapter-from-convex.ts books/1766836328269-the-king-in-yellow 1");
+    console.log(
+      "Example: tsx regenerate-chapter-from-convex.ts books/1766836328269-the-king-in-yellow 1",
+    );
     process.exit(1);
   }
 

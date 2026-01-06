@@ -14,14 +14,17 @@ export default function SSRDemo() {
 
       <h1 style={{ marginBottom: "1rem" }}>SSR + Hydration Demo</h1>
       <p style={{ marginBottom: "2rem", color: "#888" }}>
-        Page shell is server-rendered (this text). Convex data hydrates client-side. For full SSR with data, you&apos;d use Convex HTTP client in a Server Component.
+        Page shell is server-rendered (this text). Convex data hydrates client-side. For full SSR
+        with data, you&apos;d use Convex HTTP client in a Server Component.
       </p>
 
       <div style={{ padding: "1rem", background: "#1a1a1a", borderRadius: "8px" }}>
         <FolderList />
       </div>
 
-      <section style={{ marginTop: "2rem", padding: "1rem", background: "#111", borderRadius: "8px" }}>
+      <section
+        style={{ marginTop: "2rem", padding: "1rem", background: "#111", borderRadius: "8px" }}
+      >
         <h3 style={{ marginBottom: "0.5rem" }}>How this works:</h3>
         <ol style={{ marginLeft: "1.5rem", color: "#888", lineHeight: 1.8 }}>
           <li>Server renders the page shell (instant)</li>

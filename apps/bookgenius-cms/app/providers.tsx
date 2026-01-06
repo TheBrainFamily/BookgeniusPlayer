@@ -14,7 +14,14 @@ export function Providers({ children }: { children: ReactNode }) {
     }
 
     const convexQueryClient = new ConvexQueryClient(convexUrl);
-    const queryClient = new QueryClient({ defaultOptions: { queries: { queryKeyHashFn: convexQueryClient.hashFn(), queryFn: convexQueryClient.queryFn() } } });
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          queryKeyHashFn: convexQueryClient.hashFn(),
+          queryFn: convexQueryClient.queryFn(),
+        },
+      },
+    });
     convexQueryClient.connect(queryClient);
 
     return { convexQueryClient, queryClient };

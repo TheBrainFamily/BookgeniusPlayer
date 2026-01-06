@@ -44,7 +44,19 @@ export const useMusicEditModal = create<MusicEditModalState>()(
       artist: null,
       coverUrl: null,
 
-      openModal: ({ cueId, fileBasename, chapter, paragraph, currentMusicUrl, title, artist, coverUrl }: MusicEditModalParams, replaceCurrentModal = false) => {
+      openModal: (
+        {
+          cueId,
+          fileBasename,
+          chapter,
+          paragraph,
+          currentMusicUrl,
+          title,
+          artist,
+          coverUrl,
+        }: MusicEditModalParams,
+        replaceCurrentModal = false,
+      ) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID, replaceCurrentModal)) {
           set({
@@ -64,7 +76,17 @@ export const useMusicEditModal = create<MusicEditModalState>()(
       closeModal: () => {
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, cueId: null, fileBasename: null, chapter: null, paragraph: null, currentMusicUrl: null, title: null, artist: null, coverUrl: null });
+        set({
+          isOpen: false,
+          cueId: null,
+          fileBasename: null,
+          chapter: null,
+          paragraph: null,
+          currentMusicUrl: null,
+          title: null,
+          artist: null,
+          coverUrl: null,
+        });
       },
     }),
     { name: "music-edit-modal" },

@@ -1,7 +1,18 @@
 import type { CharacterData } from "@player/types/book";
 import { useGraphicsSettings } from "@player/stores/graphicsSettings.store";
 
-const AVATAR_COLORS = ["#2563eb", "#db2777", "#059669", "#7c3aed", "#ea580c", "#0891b2", "#4f46e5", "#be185d", "#16a34a", "#ca8a04"];
+const AVATAR_COLORS = [
+  "#2563eb",
+  "#db2777",
+  "#059669",
+  "#7c3aed",
+  "#ea580c",
+  "#0891b2",
+  "#4f46e5",
+  "#be185d",
+  "#16a34a",
+  "#ca8a04",
+];
 
 // Consistent color based on unique slug
 export function getColorFromSlug(slug: string) {
@@ -16,7 +27,9 @@ export function getColorFromSlug(slug: string) {
 
 export function getInitials(name: string) {
   const parts = name.trim().split(/\s+/);
-  return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0][0]?.toUpperCase() || "?";
+  return parts.length >= 2
+    ? (parts[0][0] + parts[1][0]).toUpperCase()
+    : parts[0][0]?.toUpperCase() || "?";
 }
 
 export function getAvatarSource(character: CharacterData) {

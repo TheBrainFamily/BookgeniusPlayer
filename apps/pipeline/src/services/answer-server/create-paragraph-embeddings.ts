@@ -49,23 +49,34 @@ async function computeEmbeddingsThroughHttp(document: Document): Promise<Documen
   return { ...document, Embeddings: embeddingValues };
 }
 
-export async function computeBatchEmbeddingsThroughHTTP(documents: Document[]): Promise<DocumentWithEmbeddings[]> {
+export async function computeBatchEmbeddingsThroughHTTP(
+  documents: Document[],
+): Promise<DocumentWithEmbeddings[]> {
   const BATCH_SIZE = 30;
   const RETRY_DELAYS = [5000, 30000, 35000, 35000, 35000, 35000, 35000, 35000]; // Retry delays in milliseconds
 
-  const processChunk = async (chunk: Document[], retryAttempt = 0): Promise<DocumentWithEmbeddings[]> => {
+  const processChunk = async (
+    chunk: Document[],
+    retryAttempt = 0,
+  ): Promise<DocumentWithEmbeddings[]> => {
     try {
-      const documentsWithEmbeddings = await Promise.all(chunk.map((row) => computeEmbeddingsThroughHttp(row)));
+      const documentsWithEmbeddings = await Promise.all(
+        chunk.map((row) => computeEmbeddingsThroughHttp(row)),
+      );
       return documentsWithEmbeddings;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       if (retryAttempt >= RETRY_DELAYS.length) {
-        throw new Error(`Failed to embed documents after ${RETRY_DELAYS.length} retry attempts: ${errorMessage}`);
+        throw new Error(
+          `Failed to embed documents after ${RETRY_DELAYS.length} retry attempts: ${errorMessage}`,
+        );
       }
 
       const delay = RETRY_DELAYS[retryAttempt];
       console.log(error);
-      console.log(`Embedding failed, retrying in ${delay / 1000}s. Attempt ${retryAttempt + 1}/${RETRY_DELAYS.length}`);
+      console.log(
+        `Embedding failed, retrying in ${delay / 1000}s. Attempt ${retryAttempt + 1}/${RETRY_DELAYS.length}`,
+      );
 
       // Wait for the specified delay
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -105,7 +116,9 @@ export async function computeBatchEmbeddingsThroughHTTP(documents: Document[]): 
 }
 
 function loadSummariesFromFile(): ScenesSummariesPerChapter[] {
-  return JSON.parse(readBookFile("summaries-with-paragraphs.json", FILE_TYPE.TEMPORARY)) as ScenesSummariesPerChapter[];
+  return JSON.parse(
+    readBookFile("summaries-with-paragraphs.json", FILE_TYPE.TEMPORARY),
+  ) as ScenesSummariesPerChapter[];
 }
 
 function getChapterDataFromSummaries(
@@ -143,44 +156,63 @@ export const generateEmbeddings = async (
     let speakerByIndex: Map<number, string> | null = null;
     let talkingLabelIndices: Set<number> | null = null;
     if (isPlay) {
-      const { speakerMap, labelIndices } = buildSpeakerTimelineForChapter(chapter, true, resolvedBookText);
+      const { speakerMap, labelIndices } = buildSpeakerTimelineForChapter(
+        chapter,
+        true,
+        resolvedBookText,
+      );
       speakerByIndex = speakerMap;
       talkingLabelIndices = labelIndices;
     }
 
-    const documents: Document[] = chapterData.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
-      const renderedText = isPlay
-        ? renderWithSpeakers(bulletPoint.paragraphNumbers, paragraphsFromChapter, speakerByIndex!, talkingLabelIndices!)
-        : bulletPoint.paragraphNumbers
-            .map((p) =>
-              paragraphsFromChapter
-                .filter((pfc) => pfc.dataIndex === p)
-                ?.map((pfc) => pfc.text)
-                .join(" "),
+    const documents: Document[] = chapterData.chapterSummary.chapterBulletPoints.map(
+      (bulletPoint) => {
+        const renderedText = isPlay
+          ? renderWithSpeakers(
+              bulletPoint.paragraphNumbers,
+              paragraphsFromChapter,
+              speakerByIndex!,
+              talkingLabelIndices!,
             )
-            .join("\n");
+          : bulletPoint.paragraphNumbers
+              .map((p) =>
+                paragraphsFromChapter
+                  .filter((pfc) => pfc.dataIndex === p)
+                  ?.map((pfc) => pfc.text)
+                  .join(" "),
+              )
+              .join("\n");
 
-      return {
-        text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
-        chapter: chapter,
-        paragraphNumber: bulletPoint.mainParagraphNumber,
-      };
-    });
+        return {
+          text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
+          chapter: chapter,
+          paragraphNumber: bulletPoint.mainParagraphNumber,
+        };
+      },
+    );
 
-    const pureSummariesDocuments: Document[] = chapterData.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
-      return {
-        text: `${bulletPoint.paragraphsSummary}`,
-        chapter: chapter,
-        paragraphNumber: bulletPoint.mainParagraphNumber,
-      };
-    });
+    const pureSummariesDocuments: Document[] = chapterData.chapterSummary.chapterBulletPoints.map(
+      (bulletPoint) => {
+        return {
+          text: `${bulletPoint.paragraphsSummary}`,
+          chapter: chapter,
+          paragraphNumber: bulletPoint.mainParagraphNumber,
+        };
+      },
+    );
 
-    const documentsWithEmbeddings = await computeBatchEmbeddingsThroughHTTP([...documents, ...pureSummariesDocuments]);
+    const documentsWithEmbeddings = await computeBatchEmbeddingsThroughHTTP([
+      ...documents,
+      ...pureSummariesDocuments,
+    ]);
     embeddingsForChapters.set(chapter, documentsWithEmbeddings);
   }
 
   if (writeToFile) {
-    writeBookFile("embeddings.json", JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2));
+    writeBookFile(
+      "embeddings.json",
+      JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2),
+    );
   }
 
   return embeddingsForChapters;
@@ -230,7 +262,11 @@ if (require.main === module) {
 
 type SpeakerTimeline = { speakerMap: Map<number, string>; labelIndices: Set<number> };
 
-function buildSpeakerTimelineForChapter(chapter: number, clean = true, providedBookText?: string): SpeakerTimeline {
+function buildSpeakerTimelineForChapter(
+  chapter: number,
+  clean = true,
+  providedBookText?: string,
+): SpeakerTimeline {
   const bookText = providedBookText ?? getBookData().bookText;
   const $ = cheerio.load(bookText);
 
@@ -315,7 +351,9 @@ function renderWithSpeakers(
     }
   }
 
-  const rendered = groups.map((g) => (g.speaker ? `${g.speaker}: ${g.parts.join(" ")}` : g.parts.join(" "))).join("\n");
+  const rendered = groups
+    .map((g) => (g.speaker ? `${g.speaker}: ${g.parts.join(" ")}` : g.parts.join(" ")))
+    .join("\n");
 
   return rendered;
 }

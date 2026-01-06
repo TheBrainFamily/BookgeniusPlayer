@@ -169,7 +169,10 @@ function extractTextWithExclusions(node: Node, excludeSelectors: string[] = []):
     let isExcluded = false;
     for (const selector of excludeSelectors) {
       // Simple tag name check
-      if (selector.match(/^[a-zA-Z0-9]+$/) && element.tagName.toLowerCase() === selector.toLowerCase()) {
+      if (
+        selector.match(/^[a-zA-Z0-9]+$/) &&
+        element.tagName.toLowerCase() === selector.toLowerCase()
+      ) {
         isExcluded = true;
         break;
       }
@@ -186,13 +189,20 @@ function extractTextWithExclusions(node: Node, excludeSelectors: string[] = []):
         }
         // Check using matches if selector is more complex (might be slower)
         // Note: jsdom's `matches` might have limitations
-        if (!selector.match(/^[a-zA-Z0-9]+$/) && selector !== 'a[type="note"]' && element.matches(selector)) {
+        if (
+          !selector.match(/^[a-zA-Z0-9]+$/) &&
+          selector !== 'a[type="note"]' &&
+          element.matches(selector)
+        ) {
           isExcluded = true;
           break;
         }
       } catch (e) {
         // Ignore potential errors in matches() for unsupported selectors
-        console.warn(`Could not evaluate selector "${selector}" on element <${element.tagName}>`, e);
+        console.warn(
+          `Could not evaluate selector "${selector}" on element <${element.tagName}>`,
+          e,
+        );
       }
     }
 
@@ -442,7 +452,8 @@ function transformSingleNodeToHtml(
 
       if (isNoteLink) {
         htmlElement = htmlDoc.createElement("Note");
-        const href = fb2Element.getAttributeNS(XLINK_NAMESPACE, "href") || fb2Element.getAttribute("href");
+        const href =
+          fb2Element.getAttributeNS(XLINK_NAMESPACE, "href") || fb2Element.getAttribute("href");
         if (href) {
           const id: string = extractNumberStringFromFnHref(href as string);
           htmlElement.setAttribute("id", id);
@@ -450,7 +461,8 @@ function transformSingleNodeToHtml(
       } else {
         // Regular link - preserve as <a> element
         htmlElement = htmlDoc.createElement("a");
-        const href = fb2Element.getAttributeNS(XLINK_NAMESPACE, "href") || fb2Element.getAttribute("href");
+        const href =
+          fb2Element.getAttributeNS(XLINK_NAMESPACE, "href") || fb2Element.getAttribute("href");
         if (href) {
           htmlElement.setAttribute("href", href);
         }
@@ -602,7 +614,12 @@ function convertToTextHtml(
     isParentChapter: boolean = false,
   ) {
     // 1. Transform the current node itself
-    const transformedHtmlNode = transformSingleNodeToHtml(fb2Node, htmlDoc, binaryData, currentHeadingLevel);
+    const transformedHtmlNode = transformSingleNodeToHtml(
+      fb2Node,
+      htmlDoc,
+      binaryData,
+      currentHeadingLevel,
+    );
 
     if (!transformedHtmlNode) return; // Skip node
 
@@ -696,7 +713,11 @@ function convertToTextHtml(
   }
 
   // Serialize the final HTML document
-  return { htmlDom: htmlDom.serialize(), lastChapter: chapterCounter - 1, lastNoteId: noteElements.length };
+  return {
+    htmlDom: htmlDom.serialize(),
+    lastChapter: chapterCounter - 1,
+    lastNoteId: noteElements.length,
+  };
 }
 
 // --- Main Converter Function ---
@@ -708,7 +729,10 @@ function convertToTextHtml(
  * @returns An object containing the simpleXml and richHtml strings.
  * @throws Error if parsing fails.
  */
-export function convertFb2(fb2XmlString: string, options: Fb2ConversionOptions = {}): ConversionResult {
+export function convertFb2(
+  fb2XmlString: string,
+  options: Fb2ConversionOptions = {},
+): ConversionResult {
   // Add a try-catch block around the whole process for robustness
   try {
     const doc = parseFb2Xml(fb2XmlString);

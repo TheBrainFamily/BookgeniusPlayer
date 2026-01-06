@@ -18,7 +18,10 @@ function getBookRoot(opts: Options): string {
   throw new Error("Provide either opts.bookRoot or opts.slug");
 }
 
-function closestImmediateChildOfChapter(el: Element | null, stopAt: Element | null): Element | null {
+function closestImmediateChildOfChapter(
+  el: Element | null,
+  stopAt: Element | null,
+): Element | null {
   let current: Node | null = el;
   while (current && current !== stopAt && current.nodeType === current.ELEMENT_NODE) {
     const element = current as Element;
@@ -69,7 +72,9 @@ export async function extractInlineImages(opts: Options) {
       if (!src.startsWith("data:")) return; // Only handle data URLs
 
       // Find the closest ancestor with data-index (paragraph index). Include self.
-      const anchor = closestImmediateChildOfChapter(img as unknown as Element, section as unknown as Element) || (section as unknown as Element);
+      const anchor =
+        closestImmediateChildOfChapter(img as unknown as Element, section as unknown as Element) ||
+        (section as unknown as Element);
       // Find the index of the anchor element within its chapter section
       const chapterSection = section as unknown as Element;
       const allChildren = Array.from(chapterSection.children);
@@ -103,8 +108,12 @@ export async function extractInlineImages(opts: Options) {
     .map((node: any) => (node.outerHTML !== undefined ? node.outerHTML : node.textContent || ""))
     .join("");
 
-  const newInsideMain = insideMain.replace(/<body[^>]*>[\s\S]*<\/body>/i, `<body>${serializedBodyInner}</body>`);
-  const newXml = xmlString.slice(0, mainStart + "<main>".length) + newInsideMain + xmlString.slice(mainEnd);
+  const newInsideMain = insideMain.replace(
+    /<body[^>]*>[\s\S]*<\/body>/i,
+    `<body>${serializedBodyInner}</body>`,
+  );
+  const newXml =
+    xmlString.slice(0, mainStart + "<main>".length) + newInsideMain + xmlString.slice(mainEnd);
   fs.writeFileSync(
     richXmlPath,
     newXml

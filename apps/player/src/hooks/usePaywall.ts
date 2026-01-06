@@ -23,9 +23,16 @@ export const usePaywall = () => {
     if (visibility !== "full") {
       let timeout: ReturnType<typeof setTimeout>;
       const bookForm = bookData.metadata.bookForm;
-      if ((bookForm === "play" && currentChapter > 2) || ((bookForm === "book" || bookForm === "mixed") && currentChapter > 1)) {
+      if (
+        (bookForm === "play" && currentChapter > 2) ||
+        ((bookForm === "book" || bookForm === "mixed") && currentChapter > 1)
+      ) {
         timeout = setTimeout(() => {
-          window.dispatchEvent(new CustomEvent("ShowPaywall", { detail: { bookSlug: bookData.slug, bookTitle: bookData.metadata.title } }));
+          window.dispatchEvent(
+            new CustomEvent("ShowPaywall", {
+              detail: { bookSlug: bookData.slug, bookTitle: bookData.metadata.title },
+            }),
+          );
         }, 2000);
       }
       return () => clearTimeout(timeout);

@@ -10,7 +10,12 @@ interface SentenceModalState {
   currentSentence?: string;
   simplifiedSentence?: string;
   simplifiedSentenceScore?: number;
-  openModal: (currentSentence?: string, simplifiedSentence?: string, currentSentenceId?: string, simplifiedSentenceScore?: number) => void;
+  openModal: (
+    currentSentence?: string,
+    simplifiedSentence?: string,
+    currentSentenceId?: string,
+    simplifiedSentenceScore?: number,
+  ) => void;
   closeModal: () => void;
 }
 
@@ -19,17 +24,34 @@ export const useSentenceModal = create<SentenceModalState>()(
     (set) => ({
       isOpen: false,
 
-      openModal: (currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore) => {
+      openModal: (
+        currentSentence,
+        simplifiedSentence,
+        currentSentenceId,
+        simplifiedSentenceScore,
+      ) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
-          set({ isOpen: true, currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore });
+          set({
+            isOpen: true,
+            currentSentence,
+            simplifiedSentence,
+            currentSentenceId,
+            simplifiedSentenceScore,
+          });
         }
       },
 
       closeModal: () => {
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, currentSentence: null, simplifiedSentence: null, currentSentenceId: null, simplifiedSentenceScore: null });
+        set({
+          isOpen: false,
+          currentSentence: null,
+          simplifiedSentence: null,
+          currentSentenceId: null,
+          simplifiedSentenceScore: null,
+        });
       },
     }),
     { name: "sentence-modal" },

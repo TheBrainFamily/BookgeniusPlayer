@@ -14,7 +14,12 @@ export function usePostReadyPrefetch() {
     didPrefetchRef.current = true;
 
     const saved = getSavedLocation();
-    const targetChapter = Math.max(saved.currentChapter ?? 1, saved.latestVisibleChapter ?? 0, saved.endChapter ?? 0, saved.chapter ?? 1);
+    const targetChapter = Math.max(
+      saved.currentChapter ?? 1,
+      saved.latestVisibleChapter ?? 0,
+      saved.endChapter ?? 0,
+      saved.chapter ?? 1,
+    );
     const targetParagraph = saved.currentParagraph ?? saved.paragraph ?? 1;
 
     void (async () => {

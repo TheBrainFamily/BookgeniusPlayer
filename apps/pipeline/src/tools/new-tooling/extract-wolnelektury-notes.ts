@@ -39,5 +39,9 @@ function extractNotes(fb2FileContentParsed: Document) {
 }
 
 function saveNotes(notes: { id: string | null; content: string | undefined }[]) {
-  writeBookFile("notes.ts", `export const getNotes = () => ${JSON.stringify(notes, null, 2)};`, FILE_TYPE.PERMANENT);
+  writeBookFile(
+    "notes.ts",
+    `export const getNotes = () => ${JSON.stringify(notes, null, 2)};`,
+    FILE_TYPE.PERMANENT,
+  );
 }

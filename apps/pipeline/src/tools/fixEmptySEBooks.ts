@@ -6,7 +6,12 @@ import { execSync } from "child_process";
 const ORG = "standardebooks";
 const booksDir = path.resolve(__dirname, "../../standardebooks-data/books");
 
-const SKIP_FILES = new Set(["colophon.xhtml", "imprint.xhtml", "titlepage.xhtml", "uncopyright.xhtml"]);
+const SKIP_FILES = new Set([
+  "colophon.xhtml",
+  "imprint.xhtml",
+  "titlepage.xhtml",
+  "uncopyright.xhtml",
+]);
 
 function syncBookViaGit(slug: string, forceAll = false): { downloaded: number; skipped: number } {
   const bookDir = path.join(booksDir, slug);
@@ -15,8 +20,12 @@ function syncBookViaGit(slug: string, forceAll = false): { downloaded: number; s
   const opfPath = path.join(bookDir, "content.opf");
 
   const needsOpf = forceAll || !fs.existsSync(opfPath);
-  const existingTextFiles = fs.existsSync(textDir) ? new Set(fs.readdirSync(textDir)) : new Set<string>();
-  const existingImageFiles = fs.existsSync(imagesDir) ? new Set(fs.readdirSync(imagesDir)) : new Set<string>();
+  const existingTextFiles = fs.existsSync(textDir)
+    ? new Set(fs.readdirSync(textDir))
+    : new Set<string>();
+  const existingImageFiles = fs.existsSync(imagesDir)
+    ? new Set(fs.readdirSync(imagesDir))
+    : new Set<string>();
   const needsText = forceAll || existingTextFiles.size === 0;
   const needsImages = forceAll || existingImageFiles.size === 0;
 
@@ -36,11 +45,10 @@ function syncBookViaGit(slug: string, forceAll = false): { downloaded: number; s
       timeout: 60000,
     });
 
-    execSync("git sparse-checkout set --skip-checks src/epub/content.opf src/epub/text src/epub/images", {
-      cwd: tempDir,
-      stdio: "pipe",
-      timeout: 30000,
-    });
+    execSync(
+      "git sparse-checkout set --skip-checks src/epub/content.opf src/epub/text src/epub/images",
+      { cwd: tempDir, stdio: "pipe", timeout: 30000 },
+    );
 
     fs.mkdirSync(textDir, { recursive: true });
     fs.mkdirSync(imagesDir, { recursive: true });
@@ -60,7 +68,9 @@ function syncBookViaGit(slug: string, forceAll = false): { downloaded: number; s
 
     const clonedTextDir = path.join(tempDir, "src/epub/text");
     if (fs.existsSync(clonedTextDir)) {
-      const files = fs.readdirSync(clonedTextDir).filter((f) => f.endsWith(".xhtml") && !SKIP_FILES.has(f));
+      const files = fs
+        .readdirSync(clonedTextDir)
+        .filter((f) => f.endsWith(".xhtml") && !SKIP_FILES.has(f));
 
       for (const file of files) {
         const destPath = path.join(textDir, file);
@@ -124,7 +134,9 @@ async function main() {
     return;
   }
 
-  const dirs = fs.readdirSync(booksDir).filter((d) => fs.statSync(path.join(booksDir, d)).isDirectory());
+  const dirs = fs
+    .readdirSync(booksDir)
+    .filter((d) => fs.statSync(path.join(booksDir, d)).isDirectory());
 
   let booksToProcess: string[];
   if (syncAll) {
@@ -157,7 +169,9 @@ async function main() {
 
   for (let i = 0; i < toProcess.length; i++) {
     const bookSlug = toProcess[i];
-    process.stdout.write(`\r[${i + 1}/${toProcess.length}] ${bookSlug.substring(0, 50).padEnd(50)}`);
+    process.stdout.write(
+      `\r[${i + 1}/${toProcess.length}] ${bookSlug.substring(0, 50).padEnd(50)}`,
+    );
 
     try {
       const { downloaded, skipped } = syncBookViaGit(bookSlug, forceAll);

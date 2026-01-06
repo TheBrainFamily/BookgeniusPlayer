@@ -84,7 +84,10 @@ function CueRow({ cue, isReused, onEdit, onDelete, onParagraphEdit }: CueRowProp
   };
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3 hover:bg-accent/50 group cursor-pointer" onClick={() => onEdit(cue)}>
+    <div
+      className="flex items-center gap-3 px-4 py-3 hover:bg-accent/50 group cursor-pointer"
+      onClick={() => onEdit(cue)}
+    >
       {/* Paragraph number - clickable to edit */}
       {isEditingParagraph ? (
         <Input
@@ -117,23 +120,47 @@ function CueRow({ cue, isReused, onEdit, onDelete, onParagraphEdit }: CueRowProp
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {cue.previewMp4Url ? (
           // Video preview available - show looping video with poster
-          <video className="h-16 w-24 object-cover rounded border" autoPlay loop muted playsInline poster={cue.previewWebpUrl}>
+          <video
+            className="h-16 w-24 object-cover rounded border"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={cue.previewWebpUrl}
+          >
             <source src={cue.previewMp4Url} type="video/mp4" />
           </video>
         ) : cue.previewWebpUrl ? (
           // Only webp thumbnail available (image or video still processing)
-          <img src={cue.previewWebpUrl} alt={cue.fileBasename} className="h-16 w-24 object-cover rounded border" />
+          <img
+            src={cue.previewWebpUrl}
+            alt={cue.fileBasename}
+            className="h-16 w-24 object-cover rounded border"
+          />
         ) : cue.url ? (
           isImage ? (
             // Original image (no preview yet)
-            <img src={cue.url} alt={cue.fileBasename} className="h-16 w-24 object-cover rounded border" />
+            <img
+              src={cue.url}
+              alt={cue.fileBasename}
+              className="h-16 w-24 object-cover rounded border"
+            />
           ) : (
             // Original video (no preview yet) - loads just metadata/first frame
-            <video src={cue.url} className="h-16 w-24 object-cover rounded border" muted preload="metadata" />
+            <video
+              src={cue.url}
+              className="h-16 w-24 object-cover rounded border"
+              muted
+              preload="metadata"
+            />
           )
         ) : (
           <div className="h-16 w-24 bg-muted rounded border flex items-center justify-center">
-            {isImage ? <ImageIcon className="h-6 w-6 text-muted-foreground" /> : <Video className="h-6 w-6 text-muted-foreground" />}
+            {isImage ? (
+              <ImageIcon className="h-6 w-6 text-muted-foreground" />
+            ) : (
+              <Video className="h-6 w-6 text-muted-foreground" />
+            )}
           </div>
         )}
         <div className="flex flex-col gap-1 min-w-0">
@@ -148,8 +175,20 @@ function CueRow({ cue, isReused, onEdit, onDelete, onParagraphEdit }: CueRowProp
 
       {/* Color swatches */}
       <div className="flex items-center gap-2">
-        {cue.backgroundColor && <div className="h-8 w-8 rounded border" style={{ backgroundColor: cue.backgroundColor }} title={`Background: ${cue.backgroundColor}`} />}
-        {cue.textColor && <div className="h-8 w-8 rounded border" style={{ backgroundColor: cue.textColor }} title={`Text: ${cue.textColor}`} />}
+        {cue.backgroundColor && (
+          <div
+            className="h-8 w-8 rounded border"
+            style={{ backgroundColor: cue.backgroundColor }}
+            title={`Background: ${cue.backgroundColor}`}
+          />
+        )}
+        {cue.textColor && (
+          <div
+            className="h-8 w-8 rounded border"
+            style={{ backgroundColor: cue.textColor }}
+            title={`Text: ${cue.textColor}`}
+          />
+        )}
       </div>
 
       {/* Actions */}
@@ -202,7 +241,12 @@ function ChapterHeader({ chapterNumber, cueCount, onAddCue }: ChapterHeaderProps
           </Badge>
         )}
       </div>
-      <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => onAddCue(chapterNumber)}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-7 px-2"
+        onClick={() => onAddCue(chapterNumber)}
+      >
         <Plus className="h-4 w-4 mr-1" />
         Add
       </Button>
@@ -379,7 +423,11 @@ export function BackgroundCuesView({
             const chapterCues = cuesByChapter.get(chapter) || [];
             return (
               <div key={chapter} className="mb-2">
-                <ChapterHeader chapterNumber={chapter} cueCount={chapterCues.length} onAddCue={handleAddCue} />
+                <ChapterHeader
+                  chapterNumber={chapter}
+                  cueCount={chapterCues.length}
+                  onAddCue={handleAddCue}
+                />
                 {chapterCues.length > 0 ? (
                   chapterCues.map((cue) => (
                     <CueRow
@@ -392,7 +440,9 @@ export function BackgroundCuesView({
                     />
                   ))
                 ) : (
-                  <div className="px-4 py-6 text-center text-sm text-muted-foreground">No backgrounds set for this chapter</div>
+                  <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                    No backgrounds set for this chapter
+                  </div>
                 )}
               </div>
             );
@@ -401,7 +451,11 @@ export function BackgroundCuesView({
       </ScrollArea>
 
       {/* Add Cue Dialog */}
-      <AddBackgroundCueDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} chapter={addDialogChapter} />
+      <AddBackgroundCueDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        chapter={addDialogChapter}
+      />
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { paragraphMetadataServicePure, parseParagraphRange, ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
+import {
+  paragraphMetadataServicePure,
+  parseParagraphRange,
+  ParsedParagraphRange,
+} from "@player/fetchers/getParagraphRange";
 import { Location } from "@player/state/LocationContext";
 import { useBookConvex } from "@player/context/BookConvexContext";
 
@@ -15,7 +19,11 @@ function notesEqual(a: ParsedParagraphRange[], b: ParsedParagraphRange[]): boole
  *                            if false, just replaces list on any change
  * @param sortAlphabetically  when appending, whether to sort the new items (and initial load) alphabetically
  */
-export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphabetically = true): ParsedParagraphRange[] {
+export function useCharacterNotes(
+  loc: Location,
+  addNewAtEnd = false,
+  sortAlphabetically = true,
+): ParsedParagraphRange[] {
   const [notes, setNotes] = useState<ParsedParagraphRange[]>([]);
   const { charactersData, bookData } = useBookConvex();
   const bookSlug = bookData?.slug ?? "";
@@ -42,7 +50,9 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
         }
 
         if (prev.length === 0) {
-          return sortAlphabetically ? [...parsed].sort((a, b) => a.slug.localeCompare(b.slug)) : parsed;
+          return sortAlphabetically
+            ? [...parsed].sort((a, b) => a.slug.localeCompare(b.slug))
+            : parsed;
         }
 
         // Preserve order for existing characters, append new ones
@@ -51,8 +61,12 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
         const newChars = parsed.filter((ch) => !existingNames.has(ch.slug));
 
         // Update with fresh data from parsed (contains new media URLs)
-        const updatedRemaining = remaining.map((oldCh) => parsed.find((p) => p.slug === oldCh.slug) || oldCh);
-        const appended = sortAlphabetically ? [...newChars].sort((a, b) => a.slug.localeCompare(b.slug)) : newChars;
+        const updatedRemaining = remaining.map(
+          (oldCh) => parsed.find((p) => p.slug === oldCh.slug) || oldCh,
+        );
+        const appended = sortAlphabetically
+          ? [...newChars].sort((a, b) => a.slug.localeCompare(b.slug))
+          : newChars;
         const result = [...updatedRemaining, ...appended];
 
         // Return prev if nothing changed to preserve reference equality
@@ -65,7 +79,16 @@ export function useCharacterNotes(loc: Location, addNewAtEnd = false, sortAlphab
     return () => {
       cancelled = true;
     };
-  }, [loc.chapter, loc.paragraph, loc.endChapter, loc.endParagraph, addNewAtEnd, sortAlphabetically, bookSlug, charactersData]);
+  }, [
+    loc.chapter,
+    loc.paragraph,
+    loc.endChapter,
+    loc.endParagraph,
+    addNewAtEnd,
+    sortAlphabetically,
+    bookSlug,
+    charactersData,
+  ]);
 
   return notes;
 }

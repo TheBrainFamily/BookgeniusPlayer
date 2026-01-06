@@ -2,7 +2,11 @@ import { useEffect, useMemo, useRef, useCallback } from "react";
 import debounce from "lodash.debounce";
 
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
-import { findCharacterSentences, performCachedSearch, performUnifiedSearch } from "@player/searchModal";
+import {
+  findCharacterSentences,
+  performCachedSearch,
+  performUnifiedSearch,
+} from "@player/searchModal";
 import { Location } from "@player/state/LocationContext";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { useBookConvex } from "@player/context/BookConvexContext";
@@ -40,15 +44,25 @@ export const useSearchLogic = () => {
           isLatestApiCall,
         });
         if (isLatestApiCall) {
-          console.log("[useSearchLogic] Setting results (latest API call)", { resultsCount: results.items.length });
+          console.log("[useSearchLogic] Setting results (latest API call)", {
+            resultsCount: results.items.length,
+          });
           setResults({ ...results, isRefreshing: false });
         } else {
-          console.log("[useSearchLogic] SKIPPING results (newer API call in flight)", { apiCallId, latestApiCallId: latestApiCallIdRef.current });
+          console.log("[useSearchLogic] SKIPPING results (newer API call in flight)", {
+            apiCallId,
+            latestApiCallId: latestApiCallIdRef.current,
+          });
         }
       } catch (err) {
         console.error("[useSearchLogic] executeRemoteSearch error", err);
         if (apiCallId === latestApiCallIdRef.current) {
-          setResults({ header: "Search failed. Please try again.", items: [], isLoading: false, isRefreshing: false });
+          setResults({
+            header: "Search failed. Please try again.",
+            items: [],
+            isLoading: false,
+            isRefreshing: false,
+          });
         }
       }
     },
@@ -59,7 +73,9 @@ export const useSearchLogic = () => {
     console.log("[useSearchLogic] debouncedRemoteSearch RECREATED");
     return debounce(
       (searchQuery: string, location: Location) => {
-        console.log("[useSearchLogic] debouncedRemoteSearch FIRED", { searchQuery: searchQuery.slice(0, 30) });
+        console.log("[useSearchLogic] debouncedRemoteSearch FIRED", {
+          searchQuery: searchQuery.slice(0, 30),
+        });
         void executeRemoteSearch(searchQuery, location);
       },
       REMOTE_SEARCH_DEBOUNCE_MS,
@@ -82,16 +98,28 @@ export const useSearchLogic = () => {
       }
 
       const searchId = ++latestSearchIdRef.current;
-      console.log("[useSearchLogic] performSearch", { searchQuery: searchQuery.slice(0, 30), searchId });
+      console.log("[useSearchLogic] performSearch", {
+        searchQuery: searchQuery.slice(0, 30),
+        searchId,
+      });
 
       if (searchQuery.includes("@")) {
         searchQuery = searchQuery.replaceAll("@", "");
       }
 
-      const character = charactersData.find((c) => c.slug.toLowerCase() === searchQuery.toLowerCase() || c.characterName.toLowerCase() === searchQuery.toLowerCase());
+      const character = charactersData.find(
+        (c) =>
+          c.slug.toLowerCase() === searchQuery.toLowerCase() ||
+          c.characterName.toLowerCase() === searchQuery.toLowerCase(),
+      );
 
-      const localResults = character ? findCharacterSentences(character.slug, location) : performCachedSearch(searchQuery, location);
-      console.log("[useSearchLogic] localResults", { count: localResults.items.length, isLoading: localResults.isLoading });
+      const localResults = character
+        ? findCharacterSentences(character.slug, location)
+        : performCachedSearch(searchQuery, location);
+      console.log("[useSearchLogic] localResults", {
+        count: localResults.items.length,
+        isLoading: localResults.isLoading,
+      });
 
       if (localResults.items.length > 0) {
         console.log("[useSearchLogic] Using local results, skipping remote");
@@ -106,7 +134,10 @@ export const useSearchLogic = () => {
 
       const previousResults = useSearchModal.getState().results;
       const hasExistingResults = previousResults.items.length > 0;
-      console.log("[useSearchLogic] No local results, triggering remote search", { hasExistingResults, isFirstRemote: isFirstRemoteSearchRef.current });
+      console.log("[useSearchLogic] No local results, triggering remote search", {
+        hasExistingResults,
+        isFirstRemote: isFirstRemoteSearchRef.current,
+      });
 
       if (hasExistingResults) {
         console.log("[useSearchLogic] Setting isRefreshing with existing results");

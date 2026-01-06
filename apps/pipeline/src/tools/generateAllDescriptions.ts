@@ -26,7 +26,9 @@ interface BookWithDescription extends WLBook {
 const collectionsDir = path.resolve(__dirname, "../../wolnelektury-data/collections");
 const outputDir = path.resolve(__dirname, "../../wolnelektury-data/generated-descriptions");
 
-async function processCollection(collectionSlug: string): Promise<{ slug: string; success: number; failed: number }> {
+async function processCollection(
+  collectionSlug: string,
+): Promise<{ slug: string; success: number; failed: number }> {
   const collectionPath = path.join(collectionsDir, `${collectionSlug}.json`);
   const outputPath = path.join(outputDir, `${collectionSlug}-descriptions.json`);
 
@@ -49,7 +51,11 @@ async function processCollection(collectionSlug: string): Promise<{ slug: string
           kind: book.kind,
           collectionTitle: collection.title,
         });
-        return { ...book, generatedDescription: description.description, generatedHook: description.hook };
+        return {
+          ...book,
+          generatedDescription: description.description,
+          generatedHook: description.hook,
+        };
       } catch (error) {
         console.error(`  ✗ ${collectionSlug}/${book.slug}: ${error}`);
         return { ...book, generatedDescription: "", generatedHook: "" };

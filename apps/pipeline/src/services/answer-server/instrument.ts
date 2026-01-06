@@ -6,5 +6,7 @@ Sentry.init({
   // For example, automatic IP address collection on events
   sendDefaultPii: true,
   tracesSampleRate: 1.0,
-  integrations: [Sentry.vercelAIIntegration({ recordInputs: true, recordOutputs: true, force: true })],
+  integrations: [
+    Sentry.vercelAIIntegration({ recordInputs: true, recordOutputs: true, force: true }),
+  ],
 });

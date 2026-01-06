@@ -18,16 +18,24 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
               <BookOpen className="h-8 w-8 text-library-gold animate-candleflicker" />
               <h3 className="relative text-xl font-bold text-foreground">
                 {t("hero.bookGenius").split(/(?=[A-Z])/)[0]}
-                <span className="text-library-gold">{t("hero.bookGenius").split(/(?=[A-Z])/)[1]}</span>
-                <span className="absolute -right-6 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">Beta</span>
+                <span className="text-library-gold">
+                  {t("hero.bookGenius").split(/(?=[A-Z])/)[1]}
+                </span>
+                <span className="absolute -right-6 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">
+                  Beta
+                </span>
               </h3>
             </div>
-            <p className="text-muted-foreground text-sm leading-relaxed">{t("footer.description")}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {t("footer.description")}
+            </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-library-gold">{t("footer.quickLinks.title")}</h4>
+            <h4 className="text-lg font-semibold text-library-gold">
+              {t("footer.quickLinks.title")}
+            </h4>
             <div className="space-y-2 flex flex-col">
               <Button
                 asChild
@@ -37,8 +45,16 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
               >
                 <a href="#book-collection">{t("footer.quickLinks.viewCollection")}</a>
               </Button>
-              {[t("footer.quickLinks.myProgress"), t("footer.quickLinks.readingHistory"), t("footer.quickLinks.settings")].map((link) => (
-                <Button key={link} variant="ghost" className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit">
+              {[
+                t("footer.quickLinks.myProgress"),
+                t("footer.quickLinks.readingHistory"),
+                t("footer.quickLinks.settings"),
+              ].map((link) => (
+                <Button
+                  key={link}
+                  variant="ghost"
+                  className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit"
+                >
                   {link}
                 </Button>
               ))}
@@ -47,9 +63,16 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
 
           {/* Genres */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-library-gold">{t("footer.featuredAuthors")}</h4>
+            <h4 className="text-lg font-semibold text-library-gold">
+              {t("footer.featuredAuthors")}
+            </h4>
             <div className="space-y-2 flex flex-col">
-              {["William Shakespeare", "George Orwell", "Lewis Carroll", "Hans Christian Andersen"].map((author) => (
+              {[
+                "William Shakespeare",
+                "George Orwell",
+                "Lewis Carroll",
+                "Hans Christian Andersen",
+              ].map((author) => (
                 <Button
                   key={author}
                   variant="ghost"
@@ -67,7 +90,11 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
             <h4 className="text-lg font-semibold text-library-gold">{t("footer.helpCenter")}</h4>
             <div className="space-y-2 flex flex-col">
               {["privacyPolicy", "termsOfService", "cookiePolicy"].map((linkKey) => (
-                <Button key={linkKey} variant="ghost" className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit">
+                <Button
+                  key={linkKey}
+                  variant="ghost"
+                  className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
+                >
                   {t(`footer.${linkKey}`)}
                 </Button>
               ))}

@@ -45,7 +45,10 @@ const doIt = async () => {
   createBookSettings();
 
   const singleSummaryPerPersonFileName = "single-summary-per-person.json";
-  const singleSummaryPerPersonFilePath = getFilePath(singleSummaryPerPersonFileName, FILE_TYPE.PERMANENT);
+  const singleSummaryPerPersonFilePath = getFilePath(
+    singleSummaryPerPersonFileName,
+    FILE_TYPE.PERMANENT,
+  );
 
   if (fs.existsSync(singleSummaryPerPersonFilePath)) {
     referenceCards = JSON.parse(
@@ -57,7 +60,11 @@ const doIt = async () => {
       logger.error("character-metadata-simple.ts -> No characters found.");
       process.exit(1);
     } else {
-      writeBookFile(singleSummaryPerPersonFileName, JSON.stringify(referenceCards, null, 2), FILE_TYPE.PERMANENT);
+      writeBookFile(
+        singleSummaryPerPersonFileName,
+        JSON.stringify(referenceCards, null, 2),
+        FILE_TYPE.PERMANENT,
+      );
     }
   }
 

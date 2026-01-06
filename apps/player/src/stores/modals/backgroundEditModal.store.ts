@@ -41,7 +41,18 @@ export const useBackgroundEditModal = create<BackgroundEditModalState>()(
       backgroundColor: null,
       textColor: null,
 
-      openModal: ({ cueId, fileBasename, chapter, paragraph, currentBackgroundUrl, backgroundColor, textColor }: BackgroundEditModalParams, replaceCurrentModal = false) => {
+      openModal: (
+        {
+          cueId,
+          fileBasename,
+          chapter,
+          paragraph,
+          currentBackgroundUrl,
+          backgroundColor,
+          textColor,
+        }: BackgroundEditModalParams,
+        replaceCurrentModal = false,
+      ) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID, replaceCurrentModal)) {
           set({
@@ -60,7 +71,16 @@ export const useBackgroundEditModal = create<BackgroundEditModalState>()(
       closeModal: () => {
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, cueId: null, fileBasename: null, chapter: null, paragraph: null, currentBackgroundUrl: null, backgroundColor: null, textColor: null });
+        set({
+          isOpen: false,
+          cueId: null,
+          fileBasename: null,
+          chapter: null,
+          paragraph: null,
+          currentBackgroundUrl: null,
+          backgroundColor: null,
+          textColor: null,
+        });
       },
     }),
     { name: "background-edit-modal" },

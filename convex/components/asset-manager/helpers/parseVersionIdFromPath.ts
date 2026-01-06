@@ -8,10 +8,7 @@
  * @param basePath - The base path prefix (e.g., "/am/file")
  * @returns The versionId string, or null if not found
  */
-export function parseVersionIdFromPath(
-  pathname: string,
-  basePath: string,
-): string | null {
+export function parseVersionIdFromPath(pathname: string, basePath: string): string | null {
   // Remove leading/trailing slashes and split both paths
   const baseSegments = basePath.split("/").filter(Boolean);
   const pathSegments = pathname.split("/").filter(Boolean);

@@ -14,7 +14,10 @@ import { writeBookFile } from "../../helpers/writeBookFile";
 import { NewReferenceCardsResponse } from "../../types";
 import { generateFluxImage } from "./generate-flux-schnel-image";
 import { generateTagName } from "../../helpers/generateTagName";
-import { callGeminiWithThinking, callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import {
+  callGeminiWithThinking,
+  callGeminiWithThinkingAndSchemaAndParsed,
+} from "../../callFastGemini";
 const FREE_RUN = process.env.FREE_RUN === "true";
 const CharactersSchema = z.object({
   characters: z.array(
@@ -102,12 +105,21 @@ export const generateCharacterImageWithOpenAI = async (
     if (isModerationBlocked && !useSanitizedPrompt) {
       console.log(`Moderation blocked for ${characterName}, sanitizing prompt with Gemini...`);
       const sanitizedPrompt = await sanitizePromptForModeration(prompt);
-      return await generateCharacterImageWithOpenAI(sanitizedPrompt, characterName, generalPrompt, 1, true);
+      return await generateCharacterImageWithOpenAI(
+        sanitizedPrompt,
+        characterName,
+        generalPrompt,
+        1,
+        true,
+      );
     }
 
     if (attempt < 3) {
       const waitTime = attempt * 30000 - 15000;
-      console.log(`Failed to generate image after ${attempt} attempts, waiting ${waitTime} ms`, JSON.stringify(e));
+      console.log(
+        `Failed to generate image after ${attempt} attempts, waiting ${waitTime} ms`,
+        JSON.stringify(e),
+      );
       await sleep(waitTime);
       return await generateCharacterImageWithOpenAI(
         prompt,
@@ -212,12 +224,18 @@ export const generatePicturesForEntities = async (
     console.log("inside generated prompts");
   } else {
     generatedPrompts = await generatePicturePrompts(referenceCards, { skipBookAnalysis });
-    writeBookFile("generated-prompts.json", JSON.stringify(generatedPrompts, null, 2), FILE_TYPE.TEMPORARY);
+    writeBookFile(
+      "generated-prompts.json",
+      JSON.stringify(generatedPrompts, null, 2),
+      FILE_TYPE.TEMPORARY,
+    );
   }
 
   let generalPrompt: string;
   if (bookFileExists("graphicalStyle.json", FILE_TYPE.TEMPORARY)) {
-    generalPrompt = JSON.parse(readBookFile("graphicalStyle.json", FILE_TYPE.TEMPORARY)).avatarStyle;
+    generalPrompt = JSON.parse(
+      readBookFile("graphicalStyle.json", FILE_TYPE.TEMPORARY),
+    ).avatarStyle;
   } else {
     generalPrompt = `Avatar for a character in an ebook. Expressionist Graphic Noir
 Frank Miller's *Sin City* style. extreme black-and-white contrast with splashes of color
@@ -226,7 +244,9 @@ Propaganda posters for their graphic boldness and limited color palette.
 `;
   }
 
-  const filteredPrompts = generatedPrompts.characters.filter(({ name }) => !knownCharactersArray.includes(name));
+  const filteredPrompts = generatedPrompts.characters.filter(
+    ({ name }) => !knownCharactersArray.includes(name),
+  );
   console.log("filteredPrompts", filteredPrompts);
   await Promise.all(
     filteredPrompts.map(async (prompt) => {
@@ -244,7 +264,12 @@ Propaganda posters for their graphic boldness and limited color palette.
         // const image = await generateImage(visulGuideTranslatedAndCleaned, prompt.name);
         // const image = await generateImage(visulGuideTranslatedAndCleaned, prompt.name);
         if (FREE_RUN) {
-          const image = await generateFluxImage(prompt.visualGuide, prompt.name, generalPrompt, "avatar");
+          const image = await generateFluxImage(
+            prompt.visualGuide,
+            prompt.name,
+            generalPrompt,
+            "avatar",
+          );
           console.log(`image: ${image}`);
         } else {
           await generateAndSaveCharacterImage(prompt.visualGuide, prompt.name, generalPrompt);

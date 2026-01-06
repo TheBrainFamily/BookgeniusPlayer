@@ -162,10 +162,18 @@ function parseArgs(): { bookDir: string; options: CliOptions } {
     if (Number.isNaN(options.crf) || options.crf < 0) {
       fail("CRF must be zero or greater");
     }
-    if (Number.isNaN(options.posterQuality) || options.posterQuality < 0 || options.posterQuality > 100) {
+    if (
+      Number.isNaN(options.posterQuality) ||
+      options.posterQuality < 0 ||
+      options.posterQuality > 100
+    ) {
       fail("Poster quality must be between 0 and 100");
     }
-    if (Number.isNaN(options.posterCompression) || options.posterCompression < 0 || options.posterCompression > 6) {
+    if (
+      Number.isNaN(options.posterCompression) ||
+      options.posterCompression < 0 ||
+      options.posterCompression > 6
+    ) {
       fail("Poster compression level must be between 0 and 6");
     }
   }

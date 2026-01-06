@@ -6,7 +6,11 @@ import { als } from "./als-context"; // Import your ALS instance
 
 const pinoJsonLogger = pino({
   level: "debug",
-  base: { pid: process.pid, hostname: os.hostname(), application: "identify-and-rewrite-paragraphs" },
+  base: {
+    pid: process.pid,
+    hostname: os.hostname(),
+    application: "identify-and-rewrite-paragraphs",
+  },
   mixin() {
     return als.getStore() || {};
   },

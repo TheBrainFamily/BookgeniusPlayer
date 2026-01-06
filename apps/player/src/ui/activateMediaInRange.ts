@@ -47,7 +47,18 @@ function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
 function createVideoElement(src: string, state: "listens" | "speaks"): HTMLVideoElement {
   const video = document.createElement("video");
   video.src = src;
-  video.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-all", "duration-500", "ease-in-out");
+  video.classList.add(
+    "absolute",
+    "top-0",
+    "left-0",
+    "w-full",
+    "h-full",
+    "object-cover",
+    "rounded-full",
+    "transition-all",
+    "duration-500",
+    "ease-in-out",
+  );
   video.autoplay = true;
   video.loop = true;
   video.muted = true;
@@ -67,10 +78,21 @@ function createVideoElement(src: string, state: "listens" | "speaks"): HTMLVideo
 }
 
 /** Checks if a given chapter and paragraph index falls within the specified range **/
-function isInRange(currentChapter: number, currentParagraph: number, startChapter: number, startParagraph: number, endChapter: number, endParagraph: number): boolean {
+function isInRange(
+  currentChapter: number,
+  currentParagraph: number,
+  startChapter: number,
+  startParagraph: number,
+  endChapter: number,
+  endParagraph: number,
+): boolean {
   // Single chapter range
   if (startChapter === endChapter) {
-    return currentChapter === startChapter && currentParagraph >= startParagraph && currentParagraph <= endParagraph;
+    return (
+      currentChapter === startChapter &&
+      currentParagraph >= startParagraph &&
+      currentParagraph <= endParagraph
+    );
   }
 
   // Multi-chapter range
@@ -88,7 +110,11 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 }
 
 /** Derives chapter and paragraph range for both play and non-play paragraphs */
-function getRowContext(el: HTMLElement): { chapter: number | null; firstParagraphIndex: number | null; lastParagraphIndex: number | null } {
+function getRowContext(el: HTMLElement): {
+  chapter: number | null;
+  firstParagraphIndex: number | null;
+  lastParagraphIndex: number | null;
+} {
   const section = el.closest<HTMLElement>("[data-chapter]");
   const chapter = section ? parseInt(section.dataset.chapter || "", 10) : null;
 
@@ -131,18 +157,29 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
   const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
 
   rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
-    const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+    const characterPlaceholders =
+      playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
     characterPlaceholders.forEach((activeCharacterPlaceholder) => {
       const characterSlug = activeCharacterPlaceholder?.dataset.character;
       const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
       const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
       const existingVideo = inlineAvatar?.querySelector("video");
-      const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
+      const paragraphIndex = playRow
+        ?.querySelector<HTMLElement>("[data-index]")
+        ?.getAttribute("data-index");
 
-      const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
+      const locationForPlaceholder = {
+        chapter: parseInt(chapterIndex, 10),
+        paragraph: parseInt(paragraphIndex, 10),
+      };
 
-      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const snapshot = characterData
+        ? resolveCharacterSnapshot(characterData, {
+            location: locationForPlaceholder,
+            fallbackDisplayName: characterData.characterName,
+          })
+        : null;
       const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
 
       // Case 1: Existing video needs update or removal
@@ -246,8 +283,14 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
 };
 
 function generateFallbackAvatarUrl(characterSlug: string, displayName?: string): string {
-  const name = displayName || characterSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return getAvatarSource({ slug: characterSlug, characterName: name, bookSlug: "", infoPerChapter: [] });
+  const name =
+    displayName || characterSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return getAvatarSource({
+    slug: characterSlug,
+    characterName: name,
+    bookSlug: "",
+    infoPerChapter: [],
+  });
 }
 
 function populateInlineAvatarShell(
@@ -271,7 +314,12 @@ function populateInlineAvatarShell(
     return false;
   }
 
-  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  const snapshot =
+    snapshotOverride ??
+    resolveCharacterSnapshot(characterData, {
+      location,
+      fallbackDisplayName: characterData.characterName,
+    });
   const displayName = snapshot.displayName;
   const listeningSrc = snapshot.media.listening;
   const talkingSrc = snapshot.media.talking;
@@ -285,7 +333,15 @@ function populateInlineAvatarShell(
 
   const placeholderImg = document.createElement("img");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
-  placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+  placeholderImg.classList.add(
+    "absolute",
+    "top-0",
+    "left-0",
+    "w-full",
+    "h-full",
+    "object-cover",
+    "rounded-full",
+  );
   placeholderImg.alt = displayName;
   shell.appendChild(placeholderImg);
 
@@ -309,7 +365,12 @@ function createMediaElement(
     return null;
   }
 
-  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  const snapshot =
+    snapshotOverride ??
+    resolveCharacterSnapshot(characterData, {
+      location,
+      fallbackDisplayName: characterData.characterName,
+    });
   const displayName = snapshot.displayName;
   const listeningSrc = snapshot.media.listening;
   const talkingSrc = snapshot.media.talking;
@@ -326,7 +387,15 @@ function createMediaElement(
 
   const placeholderImg = document.createElement("img");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
-  placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+  placeholderImg.classList.add(
+    "absolute",
+    "top-0",
+    "left-0",
+    "w-full",
+    "h-full",
+    "object-cover",
+    "rounded-full",
+  );
   placeholderImg.alt = displayName;
   container.appendChild(placeholderImg);
 
@@ -334,7 +403,8 @@ function createMediaElement(
 }
 
 function createDummyElement(characterPlaceholder: HTMLSpanElement) {
-  const existingInlineAvatar = characterPlaceholder.querySelector<HTMLSpanElement>(".inline-avatar");
+  const existingInlineAvatar =
+    characterPlaceholder.querySelector<HTMLSpanElement>(".inline-avatar");
   const dummyElement = document.createElement("span");
   dummyElement.classList.add("dummy-avatar-placeholder", "inline-avatar");
 
@@ -360,10 +430,20 @@ function getVideoPathname(src: string): string {
   }
 }
 
-const activatePlayFormatMediaDebounced = debounce(runPlayFormatMediaActivation, INLINE_MEDIA_DEBOUNCE_MS, { leading: true, trailing: true, maxWait: 500 });
+const activatePlayFormatMediaDebounced = debounce(
+  runPlayFormatMediaActivation,
+  INLINE_MEDIA_DEBOUNCE_MS,
+  { leading: true, trailing: true, maxWait: 500 },
+);
 
 /** Manages media loading and playback for paragraphs within the visible range **/
-export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean) {
+export function activateMediaInRange(
+  startChapter: number,
+  startParagraph: number,
+  endChapter: number,
+  endParagraph: number,
+  isPlayFormat: boolean,
+) {
   const charactersData = getCharactersData();
   const charactersBySlug = new Map(charactersData.map((c) => [c.slug, c]));
 
@@ -398,7 +478,14 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
     if (chapterStr && paragraphStr) {
       const currentChapter = parseInt(chapterStr, 10);
       const currentParagraph = parseInt(paragraphStr, 10);
-      return isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
+      return isInRange(
+        currentChapter,
+        currentParagraph,
+        startChapter,
+        startParagraph - bufferSize,
+        endChapter,
+        endParagraph + bufferSize,
+      );
     }
   });
 
@@ -436,14 +523,25 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
       const characterSlug = characterPlaceholder.dataset.character;
       if (!characterSlug?.trim()) return;
 
-      const locationForPlaceholder = { chapter: rowChapter ?? startChapter, paragraph: firstParagraphIndex ?? startParagraph };
+      const locationForPlaceholder = {
+        chapter: rowChapter ?? startChapter,
+        paragraph: firstParagraphIndex ?? startParagraph,
+      };
 
       const characterData = charactersBySlug.get(characterSlug);
-      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const snapshot = characterData
+        ? resolveCharacterSnapshot(characterData, {
+            location: locationForPlaceholder,
+            fallbackDisplayName: characterData.characterName,
+          })
+        : null;
 
-      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
+      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(
+        ".dummy-avatar-placeholder",
+      );
 
-      const existingInlineAvatar = characterPlaceholder.querySelector<HTMLElement>(".inline-avatar");
+      const existingInlineAvatar =
+        characterPlaceholder.querySelector<HTMLElement>(".inline-avatar");
       let success = false;
 
       if (existingInlineAvatar) {
@@ -451,10 +549,20 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
         if (hasImg) {
           success = true;
         } else {
-          success = populateInlineAvatarShell(existingInlineAvatar, characterData, locationForPlaceholder, snapshot);
+          success = populateInlineAvatarShell(
+            existingInlineAvatar,
+            characterData,
+            locationForPlaceholder,
+            snapshot,
+          );
         }
       } else {
-        const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
+        const newMediaElement = createMediaElement(
+          characterPlaceholder,
+          characterData,
+          locationForPlaceholder,
+          snapshot,
+        );
 
         if (newMediaElement) {
           if (dummyPlaceholder) {
@@ -474,7 +582,8 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
 
   activatedMedia.forEach((rowEl) => {
     if (!uniqueRows.includes(rowEl)) {
-      const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+      const characterPlaceholders =
+        rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
       characterPlaceholders.forEach((characterPlaceholder) => {
         const dummyElement = createDummyElement(characterPlaceholder);
@@ -488,14 +597,18 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
   });
 }
 
-export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
+export const openPlayRowCharacterModal = (
+  target: HTMLElement,
+  openCharacterDetailsModal: (params: CharacterModalParams) => void,
+) => {
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
 
   const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
   const isCharacterPlaceholder = target.closest(".character-placeholder");
 
   // Support both play and non-play: prefer .play-row, else fall back to the nearest [data-index] paragraph
-  const rowOrParagraph = target.closest<HTMLElement>(".play-row") ?? target.closest<HTMLElement>("[data-index]");
+  const rowOrParagraph =
+    target.closest<HTMLElement>(".play-row") ?? target.closest<HTMLElement>("[data-index]");
   if (!rowOrParagraph) return;
 
   // Determine chapter/paragraph from the element we found
@@ -513,7 +626,8 @@ export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDeta
     if (isCharacterPlaceholder) {
       characterPlaceholder = target.closest<HTMLSpanElement>(".character-placeholder");
     } else {
-      characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
+      characterPlaceholder =
+        rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
     }
 
     characterSlug = characterPlaceholder?.dataset.character || "";
@@ -527,10 +641,17 @@ export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDeta
 
   const characterData = charactersBySlug.get(characterSlug);
   const snapshot = characterData
-    ? resolveCharacterSnapshot(characterData, { location: { chapter, paragraph: firstParagraphIndex }, fallbackDisplayName: characterData.characterName })
+    ? resolveCharacterSnapshot(characterData, {
+        location: { chapter, paragraph: firstParagraphIndex },
+        fallbackDisplayName: characterData.characterName,
+      })
     : null;
 
-  const mediaSrc = snapshot ? (isTalkingNow ? snapshot.media.talking : snapshot.media.listening) : "";
+  const mediaSrc = snapshot
+    ? isTalkingNow
+      ? snapshot.media.talking
+      : snapshot.media.listening
+    : "";
 
   openCharacterDetailsModal({
     characterSlug,
@@ -560,7 +681,9 @@ export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
     populateInlineAvatarShell(shell, characterData, location);
   });
 
-  const personaCells = section.querySelectorAll<HTMLElement>("table[data-drama] td[data-persona]:not(:has(.inline-avatar))");
+  const personaCells = section.querySelectorAll<HTMLElement>(
+    "table[data-drama] td[data-persona]:not(:has(.inline-avatar))",
+  );
   personaCells.forEach((cell) => {
     const row = cell.closest<HTMLElement>("tr[data-speaker]");
     const characterSlug = row?.dataset.speaker;
@@ -570,7 +693,10 @@ export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
     if (!characterData) return;
 
     const location = { chapter: chapterNumber, paragraph: 0 };
-    const snapshot = resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+    const snapshot = resolveCharacterSnapshot(characterData, {
+      location,
+      fallbackDisplayName: characterData.characterName,
+    });
     const displayName = snapshot.displayName;
     const listeningSrc = snapshot.media.listening;
     const talkingSrc = snapshot.media.talking;

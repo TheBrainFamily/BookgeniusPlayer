@@ -6,7 +6,14 @@ import { useSentenceModal } from "@player/stores/modals/sentenceModal.store";
 import SentenceModal from "@player/components/modals/SentenceModal";
 
 export const SentenceModalRenderer: React.FC = () => {
-  const { isOpen, closeModal, currentSentence, simplifiedSentence, currentSentenceId, simplifiedSentenceScore } = useSentenceModal();
+  const {
+    isOpen,
+    closeModal,
+    currentSentence,
+    simplifiedSentence,
+    currentSentenceId,
+    simplifiedSentenceScore,
+  } = useSentenceModal();
 
   useEscapeKey(isOpen, closeModal);
 

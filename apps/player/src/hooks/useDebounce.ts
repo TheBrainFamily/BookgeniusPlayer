@@ -14,7 +14,10 @@ export function useDebounce<T>(value: T, delayMs = 200): T {
   const debouncedSetter = useRef<DebouncedFunc<(v: T) => void> | null>(null);
 
   useEffect(() => {
-    debouncedSetter.current = debounce((v: T) => setDebounced(v), delayMs, { leading: false, trailing: true });
+    debouncedSetter.current = debounce((v: T) => setDebounced(v), delayMs, {
+      leading: false,
+      trailing: true,
+    });
     return () => {
       debouncedSetter.current?.cancel();
     };

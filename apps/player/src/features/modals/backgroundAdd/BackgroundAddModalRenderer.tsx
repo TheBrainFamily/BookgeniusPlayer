@@ -11,5 +11,8 @@ export const BackgroundAddModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <BackgroundAddModal />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>{isOpen && <BackgroundAddModal />}</AnimatePresence>,
+    document.body,
+  );
 };

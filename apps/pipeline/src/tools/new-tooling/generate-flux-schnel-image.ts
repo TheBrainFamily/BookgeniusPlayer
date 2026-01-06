@@ -43,7 +43,14 @@ export const generateFluxImage = async (
   } catch (e) {
     console.error(`Failed to generate image after ${attempt} attempts: ${e}`);
     if (attempt < 3) {
-      return await generateFluxImage(prompt, characterName, generalPrompt, type, attempt + 1, fileName);
+      return await generateFluxImage(
+        prompt,
+        characterName,
+        generalPrompt,
+        type,
+        attempt + 1,
+        fileName,
+      );
     } else {
       logger.error("Failed to generate image after 3 attempts");
       return null;
@@ -77,9 +84,12 @@ export const generateFluxImage = async (
 };
 
 if (require.main === module) {
-  generateFluxImage("A beautiful woman with long brown hair and blue eyes", "test", "SinCity style", "avatar").then(
-    (image) => {
-      console.log(`image: ${image}`);
-    },
-  );
+  generateFluxImage(
+    "A beautiful woman with long brown hair and blue eyes",
+    "test",
+    "SinCity style",
+    "avatar",
+  ).then((image) => {
+    console.log(`image: ${image}`);
+  });
 }

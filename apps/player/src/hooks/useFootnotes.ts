@@ -9,15 +9,25 @@ export interface Footnote {
 }
 
 // Helper function to check if a paragraph's location falls within the visible range
-function isParagraphInRange(paragraphChapter: number, paragraphIndex: number, range: Location): boolean {
+function isParagraphInRange(
+  paragraphChapter: number,
+  paragraphIndex: number,
+  range: Location,
+): boolean {
   if (range.chapter === range.endChapter) {
     // Single chapter view
-    return paragraphChapter === range.chapter && paragraphIndex >= range.paragraph && paragraphIndex <= range.endParagraph;
+    return (
+      paragraphChapter === range.chapter &&
+      paragraphIndex >= range.paragraph &&
+      paragraphIndex <= range.endParagraph
+    );
   } else {
     // Multi-chapter view
     const inStartChapter = paragraphChapter === range.chapter && paragraphIndex >= range.paragraph;
-    const inMiddleChapters = paragraphChapter > range.chapter && paragraphChapter < range.endChapter;
-    const inEndChapter = paragraphChapter === range.endChapter && paragraphIndex <= range.endParagraph;
+    const inMiddleChapters =
+      paragraphChapter > range.chapter && paragraphChapter < range.endChapter;
+    const inEndChapter =
+      paragraphChapter === range.endChapter && paragraphIndex <= range.endParagraph;
     return inStartChapter || inMiddleChapters || inEndChapter;
   }
 }
@@ -34,11 +44,15 @@ export function useFootnotes(range: Location): Footnote[] {
       return;
     }
 
-    const allParagraphs = document.querySelectorAll<HTMLElement>("section[data-chapter] p[data-index]");
+    const allParagraphs = document.querySelectorAll<HTMLElement>(
+      "section[data-chapter] p[data-index]",
+    );
     const relevantFootnoteIds = new Set<string>();
 
     allParagraphs.forEach((paragraphElement) => {
-      const sectionElement = paragraphElement.closest("section[data-chapter]") as HTMLElement | null;
+      const sectionElement = paragraphElement.closest(
+        "section[data-chapter]",
+      ) as HTMLElement | null;
       if (!sectionElement) return;
 
       const paragraphChapter = parseInt(sectionElement.dataset.chapter || "-1", 10);
@@ -47,7 +61,8 @@ export function useFootnotes(range: Location): Footnote[] {
       if (paragraphChapter < 0 || paragraphIndex < 0) return; // Skip invalid paragraphs
 
       if (isParagraphInRange(paragraphChapter, paragraphIndex, range)) {
-        const annotationLinks = paragraphElement.querySelectorAll<HTMLAnchorElement>("a[data-note]");
+        const annotationLinks =
+          paragraphElement.querySelectorAll<HTMLAnchorElement>("a[data-note]");
         annotationLinks.forEach((link) => {
           const noteId = link.getAttribute("data-note");
           if (noteId) {
@@ -66,7 +81,9 @@ export function useFootnotes(range: Location): Footnote[] {
         foundNotes.push({ id: noteElement.id, html: noteElement.content });
       } else {
         // This might happen if the href points to a non-existent ID
-        console.warn(`Footnote element #${id} referenced in text but not found in notes container.`);
+        console.warn(
+          `Footnote element #${id} referenced in text but not found in notes container.`,
+        );
       }
     });
 

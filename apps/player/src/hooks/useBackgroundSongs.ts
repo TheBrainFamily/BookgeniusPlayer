@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-import { dealWithBackgroundSongs as impl, preloadBackgroundTracks, preloadCurrentTrack } from "@player/deal-with-background-songs";
+import {
+  dealWithBackgroundSongs as impl,
+  preloadBackgroundTracks,
+  preloadCurrentTrack,
+} from "@player/deal-with-background-songs";
 import { useLocationRange } from "./useLocationRange";
 import useSplashHidden from "./useSplashHidden";
 import { useIsAppReady } from "./useIsAppReady";
@@ -52,7 +56,11 @@ export function useBackgroundSongs() {
     const handleBackgroundMusic = async () => {
       await implRef.current({ currentChapter, currentParagraph });
 
-      if (isInitialTrackLoaded && !isPreloadingInProgress.current && currentChapter !== lastPreloadedChapter.current) {
+      if (
+        isInitialTrackLoaded &&
+        !isPreloadingInProgress.current &&
+        currentChapter !== lastPreloadedChapter.current
+      ) {
         isPreloadingInProgress.current = true;
         console.log(`Preloading background tracks for chapter: ${currentChapter}`);
         preloadBackgroundTracks()

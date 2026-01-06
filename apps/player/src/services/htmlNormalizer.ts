@@ -1,6 +1,21 @@
 import { getFigureUrl } from "@player/utils/assetUrls";
 
-const BLOCKED_TAGS = new Set(["script", "style", "iframe", "object", "embed", "form", "input", "button", "textarea", "select", "link", "meta", "base", "noscript"]);
+const BLOCKED_TAGS = new Set([
+  "script",
+  "style",
+  "iframe",
+  "object",
+  "embed",
+  "form",
+  "input",
+  "button",
+  "textarea",
+  "select",
+  "link",
+  "meta",
+  "base",
+  "noscript",
+]);
 
 export function sanitizeHtml(html: string): string {
   const parser = new DOMParser();
@@ -24,10 +39,17 @@ export function sanitizeHtml(html: string): string {
 }
 
 function isDramaDialogue(element: Element): boolean {
-  return element.tagName.toLowerCase() === "div" && element.querySelector("[data-speaker-label]") !== null;
+  return (
+    element.tagName.toLowerCase() === "div" &&
+    element.querySelector("[data-speaker-label]") !== null
+  );
 }
 
-function processPlayContainer(container: Element, doc: Document, state: { lastSpeaker: string | null; alignment: "left" | "right" }): void {
+function processPlayContainer(
+  container: Element,
+  doc: Document,
+  state: { lastSpeaker: string | null; alignment: "left" | "right" },
+): void {
   const children = Array.from(container.children);
 
   for (const child of children) {
@@ -43,7 +65,8 @@ function processPlayContainer(container: Element, doc: Document, state: { lastSp
       const firstSpeaker = speakers.split(/\s+/)[0];
 
       if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
-        state.alignment = state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+        state.alignment =
+          state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
         state.lastSpeaker = firstSpeaker;
       }
 
@@ -171,12 +194,16 @@ export function injectAvatarShells(section: Element, doc: Document): void {
 
   // Process character mentions per paragraph - only highlight first occurrence of each character
   // Skip highlighting if the character is the speaker of the paragraph
-  const paragraphElements = section.querySelectorAll("p, blockquote, h1, h2, h3, h4, h5, h6, li, td, th, div.character-text, div.didaskalia-text");
+  const paragraphElements = section.querySelectorAll(
+    "p, blockquote, h1, h2, h3, h4, h5, h6, li, td, th, div.character-text, div.didaskalia-text",
+  );
   const processedSpans = new Set<Element>();
 
   paragraphElements.forEach((paragraph) => {
     const seenInParagraph = new Set<string>();
-    const speakerAttr = paragraph.closest("[data-speaker]")?.getAttribute("data-speaker") ?? paragraph.getAttribute("data-speaker");
+    const speakerAttr =
+      paragraph.closest("[data-speaker]")?.getAttribute("data-speaker") ??
+      paragraph.getAttribute("data-speaker");
     const speakers = new Set(speakerAttr?.split(/\s+/).filter(Boolean) ?? []);
 
     paragraph.querySelectorAll("span[data-c]").forEach((el) => {
@@ -214,12 +241,18 @@ export type RenderMode = "default" | "enhancedProse";
 
 export type EnhancedProseOptions = { speakerDisplayNames?: Map<string, string> };
 
-function createPlayRowFromSpeakerParagraph(p: Element, doc: Document, state: { lastSpeaker: string | null; alignment: "left" | "right" }, options: EnhancedProseOptions): Element {
+function createPlayRowFromSpeakerParagraph(
+  p: Element,
+  doc: Document,
+  state: { lastSpeaker: string | null; alignment: "left" | "right" },
+  options: EnhancedProseOptions,
+): Element {
   const speakers = p.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
   const firstSpeaker = speakers[0] || "";
 
   if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
-    state.alignment = state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+    state.alignment =
+      state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
     state.lastSpeaker = firstSpeaker;
   }
 
@@ -239,7 +272,8 @@ function createPlayRowFromSpeakerParagraph(p: Element, doc: Document, state: { l
   labelP.setAttribute("data-is-character", "true");
   labelP.setAttribute("data-is-didaskalia", "false");
 
-  const displayName = options.speakerDisplayNames?.get(firstSpeaker) ?? firstSpeaker.replace(/-/g, " ");
+  const displayName =
+    options.speakerDisplayNames?.get(firstSpeaker) ?? firstSpeaker.replace(/-/g, " ");
   const strong = doc.createElement("strong");
   strong.textContent = displayName;
   labelP.appendChild(strong);
@@ -270,7 +304,8 @@ function createPlayRowFromSpeakerGroup(
 
   // Update alignment state based on speaker change
   if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
-    state.alignment = state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+    state.alignment =
+      state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
     state.lastSpeaker = firstSpeaker;
   }
 
@@ -291,7 +326,8 @@ function createPlayRowFromSpeakerGroup(
   labelP.setAttribute("data-is-character", "true");
   labelP.setAttribute("data-is-didaskalia", "false");
 
-  const displayName = options.speakerDisplayNames?.get(firstSpeaker) ?? firstSpeaker.replace(/-/g, " ");
+  const displayName =
+    options.speakerDisplayNames?.get(firstSpeaker) ?? firstSpeaker.replace(/-/g, " ");
   const strong = doc.createElement("strong");
   strong.textContent = displayName;
   labelP.appendChild(strong);
@@ -336,7 +372,11 @@ function isPureEmParagraph(p: Element): boolean {
   return withoutEm.length === 0;
 }
 
-function transformProseToPlayRows(section: Element, doc: Document, options: EnhancedProseOptions): void {
+function transformProseToPlayRows(
+  section: Element,
+  doc: Document,
+  options: EnhancedProseOptions,
+): void {
   const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
   const children = Array.from(section.children);
   let i = 0;
@@ -363,7 +403,11 @@ function transformProseToPlayRows(section: Element, doc: Document, options: Enha
 
       while (j < children.length) {
         const nextChild = children[j];
-        if (nextChild.tagName.toLowerCase() === "p" && nextChild.getAttribute("data-speaker") === speaker && !nextChild.closest("table[data-drama]")) {
+        if (
+          nextChild.tagName.toLowerCase() === "p" &&
+          nextChild.getAttribute("data-speaker") === speaker &&
+          !nextChild.closest("table[data-drama]")
+        ) {
           group.push(nextChild);
           j++;
         } else {
@@ -392,7 +436,10 @@ function transformProseToPlayRows(section: Element, doc: Document, options: Enha
   }
 }
 
-export function normalizeChapterHtmlEnhanced(html: string, options: EnhancedProseOptions = {}): string {
+export function normalizeChapterHtmlEnhanced(
+  html: string,
+  options: EnhancedProseOptions = {},
+): string {
   const sanitized = sanitizeHtml(html);
   const parser = new DOMParser();
   const doc = parser.parseFromString(sanitized, "text/html");
@@ -484,7 +531,10 @@ export interface CharacterOccurrence {
   isExiting?: boolean;
 }
 
-export function extractCharacterOccurrences(section: Element, chapterNumber: number): CharacterOccurrence[] {
+export function extractCharacterOccurrences(
+  section: Element,
+  chapterNumber: number,
+): CharacterOccurrence[] {
   const occurrences: CharacterOccurrence[] = [];
   const isPlayFormat = section.querySelector(".play-row") !== null;
 
@@ -498,7 +548,12 @@ export function extractCharacterOccurrences(section: Element, chapterNumber: num
         const isFirstInRow = el === speakerEl.querySelector("[data-index]");
         if (isFirstInRow) {
           for (const slug of speakers) {
-            occurrences.push({ slug, chapter: chapterNumber, paragraph: paragraphIndex, isSpeaking: true });
+            occurrences.push({
+              slug,
+              chapter: chapterNumber,
+              paragraph: paragraphIndex,
+              isSpeaking: true,
+            });
           }
         }
       }
@@ -508,7 +563,14 @@ export function extractCharacterOccurrences(section: Element, chapterNumber: num
         if (slug) {
           const isEntering = mention.getAttribute("data-enters") === "true";
           const isExiting = mention.getAttribute("data-exits") === "true";
-          occurrences.push({ slug, chapter: chapterNumber, paragraph: paragraphIndex, isSpeaking: false, isEntering, isExiting });
+          occurrences.push({
+            slug,
+            chapter: chapterNumber,
+            paragraph: paragraphIndex,
+            isSpeaking: false,
+            isEntering,
+            isExiting,
+          });
         }
       });
     });
@@ -517,13 +579,23 @@ export function extractCharacterOccurrences(section: Element, chapterNumber: num
     for (const child of Array.from(section.children)) {
       const speakers = child.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
       for (const slug of speakers) {
-        occurrences.push({ slug, chapter: chapterNumber, paragraph: paragraphIndex, isSpeaking: true });
+        occurrences.push({
+          slug,
+          chapter: chapterNumber,
+          paragraph: paragraphIndex,
+          isSpeaking: true,
+        });
       }
 
       child.querySelectorAll("span[data-c]").forEach((mention) => {
         const slug = mention.getAttribute("data-c");
         if (slug) {
-          occurrences.push({ slug, chapter: chapterNumber, paragraph: paragraphIndex, isSpeaking: false });
+          occurrences.push({
+            slug,
+            chapter: chapterNumber,
+            paragraph: paragraphIndex,
+            isSpeaking: false,
+          });
         }
       });
 
@@ -559,8 +631,15 @@ export function stripCharacterMarkup(html: string): string {
   return result;
 }
 
-export function compareStructure(original: string, withCharacters: string): { match: boolean; originalNormalized: string; withCharactersNormalized: string } {
+export function compareStructure(
+  original: string,
+  withCharacters: string,
+): { match: boolean; originalNormalized: string; withCharactersNormalized: string } {
   const originalNormalized = stripCharacterMarkup(original);
   const withCharactersNormalized = stripCharacterMarkup(withCharacters);
-  return { match: originalNormalized === withCharactersNormalized, originalNormalized, withCharactersNormalized };
+  return {
+    match: originalNormalized === withCharactersNormalized,
+    originalNormalized,
+    withCharactersNormalized,
+  };
 }

@@ -1,5 +1,4 @@
 // utils/assetUrls.ts
-import { getBookSlug } from "@player/state/bookDataStore";
 
 // =============================================================================
 // Live Mode Asset URL Registry
@@ -11,7 +10,10 @@ let liveAssetUrlRegistry: Map<string, string> | null = null;
 // Maps video URLs back to their avatar URLs (for normalizeSrcForInlineAvatar)
 let videoToAvatarRegistry: Map<string, string> | null = null;
 
-export const setLiveAssetUrls = (urls: Map<string, string>, videoToAvatar?: Map<string, string>) => {
+export const setLiveAssetUrls = (
+  urls: Map<string, string>,
+  videoToAvatar?: Map<string, string>,
+) => {
   liveAssetUrlRegistry = urls;
   videoToAvatarRegistry = videoToAvatar || null;
 };
@@ -116,12 +118,12 @@ function buildFromPrefix(_relativePath: string): string | null {
 }
 
 // exported helpers (very small)
-export const getBookAssetBaseUrl = (): string => {
+export const getBookAssetBaseUrl = () => {
   const built = buildFromPrefix(URL_SEGMENTS.ASSETS);
   if (built) return built;
 };
 
-export const getBookAssetUrl = (assetPath: string): string => {
+export const getBookAssetUrl = (assetPath: string) => {
   // If it's already an absolute URL (live mode), return as-is
   if (assetPath.startsWith("http://") || assetPath.startsWith("https://")) {
     return assetPath;
@@ -140,7 +142,7 @@ export const getBookAssetUrl = (assetPath: string): string => {
   if (built) return built;
 };
 
-export const buildAudioUrl = (trackId: string): string => {
+export const buildAudioUrl = (trackId: string) => {
   // If it's already an absolute URL (live mode), just add .mp3 extension
   if (trackId.startsWith("http://") || trackId.startsWith("https://")) {
     return `${trackId}${URL_SEGMENTS.AUDIO_EXT}`;
@@ -150,7 +152,7 @@ export const buildAudioUrl = (trackId: string): string => {
   const built = buildFromPrefix(joinPath(URL_SEGMENTS.ASSETS, file));
   if (built) return built;
 };
-export const getBookDataUrl = (fileName: string): string => {
+export const getBookDataUrl = (fileName: string) => {
   const rel = joinPath(URL_SEGMENTS.COMPILED, fileName);
   const built = buildFromPrefix(rel);
   if (built) return built;

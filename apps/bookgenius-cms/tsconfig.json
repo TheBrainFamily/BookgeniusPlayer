@@ -14,7 +14,7 @@
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./*"], "@convex/*": ["../../convex/*"] }
+    "paths": { "@/*": ["./*"], "@convex/*": ["../../convex/*"], "@player/*": ["../player/src/*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../convex/**/*.ts"],
   "exclude": ["node_modules"]

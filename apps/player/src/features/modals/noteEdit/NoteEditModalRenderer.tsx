@@ -11,5 +11,8 @@ export const NoteEditModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <NoteEditModal />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>{isOpen && <NoteEditModal />}</AnimatePresence>,
+    document.body,
+  );
 };

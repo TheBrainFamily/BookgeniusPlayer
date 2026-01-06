@@ -160,7 +160,15 @@ function ConvexAppInitializer({ children }: ConvexAppInitializerProps) {
   if (isLoading) {
     return (
       <div
-        style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#1a1a1a", color: "#fff", fontFamily: "system-ui, sans-serif" }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#1a1a1a",
+          color: "#fff",
+          fontFamily: "system-ui, sans-serif",
+        }}
       >
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "24px", marginBottom: "16px" }}>Loading from CMS...</div>
@@ -194,7 +202,15 @@ function ConvexAppInitializer({ children }: ConvexAppInitializerProps) {
   if (!isReady) {
     return (
       <div
-        style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#1a1a1a", color: "#fff", fontFamily: "system-ui, sans-serif" }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#1a1a1a",
+          color: "#fff",
+          fontFamily: "system-ui, sans-serif",
+        }}
       >
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "24px", marginBottom: "16px" }}>Processing book...</div>
@@ -253,10 +269,21 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
 
   if (!convexUrl) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#1a1a1a", color: "#ff6b6b" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#1a1a1a",
+          color: "#ff6b6b",
+        }}
+      >
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: "24px", marginBottom: "16px" }}>Configuration Error</div>
-          <div style={{ fontSize: "14px", color: "#888" }}>VITE_CONVEX_URL environment variable is not set</div>
+          <div style={{ fontSize: "14px", color: "#888" }}>
+            VITE_CONVEX_URL environment variable is not set
+          </div>
         </div>
       </div>
     );

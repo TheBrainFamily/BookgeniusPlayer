@@ -34,7 +34,11 @@ export const getChapterTitle = (chapter: XMLElement): string => {
   const titleText = getTitleText(titleElements[0]);
   const subtitleText = getTitleText(subtitleElements[0]);
 
-  const chapterTitle = [currentAct, titleText && subtitleText ? titleText.replace(/\.$/, "") : titleText, subtitleText]
+  const chapterTitle = [
+    currentAct,
+    titleText && subtitleText ? titleText.replace(/\.$/, "") : titleText,
+    subtitleText,
+  ]
     .filter(Boolean)
     .join(", ");
 

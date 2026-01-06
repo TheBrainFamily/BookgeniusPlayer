@@ -50,7 +50,10 @@ export const callGeminiFlashWithSentry = async <T = string>(
       // }
     } catch (error: unknown) {
       lastError = error;
-      logger.error(`LLM API error: ${error instanceof Error ? error.message : String(error)}`, "OpenAI");
+      logger.error(
+        `LLM API error: ${error instanceof Error ? error.message : String(error)}`,
+        "OpenAI",
+      );
 
       // If we've reached max attempts, throw the error
       if (attempts >= maxAttempts) {

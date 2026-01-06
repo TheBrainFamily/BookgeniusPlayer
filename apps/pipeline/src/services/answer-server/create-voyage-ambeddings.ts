@@ -8,7 +8,9 @@ import { ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-b
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { readBookFile } from "../../helpers/readBookFile";
 
-const computeBatchEmbeddingsThroughHTTP = async (documents: Document[]): Promise<DocumentWithEmbeddings[]> => {
+const computeBatchEmbeddingsThroughHTTP = async (
+  documents: Document[],
+): Promise<DocumentWithEmbeddings[]> => {
   const client = new VoyageAIClient({ apiKey: process.env.VOYAGE_API_KEY });
   const res = await client.contextualizedEmbed({
     inputs: [documents.map((document) => document.text)],
@@ -26,7 +28,11 @@ const generateEmbeddingsSimplified = async (chaptersFrom: number, chaptersTo: nu
   const embeddingsForChapters: Map<number, DocumentWithEmbeddings[]> = new Map();
 
   for (let chapter = chaptersFrom; chapter <= chaptersTo; chapter++) {
-    const paragraphsFromChapter: { text: string; dataIndex: number }[] = getParagraphsFromChapter(chapter, true, true);
+    const paragraphsFromChapter: { text: string; dataIndex: number }[] = getParagraphsFromChapter(
+      chapter,
+      true,
+      true,
+    );
     const documents: Document[] = paragraphsFromChapter.map((paragraph) => {
       return { text: paragraph.text, chapter: chapter, paragraphNumber: paragraph.dataIndex };
     });
@@ -34,7 +40,10 @@ const generateEmbeddingsSimplified = async (chaptersFrom: number, chaptersTo: nu
     embeddingsForChapters.set(chapter, documentsWithEmbeddings);
   }
 
-  writeBookFile("embeddings.json", JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2));
+  writeBookFile(
+    "embeddings.json",
+    JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2),
+  );
 
   return embeddingsForChapters;
 };
@@ -44,7 +53,9 @@ const allSummaries = JSON.parse(
 ) as ScenesSummariesPerChapter[];
 // const allSummaries = [];
 const getChapterData = async (chapter: number) => {
-  const chapterData = allSummaries.find((summary) => summary.chapterSummary.chapterNumber === chapter);
+  const chapterData = allSummaries.find(
+    (summary) => summary.chapterSummary.chapterNumber === chapter,
+  );
   if (!chapterData) {
     throw new Error(`Chapter ${chapter} not found`);
   }
@@ -54,36 +65,50 @@ const getChapterData = async (chapter: number) => {
 const generateEmbeddings = async (chaptersFrom: number, chaptersTo: number) => {
   const embeddingsForChapters: Map<number, DocumentWithEmbeddings[]> = new Map();
   for (let chapter = chaptersFrom; chapter <= chaptersTo; chapter++) {
-    const paragraphsFromChapter: { text: string; dataIndex: number }[] = getParagraphsFromChapter(chapter, true, true);
+    const paragraphsFromChapter: { text: string; dataIndex: number }[] = getParagraphsFromChapter(
+      chapter,
+      true,
+      true,
+    );
     const chapterData = await getChapterData(chapter);
-    const documents: Document[] = chapterData.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
-      return {
-        text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${bulletPoint.paragraphNumbers
-          .map((p) =>
-            paragraphsFromChapter
-              .filter((pfc) => pfc.dataIndex === p)
-              ?.map((pfc) => pfc.text)
-              .join(" "),
-          )
-          .join(" ")}</Text>`,
-        chapter: chapter,
-        paragraphNumber: bulletPoint.mainParagraphNumber,
-      };
-    });
+    const documents: Document[] = chapterData.chapterSummary.chapterBulletPoints.map(
+      (bulletPoint) => {
+        return {
+          text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${bulletPoint.paragraphNumbers
+            .map((p) =>
+              paragraphsFromChapter
+                .filter((pfc) => pfc.dataIndex === p)
+                ?.map((pfc) => pfc.text)
+                .join(" "),
+            )
+            .join(" ")}</Text>`,
+          chapter: chapter,
+          paragraphNumber: bulletPoint.mainParagraphNumber,
+        };
+      },
+    );
 
-    const moreDocuments: Document[] = chapterData.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
-      return {
-        text: `${bulletPoint.paragraphsSummary}`,
-        chapter: chapter,
-        paragraphNumber: bulletPoint.mainParagraphNumber,
-      };
-    });
+    const moreDocuments: Document[] = chapterData.chapterSummary.chapterBulletPoints.map(
+      (bulletPoint) => {
+        return {
+          text: `${bulletPoint.paragraphsSummary}`,
+          chapter: chapter,
+          paragraphNumber: bulletPoint.mainParagraphNumber,
+        };
+      },
+    );
     const documentsWithEmbeddings = await computeBatchEmbeddingsThroughHTTP(documents);
     const moreDocumentsWithEmbeddings = await computeBatchEmbeddingsThroughHTTP(moreDocuments);
-    embeddingsForChapters.set(chapter, [...documentsWithEmbeddings, ...moreDocumentsWithEmbeddings]);
+    embeddingsForChapters.set(chapter, [
+      ...documentsWithEmbeddings,
+      ...moreDocumentsWithEmbeddings,
+    ]);
   }
 
-  writeBookFile("embeddings.json", JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2));
+  writeBookFile(
+    "embeddings.json",
+    JSON.stringify(Array.from(embeddingsForChapters.entries()), null, 2),
+  );
 
   return embeddingsForChapters;
 };

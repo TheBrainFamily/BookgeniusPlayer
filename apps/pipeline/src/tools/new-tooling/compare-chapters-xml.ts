@@ -159,7 +159,9 @@ export function compareXmlTextContent(originalXml: string, modifiedXml: string):
           lastRemovedSentences = null; // Consumed the removed part
         } else {
           // Purely added sentences (no preceding removed block)
-          (part.value as string[]).forEach((sentence) => console.log(`\x1b[32m+ ${sentence}\x1b[0m`)); // Type assertion
+          (part.value as string[]).forEach((sentence) =>
+            console.log(`\x1b[32m+ ${sentence}\x1b[0m`),
+          ); // Type assertion
         }
       } else {
         // Identical part (part.added and part.removed are false)
@@ -185,7 +187,9 @@ export function compareXmlTextContent(originalXml: string, modifiedXml: string):
       if (identicalCount > 0) {
         console.log(`\x1b[90m[... ${identicalCount} identical sentence(s) ... ]\x1b[0m`);
       }
-      (lastRemovedSentences as string[]).forEach((sentence: string) => console.log(`\x1b[31m- ${sentence}\x1b[0m`));
+      (lastRemovedSentences as string[]).forEach((sentence: string) =>
+        console.log(`\x1b[31m- ${sentence}\x1b[0m`),
+      );
     } else if (identicalCount > 0) {
       // Handle trailing identical block
       console.log(`\x1b[90m[... ${identicalCount} identical sentence(s) ... ]\x1b[0m`);
@@ -298,8 +302,14 @@ if (require.main === module) {
 
   Array.from({ length: 19 }, (_, i) => i + 21).forEach((chapter) => {
     console.log(`Comparing chapter ${chapter}`);
-    const original = readBookFile(`original-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
-    const changed = readBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
+    const original = readBookFile(
+      `original-paragraphs-for-chapter-${chapter}.xml`,
+      FILE_TYPE.TEMPORARY,
+    );
+    const changed = readBookFile(
+      `rewritten-paragraphs-for-chapter-${chapter}.xml`,
+      FILE_TYPE.TEMPORARY,
+    );
     compareXmlTextContent(original, changed);
   });
 

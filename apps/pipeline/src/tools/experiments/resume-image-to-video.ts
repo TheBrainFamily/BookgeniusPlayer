@@ -34,12 +34,22 @@ type VideoTask = {
 
 type BookDirectory = { name: string; path: string };
 
-type TaskState = { bookTitle: string; tasks: VideoTask[]; completedImages: string[]; timestamp: string };
+type TaskState = {
+  bookTitle: string;
+  tasks: VideoTask[];
+  completedImages: string[];
+  timestamp: string;
+};
 
 const STATE_FILE_NAME = "video-conversion-state.json";
 
 const saveState = (bookTitle: string, tasks: VideoTask[], completedImages: string[]): void => {
-  const state: TaskState = { bookTitle, tasks, completedImages, timestamp: new Date().toISOString() };
+  const state: TaskState = {
+    bookTitle,
+    tasks,
+    completedImages,
+    timestamp: new Date().toISOString(),
+  };
 
   const statePath = `./books-data/${bookTitle}/${STATE_FILE_NAME}`;
   fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
@@ -99,7 +109,11 @@ const fetchTaskStatus = async (taskId: string) => {
   }
 };
 
-const downloadAndSaveVideo = async (videoUrl: string, fileName: string, videoOutputsPath: string): Promise<void> => {
+const downloadAndSaveVideo = async (
+  videoUrl: string,
+  fileName: string,
+  videoOutputsPath: string,
+): Promise<void> => {
   try {
     const response = await axios.get(videoUrl, { responseType: "arraybuffer" });
     const videoData = response.data as Buffer;
@@ -189,7 +203,11 @@ const getImagesToConvert = (bookDir: string, excludeImages: string[] = []): Imag
   });
 };
 
-const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: string, bookTitle: string): Promise<void> => {
+const processVideoTasks = async (
+  tasks: VideoTask[],
+  videoOutputsPath: string,
+  bookTitle: string,
+): Promise<void> => {
   let allTasksCompleted = false;
   let retryDelay = 10000;
   const maxRetryDelay = 30000;
@@ -223,7 +241,9 @@ const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: string, b
           console.log(`Task ${task.fileName} (ID: ${task.id}) status: ${task.status}`);
 
           if (task.status === "FAILED") {
-            console.warn(`The task ${task.fileName} (ID: ${task.id}) failed with message: ${response.failure}`);
+            console.warn(
+              `The task ${task.fileName} (ID: ${task.id}) failed with message: ${response.failure}`,
+            );
           }
 
           if (response.output && !task.isDownloaded) {
@@ -243,11 +263,14 @@ const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: string, b
       saveState(bookTitle, tasks, completedVideos);
 
       allTasksCompleted = tasks.every(
-        (task) => task.status === "SUCCEEDED" || task.status === "FAILED" || task.status === "CANCELLED",
+        (task) =>
+          task.status === "SUCCEEDED" || task.status === "FAILED" || task.status === "CANCELLED",
       );
 
       if (!allTasksCompleted) {
-        console.log(`Some tasks are still processing. Checking again in ${retryDelay / 1000} seconds...`);
+        console.log(
+          `Some tasks are still processing. Checking again in ${retryDelay / 1000} seconds...`,
+        );
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
         retryDelay = Math.min(retryDelay + retryIncrement, maxRetryDelay);
       } else {
@@ -255,7 +278,10 @@ const processVideoTasks = async (tasks: VideoTask[], videoOutputsPath: string, b
       }
     } catch (error) {
       consecutiveErrors++;
-      console.error(`Error in processing loop (attempt ${consecutiveErrors}/${maxConsecutiveErrors}):`, error);
+      console.error(
+        `Error in processing loop (attempt ${consecutiveErrors}/${maxConsecutiveErrors}):`,
+        error,
+      );
 
       if (consecutiveErrors >= maxConsecutiveErrors) {
         console.error("Max consecutive errors reached. Saving state and exiting...");
@@ -278,7 +304,9 @@ if (require.main === module) {
       const books = getAvailableBooks();
 
       if (bookTitle) {
-        const hasBookExisted = books.find((book) => book.name.toLowerCase().trim() === bookTitle.toLowerCase().trim());
+        const hasBookExisted = books.find(
+          (book) => book.name.toLowerCase().trim() === bookTitle.toLowerCase().trim(),
+        );
         if (!hasBookExisted) {
           console.log(
             `The book ${bookTitle} was not found. Please ensure a directory for this book exists in the ./books−data folder and that you have provided the exact directory name.`,

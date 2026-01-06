@@ -1,4 +1,8 @@
-import type { BookContextChunk, BookContextLocation, ExtractedBookText } from "@player/types/bookContext";
+import type {
+  BookContextChunk,
+  BookContextLocation,
+  ExtractedBookText,
+} from "@player/types/bookContext";
 import { textCacheManager } from "@player/logic/TextCacheManager";
 import { useBookContentStore } from "@player/stores/bookContent.store";
 import { bookIndex } from "@player/logic/BookIndex";
@@ -6,14 +10,19 @@ import { bookIndex } from "@player/logic/BookIndex";
 /**
  * Extract text from the beginning of the book up to the current location
  */
-export async function extractBookTextUpToLocation(currentLocation: BookContextLocation): Promise<ExtractedBookText> {
+export async function extractBookTextUpToLocation(
+  currentLocation: BookContextLocation,
+): Promise<ExtractedBookText> {
   return extractBookText({ chapter: 1, paragraph: 1 }, currentLocation);
 }
 
 /**
  * Extract text from a specific location onwards up to another location
  */
-export async function extractBookTextFromLocation(fromLocation: BookContextLocation, toLocation: BookContextLocation): Promise<ExtractedBookText> {
+export async function extractBookTextFromLocation(
+  fromLocation: BookContextLocation,
+  toLocation: BookContextLocation,
+): Promise<ExtractedBookText> {
   return extractBookText(fromLocation, toLocation);
 }
 
@@ -21,9 +30,13 @@ export async function extractBookTextFromLocation(fromLocation: BookContextLocat
  * Core extractor that composes paragraph-level chunks from the in-memory text cache.
  * Ensures cache coverage up to the `toLocation` and returns chunks inclusive of both endpoints.
  */
-async function extractBookText(from: BookContextLocation, to: BookContextLocation): Promise<ExtractedBookText> {
+async function extractBookText(
+  from: BookContextLocation,
+  to: BookContextLocation,
+): Promise<ExtractedBookText> {
   // Normalize invalid ranges
-  const compare = (a: BookContextLocation, b: BookContextLocation) => (a.chapter === b.chapter ? a.paragraph - b.paragraph : a.chapter - b.chapter);
+  const compare = (a: BookContextLocation, b: BookContextLocation) =>
+    a.chapter === b.chapter ? a.paragraph - b.paragraph : a.chapter - b.chapter;
 
   if (compare(to, from) < 0) {
     return { chunks: [], totalChunks: 0 };
@@ -45,7 +58,10 @@ async function extractBookText(from: BookContextLocation, to: BookContextLocatio
     const chapterCache = textCache[chapter] || {};
     // Determine paragraph range for this chapter
     const startPara = chapter === from.chapter ? Math.max(1, from.paragraph) : 1;
-    const endPara = chapter === to.chapter ? Math.max(startPara, to.paragraph) : Math.max(bookIndex.getParagraphCount(chapter), 0);
+    const endPara =
+      chapter === to.chapter
+        ? Math.max(startPara, to.paragraph)
+        : Math.max(bookIndex.getParagraphCount(chapter), 0);
 
     for (let paragraph = startPara; paragraph <= endPara; paragraph++) {
       const text = chapterCache[paragraph];

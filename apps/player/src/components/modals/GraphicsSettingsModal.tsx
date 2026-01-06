@@ -6,13 +6,22 @@ import ModalUI from "@player/components/modals/ModalUI";
 import { Label } from "@player/components/ui/label";
 import { Slider } from "@player/components/ui/slider";
 import { cn } from "@player/lib/utils";
-import { useGraphicsSettings, type GraphicsQualityLevel, type AnimationSpeed } from "@player/stores/graphicsSettings.store";
+import {
+  useGraphicsSettings,
+  type GraphicsQualityLevel,
+  type AnimationSpeed,
+} from "@player/stores/graphicsSettings.store";
 
 interface GraphicsSettingsModalProps {
   onClose: () => void;
 }
 
-const QUALITY_OPTIONS: { value: GraphicsQualityLevel; icon: React.ElementType; labelKey: string; descKey: string }[] = [
+const QUALITY_OPTIONS: {
+  value: GraphicsQualityLevel;
+  icon: React.ElementType;
+  labelKey: string;
+  descKey: string;
+}[] = [
   { value: "full", icon: Monitor, labelKey: "graphics_full", descKey: "graphics_full_desc" },
   { value: "reduced", icon: Moon, labelKey: "graphics_reduced", descKey: "graphics_reduced_desc" },
   { value: "minimal", icon: Zap, labelKey: "graphics_minimal", descKey: "graphics_minimal_desc" },
@@ -27,7 +36,14 @@ const SPEED_OPTIONS: { value: AnimationSpeed; labelKey: string }[] = [
 
 const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }) => {
   const { t } = useTranslation();
-  const { qualityLevel, backgroundBlur, animationSpeed, setQualityLevel, setBackgroundBlur, setAnimationSpeed } = useGraphicsSettings();
+  const {
+    qualityLevel,
+    backgroundBlur,
+    animationSpeed,
+    setQualityLevel,
+    setBackgroundBlur,
+    setAnimationSpeed,
+  } = useGraphicsSettings();
 
   return (
     <ModalUI title={t("graphics_settings", "Graphics")} onClose={onClose}>
@@ -35,7 +51,9 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Layers className="h-4 w-4 text-white" />
-            <Label className="text-sm font-medium text-white">{t("quality_level", "Quality Level")}</Label>
+            <Label className="text-sm font-medium text-white">
+              {t("quality_level", "Quality Level")}
+            </Label>
           </div>
           <div className="space-y-2">
             {QUALITY_OPTIONS.map((option) => {
@@ -48,13 +66,29 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
                   onClick={() => setQualityLevel(option.value)}
                   className={cn(
                     "w-full flex items-start gap-3 p-3 rounded-lg border transition-all text-left",
-                    isSelected ? "bg-white/20 border-white/40" : "bg-black/30 border-white/10 hover:bg-white/10 hover:border-white/20",
+                    isSelected
+                      ? "bg-white/20 border-white/40"
+                      : "bg-black/30 border-white/10 hover:bg-white/10 hover:border-white/20",
                   )}
                 >
-                  <Icon className={cn("h-5 w-5 mt-0.5 flex-shrink-0", isSelected ? "text-blue-400" : "text-white/60")} />
+                  <Icon
+                    className={cn(
+                      "h-5 w-5 mt-0.5 flex-shrink-0",
+                      isSelected ? "text-blue-400" : "text-white/60",
+                    )}
+                  />
                   <div className="flex-1 min-w-0">
                     <div className={cn("font-medium", isSelected ? "text-white" : "text-white/90")}>
-                      {t(option.labelKey, option.value === "full" ? "Full" : option.value === "reduced" ? "Reduced" : option.value === "minimal" ? "Minimal" : "Bright")}
+                      {t(
+                        option.labelKey,
+                        option.value === "full"
+                          ? "Full"
+                          : option.value === "reduced"
+                            ? "Reduced"
+                            : option.value === "minimal"
+                              ? "Minimal"
+                              : "Bright",
+                      )}
                     </div>
                     <div className="text-xs text-white/60 mt-0.5">
                       {t(
@@ -75,12 +109,18 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
           </div>
         </div>
 
-        <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full", qualityLevel !== "full" && "opacity-50")}>
+        <div
+          className={cn(
+            "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
+            qualityLevel !== "full" && "opacity-50",
+          )}
+        >
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Wind className="h-4 w-4 text-white" />
               <Label className="text-sm font-medium text-white">
-                {t("background_blur", "Background Blur")}: <span className="text-blue-300">{backgroundBlur}px</span>
+                {t("background_blur", "Background Blur")}:{" "}
+                <span className="text-blue-300">{backgroundBlur}px</span>
               </Label>
             </div>
             <Slider
@@ -101,11 +141,18 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
           </div>
         </div>
 
-        <div className={cn("p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full", qualityLevel !== "full" && "opacity-50")}>
+        <div
+          className={cn(
+            "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
+            qualityLevel !== "full" && "opacity-50",
+          )}
+        >
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Timer className="h-4 w-4 text-white" />
-              <Label className="text-sm font-medium text-white">{t("animation_speed", "Animation Speed")}</Label>
+              <Label className="text-sm font-medium text-white">
+                {t("animation_speed", "Animation Speed")}
+              </Label>
             </div>
             <div className="flex gap-2">
               {SPEED_OPTIONS.map((option) => {
@@ -118,11 +165,16 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
                     onClick={() => setAnimationSpeed(option.value)}
                     className={cn(
                       "flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
-                      isSelected ? "bg-white/20 border-white/40 text-white" : "bg-black/30 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20",
+                      isSelected
+                        ? "bg-white/20 border-white/40 text-white"
+                        : "bg-black/30 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20",
                       qualityLevel !== "full" && "cursor-not-allowed",
                     )}
                   >
-                    {t(option.labelKey, option.value === 1 ? "Normal" : option.value === 2 ? "Slow" : "Stop")}
+                    {t(
+                      option.labelKey,
+                      option.value === 1 ? "Normal" : option.value === 2 ? "Slow" : "Stop",
+                    )}
                   </button>
                 );
               })}

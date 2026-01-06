@@ -27,7 +27,10 @@ function DialogOverlay({
   useCustomAnimation = false,
   hideOverlay = false,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay> & { useCustomAnimation?: boolean; hideOverlay?: boolean }) {
+}: React.ComponentProps<typeof DialogPrimitive.Overlay> & {
+  useCustomAnimation?: boolean;
+  hideOverlay?: boolean;
+}) {
   if (useCustomAnimation) {
     if (hideOverlay) return null;
     // No AnimatePresence here - parent AnimatePresence handles exit animation
@@ -59,7 +62,12 @@ function DialogContent({
   children,
   overlayProps,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & { overlayProps?: React.ComponentProps<typeof DialogOverlay> & { useCustomAnimation?: boolean; hideOverlay?: boolean } }) {
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  overlayProps?: React.ComponentProps<typeof DialogOverlay> & {
+    useCustomAnimation?: boolean;
+    hideOverlay?: boolean;
+  };
+}) {
   const container = React.useMemo<HTMLElement | undefined>(() => {
     if (typeof window === "undefined") return undefined;
     return document.getElementById("player-scope") ?? undefined;
@@ -94,7 +102,10 @@ function DialogContent({
   );
 }
 
-function DialogEnhanceClose({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Close>) {
+function DialogEnhanceClose({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return (
     <DialogPrimitive.Close
       className={cn(
@@ -110,19 +121,58 @@ function DialogEnhanceClose({ className, ...props }: React.ComponentProps<typeof
 }
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="dialog-header" className={cn("flex flex-col gap-2 text-center sm:text-left", className)} {...props} />;
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      {...props}
+    />
+  );
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="dialog-footer" className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />;
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+      {...props}
+    />
+  );
 }
 
 function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title data-slot="dialog-title" className={cn("text-lg leading-none font-semibold", className)} {...props} />;
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn("text-lg leading-none font-semibold", className)}
+      {...props}
+    />
+  );
 }
 
-function DialogDescription({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Description>) {
-  return <DialogPrimitive.Description data-slot="dialog-description" className={cn("text-muted-foreground text-sm", className)} {...props} />;
+function DialogDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props}
+    />
+  );
 }
 
-export { Dialog, DialogClose, DialogEnhanceClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger };
+export {
+  Dialog,
+  DialogClose,
+  DialogEnhanceClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+};

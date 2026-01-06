@@ -35,7 +35,10 @@ function applyBaseStyles(el: HTMLDivElement) {
 }
 
 /** Create a visualizer overlay with given style. */
-function createVisualizer(id: string, opts: { zIndex: number; border: string; background: string; borderStyle?: string }): HTMLDivElement {
+function createVisualizer(
+  id: string,
+  opts: { zIndex: number; border: string; background: string; borderStyle?: string },
+): HTMLDivElement {
   const box = document.createElement("div");
   box.id = id;
   applyBaseStyles(box);
@@ -49,16 +52,30 @@ function createVisualizer(id: string, opts: { zIndex: number; border: string; ba
 }
 
 export function createActiveElementVisualizer(): HTMLDivElement {
-  return createVisualizer(ACTIVE_ELEMENT_VISUALIZER_ID, { zIndex: 45, border: "2px solid #ff6b6b", background: "rgba(255, 107, 107, 0.08)" });
+  return createVisualizer(ACTIVE_ELEMENT_VISUALIZER_ID, {
+    zIndex: 45,
+    border: "2px solid #ff6b6b",
+    background: "rgba(255, 107, 107, 0.08)",
+  });
 }
 
 export function createRangeVisualizer(): HTMLDivElement {
-  return createVisualizer(RANGE_VISUALIZER_ID, { zIndex: 44, border: "2px dashed #4ecdc4", background: "rgba(78, 205, 196, 0.06)", borderStyle: "dashed" });
+  return createVisualizer(RANGE_VISUALIZER_ID, {
+    zIndex: 44,
+    border: "2px dashed #4ecdc4",
+    background: "rgba(78, 205, 196, 0.06)",
+    borderStyle: "dashed",
+  });
 }
 
 /** Initialize (or reuse) both overlays. */
-export function initializeDevZoneVisualizers(): { activeElementVisualizer: HTMLDivElement | null; rangeVisualizer: HTMLDivElement | null } {
-  let activeElementVisualizer = document.getElementById(ACTIVE_ELEMENT_VISUALIZER_ID) as HTMLDivElement | null;
+export function initializeDevZoneVisualizers(): {
+  activeElementVisualizer: HTMLDivElement | null;
+  rangeVisualizer: HTMLDivElement | null;
+} {
+  let activeElementVisualizer = document.getElementById(
+    ACTIVE_ELEMENT_VISUALIZER_ID,
+  ) as HTMLDivElement | null;
   let rangeVisualizer = document.getElementById(RANGE_VISUALIZER_ID) as HTMLDivElement | null;
 
   if (!activeElementVisualizer) activeElementVisualizer = createActiveElementVisualizer();
@@ -81,15 +98,30 @@ export function computeElementVisualRect(el: Element): RectBox {
   const visualLeft = r.left - ml;
   const visualRight = r.right + mr;
 
-  return { left: visualLeft, top: visualTop, width: visualRight - visualLeft, height: visualBottom - visualTop };
+  return {
+    left: visualLeft,
+    top: visualTop,
+    width: visualRight - visualLeft,
+    height: visualBottom - visualTop,
+  };
 }
 
 /** Draw the full focus-zone overlay with provided vertical bounds. */
-export function drawFocusZone(rangeVisualizer: HTMLDivElement | null, rootEl: HTMLElement, focusZoneTop: number, focusZoneBottom: number) {
+export function drawFocusZone(
+  rangeVisualizer: HTMLDivElement | null,
+  rootEl: HTMLElement,
+  focusZoneTop: number,
+  focusZoneBottom: number,
+) {
   if (!rangeVisualizer) return;
 
   const rootRect = rootEl.getBoundingClientRect();
-  const box: RectBox = { left: rootRect.left, top: focusZoneTop, width: rootRect.width, height: Math.max(0, focusZoneBottom - focusZoneTop) };
+  const box: RectBox = {
+    left: rootRect.left,
+    top: focusZoneTop,
+    width: rootRect.width,
+    height: Math.max(0, focusZoneBottom - focusZoneTop),
+  };
   setRect(rangeVisualizer, box);
 }
 
@@ -145,7 +177,10 @@ export function computeElementsUnionRect(elements: Iterable<Element>): RectBox |
  * Hides the visualizer if the collection is empty.
  * RAF to avoid layout thrash when called from intersection callbacks / scroll handlers
  */
-export function drawElementsUnion(rangeVisualizer: HTMLDivElement | null, elements: Iterable<Element>) {
+export function drawElementsUnion(
+  rangeVisualizer: HTMLDivElement | null,
+  elements: Iterable<Element>,
+) {
   if (!rangeVisualizer) return;
 
   requestAnimationFrame(() => {

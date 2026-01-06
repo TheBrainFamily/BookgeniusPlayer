@@ -130,7 +130,10 @@ function convertElement(el: Element): { html: string; speakers: string[] } {
   }
 }
 
-function convertStandardElement(el: Element, htmlTag: string): { html: string; speakers: string[] } {
+function convertStandardElement(
+  el: Element,
+  htmlTag: string,
+): { html: string; speakers: string[] } {
   let inner = "";
   const speakers: string[] = [];
 
@@ -181,7 +184,11 @@ function convertXmlChapterToHtml(xml: string): string {
   return html;
 }
 
-function extractChapterMetadata(html: string): { chapterNumber: number; title: string | null; paragraphCount: number } {
+function extractChapterMetadata(html: string): {
+  chapterNumber: number;
+  title: string | null;
+  paragraphCount: number;
+} {
   const { document } = parseHTML(html);
   const section = document.querySelector("section[data-chapter]");
 
@@ -205,8 +212,18 @@ function extractChapterMetadata(html: string): { chapterNumber: number; title: s
 
 // Legacy data types
 type LegacyNote = { id: string; content: string };
-type LegacyVariant = { id: string; analysis?: unknown; simplifications: { score: number; sentences: string[] }[] };
-type LegacyBackground = { chapter: number; paragraph: number; file: string; backgroundColor: string; textColor: string };
+type LegacyVariant = {
+  id: string;
+  analysis?: unknown;
+  simplifications: { score: number; sentences: string[] }[];
+};
+type LegacyBackground = {
+  chapter: number;
+  paragraph: number;
+  file: string;
+  backgroundColor: string;
+  textColor: string;
+};
 type LegacyMusic = { chapter: number; paragraph: number; files: string[] };
 
 // CMS Extra types
@@ -297,19 +314,38 @@ function parseMetadataXml(xmlContent: string): {
     throw new Error("Missing <Language> in metadata.xml");
   }
 
-  const book = { slug: slugMatch?.[1] || bookSlug, title: titleMatch[1], author: authorMatch[1], language: languageMatch[1], form: formMatch?.[1] };
+  const book = {
+    slug: slugMatch?.[1] || bookSlug,
+    title: titleMatch[1],
+    author: authorMatch[1],
+    language: languageMatch[1],
+    form: formMatch?.[1],
+  };
 
   // Parse CharactersMaster - handles both attribute formats
   // Format 1: <Character-Name display="Display Name" summary="..." />
   // Format 2: <Character-Name display="Display Name" summary="..." aiPrompt="..." />
   // Note: summary can be empty (summary="")
-  const characterRegex = /<([A-Za-z][A-Za-z0-9-]*)\s+display="([^"]+)"\s+summary="([^"]*)"(?:\s+aiPrompt="([^"]+)")?/g;
-  const characters: { slug: string; displayName: string; summary: string; aiPrompt?: string }[] = [];
+  const characterRegex =
+    /<([A-Za-z][A-Za-z0-9-]*)\s+display="([^"]+)"\s+summary="([^"]*)"(?:\s+aiPrompt="([^"]+)")?/g;
+  const characters: { slug: string; displayName: string; summary: string; aiPrompt?: string }[] =
+    [];
 
   let match;
   while ((match = characterRegex.exec(xmlContent)) !== null) {
     // Skip known non-character tags
-    if (["BookMetadata", "CharactersMaster", "Slug", "Title", "Author", "Language", "Form", "VisualStyle"].includes(match[1])) {
+    if (
+      [
+        "BookMetadata",
+        "CharactersMaster",
+        "Slug",
+        "Title",
+        "Author",
+        "Language",
+        "Form",
+        "VisualStyle",
+      ].includes(match[1])
+    ) {
       continue;
     }
     characters.push({
@@ -371,7 +407,12 @@ async function createFolderIfNeeded(folderPath: string, extra?: object): Promise
   }
 }
 
-async function uploadFile(folderPath: string, basename: string, filePath: string, extra?: object): Promise<void> {
+async function uploadFile(
+  folderPath: string,
+  basename: string,
+  filePath: string,
+  extra?: object,
+): Promise<void> {
   if (!fs.existsSync(filePath)) {
     console.log(`  Skipping (not found): ${filePath}`);
     return;
@@ -381,9 +422,16 @@ async function uploadFile(folderPath: string, basename: string, filePath: string
   const contentType = getContentType(basename);
 
   try {
-    const { intentId, uploadUrl, backend } = await client.mutation(api.generateUploadUrl.startUpload, { folderPath, basename, publish: true, extra });
+    const { intentId, uploadUrl, backend } = await client.mutation(
+      api.generateUploadUrl.startUpload,
+      { folderPath, basename, publish: true, extra },
+    );
 
-    const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: file });
+    const response = await fetch(uploadUrl, {
+      method: backend === "r2" ? "PUT" : "POST",
+      headers: { "Content-Type": contentType },
+      body: file,
+    });
 
     if (!response.ok) {
       throw new Error(`Upload failed: ${response.status}`);
@@ -391,7 +439,12 @@ async function uploadFile(folderPath: string, basename: string, filePath: string
 
     const uploadResponse = backend === "convex" ? await response.json() : undefined;
 
-    await client.mutation(api.generateUploadUrl.finishUpload, { intentId, uploadResponse, size: file.length, contentType });
+    await client.mutation(api.generateUploadUrl.finishUpload, {
+      intentId,
+      uploadResponse,
+      size: file.length,
+      contentType,
+    });
 
     console.log(`  Uploaded: ${folderPath}/${basename}`);
   } catch (error) {
@@ -419,12 +472,23 @@ function getContentType(filename: string): string {
 // Import Steps
 // =============================================================================
 
-async function step1_CreateFolderStructure(book: { title: string; author: string; language: string; form?: string }): Promise<void> {
+async function step1_CreateFolderStructure(book: {
+  title: string;
+  author: string;
+  language: string;
+  form?: string;
+}): Promise<void> {
   console.log("\n=== Step 1: Create Folder Structure ===");
 
   await createFolderIfNeeded("books");
 
-  const bookExtra: BookFolderExtra = { type: "book", title: book.title, author: book.author, language: book.language, form: book.form };
+  const bookExtra: BookFolderExtra = {
+    type: "book",
+    title: book.title,
+    author: book.author,
+    language: book.language,
+    form: book.form,
+  };
   await createFolderIfNeeded(BOOK_PATH, bookExtra);
 
   await createFolderIfNeeded(`${BOOK_PATH}/characters`);
@@ -433,14 +497,21 @@ async function step1_CreateFolderStructure(book: { title: string; author: string
   await createFolderIfNeeded(`${BOOK_PATH}/music`);
 }
 
-async function step2_ImportCharacters(characters: { slug: string; displayName: string; summary: string; aiPrompt?: string }[]): Promise<number> {
+async function step2_ImportCharacters(
+  characters: { slug: string; displayName: string; summary: string; aiPrompt?: string }[],
+): Promise<number> {
   console.log("\n=== Step 2: Import Characters ===");
 
   await runInBatches(characters, async (char) => {
     console.log(`  Processing: ${char.displayName}`);
 
     const charPath = `${BOOK_PATH}/characters/${char.slug}`;
-    const charExtra: CharacterFolderExtra = { type: "character", displayName: char.displayName, summary: char.summary, aiPrompt: char.aiPrompt };
+    const charExtra: CharacterFolderExtra = {
+      type: "character",
+      displayName: char.displayName,
+      summary: char.summary,
+      aiPrompt: char.aiPrompt,
+    };
     await createFolderIfNeeded(charPath, charExtra);
 
     const avatarExtensions = [".png", ".jpg", ".jpeg", ".webp"];
@@ -460,7 +531,10 @@ async function step2_ImportCharacters(characters: { slug: string; displayName: s
     const speaksFile = path.join(ASSETS_DIR, `${char.slug}-speaks.mp4`);
     const listensFile = path.join(ASSETS_DIR, `${char.slug}-listens.mp4`);
 
-    await Promise.all([uploadFile(charPath, "speaks.mp4", speaksFile), uploadFile(charPath, "listens.mp4", listensFile)]);
+    await Promise.all([
+      uploadFile(charPath, "speaks.mp4", speaksFile),
+      uploadFile(charPath, "listens.mp4", listensFile),
+    ]);
   });
 
   return characters.length;
@@ -481,7 +555,9 @@ async function step3_ImportChapters(book: { form?: string; language: string }): 
     return 0;
   }
 
-  const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
+  const files = fs
+    .readdirSync(CONTENT_DIR)
+    .filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
   files.sort((a, b) => {
     const numA = parseInt(a.match(/chapter(\d+)/)?.[1] || "0");
     const numB = parseInt(b.match(/chapter(\d+)/)?.[1] || "0");
@@ -498,7 +574,9 @@ async function step3_ImportChapters(book: { form?: string; language: string }): 
   });
 
   await runInBatches(chapters, async ({ chapterNum, htmlContent, metadata }) => {
-    console.log(`  Chapter ${chapterNum}: ${metadata.title || "(no title)"} (${metadata.paragraphCount} paragraphs)`);
+    console.log(
+      `  Chapter ${chapterNum}: ${metadata.title || "(no title)"} (${metadata.paragraphCount} paragraphs)`,
+    );
     await client.action(api.chapterCompiler.uploadHtmlSourceChapter, {
       bookPath: BOOK_PATH,
       chapterNumber: chapterNum,
@@ -519,7 +597,9 @@ async function step3_ImportChaptersAsXml(): Promise<number> {
     return 0;
   }
 
-  const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
+  const files = fs
+    .readdirSync(CONTENT_DIR)
+    .filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
   files.sort((a, b) => {
     const numA = parseInt(a.match(/chapter(\d+)/)?.[1] || "0");
     const numB = parseInt(b.match(/chapter(\d+)/)?.[1] || "0");
@@ -541,16 +621,23 @@ async function step3_ImportChaptersAsXml(): Promise<number> {
   console.log("\n  🔄 Triggering chapter compilation...");
   try {
     console.log("__dirname", __dirname);
-    execSync(`npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`, { stdio: "inherit" });
+    execSync(`npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`, {
+      stdio: "inherit",
+    });
     console.log("  ✅ Compilation complete");
 
     console.log("\n  🔄 Migrating to HTML source format...");
-    execSync(`bun ./migrate-book-to-html.ts ${bookSlug}`, { stdio: "inherit", cwd: path.join(__dirname) });
+    execSync(`bun ./migrate-book-to-html.ts ${bookSlug}`, {
+      stdio: "inherit",
+      cwd: path.join(__dirname),
+    });
     console.log("  ✅ Migration complete");
   } catch (error) {
     console.error("  ❌ Auto-compilation/migration failed:", error);
     console.log("\n  Manual steps:");
-    console.log(`     npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`);
+    console.log(
+      `     npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`,
+    );
     console.log(`     bun tools/scripts/migrate-book-to-html.ts ${bookSlug}`);
   }
 
@@ -565,7 +652,9 @@ async function step4_ImportBackgrounds(): Promise<number> {
   // Try to load getBackgroundsForBook
   let backgrounds: LegacyBackground[] = [];
   try {
-    const module = (await import(`../../../books/${bookSlug}/getBackgroundsForBook`)) as { getBackgroundsForBook: () => LegacyBackground[] };
+    const module = (await import(`../../../books/${bookSlug}/getBackgroundsForBook`)) as {
+      getBackgroundsForBook: () => LegacyBackground[];
+    };
     backgrounds = module.getBackgroundsForBook();
   } catch {
     console.log("  No getBackgroundsForBook.ts found (skipping)");
@@ -619,7 +708,9 @@ async function step5_ImportMusic(): Promise<number> {
   // Try to load getBackgroundSongsForBook
   let musicTracks: LegacyMusic[] = [];
   try {
-    const module = (await import(`../../../books/${bookSlug}/getBackgroundSongsForBook`)) as { getBackgroundSongsForBook: () => LegacyMusic[] };
+    const module = (await import(`../../../books/${bookSlug}/getBackgroundSongsForBook`)) as {
+      getBackgroundSongsForBook: () => LegacyMusic[];
+    };
     musicTracks = module.getBackgroundSongsForBook();
   } catch {
     console.log("  No getBackgroundSongsForBook.ts found (skipping)");
@@ -662,7 +753,12 @@ async function step5_ImportMusic(): Promise<number> {
     for (const file of track.files) {
       const basename = path.basename(file);
       if (uploadedFiles.has(basename)) {
-        cues.push({ bookPath: BOOK_PATH, fileBasename: basename, chapter: track.chapter, paragraph: track.paragraph });
+        cues.push({
+          bookPath: BOOK_PATH,
+          fileBasename: basename,
+          chapter: track.chapter,
+          paragraph: track.paragraph,
+        });
       }
     }
   }
@@ -681,7 +777,9 @@ async function step6_ImportNotes(): Promise<number> {
   // Load notes from legacy file
   let allNotes: LegacyNote[] = [];
   try {
-    const module = (await import(`../../../books/${bookSlug}/getNotes`)) as { getNotes: () => LegacyNote[] };
+    const module = (await import(`../../../books/${bookSlug}/getNotes`)) as {
+      getNotes: () => LegacyNote[];
+    };
     allNotes = module.getNotes();
   } catch {
     console.log("  No getNotes.ts found (skipping)");
@@ -702,12 +800,15 @@ async function step6_ImportNotes(): Promise<number> {
   }
 
   // Scan chapters for note references
-  const notesToInsert: { bookPath: string; noteId: string; content: string; chapter: number }[] = [];
+  const notesToInsert: { bookPath: string; noteId: string; content: string; chapter: number }[] =
+    [];
 
   const usedNoteIds = new Set<string>();
 
   if (fs.existsSync(CONTENT_DIR)) {
-    const chapterFiles = fs.readdirSync(CONTENT_DIR).filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
+    const chapterFiles = fs
+      .readdirSync(CONTENT_DIR)
+      .filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
     chapterFiles.sort((a, b) => {
       const numA = parseInt(a.match(/chapter(\d+)/)?.[1] || "0");
       const numB = parseInt(b.match(/chapter(\d+)/)?.[1] || "0");
@@ -725,7 +826,12 @@ async function step6_ImportNotes(): Promise<number> {
       for (const noteId of noteIds) {
         const note = noteMap.get(noteId);
         if (note && !usedNoteIds.has(noteId)) {
-          notesToInsert.push({ bookPath: BOOK_PATH, noteId: note.id, content: note.content, chapter: chapterNum });
+          notesToInsert.push({
+            bookPath: BOOK_PATH,
+            noteId: note.id,
+            content: note.content,
+            chapter: chapterNum,
+          });
           usedNoteIds.add(noteId);
         }
       }
@@ -760,7 +866,9 @@ async function step7_ImportVariants(): Promise<number> {
   // Load variants from legacy file
   let allVariants: LegacyVariant[] = [];
   try {
-    const module = (await import(`../../../books/${bookSlug}/getAllVariants`)) as { getAllVariants: () => LegacyVariant[] };
+    const module = (await import(`../../../books/${bookSlug}/getAllVariants`)) as {
+      getAllVariants: () => LegacyVariant[];
+    };
     allVariants = module.getAllVariants();
   } catch {
     console.log("  No getAllVariants.ts found (skipping)");
@@ -775,7 +883,12 @@ async function step7_ImportVariants(): Promise<number> {
   console.log(`  Found ${allVariants.length} variants in getAllVariants.ts`);
 
   // Transform and prepare for insertion
-  const variantsToInsert: { bookPath: string; variantId: string; chapter: number; simplifications: { score: number; sentences: string[] }[] }[] = [];
+  const variantsToInsert: {
+    bookPath: string;
+    variantId: string;
+    chapter: number;
+    simplifications: { score: number; sentences: string[] }[];
+  }[] = [];
 
   for (const variant of allVariants) {
     // Extract chapter from ID: "ch1-p9-s1" -> 1
@@ -786,7 +899,10 @@ async function step7_ImportVariants(): Promise<number> {
       bookPath: BOOK_PATH,
       variantId: variant.id,
       chapter,
-      simplifications: variant.simplifications.map((s) => ({ score: s.score, sentences: s.sentences })),
+      simplifications: variant.simplifications.map((s) => ({
+        score: s.score,
+        sentences: s.sentences,
+      })),
     });
   }
 

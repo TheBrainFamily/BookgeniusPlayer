@@ -2,7 +2,15 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect } from "vitest";
-import { compareStructure, injectAvatarShells, injectDataIndex, normalizeChapterHtml, normalizeChapterHtmlEnhanced, sanitizeHtml, stripCharacterMarkup } from "../htmlNormalizer";
+import {
+  compareStructure,
+  injectAvatarShells,
+  injectDataIndex,
+  normalizeChapterHtml,
+  normalizeChapterHtmlEnhanced,
+  sanitizeHtml,
+  stripCharacterMarkup,
+} from "../htmlNormalizer";
 
 const parseSection = (html: string): { doc: Document; section: Element } => {
   const parser = new DOMParser();
@@ -53,7 +61,8 @@ describe("stripCharacterMarkup", () => {
 describe("compareStructure", () => {
   it("returns match=true when only character markup differs", () => {
     const original = "<p>Hello Alice, said Bob.</p>";
-    const withChars = '<p data-speaker="bob">Hello <span data-c="alice">Alice</span>, said <span data-c="bob">Bob</span>.</p>';
+    const withChars =
+      '<p data-speaker="bob">Hello <span data-c="alice">Alice</span>, said <span data-c="bob">Bob</span>.</p>';
     expect(compareStructure(original, withChars).match).toBe(true);
   });
 
@@ -314,8 +323,12 @@ describe("injectAvatarShells", () => {
     const result = applyAvatarShells(input);
     const placeholderMatches = result.match(/character-placeholder/g) || [];
     expect(placeholderMatches.length).toBe(2);
-    expect(result).toContain('<p data-speaker="pooh" class="has-speaker"><span class="character-placeholder');
-    expect(result).toContain('<p data-speaker="piglet" class="has-speaker"><span class="character-placeholder');
+    expect(result).toContain(
+      '<p data-speaker="pooh" class="has-speaker"><span class="character-placeholder',
+    );
+    expect(result).toContain(
+      '<p data-speaker="piglet" class="has-speaker"><span class="character-placeholder',
+    );
     expect(result).toContain('<tr data-speaker="heffalump" class="has-speaker">');
     expect(result).not.toContain('<tr data-speaker="heffalump" class="has-speaker"><span');
   });
@@ -357,7 +370,9 @@ describe("normalizeChapterHtmlEnhanced", () => {
         <p>After the drama.</p>
       </section>
     `;
-    const result = normalizeChapterHtmlEnhanced(input, { speakerDisplayNames: new Map([["pooh", "Pooh"]]) });
+    const result = normalizeChapterHtmlEnhanced(input, {
+      speakerDisplayNames: new Map([["pooh", "Pooh"]]),
+    });
     const { section } = parseSection(result);
 
     const playRow = section.querySelector(".play-row");
@@ -372,7 +387,9 @@ describe("normalizeChapterHtmlEnhanced", () => {
     const placeholder = playRow?.querySelector(".character-avatar .character-placeholder");
     expect(placeholder?.getAttribute("data-character")).toBe("pooh");
 
-    const narration = Array.from(section.querySelectorAll("p")).find((p) => p.textContent?.includes("After"));
+    const narration = Array.from(section.querySelectorAll("p")).find((p) =>
+      p.textContent?.includes("After"),
+    );
     expect(narration?.getAttribute("data-index")).toBeTruthy();
     expect(section.getAttribute("data-chapter-format")).toBe("mixed");
   });
@@ -482,12 +499,16 @@ describe("normalizeChapterHtmlEnhanced", () => {
 
       // First play-row should have 2 content paragraphs
       const firstPlayRow = playRows[0];
-      const firstContentPs = firstPlayRow.querySelectorAll(".character-text p[data-is-character='false']");
+      const firstContentPs = firstPlayRow.querySelectorAll(
+        ".character-text p[data-is-character='false']",
+      );
       expect(firstContentPs.length).toBe(2);
 
       // Second play-row should have 1 content paragraph
       const secondPlayRow = playRows[1];
-      const secondContentPs = secondPlayRow.querySelectorAll(".character-text p[data-is-character='false']");
+      const secondContentPs = secondPlayRow.querySelectorAll(
+        ".character-text p[data-is-character='false']",
+      );
       expect(secondContentPs.length).toBe(1);
     });
 

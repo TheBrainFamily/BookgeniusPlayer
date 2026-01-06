@@ -61,7 +61,9 @@ describe("SE Converter", () => {
       expect(result.lastChapter).toBe(2);
       expect(result.textHtml).toContain('data-chapter="1"');
       expect(result.textHtml).toContain('data-chapter="2"');
-      expect(result.textHtml.indexOf("Chapter One")).toBeLessThan(result.textHtml.indexOf("Chapter Two"));
+      expect(result.textHtml.indexOf("Chapter One")).toBeLessThan(
+        result.textHtml.indexOf("Chapter Two"),
+      );
     });
   });
 
@@ -476,7 +478,9 @@ describe("SE Converter", () => {
       expect(result.textHtml).toContain("When shall we three meet again");
       expect(result.textHtml).toContain("When the hurlyburly");
       // Count the paragraphs - should have speaker label + 2 verse paragraphs
-      const speakerDivMatch = result.textHtml.match(/data-speaker="first-witch"[\s\S]*?(?=<\/div>|$)/);
+      const speakerDivMatch = result.textHtml.match(
+        /data-speaker="first-witch"[\s\S]*?(?=<\/div>|$)/,
+      );
       expect(speakerDivMatch).toBeTruthy();
       const pCount = (speakerDivMatch![0].match(/<p/g) || []).length;
       expect(pCount).toBeGreaterThanOrEqual(3); // 1 label + 2 verse lines

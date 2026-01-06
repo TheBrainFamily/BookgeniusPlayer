@@ -5,13 +5,27 @@
  * Used by UI components to render appropriate views (book dashboard, character grid, etc.)
  */
 
-import { type FolderExtra, type CharacterAssetType, isBookFolder, isCharacterFolder, getCharacterAssetType } from "../types/book";
+import {
+  type FolderExtra,
+  type CharacterAssetType,
+  isBookFolder,
+  isCharacterFolder,
+  getCharacterAssetType,
+} from "../types/book";
 
 // =============================================================================
 // Folder Type Detection
 // =============================================================================
 
-export type DetectedFolderType = "book" | "character" | "characters-container" | "chapters-container" | "backgrounds-container" | "music-container" | "books-root" | "unknown";
+export type DetectedFolderType =
+  | "book"
+  | "character"
+  | "characters-container"
+  | "chapters-container"
+  | "backgrounds-container"
+  | "music-container"
+  | "books-root"
+  | "unknown";
 
 /**
  * Detect the type of folder based on its path and extra field.
@@ -102,7 +116,12 @@ export function parseCharacterPath(path: string): ParsedCharacterPath | null {
     return null;
   }
 
-  return { bookSlug: segments[1], bookPath: `books/${segments[1]}`, characterSlug: segments[3], characterPath: `books/${segments[1]}/characters/${segments[3]}` };
+  return {
+    bookSlug: segments[1],
+    bookPath: `books/${segments[1]}`,
+    characterSlug: segments[3],
+    characterPath: `books/${segments[1]}/characters/${segments[3]}`,
+  };
 }
 
 /**
@@ -148,7 +167,13 @@ export function checkCharacterBundle(assetBasenames: string[]): CharacterBundleC
   if (!found.speaks) missing.push("speaks");
   if (!found.listens) missing.push("listens");
 
-  return { hasAvatar: found.avatar, hasSpeaks: found.speaks, hasListens: found.listens, isComplete: missing.length === 0, missing };
+  return {
+    hasAvatar: found.avatar,
+    hasSpeaks: found.speaks,
+    hasListens: found.listens,
+    isComplete: missing.length === 0,
+    missing,
+  };
 }
 
 /**

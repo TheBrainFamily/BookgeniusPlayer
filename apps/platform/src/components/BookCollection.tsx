@@ -53,21 +53,34 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   };
 
   return (
-    <section id="book-collection" className="py-16 px-0 md:px-8 m-auto max-w-[400px] sm:max-w-[1400px] min-h-[80vh] flex items-center justify-center">
+    <section
+      id="book-collection"
+      className="py-16 px-0 md:px-8 m-auto max-w-[400px] sm:max-w-[1400px] min-h-[80vh] flex items-center justify-center"
+    >
       <div className="container mx-auto px-0">
         <div className="text-center mb-12 px-4 md:px-0">
           <h2 className="text-4xl font-bold text-foreground mb-4">
             {searchQuery ? (
               <>
-                {t("collection.searchResults").split(" ")[0]} <span className="text-library-gold">{t("collection.searchResults").split(" ")[1]}</span>
+                {t("collection.searchResults").split(" ")[0]}{" "}
+                <span className="text-library-gold">
+                  {t("collection.searchResults").split(" ")[1]}
+                </span>
               </>
             ) : (
               <>
-                {t("collection.ourCollection").split(" ")[0]} <span className="text-library-gold">{t("collection.ourCollection").split(" ")[1]}</span>
+                {t("collection.ourCollection").split(" ")[0]}{" "}
+                <span className="text-library-gold">
+                  {t("collection.ourCollection").split(" ")[1]}
+                </span>
               </>
             )}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{searchQuery ? `${t("collection.searchResultsFor")} "${searchQuery}"` : t("collection.description")}</p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            {searchQuery
+              ? `${t("collection.searchResultsFor")} "${searchQuery}"`
+              : t("collection.description")}
+          </p>
         </div>
 
         {filteredBooks.length === 0 ? (
@@ -80,7 +93,15 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
             {filteredBooks
-              .map((book) => <BookCard key={book.id} book={book} variant="default" showLanguageFlag onClick={handleBookClick} />)
+              .map((book) => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  variant="default"
+                  showLanguageFlag
+                  onClick={handleBookClick}
+                />
+              ))
               .sort((a, b) => {
                 const aPref = a.props.book.language === language ? 0 : 1;
                 const bPref = b.props.book.language === language ? 0 : 1;

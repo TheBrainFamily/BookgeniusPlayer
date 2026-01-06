@@ -4,17 +4,15 @@ type AuthComponentsWrapperProps = {
   componentName: string;
   useAuth: () => AuthCtx;
   fallbackComponent: React.ComponentType;
-}
+};
 
 const Wrapper = ({ children }) => (
-  <div className="min-h-screen flex items-center justify-center">
-    {children}
-  </div>
+  <div className="min-h-screen flex items-center justify-center">{children}</div>
 );
 
 const AuthComponentsWrapper = (props: AuthComponentsWrapperProps) => {
   const { componentName, useAuth, fallbackComponent: FallbackComponent } = props;
-  const Fallback = () => FallbackComponent ? <FallbackComponent /> : null;
+  const Fallback = () => (FallbackComponent ? <FallbackComponent /> : null);
   const authContext = useAuth();
 
   if (!componentName) {
@@ -22,7 +20,7 @@ const AuthComponentsWrapper = (props: AuthComponentsWrapperProps) => {
   }
 
   if (!authContext.ready) {
-    return null
+    return null;
   }
 
   const ComponentToRender = authContext.components?.[componentName];
@@ -31,10 +29,10 @@ const AuthComponentsWrapper = (props: AuthComponentsWrapperProps) => {
   }
 
   return (
-      <Wrapper>
-        <ComponentToRender />
-      </Wrapper>
-    );
-}
+    <Wrapper>
+      <ComponentToRender />
+    </Wrapper>
+  );
+};
 
 export default AuthComponentsWrapper;

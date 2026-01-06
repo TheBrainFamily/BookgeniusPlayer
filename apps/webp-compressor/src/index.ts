@@ -15,7 +15,10 @@ import WEBP_ENC_WASM from "../../../node_modules/@jsquash/webp/codec/enc/webp_en
 // @ts-expect-error - WASM module imports
 import RESIZE_WASM from "../../../node_modules/@jsquash/resize/lib/resize/squoosh_resize_bg.wasm";
 
-function extractDominantColor(imageData: ImageData): { backgroundColor: string; textColor: string } {
+function extractDominantColor(imageData: ImageData): {
+  backgroundColor: string;
+  textColor: string;
+} {
   const { data, width, height } = imageData;
   const step = Math.max(1, Math.floor(Math.min(width, height) / 20));
 
@@ -57,19 +60,27 @@ export default {
     const expectedToken = `Bearer ${env.WEBP_API_SECRET}`;
 
     if (!authHeader || authHeader !== expectedToken) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const startTime = Date.now();
 
     const url = new URL(request.url);
     const sourceUrl = url.searchParams.get("url");
-    const maxWidth = url.searchParams.get("maxWidth") ? parseInt(url.searchParams.get("maxWidth")!, 10) : null;
+    const maxWidth = url.searchParams.get("maxWidth")
+      ? parseInt(url.searchParams.get("maxWidth")!, 10)
+      : null;
     const quality = parseInt(url.searchParams.get("quality") || "80", 10);
     const extractColors = url.searchParams.get("extractColors") === "true";
 
     if (!sourceUrl) {
-      return new Response(JSON.stringify({ error: "Missing ?url= parameter" }), { status: 400, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "Missing ?url= parameter" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     try {
@@ -149,7 +160,10 @@ export default {
         },
       });
     } catch (error) {
-      return new Response(JSON.stringify({ error: String(error) }), { status: 500, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: String(error) }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
   },
 };

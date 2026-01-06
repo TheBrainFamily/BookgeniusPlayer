@@ -32,9 +32,20 @@ interface CharacterModalProps {
 }
 
 const findLatestSummaryInRange = (character: CharacterData, endChapter: number) =>
-  character.infoPerChapter.filter((info) => info.chapter <= endChapter).sort((a, b) => b.chapter - a.chapter)[0]?.summary ?? "";
+  character.infoPerChapter
+    .filter((info) => info.chapter <= endChapter)
+    .sort((a, b) => b.chapter - a.chapter)[0]?.summary ?? "";
 
-const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, mediaSrc, characterSlug, endChapter, chapter, paragraph, isTalking }) => {
+const CharacterModal: React.FC<CharacterModalProps> = ({
+  onClose,
+  isVideo,
+  mediaSrc,
+  characterSlug,
+  endChapter,
+  chapter,
+  paragraph,
+  isTalking,
+}) => {
   const { t } = useTranslation();
 
   const { setValue } = useBottomInput();
@@ -42,8 +53,14 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const { pauseAllTimers, showAllElements } = useElementVisibilityStore();
   const { charactersData } = useBookConvex();
 
-  const matchingCharacter = useMemo(() => charactersData.find((c) => c.slug === characterSlug), [characterSlug, charactersData]);
-  const latestSummary = useMemo(() => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""), [matchingCharacter, endChapter]);
+  const matchingCharacter = useMemo(
+    () => charactersData.find((c) => c.slug === characterSlug),
+    [characterSlug, charactersData],
+  );
+  const latestSummary = useMemo(
+    () => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""),
+    [matchingCharacter, endChapter],
+  );
 
   const locationRef = useMemo(() => {
     if (typeof chapter === "number" && typeof paragraph === "number") {
@@ -58,13 +75,25 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   const snapshot = useMemo(
     () =>
       matchingCharacter
-        ? resolveCharacterSnapshot(matchingCharacter, { location: locationRef, baseSummary: latestSummary, fallbackDisplayName: matchingCharacter.characterName })
+        ? resolveCharacterSnapshot(matchingCharacter, {
+            location: locationRef,
+            baseSummary: latestSummary,
+            fallbackDisplayName: matchingCharacter.characterName,
+          })
         : null,
     [matchingCharacter, locationRef, latestSummary],
   );
 
   const svgFallback = useMemo(
-    () => (matchingCharacter ? getAvatarSource({ slug: matchingCharacter.slug, characterName: matchingCharacter.characterName, bookSlug: "", infoPerChapter: [] }) : null),
+    () =>
+      matchingCharacter
+        ? getAvatarSource({
+            slug: matchingCharacter.slug,
+            characterName: matchingCharacter.characterName,
+            bookSlug: "",
+            infoPerChapter: [],
+          })
+        : null,
     [matchingCharacter],
   );
 
@@ -78,7 +107,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     const url = isTalking ? snapshot.media.talking : snapshot.media.listening;
     return url || svgFallback;
   }, [snapshot, mediaSrc, isTalking, svgFallback]);
-  const resolvedIsVideo = useMemo(() => (resolvedMediaSrc ? isVideoFile(resolvedMediaSrc) : isVideo), [resolvedMediaSrc, isVideo]);
+  const resolvedIsVideo = useMemo(
+    () => (resolvedMediaSrc ? isVideoFile(resolvedMediaSrc) : isVideo),
+    [resolvedMediaSrc, isVideo],
+  );
 
   const [characterAppearances, setCharacterAppearances] = useState<SearchResultItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +123,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
     setIsLoading(true);
 
     try {
-      const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "spotlight", limit: 3 });
+      const searchResults = findCharacterSentences(characterSlug, furthestLocation, {
+        mode: "spotlight",
+        limit: 3,
+      });
       setCharacterAppearances(searchResults.items);
     } catch (err) {
       console.error("Error searching for character appearances:", err);
@@ -102,16 +137,25 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
   }, [matchingCharacter, characterSlug]);
 
   const handleAppearanceClick = (appearance: SearchResultItemData) => {
-    void systemNavigateTo({ currentChapter: appearance.chapter, currentParagraph: appearance.paragraphNumber });
+    void systemNavigateTo({
+      currentChapter: appearance.chapter,
+      currentParagraph: appearance.paragraphNumber,
+    });
 
     if (matchingCharacter?.characterName) {
-      highlightSearchInParagraph(appearance.chapter, appearance.paragraphNumber, matchingCharacter.characterName);
+      highlightSearchInParagraph(
+        appearance.chapter,
+        appearance.paragraphNumber,
+        matchingCharacter.characterName,
+      );
     }
     const character = `@${matchingCharacter.characterName}`;
     setValue(character);
     const furthestLocation = getSavedLocation();
     setLastClickedAppearanceId(appearance.id);
-    const searchResults = findCharacterSentences(characterSlug, furthestLocation, { mode: "chronological" });
+    const searchResults = findCharacterSentences(characterSlug, furthestLocation, {
+      mode: "chronological",
+    });
     setResults(searchResults);
     openSearchModal(true, true, character);
     pauseAllTimers();
@@ -161,22 +205,44 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
           onPointerUp={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-center gap-2">
-            <h4 className="px-5 text-lg font-bold text-white">{snapshot?.displayName ?? matchingCharacter.characterName}</h4>
+            <h4 className="px-5 text-lg font-bold text-white">
+              {snapshot?.displayName ?? matchingCharacter.characterName}
+            </h4>
           </div>
 
           <div className="flex flex-col gap-3 px-1 min-h-0">
-            <p className="text-center text-white/90 text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: snapshot?.summary ?? latestSummary }} />
+            <p
+              className="text-center text-white/90 text-sm sm:text-base"
+              dangerouslySetInnerHTML={{ __html: snapshot?.summary ?? latestSummary }}
+            />
 
             {(isLoading || characterAppearances.length > 0) && (
-              <motion.div className="mt flex flex-col gap-2 min-h-0" variants={variants.appearances}>
-                <h5 className="text-sm sm:text-md font-semibold text-white mb-2 text-center">{t("appearances")}</h5>
+              <motion.div
+                className="mt flex flex-col gap-2 min-h-0"
+                variants={variants.appearances}
+              >
+                <h5 className="text-sm sm:text-md font-semibold text-white mb-2 text-center">
+                  {t("appearances")}
+                </h5>
 
                 {isLoading ? (
-                  <motion.div className="flex flex-col items-center justify-center py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div
+                    className="flex flex-col items-center justify-center py-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
                     <div className="relative">
-                      <motion.div className="w-8 h-8 border-3 rounded-full border-book-primary-30 border-t-book-primary" variants={variants.loading} />
+                      <motion.div
+                        className="w-8 h-8 border-3 rounded-full border-book-primary-30 border-t-book-primary"
+                        variants={variants.loading}
+                      />
                     </div>
-                    <motion.div className="mt-2 text-white/90 text-xs sm:text-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                    <motion.div
+                      className="mt-2 text-white/90 text-xs sm:text-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
                       {t("searching_appearances")}
                     </motion.div>
                   </motion.div>
@@ -207,14 +273,22 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
                             <div className="flex gap-2 mb-2">
                               {appearance.type && (
                                 <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary items-center">
-                                  <span>{t(FILTER_OPTIONS.find((option) => option.id.toLowerCase() === appearance.type.toLowerCase())?.translationKey) ?? appearance.type}</span>
+                                  <span>
+                                    {t(
+                                      FILTER_OPTIONS.find(
+                                        (option) =>
+                                          option.id.toLowerCase() === appearance.type.toLowerCase(),
+                                      )?.translationKey,
+                                    ) ?? appearance.type}
+                                  </span>
                                 </div>
                               )}
                               <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary overflow-hidden">
                                 <span className="flex items-center gap-1 min-w-0">
                                   <FileText size={12} className="flex-shrink-0" />
                                   <span className="line-clamp-1">
-                                    {appearance.percentInChapter}% {t("of_chapter")} {getChapterTitle(appearance.chapter, t)}
+                                    {appearance.percentInChapter}% {t("of_chapter")}{" "}
+                                    {getChapterTitle(appearance.chapter, t)}
                                   </span>
                                 </span>
                               </div>
@@ -269,19 +343,35 @@ const CharacterModal: React.FC<CharacterModalProps> = ({ onClose, isVideo, media
 const variants: Record<string, Variants> = {
   container: {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut", staggerChildren: 0.1 } },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.3, ease: "easeOut", staggerChildren: 0.1 },
+    },
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   },
-  media: { hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } } },
-  content: { hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut", delay: 0.1 } } },
-  appearances: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut", delay: 0.2 } } },
+  media: {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+  },
+  content: {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut", delay: 0.1 } },
+  },
+  appearances: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut", delay: 0.2 } },
+  },
   item: {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
     hover: { scale: 0.98, transition: { duration: 0.2, ease: "easeInOut" } },
     tap: { scale: 0.95, transition: { duration: 0.1 } },
   },
-  loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
+  loading: {
+    initial: { rotate: 0 },
+    animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } },
+  },
 };
 
 export default CharacterModal;

@@ -1,7 +1,14 @@
 import { getBookData } from "../shared-books-data/getBooksData";
-import { getParagraphsFromChapterWithText, getSectionAttributes } from "./getParagraphsFromChapterWithText";
+import {
+  getParagraphsFromChapterWithText,
+  getSectionAttributes,
+} from "./getParagraphsFromChapterWithText";
 
-export const getParagraphsFromChapter = (chapter: number, clean: boolean = false, pureText = false) => {
+export const getParagraphsFromChapter = (
+  chapter: number,
+  clean: boolean = false,
+  pureText = false,
+) => {
   const { bookText } = getBookData();
   return getParagraphsFromChapterWithText(chapter, bookText, clean, pureText);
 };

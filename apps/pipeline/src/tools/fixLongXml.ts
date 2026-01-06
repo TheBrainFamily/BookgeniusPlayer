@@ -64,7 +64,9 @@ function formatSource(xml: string): string {
   const serializer = new XMLSerializer();
 
   // If the file is just one <Chapter>, format that; otherwise format all Chapters found.
-  const chapters = Array.from(doc.getElementsByTagName("Chapter") as unknown as HTMLCollectionOf<Element>);
+  const chapters = Array.from(
+    doc.getElementsByTagName("Chapter") as unknown as HTMLCollectionOf<Element>,
+  );
   if (!chapters.length) return xml;
 
   // If the document *is* a single <Chapter> root:

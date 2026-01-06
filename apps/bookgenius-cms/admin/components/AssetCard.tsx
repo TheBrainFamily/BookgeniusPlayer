@@ -1,8 +1,24 @@
-import { Image, Music, Video, FileText, FileJson, Package, MoreVertical, Eye, Upload, Pencil } from "lucide-react";
+import {
+  Image,
+  Music,
+  Video,
+  FileText,
+  FileJson,
+  Package,
+  MoreVertical,
+  Eye,
+  Upload,
+  Pencil,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getContentTypeCategory, formatBytes } from "@/lib/utils";
 
 export interface AssetData {
@@ -24,7 +40,14 @@ interface AssetCardProps {
   onRename?: () => void;
 }
 
-const typeIcons = { image: Image, audio: Music, video: Video, text: FileText, json: FileJson, other: Package };
+const typeIcons = {
+  image: Image,
+  audio: Music,
+  video: Video,
+  text: FileText,
+  json: FileJson,
+  other: Package,
+};
 
 const typeColors = {
   image: "bg-info/20 text-info",
@@ -35,7 +58,10 @@ const typeColors = {
   other: "bg-accent text-accent-foreground",
 };
 
-function getAssetStatus(asset: AssetData): { label: string; variant: "published" | "draft" | "muted" } {
+function getAssetStatus(asset: AssetData): {
+  label: string;
+  variant: "published" | "draft" | "muted";
+} {
   if (asset.versionCounter === 0) {
     return { label: "Empty", variant: "muted" };
   }
@@ -68,7 +94,11 @@ export function AssetCard({ asset, publishedInfo, onClick, onUpload, onRename }:
       {/* Thumbnail */}
       <div className="aspect-video bg-surface-2 relative overflow-hidden">
         {isImage ? (
-          <img src={publishedInfo.url} alt={asset.basename} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          <img
+            src={publishedInfo.url}
+            alt={asset.basename}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Icon className="h-12 w-12 text-muted-foreground/50" />
@@ -76,7 +106,12 @@ export function AssetCard({ asset, publishedInfo, onClick, onUpload, onRename }:
         )}
         {/* Type badge overlay */}
         <div className="absolute top-2 left-2">
-          <div className={cn("flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-sm", typeColors[category])}>
+          <div
+            className={cn(
+              "flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium backdrop-blur-sm",
+              typeColors[category],
+            )}
+          >
             <Icon className="h-3 w-3" />
             <span className="capitalize">{category}</span>
           </div>

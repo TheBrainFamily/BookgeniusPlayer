@@ -3,13 +3,33 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { queries } from "@/lib/queries";
-import { Grid3X3, List, Search, X, Plus, Upload, Code, FolderOpen, Folder, ChevronRight, Loader2, Check, Clock } from "lucide-react";
+import {
+  Grid3X3,
+  List,
+  Search,
+  X,
+  Plus,
+  Upload,
+  Code,
+  FolderOpen,
+  Folder,
+  ChevronRight,
+  Loader2,
+  Check,
+  Clock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { AssetCard, type AssetData } from "./AssetCard";
 import { AssetListRow } from "./AssetListRow";
@@ -34,7 +54,15 @@ interface FolderData {
 }
 
 // Folder card for grid view
-function FolderGridItem({ folder, onClick, onMouseEnter }: { folder: FolderData; onClick: () => void; onMouseEnter?: () => void }) {
+function FolderGridItem({
+  folder,
+  onClick,
+  onMouseEnter,
+}: {
+  folder: FolderData;
+  onClick: () => void;
+  onMouseEnter?: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -58,7 +86,15 @@ function FolderGridItem({ folder, onClick, onMouseEnter }: { folder: FolderData;
 }
 
 // Folder row for list view
-function FolderListItem({ folder, onClick, onMouseEnter }: { folder: FolderData; onClick: () => void; onMouseEnter?: () => void }) {
+function FolderListItem({
+  folder,
+  onClick,
+  onMouseEnter,
+}: {
+  folder: FolderData;
+  onClick: () => void;
+  onMouseEnter?: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -98,7 +134,10 @@ interface UploadItem {
 }
 
 // Helper to recursively read directory entries from drag-and-drop
-async function getFilesFromEntry(entry: FileSystemEntry, basePath: string): Promise<{ file: File; relativePath: string }[]> {
+async function getFilesFromEntry(
+  entry: FileSystemEntry,
+  basePath: string,
+): Promise<{ file: File; relativePath: string }[]> {
   if (entry.isFile) {
     const fileEntry = entry as FileSystemFileEntry;
     const file = await new Promise<File>((resolve, reject) => fileEntry.file(resolve, reject));
@@ -134,14 +173,25 @@ async function getFilesFromEntry(entry: FileSystemEntry, basePath: string): Prom
   return [];
 }
 
-export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadNew, onCreateAsset, onCreateFolder, onShowSnippet }: AssetListProps) {
+export function AssetList({
+  folderPath,
+  onAssetSelect,
+  onFolderSelect,
+  onUploadNew,
+  onCreateAsset,
+  onCreateFolder,
+  onShowSnippet,
+}: AssetListProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<ContentTypeFilter>("all");
   const [dragOver, setDragOver] = useState(false);
   const [uploadQueue, setUploadQueue] = useState<UploadItem[]>([]);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const [assetToRename, setAssetToRename] = useState<{ folderPath: string; basename: string } | null>(null);
+  const [assetToRename, setAssetToRename] = useState<{
+    folderPath: string;
+    basename: string;
+  } | null>(null);
   const [newBasename, setNewBasename] = useState("");
   const [isRenaming, setIsRenaming] = useState(false);
 
@@ -160,10 +210,18 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
 
       try {
         // 1. Start upload
-        const { intentId, uploadUrl, backend } = await startUpload({ folderPath: item.targetFolder, basename: item.file.name, publish: true });
+        const { intentId, uploadUrl, backend } = await startUpload({
+          folderPath: item.targetFolder,
+          basename: item.file.name,
+          publish: true,
+        });
 
         // 2. Upload file - R2 uses PUT, Convex uses POST
-        const res = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": item.file.type }, body: item.file });
+        const res = await fetch(uploadUrl, {
+          method: backend === "r2" ? "PUT" : "POST",
+          headers: { "Content-Type": item.file.type },
+          body: item.file,
+        });
 
         if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
 
@@ -171,11 +229,20 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
         const uploadResponse = backend === "convex" ? await res.json() : undefined;
 
         // 4. Finish upload with file metadata (include folderPath/basename for post-upload hooks)
-        await finishUpload({ intentId, uploadResponse, size: item.file.size, contentType: item.file.type, folderPath: item.targetFolder, basename: item.file.name });
+        await finishUpload({
+          intentId,
+          uploadResponse,
+          size: item.file.size,
+          contentType: item.file.type,
+          folderPath: item.targetFolder,
+          basename: item.file.name,
+        });
 
         setUploadQueue((q) => q.map((i) => (i.id === item.id ? { ...i, status: "done" } : i)));
       } catch (error) {
-        setUploadQueue((q) => q.map((i) => (i.id === item.id ? { ...i, status: "error", error: String(error) } : i)));
+        setUploadQueue((q) =>
+          q.map((i) => (i.id === item.id ? { ...i, status: "error", error: String(error) } : i)),
+        );
       }
     },
     [startUpload, finishUpload],
@@ -185,7 +252,9 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
   const processUploadQueue = useCallback(
     async (queue: UploadItem[]) => {
       // Collect unique folder paths that need to be created
-      const uniqueFolders = [...new Set(queue.map((q) => q.targetFolder).filter((f) => f && f !== folderPath))];
+      const uniqueFolders = [
+        ...new Set(queue.map((q) => q.targetFolder).filter((f) => f && f !== folderPath)),
+      ];
       // Sort by depth so parents are created first
       uniqueFolders.sort((a, b) => a.split("/").length - b.split("/").length);
 
@@ -259,9 +328,19 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
             for (const { file, relativePath } of files) {
               const pathParts = relativePath.split("/");
               pathParts.pop(); // Remove filename
-              const subfolderPath = pathParts.length > 0 ? (folderPath ? `${folderPath}/${pathParts.join("/")}` : pathParts.join("/")) : folderPath;
+              const subfolderPath =
+                pathParts.length > 0
+                  ? folderPath
+                    ? `${folderPath}/${pathParts.join("/")}`
+                    : pathParts.join("/")
+                  : folderPath;
 
-              filesToUpload.push({ id: crypto.randomUUID(), file, targetFolder: subfolderPath, status: "pending" });
+              filesToUpload.push({
+                id: crypto.randomUUID(),
+                file,
+                targetFolder: subfolderPath,
+                status: "pending",
+              });
             }
           } catch (err) {
             toast.error(`Failed to read folder: ${entry.name}`);
@@ -270,7 +349,12 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
           // Regular file
           const file = item.getAsFile();
           if (file) {
-            filesToUpload.push({ id: crypto.randomUUID(), file, targetFolder: folderPath, status: "pending" });
+            filesToUpload.push({
+              id: crypto.randomUUID(),
+              file,
+              targetFolder: folderPath,
+              status: "pending",
+            });
           }
         }
       }
@@ -305,7 +389,11 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
 
     setIsRenaming(true);
     try {
-      await renameAssetMutation({ folderPath: assetToRename.folderPath, basename: assetToRename.basename, newBasename: newBasename.trim() });
+      await renameAssetMutation({
+        folderPath: assetToRename.folderPath,
+        basename: assetToRename.basename,
+        newBasename: newBasename.trim(),
+      });
       toast.success(`Renamed to "${newBasename.trim()}"`);
       // Invalidate queries to refresh the asset list
       queryClient.invalidateQueries({ queryKey: ["assets", folderPath] });
@@ -331,7 +419,9 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
   // Non-suspense queries so SSR renders instantly with loading state
   const { data: subfolders, isLoading: subfoldersLoading } = useQuery(queries.folders(folderPath));
   const { data: assets, isLoading: assetsLoading } = useQuery(queries.assets(folderPath));
-  const { data: publishedFiles, isLoading: publishedLoading } = useQuery(queries.publishedFilesInFolder(folderPath));
+  const { data: publishedFiles, isLoading: publishedLoading } = useQuery(
+    queries.publishedFilesInFolder(folderPath),
+  );
 
   // All hooks must be called before any conditional returns
   // Create a lookup map for published info
@@ -348,7 +438,9 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
   const filteredFolders = useMemo(() => {
     if (!subfolders) return [];
     if (!searchQuery) return subfolders;
-    return subfolders.filter((folder) => folder.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return subfolders.filter((folder) =>
+      folder.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
   }, [subfolders, searchQuery]);
 
   // Filter assets
@@ -383,7 +475,12 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
   const hasNoContent = assets.length === 0 && subfolders.length === 0;
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden relative" onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+    <div
+      className="flex-1 flex flex-col h-full overflow-hidden relative"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Drop zone overlay - shown when dragging */}
       {dragOver && uploadQueue.length === 0 && (
         <div className="absolute inset-0 z-50 pointer-events-none">
@@ -398,7 +495,9 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
               <Upload className="h-10 w-10 text-primary" />
             </div>
             <div className="text-center">
-              <p className="text-lg font-semibold text-foreground">Drop files or folders to upload</p>
+              <p className="text-lg font-semibold text-foreground">
+                Drop files or folders to upload
+              </p>
               <p className="text-sm text-muted-foreground mt-1">
                 to <span className="font-mono text-primary">{folderPath || "(root)"}</span>
               </p>
@@ -414,7 +513,11 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
             <div className="w-full max-w-md bg-card rounded-xl border border-border shadow-lg p-4">
               <div className="flex items-center gap-3 mb-4">
-                {uploadQueue.every((f) => f.status === "done") ? <Check className="h-5 w-5 text-success" /> : <Loader2 className="h-5 w-5 animate-spin text-primary" />}
+                {uploadQueue.every((f) => f.status === "done") ? (
+                  <Check className="h-5 w-5 text-success" />
+                ) : (
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                )}
                 <span className="font-medium">
                   {uploadQueue.every((f) => f.status === "done")
                     ? `Uploaded ${uploadQueue.length} file${uploadQueue.length > 1 ? "s" : ""}`
@@ -424,12 +527,20 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
               <div className="max-h-64 overflow-y-auto space-y-2">
                 {uploadQueue.map((item) => (
                   <div key={item.id} className="flex items-center gap-2 text-sm py-1">
-                    {item.status === "pending" && <Clock className="h-4 w-4 text-muted-foreground shrink-0" />}
-                    {item.status === "uploading" && <Loader2 className="h-4 w-4 animate-spin text-primary shrink-0" />}
+                    {item.status === "pending" && (
+                      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                    )}
+                    {item.status === "uploading" && (
+                      <Loader2 className="h-4 w-4 animate-spin text-primary shrink-0" />
+                    )}
                     {item.status === "done" && <Check className="h-4 w-4 text-success shrink-0" />}
                     {item.status === "error" && <X className="h-4 w-4 text-destructive shrink-0" />}
                     <span className="truncate flex-1">{item.file.name}</span>
-                    {item.targetFolder !== folderPath && <span className="text-xs text-muted-foreground shrink-0">→ {item.targetFolder.split("/").pop()}</span>}
+                    {item.targetFolder !== folderPath && (
+                      <span className="text-xs text-muted-foreground shrink-0">
+                        → {item.targetFolder.split("/").pop()}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -471,9 +582,17 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
           {/* Search */}
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search assets..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 pr-9" />
+            <Input
+              placeholder="Search assets..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9"
+            />
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
                 <X className="h-4 w-4" />
               </button>
             )}
@@ -482,7 +601,13 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
           {/* Type filters */}
           <div className="flex items-center gap-1">
             {typeFilters.map((filter) => (
-              <Button key={filter.value} variant={typeFilter === filter.value ? "secondary" : "ghost"} size="sm" onClick={() => setTypeFilter(filter.value)} className="text-xs">
+              <Button
+                key={filter.value}
+                variant={typeFilter === filter.value ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => setTypeFilter(filter.value)}
+                className="text-xs"
+              >
                 {filter.label}
               </Button>
             ))}
@@ -490,10 +615,20 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
 
           {/* View mode toggle */}
           <div className="flex items-center border border-border rounded-md">
-            <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="icon-sm" onClick={() => setViewMode("grid")} className="rounded-r-none">
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon-sm"
+              onClick={() => setViewMode("grid")}
+              className="rounded-r-none"
+            >
               <Grid3X3 className="h-4 w-4" />
             </Button>
-            <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="icon-sm" onClick={() => setViewMode("list")} className="rounded-l-none">
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="icon-sm"
+              onClick={() => setViewMode("list")}
+              className="rounded-l-none"
+            >
               <List className="h-4 w-4" />
             </Button>
           </div>
@@ -504,13 +639,21 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Filters:</span>
             {searchQuery && (
-              <Badge variant="secondary" className="text-xs cursor-pointer" onClick={() => setSearchQuery("")}>
+              <Badge
+                variant="secondary"
+                className="text-xs cursor-pointer"
+                onClick={() => setSearchQuery("")}
+              >
                 Search: {searchQuery}
                 <X className="h-3 w-3 ml-1" />
               </Badge>
             )}
             {typeFilter !== "all" && (
-              <Badge variant="secondary" className="text-xs cursor-pointer" onClick={() => setTypeFilter("all")}>
+              <Badge
+                variant="secondary"
+                className="text-xs cursor-pointer"
+                onClick={() => setTypeFilter("all")}
+              >
                 Type: {typeFilter}
                 <X className="h-3 w-3 ml-1" />
               </Badge>
@@ -528,7 +671,9 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
             </div>
             <div className="text-center">
               <h3 className="font-medium text-foreground">This folder is empty</h3>
-              <p className="text-sm text-muted-foreground mt-1">Upload an asset or create a subfolder to get started</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Upload an asset or create a subfolder to get started
+              </p>
             </div>
             <Button onClick={onUploadNew}>
               <Upload className="h-4 w-4 mr-2" />
@@ -542,7 +687,9 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
             </div>
             <div className="text-center">
               <h3 className="font-medium text-foreground">No matches found</h3>
-              <p className="text-sm text-muted-foreground mt-1">Try adjusting your search or filters</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Try adjusting your search or filters
+              </p>
             </div>
             <Button
               variant="outline"
@@ -559,18 +706,29 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
             {/* Folders first */}
             {filteredFolders.map((folder, index) => (
               <div key={folder._id} className={cn("stagger-" + Math.min(index + 1, 6))}>
-                <FolderGridItem folder={folder} onClick={() => onFolderSelect(folder.path)} onMouseEnter={() => handleFolderPrefetch(folder.path)} />
+                <FolderGridItem
+                  folder={folder}
+                  onClick={() => onFolderSelect(folder.path)}
+                  onMouseEnter={() => handleFolderPrefetch(folder.path)}
+                />
               </div>
             ))}
             {/* Then assets */}
             {filteredAssets.map((asset, index) => (
-              <div key={asset._id} className={cn("stagger-" + Math.min(index + filteredFolders.length + 1, 6))}>
+              <div
+                key={asset._id}
+                className={cn("stagger-" + Math.min(index + filteredFolders.length + 1, 6))}
+              >
                 <AssetCard
                   asset={asset as AssetData}
                   publishedInfo={publishedInfoMap.get(asset.basename)}
-                  onClick={() => onAssetSelect({ folderPath: asset.folderPath, basename: asset.basename })}
+                  onClick={() =>
+                    onAssetSelect({ folderPath: asset.folderPath, basename: asset.basename })
+                  }
                   onUpload={onUploadNew}
-                  onRename={() => handleRenameClick({ folderPath: asset.folderPath, basename: asset.basename })}
+                  onRename={() =>
+                    handleRenameClick({ folderPath: asset.folderPath, basename: asset.basename })
+                  }
                 />
               </div>
             ))}
@@ -580,18 +738,29 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
             {/* Folders first */}
             {filteredFolders.map((folder, index) => (
               <div key={folder._id} className={cn("stagger-" + Math.min(index + 1, 6))}>
-                <FolderListItem folder={folder} onClick={() => onFolderSelect(folder.path)} onMouseEnter={() => handleFolderPrefetch(folder.path)} />
+                <FolderListItem
+                  folder={folder}
+                  onClick={() => onFolderSelect(folder.path)}
+                  onMouseEnter={() => handleFolderPrefetch(folder.path)}
+                />
               </div>
             ))}
             {/* Then assets */}
             {filteredAssets.map((asset, index) => (
-              <div key={asset._id} className={cn("stagger-" + Math.min(index + filteredFolders.length + 1, 6))}>
+              <div
+                key={asset._id}
+                className={cn("stagger-" + Math.min(index + filteredFolders.length + 1, 6))}
+              >
                 <AssetListRow
                   asset={asset as AssetData}
                   publishedInfo={publishedInfoMap.get(asset.basename)}
-                  onClick={() => onAssetSelect({ folderPath: asset.folderPath, basename: asset.basename })}
+                  onClick={() =>
+                    onAssetSelect({ folderPath: asset.folderPath, basename: asset.basename })
+                  }
                   onUpload={onUploadNew}
-                  onRename={() => handleRenameClick({ folderPath: asset.folderPath, basename: asset.basename })}
+                  onRename={() =>
+                    handleRenameClick({ folderPath: asset.folderPath, basename: asset.basename })
+                  }
                 />
               </div>
             ))}
@@ -622,7 +791,11 @@ export function AssetList({ folderPath, onAssetSelect, onFolderSelect, onUploadN
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRenameDialogOpen(false)} disabled={isRenaming}>
+            <Button
+              variant="outline"
+              onClick={() => setRenameDialogOpen(false)}
+              disabled={isRenaming}
+            >
               Cancel
             </Button>
             <Button onClick={handleRenameSubmit} disabled={isRenaming || !newBasename.trim()}>

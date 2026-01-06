@@ -50,7 +50,9 @@ async function runEbookConvert(bin: string, inputPath: string, outputPath: strin
   return new Promise((resolve, reject) => {
     const child = spawn(bin, [inputPath, outputPath], { stdio: "inherit" });
     child.on("error", reject);
-    child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`ebook-convert exited with ${code}`))));
+    child.on("exit", (code) =>
+      code === 0 ? resolve() : reject(new Error(`ebook-convert exited with ${code}`)),
+    );
   });
 }
 
@@ -118,13 +120,15 @@ export const appRouter = router({
     return { rich };
   }),
 
-  saveRichXml: procedure.input(z.object({ slug: z.string(), rich: z.string() })).mutation(({ input }) => {
-    const repoRoot = path.resolve(__dirname, "../../");
-    const richPath = path.join(repoRoot, "books-data", input.slug, "input", "rich.xml");
-    ensureDir(path.dirname(richPath));
-    fs.writeFileSync(richPath, input.rich, "utf8");
-    return { ok: true };
-  }),
+  saveRichXml: procedure
+    .input(z.object({ slug: z.string(), rich: z.string() }))
+    .mutation(({ input }) => {
+      const repoRoot = path.resolve(__dirname, "../../");
+      const richPath = path.join(repoRoot, "books-data", input.slug, "input", "rich.xml");
+      ensureDir(path.dirname(richPath));
+      fs.writeFileSync(richPath, input.rich, "utf8");
+      return { ok: true };
+    }),
 
   getJobStatus: procedure.input(z.object({ jobId: z.string() })).query(({ input }) => {
     const job = jobs.get(input.jobId);
@@ -170,7 +174,9 @@ export const appRouter = router({
     .mutation(async ({ input }) => {
       const { bookSlug, chapterNumber, chapterXml, bookLanguage = "English" } = input;
 
-      console.log(`[regenerateChapterEmbeddings] Starting for ${bookSlug} chapter ${chapterNumber}`);
+      console.log(
+        `[regenerateChapterEmbeddings] Starting for ${bookSlug} chapter ${chapterNumber}`,
+      );
 
       setCurrentBook(path.join("books-data", bookSlug));
 
@@ -188,13 +194,20 @@ export const appRouter = router({
         }
         index++;
       });
-      console.log(`[regenerateChapterEmbeddings] Extracted ${paragraphs.length} paragraphs from XML`);
+      console.log(
+        `[regenerateChapterEmbeddings] Extracted ${paragraphs.length} paragraphs from XML`,
+      );
 
       let rollingSummary: string;
       try {
-        rollingSummary = readBookFile(`summaries-chapter-by-chapter-${chapterNumber}.txt`, FILE_TYPE.TEMPORARY);
+        rollingSummary = readBookFile(
+          `summaries-chapter-by-chapter-${chapterNumber}.txt`,
+          FILE_TYPE.TEMPORARY,
+        );
       } catch (e) {
-        throw new Error(`Rolling summary not found for chapter ${chapterNumber}. Run full pipeline first.`);
+        throw new Error(
+          `Rolling summary not found for chapter ${chapterNumber}. Run full pipeline first.`,
+        );
       }
 
       console.log(`[regenerateChapterEmbeddings] Generating summary for chapter ${chapterNumber}`);
@@ -205,33 +218,39 @@ export const appRouter = router({
         bookLanguage,
       });
 
-      const documents: Document[] = chapterSummary.chapterSummary.chapterBulletPoints.map((bulletPoint) => {
-        const renderedText = bulletPoint.paragraphNumbers
-          .map((p) =>
-            paragraphs
-              .filter((pfc) => pfc.dataIndex === p)
-              .map((pfc) => pfc.text)
-              .join(" "),
-          )
-          .join("\n");
+      const documents: Document[] = chapterSummary.chapterSummary.chapterBulletPoints.map(
+        (bulletPoint) => {
+          const renderedText = bulletPoint.paragraphNumbers
+            .map((p) =>
+              paragraphs
+                .filter((pfc) => pfc.dataIndex === p)
+                .map((pfc) => pfc.text)
+                .join(" "),
+            )
+            .join("\n");
 
-        return {
-          text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
+          return {
+            text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
+            chapter: chapterNumber,
+            paragraphNumber: bulletPoint.mainParagraphNumber,
+          };
+        },
+      );
+
+      const pureSummaryDocuments: Document[] =
+        chapterSummary.chapterSummary.chapterBulletPoints.map((bulletPoint) => ({
+          text: bulletPoint.paragraphsSummary,
           chapter: chapterNumber,
           paragraphNumber: bulletPoint.mainParagraphNumber,
-        };
-      });
-
-      const pureSummaryDocuments: Document[] = chapterSummary.chapterSummary.chapterBulletPoints.map((bulletPoint) => ({
-        text: bulletPoint.paragraphsSummary,
-        chapter: chapterNumber,
-        paragraphNumber: bulletPoint.mainParagraphNumber,
-      }));
+        }));
 
       console.log(
         `[regenerateChapterEmbeddings] Generating embeddings for ${documents.length + pureSummaryDocuments.length} documents`,
       );
-      const newChapterEmbeddings = await computeBatchEmbeddingsThroughHTTP([...documents, ...pureSummaryDocuments]);
+      const newChapterEmbeddings = await computeBatchEmbeddingsThroughHTTP([
+        ...documents,
+        ...pureSummaryDocuments,
+      ]);
 
       const r2 = createR2Client();
       const embeddingsKey = `answer-server-data/${bookSlug}/embeddings.json`;
@@ -257,7 +276,12 @@ export const appRouter = router({
       await embeddingsFile.write(mergedJson);
       console.log(`[regenerateChapterEmbeddings] Uploaded merged embeddings to R2`);
 
-      return { success: true, bookSlug, chapterNumber, embeddingsCount: newChapterEmbeddings.length };
+      return {
+        success: true,
+        bookSlug,
+        chapterNumber,
+        embeddingsCount: newChapterEmbeddings.length,
+      };
     }),
 
   searchWolneLektury: procedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
@@ -290,113 +314,134 @@ export const appRouter = router({
     };
   }),
 
-  getWolneLekturyBookDetails: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
-    const book = await wl.getBookBySlug(input.slug);
-    return {
-      title: book.title,
-      slug: book.slug,
-      language: book.language,
-      authors: book.authors.map((a) => a.name),
-      epochs: book.epochs.map((e) => e.name),
-      genres: book.genres.map((g) => g.name),
-      kinds: book.kinds.map((k) => k.name),
-      audioLength: book.audio_length || null,
-      fragmentHtml: book.fragment_data?.html || null,
-      hasFb2: !!book.fb2,
-      hasEpub: !!book.epub,
-      hasAudio: book.media?.some((m) => m.type === "mp3") || false,
-      cover: book.cover,
-      coverThumb: book.cover_thumb,
-    };
-  }),
+  getWolneLekturyBookDetails: procedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ input }) => {
+      const book = await wl.getBookBySlug(input.slug);
+      return {
+        title: book.title,
+        slug: book.slug,
+        language: book.language,
+        authors: book.authors.map((a) => a.name),
+        epochs: book.epochs.map((e) => e.name),
+        genres: book.genres.map((g) => g.name),
+        kinds: book.kinds.map((k) => k.name),
+        audioLength: book.audio_length || null,
+        fragmentHtml: book.fragment_data?.html || null,
+        hasFb2: !!book.fb2,
+        hasEpub: !!book.epub,
+        hasAudio: book.media?.some((m) => m.type === "mp3") || false,
+        cover: book.cover,
+        coverThumb: book.cover_thumb,
+      };
+    }),
 
-  downloadFromWolneLektury: procedure.input(z.object({ slug: z.string() })).mutation(async ({ input }) => {
-    const repoRoot = path.resolve(__dirname, "../../");
-    try {
-      process.chdir(repoRoot);
-    } catch {}
+  downloadFromWolneLektury: procedure
+    .input(z.object({ slug: z.string() }))
+    .mutation(async ({ input }) => {
+      const repoRoot = path.resolve(__dirname, "../../");
+      try {
+        process.chdir(repoRoot);
+      } catch {}
 
-    const multiVolumePath = path.join(repoRoot, "wolnelektury-data/multi-volume-mapping.json");
-    let downloadSlug = input.slug;
-    let parentTitle: string | null = null;
+      const multiVolumePath = path.join(repoRoot, "wolnelektury-data/multi-volume-mapping.json");
+      let downloadSlug = input.slug;
+      let parentTitle: string | null = null;
 
-    if (fs.existsSync(multiVolumePath)) {
-      const multiVolume = JSON.parse(fs.readFileSync(multiVolumePath, "utf-8"));
-      if (multiVolume[input.slug]) {
-        const children = multiVolume[input.slug].children;
-        if (children && children.length > 0) {
-          downloadSlug = children[0].slug;
-          parentTitle = multiVolume[input.slug].title;
-          console.log(`[downloadFromWolneLektury] Multi-volume work detected, using first volume: ${downloadSlug}`);
+      if (fs.existsSync(multiVolumePath)) {
+        const multiVolume = JSON.parse(fs.readFileSync(multiVolumePath, "utf-8"));
+        if (multiVolume[input.slug]) {
+          const children = multiVolume[input.slug].children;
+          if (children && children.length > 0) {
+            downloadSlug = children[0].slug;
+            parentTitle = multiVolume[input.slug].title;
+            console.log(
+              `[downloadFromWolneLektury] Multi-volume work detected, using first volume: ${downloadSlug}`,
+            );
+          }
         }
       }
-    }
 
-    const { buffer, details } = await wl.downloadBookFb2(downloadSlug);
+      const { buffer, details } = await wl.downloadBookFb2(downloadSlug);
 
-    const slug = input.slug;
-    const bookRoot = path.join(repoRoot, "books-data", slug);
-    const inputDir = path.join(bookRoot, "input");
-    ensureDir(inputDir);
-    ensureDir(path.join(bookRoot, "output"));
-    ensureDir(path.join(bookRoot, "temporary-output"));
+      const slug = input.slug;
+      const bookRoot = path.join(repoRoot, "books-data", slug);
+      const inputDir = path.join(bookRoot, "input");
+      ensureDir(inputDir);
+      ensureDir(path.join(bookRoot, "output"));
+      ensureDir(path.join(bookRoot, "temporary-output"));
 
-    const fb2Path = path.join(inputDir, `${slug}.fb2`);
-    fs.writeFileSync(fb2Path, buffer);
-    console.log(`[downloadFromWolneLektury] Saved FB2 to ${fb2Path}`);
+      const fb2Path = path.join(inputDir, `${slug}.fb2`);
+      fs.writeFileSync(fb2Path, buffer);
+      console.log(`[downloadFromWolneLektury] Saved FB2 to ${fb2Path}`);
 
-    setCurrentBook(path.join("books-data", slug));
-    console.log(`[downloadFromWolneLektury] Converting book...`);
-    convertBook(slug, 1, 0);
+      setCurrentBook(path.join("books-data", slug));
+      console.log(`[downloadFromWolneLektury] Converting book...`);
+      convertBook(slug, 1, 0);
 
-    const richPath = path.join(bookRoot, "input", "rich.xml");
-    const rich = fs.readFileSync(richPath, "utf8");
+      const richPath = path.join(bookRoot, "input", "rich.xml");
+      const rich = fs.readFileSync(richPath, "utf8");
 
-    return { slug, rich, title: parentTitle || details.title, authors: details.authors.map((a) => a.name) };
-  }),
+      return {
+        slug,
+        rich,
+        title: parentTitle || details.title,
+        authors: details.authors.map((a) => a.name),
+      };
+    }),
 
   getWolneLekturyCollections: procedure.query(async () => {
     const collections = await wl.getCollections();
-    return collections.map((c) => ({ title: c.title, slug: wl.extractSlugFromHref(c.href), url: c.url }));
+    return collections.map((c) => ({
+      title: c.title,
+      slug: wl.extractSlugFromHref(c.href),
+      url: c.url,
+    }));
   }),
 
-  getWolneLekturyCollection: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
-    const collection = await wl.getCollectionBySlug(input.slug);
-    return {
-      url: collection.url,
-      title: collection.title,
-      books: collection.books.map((book) => ({
-        title: book.title,
-        author: book.author,
-        slug: book.slug,
-        cover: book.cover,
-        coverThumb: book.cover_thumb,
-        coverColor: book.cover_color,
-        epoch: book.epoch,
-        genre: book.genre,
-        kind: book.kind,
-        hasAudio: book.has_audio,
-      })),
-    };
-  }),
+  getWolneLekturyCollection: procedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ input }) => {
+      const collection = await wl.getCollectionBySlug(input.slug);
+      return {
+        url: collection.url,
+        title: collection.title,
+        books: collection.books.map((book) => ({
+          title: book.title,
+          author: book.author,
+          slug: book.slug,
+          cover: book.cover,
+          coverThumb: book.cover_thumb,
+          coverColor: book.cover_color,
+          epoch: book.epoch,
+          genre: book.genre,
+          kind: book.kind,
+          hasAudio: book.has_audio,
+        })),
+      };
+    }),
 
-  getBookDescriptions: procedure.input(z.object({ collectionSlug: z.string() })).query(async ({ input }) => {
-    const descriptionsPath = path.resolve(
-      __dirname,
-      `../../wolnelektury-data/generated-descriptions/${input.collectionSlug}-descriptions.json`,
-    );
-    if (!fs.existsSync(descriptionsPath)) {
-      return { descriptions: [] };
-    }
-    const data = JSON.parse(fs.readFileSync(descriptionsPath, "utf-8"));
-    return {
-      descriptions: data.map((book: { slug: string; generatedDescription?: string; generatedHook?: string }) => ({
-        slug: book.slug,
-        description: book.generatedDescription || "",
-        hook: book.generatedHook || "",
-      })),
-    };
-  }),
+  getBookDescriptions: procedure
+    .input(z.object({ collectionSlug: z.string() }))
+    .query(async ({ input }) => {
+      const descriptionsPath = path.resolve(
+        __dirname,
+        `../../wolnelektury-data/generated-descriptions/${input.collectionSlug}-descriptions.json`,
+      );
+      if (!fs.existsSync(descriptionsPath)) {
+        return { descriptions: [] };
+      }
+      const data = JSON.parse(fs.readFileSync(descriptionsPath, "utf-8"));
+      return {
+        descriptions: data.map(
+          (book: { slug: string; generatedDescription?: string; generatedHook?: string }) => ({
+            slug: book.slug,
+            description: book.generatedDescription || "",
+            hook: book.generatedHook || "",
+          }),
+        ),
+      };
+    }),
 
   getReadingTimes: procedure.query(async () => {
     const readingTimesPath = path.resolve(__dirname, "../../wolnelektury-data/reading-times.json");
@@ -437,7 +482,11 @@ export const appRouter = router({
       }[]
     ).map((book) => {
       const desc = descriptions[book.slug];
-      return { ...book, generatedDescription: desc?.description || book.description, generatedHook: desc?.hook || "" };
+      return {
+        ...book,
+        generatedDescription: desc?.description || book.description,
+        generatedHook: desc?.hook || "",
+      };
     });
 
     const groupedByAuthorLetter: Record<string, typeof books> = {};
@@ -452,56 +501,64 @@ export const appRouter = router({
     return { books, groupedByAuthorLetter };
   }),
 
-  getStandardEbooksBook: procedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
-    const bookDir = path.resolve(__dirname, `../../standardebooks-data/books/${input.slug}`);
-    const metadataPath = path.join(bookDir, "metadata.json");
+  getStandardEbooksBook: procedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ input }) => {
+      const bookDir = path.resolve(__dirname, `../../standardebooks-data/books/${input.slug}`);
+      const metadataPath = path.join(bookDir, "metadata.json");
 
-    if (!fs.existsSync(metadataPath)) {
-      throw new Error(`Book not found: ${input.slug}`);
-    }
-
-    const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-
-    const textDir = path.join(bookDir, "text");
-    const chapters: { filename: string; title: string; content: string }[] = [];
-
-    if (fs.existsSync(textDir)) {
-      const files = fs
-        .readdirSync(textDir)
-        .filter((f) => f.endsWith(".xhtml"))
-        .sort();
-      for (const file of files) {
-        const content = fs.readFileSync(path.join(textDir, file), "utf-8");
-        const titleMatch = content.match(/<title>([^<]+)<\/title>/);
-        chapters.push({ filename: file, title: titleMatch ? titleMatch[1] : file.replace(".xhtml", ""), content });
+      if (!fs.existsSync(metadataPath)) {
+        throw new Error(`Book not found: ${input.slug}`);
       }
-    }
 
-    const coverPath = path.join(bookDir, "images", "cover.jpg");
-    const hasCover = fs.existsSync(coverPath);
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
 
-    return { metadata, chapters, hasCover };
-  }),
+      const textDir = path.join(bookDir, "text");
+      const chapters: { filename: string; title: string; content: string }[] = [];
 
-  prepareFromStandardEbooks: procedure.input(z.object({ slug: z.string() })).mutation(async ({ input }) => {
-    const repoRoot = path.resolve(__dirname, "../../");
-    const seBookDir = path.join(repoRoot, "standardebooks-data/books", input.slug);
-    const metadataPath = path.join(seBookDir, "metadata.json");
+      if (fs.existsSync(textDir)) {
+        const files = fs
+          .readdirSync(textDir)
+          .filter((f) => f.endsWith(".xhtml"))
+          .sort();
+        for (const file of files) {
+          const content = fs.readFileSync(path.join(textDir, file), "utf-8");
+          const titleMatch = content.match(/<title>([^<]+)<\/title>/);
+          chapters.push({
+            filename: file,
+            title: titleMatch ? titleMatch[1] : file.replace(".xhtml", ""),
+            content,
+          });
+        }
+      }
 
-    if (!fs.existsSync(metadataPath)) {
-      throw new Error(`Standard Ebook not found: ${input.slug}`);
-    }
+      const coverPath = path.join(bookDir, "images", "cover.jpg");
+      const hasCover = fs.existsSync(coverPath);
 
-    const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+      return { metadata, chapters, hasCover };
+    }),
 
-    convertAndSaveSEBook(input.slug);
+  prepareFromStandardEbooks: procedure
+    .input(z.object({ slug: z.string() }))
+    .mutation(async ({ input }) => {
+      const repoRoot = path.resolve(__dirname, "../../");
+      const seBookDir = path.join(repoRoot, "standardebooks-data/books", input.slug);
+      const metadataPath = path.join(seBookDir, "metadata.json");
 
-    const bookRoot = path.join(repoRoot, "books-data", input.slug);
-    const richPath = path.join(bookRoot, "input", "rich.xml");
-    const rich = fs.readFileSync(richPath, "utf-8");
+      if (!fs.existsSync(metadataPath)) {
+        throw new Error(`Standard Ebook not found: ${input.slug}`);
+      }
 
-    return { slug: input.slug, rich, title: metadata.title, author: metadata.author };
-  }),
+      const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+
+      convertAndSaveSEBook(input.slug);
+
+      const bookRoot = path.join(repoRoot, "books-data", input.slug);
+      const richPath = path.join(bookRoot, "input", "rich.xml");
+      const rich = fs.readFileSync(richPath, "utf-8");
+
+      return { slug: input.slug, rich, title: metadata.title, author: metadata.author };
+    }),
 
   getStyleSelectionStatus: procedure.input(z.object({ jobId: z.string() })).query(({ input }) => {
     const job = jobs.get(input.jobId);
@@ -605,44 +662,46 @@ export const appRouter = router({
       return { success: true, choice: input.choice };
     }),
 
-  generateStylePreviews: procedure.input(z.object({ jobId: z.string() })).mutation(async ({ input }) => {
-    const job = jobs.get(input.jobId);
-    if (!job) throw new Error("Job not found");
+  generateStylePreviews: procedure
+    .input(z.object({ jobId: z.string() }))
+    .mutation(async ({ input }) => {
+      const job = jobs.get(input.jobId);
+      if (!job) throw new Error("Job not found");
 
-    const repoRoot = path.resolve(__dirname, "../../");
-    const bookRoot = path.join(repoRoot, "books-data", job.slug);
-    const state = readStyleSelection(bookRoot);
+      const repoRoot = path.resolve(__dirname, "../../");
+      const bookRoot = path.join(repoRoot, "books-data", job.slug);
+      const state = readStyleSelection(bookRoot);
 
-    if (!state) throw new Error("Style selection not initialized");
-    if (!state.autoStyle) throw new Error("Auto style not yet generated");
+      if (!state) throw new Error("Style selection not initialized");
+      if (!state.autoStyle) throw new Error("Auto style not yet generated");
 
-    setCurrentBook(path.join("books-data", job.slug));
+      setCurrentBook(path.join("books-data", job.slug));
 
-    const autoPreview = await generateStylePreview(state.autoStyle, "auto", 1);
-    let userPreview = null;
+      const autoPreview = await generateStylePreview(state.autoStyle, "auto", 1);
+      let userPreview = null;
 
-    if (state.userStyle) {
-      userPreview = await generateStylePreview(state.userStyle, "user", 1);
-    }
+      if (state.userStyle) {
+        userPreview = await generateStylePreview(state.userStyle, "user", 1);
+      }
 
-    setPreviewsGenerated(
-      bookRoot,
-      autoPreview?.imagePath || null,
-      userPreview?.imagePath || null,
-      autoPreview?.avatarPath || null,
-      userPreview?.avatarPath || null,
-    );
+      setPreviewsGenerated(
+        bookRoot,
+        autoPreview?.imagePath || null,
+        userPreview?.imagePath || null,
+        autoPreview?.avatarPath || null,
+        userPreview?.avatarPath || null,
+      );
 
-    return {
-      success: true,
-      previews: {
-        autoPreviewPath: autoPreview?.imagePath || null,
-        userPreviewPath: userPreview?.imagePath || null,
-        autoAvatarPath: autoPreview?.avatarPath || null,
-        userAvatarPath: userPreview?.avatarPath || null,
-      },
-    };
-  }),
+      return {
+        success: true,
+        previews: {
+          autoPreviewPath: autoPreview?.imagePath || null,
+          userPreviewPath: userPreview?.imagePath || null,
+          autoAvatarPath: autoPreview?.avatarPath || null,
+          userAvatarPath: userPreview?.avatarPath || null,
+        },
+      };
+    }),
 });
 
 export type AppRouter = typeof appRouter;

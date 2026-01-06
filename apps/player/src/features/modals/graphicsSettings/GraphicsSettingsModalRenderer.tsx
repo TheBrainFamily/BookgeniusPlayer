@@ -10,5 +10,8 @@ export const GraphicsSettingsModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <GraphicsSettingsModal onClose={closeModal} />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>{isOpen && <GraphicsSettingsModal onClose={closeModal} />}</AnimatePresence>,
+    document.body,
+  );
 };

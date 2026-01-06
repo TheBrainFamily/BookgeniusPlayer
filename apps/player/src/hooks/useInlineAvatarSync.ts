@@ -77,27 +77,49 @@ export function useInlineAvatarSync() {
 
       let newUrl: string | undefined;
       if (forceSvg && displayName) {
-        newUrl = getAvatarSource({ slug: originalSlug, characterName: displayName, bookSlug: "", infoPerChapter: [] });
+        newUrl = getAvatarSource({
+          slug: originalSlug,
+          characterName: displayName,
+          bookSlug: "",
+          infoPerChapter: [],
+        });
       } else {
         newUrl = optimisticUrl || serverUrl;
         if (!newUrl && displayName) {
-          newUrl = getAvatarSource({ slug: originalSlug, characterName: displayName, bookSlug: "", infoPerChapter: [] });
+          newUrl = getAvatarSource({
+            slug: originalSlug,
+            characterName: displayName,
+            bookSlug: "",
+            infoPerChapter: [],
+          });
         }
       }
 
       if (!newUrl) return;
 
-      const emptyShells = document.querySelectorAll<HTMLElement>(`.inline-avatar[data-character="${originalSlug}"]:not(:has(img))`);
+      const emptyShells = document.querySelectorAll<HTMLElement>(
+        `.inline-avatar[data-character="${originalSlug}"]:not(:has(img))`,
+      );
       emptyShells.forEach((shell) => {
         const img = document.createElement("img");
         img.src = newUrl;
         img.alt = displayName || originalSlug;
-        img.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
+        img.classList.add(
+          "absolute",
+          "top-0",
+          "left-0",
+          "w-full",
+          "h-full",
+          "object-cover",
+          "rounded-full",
+        );
         shell.title = displayName || originalSlug;
         shell.appendChild(img);
       });
 
-      const inlineAvatars = document.querySelectorAll<HTMLImageElement>(`.inline-avatar[data-character="${originalSlug}"] img`);
+      const inlineAvatars = document.querySelectorAll<HTMLImageElement>(
+        `.inline-avatar[data-character="${originalSlug}"] img`,
+      );
       inlineAvatars.forEach((img) => {
         if (img.src !== newUrl) {
           img.src = newUrl;

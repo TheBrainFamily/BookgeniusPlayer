@@ -22,8 +22,8 @@
     "process-book": "tsx ../books-generator/src/processBook.ts",
     "start": "tsx ./scripts/startDev.ts",
     "test": "jest",
-    "typecheck": "tsc --noEmit --incremental",
-    "typecheck:ci": "tsc --noEmit --incremental --pretty false"
+    "typecheck": "tsgo --noEmit --incremental",
+    "typecheck:ci": "tsgo --noEmit --incremental --pretty false"
   },
   "dependencies": {
     "@capacitor/core": "^7.2.0",

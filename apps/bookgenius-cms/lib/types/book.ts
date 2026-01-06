@@ -126,23 +126,48 @@ export interface BookInfo {
 // =============================================================================
 
 export function isBookFolder(extra: unknown): extra is BookFolderExtra {
-  return typeof extra === "object" && extra !== null && "type" in extra && (extra as BookFolderExtra).type === "book";
+  return (
+    typeof extra === "object" &&
+    extra !== null &&
+    "type" in extra &&
+    (extra as BookFolderExtra).type === "book"
+  );
 }
 
 export function isCharacterFolder(extra: unknown): extra is CharacterFolderExtra {
-  return typeof extra === "object" && extra !== null && "type" in extra && (extra as CharacterFolderExtra).type === "character";
+  return (
+    typeof extra === "object" &&
+    extra !== null &&
+    "type" in extra &&
+    (extra as CharacterFolderExtra).type === "character"
+  );
 }
 
 export function isChapterAsset(extra: unknown): extra is ChapterExtra {
-  return typeof extra === "object" && extra !== null && "type" in extra && (extra as ChapterExtra).type === "chapter";
+  return (
+    typeof extra === "object" &&
+    extra !== null &&
+    "type" in extra &&
+    (extra as ChapterExtra).type === "chapter"
+  );
 }
 
 export function isBackgroundAsset(extra: unknown): extra is BackgroundExtra {
-  return typeof extra === "object" && extra !== null && "type" in extra && (extra as BackgroundExtra).type === "background";
+  return (
+    typeof extra === "object" &&
+    extra !== null &&
+    "type" in extra &&
+    (extra as BackgroundExtra).type === "background"
+  );
 }
 
 export function isMusicAsset(extra: unknown): extra is MusicExtra {
-  return typeof extra === "object" && extra !== null && "type" in extra && (extra as MusicExtra).type === "music";
+  return (
+    typeof extra === "object" &&
+    extra !== null &&
+    "type" in extra &&
+    (extra as MusicExtra).type === "music"
+  );
 }
 
 // =============================================================================

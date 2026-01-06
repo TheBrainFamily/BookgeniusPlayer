@@ -11,5 +11,8 @@ export const MusicEditModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <MusicEditModal />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>{isOpen && <MusicEditModal />}</AnimatePresence>,
+    document.body,
+  );
 };

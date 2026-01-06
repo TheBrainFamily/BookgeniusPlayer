@@ -12,7 +12,13 @@
  * @param isLastWordInParagraph Optional. If true, an additional class 'last-word-auto-fade' is added for timed visual effect.
  * @returns The modified HTML string.
  */
-export function highlightNthOccurrence(htmlText: string, wordToFind: string, occurrenceIndex: number, className: string = "current-word", isLastWordInParagraph?: boolean): string {
+export function highlightNthOccurrence(
+  htmlText: string,
+  wordToFind: string,
+  occurrenceIndex: number,
+  className: string = "current-word",
+  isLastWordInParagraph?: boolean,
+): string {
   if (!wordToFind || !htmlText) {
     return htmlText;
   }
@@ -43,7 +49,9 @@ export function highlightNthOccurrence(htmlText: string, wordToFind: string, occ
 
   // Helper function to clean up existing highlights
   const cleanupExistingHighlights = () => {
-    const elementsWithHighlight: NodeListOf<HTMLElement> = tempDiv.querySelectorAll(`.${primaryHighlightClass}`);
+    const elementsWithHighlight: NodeListOf<HTMLElement> = tempDiv.querySelectorAll(
+      `.${primaryHighlightClass}`,
+    );
     elementsWithHighlight.forEach((el) => {
       const wasGeneratedByUs = el.getAttribute(GENERATED_SPAN_MARKER) === "true";
 
@@ -53,7 +61,11 @@ export function highlightNthOccurrence(htmlText: string, wordToFind: string, occ
       if (wasGeneratedByUs) {
         const parent = el.parentNode;
         if (parent) {
-          if (el.childNodes.length === 1 && el.firstChild && el.firstChild.nodeType === Node.ELEMENT_NODE) {
+          if (
+            el.childNodes.length === 1 &&
+            el.firstChild &&
+            el.firstChild.nodeType === Node.ELEMENT_NODE
+          ) {
             parent.insertBefore(el.firstChild, el);
           } else {
             while (el.firstChild) {
@@ -75,7 +87,11 @@ export function highlightNthOccurrence(htmlText: string, wordToFind: string, occ
     const walker: TreeWalker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null);
     let currentNodeFromWalker: Node | null;
     while ((currentNodeFromWalker = walker.nextNode())) {
-      if (currentNodeFromWalker.nodeType === Node.TEXT_NODE && currentNodeFromWalker.nodeValue && currentNodeFromWalker.nodeValue.trim() !== "") {
+      if (
+        currentNodeFromWalker.nodeType === Node.TEXT_NODE &&
+        currentNodeFromWalker.nodeValue &&
+        currentNodeFromWalker.nodeValue.trim() !== ""
+      ) {
         nodesToProcess.push(currentNodeFromWalker as Text);
       }
     }
@@ -155,13 +171,22 @@ export function highlightNthOccurrence(htmlText: string, wordToFind: string, occ
         const matchStartIndexInLcText = LcNodeText.indexOf(LcWordToFind, searchIndexInLcText);
         if (matchStartIndexInLcText === -1) break;
 
-        const charBefore = matchStartIndexInLcText > 0 ? nodeText[matchStartIndexInLcText - 1] : " ";
-        const charAfter = matchStartIndexInLcText + LcWordToFind.length < nodeText.length ? nodeText[matchStartIndexInLcText + LcWordToFind.length] : " ";
+        const charBefore =
+          matchStartIndexInLcText > 0 ? nodeText[matchStartIndexInLcText - 1] : " ";
+        const charAfter =
+          matchStartIndexInLcText + LcWordToFind.length < nodeText.length
+            ? nodeText[matchStartIndexInLcText + LcWordToFind.length]
+            : " ";
 
         if (!isWordChar(charBefore) && !isWordChar(charAfter)) {
           if (currentTextMatchCount === occurrenceIndex) {
             const parentElement = textNode.parentNode as HTMLElement | null;
-            if (parentElement && parentElement.nodeName === "SPAN" && parentElement.parentNode && !parentElement.hasAttribute(GENERATED_SPAN_MARKER)) {
+            if (
+              parentElement &&
+              parentElement.nodeName === "SPAN" &&
+              parentElement.parentNode &&
+              !parentElement.hasAttribute(GENERATED_SPAN_MARKER)
+            ) {
               return wrapExistingSpan(parentElement);
             } else if (parentElement) {
               return wrapWordInTextNode(textNode, matchStartIndexInLcText, LcWordToFind.length);

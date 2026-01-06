@@ -18,7 +18,15 @@ type ResolveError = Error & { status?: number };
 
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
-  const { startTransition, finishTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform, updateTransitionMeta, navigating } = useRouteTransition();
+  const {
+    startTransition,
+    finishTransition,
+    cancelTransition,
+    navigatedFromPlatform,
+    setNavigatedFromPlatform,
+    updateTransitionMeta,
+    navigating,
+  } = useRouteTransition();
   const auth = useAuth();
 
   const book = searchParams.get("book");
@@ -153,7 +161,13 @@ const WrappedPlayerApp = () => {
         const author = meta?.author ?? "";
 
         // For direct loads we DO NOT show Start yet; it appears only after appReady.
-        startTransition({ title, phrases, author, showStartButton: false, onStartClick: handleStartClick });
+        startTransition({
+          title,
+          phrases,
+          author,
+          showStartButton: false,
+          onStartClick: handleStartClick,
+        });
       }
 
       if (!book) {
@@ -182,7 +196,10 @@ const WrappedPlayerApp = () => {
       return;
     }
 
-    const resolveBookContent = async (mode: "signed-in" | "anon", { forceFreshToken = false }: { forceFreshToken?: boolean } = {}) => {
+    const resolveBookContent = async (
+      mode: "signed-in" | "anon",
+      { forceFreshToken = false }: { forceFreshToken?: boolean } = {},
+    ) => {
       const headers: Record<string, string> = {};
       let credentials: RequestCredentials = "omit";
 
@@ -259,7 +276,10 @@ const WrappedPlayerApp = () => {
             await resolveBookContent("anon");
           }
         } catch (err: unknown) {
-          console.error("[RESOLVE] error final attempt failed. Keeping splash visible for manual retry.", err);
+          console.error(
+            "[RESOLVE] error final attempt failed. Keeping splash visible for manual retry.",
+            err,
+          );
           if (auth.isSignedIn) {
             console.warn("[RESOLVE] prompting auth modal after repeated failures.");
             setShowAuth(true);
@@ -326,22 +346,45 @@ const WrappedPlayerApp = () => {
   }, [isPlayerReady]);
 
   return (
-    <div className={`w-full h-full border-0 transition-opacity duration-100 ${isPlayerReady ? "opacity-100" : "opacity-0"}`}>
-      {assetBaseReady ? <Suspense fallback={null}>{createPortal(<PlayerApp />, document.getElementById("root-player")!)}</Suspense> : null}
+    <div
+      className={`w-full h-full border-0 transition-opacity duration-100 ${isPlayerReady ? "opacity-100" : "opacity-0"}`}
+    >
+      {assetBaseReady ? (
+        <Suspense fallback={null}>
+          {createPortal(<PlayerApp />, document.getElementById("root-player")!)}
+        </Suspense>
+      ) : null}
 
       {paywallMounted && (
-        <div ref={paywallHostRef} className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${paywallVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
+        <div
+          ref={paywallHostRef}
+          className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${paywallVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        />
       )}
 
       {authMounted && (
-        <div ref={authHostRef} className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${authVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
+        <div
+          ref={authHostRef}
+          className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${authVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        />
       )}
 
       {/* render Paywall INTO the fading host */}
-      {showPaywall && paywallHostRef.current && createPortal(<Paywall bookSlug={bookSlug} bookTitle={bookTitle} onClose={() => setShowPaywall(false)} />, paywallHostRef.current)}
+      {showPaywall &&
+        paywallHostRef.current &&
+        createPortal(
+          <Paywall
+            bookSlug={bookSlug}
+            bookTitle={bookTitle}
+            onClose={() => setShowPaywall(false)}
+          />,
+          paywallHostRef.current,
+        )}
 
       {/* render Auth modal INTO its fading host */}
-      {showAuth && authHostRef.current && createPortal(<AuthRequiredModal onClose={() => setShowAuth(false)} />, authHostRef.current)}
+      {showAuth &&
+        authHostRef.current &&
+        createPortal(<AuthRequiredModal onClose={() => setShowAuth(false)} />, authHostRef.current)}
     </div>
   );
 };

@@ -12,7 +12,11 @@ const MenuButton = () => {
   const { t } = useTranslation();
 
   return (
-    <OptionalElement className={cn("bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center")}>
+    <OptionalElement
+      className={cn(
+        "bg-black/70 textured-bg rounded-3xl border shadow-xl text-white border-white/30 px-1 flex items-center",
+      )}
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <motion.button
@@ -39,4 +43,10 @@ const MenuButton = () => {
 
 export default MenuButton;
 
-const buttonVariants: Variants = { hover: { backgroundColor: "rgba(255,255,255,0.2)", boxShadow: "0px 0px 8px rgba(255,255,255,0.5)" }, tap: { scale: 0.9 } };
+const buttonVariants: Variants = {
+  hover: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    boxShadow: "0px 0px 8px rgba(255,255,255,0.5)",
+  },
+  tap: { scale: 0.9 },
+};

@@ -1,6 +1,11 @@
 import path from "path";
 import fs from "fs";
-import { convex, getCharacterFolders, getPublishedFilesInFolder, updateCharacterFolder } from "./convex-client";
+import {
+  convex,
+  getCharacterFolders,
+  getPublishedFilesInFolder,
+  updateCharacterFolder,
+} from "./convex-client";
 import { generateCharacterImageWithOpenAI } from "../../src/tools/new-tooling/generate-pictures-for-entities";
 import "dotenv/config";
 
@@ -74,7 +79,11 @@ async function findCharactersMissingAvatars(bookPath: string): Promise<MissingAv
     if (!hasAvatarLarge) {
       if (folder.aiPrompt) {
         console.log(`  ❌ ${folder.slug} - missing avatar-large.png (has aiPrompt)`);
-        missingLarge.push({ slug: folder.slug, aiPrompt: folder.aiPrompt, displayName: folder.displayName });
+        missingLarge.push({
+          slug: folder.slug,
+          aiPrompt: folder.aiPrompt,
+          displayName: folder.displayName,
+        });
       } else {
         console.log(`  ⚠️  ${folder.slug} - missing avatar-large.png AND aiPrompt`);
       }
@@ -112,7 +121,11 @@ async function generateSingleAvatar(
       state: "generating",
     });
 
-    const imageBuffer = await generateCharacterImageWithOpenAI(character.aiPrompt, character.displayName, avatarStyle);
+    const imageBuffer = await generateCharacterImageWithOpenAI(
+      character.aiPrompt,
+      character.displayName,
+      avatarStyle,
+    );
 
     if (!imageBuffer) {
       await convex.markCharacterAvatarState({
@@ -175,10 +188,14 @@ async function main() {
   const args = process.argv.slice(2);
 
   if (args.length < 1) {
-    console.log("Usage: tsx regenerate-missing-avatars.ts <book-slug> [--inject-only] [--check-only]");
+    console.log(
+      "Usage: tsx regenerate-missing-avatars.ts <book-slug> [--inject-only] [--check-only]",
+    );
     console.log("");
     console.log("Examples:");
-    console.log("  tsx regenerate-missing-avatars.ts 1766867074631-dolega-mostowicz-prokurator-alicja-horn");
+    console.log(
+      "  tsx regenerate-missing-avatars.ts 1766867074631-dolega-mostowicz-prokurator-alicja-horn",
+    );
     console.log(
       "  tsx regenerate-missing-avatars.ts 1766867074631-dolega-mostowicz-prokurator-alicja-horn --inject-only",
     );

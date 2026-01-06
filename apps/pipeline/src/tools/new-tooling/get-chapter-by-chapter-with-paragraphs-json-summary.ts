@@ -45,7 +45,10 @@ export async function generateSingleChapterSummary(
   const { chapterNum, paragraphs, rollingSummary, bookLanguage = "English" } = options;
 
   const paragraphsForPage = paragraphs
-    .map((paragraph) => `<p id="${paragraph.dataIndex}">${paragraph.text.trim().replace(/"/g, "'")}</p>`)
+    .map(
+      (paragraph) =>
+        `<p id="${paragraph.dataIndex}">${paragraph.text.trim().replace(/"/g, "'")}</p>`,
+    )
     .join("\n");
 
   const prompt = `
@@ -136,11 +139,18 @@ export const turnChapterSummariesIntoBulletPointsMappedToParagraphs = async () =
   const chapterTo = bookSettings.startFromChapter + bookSettings.numberOfChaptersToProcess - 1;
 
   const jsonSummaries: ScenesSummariesPerChapter[] = [];
-  const chaptersToParse = Array.from({ length: chapterTo - chapterFrom + 1 }, (_, i) => i + chapterFrom);
+  const chaptersToParse = Array.from(
+    { length: chapterTo - chapterFrom + 1 },
+    (_, i) => i + chapterFrom,
+  );
   await Promise.all(
     chaptersToParse.map(async (chapterNum) => {
       const previousSummaries: string[] = [];
-      for (let summaryChapterNum = chapterFrom; summaryChapterNum <= chapterNum; summaryChapterNum++) {
+      for (
+        let summaryChapterNum = chapterFrom;
+        summaryChapterNum <= chapterNum;
+        summaryChapterNum++
+      ) {
         try {
           const previousSummary = readBookFile(
             `summaries-chapter-by-chapter-${summaryChapterNum}.txt`,
@@ -152,7 +162,9 @@ export const turnChapterSummariesIntoBulletPointsMappedToParagraphs = async () =
             console.log("No previous summary for chapter 1");
             process.exit(1);
           } else {
-            console.log(`No previous summary for chapter ${summaryChapterNum}, possibly end of book`);
+            console.log(
+              `No previous summary for chapter ${summaryChapterNum}, possibly end of book`,
+            );
             return;
           }
         }
@@ -161,7 +173,10 @@ export const turnChapterSummariesIntoBulletPointsMappedToParagraphs = async () =
       const paragraphsFromChapter = getParagraphsFromChapter(chapterNum, true, true);
 
       const paragraphsForPage = paragraphsFromChapter
-        .map((paragraph) => `<p id="${paragraph.dataIndex}">${paragraph.text.trim().replace(/"/g, "'")}</p>`)
+        .map(
+          (paragraph) =>
+            `<p id="${paragraph.dataIndex}">${paragraph.text.trim().replace(/"/g, "'")}</p>`,
+        )
         .join("\n");
 
       const prompt = `
@@ -254,7 +269,10 @@ Provide your summary clearly organized according to the structure above, explici
       // previousSummaries += `\n\n${currentSummary}`;
       jsonSummaries.push(summary);
       writeBookFile(`prompt-summaries-with-paragraphs-${chapterNum}.txt`, prompt);
-      writeBookFile(`summaries-with-paragraphs-${chapterNum}.json`, `${JSON.stringify(summary, null, 2)}`);
+      writeBookFile(
+        `summaries-with-paragraphs-${chapterNum}.json`,
+        `${JSON.stringify(summary, null, 2)}`,
+      );
     }),
   );
 

@@ -11,7 +11,11 @@ if (require.main === module) {
     const { chapters } = getBookContent(frontendBookPath);
 
     for (const [fileName, chapter] of chapters) {
-      fs.writeFileSync(path.join(frontendBookPath, "booksContent", fileName), removeSpansFromChapterXml(chapter), "utf-8");
+      fs.writeFileSync(
+        path.join(frontendBookPath, "booksContent", fileName),
+        removeSpansFromChapterXml(chapter),
+        "utf-8",
+      );
     }
   })();
 }

@@ -14,7 +14,12 @@ interface DeepResearchModalState {
   isDiveDeeperLoading: boolean;
   diveDeeperHandler?: () => void | Promise<void>;
   type: "deep" | "ask";
-  openModal: (content?: string, layoutView?: boolean, hideOverlay?: boolean, type?: "deep" | "ask") => void;
+  openModal: (
+    content?: string,
+    layoutView?: boolean,
+    hideOverlay?: boolean,
+    type?: "deep" | "ask",
+  ) => void;
   closeModal: () => void;
   setContent: (content: string) => void;
   setLoading: (isLoading: boolean) => void;
@@ -60,11 +65,25 @@ export const useDeepResearchModal = create<DeepResearchModalState>()(
         // Content shift is now handled by DeepResearchModalRenderer (via onExitComplete)
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined, type: "ask" });
+        set({
+          isOpen: false,
+          isLoading: false,
+          showDiveDeeperCTA: false,
+          isDiveDeeperLoading: false,
+          diveDeeperHandler: undefined,
+          type: "ask",
+        });
       },
 
       clearModal: () => {
-        set({ content: undefined, isLoading: false, showDiveDeeperCTA: false, isDiveDeeperLoading: false, diveDeeperHandler: undefined, type: "ask" });
+        set({
+          content: undefined,
+          isLoading: false,
+          showDiveDeeperCTA: false,
+          isDiveDeeperLoading: false,
+          diveDeeperHandler: undefined,
+          type: "ask",
+        });
       },
 
       setContent: (content) => set({ content, isLoading: false }),

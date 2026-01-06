@@ -57,7 +57,12 @@ class ScrollCoordinator {
       }
       this._lastScrollEventAt = Date.now();
       const newScrollTop = container.scrollTop;
-      this._scrollDirection = newScrollTop > this._lastScrollTop ? "down" : newScrollTop < this._lastScrollTop ? "up" : "none";
+      this._scrollDirection =
+        newScrollTop > this._lastScrollTop
+          ? "down"
+          : newScrollTop < this._lastScrollTop
+            ? "up"
+            : "none";
       this._lastScrollTop = newScrollTop;
       // Note: Logging every scroll event is very verbose, only log when direction changes
     };
@@ -119,7 +124,11 @@ class ScrollCoordinator {
   canTriggerChapterTransition(): boolean {
     const elapsed = Date.now() - this._lastChapterTransitionTime;
     const canTrigger = elapsed >= this._chapterTransitionCooldownMs;
-    debugLog("canTriggerChapterTransition", { elapsed, cooldown: this._chapterTransitionCooldownMs, canTrigger });
+    debugLog("canTriggerChapterTransition", {
+      elapsed,
+      cooldown: this._chapterTransitionCooldownMs,
+      canTrigger,
+    });
     return canTrigger;
   }
 

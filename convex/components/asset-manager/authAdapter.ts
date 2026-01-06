@@ -1,14 +1,8 @@
 import type { QueryCtx, MutationCtx } from "./_generated/server";
 
 export type Actor =
-  | {
-      kind: "anonymous";
-      tokenIdentifier: null;
-    }
-  | {
-      kind: "user";
-      tokenIdentifier: string;
-    };
+  | { kind: "anonymous"; tokenIdentifier: null }
+  | { kind: "user"; tokenIdentifier: string };
 
 // soft version: returns anonymous when no auth
 export async function getActor(ctx: QueryCtx | MutationCtx): Promise<Actor> {
@@ -33,15 +27,10 @@ export async function requireActor(ctx: QueryCtx | MutationCtx) {
 }
 
 // Returns actor fields that can be spread into insert/patch operations
-export async function getActorFields(ctx: QueryCtx | MutationCtx): Promise<{
-  createdBy?: string;
-  updatedBy?: string;
-}> {
+export async function getActorFields(
+  ctx: QueryCtx | MutationCtx,
+): Promise<{ createdBy?: string; updatedBy?: string }> {
   const actor = await getActor(ctx);
-  const tokenIdentifier =
-    actor.kind === "user" ? actor.tokenIdentifier : undefined;
-  return {
-    createdBy: tokenIdentifier,
-    updatedBy: tokenIdentifier,
-  };
+  const tokenIdentifier = actor.kind === "user" ? actor.tokenIdentifier : undefined;
+  return { createdBy: tokenIdentifier, updatedBy: tokenIdentifier };
 }

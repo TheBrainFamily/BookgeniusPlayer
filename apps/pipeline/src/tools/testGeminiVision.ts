@@ -13,7 +13,10 @@ const GraphicalStyleSchema = z.object({
 });
 
 async function testWithAiSdk() {
-  const coverPath = path.resolve(__dirname, "../../standardebooks-data/books/james-joyce_dubliners/images/cover.jpg");
+  const coverPath = path.resolve(
+    __dirname,
+    "../../standardebooks-data/books/james-joyce_dubliners/images/cover.jpg",
+  );
   const imageBuffer = fs.readFileSync(coverPath);
   const imageBase64 = imageBuffer.toString("base64");
 

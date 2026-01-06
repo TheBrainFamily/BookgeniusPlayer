@@ -133,7 +133,9 @@ function extractDialogueLines(cell: Element, doc: Document): Element[] {
     sd.replaceWith(span);
   }
 
-  const verseBlock = cell.querySelector('[epub\\:type="z3998:verse"], [data-epub-type="z3998:verse"]');
+  const verseBlock = cell.querySelector(
+    '[epub\\:type="z3998:verse"], [data-epub-type="z3998:verse"]',
+  );
   if (verseBlock) {
     const verseParagraphs = verseBlock.querySelectorAll("p");
     if (verseParagraphs.length > 0) {
@@ -175,7 +177,9 @@ function isDramaTable(table: Element): boolean {
     table.querySelectorAll('td[epub\\:type*="persona"], td[data-epub-type*="persona"]').length > 0;
   if (hasPersonaCells) return true;
   const hasStageDirections =
-    table.querySelectorAll('i[epub\\:type*="stage-direction"], i[data-epub-type*="stage-direction"]').length > 0;
+    table.querySelectorAll(
+      'i[epub\\:type*="stage-direction"], i[data-epub-type*="stage-direction"]',
+    ).length > 0;
   return hasStageDirections;
 }
 
@@ -209,7 +213,8 @@ function annotateDramaTables(doc: Document): void {
       if (cells.length === 0) continue;
 
       const firstCell = cells[0];
-      const personaType = firstCell?.getAttribute("epub:type") || firstCell?.getAttribute("data-epub-type") || "";
+      const personaType =
+        firstCell?.getAttribute("epub:type") || firstCell?.getAttribute("data-epub-type") || "";
 
       if (personaType.includes("z3998:persona")) {
         const speakerName = (firstCell.textContent || "").trim();
@@ -298,7 +303,11 @@ function convertDramaTablesToPlayFormat(doc: Document): void {
 function extractChaptersFromFile(
   file: { filename: string; content: string },
   startChapter: number,
-): { chapters: { number: number; title: string; content: string }[]; htmlParts: string[]; nextChapter: number } {
+): {
+  chapters: { number: number; title: string; content: string }[];
+  htmlParts: string[];
+  nextChapter: number;
+} {
   const dom = new JSDOM(file.content, { contentType: "application/xhtml+xml" });
   const doc = dom.window.document;
   const body = doc.querySelector("body");
@@ -314,9 +323,12 @@ function extractChaptersFromFile(
     annotateDramaTables(doc);
   }
 
-  const allNestedSections = article.querySelectorAll(":scope > section[data-epub-type], :scope > section[epub\\:type]");
+  const allNestedSections = article.querySelectorAll(
+    ":scope > section[data-epub-type], :scope > section[epub\\:type]",
+  );
   const nestedChapterSections = Array.from(allNestedSections).filter((section) => {
-    const epubType = section.getAttribute("data-epub-type") || section.getAttribute("epub:type") || "";
+    const epubType =
+      section.getAttribute("data-epub-type") || section.getAttribute("epub:type") || "";
     return epubType === "chapter" || epubType.split(" ").includes("chapter");
   });
 
@@ -325,7 +337,9 @@ function extractChaptersFromFile(
   let chapterCounter = startChapter;
 
   if (nestedChapterSections.length > 0) {
-    const mainTitleEl = article.querySelector(":scope > h1, :scope > h2, :scope > header h1, :scope > header h2");
+    const mainTitleEl = article.querySelector(
+      ":scope > h1, :scope > h2, :scope > header h1, :scope > header h2",
+    );
     const mainTitle = mainTitleEl ? extractTextContent(mainTitleEl) : null;
 
     const preambleNodes: Node[] = [];
@@ -362,7 +376,8 @@ function extractChaptersFromFile(
       }
 
       // Preserve section-level epub:type for CSS targeting (dedication, epigraph, etc.)
-      const sectionEpubType = section.getAttribute("epub:type") || section.getAttribute("data-epub-type") || "";
+      const sectionEpubType =
+        section.getAttribute("epub:type") || section.getAttribute("data-epub-type") || "";
       const epubTypeAttr = sectionEpubType ? ` data-epub-type="${sectionEpubType}"` : "";
       const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
       htmlParts.push(
@@ -381,10 +396,13 @@ function extractChaptersFromFile(
 
     const innerHTML = htmlToValidXml(article.innerHTML);
     // Preserve article/section-level epub:type for CSS targeting (dedication, epigraph, etc.)
-    const articleEpubType = article.getAttribute("epub:type") || article.getAttribute("data-epub-type") || "";
+    const articleEpubType =
+      article.getAttribute("epub:type") || article.getAttribute("data-epub-type") || "";
     const epubTypeAttr = articleEpubType ? ` data-epub-type="${articleEpubType}"` : "";
     const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
-    htmlParts.push(`<section data-chapter="${chapterCounter}"${formatAttr}${epubTypeAttr}>\n${innerHTML}\n</section>`);
+    htmlParts.push(
+      `<section data-chapter="${chapterCounter}"${formatAttr}${epubTypeAttr}>\n${innerHTML}\n</section>`,
+    );
 
     chapters.push({
       number: chapterCounter,

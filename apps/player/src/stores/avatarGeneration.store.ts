@@ -22,7 +22,11 @@ export const useAvatarGenerationStore = create<AvatarGenerationState>()(
 
       startOptimisticGeneration: (characterSlug: string, displayName: string) => {
         displayNames.set(characterSlug.toLowerCase(), displayName);
-        set((state) => ({ optimisticGenerating: new Set(state.optimisticGenerating).add(characterSlug.toLowerCase()) }));
+        set((state) => ({
+          optimisticGenerating: new Set(state.optimisticGenerating).add(
+            characterSlug.toLowerCase(),
+          ),
+        }));
       },
 
       clearOptimisticGeneration: (characterSlug: string) => {
@@ -39,7 +43,12 @@ export const useAvatarGenerationStore = create<AvatarGenerationState>()(
       },
 
       setOptimisticAvatar: (characterSlug: string, avatarUrl: string) => {
-        set((state) => ({ optimisticAvatars: { ...state.optimisticAvatars, [characterSlug.toLowerCase()]: avatarUrl } }));
+        set((state) => ({
+          optimisticAvatars: {
+            ...state.optimisticAvatars,
+            [characterSlug.toLowerCase()]: avatarUrl,
+          },
+        }));
       },
 
       clearOptimisticAvatar: (characterSlug: string) => {

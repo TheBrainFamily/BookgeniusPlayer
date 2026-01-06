@@ -23,7 +23,10 @@ function setBookArg(slug: string) {
 function deleteChapterFiles(chapter: number): string[] {
   const deletedFiles: string[] = [];
 
-  const mainFile = getFilePath(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
+  const mainFile = getFilePath(
+    `rewritten-paragraphs-for-chapter-${chapter}.xml`,
+    FILE_TYPE.TEMPORARY,
+  );
   if (fs.existsSync(mainFile)) {
     fs.unlinkSync(mainFile);
     deletedFiles.push(mainFile);
@@ -69,7 +72,10 @@ export async function regenerateChapter(
     return { success: false, error: "Failed to read reference cards" };
   }
 
-  const charactersForChapter = referenceCards.characters.map((c) => ({ name: c.name, summary: c.referenceCard }));
+  const charactersForChapter = referenceCards.characters.map((c) => ({
+    name: c.name,
+    summary: c.referenceCard,
+  }));
 
   try {
     await identifyAndRewriteParagraphs(chapter, charactersForChapter);
@@ -82,7 +88,10 @@ export async function regenerateChapter(
   if (options.uploadToConvex && options.bookPath) {
     console.log(`[regenerateChapter] Uploading to Convex...`);
     try {
-      const chapterXml = readBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
+      const chapterXml = readBookFile(
+        `rewritten-paragraphs-for-chapter-${chapter}.xml`,
+        FILE_TYPE.TEMPORARY,
+      );
 
       await convex.uploadFile({
         folderPath: `${options.bookPath}/chapters`,

@@ -161,7 +161,11 @@ export function XmlEditor({
   // Auto-save function
   const performAutoSave = useCallback(
     async (content: string) => {
-      console.log("[XmlEditor] performAutoSave called", { contentLength: content?.length, readOnly, hasOnAutoSave: !!onAutoSave });
+      console.log("[XmlEditor] performAutoSave called", {
+        contentLength: content?.length,
+        readOnly,
+        hasOnAutoSave: !!onAutoSave,
+      });
       if (!onAutoSave || readOnly) return;
 
       // Don't auto-save if there's a parse error
@@ -175,7 +179,10 @@ export function XmlEditor({
       try {
         console.log("[XmlEditor] Calling onAutoSave...");
         await onAutoSave(content);
-        console.log("[XmlEditor] onAutoSave completed, pendingAutoSaveRef:", pendingAutoSaveRef.current);
+        console.log(
+          "[XmlEditor] onAutoSave completed, pendingAutoSaveRef:",
+          pendingAutoSaveRef.current,
+        );
         // Mark that we have draft changes that need publishing
         // NOTE: We do NOT update lastPublishedValue here - only after publish
         setHasDraftChanges(true);

@@ -35,7 +35,12 @@ export const logger = {
     }
   },
 
-  error: (message: string, contextStr?: string | unknown, error?: unknown, ...extraData: unknown[]) => {
+  error: (
+    message: string,
+    contextStr?: string | unknown,
+    error?: unknown,
+    ...extraData: unknown[]
+  ) => {
     let errorObject: Error | undefined = undefined;
     if (error) {
       if (error instanceof Error) {
@@ -47,9 +52,15 @@ export const logger = {
     }
     const store = als.getStore();
     if (typeof contextStr === "string") {
-      pinoJsonLogger.error({ contextStr, err: errorObject, rawError: error, extraData, ...store }, message);
+      pinoJsonLogger.error(
+        { contextStr, err: errorObject, rawError: error, extraData, ...store },
+        message,
+      );
     } else {
-      pinoJsonLogger.error({ data: contextStr, err: errorObject, rawError: error, extraData, ...store }, message);
+      pinoJsonLogger.error(
+        { data: contextStr, err: errorObject, rawError: error, extraData, ...store },
+        message,
+      );
     }
     if (pinoJsonLogger && pinoJsonLogger.flush) {
       // pinoJsonLogger.flush((e: unknown) => {

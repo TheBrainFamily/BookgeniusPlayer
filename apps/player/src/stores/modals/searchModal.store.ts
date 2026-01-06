@@ -47,7 +47,14 @@ export const useSearchModal = create<SearchModalState>()(
         const coordinator = useModalCoordinator.getState();
         if (!coordinator.requestModalOpen(MODAL_ID)) return;
 
-        set({ isOpen: true, layoutView, hideOverlay, query: query.trim(), results: EMPTY_RESULTS, isLoading: false });
+        set({
+          isOpen: true,
+          layoutView,
+          hideOverlay,
+          query: query.trim(),
+          results: EMPTY_RESULTS,
+          isLoading: false,
+        });
       },
 
       closeModal: () => {
@@ -58,7 +65,12 @@ export const useSearchModal = create<SearchModalState>()(
       },
 
       clearModal: () => {
-        set({ query: "", results: EMPTY_RESULTS, isLoading: false, lastClickedAppearanceId: undefined });
+        set({
+          query: "",
+          results: EMPTY_RESULTS,
+          isLoading: false,
+          lastClickedAppearanceId: undefined,
+        });
       },
 
       setQuery: (query) => set({ query }),

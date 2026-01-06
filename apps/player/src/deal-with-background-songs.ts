@@ -35,10 +35,17 @@ const getValidatedBookSongs = (): BackgroundSongSection[] | null => {
 };
 
 // Helper function to find applicable background sections for a location
-const findApplicableBackgroundSections = (bookSongs: BackgroundSongSection[], currentChapter: number, currentParagraph: number): BackgroundSongSection[] => {
+const findApplicableBackgroundSections = (
+  bookSongs: BackgroundSongSection[],
+  currentChapter: number,
+  currentParagraph: number,
+): BackgroundSongSection[] => {
   return bookSongs
     .filter((section: BackgroundSongSection) => {
-      return section.chapter < currentChapter || (section.chapter === currentChapter && section.paragraph <= currentParagraph);
+      return (
+        section.chapter < currentChapter ||
+        (section.chapter === currentChapter && section.paragraph <= currentParagraph)
+      );
     })
     .sort((a: BackgroundSongSection, b: BackgroundSongSection) => {
       if (b.chapter !== a.chapter) return b.chapter - a.chapter;
@@ -70,13 +77,20 @@ const loadMultipleTracks = async (trackIds: string[], context: string): Promise<
 
   try {
     const results = await Promise.allSettled(preloadPromises);
-    const successful = results.filter((result) => result.status === "fulfilled" && result.value === true).length;
+    const successful = results.filter(
+      (result) => result.status === "fulfilled" && result.value === true,
+    ).length;
     const failed = results.length - successful;
 
-    console.log(`${context} tracks preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`);
+    console.log(
+      `${context} tracks preloading complete. Successfully loaded: ${successful}, Failed: ${failed}`,
+    );
 
     if (failed > 0) {
-      const failedResults = results.filter((result) => result.status === "rejected" || (result.status === "fulfilled" && result.value === false));
+      const failedResults = results.filter(
+        (result) =>
+          result.status === "rejected" || (result.status === "fulfilled" && result.value === false),
+      );
       console.warn(`Some ${context} tracks failed to preload:`, failedResults);
     }
 
@@ -118,7 +132,9 @@ export const preloadBackgroundTracks = async () => {
     return false;
   }
 
-  const sectionsToPreload = bookSongs.filter((section) => chaptersToConsider.includes(section.chapter));
+  const sectionsToPreload = bookSongs.filter((section) =>
+    chaptersToConsider.includes(section.chapter),
+  );
 
   if (sectionsToPreload.length === 0) {
     console.log("No background tracks found for the current chapter range to preload.");
@@ -126,7 +142,11 @@ export const preloadBackgroundTracks = async () => {
   }
 
   // Find the applicable section for the current location
-  const foundBackgroundSections = findApplicableBackgroundSections(bookSongs, currentChapter, currentParagraph);
+  const foundBackgroundSections = findApplicableBackgroundSections(
+    bookSongs,
+    currentChapter,
+    currentParagraph,
+  );
   const currentSection = foundBackgroundSections[0];
 
   if (!currentSection || !currentSection.files || currentSection.files.length === 0) {
@@ -137,7 +157,9 @@ export const preloadBackgroundTracks = async () => {
   // Get the first track of the current section
   const firstTrackId = currentSection.files[0].replace(".mp3", "");
 
-  const trackIds = sectionsToPreload.flatMap((section) => section.files.map((file) => file.replace(".mp3", "")));
+  const trackIds = sectionsToPreload.flatMap((section) =>
+    section.files.map((file) => file.replace(".mp3", "")),
+  );
 
   const currentTrackIndex = trackIds.indexOf(firstTrackId);
   const previousTrackId = trackIds[currentTrackIndex - 1];
@@ -157,7 +179,9 @@ export const preloadCurrentTrack = async () => {
   const currentChapter = location.currentChapter;
   const currentParagraph = location.currentParagraph;
 
-  console.log(`Preloading track for current location: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
+  console.log(
+    `Preloading track for current location: Chapter ${currentChapter}, Paragraph ${currentParagraph}`,
+  );
 
   const bookSongs = getValidatedBookSongs();
   if (!bookSongs) {
@@ -165,7 +189,11 @@ export const preloadCurrentTrack = async () => {
   }
 
   // Find the applicable section for the current location
-  const foundBackgroundSections = findApplicableBackgroundSections(bookSongs, currentChapter, currentParagraph);
+  const foundBackgroundSections = findApplicableBackgroundSections(
+    bookSongs,
+    currentChapter,
+    currentParagraph,
+  );
   const currentSection = foundBackgroundSections[0];
 
   if (!currentSection || !currentSection.files || currentSection.files.length === 0) {
@@ -185,7 +213,10 @@ interface DealWithBackgroundSongsParams {
   currentParagraph: number;
 }
 
-export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph }: DealWithBackgroundSongsParams): Promise<void> => {
+export const dealWithBackgroundSongs = async ({
+  currentChapter,
+  currentParagraph,
+}: DealWithBackgroundSongsParams): Promise<void> => {
   console.log("PONTON deal with background songs");
   if (isProcessingBackgroundSongs) {
     console.log("dealWithBackgroundSongs: Already processing, skipping this call.");
@@ -196,16 +227,24 @@ export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph
   console.log("dealWithBackgroundSongs invoked with:", { currentChapter, currentParagraph });
 
   try {
-    console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
+    console.log(
+      `Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`,
+    );
 
     const bookSongs = getBackgroundSongsForBook();
     if (!bookSongs || bookSongs.length === 0) {
-      console.log(`No song definitions found for book ${getBookSlug()}. Cannot determine background song.`);
+      console.log(
+        `No song definitions found for book ${getBookSlug()}. Cannot determine background song.`,
+      );
       isProcessingBackgroundSongs = false; // Reset flag before early exit
       return;
     }
 
-    const foundBackgroundSections = findApplicableBackgroundSections(bookSongs, currentChapter, currentParagraph);
+    const foundBackgroundSections = findApplicableBackgroundSections(
+      bookSongs,
+      currentChapter,
+      currentParagraph,
+    );
     const sectionToApply = foundBackgroundSections[0];
 
     if (sectionToApply && sectionToApply.files && sectionToApply.files.length > 0) {
@@ -214,7 +253,9 @@ export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph
       const firstTrackIdInSection = sectionTrackIds[0];
       const currentPlayingTrackId = getCurrentTrackId(); // Get current from crossfader
 
-      console.log(`Background song check: Section is [${sectionTrackIds.join(", ")}]. First track: ${firstTrackIdInSection}. Currently playing: ${currentPlayingTrackId}.`);
+      console.log(
+        `Background song check: Section is [${sectionTrackIds.join(", ")}]. First track: ${firstTrackIdInSection}. Currently playing: ${currentPlayingTrackId}.`,
+      );
 
       // Inform the crossfader about the active section's tracks.
       // This call might be deferred if a transition is in progress in audio-crossfader.
@@ -223,39 +264,55 @@ export const dealWithBackgroundSongs = async ({ currentChapter, currentParagraph
       // Check if the currently playing track is already part of the *correct* and *active* section.
       // isCurrentTrackInSection checks against the audio-crossfader's *actual current* section.
       if (isCurrentTrackInSection(sectionTrackIds)) {
-        console.log(`Current track ${currentPlayingTrackId} is already part of the active section [${sectionTrackIds.join(", ")}]. Letting sequence handler manage playback.`);
+        console.log(
+          `Current track ${currentPlayingTrackId} is already part of the active section [${sectionTrackIds.join(", ")}]. Letting sequence handler manage playback.`,
+        );
         // Do nothing - onended handler in audio-crossfader will play the next track if needed.
       } else {
         // If we're here, either nothing is playing, or the wrong track/section is playing,
         // or the section was just changed and the current track isn't in it.
         // Transition to the *first* track of the *correct* section.
-        console.log(`Action: Transitioning/starting first track of new/correct section: ${firstTrackIdInSection}`);
+        console.log(
+          `Action: Transitioning/starting first track of new/correct section: ${firstTrackIdInSection}`,
+        );
 
         // Ensure the first track is loaded before transitioning (loadTrack handles if already loaded)
-        const loaded = await loadTrack(firstTrackIdInSection /*, sectionToApply.transitionPoints */);
+        const loaded = await loadTrack(
+          firstTrackIdInSection /*, sectionToApply.transitionPoints */,
+        );
         if (loaded) {
           const success = await transitionToTrack(firstTrackIdInSection);
           if (!success) {
-            console.warn(`dealWithBackgroundSongs: Failed to initiate transition/start for ${firstTrackIdInSection}. Audio-crossfader logs should have details.`);
+            console.warn(
+              `dealWithBackgroundSongs: Failed to initiate transition/start for ${firstTrackIdInSection}. Audio-crossfader logs should have details.`,
+            );
           } else {
-            console.log(`dealWithBackgroundSongs: Successfully initiated transition/start for ${firstTrackIdInSection}.`);
+            console.log(
+              `dealWithBackgroundSongs: Successfully initiated transition/start for ${firstTrackIdInSection}.`,
+            );
           }
         } else {
-          console.error(`dealWithBackgroundSongs: Failed to load first track ${firstTrackIdInSection} of section. Cannot transition.`);
+          console.error(
+            `dealWithBackgroundSongs: Failed to load first track ${firstTrackIdInSection} of section. Cannot transition.`,
+          );
           // Consider stopping music if essential track fails to load
           // await stopAllPlayback(); // stopAllPlayback is currently sync
           stopAllPlayback();
         }
       }
     } else {
-      console.log(`No background song section defined for current location (Ch ${currentChapter}, P ${currentParagraph}).`);
+      console.log(
+        `No background song section defined for current location (Ch ${currentChapter}, P ${currentParagraph}).`,
+      );
       // What to do if no section applies?
       // Option 1: Stop any current music if it's not part of *any* section (more complex to check)
       // Option 2: Let current music play out (current behavior if nothing transitions it)
       // Option 3: Explicitly stop if current track is not null and current section becomes null
       if (getCurrentTrackId() && !getActiveSectionTracks()) {
         // getActiveSectionTracks would be a new getter or use getCurrentSectionTracks()
-        console.log("No applicable section, and a track is playing outside of any defined section. Stopping playback.");
+        console.log(
+          "No applicable section, and a track is playing outside of any defined section. Stopping playback.",
+        );
         stopAllPlayback();
       } else if (!getCurrentTrackId() && !getActiveSectionTracks()) {
         console.log("No applicable section, and nothing is playing. Ensuring audio is silent.");

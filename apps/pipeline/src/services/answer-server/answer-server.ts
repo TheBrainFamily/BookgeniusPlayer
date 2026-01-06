@@ -154,7 +154,9 @@ export const deepResearch = async (question: string, filter: Filter) => {
   const bookText = xmlFiles.textWithParagraphs;
   const paragraphs = getParagraphsFromChapterWithText(chapterTo, bookText, true, true);
   console.log("paragraphs", paragraphs);
-  const filteredParagraphs = paragraphs.filter((p) => p.dataIndex <= (filter.paragraphTo as number));
+  const filteredParagraphs = paragraphs.filter(
+    (p) => p.dataIndex <= (filter.paragraphTo as number),
+  );
   console.log("filter", filter);
   const thingsToSendToResearch = [
     ...chaptersText,
@@ -164,7 +166,9 @@ export const deepResearch = async (question: string, filter: Filter) => {
   return response;
 };
 
-async function getBookXmlFiles(bookName: string): Promise<{ chapters: string; textWithParagraphs: string }> {
+async function getBookXmlFiles(
+  bookName: string,
+): Promise<{ chapters: string; textWithParagraphs: string }> {
   const bookData = await getBookData(bookName);
   return { chapters: bookData.chapters, textWithParagraphs: bookData.richXml };
 }
@@ -218,14 +222,22 @@ function parseCookies(cookieHeader: string | null): Record<string, string> {
   return cookies;
 }
 
-function jsonResponse(data: unknown, status = 200, extraHeaders: Record<string, string> = {}): Response {
+function jsonResponse(
+  data: unknown,
+  status = 200,
+  extraHeaders: Record<string, string> = {},
+): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: { "Content-Type": "application/json", ...extraHeaders },
   });
 }
 
-function textResponse(text: string, status = 200, extraHeaders: Record<string, string> = {}): Response {
+function textResponse(
+  text: string,
+  status = 200,
+  extraHeaders: Record<string, string> = {},
+): Response {
   return new Response(text, { status, headers: extraHeaders });
 }
 
@@ -254,7 +266,10 @@ export const startAnswerServer = () => {
 
       const secretHeader = req.headers.get("x-secret-pass");
       if (secretHeader !== SECRET_KEY && process.env.NODE_ENV !== "dev") {
-        return new Response("Nice try! Unauthorized—proxied access only.", { status: 403, headers: corsHeaders });
+        return new Response("Nice try! Unauthorized—proxied access only.", {
+          status: 403,
+          headers: corsHeaders,
+        });
       }
 
       const cookies = parseCookies(req.headers.get("cookie"));
@@ -344,7 +359,10 @@ async function handleAskStream(
     enforceResult.response.headers.forEach((v, k) => {
       headers[k] = v;
     });
-    return new Response(enforceResult.response.body, { status: enforceResult.response.status, headers });
+    return new Response(enforceResult.response.body, {
+      status: enforceResult.response.status,
+      headers,
+    });
   }
 
   if (question.trim().length > 2500 * 4) {
@@ -365,10 +383,10 @@ async function handleAskStream(
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
     };
-    return new Response(`event: error\ndata: ${JSON.stringify({ message: "Error getting embeddings" })}\n\n`, {
-      status: 200,
-      headers: sseHeaders,
-    });
+    return new Response(
+      `event: error\ndata: ${JSON.stringify({ message: "Error getting embeddings" })}\n\n`,
+      { status: 200, headers: sseHeaders },
+    );
   }
 
   const sseHeaders = {
@@ -513,7 +531,10 @@ async function handleGetParagraphsForSearch(
     enforceResult.response.headers.forEach((v, k) => {
       headers[k] = v;
     });
-    return new Response(enforceResult.response.body, { status: enforceResult.response.status, headers });
+    return new Response(enforceResult.response.body, {
+      status: enforceResult.response.status,
+      headers,
+    });
   }
 
   if (searchQuery.trim().length > 2500) {
@@ -531,7 +552,11 @@ async function handleGetParagraphsForSearch(
     throw new HttpError(500, "Error getting embeddings");
   }
 
-  const bestPassages = await findBestPassages(searchQuery, Array.from(embeddings.values()).flat(), filter);
+  const bestPassages = await findBestPassages(
+    searchQuery,
+    Array.from(embeddings.values()).flat(),
+    filter,
+  );
   const flatBestPassages = bestPassages.flat();
 
   const uniquePassagesMap = new Map<string, (typeof flatBestPassages)[0]>();
@@ -567,7 +592,10 @@ async function handleDeepResearch(
     enforceResult.response.headers.forEach((v, k) => {
       headers[k] = v;
     });
-    return new Response(enforceResult.response.body, { status: enforceResult.response.status, headers });
+    return new Response(enforceResult.response.body, {
+      status: enforceResult.response.status,
+      headers,
+    });
   }
 
   const filterStr = url.searchParams.get("filter");
@@ -581,7 +609,12 @@ async function handleDeepResearch(
 
   const filter: Filter = JSON.parse(filterStr);
   const localPass = req.headers.get("x-local-pass");
-  if (filter.chapterTo >= 4 && !isLoggedIn && process.env.NODE_ENV !== "dev" && localPass !== SECRET_KEY) {
+  if (
+    filter.chapterTo >= 4 &&
+    !isLoggedIn &&
+    process.env.NODE_ENV !== "dev" &&
+    localPass !== SECRET_KEY
+  ) {
     throw new HttpError(400, "Please log in to continue.");
   }
 

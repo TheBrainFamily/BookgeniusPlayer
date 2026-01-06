@@ -32,17 +32,32 @@ export const useAvatarEditModal = create<AvatarEditModalState>()(
       currentAvatarUrl: null,
       aiPrompt: null,
 
-      openModal: ({ characterSlug, characterDisplayName, currentAvatarUrl, aiPrompt }: AvatarEditModalParams, replaceCurrentModal = false) => {
+      openModal: (
+        { characterSlug, characterDisplayName, currentAvatarUrl, aiPrompt }: AvatarEditModalParams,
+        replaceCurrentModal = false,
+      ) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID, replaceCurrentModal)) {
-          set({ isOpen: true, characterSlug, characterDisplayName, currentAvatarUrl: currentAvatarUrl ?? null, aiPrompt: aiPrompt ?? null });
+          set({
+            isOpen: true,
+            characterSlug,
+            characterDisplayName,
+            currentAvatarUrl: currentAvatarUrl ?? null,
+            aiPrompt: aiPrompt ?? null,
+          });
         }
       },
 
       closeModal: () => {
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, characterSlug: null, characterDisplayName: null, currentAvatarUrl: null, aiPrompt: null });
+        set({
+          isOpen: false,
+          characterSlug: null,
+          characterDisplayName: null,
+          currentAvatarUrl: null,
+          aiPrompt: null,
+        });
       },
     }),
     { name: "avatar-edit-modal" },

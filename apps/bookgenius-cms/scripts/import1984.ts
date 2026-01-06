@@ -97,7 +97,12 @@ function parseMetadataXml(xmlContent: string): {
   const authorMatch = xmlContent.match(/<Author>([^<]+)<\/Author>/);
   const languageMatch = xmlContent.match(/<Language>([^<]+)<\/Language>/);
 
-  const book = { slug: slugMatch?.[1] || "1984-English", title: titleMatch?.[1] || "1984", author: authorMatch?.[1] || "George Orwell", language: languageMatch?.[1] || "English" };
+  const book = {
+    slug: slugMatch?.[1] || "1984-English",
+    title: titleMatch?.[1] || "1984",
+    author: authorMatch?.[1] || "George Orwell",
+    language: languageMatch?.[1] || "English",
+  };
 
   // Parse CharactersMaster
   // Format: <Winston-Smith display="Winston Smith" summary="..." />
@@ -145,7 +150,12 @@ async function createFolderIfNeeded(folderPath: string, extra?: object): Promise
   }
 }
 
-async function uploadFile(folderPath: string, basename: string, filePath: string, extra?: object): Promise<void> {
+async function uploadFile(
+  folderPath: string,
+  basename: string,
+  filePath: string,
+  extra?: object,
+): Promise<void> {
   // Check if file exists
   if (!fs.existsSync(filePath)) {
     console.log(`  Skipping (not found): ${filePath}`);
@@ -157,10 +167,17 @@ async function uploadFile(folderPath: string, basename: string, filePath: string
 
   try {
     // Start upload
-    const { intentId, uploadUrl, backend } = await client.mutation(api.generateUploadUrl.startUpload, { folderPath, basename, publish: true, extra });
+    const { intentId, uploadUrl, backend } = await client.mutation(
+      api.generateUploadUrl.startUpload,
+      { folderPath, basename, publish: true, extra },
+    );
 
     // Upload to URL
-    const response = await fetch(uploadUrl, { method: backend === "r2" ? "PUT" : "POST", headers: { "Content-Type": contentType }, body: file });
+    const response = await fetch(uploadUrl, {
+      method: backend === "r2" ? "PUT" : "POST",
+      headers: { "Content-Type": contentType },
+      body: file,
+    });
 
     if (!response.ok) {
       throw new Error(`Upload failed: ${response.status}`);
@@ -170,7 +187,12 @@ async function uploadFile(folderPath: string, basename: string, filePath: string
     const uploadResponse = backend === "convex" ? await response.json() : undefined;
 
     // Finish upload
-    await client.mutation(api.generateUploadUrl.finishUpload, { intentId, uploadResponse, size: file.length, contentType });
+    await client.mutation(api.generateUploadUrl.finishUpload, {
+      intentId,
+      uploadResponse,
+      size: file.length,
+      contentType,
+    });
 
     console.log(`  Uploaded: ${folderPath}/${basename}`);
   } catch (error) {
@@ -196,14 +218,23 @@ function getContentType(filename: string): string {
 // Import Steps
 // =============================================================================
 
-async function step1_CreateFolderStructure(book: { title: string; author: string; language: string }): Promise<void> {
+async function step1_CreateFolderStructure(book: {
+  title: string;
+  author: string;
+  language: string;
+}): Promise<void> {
   console.log("\n=== Step 1: Create Folder Structure ===");
 
   // Create books root
   await createFolderIfNeeded("books");
 
   // Create book folder with metadata
-  const bookExtra: BookFolderExtra = { type: "book", title: book.title, author: book.author, language: book.language };
+  const bookExtra: BookFolderExtra = {
+    type: "book",
+    title: book.title,
+    author: book.author,
+    language: book.language,
+  };
   await createFolderIfNeeded(BOOK_PATH, bookExtra);
 
   // Create subfolders
@@ -213,7 +244,9 @@ async function step1_CreateFolderStructure(book: { title: string; author: string
   await createFolderIfNeeded(`${BOOK_PATH}/music`);
 }
 
-async function step2_ImportCharacters(characters: { slug: string; displayName: string; summary: string }[]): Promise<void> {
+async function step2_ImportCharacters(
+  characters: { slug: string; displayName: string; summary: string }[],
+): Promise<void> {
   console.log("\n=== Step 2: Import Characters ===");
 
   for (const char of characters) {
@@ -221,7 +254,11 @@ async function step2_ImportCharacters(characters: { slug: string; displayName: s
 
     // Create character folder with metadata
     const charPath = `${BOOK_PATH}/characters/${char.slug}`;
-    const charExtra: CharacterFolderExtra = { type: "character", displayName: char.displayName, summary: char.summary };
+    const charExtra: CharacterFolderExtra = {
+      type: "character",
+      displayName: char.displayName,
+      summary: char.summary,
+    };
     await createFolderIfNeeded(charPath, charExtra);
 
     // Upload assets
@@ -241,7 +278,9 @@ async function step3_ImportChapters(): Promise<void> {
   const chaptersPath = `${BOOK_PATH}/chapters`;
 
   // Find all chapter files
-  const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
+  const files = fs
+    .readdirSync(CONTENT_DIR)
+    .filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
   files.sort((a, b) => {
     const numA = parseInt(a.match(/chapter(\d+)/)?.[1] || "0");
     const numB = parseInt(b.match(/chapter(\d+)/)?.[1] || "0");
@@ -285,7 +324,13 @@ async function step4_ImportBackgrounds(): Promise<void> {
       continue;
     }
 
-    const extra: BackgroundExtra = { type: "background", chapter: bg.chapter, paragraph: bg.paragraph, backgroundColor: bg.backgroundColor, textColor: bg.textColor };
+    const extra: BackgroundExtra = {
+      type: "background",
+      chapter: bg.chapter,
+      paragraph: bg.paragraph,
+      backgroundColor: bg.backgroundColor,
+      textColor: bg.textColor,
+    };
 
     console.log(`  Uploading: ${bg.file}`);
     await uploadFile(backgroundsPath, bg.file, filePath, extra);
@@ -319,7 +364,11 @@ async function step5_ImportMusic(): Promise<void> {
         continue;
       }
 
-      const extra: MusicExtra = { type: "music", chapter: track.chapter, paragraph: track.paragraph };
+      const extra: MusicExtra = {
+        type: "music",
+        chapter: track.chapter,
+        paragraph: track.paragraph,
+      };
 
       console.log(`  Uploading: ${file}`);
       await uploadFile(musicPath, file, filePath, extra);

@@ -30,7 +30,8 @@ async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
   try {
     const files = await readdir(textDir);
     const xhtmlFiles = files.filter((f) => f.endsWith(".xhtml"));
-    const isFullPlay = files.some((f) => /^act-\d+\.xhtml$/.test(f)) && files.includes("dramatis-personae.xhtml");
+    const isFullPlay =
+      files.some((f) => /^act-\d+\.xhtml$/.test(f)) && files.includes("dramatis-personae.xhtml");
 
     for (const file of xhtmlFiles) {
       const content = await Bun.file(join(textDir, file)).text();
@@ -149,7 +150,9 @@ async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
       }
 
       // === MEDIUM: Data tables (not drama) ===
-      const dataTables = content.match(/<table(?![^>]*z3998:drama)[^>]*>(?![\s\S]*?z3998:persona)[\s\S]*?<\/table>/g);
+      const dataTables = content.match(
+        /<table(?![^>]*z3998:drama)[^>]*>(?![\s\S]*?z3998:persona)[\s\S]*?<\/table>/g,
+      );
       if (dataTables) {
         const existing = risks.find((r) => r.type === "DATA_TABLES");
         if (existing) {
@@ -195,7 +198,12 @@ async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
 async function main() {
   const bookDirs = await readdir(BOOKS_DIR);
 
-  const byCategory: Record<string, BookAnalysis[]> = { CRITICAL: [], HIGH: [], MEDIUM: [], LOW: [] };
+  const byCategory: Record<string, BookAnalysis[]> = {
+    CRITICAL: [],
+    HIGH: [],
+    MEDIUM: [],
+    LOW: [],
+  };
   const riskCounts: Record<string, number> = {};
 
   for (const bookSlug of bookDirs) {
@@ -245,7 +253,8 @@ async function main() {
     for (const r of critical) {
       lines.push(`  [${r.type}] ${r.description}`);
       lines.push(`    Files: ${r.files.join(", ")}`);
-      if (r.examples[0]) lines.push(`    Sample: ${r.examples[0].replace(/\s+/g, " ").slice(0, 120)}...`);
+      if (r.examples[0])
+        lines.push(`    Sample: ${r.examples[0].replace(/\s+/g, " ").slice(0, 120)}...`);
     }
   }
 

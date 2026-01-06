@@ -1,6 +1,9 @@
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getCharactersData } from "@player/state/bookDataStore";
-import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils/characterOverrides";
+import {
+  resolveCharacterSnapshot,
+  parseChapterParagraphId,
+} from "@player/utils/characterOverrides";
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
 import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getAvatarUrlForVideo } from "@player/utils/assetUrls";
@@ -137,7 +140,9 @@ function attachGlobalGuardsOnce() {
 
   window.addEventListener("scroll", dismissNow, { passive: true, capture: true });
   window.addEventListener("resize", dismissNow, { passive: true, capture: true });
-  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), { capture: true });
+  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), {
+    capture: true,
+  });
 }
 
 function showFloatingAvatar(anchorEl: HTMLElement, avatarSrc: string) {
@@ -193,7 +198,10 @@ function getAvatarSrcForElement(characterEl: HTMLSpanElement): string {
   if (!characterData) return "";
 
   const location = extractLocationFromCharacterEl(characterEl);
-  const snapshot = resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  const snapshot = resolveCharacterSnapshot(characterData, {
+    location,
+    fallbackDisplayName: characterData.characterName,
+  });
 
   const listeningSrc = snapshot.media.listening;
   return listeningSrc ? normalizeSrcForInlineAvatar(listeningSrc) : "";
@@ -213,7 +221,10 @@ export function highlightCharacter(characterEl: HTMLSpanElement) {
   characterEl.classList.add("character-highlighted-activated");
 
   // Only attach hover behavior on devices that actually support hover
-  const supportsHover = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(hover: hover)").matches;
+  const supportsHover =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(hover: hover)").matches;
   if (supportsHover) {
     characterEl.addEventListener("pointerenter", () => {
       // Look up URL dynamically to pick up reactive updates
@@ -222,7 +233,10 @@ export function highlightCharacter(characterEl: HTMLSpanElement) {
 
       if (hoverDebounceTimeout) clearTimeout(hoverDebounceTimeout);
       if (HOVER_DEBOUNCE_MS > 0) {
-        hoverDebounceTimeout = window.setTimeout(() => showFloatingAvatar(characterEl, avatarSrc), HOVER_DEBOUNCE_MS);
+        hoverDebounceTimeout = window.setTimeout(
+          () => showFloatingAvatar(characterEl, avatarSrc),
+          HOVER_DEBOUNCE_MS,
+        );
       } else {
         showFloatingAvatar(characterEl, avatarSrc);
       }

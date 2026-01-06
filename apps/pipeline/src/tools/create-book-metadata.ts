@@ -65,7 +65,12 @@ export function extractCharacterMetadata(
   // Initialize results map keyed by character tag name
   const resultsMap = new Map<string, SimpleCharacterMetadata>();
   characterTags.forEach((tag) => {
-    resultsMap.set(tag, { slug: tag, characterName: getDisplayForCharacter(tag, doc), bookSlug, infoPerChapter: [] });
+    resultsMap.set(tag, {
+      slug: tag,
+      characterName: getDisplayForCharacter(tag, doc),
+      bookSlug,
+      infoPerChapter: [],
+    });
   });
 
   try {
@@ -73,8 +78,11 @@ export function extractCharacterMetadata(
     const parserError = doc.getElementsByTagName("parsererror");
     if (parserError.length > 0) {
       const serializer = new XMLSerializer();
-      // @ts-expect-error (works, weird xmldom typing)
-      console.error("Error parsing generated chapter XML:", serializer.serializeToString(parserError[0]));
+      console.error(
+        "Error parsing generated chapter XML:",
+        // @ts-expect-error (works, weird xmldom typing)
+        serializer.serializeToString(parserError[0]),
+      );
       return []; // Return empty on error
     }
 
@@ -91,7 +99,9 @@ export function extractCharacterMetadata(
 
       const chapterIdAttr = chapterElement.getAttribute("id");
       if (!chapterIdAttr || isNaN(parseInt(chapterIdAttr, 10))) {
-        console.warn(`Chapter element at index ${chapterIndex} is missing or has an invalid ID. Skipping.`);
+        console.warn(
+          `Chapter element at index ${chapterIndex} is missing or has an invalid ID. Skipping.`,
+        );
         continue; // Skip this chapter if ID is invalid
       }
       const chapterId = parseInt(chapterIdAttr, 10);
@@ -292,7 +302,10 @@ export const generateCharacterMetadata = (
     .replaceAll(/<\/?em[^>]*>/g, "");
   const xmlDocWithoutSpans = parser.parseFromString(updatedString, "text/xml");
 
-  return extractCharacterMetadata(xmlDocWithoutSpans as unknown as XMLDocument, characterTags, bookForm, bookSlug).map(
-    (character) => ({ ...character, bookSlug }),
-  );
+  return extractCharacterMetadata(
+    xmlDocWithoutSpans as unknown as XMLDocument,
+    characterTags,
+    bookForm,
+    bookSlug,
+  ).map((character) => ({ ...character, bookSlug }));
 };

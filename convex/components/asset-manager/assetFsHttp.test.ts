@@ -19,14 +19,14 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
     const t = convexTest(schema, modules);
 
     // Create two versions - the first will be archived when second is published
-    const s1 = await t.action(
-      internal._testInsertFakeFile._testStoreFakeFile,
-      { size: 100, contentType: "image/png" },
-    );
-    const s2 = await t.action(
-      internal._testInsertFakeFile._testStoreFakeFile,
-      { size: 200, contentType: "image/png" },
-    );
+    const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+      size: 100,
+      contentType: "image/png",
+    });
+    const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+      size: 200,
+      contentType: "image/png",
+    });
 
     const v1 = await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "",
@@ -52,9 +52,7 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
     expect(archivedV1?.state).toBe("archived");
 
     // v1 is archived - but admin preview should still return URL
-    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, {
-      versionId: v1.versionId,
-    });
+    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, { versionId: v1.versionId });
 
     expect(result).not.toBeNull();
     expect(result?.url).toBeDefined();
@@ -65,10 +63,10 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
   it("returns URL for draft versions (for admin preview)", async () => {
     const t = convexTest(schema, modules);
 
-    const storageId = await t.action(
-      internal._testInsertFakeFile._testStoreFakeFile,
-      { size: 100, contentType: "application/json" },
-    );
+    const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+      size: 100,
+      contentType: "application/json",
+    });
 
     const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "",
@@ -85,9 +83,7 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
     expect(versions[0]?.state).toBe("draft");
 
     // Draft version should be previewable in admin
-    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, {
-      versionId,
-    });
+    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, { versionId });
 
     expect(result).not.toBeNull();
     expect(result?.url).toBeDefined();
@@ -97,10 +93,10 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
   it("returns URL for published versions", async () => {
     const t = convexTest(schema, modules);
 
-    const storageId = await t.action(
-      internal._testInsertFakeFile._testStoreFakeFile,
-      { size: 100, contentType: "text/plain" },
-    );
+    const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+      size: 100,
+      contentType: "text/plain",
+    });
 
     const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "",
@@ -109,9 +105,7 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
       publish: true,
     });
 
-    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, {
-      versionId,
-    });
+    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, { versionId });
 
     expect(result).not.toBeNull();
     expect(result?.url).toBeDefined();
@@ -128,9 +122,7 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
       publish: true,
     });
 
-    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, {
-      versionId,
-    });
+    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, { versionId });
 
     // Should return null because there's no storageId
     expect(result).toBeNull();
@@ -142,10 +134,10 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
     it("serves draft versions (version IDs are opaque, no access restriction)", async () => {
       const t = convexTest(schema, modules);
 
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: 100, contentType: "text/plain" },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: 100,
+        contentType: "text/plain",
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "drafts",
@@ -154,9 +146,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: false, // Draft only
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       // Draft versions ARE served - knowing the version ID is sufficient
       expect(result).not.toBeNull();
@@ -167,14 +157,14 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
       const t = convexTest(schema, modules);
 
       // Create two versions - the first will be archived when second is published
-      const s1 = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: 100, contentType: "text/plain" },
-      );
-      const s2 = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: 200, contentType: "text/plain" },
-      );
+      const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: 100,
+        contentType: "text/plain",
+      });
+      const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: 200,
+        contentType: "text/plain",
+      });
 
       const v1 = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "",
@@ -203,10 +193,10 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
     it("serves published versions", async () => {
       const t = convexTest(schema, modules);
 
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: 100, contentType: "application/json" },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: 100,
+        contentType: "application/json",
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "api",
@@ -215,9 +205,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       expect(result).not.toBeNull();
       expect(result?.storageId).toEqual(storageId);
@@ -233,9 +221,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       expect(result).toBeNull();
     });
@@ -246,10 +232,10 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
       const t = convexTest(schema, modules);
 
       // Create a small file (100 bytes, well under 20MB limit)
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: 100, contentType: "image/png" },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: 100,
+        contentType: "image/png",
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "images",
@@ -258,9 +244,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       // Small files return blob response for direct serving
       expect(result?.kind).toBe("blob");
@@ -277,10 +261,10 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
 
       // Create a large file (25MB, over 20MB limit)
       const largeSize = 25 * 1024 * 1024; // 25MB
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: largeSize, contentType: "video/mp4" },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: largeSize,
+        contentType: "video/mp4",
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "videos",
@@ -289,9 +273,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       // Large files return redirect to storage URL
       expect(result?.kind).toBe("redirect");
@@ -308,10 +290,10 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
 
       // Exactly 20MB - should be treated as small
       const exactLimit = 20 * 1024 * 1024;
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: exactLimit, contentType: "application/zip" },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: exactLimit,
+        contentType: "application/zip",
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "archives",
@@ -320,9 +302,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       expect(result?.kind).toBe("blob");
     });
@@ -332,10 +312,10 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
 
       // Just over 20MB - should be treated as large
       const justOver = 20 * 1024 * 1024 + 1;
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: justOver, contentType: "application/zip" },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: justOver,
+        contentType: "application/zip",
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "archives",
@@ -344,9 +324,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       expect(result?.kind).toBe("redirect");
     });
@@ -356,10 +334,10 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
     it("always includes a content type in the response", async () => {
       const t = convexTest(schema, modules);
 
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: 500, contentType: "application/pdf" },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: 500,
+        contentType: "application/pdf",
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "docs",
@@ -368,9 +346,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       expect(result?.kind).toBe("blob");
       // Content type is always present (from storage metadata or defaults to octet-stream)
@@ -382,10 +358,9 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
       const t = convexTest(schema, modules);
 
       // Create file - storage may or may not preserve contentType
-      const storageId = await t.action(
-        internal._testInsertFakeFile._testStoreFakeFile,
-        { size: 100 },
-      );
+      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
+        size: 100,
+      });
 
       const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
         folderPath: "misc",
@@ -394,9 +369,7 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         publish: true,
       });
 
-      const result = await t.query(api.assetFsHttp.getVersionForServing, {
-        versionId,
-      });
+      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
 
       expect(result?.kind).toBe("blob");
       // Falls back to octet-stream when no contentType is available

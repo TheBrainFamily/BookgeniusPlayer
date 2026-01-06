@@ -12,8 +12,10 @@ export const compareLocations = (a: ChapterParagraphRef, b: ChapterParagraphRef)
   return a.paragraph - b.paragraph;
 };
 
-const isOnOrAfter = (location: ChapterParagraphRef, start: ChapterParagraphRef) => compareLocations(location, start) >= 0;
-const isOnOrBefore = (location: ChapterParagraphRef, end: ChapterParagraphRef) => compareLocations(location, end) <= 0;
+const isOnOrAfter = (location: ChapterParagraphRef, start: ChapterParagraphRef) =>
+  compareLocations(location, start) >= 0;
+const isOnOrBefore = (location: ChapterParagraphRef, end: ChapterParagraphRef) =>
+  compareLocations(location, end) <= 0;
 
 export const parseChapterParagraphId = (id?: string | null): ChapterParagraphRef | null => {
   if (!id) return null;
@@ -28,7 +30,10 @@ export const parseChapterParagraphId = (id?: string | null): ChapterParagraphRef
   return { chapter, paragraph };
 };
 
-export const findActiveOverride = (character: CharacterData, location?: ChapterParagraphRef | null): CharacterOverride | null => {
+export const findActiveOverride = (
+  character: CharacterData,
+  location?: ChapterParagraphRef | null,
+): CharacterOverride | null => {
   if (!location || !character.overrides?.length) {
     return null;
   }
@@ -64,14 +69,24 @@ export interface CharacterSnapshot {
   displayName: string;
   summary?: string;
   override: CharacterOverride | null;
-  media: { listening: string; talking: string; usesExplicitAsset: boolean; baseNameUsed: string; explicitAssetUrl?: string };
+  media: {
+    listening: string;
+    talking: string;
+    usesExplicitAsset: boolean;
+    baseNameUsed: string;
+    explicitAssetUrl?: string;
+  };
 }
 
-export const resolveCharacterSnapshot = (character: CharacterData, { location = null, baseSummary, fallbackDisplayName }: CharacterSnapshotOptions = {}): CharacterSnapshot => {
+export const resolveCharacterSnapshot = (
+  character: CharacterData,
+  { location = null, baseSummary, fallbackDisplayName }: CharacterSnapshotOptions = {},
+): CharacterSnapshot => {
   const override = findActiveOverride(character, location);
 
   const displayName = override?.display ?? fallbackDisplayName ?? character.characterName;
-  const normalizedBaseSummary = baseSummary && baseSummary.trim().length > 0 ? baseSummary : undefined;
+  const normalizedBaseSummary =
+    baseSummary && baseSummary.trim().length > 0 ? baseSummary : undefined;
   const derivedBaseSummary = normalizedBaseSummary ?? character.infoPerChapter[0]?.summary;
   const summary = override?.summary ?? derivedBaseSummary;
 
@@ -92,9 +107,21 @@ export const resolveCharacterSnapshot = (character: CharacterData, { location = 
   } else {
     // Use Convex URLs directly
     listening = character.media?.listensUrl ?? character.media?.avatarUrl ?? "";
-    talking = character.media?.speaksUrl ?? character.media?.listensUrl ?? character.media?.avatarUrl ?? "";
+    talking =
+      character.media?.speaksUrl ?? character.media?.listensUrl ?? character.media?.avatarUrl ?? "";
     baseNameUsed = character.slug;
   }
 
-  return { displayName, summary, override, media: { listening, talking, usesExplicitAsset: usesExplicitAsset && Boolean(explicitAssetUrl), baseNameUsed, explicitAssetUrl } };
+  return {
+    displayName,
+    summary,
+    override,
+    media: {
+      listening,
+      talking,
+      usesExplicitAsset: usesExplicitAsset && Boolean(explicitAssetUrl),
+      baseNameUsed,
+      explicitAssetUrl,
+    },
+  };
 };

@@ -1,4 +1,12 @@
-import React, { memo, useCallback, useEffect, useMemo, useDeferredValue, useState, useRef } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useDeferredValue,
+  useState,
+  useRef,
+} from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 
@@ -7,11 +15,20 @@ import { Search, FileText, Minimize2, Maximize2, X } from "lucide-react";
 
 import { Tooltip, TooltipTrigger, TooltipContent } from "@player/components/ui/tooltip";
 
-import { SearchResultsData, SearchResultItemData, cleanupSearchChapters } from "@player/searchModal";
+import {
+  SearchResultsData,
+  SearchResultItemData,
+  cleanupSearchChapters,
+} from "@player/searchModal";
 import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import ModalUI from "./ModalUI";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@player/components/ui/accordion";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@player/components/ui/accordion";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { cn } from "@player/lib/utils";
 import { findScrollParent } from "@player/utils/findScrollParent";
@@ -26,7 +43,14 @@ interface SearchModalProps {
   isSidePanel?: boolean;
 }
 
-export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, searchResults, clickedAppearanceId, searchQuery, isSidePanel = false }) => {
+export const SearchModal: React.FC<SearchModalProps> = ({
+  onClose,
+  layoutView,
+  searchResults,
+  clickedAppearanceId,
+  searchQuery,
+  isSidePanel = false,
+}) => {
   const { t } = useTranslation();
 
   const deferredResults = useDeferredValue(searchResults);
@@ -34,7 +58,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
   const isCurrentlyLoading = Boolean(searchResults?.isLoading);
   const isRefreshing = Boolean(searchResults?.isRefreshing);
   const isDeferring = deferredResults !== searchResults;
-  const showSpinner = isCurrentlyLoading && !isRefreshing && (isDeferring || !deferredResults?.items?.length);
+  const showSpinner =
+    isCurrentlyLoading && !isRefreshing && (isDeferring || !deferredResults?.items?.length);
   const showContent = Boolean(deferredResults) && !showSpinner;
 
   const [activeFilter, setActiveFilter] = useState<SearchFilter>("all");
@@ -58,7 +83,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
   const filterAvailability = useMemo(() => {
     const items = deferredResults?.items ?? [];
 
-    const availability: Record<SearchFilter, boolean> = { all: true, mentioned: false, talking: false };
+    const availability: Record<SearchFilter, boolean> = {
+      all: true,
+      mentioned: false,
+      talking: false,
+    };
 
     for (const item of items) {
       if (!availability.mentioned && item.type === FILTER_VALUE_MAP.mentioned) {
@@ -121,7 +150,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
       const parentRect = scrollParent.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
 
-      const targetCenter = targetRect.top - parentRect.top + scrollParent.scrollTop + targetRect.height / 2;
+      const targetCenter =
+        targetRect.top - parentRect.top + scrollParent.scrollTop + targetRect.height / 2;
       const desiredScrollTop = targetCenter - scrollParent.clientHeight / 2;
 
       const maxScrollTop = Math.max(0, scrollParent.scrollHeight - scrollParent.clientHeight);
@@ -188,7 +218,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
   useEffect(() => {
     // Only auto-expand chapters when the underlying search results change.
     const rawItems = deferredResults?.items ?? [];
-    const signature = rawItems.map((item) => String(item.id ?? `${item.chapter}-${item.paragraphNumber}`)).join("|");
+    const signature = rawItems
+      .map((item) => String(item.id ?? `${item.chapter}-${item.paragraphNumber}`))
+      .join("|");
 
     if (signature === previousItemsSignatureRef.current) {
       return;
@@ -254,7 +286,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
           <button
             type="button"
             onClick={areAllCollapsed ? handleExpandAll : handleCollapseAll}
-            className={"p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white"}
+            className={
+              "p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white"
+            }
             aria-label={areAllCollapsed ? t("expand_all_groups") : t("collapse_all_groups")}
           >
             {areAllCollapsed ? <Maximize2 size={18} /> : <Minimize2 size={18} />}
@@ -278,7 +312,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
           key="loading"
         >
           <div className="relative">
-            <motion.div className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary" variants={variants.loading} initial="initial" animate="animate" />
+            <motion.div
+              className="w-12 h-12 border-4 rounded-full border-book-primary-30 border-t-book-primary"
+              variants={variants.loading}
+              initial="initial"
+              animate="animate"
+            />
             <motion.div
               className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full border-t-book-tertiary-50"
               variants={variants.loading}
@@ -287,23 +326,52 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
               transition={{ delay: 0.1 }}
             />
           </div>
-          <motion.div className="mt-4 text-white/90 font-medium" variants={variants.loadingText} initial="hidden" animate="visible">
+          <motion.div
+            className="mt-4 text-white/90 font-medium"
+            variants={variants.loadingText}
+            initial="hidden"
+            animate="visible"
+          >
             {t("searching")}
           </motion.div>
-          <motion.div className="mt-2 text-white/60 text-sm" variants={variants.loadingSubtext} initial="hidden" animate="visible">
+          <motion.div
+            className="mt-2 text-white/60 text-sm"
+            variants={variants.loadingSubtext}
+            initial="hidden"
+            animate="visible"
+          >
             {t("exploring_chapters")}
           </motion.div>
         </motion.div>
       )}
 
       {showContent && (
-        <motion.div className="flex-grow overflow-y-auto" key="content" initial={{ opacity: 0.7 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
+        <motion.div
+          className="flex-grow overflow-y-auto"
+          key="content"
+          initial={{ opacity: 0.7 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
+        >
           <div className={cn("space-y-3 relative", isRefreshing && "search-results-refreshing")}>
             {hasItems ? (
               <div className="space-y-3">
-                <Accordion id="search-modal-accordion" type="multiple" value={openChapters} onValueChange={setOpenChapters} className="w-full">
+                <Accordion
+                  id="search-modal-accordion"
+                  type="multiple"
+                  value={openChapters}
+                  onValueChange={setOpenChapters}
+                  className="w-full"
+                >
                   {sortedChapterEntries.map(([chapter, items]) => (
-                    <ChapterGroup key={chapter} chapter={Number(chapter)} items={items} t={t} clickedAppearanceId={clickedAppearanceId} searchQuery={searchQuery} />
+                    <ChapterGroup
+                      key={chapter}
+                      chapter={Number(chapter)}
+                      items={items}
+                      t={t}
+                      clickedAppearanceId={clickedAppearanceId}
+                      searchQuery={searchQuery}
+                    />
                   ))}
                 </Accordion>
               </div>
@@ -312,7 +380,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
                 <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30 animate-pulse">
                   <Search size={24} />
                 </div>
-                <p className="text-white/60 text-sm animate-pulse">{t("updating_results", "Updating results...")}</p>
+                <p className="text-white/60 text-sm animate-pulse">
+                  {t("updating_results", "Updating results...")}
+                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -348,12 +418,21 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
             <div className="text-lg font-semibold text-white">{modalTitle}</div>
             <div className="flex items-center gap-2">
               {headerActions}
-              <button type="button" onClick={onClose} className="p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white" aria-label="Close modal">
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white"
+                aria-label="Close modal"
+              >
                 <X size={20} />
               </button>
             </div>
           </header>
-          {searchActions && <div className="w-full flex justify-between items-center px-4 pt-4">{searchActions}</div>}
+          {searchActions && (
+            <div className="w-full flex justify-between items-center px-4 pt-4">
+              {searchActions}
+            </div>
+          )}
           <div className="py-3 px-2 overflow-y-auto w-full flex-1">{content}</div>
         </div>
       </motion.div>
@@ -362,7 +441,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, layoutView, s
 
   // Mobile/tablet mode: use ModalUI with Dialog
   return (
-    <ModalUI title={modalTitle} onClose={onClose} layoutView={wideScreen} hideOverlay={true} headerActions={headerActions} searchActions={searchActions}>
+    <ModalUI
+      title={modalTitle}
+      onClose={onClose}
+      layoutView={wideScreen}
+      hideOverlay={true}
+      headerActions={headerActions}
+      searchActions={searchActions}
+    >
       {content}
     </ModalUI>
   );
@@ -386,7 +472,8 @@ const ChapterGroup = memo(function ChapterGroup({
       <div className="flex items-center gap-2">
         <FileText size={16} />
         <span className="font-medium">
-          {getChapterTitle(Number(chapter), t)} ({items.length} {items.length === 1 ? "result" : "results"})
+          {getChapterTitle(Number(chapter), t)} ({items.length}{" "}
+          {items.length === 1 ? "result" : "results"})
         </span>
       </div>
     ),
@@ -394,14 +481,22 @@ const ChapterGroup = memo(function ChapterGroup({
   );
 
   return (
-    <AccordionItem value={String(chapter)} className="border-book-primary-20 rounded-lg mb-3 overflow-hidden">
+    <AccordionItem
+      value={String(chapter)}
+      className="border-book-primary-20 rounded-lg mb-3 overflow-hidden"
+    >
       <AccordionTrigger className="px-2 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer transition-all duration-200 ease-out hover:scale-[1.01] hover:shadow-sm">
         {chapterTitle}
       </AccordionTrigger>
       <AccordionContent className="px-0 pb-0">
         <div className="space-y-2 py-2 px-1">
           {items.map((item) => (
-            <ResultCard key={item.id} item={item} clickedAppearanceId={clickedAppearanceId} searchQuery={searchQuery} />
+            <ResultCard
+              key={item.id}
+              item={item}
+              clickedAppearanceId={clickedAppearanceId}
+              searchQuery={searchQuery}
+            />
           ))}
         </div>
       </AccordionContent>
@@ -409,7 +504,15 @@ const ChapterGroup = memo(function ChapterGroup({
   );
 });
 
-const ResultCard = memo(function ResultCard({ item, clickedAppearanceId, searchQuery }: { item: SearchResultItemData; clickedAppearanceId?: string; searchQuery?: string }) {
+const ResultCard = memo(function ResultCard({
+  item,
+  clickedAppearanceId,
+  searchQuery,
+}: {
+  item: SearchResultItemData;
+  clickedAppearanceId?: string;
+  searchQuery?: string;
+}) {
   const { t } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isPulsing, setIsPulsing] = useState(false);
@@ -435,7 +538,10 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId, searchQ
     const parsedSearchQuery = (searchQuery ?? "").replace("@", "");
 
     try {
-      await systemNavigateTo({ currentChapter: item.chapter, currentParagraph: item.paragraphNumber }, { behavior: "smooth", expandChapterRange: true, history: "push" });
+      await systemNavigateTo(
+        { currentChapter: item.chapter, currentParagraph: item.paragraphNumber },
+        { behavior: "smooth", expandChapterRange: true, history: "push" },
+      );
 
       // Defer highlighting to next frame to ensure DOM is stable after navigation
       if (parsedSearchQuery) {
@@ -464,7 +570,10 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId, searchQ
         <div className="flex items-center gap-2 mb-2">
           {item.type && (
             <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-              {t(FILTER_OPTIONS.find((option) => option.id.toLowerCase() === item.type.toLowerCase()).translationKey) ?? item.type}
+              {t(
+                FILTER_OPTIONS.find((option) => option.id.toLowerCase() === item.type.toLowerCase())
+                  .translationKey,
+              ) ?? item.type}
             </div>
           )}
           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">
@@ -489,8 +598,17 @@ const ResultCard = memo(function ResultCard({ item, clickedAppearanceId, searchQ
 });
 
 const variants = {
-  loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
+  loading: {
+    initial: { rotate: 0 },
+    animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } },
+  },
   loadingContainer: { hidden: { opacity: 0 }, visible: { opacity: 1 }, exit: { opacity: 0 } },
-  loadingText: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.2 } } },
-  loadingSubtext: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.4 } } },
+  loadingText: {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { delay: 0.2 } },
+  },
+  loadingSubtext: {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { delay: 0.4 } },
+  },
 } as const;

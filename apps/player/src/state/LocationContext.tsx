@@ -1,5 +1,9 @@
 import React, { createContext, useCallback, useMemo, useState, useEffect } from "react";
-import { __setLocationBridge, parseLocationFromHash, getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import {
+  __setLocationBridge,
+  parseLocationFromHash,
+  getSavedLocation,
+} from "@player/helpers/paragraphsNavigation";
 
 /* ------------------------------------------------------------------ */
 export interface Location {
@@ -52,7 +56,11 @@ interface LocationCtx {
   setLocation: (loc: Location, source?: "user" | "system") => void;
 }
 
-export const LocationContext = createContext<LocationCtx>({ location: DEFAULT_LOCATION, lastSystemLocation: null, setLocation: () => {} });
+export const LocationContext = createContext<LocationCtx>({
+  location: DEFAULT_LOCATION,
+  lastSystemLocation: null,
+  setLocation: () => {},
+});
 
 /* ------------------------------------------------------------------ */
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -96,11 +104,17 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   /* ------------------------------------------------------------------ */
   /*  Sync internal bridge                                              */
   useEffect(() => {
-    __setLocationBridge({ get: () => location, set: (loc, source = "user") => setLocation(loc, source) });
+    __setLocationBridge({
+      get: () => location,
+      set: (loc, source = "user") => setLocation(loc, source),
+    });
   }, [location, setLocation]);
 
   /* ------------------------------------------------------------------ */
-  const value = useMemo(() => ({ location, lastSystemLocation, setLocation }), [location, lastSystemLocation, setLocation]);
+  const value = useMemo(
+    () => ({ location, lastSystemLocation, setLocation }),
+    [location, lastSystemLocation, setLocation],
+  );
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
 };

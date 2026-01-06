@@ -9,7 +9,9 @@ const verifiedBookColorPaths = new Map<string, string>();
 const LINK_ID_PREFIX = "book-colors-";
 
 function removeExistingBookColorLinks(): void {
-  const links = Array.from(document.querySelectorAll<HTMLLinkElement>(`link[id^="${LINK_ID_PREFIX}"]`));
+  const links = Array.from(
+    document.querySelectorAll<HTMLLinkElement>(`link[id^="${LINK_ID_PREFIX}"]`),
+  );
 
   for (const link of links) {
     const slug = link.dataset.bookSlug ?? link.id.replace(LINK_ID_PREFIX, "");

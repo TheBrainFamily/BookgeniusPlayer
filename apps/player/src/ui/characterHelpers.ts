@@ -16,7 +16,11 @@ export function isAppearanceWithinRange(
 
   // Single chapter range
   if (startChapter === effectiveEndChapter) {
-    return chapterNumber === startChapter && paragraphNumber >= startParagraph && paragraphNumber <= effectiveEndParagraph;
+    return (
+      chapterNumber === startChapter &&
+      paragraphNumber >= startParagraph &&
+      paragraphNumber <= effectiveEndParagraph
+    );
   }
 
   // Multi-chapter range cases:
@@ -36,7 +40,14 @@ export function isAppearanceWithinRange(
   return false; // Not in range
 }
 
-export function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: string, endChapter?: number, endParagraph?: number, onlyTalking = false) {
+export function activateCharacters(
+  chapterNum: number,
+  paragraphNum: number,
+  bookSlug: string,
+  endChapter?: number,
+  endParagraph?: number,
+  onlyTalking = false,
+) {
   const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
   entityNotes.forEach((note) => {
     const appearancesStr = note.dataset.appearances;
@@ -44,7 +55,11 @@ export function activateCharacters(chapterNum: number, paragraphNum: number, boo
     if (!appearancesStr || !canonicalName) return;
 
     try {
-      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
+      const appearances: {
+        chapterNumber: number;
+        paragraphNumber: number;
+        isTalkingInParagraph: boolean;
+      }[] = JSON.parse(appearancesStr);
       let isInRange = false;
       let isTalkingInRange = false;
 

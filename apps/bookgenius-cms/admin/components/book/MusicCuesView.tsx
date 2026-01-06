@@ -21,8 +21,23 @@ import { Input } from "@/components/ui/input";
 import { Plus, Music, List, FolderOpen, Trash2, Upload, GripVertical } from "lucide-react";
 import { Id } from "@convex/_generated/dataModel";
 import { AddMusicCueDialog } from "../dialogs/AddMusicCueDialog";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, horizontalListSortingStrategy, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  horizontalListSortingStrategy,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 // =============================================================================
@@ -42,7 +57,17 @@ interface MusicCuesViewProps {
 
 type ViewMode = "cuesheet" | "files";
 
-type CueData = { _id: Id<"musicCues">; fileBasename: string; chapter: number; paragraph: number; order: number; url?: string; coverUrl?: string; title?: string; artist?: string };
+type CueData = {
+  _id: Id<"musicCues">;
+  fileBasename: string;
+  chapter: number;
+  paragraph: number;
+  order: number;
+  url?: string;
+  coverUrl?: string;
+  title?: string;
+  artist?: string;
+};
 
 // =============================================================================
 // Sortable Cue Card Component (for grouped display with drag-and-drop)
@@ -57,7 +82,14 @@ interface SortableCueCardProps {
   isDraggable?: boolean;
 }
 
-function SortableCueCard({ cue, isReused, onEdit, onDelete, compact, isDraggable }: SortableCueCardProps) {
+function SortableCueCard({
+  cue,
+  isReused,
+  onEdit,
+  onDelete,
+  compact,
+  isDraggable,
+}: SortableCueCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: cue._id,
     // Disable layout animation to prevent snap-back glitch on drop
@@ -72,7 +104,12 @@ function SortableCueCard({ cue, isReused, onEdit, onDelete, compact, isDraggable
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-2 p-2 rounded-md hover:bg-accent/50 group cursor-pointer border bg-card" onClick={() => onEdit(cue)}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 p-2 rounded-md hover:bg-accent/50 group cursor-pointer border bg-card"
+      onClick={() => onEdit(cue)}
+    >
       {/* Drag handle - only show when draggable */}
       {isDraggable && (
         <div
@@ -86,7 +123,9 @@ function SortableCueCard({ cue, isReused, onEdit, onDelete, compact, isDraggable
       )}
 
       {/* Cover art */}
-      <div className={`${compact ? "h-10 w-10" : "h-12 w-12"} rounded border overflow-hidden shrink-0`}>
+      <div
+        className={`${compact ? "h-10 w-10" : "h-12 w-12"} rounded border overflow-hidden shrink-0`}
+      >
         {cue.coverUrl ? (
           <img src={cue.coverUrl} alt={cue.fileBasename} className="h-full w-full object-cover" />
         ) : (
@@ -137,7 +176,15 @@ interface GroupedCueRowProps {
   onReorder: (cueIds: Id<"musicCues">[]) => void;
 }
 
-function GroupedCueRow({ paragraph, cues, fileUsageCount, onEdit, onDelete, onParagraphEdit, onReorder }: GroupedCueRowProps) {
+function GroupedCueRow({
+  paragraph,
+  cues,
+  fileUsageCount,
+  onEdit,
+  onDelete,
+  onParagraphEdit,
+  onReorder,
+}: GroupedCueRowProps) {
   const [isEditingParagraph, setIsEditingParagraph] = useState(false);
   const [paragraphValue, setParagraphValue] = useState(String(paragraph));
 
@@ -218,11 +265,21 @@ function GroupedCueRow({ paragraph, cues, fileUsageCount, onEdit, onDelete, onPa
       {/* Cue cards - with drag-and-drop for multiple cues */}
       {isMultipleCues ? (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={localCues.map((c) => c._id)} strategy={horizontalListSortingStrategy}>
+          <SortableContext
+            items={localCues.map((c) => c._id)}
+            strategy={horizontalListSortingStrategy}
+          >
             <div className="flex-1 flex flex-col sm:flex-row gap-2">
               {localCues.map((cue) => (
                 <div key={cue._id} className="flex-1 min-w-0 sm:max-w-[50%]">
-                  <SortableCueCard cue={cue} isReused={(fileUsageCount.get(cue.fileBasename) || 0) > 1} onEdit={onEdit} onDelete={onDelete} compact isDraggable />
+                  <SortableCueCard
+                    cue={cue}
+                    isReused={(fileUsageCount.get(cue.fileBasename) || 0) > 1}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    compact
+                    isDraggable
+                  />
                 </div>
               ))}
             </div>
@@ -268,7 +325,12 @@ function ChapterHeader({ chapterNumber, cueCount, onAddCue }: ChapterHeaderProps
           </Badge>
         )}
       </div>
-      <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => onAddCue(chapterNumber)}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-7 px-2"
+        onClick={() => onAddCue(chapterNumber)}
+      >
         <Plus className="h-4 w-4 mr-1" />
         Add
       </Button>
@@ -281,7 +343,14 @@ function ChapterHeader({ chapterNumber, cueCount, onAddCue }: ChapterHeaderProps
 // =============================================================================
 
 interface MusicFileCardProps {
-  file: { basename: string; url?: string; coverUrl?: string; title?: string; artist?: string; duration?: number };
+  file: {
+    basename: string;
+    url?: string;
+    coverUrl?: string;
+    title?: string;
+    artist?: string;
+    duration?: number;
+  };
   onSelect: () => void;
 }
 
@@ -294,7 +363,10 @@ function MusicFileCard({ file, onSelect }: MusicFileCardProps) {
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors" onClick={onSelect}>
+    <div
+      className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors"
+      onClick={onSelect}
+    >
       {/* Cover art */}
       <div className="h-14 w-14 rounded-md border overflow-hidden shrink-0">
         {file.coverUrl ? (
@@ -309,12 +381,18 @@ function MusicFileCard({ file, onSelect }: MusicFileCardProps) {
       {/* Info */}
       <div className="flex flex-col gap-0.5 min-w-0 flex-1">
         <span className="text-sm font-medium truncate">{file.title || file.basename}</span>
-        {file.artist && <span className="text-xs text-muted-foreground truncate">{file.artist}</span>}
+        {file.artist && (
+          <span className="text-xs text-muted-foreground truncate">{file.artist}</span>
+        )}
         <span className="text-xs text-muted-foreground truncate">{file.basename}</span>
       </div>
 
       {/* Duration */}
-      {file.duration && <span className="text-xs text-muted-foreground shrink-0">{formatDuration(file.duration)}</span>}
+      {file.duration && (
+        <span className="text-xs text-muted-foreground shrink-0">
+          {formatDuration(file.duration)}
+        </span>
+      )}
     </div>
   );
 }
@@ -323,7 +401,16 @@ function MusicFileCard({ file, onSelect }: MusicFileCardProps) {
 // Main Component
 // =============================================================================
 
-export function MusicCuesView({ folderPath, onAssetSelect, onFolderSelect, onUploadNew, onUploadAsset, onCreateAsset, onCreateFolder, onShowSnippet }: MusicCuesViewProps) {
+export function MusicCuesView({
+  folderPath,
+  onAssetSelect,
+  onFolderSelect,
+  onUploadNew,
+  onUploadAsset,
+  onCreateAsset,
+  onCreateFolder,
+  onShowSnippet,
+}: MusicCuesViewProps) {
   const { cues, files, isLoading } = useMusicCues();
   const { chapters } = useChapters();
   const { bookPath } = useBook();
@@ -333,26 +420,31 @@ export function MusicCuesView({ folderPath, onAssetSelect, onFolderSelect, onUpl
 
   const deleteCue = useMutation(api.musicCues.remove);
   const updatePosition = useMutation(api.musicCues.updatePosition);
-  const reorderCues = useMutation(api.musicCues.reorder).withOptimisticUpdate((localStore, { cueIds }) => {
-    // Get current cues from cache
-    const currentCues = localStore.getQuery(api.musicCues.listByBook, { bookPath });
-    if (!currentCues) return;
+  const reorderCues = useMutation(api.musicCues.reorder).withOptimisticUpdate(
+    (localStore, { cueIds }) => {
+      // Get current cues from cache
+      const currentCues = localStore.getQuery(api.musicCues.listByBook, { bookPath });
+      if (!currentCues) return;
 
-    // Create new order map
-    const orderMap = new Map(cueIds.map((id, idx) => [id, idx]));
+      // Create new order map
+      const orderMap = new Map(cueIds.map((id, idx) => [id, idx]));
 
-    // Update order in cached cues
-    const updatedCues = currentCues.map((cue) => ({ ...cue, order: orderMap.has(cue._id) ? orderMap.get(cue._id)! : cue.order }));
+      // Update order in cached cues
+      const updatedCues = currentCues.map((cue) => ({
+        ...cue,
+        order: orderMap.has(cue._id) ? orderMap.get(cue._id)! : cue.order,
+      }));
 
-    // Re-sort by chapter, paragraph, order
-    updatedCues.sort((a, b) => {
-      if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-      if (a.paragraph !== b.paragraph) return a.paragraph - b.paragraph;
-      return a.order - b.order;
-    });
+      // Re-sort by chapter, paragraph, order
+      updatedCues.sort((a, b) => {
+        if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+        if (a.paragraph !== b.paragraph) return a.paragraph - b.paragraph;
+        return a.order - b.order;
+      });
 
-    localStore.setQuery(api.musicCues.listByBook, { bookPath }, updatedCues);
-  });
+      localStore.setQuery(api.musicCues.listByBook, { bookPath }, updatedCues);
+    },
+  );
 
   // Get all chapter numbers from chapters data
   const allChapterNumbers = useMemo(() => {
@@ -486,7 +578,13 @@ export function MusicCuesView({ folderPath, onAssetSelect, onFolderSelect, onUpl
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-2">
             {files && files.length > 0 ? (
-              files.map((file) => <MusicFileCard key={file.basename} file={file} onSelect={() => handleFileSelect(file.basename)} />)
+              files.map((file) => (
+                <MusicFileCard
+                  key={file.basename}
+                  file={file}
+                  onSelect={() => handleFileSelect(file.basename)}
+                />
+              ))
             ) : (
               <div className="py-12 text-center text-sm text-muted-foreground">
                 No music files uploaded yet.
@@ -532,12 +630,19 @@ export function MusicCuesView({ folderPath, onAssetSelect, onFolderSelect, onUpl
         <div className="py-2">
           {sortedChapters.map((chapter) => {
             const paragraphMap = cuesByChapterAndParagraph.get(chapter)!;
-            const totalCues = Array.from(paragraphMap.values()).reduce((sum, cues) => sum + cues.length, 0);
+            const totalCues = Array.from(paragraphMap.values()).reduce(
+              (sum, cues) => sum + cues.length,
+              0,
+            );
             const sortedParagraphs = Array.from(paragraphMap.keys()).sort((a, b) => a - b);
 
             return (
               <div key={chapter} className="mb-2">
-                <ChapterHeader chapterNumber={chapter} cueCount={totalCues} onAddCue={handleAddCue} />
+                <ChapterHeader
+                  chapterNumber={chapter}
+                  cueCount={totalCues}
+                  onAddCue={handleAddCue}
+                />
                 {sortedParagraphs.length > 0 ? (
                   sortedParagraphs.map((paragraph) => {
                     const paragraphCues = paragraphMap.get(paragraph)!;
@@ -555,7 +660,9 @@ export function MusicCuesView({ folderPath, onAssetSelect, onFolderSelect, onUpl
                     );
                   })
                 ) : (
-                  <div className="px-4 py-6 text-center text-sm text-muted-foreground">No music set for this chapter</div>
+                  <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                    No music set for this chapter
+                  </div>
                 )}
               </div>
             );
@@ -564,7 +671,11 @@ export function MusicCuesView({ folderPath, onAssetSelect, onFolderSelect, onUpl
       </ScrollArea>
 
       {/* Add Cue Dialog */}
-      <AddMusicCueDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} chapter={addDialogChapter} />
+      <AddMusicCueDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        chapter={addDialogChapter}
+      />
     </div>
   );
 }

@@ -16,7 +16,8 @@ import { ExtendedLocation } from "@player/helpers/paragraphsNavigation";
 
 export function useCriticalAssetPreloader() {
   const [readingPosition, setReadingPosition] = useState<ExtendedLocation | null>(null);
-  const { backgroundsForBook, backgroundSongsForBook, isLoading, ensureCompiledChaptersLoaded } = useBookConvex();
+  const { backgroundsForBook, backgroundSongsForBook, isLoading, ensureCompiledChaptersLoaded } =
+    useBookConvex();
   const preloadStartedRef = useRef(false);
   const chapterPreloadStartedRef = useRef(false);
 
@@ -59,14 +60,21 @@ export function useCriticalAssetPreloader() {
     preloadStartedRef.current = true;
 
     const { currentChapter, currentParagraph } = readingPosition;
-    console.log("[CriticalAssetPreloader] Triggering dealWithBackground for:", { currentChapter, currentParagraph });
+    console.log("[CriticalAssetPreloader] Triggering dealWithBackground for:", {
+      currentChapter,
+      currentParagraph,
+    });
 
     // Use the existing mechanism - it handles finding the right background,
     // loading into video elements, transitions, debouncing, etc.
     dealWithBackground({ currentChapter, currentParagraph });
 
     // Music: find track for reading position and preload
-    const matchingTracks = backgroundSongsForBook.filter((track) => (currentChapter === track.chapter && currentParagraph >= track.paragraph) || currentChapter > track.chapter);
+    const matchingTracks = backgroundSongsForBook.filter(
+      (track) =>
+        (currentChapter === track.chapter && currentParagraph >= track.paragraph) ||
+        currentChapter > track.chapter,
+    );
     const targetTrack = matchingTracks[matchingTracks.length - 1];
 
     if (targetTrack?.files?.[0]) {

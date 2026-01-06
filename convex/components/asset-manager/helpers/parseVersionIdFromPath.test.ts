@@ -22,28 +22,19 @@ describe("parseVersionIdFromPath", () => {
     });
 
     it("handles simple filenames", () => {
-      const result = parseVersionIdFromPath(
-        "/am/file/v/abc/file.txt",
-        DEFAULT_BASE_PATH,
-      );
+      const result = parseVersionIdFromPath("/am/file/v/abc/file.txt", DEFAULT_BASE_PATH);
       expect(result).toBe("abc");
     });
   });
 
   describe("with custom base path", () => {
     it("works with single-segment base path", () => {
-      const result = parseVersionIdFromPath(
-        "/assets/v/ver123/image.png",
-        "/assets",
-      );
+      const result = parseVersionIdFromPath("/assets/v/ver123/image.png", "/assets");
       expect(result).toBe("ver123");
     });
 
     it("works with deeper base path", () => {
-      const result = parseVersionIdFromPath(
-        "/api/v1/files/v/ver456/doc.pdf",
-        "/api/v1/files",
-      );
+      const result = parseVersionIdFromPath("/api/v1/files/v/ver456/doc.pdf", "/api/v1/files");
       expect(result).toBe("ver456");
     });
 
@@ -55,10 +46,7 @@ describe("parseVersionIdFromPath", () => {
 
   describe("edge cases and error handling", () => {
     it("returns null when /v/ marker is missing", () => {
-      const result = parseVersionIdFromPath(
-        "/am/file/version123/file.txt",
-        DEFAULT_BASE_PATH,
-      );
+      const result = parseVersionIdFromPath("/am/file/version123/file.txt", DEFAULT_BASE_PATH);
       expect(result).toBeNull();
     });
 
@@ -91,23 +79,14 @@ describe("parseVersionIdFromPath", () => {
 
     it("handles pathname with leading slash variations", () => {
       // Both with and without leading slash should work
-      const result1 = parseVersionIdFromPath(
-        "/am/file/v/ver123/file.txt",
-        "/am/file",
-      );
-      const result2 = parseVersionIdFromPath(
-        "/am/file/v/ver123/file.txt",
-        "am/file",
-      );
+      const result1 = parseVersionIdFromPath("/am/file/v/ver123/file.txt", "/am/file");
+      const result2 = parseVersionIdFromPath("/am/file/v/ver123/file.txt", "am/file");
       expect(result1).toBe("ver123");
       expect(result2).toBe("ver123");
     });
 
     it("handles base path with trailing slash", () => {
-      const result = parseVersionIdFromPath(
-        "/am/file/v/ver123/file.txt",
-        "/am/file/",
-      );
+      const result = parseVersionIdFromPath("/am/file/v/ver123/file.txt", "/am/file/");
       expect(result).toBe("ver123");
     });
   });

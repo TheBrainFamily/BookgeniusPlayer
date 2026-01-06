@@ -5,7 +5,11 @@ import { anthropic } from "@ai-sdk/anthropic";
 
 import { sleep } from "./tools/sleep";
 
-export const callSonnet45 = async <T = string>(prompt: string[], schema?: z.ZodSchema<T>, maxRetries = 2) => {
+export const callSonnet45 = async <T = string>(
+  prompt: string[],
+  schema?: z.ZodSchema<T>,
+  maxRetries = 2,
+) => {
   let lastError: unknown;
   let attempts = 0;
   const maxAttempts = maxRetries + 1; // First attempt + retries
@@ -46,7 +50,10 @@ export const callSonnet45 = async <T = string>(prompt: string[], schema?: z.ZodS
       }
     } catch (error: unknown) {
       lastError = error;
-      logger.error(`LLM API error: ${error instanceof Error ? error.message : String(error)}`, "OpenAI");
+      logger.error(
+        `LLM API error: ${error instanceof Error ? error.message : String(error)}`,
+        "OpenAI",
+      );
 
       // If we've reached max attempts, throw the error
       if (attempts >= maxAttempts) {

@@ -65,7 +65,8 @@ export const CoverArt = ({ src }: CoverArtProps) => {
 
   return (
     <div className="relative w-full h-full group">
-      <AnimatePresence /* default mode="sync" gives us overlapping enter/exit for a smooth cross-fade */>
+      <AnimatePresence /* default mode="sync" gives us overlapping enter/exit for a smooth cross-fade */
+      >
         <motion.img
           key={displayedSrc}
           src={displayedSrc}

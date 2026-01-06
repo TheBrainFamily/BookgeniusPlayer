@@ -179,7 +179,9 @@ function splitTopLevelElements(inner: string): string[] {
 }
 
 function formatChapters(xml: string): string {
-  return xml.replace(/<Chapter\b[^>]*>[\s\S]*?<\/Chapter>/g, (chapter) => formatChapterBlock(chapter));
+  return xml.replace(/<Chapter\b[^>]*>[\s\S]*?<\/Chapter>/g, (chapter) =>
+    formatChapterBlock(chapter),
+  );
 }
 
 async function processFile(filePath: string, options: Options): Promise<boolean> {

@@ -16,7 +16,11 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { queries } from "@/lib/queries";
-import { detectFolderType, parseBookPath, type DetectedFolderType } from "@/lib/utils/folderPatterns";
+import {
+  detectFolderType,
+  parseBookPath,
+  type DetectedFolderType,
+} from "@/lib/utils/folderPatterns";
 import { BookProvider } from "@/lib/contexts";
 import { BookDashboard } from "./BookDashboard";
 import { CharacterGrid } from "./CharacterGrid";
@@ -49,7 +53,10 @@ export function BookAwareAssetList(props: BookAwareAssetListProps) {
   });
 
   // Detect folder type from path
-  const folderType = useMemo(() => detectFolderType(folderPath, folder?.extra), [folderPath, folder?.extra]);
+  const folderType = useMemo(
+    () => detectFolderType(folderPath, folder?.extra),
+    [folderPath, folder?.extra],
+  );
 
   // Parse book path for context
   const bookInfo = useMemo(() => parseBookPath(folderPath), [folderPath]);
@@ -69,7 +76,10 @@ export function BookAwareAssetList(props: BookAwareAssetListProps) {
       if (bookInfo) {
         return (
           <BookProvider bookPath={bookInfo.bookPath}>
-            <CharacterGrid onCharacterSelect={(characterPath) => onFolderSelect(characterPath)} onCreateCharacter={props.onCreateFolder} />
+            <CharacterGrid
+              onCharacterSelect={(characterPath) => onFolderSelect(characterPath)}
+              onCreateCharacter={props.onCreateFolder}
+            />
           </BookProvider>
         );
       }

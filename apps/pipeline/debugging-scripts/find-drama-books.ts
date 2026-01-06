@@ -71,7 +71,10 @@ async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
       }
 
       // Check for scene sections (full play indicator)
-      if (content.includes('epub:type="z3998:scene"') || content.includes("epub:type='z3998:scene'")) {
+      if (
+        content.includes('epub:type="z3998:scene"') ||
+        content.includes("epub:type='z3998:scene'")
+      ) {
         analysis.hasSceneSections = true;
         hasAnyDramaContent = true;
       }
@@ -83,7 +86,17 @@ async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
       }
 
       // Count regular paragraphs (excluding metadata files)
-      if (!["dramatis-personae.xhtml", "endnotes.xhtml", "colophon.xhtml", "imprint.xhtml", "titlepage.xhtml", "halftitlepage.xhtml", "loi.xhtml"].includes(file)) {
+      if (
+        ![
+          "dramatis-personae.xhtml",
+          "endnotes.xhtml",
+          "colophon.xhtml",
+          "imprint.xhtml",
+          "titlepage.xhtml",
+          "halftitlepage.xhtml",
+          "loi.xhtml",
+        ].includes(file)
+      ) {
         const paragraphs = content.match(/<p[^>]*>/g);
         if (paragraphs) {
           analysis.regularParagraphs += paragraphs.length;
@@ -119,11 +132,15 @@ async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
     } else if (analysis.hasDramaTables && analysis.chapterCount > 0) {
       // Has chapters AND drama tables = novel with embedded drama
       analysis.category = "EMBEDDED_DRAMA";
-      analysis.notes.push(`${analysis.dramaTables} drama sections in ${analysis.chapterCount}-chapter book`);
+      analysis.notes.push(
+        `${analysis.dramaTables} drama sections in ${analysis.chapterCount}-chapter book`,
+      );
     } else if (analysis.hasDramaTables && analysis.regularParagraphs > analysis.dialogueRows * 2) {
       // More prose than dialogue = embedded drama
       analysis.category = "EMBEDDED_DRAMA";
-      analysis.notes.push(`${analysis.dramaTables} drama tables, ${analysis.regularParagraphs} paragraphs`);
+      analysis.notes.push(
+        `${analysis.dramaTables} drama tables, ${analysis.regularParagraphs} paragraphs`,
+      );
     } else if (analysis.hasDramaTables && analysis.dialogueRows > 100) {
       // Mostly drama content
       analysis.category = "FULL_PLAY";

@@ -26,7 +26,10 @@ export const useBackgroundAddModal = create<BackgroundAddModalState>()(
       chapter: null,
       paragraph: null,
 
-      openModal: ({ chapter, paragraph }: BackgroundAddModalParams, replaceCurrentModal = false) => {
+      openModal: (
+        { chapter, paragraph }: BackgroundAddModalParams,
+        replaceCurrentModal = false,
+      ) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID, replaceCurrentModal)) {
           set({ isOpen: true, chapter, paragraph });

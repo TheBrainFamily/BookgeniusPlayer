@@ -29,7 +29,11 @@ interface UseImageReadinessOpts {
  *
  * We only start the splash timer after a configurable post-ready delay.
  */
-const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postReadyDelayMs = 100 }: UseVideoReadinessOpts = {}) => {
+const useVideoReadiness = ({
+  videoTimeoutMs = 30000,
+  minSplashMs = 1500,
+  postReadyDelayMs = 100,
+}: UseVideoReadinessOpts = {}) => {
   const [videoAReady, setVideoAReady] = useState(false);
   const [videoBReady, setVideoBReady] = useState(false);
   const [postReadyDelayElapsed, setPostReadyDelayElapsed] = useState(false);
@@ -137,7 +141,12 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
   return { videoBackgroundReady, setVideoBackgroundReady };
 };
 
-const useImageReadiness = ({ imageTimeoutMs = 30000, charactersData }: UseImageReadinessOpts & { charactersData: ReturnType<typeof useBookConvex>["charactersData"] }) => {
+const useImageReadiness = ({
+  imageTimeoutMs = 30000,
+  charactersData,
+}: UseImageReadinessOpts & {
+  charactersData: ReturnType<typeof useBookConvex>["charactersData"];
+}) => {
   const [imageBackgroundReady, setImageBackgroundReady] = useState(false);
   const allCharacters = charactersData;
   const timeoutIdsRef = useRef<Set<TimeoutId>>(new Set());
@@ -146,9 +155,13 @@ const useImageReadiness = ({ imageTimeoutMs = 30000, charactersData }: UseImageR
 
   const { chapter } = locationRange;
   const loadImages = useCallback(async (): Promise<void> => {
-    const chapterCharacters = allCharacters.filter((character) => character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter));
+    const chapterCharacters = allCharacters.filter((character) =>
+      character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter),
+    );
 
-    const imageUrls = chapterCharacters.filter((character) => character.media?.avatarUrl).map((character) => getBookAssetUrl(character.media?.avatarUrl));
+    const imageUrls = chapterCharacters
+      .filter((character) => character.media?.avatarUrl)
+      .map((character) => getBookAssetUrl(character.media?.avatarUrl));
 
     let failedCount = 0;
 
@@ -245,7 +258,10 @@ const useImageReadiness = ({ imageTimeoutMs = 30000, charactersData }: UseImageR
     };
 
     const checkImages = async () => {
-      const [isALoaded, isBLoaded] = await Promise.all([isBackgroundImageLoaded(bgImageA), isBackgroundImageLoaded(bgImageB)]);
+      const [isALoaded, isBLoaded] = await Promise.all([
+        isBackgroundImageLoaded(bgImageA),
+        isBackgroundImageLoaded(bgImageB),
+      ]);
 
       if (isALoaded || isBLoaded) {
         setImageBackgroundReady(true);
@@ -260,8 +276,15 @@ const useImageReadiness = ({ imageTimeoutMs = 30000, charactersData }: UseImageR
 
 export const useAppReady = () => {
   const { charactersData, backgroundsForBook } = useBookConvex();
-  const { videoBackgroundReady, setVideoBackgroundReady } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 100, postReadyDelayMs: 100 });
-  const { loadImages, imageBackgroundReady } = useImageReadiness({ imageTimeoutMs: 30000, charactersData });
+  const { videoBackgroundReady, setVideoBackgroundReady } = useVideoReadiness({
+    videoTimeoutMs: 30000,
+    minSplashMs: 100,
+    postReadyDelayMs: 100,
+  });
+  const { loadImages, imageBackgroundReady } = useImageReadiness({
+    imageTimeoutMs: 30000,
+    charactersData,
+  });
 
   // If no backgrounds, mark video as ready immediately
   useEffect(() => {

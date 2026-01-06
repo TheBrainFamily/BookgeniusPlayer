@@ -24,7 +24,10 @@ function extractTagSpots(modelHtml: string): { tagSpots: TagSpot[]; modelPlain: 
   return { tagSpots, modelPlain };
 }
 
-function buildPositionMapping(modelPlain: string, origPlain: string): { idxMap: number[]; finalOPos: number } {
+function buildPositionMapping(
+  modelPlain: string,
+  origPlain: string,
+): { idxMap: number[]; finalOPos: number } {
   const idxMap: number[] = [];
   let mPos = 0;
   let oPos = 0;
@@ -54,7 +57,12 @@ function calculateDrift(origPlain: string, modelPlain: string): number {
   return origPlain.length === 0 ? 0 : deltaChars / origPlain.length;
 }
 
-function reassemble(tagSpots: TagSpot[], origPlain: string, idxMap: number[], finalOPos: number): string {
+function reassemble(
+  tagSpots: TagSpot[],
+  origPlain: string,
+  idxMap: number[],
+  finalOPos: number,
+): string {
   let out = "";
   let lastOrig = 0;
 
@@ -69,7 +77,11 @@ function reassemble(tagSpots: TagSpot[], origPlain: string, idxMap: number[], fi
   return out;
 }
 
-export function restoreOriginalTextInHtml(originalHtml: string, modelHtml: string, tolerance = 0.2): string {
+export function restoreOriginalTextInHtml(
+  originalHtml: string,
+  modelHtml: string,
+  tolerance = 0.2,
+): string {
   if (originalHtml === modelHtml) return modelHtml;
 
   const origPlain = stripHtmlTags(originalHtml);

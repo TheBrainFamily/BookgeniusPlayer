@@ -10,7 +10,12 @@ export function useApplyGraphicsSettings() {
     const legacy = document.getElementById("legacy");
     if (!legacy) return;
 
-    legacy.classList.remove("graphics-full", "graphics-reduced", "graphics-minimal", "graphics-bright");
+    legacy.classList.remove(
+      "graphics-full",
+      "graphics-reduced",
+      "graphics-minimal",
+      "graphics-bright",
+    );
     legacy.classList.add(`graphics-${qualityLevel}`);
   }, [qualityLevel]);
 
@@ -33,7 +38,9 @@ export function useApplyGraphicsSettings() {
     };
 
     const getMultiplierFromStyle = () => {
-      const multiplierValue = Number.parseFloat(legacy.style.getPropertyValue("--bg-blur-multiplier"));
+      const multiplierValue = Number.parseFloat(
+        legacy.style.getPropertyValue("--bg-blur-multiplier"),
+      );
       return Number.isFinite(multiplierValue) ? multiplierValue : null;
     };
 

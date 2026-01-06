@@ -10,7 +10,12 @@ import { CreateFolderDialog } from "./components/CreateFolderDialog";
 import { UploadDialog } from "./components/UploadDialog";
 import { CodeSnippetDialog } from "./components/CodeSnippetDialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle, usePanelRef } from "@/components/ui/resizable";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+  usePanelRef,
+} from "@/components/ui/resizable";
 import { Loader2, PanelLeftClose, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -20,7 +25,9 @@ import { Button } from "@/components/ui/button";
 
 type SpecializedAssetType = "chapter" | null;
 
-function detectSpecializedAsset(asset: { folderPath: string; basename: string } | null): SpecializedAssetType {
+function detectSpecializedAsset(
+  asset: { folderPath: string; basename: string } | null,
+): SpecializedAssetType {
   if (!asset) return null;
 
   const { folderPath, basename } = asset;
@@ -47,7 +54,14 @@ const STORAGE_KEY_LEFT_COLLAPSED = "cms-left-panel-collapsed";
 const STORAGE_KEY_LEFT_SIZE = "cms-left-panel-size";
 const STORAGE_KEY_RIGHT_SIZE = "cms-right-panel-size";
 
-export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFolderSelect, onAssetSelect, onVersionSelect }: AdminPanelProps) {
+export function AdminPanel({
+  folderPath,
+  selectedAsset,
+  selectedVersionId,
+  onFolderSelect,
+  onAssetSelect,
+  onVersionSelect,
+}: AdminPanelProps) {
   // Dialog state (local, not URL-based)
   const [createFolderOpen, setCreateFolderOpen] = useState(false);
   const [createFolderParentPath, setCreateFolderParentPath] = useState("");
@@ -96,12 +110,15 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
     setUploadOpen(true);
   };
 
-  const handleUploadComplete = useCallback((uploadFolderPath: string, basename: string, file: File) => {
-    if (basename.startsWith("avatar-large.")) {
-      const objectUrl = URL.createObjectURL(file);
-      setOptimisticAvatars((prev) => ({ ...prev, [uploadFolderPath]: objectUrl }));
-    }
-  }, []);
+  const handleUploadComplete = useCallback(
+    (uploadFolderPath: string, basename: string, file: File) => {
+      if (basename.startsWith("avatar-large.")) {
+        const objectUrl = URL.createObjectURL(file);
+        setOptimisticAvatars((prev) => ({ ...prev, [uploadFolderPath]: objectUrl }));
+      }
+    },
+    [],
+  );
 
   const handleCloseDetail = () => {
     onAssetSelect(null);
@@ -159,7 +176,12 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
           >
             <div className="h-full flex flex-col">
               <Suspense fallback={<FolderTreeSkeleton onToggleCollapse={toggleLeftSidebar} />}>
-                <FolderTree selectedFolderPath={folderPath} onFolderSelect={onFolderSelect} onCreateFolder={handleCreateFolder} onToggleCollapse={toggleLeftSidebar} />
+                <FolderTree
+                  selectedFolderPath={folderPath}
+                  onFolderSelect={onFolderSelect}
+                  onCreateFolder={handleCreateFolder}
+                  onToggleCollapse={toggleLeftSidebar}
+                />
               </Suspense>
             </div>
           </ResizablePanel>
@@ -172,7 +194,13 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
               {/* Collapsed sidebar toggle - shown when left panel is collapsed */}
               {leftCollapsed && (
                 <div className="h-full flex flex-col border-r border-border bg-sidebar shrink-0">
-                  <Button variant="ghost" size="icon" className="m-2" onClick={toggleLeftSidebar} title="Expand sidebar">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="m-2"
+                    onClick={toggleLeftSidebar}
+                    title="Expand sidebar"
+                  >
                     <PanelLeft className="h-4 w-4" />
                   </Button>
                 </div>
@@ -180,7 +208,9 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
 
               {/* Specialized Editor (replaces middle + right panels) */}
               {specializedType ? (
-                <div className="flex-1 h-full flex flex-col min-w-0">{renderSpecializedEditor()}</div>
+                <div className="flex-1 h-full flex flex-col min-w-0">
+                  {renderSpecializedEditor()}
+                </div>
               ) : (
                 <ResizablePanelGroup orientation="horizontal" className="flex-1 h-full">
                   {/* Middle: Asset List (book-aware) */}
@@ -208,7 +238,12 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
                   {selectedAsset && (
                     <>
                       <ResizableHandle />
-                      <ResizablePanel id="asset-detail" defaultSize="350px" minSize="280px" maxSize="500px">
+                      <ResizablePanel
+                        id="asset-detail"
+                        defaultSize="350px"
+                        minSize="280px"
+                        maxSize="500px"
+                      >
                         <div className="h-full flex flex-col">
                           <Suspense fallback={<AssetDetailSkeleton />}>
                             <AssetDetail
@@ -231,14 +266,37 @@ export function AdminPanel({ folderPath, selectedAsset, selectedVersionId, onFol
         </ResizablePanelGroup>
 
         {/* Dialogs */}
-        <CreateFolderDialog open={createFolderOpen} onOpenChange={setCreateFolderOpen} parentPath={createFolderParentPath} />
+        <CreateFolderDialog
+          open={createFolderOpen}
+          onOpenChange={setCreateFolderOpen}
+          parentPath={createFolderParentPath}
+        />
 
-        <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} folderPath={folderPath} existingBasename={uploadBasename} onUploadComplete={handleUploadComplete} />
+        <UploadDialog
+          open={uploadOpen}
+          onOpenChange={setUploadOpen}
+          folderPath={folderPath}
+          existingBasename={uploadBasename}
+          onUploadComplete={handleUploadComplete}
+        />
 
-        <CodeSnippetDialog open={snippetOpen} onOpenChange={setSnippetOpen} folderPath={folderPath} />
+        <CodeSnippetDialog
+          open={snippetOpen}
+          onOpenChange={setSnippetOpen}
+          folderPath={folderPath}
+        />
 
         {/* Toast notifications */}
-        <Toaster position="bottom-right" toastOptions={{ style: { background: "var(--color-card)", border: "1px solid var(--color-border)", color: "var(--color-foreground)" } }} />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "var(--color-card)",
+              border: "1px solid var(--color-border)",
+              color: "var(--color-foreground)",
+            },
+          }}
+        />
       </div>
     </TooltipProvider>
   );

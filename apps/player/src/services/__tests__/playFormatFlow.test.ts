@@ -2,7 +2,12 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { normalizeChapterHtml, injectDataIndex, injectAvatarShells, countParagraphs } from "../htmlNormalizer";
+import {
+  normalizeChapterHtml,
+  injectDataIndex,
+  injectAvatarShells,
+  countParagraphs,
+} from "../htmlNormalizer";
 
 const SOURCE_HTML = `<section data-chapter="1">
     <h3 data-act="true">ACT I</h3>

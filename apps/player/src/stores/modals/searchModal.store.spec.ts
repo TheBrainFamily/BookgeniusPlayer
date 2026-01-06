@@ -2,7 +2,11 @@ import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { useSearchModal } from "./searchModal.store";
 import { useModalCoordinator } from "../modalCoordinator.store";
 
-jest.mock("../modalCoordinator.store", () => ({ useModalCoordinator: { getState: () => ({ requestModalOpen: () => true, releaseModal: () => {} }) } }));
+jest.mock("../modalCoordinator.store", () => ({
+  useModalCoordinator: {
+    getState: () => ({ requestModalOpen: () => true, releaseModal: () => {} }),
+  },
+}));
 
 describe("searchModal store - flicker prevention", () => {
   beforeEach(() => {
