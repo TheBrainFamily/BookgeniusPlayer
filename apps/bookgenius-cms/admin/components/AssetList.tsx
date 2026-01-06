@@ -33,7 +33,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { AssetCard, type AssetData } from "./AssetCard";
 import { AssetListRow } from "./AssetListRow";
-import { getContentTypeCategory } from "@/lib/utils";
+import { getContentTypeCategory, logError } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface AssetListProps {
@@ -343,7 +343,8 @@ export function AssetList({
                 status: "pending",
               });
             }
-          } catch {
+          } catch (err) {
+            logError(`Failed to read folder: ${entry.name}`, err);
             toast.error(`Failed to read folder: ${entry.name}`);
           }
         } else {
