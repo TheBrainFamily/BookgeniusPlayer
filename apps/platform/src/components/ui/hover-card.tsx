@@ -10,7 +10,7 @@ const HoverCardTrigger = HoverCardPrimitive.Trigger;
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content>
->(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+>(({ className, align = "center" as const, sideOffset = 4, ...props }, ref) => (
   <HoverCardPrimitive.Content
     ref={ref}
     align={align}
