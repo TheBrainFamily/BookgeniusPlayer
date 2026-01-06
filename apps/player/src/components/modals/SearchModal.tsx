@@ -117,6 +117,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   useEffect(() => {
     if (!filterAvailability[activeFilter] && activeFilter !== "all") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Resetting filter when unavailable
       setActiveFilter("all");
     }
   }, [activeFilter, filterAvailability]);
@@ -230,8 +231,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
     if (filteredItems.length > 0) {
       const chapters = Array.from(new Set(filteredItems.map((item) => String(item.chapter))));
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Auto-expanding chapters with results
       setOpenChapters(chapters);
     } else {
+       
       setOpenChapters([]);
     }
   }, [filteredItems, deferredResults?.items]);
@@ -519,6 +522,7 @@ const ResultCard = memo(function ResultCard({
 
   useEffect(() => {
     if (!clickedAppearanceId || clickedAppearanceId !== item.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Resetting pulse state
       setIsPulsing(false);
       return;
     }

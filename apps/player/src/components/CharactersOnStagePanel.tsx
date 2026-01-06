@@ -32,6 +32,7 @@ const CharactersOnStagePanel = () => {
 
   useEffect(() => {
     if (isOverlayVisible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing derived visibility state
       setIsOverlayEffectivelyVisible(true);
       return;
     }

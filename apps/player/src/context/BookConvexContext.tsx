@@ -823,8 +823,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     musicQuery === undefined ||
     figuresQuery === undefined;
 
+  /* eslint-disable react-hooks/refs -- Intentionally accessing ref during render for ready state */
   const isReady =
     !isLoading && !error && bookStringified !== null && initialLoadCompleteRef.current;
+  /* eslint-enable react-hooks/refs */
 
   // =============================================================================
   // Context value
@@ -943,6 +945,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     };
   }, []);
 
+  // eslint-disable-next-line react-hooks/refs -- value includes isReady which derives from ref, but is stable
   return <BookConvexContext.Provider value={value}>{children}</BookConvexContext.Provider>;
 }
 

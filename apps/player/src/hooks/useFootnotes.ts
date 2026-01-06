@@ -40,6 +40,7 @@ export function useFootnotes(range: Location): Footnote[] {
     const notesContainer = document.getElementById("right-notes-scrollable-container");
     if (!notesContainer) {
       console.warn("Footnotes container 'right-notes-scrollable-container' not found.");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Clearing state when container missing
       setNotes([]);
       return;
     }

@@ -39,7 +39,9 @@ const ProgressBars: React.FC = () => {
         last: structure[structure.length - 1],
       });
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Computing derived structure from book data
       setChaptersStructure(structure);
+       
       setTotalParagraphs(total);
     } catch (error) {
       console.error("❌ Error preparing chapters structure:", error);

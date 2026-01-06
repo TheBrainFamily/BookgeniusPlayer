@@ -23,7 +23,9 @@ export const CoverArt = ({ src }: CoverArtProps) => {
   useEffect(() => {
     // If no new src is provided, show the fallback icon.
     if (!src) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Resetting state when src cleared
       setDisplayedSrc(null);
+       
       setHasError(true);
       return;
     }

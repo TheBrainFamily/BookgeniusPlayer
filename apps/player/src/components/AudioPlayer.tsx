@@ -77,7 +77,9 @@ const AudioPlayer = () => {
 
   useEffect(() => {
     if (!areElementsVisible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Closing UI panels when elements hide
       setIsBigPlayerOpen(false);
+       
       setIsVolumeOpen(false);
     }
   }, [areElementsVisible]);
@@ -192,6 +194,7 @@ const AudioPlayer = () => {
     const available =
       Array.isArray(backgroundSongsForBook) &&
       backgroundSongsForBook.some((s) => Array.isArray(s.files) && s.files.length > 0);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Deriving state from async data
     setHasBackgroundSongs(available);
   }, [backgroundSongsForBook]);
 

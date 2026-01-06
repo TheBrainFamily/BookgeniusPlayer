@@ -29,9 +29,9 @@ export function StylePreviewComparison({
   userStyle,
   onChoose,
 }: StylePreviewComparisonProps) {
-  if (!previews) return null;
-
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+
+  if (!previews) return null;
 
   const serverURL = "http://localhost:4000";
 

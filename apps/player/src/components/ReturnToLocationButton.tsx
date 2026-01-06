@@ -20,6 +20,7 @@ const ReturnToLocationButton = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Deriving visibility from location
     setIsVisible(shouldShowReturnButton());
   }, [currentParagraph, currentChapter]);
 

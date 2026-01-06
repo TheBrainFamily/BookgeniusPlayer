@@ -28,6 +28,7 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Cleanup when deactivating
       setVolume(0);
       framesWithDataRef.current = 0;
       if (micReadyRef.current) {

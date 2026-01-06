@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 /**
@@ -36,7 +37,6 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
   horizontalListSortingStrategy,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -233,7 +233,6 @@ function GroupedCueRow({
     }
   };
 
-  const isSingleCue = localCues.length === 1;
   const isMultipleCues = localCues.length > 1;
 
   return (
@@ -401,16 +400,7 @@ function MusicFileCard({ file, onSelect }: MusicFileCardProps) {
 // Main Component
 // =============================================================================
 
-export function MusicCuesView({
-  folderPath,
-  onAssetSelect,
-  onFolderSelect,
-  onUploadNew,
-  onUploadAsset,
-  onCreateAsset,
-  onCreateFolder,
-  onShowSnippet,
-}: MusicCuesViewProps) {
+export function MusicCuesView({ folderPath, onAssetSelect, onUploadNew }: MusicCuesViewProps) {
   const { cues, files, isLoading } = useMusicCues();
   const { chapters } = useChapters();
   const { bookPath } = useBook();

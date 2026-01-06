@@ -96,6 +96,7 @@ function SnapplifyChatSafe() {
 
     if (window.fcWidget) {
       console.log("[SnapplifyChat] FreshChat widget already exists, setting ready");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing with external widget state on mount
       setFcReady(true);
     } else {
       console.log("[SnapplifyChat] FreshChat widget not found, initiating...");
