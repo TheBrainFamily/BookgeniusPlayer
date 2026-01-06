@@ -18,7 +18,6 @@
     "noFallthroughCasesInSwitch": false,
     "allowJs": true,
     "paths": {
-      "@/*": ["./src/*"],
       "@platform/*": ["./src/*"],
       "@player/*": ["../player/src/*"],
       "@convex/*": ["../../convex/*"]

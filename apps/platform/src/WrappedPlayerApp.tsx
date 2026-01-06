@@ -9,7 +9,7 @@ import Paywall from "./components/Paywall";
 import AuthRequiredModal from "./components/AuthRequiredModal";
 import { teardownPlayer } from "../../player/src/teardown";
 import { useAuth } from "./hooks/useAuth";
-import { detectLanguageFromDomain } from "@/utils/languageDetection";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
