@@ -1,0 +1,6 @@
+reviews:
+  review_status: false
+  auto_review:
+    enabled: true
+    base_branches:
+      - "convex-cms"  # This adds your staging branch
