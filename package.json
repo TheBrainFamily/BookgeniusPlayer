@@ -22,7 +22,7 @@
     "lint:fix": "eslint . --cache --fix",
     "lint:ci": "eslint . --cache --quiet",
     "typecheck": "FORCE_COLOR=1 turbo run typecheck -- --pretty | bun ./tools/scripts/typecheck.ts",
-    "typecheck:ci": "bun --filter '*' typecheck:ci",
+    "typecheck:ci": "bun run typecheck",
     "typecheck:watch": "bun run tools/ts-watch-server/index.ts"
   },
   "keywords": [],
