@@ -42,7 +42,6 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const { charactersData, characters } = useBookConvex();
   const [error, setError] = useState("");
-  const [isSubmitting, _setIsSubmitting] = useState(false);
   const [newCharacterName, setNewCharacterName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [activeTab, setActiveTab] = useState<"existing" | "new">("existing");
@@ -311,17 +310,16 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                 <div className="flex gap-3">
                   <button
                     onClick={onClose}
-                    disabled={isSubmitting}
                     className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSetSpeaker}
-                    disabled={isSubmitting || !selectedCharacter}
+                    disabled={!selectedCharacter}
                     className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isSubmitting ? "Saving..." : "Set Speaker"}
+                    Set Speaker
                   </button>
                 </div>
               </>
@@ -380,17 +378,17 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
             {currentSpeaker && (
               <button
                 onClick={handleRemoveSpeaker}
-                disabled={isSubmitting || isCreating}
+                disabled={isCreating}
                 className="w-full bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/30 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
               >
-                {isSubmitting ? "Removing..." : "Remove Current Speaker"}
+                Remove Current Speaker
               </button>
             )}
 
             {selectedCharacter && (
               <button
                 onClick={handleChangeAvatar}
-                disabled={isSubmitting || isCreating}
+                disabled={isCreating}
                 className="w-full bg-zinc-700/50 text-zinc-300 border border-zinc-600 hover:bg-zinc-600/50 h-10 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors text-sm"
               >
                 Change Character's Avatar
@@ -610,21 +608,16 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                 <div className="flex gap-3">
                   <button
                     onClick={onClose}
-                    disabled={isSubmitting}
                     className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSetSpeaker}
-                    disabled={
-                      isSubmitting ||
-                      !selectedCharacter ||
-                      selectedCharacter === currentCharacterSlug
-                    }
+                    disabled={!selectedCharacter || selectedCharacter === currentCharacterSlug}
                     className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isSubmitting ? "Saving..." : "Change Character"}
+                    Change Character
                   </button>
                 </div>
               </>
@@ -682,10 +675,10 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
 
             <button
               onClick={handleRemoveSpeaker}
-              disabled={isSubmitting || isCreating}
+              disabled={isCreating}
               className="w-full bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/30 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
             >
-              {isSubmitting ? "Removing..." : "Remove Character Tag"}
+              Remove Character Tag
             </button>
           </div>
         );
@@ -799,17 +792,16 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                 <div className="flex gap-3">
                   <button
                     onClick={onClose}
-                    disabled={isSubmitting}
                     className="flex-1 bg-zinc-700 text-white hover:bg-zinc-600 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSetSpeaker}
-                    disabled={isSubmitting || !selectedCharacter}
+                    disabled={!selectedCharacter}
                     className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isSubmitting ? "Wrapping..." : "Wrap with Character"}
+                    Wrap with Character
                   </button>
                 </div>
               </>
