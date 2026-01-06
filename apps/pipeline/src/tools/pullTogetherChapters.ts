@@ -35,6 +35,7 @@ export const pullTogetherChapters = () => {
               FILE_TYPE.TEMPORARY,
             );
           } catch {
+            // eslint-disable-next-line max-depth -- fallback file loading chain
             try {
               chapterText = readBookFile(
                 `rewritten-paragraphs-for-chapter-${i}.xml`,

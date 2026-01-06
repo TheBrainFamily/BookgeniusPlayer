@@ -42,7 +42,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const { charactersData, characters } = useBookConvex();
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, _setIsSubmitting] = useState(false);
   const [newCharacterName, setNewCharacterName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [activeTab, setActiveTab] = useState<"existing" | "new">("existing");
@@ -101,7 +101,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
       const matchingChar = sortedCharacters.find(
         (c) => c.slug.toLowerCase() === currentCharacterSlug.toLowerCase(),
       );
-       
+
       setSelectedCharacter(matchingChar?.slug || currentCharacterSlug);
     }
   }, [currentSpeaker, currentCharacterSlug, modalType, sortedCharacters]);
@@ -195,6 +195,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
     return getAvatarSource({ slug, characterName: name, bookSlug: "", infoPerChapter: [] });
   };
 
+  // eslint-disable-next-line complexity
   const renderContent = () => {
     if (!modalType) return null;
 

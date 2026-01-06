@@ -33,7 +33,7 @@ const knownCharactersArray = knowCharactersFromAllPreviousBooks.map(({ name }) =
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 //Todo: should be taken from book directory
-const generalPrompt = `Avatar for a character in an ebook. Expressionist Graphic Noir
+const _generalPrompt = `Avatar for a character in an ebook. Expressionist Graphic Noir
 Frank Miller's *Sin City* style. extreme black-and-white contrast with splashes of color
 Mid-century film noir cinematography.
 Propaganda posters for their graphic boldness and limited color palette.

@@ -18,6 +18,7 @@ interface BookAnalysis {
   slug: string;
   risks: ContentRisk[];
 }
+// eslint-disable-next-line complexity
 async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
   const textDir = join(BOOKS_DIR, bookSlug, "text");
   const risks: ContentRisk[] = [];

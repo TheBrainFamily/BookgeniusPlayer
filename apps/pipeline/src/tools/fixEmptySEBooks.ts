@@ -13,6 +13,7 @@ const SKIP_FILES = new Set([
   "uncopyright.xhtml",
 ]);
 
+// eslint-disable-next-line complexity
 function syncBookViaGit(slug: string, forceAll = false): { downloaded: number; skipped: number } {
   const bookDir = path.join(booksDir, slug);
   const textDir = path.join(bookDir, "text");

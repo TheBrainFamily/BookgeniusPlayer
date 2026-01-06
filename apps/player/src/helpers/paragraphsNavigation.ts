@@ -308,6 +308,7 @@ export const systemNavigateTo = async (
      */
     expandChapterRange?: boolean;
   } = {},
+  // eslint-disable-next-line complexity
 ) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);

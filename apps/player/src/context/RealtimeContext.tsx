@@ -4,13 +4,7 @@ import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents-realtime";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useLocation } from "@player/state/LocationContext";
 import { z } from "zod";
-import { useLocationRange } from "@player/hooks/useLocationRange";
-import {
-  extractBookTextFromLocation,
-  extractBookTextUpToLocation,
-} from "@player/utils/extractBookText";
-import type { BookContextLocation, BookContextChunk } from "@player/types/bookContext";
-import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import type { BookContextLocation } from "@player/types/bookContext";
 import { getSurroundingText } from "@player/utils/getSurroundingText";
 
 interface RealtimeContextType {
@@ -52,13 +46,17 @@ type TransportEvent =
 
 function setMicActiveSafe(active: boolean) {
   try {
-    // @ts-ignore
-    navigator.mediaSession?.setMicrophoneActive?.(active);
+    // setMicrophoneActive is an experimental API not in TS types
+    const session = navigator.mediaSession as MediaSession & {
+      setMicrophoneActive?: (active: boolean) => void;
+    };
+    session?.setMicrophoneActive?.(active);
   } catch (e) {
     console.debug("[mic] setMicrophoneActive suppressed:", (e as Error)?.name);
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useRealtime = () => {
   const context = useContext(RealtimeContext);
   if (!context) throw new Error("useRealtime must be used within a RealtimeProvider");
@@ -67,7 +65,6 @@ export const useRealtime = () => {
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { location } = useLocation();
-  const { debouncedLocation } = useLocationRange(300);
   const { charactersData, bookData } = useBookConvex();
   const audioResponses = (() => {
     try {
@@ -90,7 +87,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Persistent book context tracking (Option B)
   const bookContextLastSentRef = useRef<BookContextLocation | null>(null);
-  const isUpdatingBookContextRef = useRef<boolean>(false);
+  const _isUpdatingBookContextRef = useRef<boolean>(false);
 
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -143,7 +140,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.log("mod audio context finished", ctx);
         if (ctx) return ctx;
       }
-    } catch (e) {
+    } catch {
       // Fallback: create a local context if crossfader isn't initialized yet
     }
     const Ctx =
@@ -203,6 +200,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       instructions,
       tools: toolsArr,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: Session configuration should only run once on mount. instructions and toolsArr are stable module-level constants.
   }, []);
 
   // Attach streaming handlers on the active session
@@ -298,7 +296,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                   detail: { reason: "realtimeTokenUnauthorized" },
                 }),
               );
-            } catch (_) {
+            } catch {
               // ignore dispatch failures
             }
           } else {
@@ -388,6 +386,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
+  // eslint-disable-next-line complexity
   const sendPerHoldPriming = useCallback(async () => {
     if (primingSentThisHoldRef.current) return;
     const session = sessionRef.current;
@@ -461,6 +460,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.error("Failed to send visible text context", e);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: Only want to trigger on audioResponses and location changes. Other refs (sessionRef, textCacheRef) are stable and read fresh values when needed.
   }, [audioResponses, location]);
 
   // Optional preconnect: disabled until mic is primed to ensure we attach our MediaStream
@@ -477,7 +477,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             name: "microphone" as PermissionName,
           });
           hasPermission = result.state === "granted";
-        } catch (error) {
+        } catch {
           // permissions.query not supported or failed, skip preconnect
           return;
         }
@@ -496,117 +496,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // ------------------------------
   // Persistent Book Context (Option B)
   // ------------------------------
-  const hasAdvancedBeyond = (a: BookContextLocation | null, b: BookContextLocation): boolean => {
+  const _hasAdvancedBeyond = (a: BookContextLocation | null, b: BookContextLocation): boolean => {
     if (!a) return true;
     return b.chapter > a.chapter || (b.chapter === a.chapter && b.paragraph > a.paragraph);
   };
-
-  const sendBookContext = useCallback(
-    async (chunks: BookContextChunk[], isInitial: boolean) => {
-      if (!isConnected || !sessionRef.current || !chunks.length) return;
-      const session = sessionRef.current;
-      const contextText = chunks.map((c) => c.text).join("\n\n");
-      const header = isInitial ? "Book context so far:" : "Additional book context:";
-      const text = `${header}\n\n${contextText}`;
-      session.transport.sendEvent({
-        type: "conversation.item.create",
-        item: { type: "message", role: "system", content: [{ type: "input_text", text }] },
-      });
-      const last = chunks[chunks.length - 1];
-      bookContextLastSentRef.current = { chapter: last.chapter, paragraph: last.paragraph };
-    },
-    [isConnected],
-  );
-
-  const sendInitialBookContext = useCallback(async () => {
-    if (!audioResponses) return;
-    console.log("sendInitialBookContext");
-    if (!isConnected || !sessionRef.current || isUpdatingBookContextRef.current) return;
-    console.log("sendInitialBookContext 2");
-    isUpdatingBookContextRef.current = true;
-    try {
-      const current: BookContextLocation = {
-        chapter: debouncedLocation.currentChapter ?? debouncedLocation.chapter,
-        paragraph: debouncedLocation.currentParagraph ?? debouncedLocation.paragraph,
-      };
-      const { chunks } = await extractBookTextUpToLocation(current);
-      if (chunks.length) await sendBookContext(chunks, true);
-    } catch (e) {
-      console.warn("Failed to send initial book context", e);
-    } finally {
-      isUpdatingBookContextRef.current = false;
-    }
-  }, [
-    isConnected,
-    debouncedLocation.currentChapter,
-    debouncedLocation.currentParagraph,
-    debouncedLocation.chapter,
-    debouncedLocation.paragraph,
-    sendBookContext,
-  ]);
-
-  const sendIncrementalBookContext = useCallback(async () => {
-    if (!audioResponses) return;
-    console.log("sendIncrementalBookContext");
-    if (!isConnected || !sessionRef.current || isUpdatingBookContextRef.current) return;
-    console.log("sendIncrementalBookContext 2");
-    const last = bookContextLastSentRef.current;
-    if (!last) return;
-    console.log("sendIncrementalBookContext 3");
-    const current: BookContextLocation = {
-      chapter: debouncedLocation.currentChapter ?? debouncedLocation.chapter,
-      paragraph: debouncedLocation.currentParagraph ?? debouncedLocation.paragraph,
-    };
-    if (!hasAdvancedBeyond(last, current)) return;
-
-    isUpdatingBookContextRef.current = true;
-    try {
-      const from: BookContextLocation = { chapter: last.chapter, paragraph: last.paragraph + 1 };
-      if (current.chapter > last.chapter) {
-        from.chapter = last.chapter + 1;
-        from.paragraph = 1;
-      }
-      const { chunks } = await extractBookTextFromLocation(from, current);
-      if (chunks.length) await sendBookContext(chunks, false);
-    } catch (e) {
-      console.warn("Failed to send incremental book context", e);
-    } finally {
-      isUpdatingBookContextRef.current = false;
-    }
-  }, [
-    isConnected,
-    debouncedLocation.currentChapter,
-    debouncedLocation.currentParagraph,
-    debouncedLocation.chapter,
-    debouncedLocation.paragraph,
-    sendBookContext,
-  ]);
-
-  // Kick off initial context once connected
-  useEffect(() => {
-    if (audioResponses && isConnected && !bookContextLastSentRef.current) {
-      const t = setTimeout(() => {
-        // void sendInitialBookContext();
-      }, 50);
-      return () => clearTimeout(t);
-    }
-  }, [audioResponses, isConnected, sendInitialBookContext]);
-
-  // Send incremental context as the reader advances
-  useEffect(() => {
-    if (audioResponses && isConnected && bookContextLastSentRef.current) {
-      const t = setTimeout(() => {
-        // void sendIncrementalBookContext();
-      }, 350);
-      return () => clearTimeout(t);
-    }
-  }, [
-    audioResponses,
-    isConnected,
-    debouncedLocation.currentChapter,
-    debouncedLocation.currentParagraph,
-    sendIncrementalBookContext,
-  ]);
 
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
@@ -624,6 +517,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Prime microphone once: request permission, set up analyser, keep stream alive (tracks disabled)
   const primeMicrophone = useCallback(async (): Promise<
     "already_primed" | "just_primed" | "failed"
+    // eslint-disable-next-line complexity -- microphone setup with cross-browser compatibility
   > => {
     const t0 = performance.now();
     console.log("[mic] prime start at", t0.toFixed(1));
@@ -720,6 +614,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [getSharedAudioContext]);
 
+  // eslint-disable-next-line complexity
   const startRecording = useCallback(async (): Promise<"local_first" | "streaming_now"> => {
     const tPress = performance.now();
     console.log("[ptt] startRecording invoked at", tPress.toFixed(1));
@@ -874,6 +769,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             audioWorkletNodeRef.current = node;
           }
           let voicedLogged = false;
+          // eslint-disable-next-line complexity -- audio resampling with multiple branch conditions
           node.port.onmessage = (e: MessageEvent) => {
             if (!isStreamingAudioRef.current) return;
             try {
@@ -971,6 +867,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             scriptProcessorRef.current = sp;
           }
           let voicedLogged = false;
+          // eslint-disable-next-line complexity -- ScriptProcessor fallback with resampling logic
           sp.onaudioprocess = (ev) => {
             if (!isStreamingAudioRef.current) return;
             try {
@@ -1061,10 +958,13 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               gain.gain.value = 0;
               scriptProcessorGainRef.current = gain;
             }
+
             if (gain) {
+              // eslint-disable-next-line max-depth -- audio node connection with error recovery
               try {
                 sp.disconnect();
               } catch {}
+              // eslint-disable-next-line max-depth -- audio node connection with error recovery
               try {
                 gain.disconnect();
               } catch {}
@@ -1090,6 +990,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       .catch(() => {});
     // Prime mic permission on first use to avoid missing initial speech
     return "streaming_now";
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: getSharedAudioContext is stable, refs are excluded as they read fresh values. Including all would cause unnecessary re-creation of callback.
   }, [
     isConnected,
     connectConversation,
@@ -1100,6 +1001,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     debugClipUrl,
   ]);
 
+  // eslint-disable-next-line complexity
   const stopRecording = useCallback(async () => {
     setIsRecording(false);
 

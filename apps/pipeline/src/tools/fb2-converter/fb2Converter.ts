@@ -343,6 +343,7 @@ function extractBinaryData(doc: Document): BinaryDataMap {
  * @param currentHeadingLevel - The current heading level (for section titles).
  * @returns The transformed HTML Node or null if the node should be skipped.
  */
+// eslint-disable-next-line complexity
 function transformSingleNodeToHtml(
   fb2Node: Node,
   htmlDoc: Document,
@@ -611,7 +612,7 @@ function convertToTextHtml(
     fb2Node: Node,
     htmlParent: Node,
     currentHeadingLevel: number,
-    isParentChapter: boolean = false,
+    _isParentChapter: boolean = false,
   ) {
     // 1. Transform the current node itself
     const transformedHtmlNode = transformSingleNodeToHtml(

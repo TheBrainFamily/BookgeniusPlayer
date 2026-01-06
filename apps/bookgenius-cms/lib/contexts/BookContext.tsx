@@ -129,6 +129,7 @@ export function BookProvider({ bookPath, children }: BookProviderProps) {
  * Get the full book context.
  * Must be used within a BookProvider.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBook() {
   const context = useContext(BookContext);
   if (!context) {
@@ -140,6 +141,7 @@ export function useBook() {
 /**
  * Get book metadata only.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBookMetadata() {
   const { metadata, isLoading } = useBook();
   return { metadata, isLoading };
@@ -148,6 +150,7 @@ export function useBookMetadata() {
 /**
  * Get character list for the current book.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCharacters() {
   const { characters, isLoading } = useBook();
   return { characters, isLoading };
@@ -156,6 +159,7 @@ export function useCharacters() {
 /**
  * Get chapter list for the current book.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useChapters() {
   const { chapters, isLoading } = useBook();
   return { chapters, isLoading };
@@ -164,6 +168,7 @@ export function useChapters() {
 /**
  * Get book stats.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBookStats() {
   const { stats, isLoading } = useBook();
   return { stats, isLoading };
@@ -172,6 +177,7 @@ export function useBookStats() {
 /**
  * Get background cues for the current book.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBackgroundCues() {
   const { bookPath } = useBook();
   const { data: cues, isLoading } = useQuery(
@@ -187,6 +193,7 @@ export function useBackgroundCues() {
 /**
  * Get music cues for the current book.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useMusicCues() {
   const { bookPath } = useBook();
   const { data: cues, isLoading } = useQuery(convexQuery(api.musicCues.listByBook, { bookPath }));
@@ -205,6 +212,7 @@ export function useMusicCues() {
  * Get the list of all books.
  * This is a standalone hook that doesn't require BookProvider.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBooks() {
   const { data: books, isLoading } = useQuery(convexQuery(api.bookQueries.listBooks, {}));
 

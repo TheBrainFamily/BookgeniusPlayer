@@ -101,7 +101,7 @@ export const generateAvatarOptions = internalAction({
 
           const urlInfo = await ctx.runQuery(
             components.assetManager.assetFsHttp.getVersionPreviewUrl,
-            { versionId: versionId as any },
+            { versionId },
           );
 
           return urlInfo?.url || null;
@@ -241,7 +241,7 @@ export const selectAvatar = internalAction({
       const latestLargeVersion = largeVersions.at(-1);
       const largeUrlInfo = latestLargeVersion
         ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
-            versionId: latestLargeVersion._id as any,
+            versionId: latestLargeVersion._id,
           })
         : null;
 
@@ -370,7 +370,7 @@ export const processUploadedAvatarLarge = internalAction({
       const latestVersion = versions.at(-1);
       const largeUrlInfo = latestVersion
         ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
-            versionId: latestVersion._id as any,
+            versionId: latestVersion._id,
           })
         : null;
 

@@ -14,7 +14,7 @@ import { getBookSettings } from "../helpers/getBookSettings";
 import { FILE_TYPE } from "../helpers/filesHelpers";
 import { readBookFile } from "../helpers/readBookFile";
 import { generateTagName } from "../helpers/generateTagName";
-import { getChapterFormat, type ChapterFormat } from "./getChapterFormat";
+import { getChapterFormat } from "./getChapterFormat";
 import { doesBookFileExist } from "../helpers/readBookFile";
 import { callGpt5 } from "../callO3";
 import { sleep } from "./sleep";
@@ -49,7 +49,7 @@ function buildJsonCharacters(charactersForChapter: { name: string; summary: stri
  */
 function buildChunkedPrompt(
   paragraphs: Paragraph[],
-  chapterId: number,
+  _chapterId: number,
   jsonCharacters: string,
   previousChunkOutput: string | null,
 ): string {
@@ -285,9 +285,6 @@ export const identifyAndRewriteParagraphs = async (
       response.slice(0, 50),
     );
     const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
-    const allCharacters = JSON.parse(
-      readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
-    ) as { characters: { name: string }[] };
 
     let restored = clearedResponse;
     try {

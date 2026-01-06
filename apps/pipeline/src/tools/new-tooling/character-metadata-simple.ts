@@ -13,9 +13,7 @@ import "dotenv/config";
 import { identifyCharactersAndRewriteParagraphs } from "../identifyEntityAndRewriteParagraphs";
 import { generatePicturesForEntities } from "./generate-pictures-for-entities";
 import { generateIntroSummary } from "./generate-intro-summary-simple";
-import { generateCharactersMaster } from "../postprocessing-helpers/generate-characters-master";
 import { generateBackgrounds } from "./generate-prompts-for-backgrounds";
-import { pullTogetherChapters } from "../pullTogetherChapters";
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("🚨 Unhandled Rejection at:", promise);

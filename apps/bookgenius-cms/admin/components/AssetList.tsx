@@ -173,6 +173,7 @@ async function getFilesFromEntry(
   return [];
 }
 
+// eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
 export function AssetList({
   folderPath,
   onAssetSelect,
@@ -342,7 +343,7 @@ export function AssetList({
                 status: "pending",
               });
             }
-          } catch (err) {
+          } catch {
             toast.error(`Failed to read folder: ${entry.name}`);
           }
         } else {

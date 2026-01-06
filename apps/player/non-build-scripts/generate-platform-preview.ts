@@ -80,6 +80,7 @@ function runCommand(command: string, args: string[]): void {
   }
 }
 
+// eslint-disable-next-line complexity
 function parseArgs(): { bookDir: string; options: CliOptions } {
   const args = process.argv.slice(2);
   if (args.length === 0) {

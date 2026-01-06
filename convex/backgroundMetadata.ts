@@ -182,7 +182,7 @@ export const updateStatus = internalMutation({
 /**
  * Get R2 config from env vars.
  */
-function getR2Config() {
+function _getR2Config() {
   if (!process.env.R2_BUCKET) return undefined;
   return {
     R2_BUCKET: process.env.R2_BUCKET,

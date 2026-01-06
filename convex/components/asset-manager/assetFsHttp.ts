@@ -1,5 +1,5 @@
 // convex/assetFsHttp.ts
-import { action, internalAction, internalQuery, query, type QueryCtx } from "./_generated/server";
+import { action, internalQuery, query, type QueryCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { type Id } from "./_generated/dataModel";
 import { v } from "convex/values";
@@ -146,7 +146,7 @@ export const getVersionForServing = query({
   },
 });
 
-type ServeVersionResult =
+type _ServeVersionResult =
   | null
   | { kind: "blob"; storageId: Id<"_storage">; contentType?: string; cacheControl?: string }
   | { kind: "redirect"; location: string; cacheControl?: string };

@@ -22,7 +22,7 @@ const stepStatusValidator = v.union(
   v.literal("skipped"),
 );
 
-const jobStatusValidator = v.union(
+const _jobStatusValidator = v.union(
   v.literal("pending"),
   v.literal("generating"),
   v.literal("paused"),

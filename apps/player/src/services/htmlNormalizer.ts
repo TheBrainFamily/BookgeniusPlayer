@@ -241,7 +241,7 @@ export type RenderMode = "default" | "enhancedProse";
 
 export type EnhancedProseOptions = { speakerDisplayNames?: Map<string, string> };
 
-function createPlayRowFromSpeakerParagraph(
+function _createPlayRowFromSpeakerParagraph(
   p: Element,
   doc: Document,
   state: { lastSpeaker: string | null; alignment: "left" | "right" },

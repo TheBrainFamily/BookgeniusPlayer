@@ -26,6 +26,7 @@ export interface LocationWithMetadata {
   source: "user" | "system";
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const DEFAULT_LOCATION: Location = {
   chapter: 1,
   paragraph: 1,
@@ -56,6 +57,7 @@ interface LocationCtx {
   setLocation: (loc: Location, source?: "user" | "system") => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const LocationContext = createContext<LocationCtx>({
   location: DEFAULT_LOCATION,
   lastSystemLocation: null,
@@ -120,6 +122,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 };
 
 /* ------------------------------------------------------------------ */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLocation = () => {
   const ctx = React.useContext(LocationContext);
   if (!ctx) throw new Error("useLocation must be used within LocationProvider");

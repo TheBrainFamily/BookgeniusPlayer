@@ -19,6 +19,7 @@ import { useMutation, useAction } from "convex/react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@convex/_generated/api";
 import { queries } from "@/lib/queries";
+import { logError } from "@/lib/utils";
 import { XmlEditor } from "./XmlEditor";
 import { useCharacters } from "../../../lib/contexts/BookContext";
 import type { editor, languages, Position } from "monaco-editor";
@@ -92,7 +93,7 @@ function useXmlContent(versionId: string) {
         }
       } catch (e) {
         if (!cancelled) {
-          console.error("[useXmlContent] Error fetching content:", e);
+          logError("[useXmlContent] Error fetching content:", e);
           setError(e instanceof Error ? e.message : "Failed to load content");
         }
       } finally {
@@ -107,6 +108,7 @@ function useXmlContent(versionId: string) {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- content is intentionally excluded to prevent refetch loops
   }, [versionId, getTextContent]);
 
   // Only show loading on initial load when we have no content yet
@@ -292,7 +294,7 @@ export function ChapterEditor({
         lastAutoSavedContentRef.current = xmlContent;
         console.log("[ChapterEditor] Draft uploaded, lastAutoSavedContentRef updated");
       } catch (e) {
-        console.error("[ChapterEditor] Auto-save failed:", e);
+        logError("[ChapterEditor] Auto-save failed:", e);
       }
     },
     [uploadDraft],
@@ -327,7 +329,7 @@ export function ChapterEditor({
         toast.success("Chapter published");
         onSaveComplete?.();
       } catch (e) {
-        console.error("[ChapterEditor] Save failed:", e);
+        logError("[ChapterEditor] Save failed:", e);
         toast.error(e instanceof Error ? e.message : "Failed to publish chapter");
       } finally {
         setIsSaving(false);
@@ -455,7 +457,7 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
         await uploadDraft(xmlContent);
         lastAutoSavedContentRef.current = xmlContent;
       } catch (e) {
-        console.error("Auto-save failed:", e);
+        logError("Auto-save failed:", e);
       }
     },
     [uploadDraft],
@@ -473,12 +475,13 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
         toast.success("Chapter published");
         props.onSaveComplete?.();
       } catch (e) {
-        console.error("Save failed:", e);
+        logError("Save failed:", e);
         toast.error(e instanceof Error ? e.message : "Failed to publish chapter");
       } finally {
         setIsSaving(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- accessing props directly is intentional here
     [props.folderPath, props.basename, uploadDraft, publishDraft, props.onSaveComplete],
   );
 

@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { action, internalAction } from "./_generated/server";
+import { action, type ActionCtx, internalAction } from "./_generated/server";
 import { api, components, internal } from "./_generated/api";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import {
@@ -26,11 +26,11 @@ const normalizeChapterXml = (xml: string, fallbackChapterId?: number): string =>
   if (trimmed.startsWith("<Chapter")) {
     return trimmed;
   }
-  const idAttr = fallbackChapterId ? ` id=\"${fallbackChapterId}\"` : "";
+  const idAttr = fallbackChapterId ? ` id="${fallbackChapterId}"` : "";
   return `<Chapter${idAttr}>${trimmed}</Chapter>`;
 };
 
-const ensureFolder = async (ctx: any, path: string): Promise<void> => {
+const ensureFolder = async (ctx: ActionCtx, path: string): Promise<void> => {
   try {
     await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, { path });
   } catch (error) {
@@ -42,7 +42,7 @@ const ensureFolder = async (ctx: any, path: string): Promise<void> => {
 };
 
 const uploadGeneratedAsset = async (
-  ctx: any,
+  ctx: ActionCtx,
   args: {
     folderPath: string;
     basename: string;
@@ -91,6 +91,7 @@ const uploadGeneratedAsset = async (
  */
 export const processPublishedChapter = internalAction({
   args: { bookPath: v.string(), chapterBasename: v.string(), versionId: v.string() },
+  // eslint-disable-next-line complexity -- chapter compilation with character extraction and HTML generation
   handler: async (ctx, { bookPath, chapterBasename, versionId }) => {
     const chaptersPath = `${bookPath}/chapters`;
     if (!bookPath || !chaptersPath.endsWith(CHAPTERS_FOLDER_SUFFIX)) {
@@ -188,7 +189,7 @@ export const processPublishedChapter = internalAction({
       bookSlug,
       characterBundles,
     );
-    const strippedCharacterMetadata = characterMetadata.map(({ media, ...rest }) => rest);
+    const strippedCharacterMetadata = characterMetadata.map(({ media: _media, ...rest }) => rest);
     const characterPayload = JSON.stringify({
       chapterNumber,
       characters: strippedCharacterMetadata,

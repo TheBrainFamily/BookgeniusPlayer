@@ -4,11 +4,7 @@ import {
   getCurrentPlatformAndBook,
   type SavePositionInput,
 } from "./readingPositionApi";
-import {
-  getSavedLocation,
-  setSavedLocation,
-  type ExtendedLocation,
-} from "@player/helpers/paragraphsNavigation";
+import { getSavedLocation, setSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { calculateReadProgress } from "@player/helpers/readProgress";
 import { bookIndex } from "@player/logic/BookIndex";
 
@@ -84,7 +80,7 @@ class ReadingPositionTracker {
   /**
    * Send position to backend
    */
-  private async sendPosition(loc: Location, immediate: boolean): Promise<void> {
+  private async sendPosition(loc: Location, _immediate: boolean): Promise<void> {
     try {
       const { platformId, bookSlug } = getCurrentPlatformAndBook();
       const progress = this.calculateProgress(loc.currentChapter, loc.currentParagraph);

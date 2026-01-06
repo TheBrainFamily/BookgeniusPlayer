@@ -110,6 +110,7 @@ function isInRange(
 }
 
 /** Derives chapter and paragraph range for both play and non-play paragraphs */
+// eslint-disable-next-line complexity -- DOM traversal with multiple fallback paths
 function getRowContext(el: HTMLElement): {
   chapter: number | null;
   firstParagraphIndex: number | null;
@@ -160,6 +161,7 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
     const characterPlaceholders =
       playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
+    // eslint-disable-next-line complexity -- character placeholder hydration with video state management
     characterPlaceholders.forEach((activeCharacterPlaceholder) => {
       const characterSlug = activeCharacterPlaceholder?.dataset.character;
       const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;

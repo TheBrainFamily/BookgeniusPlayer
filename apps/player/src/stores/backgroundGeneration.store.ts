@@ -26,7 +26,7 @@ const createKey = (chapter: number, paragraph: number) => `${chapter}-${paragrap
 
 export const useBackgroundGenerationStore = create<BackgroundGenerationState>()(
   devtools(
-    (set, get) => ({
+    (set, _get) => ({
       generatingBackgrounds: new Map(),
       readyBackgrounds: new Map(),
 

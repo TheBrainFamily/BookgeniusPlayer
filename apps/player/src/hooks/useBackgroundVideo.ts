@@ -22,8 +22,9 @@ export function useBackgroundVideo() {
 
   const { currentChapter, currentParagraph } = location;
   // For handling the current background
+
   useEffect(() => {
-    implRef.current(location);
+    implRef.current({ currentChapter, currentParagraph });
   }, [currentChapter, currentParagraph]);
 
   // For preloading future backgrounds

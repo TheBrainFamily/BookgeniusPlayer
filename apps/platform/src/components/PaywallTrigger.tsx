@@ -17,7 +17,7 @@ const PaywallTriggerInner: React.FC<PaywallTriggerProps> = ({ bookSlug, bookTitl
   const { authMod, paymentsMod } = useIntegrations();
   const [hasAccess, setHasAccess] = useState(false);
   const [showingPaywall, setShowingPaywall] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
 
   if (!authMod || !paymentsMod) {
     return (

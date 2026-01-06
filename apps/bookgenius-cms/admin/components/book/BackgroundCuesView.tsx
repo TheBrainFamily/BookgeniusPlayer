@@ -270,7 +270,7 @@ export function BackgroundCuesView({
 }: BackgroundCuesViewProps) {
   const { cues, files, isLoading } = useBackgroundCues();
   const { chapters } = useChapters();
-  const { bookPath } = useBook();
+  useBook();
   const [viewMode, setViewMode] = useState<ViewMode>("cuesheet");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [addDialogChapter, setAddDialogChapter] = useState(1);

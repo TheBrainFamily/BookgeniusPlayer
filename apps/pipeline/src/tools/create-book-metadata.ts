@@ -56,6 +56,7 @@ export function getCharacterTags(doc: XMLDocument): Set<string> {
  * @param characterTags A Set containing the valid character tag names.
  * @returns An array of SimpleCharacterMetadata objects.
  */
+
 export function extractCharacterMetadata(
   doc: XMLDocument,
   characterTags: Set<string>,
@@ -122,26 +123,32 @@ export function extractCharacterMetadata(
           const exitsInPara = new Set<string>();
 
           // Iterate through all direct children of the paragraph
+
           for (let i = 0; i < paragraph.childNodes.length; i++) {
             const node = paragraph.childNodes[i];
 
             // We only care about element nodes (tags)
+            // eslint-disable-next-line max-depth -- deeply nested XML parsing
             if (node.nodeType === node.ELEMENT_NODE) {
               const element = node as Element;
               const tagName = element.tagName;
 
               // Check if this tag is one of our characters
+              // eslint-disable-next-line max-depth -- deeply nested XML parsing
               if (characterTags.has(tagName)) {
                 // Check for the specific talking="true" attribute
 
+                // eslint-disable-next-line max-depth -- deeply nested XML parsing
                 if (element.getAttribute("dynasty") === "true") continue;
 
+                // eslint-disable-next-line max-depth -- deeply nested XML parsing
                 if (element.getAttribute("enters") === "true") {
                   entersInPara.add(tagName);
                 } else if (element.getAttribute("exits") === "true") {
                   exitsInPara.add(tagName);
                 }
 
+                // eslint-disable-next-line max-depth -- deeply nested XML parsing
                 if (element.getAttribute("talking") === "true") {
                   talksInPara.add(tagName);
                 } else {
@@ -152,8 +159,6 @@ export function extractCharacterMetadata(
                   spottedInPara.add(tagName);
                 }
               }
-              // Could add recursive check here if tags might be nested deeper,
-              // but based on your example, they are direct children of <p>
             }
           } // End loop through paragraph children
 

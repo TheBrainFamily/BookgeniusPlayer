@@ -18,6 +18,7 @@ import { execSync } from "child_process";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
 import { parseHTML } from "linkedom";
+import { logError } from "../lib/utils";
 
 // =============================================================================
 // XML to HTML Conversion (Node-compatible version)
@@ -403,7 +404,7 @@ async function createFolderIfNeeded(folderPath: string, extra?: object): Promise
     await client.mutation(api.cli.createFolderByPath, { path: folderPath, extra });
     console.log(`  Created folder: ${folderPath}`);
   } catch (error) {
-    console.error(`  Failed to create folder ${folderPath}:`, error);
+    logError(`  Failed to create folder ${folderPath}:`, error);
   }
 }
 
@@ -448,7 +449,7 @@ async function uploadFile(
 
     console.log(`  Uploaded: ${folderPath}/${basename}`);
   } catch (error) {
-    console.error(`  Failed to upload ${basename}:`, error);
+    logError(`  Failed to upload ${basename}:`, error);
   }
 }
 
@@ -633,7 +634,7 @@ async function step3_ImportChaptersAsXml(): Promise<number> {
     });
     console.log("  ✅ Migration complete");
   } catch (error) {
-    console.error("  ❌ Auto-compilation/migration failed:", error);
+    logError("  ❌ Auto-compilation/migration failed:", error);
     console.log("\n  Manual steps:");
     console.log(
       `     npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`,
@@ -965,6 +966,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Import failed:", error);
+  logError("Import failed:", error);
   process.exit(1);
 });

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
@@ -74,7 +74,6 @@ const useVideoReadiness = ({
 
     if (bgVideoB) {
       if (bgVideoB.readyState >= READY_STATE_CAN_PLAY && !bgVideoB.paused) {
-         
         setVideoBReady(true);
       } else {
         bgVideoB.addEventListener("playing", onBPlaying);
@@ -194,7 +193,6 @@ const useImageReadiness = ({
               resolve();
             };
 
-            // Set timeout for this image
             timeoutId = window.setTimeout(() => {
               cleanup();
               console.warn(`Timeout loading: ${url}`);
@@ -213,15 +211,16 @@ const useImageReadiness = ({
     }
 
     console.log("All images processing completed!");
-  }, [chapter, imageTimeoutMs]);
+  }, [allCharacters, chapter, imageTimeoutMs]);
 
   // Cleanup function to clear all pending timeouts
   useEffect(() => {
+    const timeoutIds = timeoutIdsRef.current;
     return () => {
-      timeoutIdsRef.current.forEach((id) => {
+      timeoutIds.forEach((id) => {
         if (id) clearTimeout(id);
       });
-      timeoutIdsRef.current.clear();
+      timeoutIds.clear();
     };
   }, []);
 

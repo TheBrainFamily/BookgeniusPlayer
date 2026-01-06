@@ -50,7 +50,7 @@ export const paragraphMetadataServicePure = {
     range: PureRange,
     data: SelfSufficientCharacterMetadata[],
   ): SelfSufficientCharacterMetadata[] {
-    const { startChapter, endChapter, bookSlug, startParagraph, endParagraph } = range;
+    const { startChapter, endChapter, bookSlug: _bookSlug, startParagraph, endParagraph } = range;
     const {
       metadata: { bookForm },
     } = getBookData();

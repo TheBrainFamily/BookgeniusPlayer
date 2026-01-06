@@ -23,9 +23,8 @@ export const CoverArt = ({ src }: CoverArtProps) => {
   useEffect(() => {
     // If no new src is provided, show the fallback icon.
     if (!src) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Resetting state when src cleared
       setDisplayedSrc(null);
-       
+
       setHasError(true);
       return;
     }
@@ -55,6 +54,7 @@ export const CoverArt = ({ src }: CoverArtProps) => {
       img.onload = null;
       img.onerror = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: hasError is read inside but excluded because we only want to trigger on src/displayedSrc changes. hasError is reset within the effect.
   }, [src, displayedSrc]);
 
   if (!displayedSrc || hasError) {

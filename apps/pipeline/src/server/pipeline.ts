@@ -336,6 +336,7 @@ async function uploadBackgroundsToConvex(job: Job, outputDir: string) {
   }
 }
 
+// eslint-disable-next-line complexity
 async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
   const fb2Path = findFb2FilePath(inputDir);
   if (!fb2Path) {
@@ -601,6 +602,7 @@ export async function startPipeline(input: {
       await uploadChaptersToConvex(job, tempOutputDir);
     },
 
+    // eslint-disable-next-line complexity
     generate_graphical_style: async () => {
       setBookArg(slug);
 
@@ -645,14 +647,13 @@ export async function startPipeline(input: {
       setAutoStyleComplete(bookRoot, autoStyle);
       addLog(job, "Auto style generated, awaiting user input");
 
-      let userStyleSubmitted = false;
+      let _userStyleSubmitted = false;
       let userStyle: GraphicalStyle | null = null;
-      let styleChosen = false;
 
       const userStylePromise = new Promise<GraphicalStyle | null>((resolve) => {
         const existingState = readStyleSelection(bookRoot);
         if (existingState?.userStyle) {
-          userStyleSubmitted = true;
+          _userStyleSubmitted = true;
           userStyle = existingState.userStyle;
           resolve(existingState.userStyle);
           return;
@@ -664,13 +665,11 @@ export async function startPipeline(input: {
 
         styleSelectionCallbacks.set(job.id, {
           onUserStyleSubmitted: (style) => {
-            userStyleSubmitted = true;
+            _userStyleSubmitted = true;
             userStyle = style;
             resolve(style);
           },
-          onStyleChosen: (choice) => {
-            styleChosen = true;
-          },
+          onStyleChosen: (_choice) => {},
         });
       });
 
@@ -695,7 +694,6 @@ export async function startPipeline(input: {
           const currentCallback = styleSelectionCallbacks.get(job.id);
           if (currentCallback) {
             currentCallback.onStyleChosen = () => {
-              styleChosen = true;
               resolve();
             };
           }

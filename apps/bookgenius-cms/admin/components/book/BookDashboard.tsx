@@ -16,22 +16,13 @@ import { isBookFolder, type BookFolderExtra } from "@/lib/types/book";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  BookOpen,
-  Users,
-  FileText,
-  Film,
-  Music,
-  ArrowRight,
-  Sparkles,
-  Globe,
-  Loader2,
-} from "lucide-react";
+import { BookOpen, Users, FileText, Film, Music, ArrowRight, Sparkles, Globe } from "lucide-react";
 
 interface BookDashboardProps {
   onNavigate: (path: string) => void;
 }
 
+// eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
 export function BookDashboard({ onNavigate }: BookDashboardProps) {
   const { bookPath, metadata, isLoading } = useBook();
   const { stats } = useBookStats();

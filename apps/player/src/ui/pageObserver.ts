@@ -199,6 +199,7 @@ export function setupPageObserver(): {
     );
   };
 
+  // eslint-disable-next-line complexity -- intersection processing with many visibility calculations
   const processIntersections = () => {
     // Skip heavy processing during system navigation or viewport stabilization
     // This covers: systemNavigateTo, resize/orientation transaction, any programmatic scroll
@@ -747,6 +748,7 @@ export function setupPageObserver(): {
 
       let shouldApplyBlur = false;
 
+      // eslint-disable-next-line complexity -- spacer visibility calculation with blur effects
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
 

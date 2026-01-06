@@ -1,4 +1,8 @@
-import { type CharacterData, type CharacterOverride, type ChapterParagraphRef } from "@player/types/book";
+import {
+  type CharacterData,
+  type CharacterOverride,
+  type ChapterParagraphRef,
+} from "@player/types/book";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const LOCATION_REGEX = /^ch(\d+)-p(\d+)$/i;
@@ -81,6 +85,7 @@ export interface CharacterSnapshot {
 export const resolveCharacterSnapshot = (
   character: CharacterData,
   { location = null, baseSummary, fallbackDisplayName }: CharacterSnapshotOptions = {},
+  // eslint-disable-next-line complexity -- character snapshot resolution with override cascading
 ): CharacterSnapshot => {
   const override = findActiveOverride(character, location);
 

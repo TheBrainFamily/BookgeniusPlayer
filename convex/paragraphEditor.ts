@@ -107,6 +107,7 @@ function findTextNode(
   return walk(parent);
 }
 
+// eslint-disable-next-line max-params -- internal upload helper with contextual parameters
 async function uploadAndPublishContent(
   ctx: ActionCtx,
   folderPath: string,

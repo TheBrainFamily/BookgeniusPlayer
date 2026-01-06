@@ -168,6 +168,7 @@ export function setupParagraphHighlighting() {
     }
   });
 
+  // eslint-disable-next-line complexity -- click handler with edit mode, character clicks, footnotes
   contentContainer.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
 

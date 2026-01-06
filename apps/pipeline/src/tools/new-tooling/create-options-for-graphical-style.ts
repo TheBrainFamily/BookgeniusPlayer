@@ -6,7 +6,7 @@ import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
 
 export type GraphicalStyle = { backgroundStyle: string; periodStyle: string; avatarStyle: string };
-export const createOptionsForGraphicalStyle = async (bookTitle: string, suggestion?: string) => {
+export const createOptionsForGraphicalStyle = async (bookTitle: string, _suggestion?: string) => {
   let bookText = "";
   const bookChapters = getChaptersUpTo(
     getBookSettings().startFromChapter,

@@ -5,7 +5,6 @@ import {
   parseChapterParagraphId,
 } from "@player/utils/characterOverrides";
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
-import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getAvatarUrlForVideo } from "@player/utils/assetUrls";
 
 let avatarContainerEl: HTMLDivElement | null = null;

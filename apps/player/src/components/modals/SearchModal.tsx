@@ -45,11 +45,12 @@ interface SearchModalProps {
 
 export const SearchModal: React.FC<SearchModalProps> = ({
   onClose,
-  layoutView,
+  layoutView: _layoutView,
   searchResults,
   clickedAppearanceId,
   searchQuery,
   isSidePanel = false,
+  // eslint-disable-next-line complexity -- search UI with filtering, loading states, and result rendering
 }) => {
   const { t } = useTranslation();
 
@@ -66,7 +67,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   const [openChapters, setOpenChapters] = useState<string[]>([]);
 
-  const [wideScreen, setIsWideScreen] = useState(null);
+  const [wideScreen, setIsWideScreen] = useState<boolean | null>(null);
 
   const hasAnyResults = (deferredResults?.items?.length ?? 0) > 0;
 
@@ -234,7 +235,6 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       // eslint-disable-next-line react-hooks/set-state-in-effect -- Auto-expanding chapters with results
       setOpenChapters(chapters);
     } else {
-       
       setOpenChapters([]);
     }
   }, [filteredItems, deferredResults?.items]);

@@ -40,11 +40,12 @@ import { useOptionalElementVisibility } from "@player/stores/elementVisibility.s
 import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
+// eslint-disable-next-line complexity
 const AudioPlayer = () => {
   const { t } = useTranslation();
   const { bookData, backgroundSongsForBook } = useBookConvex();
   const hasAudiobook = bookData?.hasAudiobook ?? false;
-  const slug = bookData?.slug ?? "";
+  const _slug = bookData?.slug ?? "";
   const bookForm = bookData?.metadata?.bookForm ?? "prose";
 
   const isInitialLoad = useRef(true);
@@ -79,7 +80,7 @@ const AudioPlayer = () => {
     if (!areElementsVisible) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- Closing UI panels when elements hide
       setIsBigPlayerOpen(false);
-       
+
       setIsVolumeOpen(false);
     }
   }, [areElementsVisible]);
@@ -406,7 +407,7 @@ const AudioPlayer = () => {
     if (!id) return;
 
     const url = getBookAssetUrl(`${id}.mp3`);
-    const name = `${(title || id).replace(/[\/\\:*?"<>|]+/g, "").trim()}.mp3`;
+    const name = `${(title || id).replace(/[/\\:*?"<>|]+/g, "").trim()}.mp3`;
 
     try {
       await downloadFile(url, name);
@@ -915,7 +916,7 @@ const transitions = {
     duration: options?.duration ?? 0.25,
     delay: options?.delay ?? 0,
   }),
-  ease: (options?: { duration?: number; ease?: Easing | Easing[] }): Transition => ({
+  ease: (options?: { duration?: number; ease?: Easing }): Transition => ({
     duration: options?.duration ?? 0.25,
     ease: options?.ease ?? "easeInOut",
   }),

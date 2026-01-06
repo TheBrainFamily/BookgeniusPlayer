@@ -150,6 +150,7 @@ const createContextualSummary = (
   return highlightMatchedWords(summary, query);
 };
 
+// eslint-disable-next-line complexity
 export function performCachedSearch(query: string, currentLocation: Location): SearchResultsData {
   const { textCache, isInitialized } = useBookContentStore.getState();
   const bookIsPlay =
@@ -199,6 +200,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
             const paragraphElement = bookIndex.getParagraphElement(chapterIdNum, paragraphNumber);
             const isCharacterLine = paragraphElement?.getAttribute("data-is-character") === "true";
 
+            // eslint-disable-next-line max-depth -- play format character line detection
             if (isCharacterLine) {
               const nextParagraphElement = bookIndex.getParagraphElement(
                 chapterIdNum,
@@ -207,6 +209,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
               const nextIsSpoken =
                 nextParagraphElement?.getAttribute("data-is-character") === "false";
 
+              // eslint-disable-next-line max-depth -- play format character line detection
               if (nextParagraphElement && nextIsSpoken) {
                 const rawName = (paragraphElement!.textContent || "").replace(/\s+/g, " ").trim();
                 const prettyName = rawName.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -215,14 +218,17 @@ export function performCachedSearch(query: string, currentLocation: Location): S
                   .replace(/\s+/g, " ")
                   .trim();
 
+                // eslint-disable-next-line max-depth -- play format character line detection
                 if (nextText) {
                   paragraphText = `${prettyName}: ${nextText}`;
                 }
               }
             } else {
               // Fallback to previous string-based detection if DOM attributes aren't usable
+              // eslint-disable-next-line max-depth -- play format fallback detection
               if (bookCharacters.includes(paragraphText.trim().toLowerCase())) {
                 const nextParagraphText = chapterCache[paragraphNumber + 1];
+                // eslint-disable-next-line max-depth -- play format fallback detection
                 if (nextParagraphText) {
                   paragraphText = `${paragraphText}: ${nextParagraphText}`;
                 }
@@ -392,6 +398,7 @@ export function findCharacterSentences(
       spottedCharacterHistory.forEach(({ chapter, paragraphs }) => {
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
+        // eslint-disable-next-line complexity
         paragraphs.forEach((paragraph) => {
           const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
           if (!paragraphElement) return;

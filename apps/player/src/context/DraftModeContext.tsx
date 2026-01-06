@@ -35,7 +35,7 @@ export function DraftModeProvider({ children, forceDraftMode }: DraftModeProvide
     // Otherwise, detect from URL
     const urlParams = new URLSearchParams(window.location.search);
     const isDraft = urlParams.get("draft") === "true" || urlParams.get("editor") === "true";
-     
+
     setDraftMode(isDraft);
   }, [forceDraftMode]);
 
@@ -46,6 +46,7 @@ export function DraftModeProvider({ children, forceDraftMode }: DraftModeProvide
  * Hook to get the current draft mode setting.
  * Returns true if viewing draft content, false for published-only.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useDraftMode(): boolean {
   return useContext(DraftModeContext);
 }

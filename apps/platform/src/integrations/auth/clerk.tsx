@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import type { ClerkProviderProps } from "@clerk/react-router";
 import type { LoadedClerk, UseUserReturn, UseAuthReturn } from "@clerk/types";

@@ -249,7 +249,7 @@ Propaganda posters for their graphic boldness and limited color palette.`;
         avatarStyle = styleData.avatarStyle;
         console.log(`\n🎨 Using avatarStyle from graphicalStyle.json`);
       }
-    } catch (e) {
+    } catch {
       console.log(`⚠️  Could not parse graphicalStyle.json, using default style`);
     }
   }

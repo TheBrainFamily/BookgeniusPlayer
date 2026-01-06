@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import { cn } from "@player/lib/utils";
-import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 import { getSpeaksUrlForListens } from "@player/utils/assetUrls";
 
@@ -35,7 +34,7 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
       if (mediaSrc !== videoListensSrc) {
         // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing video state with prop changes
         setVideoListensLoaded(false);
-         
+
         setVideoListensSrc(mediaSrc);
 
         // Look up the speaks URL from the registry
@@ -61,11 +60,11 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
     if (!isVideo) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing video state for image mode
       if (videoListensSrc !== mediaSrc) setVideoListensSrc(mediaSrc);
-       
+
       if (!isListeningMode) setIsListeningMode(true);
-       
+
       setVideoListensLoaded(true);
-       
+
       if (videoSpeaksSrc !== null) setVideoSpeaksSrc(null);
       setVideoSpeaksLoaded(false);
       return;

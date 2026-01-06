@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 /**
@@ -196,7 +195,8 @@ function GroupedCueRow({
   const serverCueKey = cues.map((c) => `${c._id}:${c.order}`).join(",");
   useEffect(() => {
     setLocalCues(cues);
-  }, [serverCueKey]); // Only sync when server order actually changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally only sync when server order changes, not on every cues reference change
+  }, [serverCueKey]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

@@ -35,8 +35,13 @@ if (import.meta.hot) {
 const containerId = "content-container";
 
 export function useBookContent() {
-  const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded } =
-    useBookConvex();
+  const {
+    textVersion,
+    bookData: _bookData,
+    isReady,
+    bookStringified,
+    ensureCompiledChaptersLoaded,
+  } = useBookConvex();
   const { location } = useLocation();
   const { currentChapter } = location;
   const { isPlayFormat } = useBookForm();
@@ -259,6 +264,7 @@ export function useBookContent() {
     // by the textVersion effect using updateMountedChaptersInPlace().
     // Including bookStringified would cause cleanup to run (disposing virtualizer)
     // before the next effect run, triggering full re-initialization and scroll loss.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: bookStringified excluded to prevent re-initialization on content updates. See comment above.
   }, [handleContentChanged, isReady]);
 
   useEffect(() => {
