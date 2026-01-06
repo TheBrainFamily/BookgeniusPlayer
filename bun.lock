@@ -314,6 +314,8 @@
         "@tailwindcss/typography": "^0.5.16",
         "@tailwindcss/vite": "^4.1.12",
         "@types/node": "^22.16.5",
+        "@types/react": "^19.1.10",
+        "@types/react-dom": "^19.1.7",
         "@vitejs/plugin-react-swc": "^3.11.0",
         "autoprefixer": "^10.4.21",
         "eslint": "^9.32.0",
