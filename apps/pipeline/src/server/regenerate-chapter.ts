@@ -15,7 +15,7 @@ function setBookArg(slug: string) {
   const bookArg = path.join("books-data", slug);
   try {
     setCurrentBook(bookArg);
-  } catch (_) {
+  } catch {
     process.argv[2] = bookArg;
   }
 }
@@ -68,7 +68,7 @@ export async function regenerateChapter(
     referenceCards = JSON.parse(
       readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
     ) as NewReferenceCardsResponse;
-  } catch (e) {
+  } catch {
     return { success: false, error: "Failed to read reference cards" };
   }
 

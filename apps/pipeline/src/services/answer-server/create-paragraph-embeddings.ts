@@ -1,9 +1,7 @@
 import fs from "fs";
 import type { ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleGenAI } from "@google/genai";
 
-import dotenv from "dotenv";
 import { getParagraphsFromChapter } from "../../tools/createParagraphsWithPageNumbers";
 import { getParagraphsFromChapterWithText } from "../../tools/getParagraphsFromChapterWithText";
 import { getBookForm } from "../../tools/getBookForm";

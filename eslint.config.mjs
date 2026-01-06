@@ -74,26 +74,29 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-require-imports": "off",
 
-      // ===== TURNED OFF (from base configs, too noisy for gradual adoption) =====
-      // These come from eslint:recommended and cause many errors in existing code
+      // ===== TURNED OFF (TypeScript handles these) =====
+      // "no-undef": "off",
+      // "no-redeclare": "off",
+      // "no-func-assign": "off",
+      // "no-unsafe-optional-chaining": "off",
+      // "no-unsafe-finally": "off",
+
+      // ===== TURNED OFF (intentional patterns or too many violations) =====
       "@typescript-eslint/no-unused-expressions": "off", // Many false positives with optional chaining
       "@typescript-eslint/no-this-alias": "off", // Used intentionally in some patterns
-      "no-empty": "off", // Empty catch blocks are intentional sometimes
-      "no-console": "off", // Allow console in dev, enforce via custom rules where needed
-      "no-func-assign": "off", // TypeScript already catches this
-      "no-undef": "off", // TypeScript handles this
-      "no-redeclare": "off", // TypeScript handles this
-      "no-case-declarations": "off", // Can be fixed incrementally
-      "no-prototype-builtins": "off", // Rarely an actual issue
-      "no-fallthrough": "off", // Sometimes intentional
-      "no-unsafe-finally": "off", // TypeScript catches most issues
-      "no-useless-escape": "warn", // Downgrade to warning (auto-fixable)
+      "no-empty": ["warn", { allowEmptyCatch: true }], // Allow empty catch blocks
+      "no-console": "off", // Allow console in dev, enforce per-context
       "no-control-regex": "off", // Used intentionally for ANSI stripping
       "no-irregular-whitespace": "off", // Book content has special chars
-      "no-misleading-character-class": "off", // Rare edge case
       "no-cond-assign": "off", // Sometimes intentional (while assignments)
       "no-constant-condition": "off", // Used in while(true) patterns
-      "no-unsafe-optional-chaining": "off", // TypeScript handles this
+
+      // ===== WARNINGS (few/no violations, catch regressions) =====
+      "no-useless-escape": "warn",
+      "no-case-declarations": "warn",
+      "no-prototype-builtins": "warn",
+      "no-fallthrough": "warn",
+      "no-misleading-character-class": "warn",
     },
   },
 
@@ -141,7 +144,7 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node } },
     rules: {
       // Convex-specific
-      "no-console": "warn",
+      "no-console": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_|^ctx$", varsIgnorePattern: "^_" },

@@ -110,7 +110,7 @@ function setBookArg(slug: string) {
   const bookArg = path.join("books-data", slug);
   try {
     setCurrentBook(bookArg);
-  } catch (_) {
+  } catch {
     process.argv[2] = bookArg;
   }
 }

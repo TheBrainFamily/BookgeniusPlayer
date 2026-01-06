@@ -15,7 +15,7 @@ export const extractJSON = <T>(input: string): T | null => {
     // First attempt: Try to parse the whole string (maybe it's already valid JSON)
     try {
       return JSON.parse(input);
-    } catch (e) {
+    } catch {
       // Not valid JSON, continue with extraction
     }
 
@@ -26,7 +26,7 @@ export const extractJSON = <T>(input: string): T | null => {
     if (jsonBlockMatch && jsonBlockMatch[1]) {
       try {
         return JSON.parse(jsonBlockMatch[1]);
-      } catch (e) {
+      } catch {
         // JSON in code block wasn't valid, try other methods
       }
     }
@@ -36,7 +36,7 @@ export const extractJSON = <T>(input: string): T | null => {
     if (arrayMatch) {
       try {
         return JSON.parse(arrayMatch[0]);
-      } catch (e) {
+      } catch {
         // Not valid JSON array, continue
       }
     }
@@ -46,7 +46,7 @@ export const extractJSON = <T>(input: string): T | null => {
     if (objectMatch) {
       try {
         return JSON.parse(objectMatch[0]);
-      } catch (e) {
+      } catch {
         // Not valid JSON object, continue
       }
     }
@@ -64,7 +64,7 @@ export const extractJSON = <T>(input: string): T | null => {
       const possibleJSON = input.substring(firstBrace, lastBrace + 1);
       try {
         return JSON.parse(possibleJSON);
-      } catch (e: unknown) {
+      } catch {
         // Not valid JSON, try with a more specialized approach
       }
     }
@@ -82,7 +82,7 @@ export const extractJSON = <T>(input: string): T | null => {
           if (match.length > 10) {
             return JSON.parse(match);
           }
-        } catch (_) {
+        } catch {
           // Continue to next match if this one isn't valid
           continue;
         }
@@ -92,8 +92,12 @@ export const extractJSON = <T>(input: string): T | null => {
     // Nothing worked
     console.error("Could not extract valid JSON from the input string");
     return null;
-  } catch (error) {
-    console.error("Error extracting JSON:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error extracting JSON:", error.message);
+    } else {
+      console.error("Error extracting JSON:", error);
+    }
     return null;
   }
 };

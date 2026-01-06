@@ -3,7 +3,6 @@ import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@player/preloadBackgrounds";
 import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
-import { getBookSlug } from "@player/state/bookDataStore";
 import { getBookFromUrl } from "@player/getBookFromUrl";
 
 export type Background = {
@@ -396,7 +395,6 @@ export const dealWithBackground = ({
         }
 
         // Force reflow to apply "transition: none" reset cleanly, then restore transition
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         nextBack.offsetHeight;
         nextBack.style.transition = "";
 
