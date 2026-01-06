@@ -1,7 +1,7 @@
 // convex/assetFsHttp.ts
-import { action, internalAction, internalQuery, query, QueryCtx } from "./_generated/server";
+import { action, internalAction, internalQuery, query, type QueryCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import { type Id } from "./_generated/dataModel";
 import { v } from "convex/values";
 
 /**

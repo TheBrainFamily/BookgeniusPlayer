@@ -1,9 +1,9 @@
-import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
+import { mutation, query, type QueryCtx, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { slugify } from "./slugify";
 import { allocateFolderSegment } from "./allocateFolderSegment";
 import { getActorFields } from "./authAdapter";
-import { Id } from "./_generated/dataModel";
+import { type Id } from "./_generated/dataModel";
 import { folderFields, assetFields, assetVersionFields } from "./validators";
 import { storageBackendValidator } from "./schema";
 import { createR2Client, type R2Config } from "./r2Client";
@@ -676,7 +676,7 @@ export const listFoldersWithAssets = query({
           return {
             basename: asset.basename,
             url,
-            versionId: versionId,
+            versionId,
             contentType: version?.contentType,
             size: version?.size,
           };

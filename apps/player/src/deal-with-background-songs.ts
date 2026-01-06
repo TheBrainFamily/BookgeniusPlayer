@@ -10,7 +10,7 @@ import {
 } from "./audio-crossfader";
 import { getBackgroundSongsForBook, getBookSlug } from "./state/bookDataStore";
 import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
-import { BackgroundSongSection } from "./types/book";
+import { type BackgroundSongSection } from "./types/book";
 
 let isProcessingBackgroundSongs = false; // Module-level flag to prevent re-entrancy
 

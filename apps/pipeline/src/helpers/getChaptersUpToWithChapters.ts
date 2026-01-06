@@ -1,4 +1,4 @@
-import { Chapter } from "../types";
+import { type Chapter } from "../types";
 import * as cheerio from "cheerio";
 
 export const getChaptersUpToWithChapters = (from: number, upTo: number, chapters: string) => {

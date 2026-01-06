@@ -1,4 +1,4 @@
-import { Element as XMLElement } from "@xmldom/xmldom";
+import { type Element as XMLElement } from "@xmldom/xmldom";
 
 const getTitleText = (el?: XMLElement | null) => (el ? (el.textContent || "").trim() : "");
 

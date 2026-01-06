@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import {
   useBackgroundGenerationStore,
-  GeneratingBackground,
-  ReadyBackground,
+  type GeneratingBackground,
+  type ReadyBackground,
   createBackgroundKey,
 } from "@player/stores/backgroundGeneration.store";
 

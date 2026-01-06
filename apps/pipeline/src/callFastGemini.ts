@@ -1,10 +1,10 @@
 import {
-  GenerateContentConfig,
+  type GenerateContentConfig,
   GoogleGenAI,
   HarmBlockThreshold,
   HarmCategory,
 } from "@google/genai";
-import { z } from "zod";
+import { type z } from "zod";
 import { google } from "@ai-sdk/google";
 import { generateObject, generateText, streamText, wrapLanguageModel } from "ai";
 import { toGeminiSchema } from "gemini-zod";
@@ -163,7 +163,7 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
   const { object } = await generateObject({
     model: google(model),
     schema: zodSchema,
-    prompt: prompt,
+    prompt,
     // providerOptions: { google: { thinkingConfig: { thinkingBudget: 0, includeThoughts: true } } },
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
     providerOptions: {
@@ -285,7 +285,7 @@ export const callSlowGeminiWithThinkingAndSchemaAndParsed = async <T>(
         ? claudeModel
         : openrouter(model),
     schema: zodSchema,
-    prompt: prompt,
+    prompt,
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
     providerOptions: {
       openrouter: {

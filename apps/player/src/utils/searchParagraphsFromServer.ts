@@ -1,7 +1,7 @@
-import { Location } from "@player/state/LocationContext";
+import { type Location } from "@player/state/LocationContext";
 import { ANSWERS_SERVER_URL } from "@player/lib/consts";
 import { getBookSlug } from "@player/state/bookDataStore";
-import { Filter } from "@player/types/book";
+import { type Filter } from "@player/types/book";
 
 const extractSummary = (text: string): string => {
   const summaryMatch = text.match(/<Summary>(.*?)<\/Summary>/);
@@ -27,8 +27,8 @@ export const parseSearchParagraphsServerResponse = (
     return {
       chapter: r.chapter,
       paragraphNumber: r.paragraphNumber,
-      text: text,
-      summary: summary,
+      text,
+      summary,
       score: r.score,
     };
   });
@@ -68,7 +68,7 @@ export async function searchParagraphsFromServer(
     bookSlug: slug,
   };
 
-  const params = new URLSearchParams({ searchQuery: searchQuery, filter: JSON.stringify(filter) });
+  const params = new URLSearchParams({ searchQuery, filter: JSON.stringify(filter) });
 
   const url = `${baseUrl}?${params.toString()}`;
 

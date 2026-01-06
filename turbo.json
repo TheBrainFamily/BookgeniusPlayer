@@ -1,4 +1,4 @@
-  {
+{
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "typecheck": {
@@ -13,13 +13,25 @@
       "outputs": []
     },
     "lint": {
+      "cache": true,
       "inputs": [
         "src/**/*.ts",
         "src/**/*.tsx",
         "**/*.ts",
         "**/*.tsx",
-        ".eslintrc*",
-        "eslint.config.*",
+        "../../eslint.config.mjs",
+        "package.json"
+      ],
+      "outputs": [".eslintcache"]
+    },
+    "lint:ci": {
+      "cache": true,
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "../../eslint.config.mjs",
         "package.json"
       ],
       "outputs": []

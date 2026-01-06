@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, Variants } from "motion/react";
+import { motion, type Variants } from "motion/react";
 import { FileText, CheckCircle, ArrowDownUp } from "lucide-react";
 
 import ModalUI from "./ModalUI";

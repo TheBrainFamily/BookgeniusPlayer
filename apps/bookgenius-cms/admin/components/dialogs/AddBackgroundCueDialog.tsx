@@ -268,7 +268,7 @@ export function AddBackgroundCueDialog({
                 {backgroundColor && (
                   <div
                     className="h-9 w-9 rounded border shrink-0"
-                    style={{ backgroundColor: backgroundColor }}
+                    style={{ backgroundColor }}
                   />
                 )}
               </div>

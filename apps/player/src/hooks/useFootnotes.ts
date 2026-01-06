@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Location } from "@player/state/LocationContext";
+import { type Location } from "@player/state/LocationContext";
 import { useBookConvex } from "@player/context/BookConvexContext";
 
 export interface Footnote {

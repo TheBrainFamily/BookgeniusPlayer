@@ -1,6 +1,6 @@
 // Define a type for parsed chapters
-import { z } from "zod";
-import { NewReferenceCardsResponseSchema } from "./schemes";
+import { type z } from "zod";
+import { type NewReferenceCardsResponseSchema } from "./schemes";
 
 export type Chapter = { number: number; title: string; content: string };
 

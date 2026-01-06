@@ -1,5 +1,5 @@
 import { DOMParser } from "@xmldom/xmldom";
-import { Element as XMLElement, Node as XMLNode } from "@xmldom/xmldom";
+import { type Element as XMLElement, type Node as XMLNode } from "@xmldom/xmldom";
 import { getParagraphsFromChapterWithText } from "../getParagraphsFromChapterWithText";
 import { getChapterTitle } from "./get-chapter-title";
 import * as cheerio from "cheerio";

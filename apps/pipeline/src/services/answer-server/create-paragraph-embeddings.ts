@@ -185,7 +185,7 @@ export const generateEmbeddings = async (
 
         return {
           text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
-          chapter: chapter,
+          chapter,
           paragraphNumber: bulletPoint.mainParagraphNumber,
         };
       },
@@ -195,7 +195,7 @@ export const generateEmbeddings = async (
       (bulletPoint) => {
         return {
           text: `${bulletPoint.paragraphsSummary}`,
-          chapter: chapter,
+          chapter,
           paragraphNumber: bulletPoint.mainParagraphNumber,
         };
       },

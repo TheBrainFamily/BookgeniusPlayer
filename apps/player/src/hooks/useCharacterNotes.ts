@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import {
   paragraphMetadataServicePure,
   parseParagraphRange,
-  ParsedParagraphRange,
+  type ParsedParagraphRange,
 } from "@player/fetchers/getParagraphRange";
-import { Location } from "@player/state/LocationContext";
+import { type Location } from "@player/state/LocationContext";
 import { useBookConvex } from "@player/context/BookConvexContext";
 
 /** Deep equality check using JSON - compares ALL fields */

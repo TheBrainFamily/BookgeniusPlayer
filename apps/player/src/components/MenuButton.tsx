@@ -1,5 +1,5 @@
 import { Book } from "lucide-react";
-import { motion, Variants } from "motion/react";
+import { motion, type Variants } from "motion/react";
 
 import { useBookMenuModal } from "@player/stores/modals/bookMenuModal.store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@player/components/ui/tooltip";

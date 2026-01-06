@@ -1,5 +1,5 @@
-import { Location } from "./state/LocationContext";
-import { Filter } from "./types/book";
+import { type Location } from "./state/LocationContext";
+import { type Filter } from "./types/book";
 import { ANSWERS_SERVER_URL } from "@player/lib/consts";
 import { getBookSlug } from "./state/bookDataStore";
 import { getSurroundingText } from "./utils/getSurroundingText";

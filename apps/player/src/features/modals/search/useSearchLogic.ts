@@ -7,7 +7,7 @@ import {
   performCachedSearch,
   performUnifiedSearch,
 } from "@player/searchModal";
-import { Location } from "@player/state/LocationContext";
+import { type Location } from "@player/state/LocationContext";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { useBookConvex } from "@player/context/BookConvexContext";
 

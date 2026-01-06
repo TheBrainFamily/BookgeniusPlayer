@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AnimatePresence, motion, Variants, useSpring } from "motion/react";
+import { AnimatePresence, motion, type Variants, useSpring } from "motion/react";
 
 import { useReadingProgress } from "@player/hooks/useReadingProgress";
 import { bookIndex } from "@player/logic/BookIndex";

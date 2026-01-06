@@ -1,4 +1,4 @@
-import { Database } from "../supabase/types";
+import { type Database } from "../supabase/types";
 import type { PaymentsModule, PaymentType } from "./types";
 import { createClient } from "@supabase/supabase-js";
 

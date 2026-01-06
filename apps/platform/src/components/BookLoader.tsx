@@ -142,7 +142,7 @@ export const BookLoader: React.FC<BookLoaderProps> = ({
             }}
           >
             <div className="play-icon" aria-hidden="true">
-              <div className="w-0 h-0 border-l-[10px] sm:border-l-[12px] border-l-white border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent ml-1"></div>
+              <div className="w-0 h-0 border-l-[10px] sm:border-l-[12px] border-l-white border-t-[6px] sm:border-t-[8px] border-t-transparent border-b-[6px] sm:border-b-[8px] border-b-transparent ml-1" />
             </div>
             <span className="min-w-[3em] sm:min-w-[4em] text-center transition-opacity duration-300">
               Start

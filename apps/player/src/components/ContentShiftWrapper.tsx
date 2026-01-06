@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";

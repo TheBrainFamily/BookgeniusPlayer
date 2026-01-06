@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { callGeminiWrapper } from "../../callClaude";
-import { NewReferenceCardsResponse } from "../../types";
+import { type NewReferenceCardsResponse } from "../../types";
 import { NewReferenceCardsResponseSchema } from "../../schemes";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";

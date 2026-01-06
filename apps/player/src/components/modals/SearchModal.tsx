@@ -16,8 +16,8 @@ import { Search, FileText, Minimize2, Maximize2, X } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@player/components/ui/tooltip";
 
 import {
-  SearchResultsData,
-  SearchResultItemData,
+  type SearchResultsData,
+  type SearchResultItemData,
   cleanupSearchChapters,
 } from "@player/searchModal";
 import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
@@ -32,7 +32,7 @@ import {
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { cn } from "@player/lib/utils";
 import { findScrollParent } from "@player/utils/findScrollParent";
-import { FILTER_OPTIONS, FILTER_VALUE_MAP, SearchFilter } from "@player/utils/filterOptions";
+import { FILTER_OPTIONS, FILTER_VALUE_MAP, type SearchFilter } from "@player/utils/filterOptions";
 
 interface SearchModalProps {
   onClose: () => void;

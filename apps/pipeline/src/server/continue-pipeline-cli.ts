@@ -12,7 +12,7 @@ import {
   isValidStep,
   getStepOrder,
 } from "./pipeline-progress";
-import { Step, StepLabels } from "../shared/pipelineTypes";
+import { type Step, StepLabels } from "../shared/pipelineTypes";
 
 dotenv.config();
 

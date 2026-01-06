@@ -1,10 +1,10 @@
 import { VoyageAIClient } from "voyageai";
 import "dotenv/config";
 import { getParagraphsFromChapter } from "../../tools/createParagraphsWithPageNumbers";
-import { DocumentWithEmbeddings, Document } from "./create-paragraph-embeddings";
+import { type DocumentWithEmbeddings, type Document } from "./create-paragraph-embeddings";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { getBookSettings } from "../../helpers/getBookSettings";
-import { ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
+import { type ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { readBookFile } from "../../helpers/readBookFile";
 
@@ -34,7 +34,7 @@ const generateEmbeddingsSimplified = async (chaptersFrom: number, chaptersTo: nu
       true,
     );
     const documents: Document[] = paragraphsFromChapter.map((paragraph) => {
-      return { text: paragraph.text, chapter: chapter, paragraphNumber: paragraph.dataIndex };
+      return { text: paragraph.text, chapter, paragraphNumber: paragraph.dataIndex };
     });
     const documentsWithEmbeddings = await computeBatchEmbeddingsThroughHTTP(documents);
     embeddingsForChapters.set(chapter, documentsWithEmbeddings);
@@ -82,7 +82,7 @@ const generateEmbeddings = async (chaptersFrom: number, chaptersTo: number) => {
                 .join(" "),
             )
             .join(" ")}</Text>`,
-          chapter: chapter,
+          chapter,
           paragraphNumber: bulletPoint.mainParagraphNumber,
         };
       },
@@ -92,7 +92,7 @@ const generateEmbeddings = async (chaptersFrom: number, chaptersTo: number) => {
       (bulletPoint) => {
         return {
           text: `${bulletPoint.paragraphsSummary}`,
-          chapter: chapter,
+          chapter,
           paragraphNumber: bulletPoint.mainParagraphNumber,
         };
       },

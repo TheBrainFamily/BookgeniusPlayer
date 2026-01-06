@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { z } from "zod";
+import { type z } from "zod";
 import Anthropic from "@anthropic-ai/sdk";
 import { logger } from "./logger";
 import { callGemini } from "./callGemini";

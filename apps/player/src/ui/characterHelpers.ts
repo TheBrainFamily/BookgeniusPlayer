@@ -1,4 +1,4 @@
-import { BOOK_SLUGS } from "@player/consts";
+import { type BOOK_SLUGS } from "@player/consts";
 import { getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
 
 export function isAppearanceWithinRange(

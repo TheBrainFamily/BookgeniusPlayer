@@ -10,7 +10,7 @@ import {
   VolumeX,
   Download,
 } from "lucide-react";
-import { motion, AnimatePresence, Variants, Transition, Easing } from "motion/react";
+import { motion, AnimatePresence, type Variants, type Transition, type Easing } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
 import { useTranslation } from "react-i18next";
 
@@ -19,7 +19,7 @@ import {
   setMasterVolume,
   setBackgroundVolume,
   initAudioContext,
-  TrackState,
+  type TrackState,
   getCurrentTrackPosition,
   pauseCurrentTrack,
   resumeCurrentTrack,

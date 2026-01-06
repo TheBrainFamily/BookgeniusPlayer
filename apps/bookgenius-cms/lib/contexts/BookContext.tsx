@@ -14,7 +14,7 @@
  * - Granular reactivity (each query triggers its own re-render)
  */
 
-import { createContext, useContext, ReactNode, useMemo } from "react";
+import { createContext, useContext, type ReactNode, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";

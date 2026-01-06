@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
-import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
+import { type CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
 import { getCharactersData } from "@player/state/bookDataStore";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";

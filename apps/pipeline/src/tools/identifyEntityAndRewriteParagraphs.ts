@@ -8,7 +8,7 @@ import fs from "fs";
 import { compareXmlTextContent } from "./new-tooling/compare-chapters-xml";
 import { restoreOriginalTextInHtml } from "./new-tooling/restore-text-in-html";
 import path from "path";
-import { NewReferenceCardsResponse } from "../types";
+import { type NewReferenceCardsResponse } from "../types";
 import { writeBookFile } from "../helpers/writeBookFile";
 import { getBookSettings } from "../helpers/getBookSettings";
 import { FILE_TYPE } from "../helpers/filesHelpers";

@@ -82,7 +82,7 @@ function SnapplifyChatSafe() {
   console.log("[SnapplifyChat] Initial state:", {
     authReady: auth.ready,
     isSignedIn: auth.isSignedIn,
-    fcReady: fcReady,
+    fcReady,
     fcWidgetExists: typeof window !== "undefined" && !!window.fcWidget,
   });
 
@@ -112,13 +112,13 @@ function SnapplifyChatSafe() {
     console.log("[SnapplifyChat] Auth/FC state change effect triggered:", {
       authReady: auth.ready,
       isSignedIn: auth.isSignedIn,
-      fcReady: fcReady,
+      fcReady,
     });
 
     if (!auth.ready || !fcReady) {
       console.log("[SnapplifyChat] Skipping user properties - not ready:", {
         authReady: auth.ready,
-        fcReady: fcReady,
+        fcReady,
       });
       return;
     }

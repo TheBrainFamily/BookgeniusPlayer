@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Plus, Music, List, FolderOpen, Trash2, Upload, GripVertical } from "lucide-react";
-import { Id } from "@convex/_generated/dataModel";
+import { type Id } from "@convex/_generated/dataModel";
 import { AddMusicCueDialog } from "../dialogs/AddMusicCueDialog";
 import {
   DndContext,
@@ -28,7 +28,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
+  type DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,

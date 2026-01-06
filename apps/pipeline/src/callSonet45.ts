@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { type z } from "zod";
 import { logger } from "./logger";
 import { generateObject } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
@@ -29,7 +29,7 @@ export const callSonnet45 = async <T = string>(
         model: anthropic("claude-opus-4-5-20251101"),
         messages: prompt.map((p) => ({ role: "user", content: [{ type: "text", text: p }] })),
         // @ts-expect-error(weird zod typing)
-        schema: schema,
+        schema,
         // providerOptions: { google: { thinkingConfig: { thinkingBudget: 256 } } },
         // providerOptions: { openai: { reasoningEffort: "low" } },
         providerOptions: { anthropic: { thinking: { type: "disabled" } } },

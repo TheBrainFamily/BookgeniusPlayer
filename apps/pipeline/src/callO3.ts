@@ -1,6 +1,6 @@
 import "dotenv/config";
 import OpenAI from "openai";
-import { z } from "zod";
+import { type z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { logger } from "./logger";
 import { generateObject } from "ai";
@@ -29,7 +29,7 @@ export const callO3WithSchema = async <T>(
   const { object } = await generateObject({
     model: openai(model),
     schema: zodSchema,
-    prompt: prompt,
+    prompt,
     // providerOptions: { google: { thinkingConfig: { thinkingBudget: 0, includeThoughts: true } } },
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
   });
@@ -37,7 +37,7 @@ export const callO3WithSchema = async <T>(
   return object as T;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export const callGpt5 = async <T = string>(
   prompt: string,
   schema?: z.ZodSchema<T>,

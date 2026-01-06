@@ -1,5 +1,5 @@
-import { CSSProperties, useMemo, useState, useEffect, memo } from "react";
-import { motion, Variants, AnimatePresence } from "motion/react";
+import { type CSSProperties, useMemo, useState, useEffect, memo } from "react";
+import { motion, type Variants, AnimatePresence } from "motion/react";
 
 import { useCharactersOnStage } from "@player/hooks/useCharactersOnStage";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
@@ -11,7 +11,7 @@ import {
   useOptionalElementVisibility,
   useLastHideReason,
 } from "@player/stores/elementVisibility.store";
-import { Appearance } from "@player/fetchers/getParagraphRange";
+import { type Appearance } from "@player/fetchers/getParagraphRange";
 
 const AVATAR_SIZE = "clamp(55px, 6.5vw, 90px)";
 const FADE_OUT_DURATION_MS = 3000;

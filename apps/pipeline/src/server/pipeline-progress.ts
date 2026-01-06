@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { Step, StepEnum } from "../shared/pipelineTypes";
+import { type Step, StepEnum } from "../shared/pipelineTypes";
 
 export interface StepProgress {
   status: "done" | "error";

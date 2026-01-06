@@ -111,7 +111,7 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
               </div>
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span className="text-sm"></span>
+                <span className="text-sm" />
               </div>
               <div className="flex items-center space-x-3 text-muted-foreground">
                 <MapPin className="h-4 w-4" />

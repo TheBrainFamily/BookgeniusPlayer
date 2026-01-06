@@ -52,7 +52,7 @@ async function cleanupBookVersions() {
 }
 
 async function listPrefixes(prefix: string): Promise<string[]> {
-  let prefixes: string[] = [];
+  const prefixes: string[] = [];
   let continuationToken: string | undefined = undefined;
 
   do {

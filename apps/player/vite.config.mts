@@ -5,7 +5,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { createHtmlPlugin } from "vite-plugin-html";
 import tailwind from "@tailwindcss/vite";
-import { HttpProxy } from "vite";
+import { type HttpProxy } from "vite";
 import "dotenv/config";
 
 export default defineConfig(async () => {

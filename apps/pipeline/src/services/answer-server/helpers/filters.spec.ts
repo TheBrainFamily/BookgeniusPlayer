@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { shouldAllowDocument, Filter } from "./filters";
+import { shouldAllowDocument, type Filter } from "./filters";
 import type { Document } from "../embeddingManager";
 
 describe("shouldAllowDocument", () => {

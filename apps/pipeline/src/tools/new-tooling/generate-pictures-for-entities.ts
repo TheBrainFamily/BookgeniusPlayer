@@ -11,7 +11,7 @@ import { getBookSettings } from "../../helpers/getBookSettings";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { bookFileExists } from "../../helpers/bookFileExists";
 import { writeBookFile } from "../../helpers/writeBookFile";
-import { NewReferenceCardsResponse } from "../../types";
+import { type NewReferenceCardsResponse } from "../../types";
 import { generateFluxImage } from "./generate-flux-schnel-image";
 import { generateTagName } from "../../helpers/generateTagName";
 import {

@@ -1,7 +1,7 @@
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { readBookFile } from "../../helpers/readBookFile";
 import { writeBookFile } from "../../helpers/writeBookFile";
-import { NewReferenceCardsResponse } from "../../types";
+import { type NewReferenceCardsResponse } from "../../types";
 
 import { generateTagName } from "../../helpers/generateTagName";
 

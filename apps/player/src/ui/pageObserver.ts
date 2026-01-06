@@ -557,8 +557,8 @@ export function setupPageObserver(): {
             console.warn("[Observer] Could not update location: start/end info is invalid.", {
               activePgh: activeParagraph,
               effectiveActiveParagraph,
-              startInfo: startInfo,
-              endInfo: endInfo,
+              startInfo,
+              endInfo,
             });
           }
         }

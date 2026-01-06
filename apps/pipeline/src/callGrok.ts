@@ -16,7 +16,7 @@ export const callGrokWithSchema = async <T>(prompt: string, zodSchema: z.ZodSche
   const { object } = await generateObject({
     model: openrouter("x-ai/grok-4.1-fast"),
     schema: zodSchema,
-    prompt: prompt,
+    prompt,
     // providerOptions: { google: { thinkingConfig: { thinkingBudget: 0, includeThoughts: true } } },
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
   });

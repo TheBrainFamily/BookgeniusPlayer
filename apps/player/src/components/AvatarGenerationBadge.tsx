@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { useBookConvex, CharacterBundle } from "@player/context/BookConvexContext";
+import { useBookConvex, type CharacterBundle } from "@player/context/BookConvexContext";
 import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
 import { motion, AnimatePresence } from "motion/react";
 

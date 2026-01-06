@@ -1,4 +1,4 @@
-import { DOMParser, Element } from "@xmldom/xmldom"; // Using @xmldom/xmldom
+import { DOMParser, type Element } from "@xmldom/xmldom"; // Using @xmldom/xmldom
 import fs from "fs";
 
 // Interface for the desired output object

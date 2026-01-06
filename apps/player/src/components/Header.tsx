@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, Variants } from "motion/react";
+import { AnimatePresence, motion, type Variants } from "motion/react";
 
 import { cn } from "@player/lib/utils";
 import useSplashHidden from "@player/hooks/useSplashHidden";

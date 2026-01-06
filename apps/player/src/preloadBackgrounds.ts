@@ -2,7 +2,7 @@ import { getCurrentLocation } from "@player/helpers/paragraphsNavigation";
 import { getBackgroundsForBook, getBookData } from "@player/state/bookDataStore";
 import { getFileType, loadVideoAsHTMLElement } from "@player/ui/backgroundUtils";
 import { getBookAssetUrl } from "./utils/assetUrls";
-import { BackgroundForBook } from "./types/book";
+import { type BackgroundForBook } from "./types/book";
 
 // Cache to store preloaded elements
 const preloadCache = new Map<string, HTMLVideoElement | HTMLDivElement>();

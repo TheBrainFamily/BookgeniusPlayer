@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Bucket, Storage } from "@google-cloud/storage";
+import { type Bucket, Storage } from "@google-cloud/storage";
 
 const storage = new Storage();
 
