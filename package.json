@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky",
+    "prepare": "husky && git config blame.ignoreRevsFile .git-blame-ignore-revs",
     "dev:player": "bun --filter player dev",
     "dev:editor": "bun --filter editor dev",
     "build:player:docker": "bun --filter player build-for-docker",
