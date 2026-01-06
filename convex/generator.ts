@@ -22,14 +22,6 @@ const stepStatusValidator = v.union(
   v.literal("skipped"),
 );
 
-const _jobStatusValidator = v.union(
-  v.literal("pending"),
-  v.literal("generating"),
-  v.literal("paused"),
-  v.literal("failed"),
-  v.literal("completed"),
-);
-
 export const ensureBookStructure = mutation({
   args: {
     jobId: v.string(),

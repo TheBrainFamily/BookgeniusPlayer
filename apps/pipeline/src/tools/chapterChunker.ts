@@ -114,7 +114,7 @@ export function buildParagraphXml(p: Paragraph): string {
   return `<${p.elementType}${attrs}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`;
 }
 
-export function buildChunkXml(chapterId: number, paragraphs: Paragraph[]): string {
+export function buildChunkXml(paragraphs: Paragraph[]): string {
   return paragraphs.map(buildParagraphXml).join("\n");
 }
 

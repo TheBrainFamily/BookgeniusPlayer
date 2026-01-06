@@ -12,8 +12,10 @@ import { activateCharacterInteractions } from "@player/helpers/activateCharacter
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
 
-function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
-  const result = [];
+function getActiveWithSiblingsSkippingDidaskalia(
+  element: Element,
+): { row: Element; state: "listens" | "speaks" }[] {
+  const result: { row: Element; state: "listens" | "speaks" }[] = [];
 
   // Get previous sibling
   let prev = element.previousElementSibling;
@@ -150,16 +152,23 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
   const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
   const activePlayRow = activeParagraph?.closest(".play-row");
 
-  if (!activePlayRow) return;
+  if (!activePlayRow) {
+    console.error("no active play row");
+    return;
+  }
 
   const chapterElement = activePlayRow?.closest<HTMLElement>("[data-chapter]");
-  const chapterIndex = chapterElement?.dataset.chapter;
+  if (!chapterElement) {
+    console.error("no chapter element");
+    return;
+  }
+  const chapterIndex = chapterElement.dataset.chapter!;
 
   const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
 
-  rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
+  rows.forEach(({ row: playRow, state }) => {
     const characterPlaceholders =
-      playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+      playRow.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
     // eslint-disable-next-line complexity -- character placeholder hydration with video state management
     characterPlaceholders.forEach((activeCharacterPlaceholder) => {
@@ -168,8 +177,13 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
       const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
       const existingVideo = inlineAvatar?.querySelector("video");
       const paragraphIndex = playRow
-        ?.querySelector<HTMLElement>("[data-index]")
+        .querySelector<HTMLElement>("[data-index]")
         ?.getAttribute("data-index");
+
+      if (!paragraphIndex) {
+        console.error("no paragraph index for play row", playRow);
+        return;
+      }
 
       const locationForPlaceholder = {
         chapter: parseInt(chapterIndex, 10),

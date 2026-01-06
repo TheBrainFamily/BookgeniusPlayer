@@ -157,7 +157,12 @@ export const dealWithAudiobookTracks = async ({
             });
           return events;
         };
-        const events: AudiobookTrackEvent[] = createEventsForAudiobook();
+        const events = createEventsForAudiobook();
+        if (!events) {
+          console.warn("no events for audiobook");
+          isProcessingAudiobookTracks = false;
+          return;
+        }
 
         const createWordLevelEvents = () => {
           const sectionsToApply = bookTracks.filter(
@@ -240,13 +245,20 @@ export const dealWithAudiobookTracks = async ({
               });
             });
         };
-        const wordLevelEvents: AudiobookTrackEvent[] = createWordLevelEvents();
-        // console.log(`wordLevelEvents: ${wordLevelEvents.splice(0, 3)}`);
+        const wordLevelEvents = createWordLevelEvents();
+        if (!wordLevelEvents) {
+          console.warn("no word level events for audiobook");
+          isProcessingAudiobookTracks = false;
+          return;
+        }
 
         const clipBeginCalculated = sectionToApply["clip-begin"] + AUDIO_SYNC_SHIFT;
         const clipBeginToUse = clipBeginCalculated > 0 ? clipBeginCalculated : 0; // THIS PREVENTS A LOUD AUDIBLE CLICK / AUDIO ARTIFACT
 
-        playTrack(sectionToApply.file, 0, clipBeginToUse, [...events, ...wordLevelEvents]);
+        playTrack(sectionToApply.file, 0, clipBeginToUse, [
+          ...events,
+          ...(wordLevelEvents as AudiobookTrackEvent[]),
+        ]);
       });
     }
   } catch (error) {

@@ -6,7 +6,7 @@ import { Jimp } from "jimp";
 
 export const extractDominantColor = internalAction({
   args: { base64Data: v.string() },
-  handler: async (ctx, { base64Data }) => {
+  handler: async (_, { base64Data }) => {
     const buffer = Buffer.from(base64Data, "base64");
     const image = await Jimp.read(buffer);
 

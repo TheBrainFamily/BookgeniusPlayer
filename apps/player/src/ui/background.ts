@@ -17,7 +17,7 @@ export type Background = {
 
 // ---- globals ----------------------------------------------------------------
 
-type DebouncedLike<F extends (...args: unknown[]) => unknown> = F & {
+type DebouncedLike<F extends (...args: never[]) => unknown> = F & {
   cancel: () => void;
   flush?: () => void;
   pending?: () => boolean;

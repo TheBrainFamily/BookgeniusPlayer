@@ -106,7 +106,10 @@ export const preloadBackgrounds = async () => {
     const loadPromise = new Promise<boolean>((resolve) => {
       const backgroundType = getFileType(fileName);
       const newSrc = getBookAssetUrl(fileName);
-
+      if (!newSrc) {
+        console.error("Failed to get asset URL for:", fileName);
+        return Promise.resolve(false);
+      }
       if (backgroundType === "video") {
         const videoElement = document.createElement("video");
         videoElement.preload = "auto";

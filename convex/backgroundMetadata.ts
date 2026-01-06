@@ -180,19 +180,6 @@ export const updateStatus = internalMutation({
 // =============================================================================
 
 /**
- * Get R2 config from env vars.
- */
-function _getR2Config() {
-  if (!process.env.R2_BUCKET) return undefined;
-  return {
-    R2_BUCKET: process.env.R2_BUCKET,
-    R2_ENDPOINT: process.env.R2_ENDPOINT!,
-    R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
-    R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
-  };
-}
-
-/**
  * Generate preview for an image file (direct processing in Convex).
  */
 export const generateImagePreview = internalAction({

@@ -67,7 +67,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   const [openChapters, setOpenChapters] = useState<string[]>([]);
 
-  const [wideScreen, setIsWideScreen] = useState<boolean | null>(null);
+  const [wideScreen, setIsWideScreen] = useState<boolean>(false);
 
   const hasAnyResults = (deferredResults?.items?.length ?? 0) > 0;
 
@@ -538,6 +538,15 @@ const ResultCard = memo(function ResultCard({
     };
   }, [clickedAppearanceId, item.id]);
 
+  const getAppearanceLabel = useCallback(
+    (type: string | undefined) => {
+      if (!type) return type;
+      const option = FILTER_OPTIONS.find((o) => o.id.toLowerCase() === type.toLowerCase());
+      return option ? t(option.translationKey) : type;
+    },
+    [t],
+  );
+
   const handleSearchResultClick = useCallback(async () => {
     const parsedSearchQuery = (searchQuery ?? "").replace("@", "");
 
@@ -574,10 +583,7 @@ const ResultCard = memo(function ResultCard({
         <div className="flex items-center gap-2 mb-2">
           {item.type && (
             <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-tertiary-30 text-book-tertiary">
-              {t(
-                FILTER_OPTIONS.find((option) => option.id.toLowerCase() === item.type.toLowerCase())
-                  .translationKey,
-              ) ?? item.type}
+              {getAppearanceLabel(item.type)}
             </div>
           )}
           <div className="px-2 py-1 rounded-md text-xs font-medium bg-book-primary-30 text-book-primary">

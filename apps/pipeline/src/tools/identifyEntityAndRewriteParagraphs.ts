@@ -130,7 +130,7 @@ async function processChunk(
       `Using provider for chapter ${chapter} chunk ${chunkIndex}: ${selectedProvider.name}`,
     );
 
-    const originalChunkXml = buildChunkXml(chapter, chunk.paragraphs);
+    const originalChunkXml = buildChunkXml(chunk.paragraphs);
     writeBookFile(
       `original-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`,
       originalChunkXml,
@@ -404,7 +404,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
 
     // Chunk 1 (RAW chunk 0 text as context) - if exists
     if (chunks.length > 1) {
-      const rawChunk0Context = buildChunkXml(chapter, chunks[0].paragraphs);
+      const rawChunk0Context = buildChunkXml(chunks[0].paragraphs);
       logger.info(`📦 Queueing chapter ${chapter} chunk 1/${chunks.length} (with RAW context)`);
       phase1Promises.push(processChunk(chapter, 1, chunks[1], jsonCharacters, rawChunk0Context));
     }

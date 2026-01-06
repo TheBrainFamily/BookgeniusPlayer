@@ -241,57 +241,6 @@ export type RenderMode = "default" | "enhancedProse";
 
 export type EnhancedProseOptions = { speakerDisplayNames?: Map<string, string> };
 
-function _createPlayRowFromSpeakerParagraph(
-  p: Element,
-  doc: Document,
-  state: { lastSpeaker: string | null; alignment: "left" | "right" },
-  options: EnhancedProseOptions,
-): Element {
-  const speakers = p.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
-  const firstSpeaker = speakers[0] || "";
-
-  if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
-    state.alignment =
-      state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
-    state.lastSpeaker = firstSpeaker;
-  }
-
-  const playRow = doc.createElement("div");
-  playRow.className = "play-row";
-  playRow.setAttribute("data-text-alignment", state.alignment);
-  playRow.setAttribute("data-speaker", speakers.join(" "));
-
-  const characterAvatar = doc.createElement("div");
-  characterAvatar.className = "character-avatar";
-
-  const characterText = doc.createElement("div");
-  characterText.className = "character-text";
-
-  const labelP = doc.createElement("p");
-  labelP.setAttribute("data-text-alignment", state.alignment);
-  labelP.setAttribute("data-is-character", "true");
-  labelP.setAttribute("data-is-didaskalia", "false");
-
-  const displayName =
-    options.speakerDisplayNames?.get(firstSpeaker) ?? firstSpeaker.replace(/-/g, " ");
-  const strong = doc.createElement("strong");
-  strong.textContent = displayName;
-  labelP.appendChild(strong);
-  characterText.appendChild(labelP);
-
-  const contentP = p.cloneNode(true) as Element;
-  contentP.removeAttribute("data-speaker");
-  contentP.setAttribute("data-text-alignment", state.alignment);
-  contentP.setAttribute("data-is-character", "false");
-  contentP.setAttribute("data-is-didaskalia", "false");
-  characterText.appendChild(contentP);
-
-  playRow.appendChild(characterAvatar);
-  playRow.appendChild(characterText);
-
-  return playRow;
-}
-
 function createPlayRowFromSpeakerGroup(
   paragraphs: Element[],
   doc: Document,

@@ -118,7 +118,7 @@ export interface BookMetadata {
   path: string;
   slug: string;
   name: string;
-  extra: { title?: string; author?: string; language?: string; form?: string };
+  extra: { title: string; author: string; language?: string; form?: string };
 }
 
 type ChapterHtmlEntry = { chapterNumber: number; html?: string };

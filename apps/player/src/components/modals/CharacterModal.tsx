@@ -149,6 +149,10 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
         matchingCharacter.characterName,
       );
     }
+    if (!matchingCharacter) {
+      console.error("no matching character for appearance click", appearance);
+      return;
+    }
     const character = `@${matchingCharacter.characterName}`;
     setValue(character);
     const furthestLocation = getSavedLocation();
@@ -167,7 +171,17 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
     onClose();
   };
 
+  const getAppearanceLabel = (type: string | undefined) => {
+    const option = FILTER_OPTIONS.find((o) => o.id.toLowerCase() === type?.toLowerCase());
+    return option ? t(option.translationKey) : type;
+  };
+
   if (!matchingCharacter) return null;
+
+  if (!resolvedMediaSrc) {
+    console.error("no resolved media src for character modal", matchingCharacter);
+    return null;
+  }
 
   return (
     <ModalUI onClose={handleOnClose} className="bg-transparent" size="xxl" disableHeightConstraint>
@@ -273,14 +287,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
                             <div className="flex gap-2 mb-2">
                               {appearance.type && (
                                 <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-tertiary-30 text-book-tertiary items-center">
-                                  <span>
-                                    {t(
-                                      FILTER_OPTIONS.find(
-                                        (option) =>
-                                          option.id.toLowerCase() === appearance.type.toLowerCase(),
-                                      )?.translationKey,
-                                    ) ?? appearance.type}
-                                  </span>
+                                  <span>{getAppearanceLabel(appearance.type)}</span>
                                 </div>
                               )}
                               <div className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-medium bg-book-primary-30 text-book-primary overflow-hidden">

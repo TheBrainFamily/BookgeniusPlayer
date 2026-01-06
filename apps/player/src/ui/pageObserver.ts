@@ -389,8 +389,8 @@ export function setupPageObserver(): {
           activeParagraphChanged = true;
         } else if (currentlyActiveParagraph && activeParagraph) {
           if (
-            currentlyActiveParagraph.chapter !== activeParagraph.chapter ||
-            currentlyActiveParagraph.paragraph !== activeParagraph.paragraph
+            currentlyActiveParagraph.chapter !== activeParagraph!.chapter ||
+            currentlyActiveParagraph.paragraph !== activeParagraph!.paragraph
           ) {
             activeParagraphChanged = true;
           }

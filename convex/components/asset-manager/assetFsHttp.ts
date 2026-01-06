@@ -146,11 +146,6 @@ export const getVersionForServing = query({
   },
 });
 
-type _ServeVersionResult =
-  | null
-  | { kind: "blob"; storageId: Id<"_storage">; contentType?: string; cacheControl?: string }
-  | { kind: "redirect"; location: string; cacheControl?: string };
-
 /**
  * Get the published version of an asset by path, ready for HTTP serving.
  * This is the "one request" pattern - look up by path and get serving info in one call.

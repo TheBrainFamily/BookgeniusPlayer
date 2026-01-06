@@ -106,6 +106,10 @@ export const resolveCharacterSnapshot = (
   if (usesExplicitAsset && avatarValue) {
     // Override with explicit asset file
     explicitAssetUrl = getBookAssetUrl(avatarValue);
+    if (!explicitAssetUrl) {
+      console.error("Failed to get asset URL for:", avatarValue);
+      throw new Error(`Failed to get asset URL for: ${avatarValue}`);
+    }
     listening = explicitAssetUrl;
     talking = explicitAssetUrl;
     baseNameUsed = avatarValue;

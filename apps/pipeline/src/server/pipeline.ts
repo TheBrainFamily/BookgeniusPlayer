@@ -647,13 +647,11 @@ export async function startPipeline(input: {
       setAutoStyleComplete(bookRoot, autoStyle);
       addLog(job, "Auto style generated, awaiting user input");
 
-      let _userStyleSubmitted = false;
       let userStyle: GraphicalStyle | null = null;
 
       const userStylePromise = new Promise<GraphicalStyle | null>((resolve) => {
         const existingState = readStyleSelection(bookRoot);
         if (existingState?.userStyle) {
-          _userStyleSubmitted = true;
           userStyle = existingState.userStyle;
           resolve(existingState.userStyle);
           return;
@@ -665,7 +663,6 @@ export async function startPipeline(input: {
 
         styleSelectionCallbacks.set(job.id, {
           onUserStyleSubmitted: (style) => {
-            _userStyleSubmitted = true;
             userStyle = style;
             resolve(style);
           },

@@ -87,7 +87,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Persistent book context tracking (Option B)
   const bookContextLastSentRef = useRef<BookContextLocation | null>(null);
-  const _isUpdatingBookContextRef = useRef<boolean>(false);
 
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -496,10 +495,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // ------------------------------
   // Persistent Book Context (Option B)
   // ------------------------------
-  const _hasAdvancedBeyond = (a: BookContextLocation | null, b: BookContextLocation): boolean => {
-    if (!a) return true;
-    return b.chapter > a.chapter || (b.chapter === a.chapter && b.paragraph > a.paragraph);
-  };
 
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
@@ -1196,6 +1191,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     inputClearedThisHoldRef.current = false;
     primingSentThisHoldRef.current = false;
     try {
+      if (!session) {
+        console.error("[ptt] no session");
+        return;
+      }
       session.transport.sendEvent({
         type: "response.create",
         response: {

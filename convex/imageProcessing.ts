@@ -7,7 +7,7 @@ import { extractDominantColorFromBase64 } from "./lib/extractDominantColor";
 
 export const getImageMetadata = internalAction({
   args: { sourceUrl: v.string() },
-  handler: async (ctx, { sourceUrl }) => {
+  handler: async (_ctx, { sourceUrl }) => {
     const response = await fetch(sourceUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.status}`);
@@ -29,7 +29,7 @@ export const resizeToWebpViaWorker = internalAction({
     quality: v.optional(v.number()),
     extractColors: v.optional(v.boolean()),
   },
-  handler: async (ctx, { sourceUrl, maxWidth = 400, quality = 80, extractColors = false }) => {
+  handler: async (_ctx, { sourceUrl, maxWidth = 400, quality = 80, extractColors = false }) => {
     const workerUrl = process.env.WEBP_WORKER_URL;
     const secret = process.env.WEBP_API_SECRET;
     if (!workerUrl || !secret) {
@@ -77,7 +77,7 @@ export const resizeToWebpViaWorker = internalAction({
 
 export const extractDominantColor = internalAction({
   args: { base64Data: v.string() },
-  handler: async (ctx, { base64Data }) => {
+  handler: async (_ctx, { base64Data }) => {
     return await extractDominantColorFromBase64(base64Data);
   },
 });

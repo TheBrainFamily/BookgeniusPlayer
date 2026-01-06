@@ -55,7 +55,6 @@ class BookIndex {
   private static instance: BookIndex;
 
   private initialized = false;
-  private doc: Document | null = null;
   private rootTemplates: HTMLElement[] = [];
   private chapters = new Map<number, ChapterRecord>();
   private chapterOrder: number[] = [];
@@ -71,7 +70,6 @@ class BookIndex {
 
   invalidate(): void {
     this.initialized = false;
-    this.doc = null;
     this.rootTemplates = [];
     this.chapters.clear();
     this.chapterOrder = [];
@@ -190,7 +188,7 @@ class BookIndex {
     this.chapterOrder.sort((a, b) => a - b);
 
     if (chaptersContainer) {
-      chaptersContainer.setAttribute("data-chapters-container", "true");
+      (chaptersContainer as HTMLElement).setAttribute("data-chapters-container", "true");
     }
 
     // Store static root templates (body children without chapter wrappers)
@@ -200,7 +198,6 @@ class BookIndex {
       return clone;
     });
 
-    this.doc = doc;
     this.initialized = true;
   }
 

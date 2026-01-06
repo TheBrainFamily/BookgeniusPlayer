@@ -45,7 +45,6 @@ const AudioPlayer = () => {
   const { t } = useTranslation();
   const { bookData, backgroundSongsForBook } = useBookConvex();
   const hasAudiobook = bookData?.hasAudiobook ?? false;
-  const _slug = bookData?.slug ?? "";
   const bookForm = bookData?.metadata?.bookForm ?? "prose";
 
   const isInitialLoad = useRef(true);
@@ -64,7 +63,7 @@ const AudioPlayer = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isVolumeOpen, setIsVolumeOpen] = useState(false);
   const [isBigPlayerOpen, setIsBigPlayerOpen] = useState(false);
-  const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
+  const [currentTrackData, setCurrentTrackData] = useState<TrackState | undefined>(undefined);
   const [showSongNotification, setShowSongNotification] = useState(false);
   const [playlistTracks, setPlaylistTracks] = useState<
     { id: string; title: string; duration: number }[]
@@ -254,6 +253,10 @@ const AudioPlayer = () => {
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
 
     const handleSongTransition = (event: CustomEvent<TrackState | null>) => {
+      if (!event || !event.detail) {
+        console.error("AudioPlayer: Song transition event is null");
+        return;
+      }
       const newCurrentTrack = event.detail;
       console.log("AudioPlayer: Song transition event received", newCurrentTrack);
 
@@ -407,6 +410,10 @@ const AudioPlayer = () => {
     if (!id) return;
 
     const url = getBookAssetUrl(`${id}.mp3`);
+    if (!url) {
+      console.error("Failed to get asset URL for:", id);
+      return;
+    }
     const name = `${(title || id).replace(/[/\\:*?"<>|]+/g, "").trim()}.mp3`;
 
     try {
@@ -657,7 +664,7 @@ const AudioPlayer = () => {
                       animate="open"
                     >
                       <span>{formatTime(currentTime)}</span>
-                      <span>{formatTime(currentTrackData?.duration)}</span>
+                      <span>{formatTime(currentTrackData?.duration ?? 0)}</span>
                     </motion.div>
 
                     <motion.div

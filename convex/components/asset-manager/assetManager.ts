@@ -31,20 +31,20 @@ interface StorageConfig {
 // Storage Type Helpers
 // =============================================================================
 
-interface StorageReference {
-  storageId?: Id<"_storage">;
-  r2Key?: string;
-}
+// interface StorageReference {
+//   storageId?: Id<"_storage">;
+//   r2Key?: string;
+// }
 
-function _isStoredOnConvex(
-  ref: StorageReference,
-): ref is StorageReference & { storageId: Id<"_storage"> } {
-  return ref.storageId !== undefined;
-}
+// function isStoredOnConvex(
+//   ref: StorageReference,
+// ): ref is StorageReference & { storageId: Id<"_storage"> } {
+//   return ref.storageId !== undefined;
+// }
 
-function _isStoredOnR2(ref: StorageReference): ref is StorageReference & { r2Key: string } {
-  return ref.r2Key !== undefined;
-}
+// function isStoredOnR2(ref: StorageReference): ref is StorageReference & { r2Key: string } {
+//   return ref.r2Key !== undefined;
+// }
 
 /**
  * Get the current storage backend configuration.
