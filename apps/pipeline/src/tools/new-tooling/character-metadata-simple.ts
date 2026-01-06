@@ -1,7 +1,7 @@
 import fs from "fs";
 import { logger } from "../../logger";
 import { getReferenceCardsForWholeBook } from "./get-reference-cards-for-whole-book";
-import { NewReferenceCardsResponse } from "../../types";
+import { type NewReferenceCardsResponse } from "../../types";
 import { checkIfBookDataExists } from "../../shared-books-data/getBooksData";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { FILE_TYPE, getFilePath } from "../../helpers/filesHelpers";

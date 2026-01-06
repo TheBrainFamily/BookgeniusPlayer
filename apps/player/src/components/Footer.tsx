@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, Variants } from "motion/react";
+import { AnimatePresence, motion, type Variants } from "motion/react";
 
 import useSplashHidden from "@player/hooks/useSplashHidden";
 import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";

@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Plus, Video, Image as ImageIcon, List, FolderOpen, Trash2, Pencil } from "lucide-react";
-import { Id } from "@convex/_generated/dataModel";
+import { type Id } from "@convex/_generated/dataModel";
 import { AddBackgroundCueDialog } from "../dialogs/AddBackgroundCueDialog";
 
 // =============================================================================

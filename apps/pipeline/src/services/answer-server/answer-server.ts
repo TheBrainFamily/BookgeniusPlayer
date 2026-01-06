@@ -8,7 +8,7 @@ import { getChaptersUpToWithChapters } from "../../helpers/getChaptersUpToWithCh
 import { z } from "zod";
 import { GoogleGenAI } from "@google/genai";
 import { cerebras } from "@ai-sdk/cerebras";
-import { generateObject, GenerateObjectResult } from "ai";
+import { generateObject, type GenerateObjectResult } from "ai";
 import { HttpError } from "./error-handler";
 import { SECRET_KEY } from "./secretKey";
 import { enforce } from "./helpers/enforce";
@@ -568,7 +568,7 @@ async function handleGetParagraphsForSearch(
   }
 
   const passagesWithoutEmbeddings = Array.from(uniquePassagesMap.values()).map(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     ({ Embeddings: _embeddings, ...rest }) => rest,
   );
 

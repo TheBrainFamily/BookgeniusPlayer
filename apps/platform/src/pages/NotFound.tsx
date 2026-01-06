@@ -19,7 +19,7 @@ const NotFound = () => {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${library404Image})` }}
-      ></div>
+       />
 
       {/* Floating sparkles animation */}
       <div className="absolute top-20 left-1/4 animate-float opacity-30">

@@ -45,6 +45,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
   // Reset hover state when window becomes too narrow
   useEffect(() => {
     if (!isDesktop && isHovered) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Clearing hover on resize
       setIsHovered(false);
       startAllTimers(); // Resume timers when forcibly clearing hover
     }

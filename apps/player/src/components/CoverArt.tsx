@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AnimatePresence, motion, Variants } from "motion/react";
+import { AnimatePresence, motion, type Variants } from "motion/react";
 import { ListMusic } from "lucide-react";
 
 const Fallback = () => (
@@ -23,7 +23,9 @@ export const CoverArt = ({ src }: CoverArtProps) => {
   useEffect(() => {
     // If no new src is provided, show the fallback icon.
     if (!src) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Resetting state when src cleared
       setDisplayedSrc(null);
+       
       setHasError(true);
       return;
     }

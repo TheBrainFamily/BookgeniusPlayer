@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { type z } from "zod";
 import { logger } from "./logger";
 import { generateText } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";

@@ -94,12 +94,14 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
       const matchingChar = sortedCharacters.find(
         (c) => c.slug.toLowerCase() === currentSpeaker.toLowerCase(),
       );
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing selection with current speaker
       setSelectedCharacter(matchingChar?.slug || currentSpeaker);
     }
     if (currentCharacterSlug && modalType === "edit-character-tag") {
       const matchingChar = sortedCharacters.find(
         (c) => c.slug.toLowerCase() === currentCharacterSlug.toLowerCase(),
       );
+       
       setSelectedCharacter(matchingChar?.slug || currentCharacterSlug);
     }
   }, [currentSpeaker, currentCharacterSlug, modalType, sortedCharacters]);

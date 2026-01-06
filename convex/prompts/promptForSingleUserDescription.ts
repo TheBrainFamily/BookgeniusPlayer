@@ -12,7 +12,7 @@ Generate a JSON object containing the character ${character} visual guide. This 
 
 **Visual Guide Content Constraints:**
 
-1.  **Appearance Only:** The \'visualGuide\' MUST describe only the character's physical appearance: age (estimated if not stated), sex, ethnicity (if mentioned or strongly implied), build, hair, eyes, facial features, distinctive marks (scars, tattoos), clothing, and accessories _if_ they are characteristic or commonly worn.
+1.  **Appearance Only:** The 'visualGuide' MUST describe only the character's physical appearance: age (estimated if not stated), sex, ethnicity (if mentioned or strongly implied), build, hair, eyes, facial features, distinctive marks (scars, tattoos), clothing, and accessories _if_ they are characteristic or commonly worn.
 2.  **Static Portrait:** Describe the character as if they were posing for a single, static portrait. Think nouns and adjectives.
 3.  **Format:** Use descriptive phrases, primarily nouns and adjectives. Avoid verbs describing actions or plot events. Phrases like "wearing [item]" or "with [feature]" are acceptable. Keep it to a single paragraph maximum per character.
 4.  **Emphasis:** Exaggerate unique visual traits mentioned in the text to make characters distinct.
@@ -22,11 +22,11 @@ Generate a JSON object containing the character ${character} visual guide. This 
 
 ## Example Snippet and Data Format
 
-\'\'\'json5
+\`\`\`json
 {
     "visualGuide": "Young man, around 25, North African ethnicity, olive skin. Sharp cheekbones, noble nose, deep-set dark brown eyes. Wearing regal Egyptian attire: blue and gold-striped Nemes headdress with golden cobra (Uraeus). Confident, thoughtful expression."
 }
-\'\'\'
+\`\`\`
 
 _(Note how the example focuses purely on visual elements and inferred mood from expression, avoiding actions.)_
 

@@ -2,7 +2,7 @@ import React, { useRef, useMemo, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
 
 import CharacterMedia from "./CharacterMedia";
-import { ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
+import { type ParsedParagraphRange } from "@player/fetchers/getParagraphRange";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { cn } from "@player/lib/utils";
 import { useHighlight } from "@player/hooks/useHighlight";

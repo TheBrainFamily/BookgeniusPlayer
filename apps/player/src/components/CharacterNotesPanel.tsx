@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence, Variants } from "motion/react";
+import { motion, AnimatePresence, type Variants } from "motion/react";
 
 import { useCharacterNotes } from "@player/hooks/useCharacterNotes";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";

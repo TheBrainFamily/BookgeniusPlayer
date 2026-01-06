@@ -1,7 +1,7 @@
 import { expect, test } from "@jest/globals";
 import {
   parseSearchParagraphsServerResponse,
-  SearchParagraphsServerResponse,
+  type SearchParagraphsServerResponse,
 } from "./searchParagraphsFromServer";
 
 test("parseSearchParagraphsServerResponse", () => {

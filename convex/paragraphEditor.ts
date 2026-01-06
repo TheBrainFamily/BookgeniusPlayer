@@ -1,12 +1,12 @@
 import { v } from "convex/values";
-import { action, ActionCtx } from "./_generated/server";
+import { action, type ActionCtx } from "./_generated/server";
 import { components, internal } from "./_generated/api";
 import {
   DOMParser,
   XMLSerializer,
-  Document as XmlDocument,
-  Element as XmlElement,
-  Node as XmlNode,
+  type Document as XmlDocument,
+  type Element as XmlElement,
+  type Node as XmlNode,
 } from "@xmldom/xmldom";
 
 function slugify(name: string): string {

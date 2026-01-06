@@ -45,7 +45,7 @@ async function main() {
     const logs = job.logs || [];
     if (logs.length > lastLogIndex) {
       for (let i = lastLogIndex; i < logs.length; i++) {
-        // eslint-disable-next-line no-console
+         
         console.log(logs[i]);
       }
       lastLogIndex = logs.length;

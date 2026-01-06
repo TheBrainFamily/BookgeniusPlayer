@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useLocation } from "@player/state/LocationContext";
-import { CharacterData } from "@player/types/book";
+import { type CharacterData } from "@player/types/book";
 
 export function useCharactersOnStage(allCharacters: CharacterData[]): CharacterData[] {
   const { location } = useLocation();

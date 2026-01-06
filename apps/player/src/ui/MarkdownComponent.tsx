@@ -204,6 +204,7 @@ type ViewerProps = { answerMarkdown: string };
 export const LLMAnswerViewer: React.FC<ViewerProps> = ({ answerMarkdown }) => {
   console.log("RUNNING LLM ANSWER");
   /* 1. build paragraph cache once */
+  // eslint-disable-next-line react-hooks/use-memo -- Factory function is stable
   const paragraphs = useMemo(buildParagraphCache, []);
 
   /* 2. extract & match when the answer changes */

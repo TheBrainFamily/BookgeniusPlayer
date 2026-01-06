@@ -1,5 +1,5 @@
 import { getCutScenesForBook, getBookSlug } from "./state/bookDataStore";
-import { CutSceneForBook } from "./types/book";
+import { type CutSceneForBook } from "./types/book";
 import "./styles/cutscene-video.css";
 
 export const dealWithCutScenes = ({

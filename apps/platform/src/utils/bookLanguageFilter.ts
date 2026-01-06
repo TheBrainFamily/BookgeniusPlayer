@@ -1,5 +1,5 @@
 import type { Book } from "@platform/utils/types";
-import { detectLanguageFromDomain, SupportedLanguage } from "./languageDetection";
+import { detectLanguageFromDomain, type SupportedLanguage } from "./languageDetection";
 import { books, books as currentBooks } from "@platform/books.ts";
 
 const EXCLUDED_BOOKS_BY_LANGUAGE: Record<SupportedLanguage, string[]> = {

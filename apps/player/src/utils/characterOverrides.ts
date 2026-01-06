@@ -1,4 +1,4 @@
-import { CharacterData, CharacterOverride, ChapterParagraphRef } from "@player/types/book";
+import { type CharacterData, type CharacterOverride, type ChapterParagraphRef } from "@player/types/book";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const LOCATION_REGEX = /^ch(\d+)-p(\d+)$/i;

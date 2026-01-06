@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { motion, Variants } from "motion/react";
+import { motion, type Variants } from "motion/react";
 import { FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import ModalUI from "./ModalUI";
 import CharacterMedia from "@player/components/CharacterMedia";
-import { CharacterData } from "@player/types/book";
-import { findCharacterSentences, SearchResultItemData } from "@player/searchModal";
+import { type CharacterData } from "@player/types/book";
+import { findCharacterSentences, type SearchResultItemData } from "@player/searchModal";
 import { getSavedLocation, systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";

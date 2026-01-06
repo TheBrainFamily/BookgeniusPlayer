@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, Variants, AnimatePresence } from "motion/react";
+import { motion, type Variants, AnimatePresence } from "motion/react";
 import { Brain, FileSearch, Telescope, Loader2, X } from "lucide-react";
 
 import ModalUI from "./ModalUI";

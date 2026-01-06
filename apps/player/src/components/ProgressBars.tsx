@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AnimatePresence, motion, Variants, useSpring } from "motion/react";
+import { AnimatePresence, motion, type Variants, useSpring } from "motion/react";
 
 import { useReadingProgress } from "@player/hooks/useReadingProgress";
 import { bookIndex } from "@player/logic/BookIndex";
@@ -39,7 +39,9 @@ const ProgressBars: React.FC = () => {
         last: structure[structure.length - 1],
       });
 
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Computing derived structure from book data
       setChaptersStructure(structure);
+       
       setTotalParagraphs(total);
     } catch (error) {
       console.error("❌ Error preparing chapters structure:", error);

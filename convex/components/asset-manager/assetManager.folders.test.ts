@@ -375,7 +375,7 @@ test("updateFolder can set extra to null", async () => {
   expect(folder?.extra).toBeNull();
 });
 
-describe("folders: path-first + label-first APIs", () => {
+describe("folders: path-first + label-first APIs v2", () => {
   it("createFolderByName handles slug collisions at root without leading slash", async () => {
     const t = convexTest(schema, modules);
 

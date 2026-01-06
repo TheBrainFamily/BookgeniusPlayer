@@ -6,6 +6,20 @@ import { useTranslation } from "react-i18next";
 const FADE_DURATION_MS = 300;
 const SCROLL_INDICATOR_SCROLL_MARGIN_PX = 320;
 
+const MobileScrollIndicator = ({ label }: { label: string }) => (
+  <>
+    <ChevronsUp className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
+    <span className="uppercase">{label}</span>
+  </>
+);
+
+const DesktopScrollIndicator = ({ label }: { label: string }) => (
+  <>
+    <ChevronsDown className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
+    <span className="uppercase">{label}</span>
+  </>
+);
+
 export const ScrollIndicator = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [targetChapter, setTargetChapter] = useState<number | null>(null);
@@ -81,20 +95,6 @@ export const ScrollIndicator = () => {
     window.dispatchEvent(new Event("scrollIndicatorClicked"));
   };
 
-  const MobileScrollIndicator = () => (
-    <>
-      <ChevronsUp className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
-      <span className="uppercase">{t("scroll_indicator-swipe-up")}</span>
-    </>
-  );
-
-  const DesktopScrollIndicator = () => (
-    <>
-      <ChevronsDown className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
-      <span className="uppercase">{t("scroll_indicator-keep-scrolling")}</span>
-    </>
-  );
-
   return (
     <button
       type="button"
@@ -104,7 +104,11 @@ export const ScrollIndicator = () => {
       }
       onClick={handleClick}
     >
-      {isMobileOrTablet ? <MobileScrollIndicator /> : <DesktopScrollIndicator />}
+      {isMobileOrTablet ? (
+        <MobileScrollIndicator label={t("scroll_indicator-swipe-up")} />
+      ) : (
+        <DesktopScrollIndicator label={t("scroll_indicator-keep-scrolling")} />
+      )}
     </button>
   );
 };

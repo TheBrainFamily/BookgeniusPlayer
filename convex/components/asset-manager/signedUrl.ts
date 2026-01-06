@@ -2,7 +2,7 @@ import { action } from "./_generated/server";
 import { anyApi } from "convex/server";
 import { v } from "convex/values";
 import { createR2Client } from "./r2Client";
-import { Id } from "./_generated/dataModel";
+import { type Id } from "./_generated/dataModel";
 
 // Use anyApi to avoid circular type references when calling internal queries
 // from actions in the same component

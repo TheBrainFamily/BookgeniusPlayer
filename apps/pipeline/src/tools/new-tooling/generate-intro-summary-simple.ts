@@ -3,7 +3,7 @@ import { DOMParser } from "@xmldom/xmldom";
 import { callGeminiWrapper } from "../../callClaude";
 import { getParagraphsFromChapter } from "../createParagraphsWithPageNumbers";
 import { logger } from "../../logger";
-import { NewReferenceCardsResponse } from "../../types";
+import { type NewReferenceCardsResponse } from "../../types";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { readBookFile } from "../../helpers/readBookFile";

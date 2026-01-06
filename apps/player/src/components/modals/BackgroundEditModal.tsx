@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Id } from "@convex/_generated/dataModel";
+import { type Id } from "@convex/_generated/dataModel";
 import { motion, AnimatePresence } from "motion/react";
 
 import { useBookConvex } from "@player/context/BookConvexContext";

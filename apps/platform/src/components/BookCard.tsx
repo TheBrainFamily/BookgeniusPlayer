@@ -3,7 +3,7 @@ import { Play, Volume2, Star, Clock, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@platform/components/ui/card";
 import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
-import { books } from "@platform/books";
+import { type books } from "@platform/books";
 import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText";
 import { detectLanguageFromDomain } from "@platform/utils/languageDetection.ts";
 import { LanguageFlagEN } from "@platform/components/LanguageFlagEN.tsx";
@@ -11,7 +11,7 @@ import { LanguageFlagPL } from "@platform/components/LanguageFlagPL.tsx";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { minutesToHours } from "@platform/utils/minutesToHours.ts";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 
 type Book = (typeof books)[number];
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ReactNode, useMemo } from "react";
+import React, { useEffect, useState, type ReactNode, useMemo } from "react";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { HighlightContext } from "@player/hooks/useHighlight";
 

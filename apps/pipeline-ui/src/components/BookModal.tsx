@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useCallback, useState } from "react";
 import { X, BookOpen, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";

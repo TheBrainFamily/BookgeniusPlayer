@@ -32,3 +32,5 @@ backend/wolnelektury-data/generated-descriptions/
 backend/wolnelektury-data/fb2/
 backend/wolnelektury-data/
 backend/standardebooks-data/
+.serena/
+tools/convex-fuse/.gocache/

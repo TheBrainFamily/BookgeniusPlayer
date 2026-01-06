@@ -1,4 +1,4 @@
-import { HttpRouter, FunctionReference } from "convex/server";
+import { type HttpRouter, type FunctionReference } from "convex/server";
 import { httpActionGeneric } from "convex/server";
 import { parseVersionIdFromPath } from "./helpers/parseVersionIdFromPath";
 

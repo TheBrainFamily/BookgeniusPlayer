@@ -346,8 +346,15 @@ if (require.main === module) {
             });
 
             tasks.push({ id: taskId, fileName, status: null, output: null, isDownloaded: false });
-          } catch (error: any) {
-            console.error(`Failed to create video generation task for ${fileName}:`, error);
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              console.error(
+                `Failed to create video generation task for ${fileName}:`,
+                error.message,
+              );
+            } else {
+              console.error(`Failed to create video generation task for ${fileName}:`, error);
+            }
             tasks.push({ id: null, fileName, status: "FAILED", output: null, isDownloaded: false });
           }
         }),

@@ -29,9 +29,9 @@ export function StylePreviewComparison({
   userStyle,
   onChoose,
 }: StylePreviewComparisonProps) {
-  if (!previews) return null;
-
   const [isAvatarHovered, setIsAvatarHovered] = useState(false);
+
+  if (!previews) return null;
 
   const serverURL = "http://localhost:4000";
 
@@ -60,7 +60,7 @@ export function StylePreviewComparison({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Auto Style Option */}
           <div className="group relative">
-            <div className="absolute -inset-0.5 bg-gradient-to-b from-primary/20 to-transparent rounded-2xl opacity-50 blur group-hover:opacity-100 transition duration-500"></div>
+            <div className="absolute -inset-0.5 bg-gradient-to-b from-primary/20 to-transparent rounded-2xl opacity-50 blur group-hover:opacity-100 transition duration-500" />
             <Card className="relative h-full flex flex-col border-primary/20 overflow-hidden bg-card/90 backdrop-blur hover:border-primary/50 transition-all duration-300 transform hover:-translate-y-1">
               <div className="aspect-video w-full overflow-hidden bg-muted relative">
                 {autoImageUrl ? (
@@ -134,7 +134,7 @@ export function StylePreviewComparison({
           {/* User Style Option */}
           {userStyle && userImageUrl ? (
             <div className="group relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-b from-purple-500/20 to-transparent rounded-2xl opacity-50 blur group-hover:opacity-100 transition duration-500"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-b from-purple-500/20 to-transparent rounded-2xl opacity-50 blur group-hover:opacity-100 transition duration-500" />
               <Card className="relative h-full flex flex-col border-purple-500/20 overflow-hidden bg-card/90 backdrop-blur hover:border-purple-500/50 transition-all duration-300 transform hover:-translate-y-1">
                 <div className="aspect-video w-full overflow-hidden bg-muted relative">
                   <img

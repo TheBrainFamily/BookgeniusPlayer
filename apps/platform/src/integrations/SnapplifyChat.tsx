@@ -82,7 +82,7 @@ function SnapplifyChatSafe() {
   console.log("[SnapplifyChat] Initial state:", {
     authReady: auth.ready,
     isSignedIn: auth.isSignedIn,
-    fcReady: fcReady,
+    fcReady,
     fcWidgetExists: typeof window !== "undefined" && !!window.fcWidget,
   });
 
@@ -96,6 +96,7 @@ function SnapplifyChatSafe() {
 
     if (window.fcWidget) {
       console.log("[SnapplifyChat] FreshChat widget already exists, setting ready");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing with external widget state on mount
       setFcReady(true);
     } else {
       console.log("[SnapplifyChat] FreshChat widget not found, initiating...");
@@ -112,13 +113,13 @@ function SnapplifyChatSafe() {
     console.log("[SnapplifyChat] Auth/FC state change effect triggered:", {
       authReady: auth.ready,
       isSignedIn: auth.isSignedIn,
-      fcReady: fcReady,
+      fcReady,
     });
 
     if (!auth.ready || !fcReady) {
       console.log("[SnapplifyChat] Skipping user properties - not ready:", {
         authReady: auth.ready,
-        fcReady: fcReady,
+        fcReady,
       });
       return;
     }

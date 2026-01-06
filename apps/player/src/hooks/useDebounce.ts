@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
-import { DebouncedFunc } from "lodash";
+import { type DebouncedFunc } from "lodash";
 
 /**
  * React hook that returns a debounced version of `value`.

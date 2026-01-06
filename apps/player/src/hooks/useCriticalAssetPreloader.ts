@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { dealWithBackground } from "@player/ui/background";
 import { initializeReadingPosition } from "@player/services/initializeReadingPosition";
-import { ExtendedLocation } from "@player/helpers/paragraphsNavigation";
+import { type ExtendedLocation } from "@player/helpers/paragraphsNavigation";
 
 export function useCriticalAssetPreloader() {
   const [readingPosition, setReadingPosition] = useState<ExtendedLocation | null>(null);

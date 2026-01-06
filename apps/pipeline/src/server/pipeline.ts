@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 import { v4 as uuidv4 } from "uuid";
-import { Step, StepLabels } from "../shared/pipelineTypes";
+import { type Step, StepLabels } from "../shared/pipelineTypes";
 import { convertBook, findFb2FilePath } from "../../src/tools/fb2-converter/index";
 import { parseFb2Xml } from "../../src/tools/fb2-converter/fb2Converter";
 import { extractInlineImages } from "../../.scripts/extract-inline-images";
@@ -110,7 +110,7 @@ function setBookArg(slug: string) {
   const bookArg = path.join("books-data", slug);
   try {
     setCurrentBook(bookArg);
-  } catch (_) {
+  } catch {
     process.argv[2] = bookArg;
   }
 }

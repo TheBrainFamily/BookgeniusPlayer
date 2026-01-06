@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { procedure, router } from "./trpc";
-import { JobStatus, StartPipelineInput } from "../shared/pipelineTypes";
+import { type JobStatus, StartPipelineInput } from "../shared/pipelineTypes";
 import { jobs, startPipeline, styleSelectionCallbacks } from "./pipeline";
 import fs from "fs";
 import path from "path";

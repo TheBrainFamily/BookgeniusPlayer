@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import React, { useEffect, useRef, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";

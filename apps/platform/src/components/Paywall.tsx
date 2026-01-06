@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Crown, BookOpen, Zap, Check, Lock, X } from "lucide-react";
+import { Lock, X } from "lucide-react";
 
 import { useIntegrations } from "@platform/integrations";
 import type { PaymentType } from "@platform/integrations";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
 
 interface PaywallProps {
   bookSlug: string;
@@ -19,13 +18,10 @@ interface PaywallProps {
 }
 
 export const PaywallInner: React.FC<PaywallProps> = ({
-  bookSlug,
   bookTitle,
   onClose,
   openSignIn,
   isUserLoggedIn,
-  handlePayment,
-  loading,
 }) => {
   const { t } = useTranslation();
 

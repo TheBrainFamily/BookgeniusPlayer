@@ -7,7 +7,7 @@ import {
   performCachedSearch,
   performUnifiedSearch,
 } from "@player/searchModal";
-import { Location } from "@player/state/LocationContext";
+import { type Location } from "@player/state/LocationContext";
 import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { useBookConvex } from "@player/context/BookConvexContext";
 
@@ -69,6 +69,7 @@ export const useSearchLogic = () => {
     [setResults],
   );
 
+  /* eslint-disable react-hooks/refs -- Debounced function captures callback, not ref */
   const debouncedRemoteSearch = useMemo(() => {
     console.log("[useSearchLogic] debouncedRemoteSearch RECREATED");
     return debounce(
@@ -82,6 +83,7 @@ export const useSearchLogic = () => {
       { leading: false, trailing: true, maxWait: REMOTE_SEARCH_MAX_WAIT_MS },
     );
   }, [executeRemoteSearch]);
+  /* eslint-enable react-hooks/refs */
 
   useEffect(() => {
     return () => {
@@ -156,10 +158,12 @@ export const useSearchLogic = () => {
     [setResults, debouncedRemoteSearch, charactersData],
   );
 
+  /* eslint-disable react-hooks/refs -- Debounced function captures callback, not ref */
   const debouncedTriggerSearch = useMemo(() => {
     console.log("[useSearchLogic] debouncedTriggerSearch RECREATED");
     return debounce(performSearch, TYPING_DEBOUNCE_MS);
   }, [performSearch]);
+  /* eslint-enable react-hooks/refs */
 
   useEffect(() => {
     if (query.trim()) {

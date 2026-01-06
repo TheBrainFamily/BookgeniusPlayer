@@ -1,9 +1,7 @@
 import fs from "fs";
 import type { ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleGenAI } from "@google/genai";
 
-import dotenv from "dotenv";
 import { getParagraphsFromChapter } from "../../tools/createParagraphsWithPageNumbers";
 import { getParagraphsFromChapterWithText } from "../../tools/getParagraphsFromChapterWithText";
 import { getBookForm } from "../../tools/getBookForm";
@@ -185,7 +183,7 @@ export const generateEmbeddings = async (
 
         return {
           text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
-          chapter: chapter,
+          chapter,
           paragraphNumber: bulletPoint.mainParagraphNumber,
         };
       },
@@ -195,7 +193,7 @@ export const generateEmbeddings = async (
       (bulletPoint) => {
         return {
           text: `${bulletPoint.paragraphsSummary}`,
-          chapter: chapter,
+          chapter,
           paragraphNumber: bulletPoint.mainParagraphNumber,
         };
       },

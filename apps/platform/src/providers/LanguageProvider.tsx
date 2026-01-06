@@ -43,8 +43,10 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     if (ready) {
       const detectedLanguage = detectLanguageFromDomain();
       if (detectedLanguage !== language) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing with external domain detection
         setLanguage(detectedLanguage);
       }
+       
       setIsLoading(false);
     }
   }, [ready]);

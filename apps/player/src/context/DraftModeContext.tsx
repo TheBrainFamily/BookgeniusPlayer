@@ -27,6 +27,7 @@ export function DraftModeProvider({ children, forceDraftMode }: DraftModeProvide
   useEffect(() => {
     // If forceDraftMode is provided, use it
     if (forceDraftMode !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing with prop on mount
       setDraftMode(forceDraftMode);
       return;
     }
@@ -34,6 +35,7 @@ export function DraftModeProvider({ children, forceDraftMode }: DraftModeProvide
     // Otherwise, detect from URL
     const urlParams = new URLSearchParams(window.location.search);
     const isDraft = urlParams.get("draft") === "true" || urlParams.get("editor") === "true";
+     
     setDraftMode(isDraft);
   }, [forceDraftMode]);
 

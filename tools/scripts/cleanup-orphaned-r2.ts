@@ -7,7 +7,9 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "../..");
 
-const envPath = existsSync(join(rootDir, ".env")) ? join(rootDir, ".env") : join(rootDir, "backend/.env");
+const envPath = existsSync(join(rootDir, ".env"))
+  ? join(rootDir, ".env")
+  : join(rootDir, "backend/.env");
 
 config({ path: envPath });
 
@@ -31,7 +33,11 @@ if (!R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET || !R2_ENDPOINT) {
 
 const endpoint = R2_ENDPOINT.startsWith("http") ? R2_ENDPOINT : `https://${R2_ENDPOINT}`;
 
-const s3 = new S3Client({ region: "auto", endpoint, credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY } });
+const s3 = new S3Client({
+  region: "auto",
+  endpoint,
+  credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY },
+});
 
 async function deleteKeys() {
   console.log(`Loaded .env from: ${envPath}`);
@@ -47,15 +53,24 @@ async function deleteKeys() {
   for (let i = 0; i < toDelete.length; i += batchSize) {
     const batch = toDelete.slice(i, i + batchSize);
     try {
-      const result = await s3.send(new DeleteObjectsCommand({ Bucket: R2_BUCKET, Delete: { Objects: batch.map((key) => ({ Key: key })), Quiet: true } }));
+      const result = await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: R2_BUCKET,
+          Delete: { Objects: batch.map((key) => ({ Key: key })), Quiet: true },
+        }),
+      );
       const errors = result.Errors?.length ?? 0;
       deleted += batch.length - errors;
       failed += errors;
       if (errors > 0) {
         result.Errors?.forEach((e) => console.error(`  Failed: ${e.Key}: ${e.Message}`));
       }
-    } catch (err: any) {
-      console.error(`Batch failed: ${err.message}`);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(`Batch failed: ${err.message}`);
+      } else {
+        console.error(`Batch failed: ${err}`);
+      }
       failed += batch.length;
     }
     console.log(`Progress: ${Math.min(i + batchSize, toDelete.length)}/${toDelete.length}`);

@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { z } from "zod";
+import { type z } from "zod";
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { logger } from "./logger";

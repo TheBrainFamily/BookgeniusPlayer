@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react
 import { useNavigate } from "react-router-dom";
 import { trpc } from "../trpc";
 import { Loader2, ArrowLeft, BookOpen } from "lucide-react";
-import { BookCard, CollectionBook } from "../components/BookCard";
+import { BookCard, type CollectionBook } from "../components/BookCard";
 import { BookModal } from "../components/BookModal";
 import { Button } from "@/components/ui/button";
 

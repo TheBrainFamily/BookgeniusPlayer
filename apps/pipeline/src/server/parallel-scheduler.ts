@@ -1,4 +1,4 @@
-import { Step } from "../shared/pipelineTypes";
+import { type Step } from "../shared/pipelineTypes";
 
 export type StepDependency = { step: Step; deps: Step[] };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, startTransition } from "react";
 import { Mic, Send, Telescope, Loader2 } from "lucide-react";
-import { motion, Variants, AnimatePresence } from "motion/react";
+import { motion, type Variants, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@player/lib/utils";

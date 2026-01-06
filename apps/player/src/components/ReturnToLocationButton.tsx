@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, Variants } from "motion/react";
+import { AnimatePresence, motion, type Variants } from "motion/react";
 import { UndoDot } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -20,6 +20,7 @@ const ReturnToLocationButton = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Deriving visibility from location
     setIsVisible(shouldShowReturnButton());
   }, [currentParagraph, currentChapter]);
 

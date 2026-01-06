@@ -1,6 +1,6 @@
 // convex/comics.ts
 import { v } from "convex/values";
-import { query, mutation, internalMutation, MutationCtx } from "./_generated/server";
+import { query, mutation, internalMutation, type MutationCtx } from "./_generated/server";
 import { components } from "./_generated/api";
 import { requireAuth } from "./authHelpers";
 

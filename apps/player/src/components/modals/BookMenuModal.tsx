@@ -45,6 +45,7 @@ const AnimatedFontSize: React.FC<{ value: number; isChanging: boolean }> = memo(
     const rounded = useTransform(spring, (latest) => Math.round(latest * 10) / 10);
 
     useEffect(() => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing display value with prop
       setCurrentDisplayValue(value);
       motionValue.set(value);
     }, [value, motionValue]);

@@ -235,7 +235,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
 
         items.push({
           chapter: chapterIdNum,
-          paragraphNumber: paragraphNumber,
+          paragraphNumber,
           percentInChapter: calculatePercentInChapter(paragraphNumber, totalParagraphsInChapter),
           summary: createContextualSummary(paragraphText, query),
           id: `cached-search-${chapterIdNum}-${paragraphNumber}`,

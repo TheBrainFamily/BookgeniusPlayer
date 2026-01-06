@@ -10,7 +10,7 @@ import {
   VolumeX,
   Download,
 } from "lucide-react";
-import { motion, AnimatePresence, Variants, Transition, Easing } from "motion/react";
+import { motion, AnimatePresence, type Variants, type Transition, type Easing } from "motion/react";
 import useLocalStorageState from "use-local-storage-state";
 import { useTranslation } from "react-i18next";
 
@@ -19,7 +19,7 @@ import {
   setMasterVolume,
   setBackgroundVolume,
   initAudioContext,
-  TrackState,
+  type TrackState,
   getCurrentTrackPosition,
   pauseCurrentTrack,
   resumeCurrentTrack,
@@ -77,7 +77,9 @@ const AudioPlayer = () => {
 
   useEffect(() => {
     if (!areElementsVisible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Closing UI panels when elements hide
       setIsBigPlayerOpen(false);
+       
       setIsVolumeOpen(false);
     }
   }, [areElementsVisible]);
@@ -192,6 +194,7 @@ const AudioPlayer = () => {
     const available =
       Array.isArray(backgroundSongsForBook) &&
       backgroundSongsForBook.some((s) => Array.isArray(s.files) && s.files.length > 0);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Deriving state from async data
     setHasBackgroundSongs(available);
   }, [backgroundSongsForBook]);
 

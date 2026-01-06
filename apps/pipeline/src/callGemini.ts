@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { z } from "zod";
+import { type z } from "zod";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "./callFastGemini";
 import { callGeminiWithThinking } from "./callFastGemini";
 

@@ -18,7 +18,7 @@ import { activateMediaInRange } from "@player/ui/activateMediaInRange";
 export const isSystemNavigationInProgress = (): boolean => scrollCoordinator.isNavigating;
 
 /* ------------------------------------------------------------------ */
-import { DEFAULT_LOCATION, Location } from "@player/state/LocationContext";
+import { DEFAULT_LOCATION, type Location } from "@player/state/LocationContext";
 import debounce from "lodash.debounce";
 import { setUrlHash } from "./setUrlHash";
 import {

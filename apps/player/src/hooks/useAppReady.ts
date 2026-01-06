@@ -64,6 +64,7 @@ const useVideoReadiness = ({
       // If already in a state that implies playable soon, attach events and
       // also check current readyState/paused to possibly mark ready early.
       if (bgVideoA.readyState >= READY_STATE_CAN_PLAY && !bgVideoA.paused) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Checking video state on mount
         setVideoAReady(true);
       } else {
         bgVideoA.addEventListener("playing", onAPlaying);
@@ -73,6 +74,7 @@ const useVideoReadiness = ({
 
     if (bgVideoB) {
       if (bgVideoB.readyState >= READY_STATE_CAN_PLAY && !bgVideoB.paused) {
+         
         setVideoBReady(true);
       } else {
         bgVideoB.addEventListener("playing", onBPlaying);
@@ -134,6 +136,7 @@ const useVideoReadiness = ({
   useEffect(() => {
     const videosReady = videoAReady || videoBReady;
     if (videosReady && postReadyDelayElapsed && minSplashElapsed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Deriving final ready state
       setVideoBackgroundReady(true);
     }
   }, [videoAReady, videoBReady, postReadyDelayElapsed, minSplashElapsed]);

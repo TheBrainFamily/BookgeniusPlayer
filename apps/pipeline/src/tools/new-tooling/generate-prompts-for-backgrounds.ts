@@ -8,7 +8,7 @@ import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { z } from "zod";
 import { readBookFile } from "../../helpers/readBookFile";
 import { generateFluxImage } from "./generate-flux-schnel-image";
-import { GraphicalStyle } from "./create-graphical-style";
+import { type GraphicalStyle } from "./create-graphical-style";
 import { callSonnet45 } from "../../callSonet45";
 import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { generateCharacterImageWithOpenAI } from "./generate-pictures-for-entities";
