@@ -149,34 +149,34 @@ function parseArgs(): { bookDir: string; options: CliOptions } {
       default:
         fail(`Unknown option "${arg}"`);
     }
+  }
 
-    // basic numeric validation
-    if (Number.isNaN(options.width) || options.width <= 0) {
-      fail("Width must be a positive number");
-    }
-    if (Number.isNaN(options.height) || options.height <= 0) {
-      fail("Height must be a positive number");
-    }
-    if (Number.isNaN(options.fps) || options.fps <= 0) {
-      fail("FPS must be a positive number");
-    }
-    if (Number.isNaN(options.crf) || options.crf < 0) {
-      fail("CRF must be zero or greater");
-    }
-    if (
-      Number.isNaN(options.posterQuality) ||
-      options.posterQuality < 0 ||
-      options.posterQuality > 100
-    ) {
-      fail("Poster quality must be between 0 and 100");
-    }
-    if (
-      Number.isNaN(options.posterCompression) ||
-      options.posterCompression < 0 ||
-      options.posterCompression > 6
-    ) {
-      fail("Poster compression level must be between 0 and 6");
-    }
+  // basic numeric validation
+  if (Number.isNaN(options.width) || options.width <= 0) {
+    fail("Width must be a positive number");
+  }
+  if (Number.isNaN(options.height) || options.height <= 0) {
+    fail("Height must be a positive number");
+  }
+  if (Number.isNaN(options.fps) || options.fps <= 0) {
+    fail("FPS must be a positive number");
+  }
+  if (Number.isNaN(options.crf) || options.crf < 0) {
+    fail("CRF must be zero or greater");
+  }
+  if (
+    Number.isNaN(options.posterQuality) ||
+    options.posterQuality < 0 ||
+    options.posterQuality > 100
+  ) {
+    fail("Poster quality must be between 0 and 100");
+  }
+  if (
+    Number.isNaN(options.posterCompression) ||
+    options.posterCompression < 0 ||
+    options.posterCompression > 6
+  ) {
+    fail("Poster compression level must be between 0 and 6");
   }
 
   return { bookDir, options };

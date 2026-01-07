@@ -443,7 +443,10 @@ export const wrapTextWithCharacter = action({
     wrapper.setAttribute("data-c", characterSlug);
     wrapper.appendChild(doc.createTextNode(textToWrap));
 
-    const parent = textNode.parentNode!;
+    const parent = textNode.parentNode;
+    if (!parent) {
+      throw new Error("Cannot wrap text: text node has no parent");
+    }
     if (before) parent.insertBefore(doc.createTextNode(before), textNode);
     parent.insertBefore(wrapper, textNode);
     if (after) parent.insertBefore(doc.createTextNode(after), textNode);
