@@ -163,7 +163,8 @@ const useImageReadiness = ({
 
     const imageUrls = chapterCharacters
       .filter((character) => character.media?.avatarUrl)
-      .map((character) => getBookAssetUrl(character.media!.avatarUrl!)) as string[];
+      .map((character) => getBookAssetUrl(character.media!.avatarUrl!))
+      .filter((url): url is string => !!url);
 
     let failedCount = 0;
 
