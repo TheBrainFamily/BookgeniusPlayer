@@ -92,7 +92,7 @@ const getContainerClasses = (
   layoutView: boolean,
   isPlayFormat: boolean,
   sizeConfig: ModalSize,
-  isLargeScreen: boolean,
+  _isLargeScreen: boolean,
 ): string => {
   return cn(
     "flex flex-row justify-center h-full",
@@ -114,7 +114,7 @@ const getModalWrapperClasses = (
   isMediumScreen: boolean,
   isLargeScreen: boolean,
   shouldShiftContent: boolean,
-  isWideScreen: boolean,
+  _isWideScreen: boolean,
 ): string => {
   if (!layoutView) return "";
 
@@ -171,6 +171,7 @@ const LeftSpacer: React.FC<SpacerProps> = ({
   shouldShiftContent,
   isMobileOrTablet,
   columnWidths,
+  isWideScreen: _isWideScreen,
 }) => {
   if (!layoutView || isPlayFormat || isMobileOrTablet) return null;
 
@@ -196,6 +197,7 @@ const ContentSpacer: React.FC<SpacerProps> = ({
   shouldShiftContent,
   isMobileOrTablet,
   columnWidths,
+  isWideScreen: _isWideScreen,
 }) => {
   if (!layoutView) return null;
 
@@ -223,6 +225,11 @@ const PlayFormatSpacer: React.FC<SpacerProps> = ({
   layoutView,
   isPlayFormat,
   shouldShiftContent,
+  isLargeScreen: _isLargeScreen,
+  isMediumScreen: _isMediumScreen,
+  isMobileOrTablet: _isMobileOrTablet,
+  isWideScreen: _isWideScreen,
+  columnWidths: _columnWidths,
 }) => {
   if (!layoutView || !isPlayFormat || !shouldShiftContent) return null;
 
@@ -301,6 +308,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   headerActions,
   searchActions,
   disableHeightConstraint = false,
+  // eslint-disable-next-line complexity
 }) => {
   const { isContentShiftedLeft } = useContentShift();
   const { isLargeScreen, isMediumScreen } = useScreenSize();

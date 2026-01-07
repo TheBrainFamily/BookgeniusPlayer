@@ -28,6 +28,7 @@ interface BookAnalysis {
   dialogueRows: number; // <tr> in drama tables
   notes: string[];
 }
+// eslint-disable-next-line complexity
 async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
   const textDir = join(BOOKS_DIR, bookSlug, "text");
 

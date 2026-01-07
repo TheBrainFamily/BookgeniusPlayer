@@ -14,6 +14,7 @@
 
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
+import { logError } from "../lib/utils";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
 if (!CONVEX_URL) {
@@ -84,6 +85,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Reset failed:", error);
+  logError("Reset failed:", error);
   process.exit(1);
 });

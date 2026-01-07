@@ -9,7 +9,6 @@ import { z } from "zod";
 import { readBookFile } from "../../helpers/readBookFile";
 import { generateFluxImage } from "./generate-flux-schnel-image";
 import { type GraphicalStyle } from "./create-graphical-style";
-import { callSonnet45 } from "../../callSonet45";
 import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { generateCharacterImageWithOpenAI } from "./generate-pictures-for-entities";
 import { bookFileExists } from "../../helpers/bookFileExists";
@@ -50,6 +49,7 @@ export const generateImageWithOpenAI = async (
     | null
     | undefined = "1536x1024",
   genericPrompt: GenericBackgroundPrompt,
+  // eslint-disable-next-line max-params
 ): Promise<undefined> => {
   const finalPrompt = `${genericPrompt.backgroundStyle} ${prompt}`;
   console.log(`Generating image with OpenAI for chapter ${chapter} with prompt: ${finalPrompt}`);
@@ -241,6 +241,7 @@ export const generateImageWithOpenAIToFolder = async (
     | "auto"
     | null
     | undefined = "1536x1024",
+  // eslint-disable-next-line max-params
 ): Promise<string | undefined> => {
   const finalPrompt = `${genericPrompt.backgroundStyle} ${prompt}`;
   console.log(`Generating image with OpenAI for chapter ${chapter} with prompt: ${finalPrompt}`);

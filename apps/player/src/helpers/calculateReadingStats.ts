@@ -14,6 +14,7 @@ export interface ReadingStats {
 export const calculateReadingStats = (
   history: ReadingPosition[],
   currentProgress: number | null,
+  // eslint-disable-next-line complexity -- reading stats calculation with multiple conditions
 ): ReadingStats => {
   if (history.length < 2) {
     return {

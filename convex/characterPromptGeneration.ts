@@ -49,6 +49,7 @@ export const generateCharacterPrompt = internalAction({
     paragraphIndex: v.number(),
   },
   returns: v.object({ success: v.boolean(), aiPrompt: v.optional(v.string()) }),
+  // eslint-disable-next-line complexity -- AI prompt generation with context building
   handler: async (
     ctx,
     { bookPath, characterSlug, characterName, chapterNumber, paragraphIndex },

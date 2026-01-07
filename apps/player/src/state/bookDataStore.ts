@@ -147,8 +147,21 @@ export function getCharactersData(): CharacterData[] {
  * Get book metadata (replaces old getBookData getter).
  * Returns null if not ready.
  */
-export function getBookData(): BookData | null {
-  return _store?.bookData ?? null;
+export function getBookData(): BookData {
+  if (!_store) {
+    throw new Error(
+      "[bookDataStore] Store not initialized. " +
+        "This usually means a store function was called before BookConvexProvider mounted. " +
+        "Ensure your component tree is wrapped in <BookConvexProvider>.",
+    );
+  }
+  if (!_store.bookData) {
+    throw new Error(
+      "[bookDataStore] Book data not found. " +
+        "This usually means the book data is not loaded yet.",
+    );
+  }
+  return _store.bookData;
 }
 
 export function getIsPlayLayout(): boolean {
@@ -211,6 +224,19 @@ export function getAudiobookTracksForBook(): unknown[] {
  * Get the current book's slug.
  * Returns null if not ready.
  */
-export function getBookSlug(): string | null {
-  return _store?.bookData?.slug ?? null;
+export function getBookSlug(): string {
+  if (!_store) {
+    throw new Error(
+      "[bookDataStore] Store not initialized. " +
+        "This usually means a store function was called before BookConvexProvider mounted. " +
+        "Ensure your component tree is wrapped in <BookConvexProvider>.",
+    );
+  }
+  if (!_store.bookData) {
+    throw new Error(
+      "[bookDataStore] Book data not found. " +
+        "This usually means the book data is not loaded yet.",
+    );
+  }
+  return _store.bookData.slug;
 }

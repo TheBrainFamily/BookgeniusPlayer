@@ -13,7 +13,7 @@ import { BookLoader } from "@platform/components/BookLoader";
 type LoaderMeta = {
   title: string;
   phrases: string[];
-  author?: string;
+  author: string;
   showStartButton?: boolean;
   onStartClick?: () => void;
 };
@@ -38,6 +38,7 @@ type Ctx = {
 
 const RouteTransitionContext = createContext<Ctx | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useRouteTransition = () => {
   const ctx = useContext(RouteTransitionContext);
   if (!ctx) {

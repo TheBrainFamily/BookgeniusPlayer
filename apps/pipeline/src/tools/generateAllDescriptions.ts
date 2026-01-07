@@ -18,11 +18,6 @@ interface CollectionData {
   books: WLBook[];
 }
 
-interface BookWithDescription extends WLBook {
-  generatedDescription: string;
-  generatedHook: string;
-}
-
 const collectionsDir = path.resolve(__dirname, "../../wolnelektury-data/collections");
 const outputDir = path.resolve(__dirname, "../../wolnelektury-data/generated-descriptions");
 

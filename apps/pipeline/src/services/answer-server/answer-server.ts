@@ -255,6 +255,7 @@ const PORT = Number(process.env.PORT) || 30310;
 export const startAnswerServer = () => {
   Bun.serve({
     port: PORT,
+    // eslint-disable-next-line complexity
     async fetch(req) {
       const url = new URL(req.url);
       const origin = req.headers.get("origin");
@@ -568,7 +569,6 @@ async function handleGetParagraphsForSearch(
   }
 
   const passagesWithoutEmbeddings = Array.from(uniquePassagesMap.values()).map(
-     
     ({ Embeddings: _embeddings, ...rest }) => rest,
   );
 

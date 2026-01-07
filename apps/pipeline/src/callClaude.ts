@@ -61,6 +61,7 @@ const DEBUG = false;
  * @param maxRetries Maximum number of retry attempts (default: 2, meaning 3 total attempts)
  * @returns The LLM response, either as a string or parsed according to the provided schema
  */
+
 export const callClaude = async <T = string>(
   prompt: string,
   schema?: z.ZodSchema<T>,
@@ -68,6 +69,7 @@ export const callClaude = async <T = string>(
   thinkingTokens = 1024 * 10,
   useGemini = false,
   useGeminiThinking = true,
+  // eslint-disable-next-line complexity -- multi-provider retry with fallback logic; refactor pending
 ) => {
   let lastError: unknown;
   let attempts = 0;

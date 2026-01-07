@@ -36,6 +36,7 @@ const PACKAGES = [
   { name: "pipeline-ui", path: "apps/pipeline-ui" },
   { name: "ffmpeg-worker", path: "apps/ffmpeg-worker" },
   { name: "convex", path: "convex" },
+  { name: "native", path: "native" },
 ];
 
 // Parse tsgo output line

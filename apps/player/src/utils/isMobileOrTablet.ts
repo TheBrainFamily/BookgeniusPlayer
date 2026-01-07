@@ -54,6 +54,7 @@ export const isTablet = (
   considerViewportWidth = false,
   tabletMinWidth = 768,
   tabletMaxWidth = 1024,
+  // eslint-disable-next-line complexity -- device detection with multiple UA patterns
 ): boolean => {
   if (typeof window === "undefined") return false;
 

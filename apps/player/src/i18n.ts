@@ -8,7 +8,7 @@ const i18n: I18nInstance = i18next.createInstance();
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
-  .use(resourcesToBackend((lng, ns) => import(`./locales/${lng}/${ns}.json`)))
+  .use(resourcesToBackend((lng: string, ns: string) => import(`./locales/${lng}/${ns}.json`)))
   .init({
     fallbackLng: "en",
     supportedLngs: ["en", "pl"],

@@ -1,4 +1,3 @@
-import { getBookSlug } from "@player/state/bookDataStore";
 import { activateCharacters } from "./characterHelpers";
 import { getGlobalEditModeActive } from "@player/context/EditModeContext";
 
@@ -123,7 +122,7 @@ export function setupParagraphHighlighting() {
       if (chapterNumber && paragraphNumber) {
         const chapterNum = parseInt(chapterNumber);
         const paragraphNum = parseInt(paragraphNumber);
-        activateCharacters(chapterNum, paragraphNum, getBookSlug() || undefined);
+        activateCharacters(chapterNum, paragraphNum);
       }
 
       if (getGlobalEditModeActive() && paragraph !== currentEditHoverElement) {
@@ -168,6 +167,7 @@ export function setupParagraphHighlighting() {
     }
   });
 
+  // eslint-disable-next-line complexity -- click handler with edit mode, character clicks, footnotes
   contentContainer.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
 

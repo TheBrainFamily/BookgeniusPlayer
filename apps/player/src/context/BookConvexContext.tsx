@@ -118,7 +118,7 @@ export interface BookMetadata {
   path: string;
   slug: string;
   name: string;
-  extra: { title?: string; author?: string; language?: string; form?: string };
+  extra: { title: string; author: string; language?: string; form?: string };
 }
 
 type ChapterHtmlEntry = { chapterNumber: number; html?: string };
@@ -496,6 +496,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     });
   }, [chapterOrder]);
 
+  // eslint-disable-next-line complexity
   const updateFromHtmlSourceCache = useCallback(() => {
     if (htmlSourceCacheRef.current.size === 0) return;
 
@@ -577,6 +578,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     }
 
     setTextVersion((v) => v + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: updateFromHtmlSourceCache is used inside but intentionally excluded to prevent infinite loops. It reads from refs which are always fresh.
   }, [
     book,
     bookSlug,
@@ -823,10 +825,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     musicQuery === undefined ||
     figuresQuery === undefined;
 
-  /* eslint-disable react-hooks/refs -- Intentionally accessing ref during render for ready state */
   const isReady =
     !isLoading && !error && bookStringified !== null && initialLoadCompleteRef.current;
-  /* eslint-enable react-hooks/refs */
 
   // =============================================================================
   // Context value
@@ -945,7 +945,6 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     };
   }, []);
 
-  // eslint-disable-next-line react-hooks/refs -- value includes isReady which derives from ref, but is stable
   return <BookConvexContext.Provider value={value}>{children}</BookConvexContext.Provider>;
 }
 
@@ -953,10 +952,12 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 // Hooks
 // =============================================================================
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBookConvex() {
   return useContext(BookConvexContext);
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCharacterMap() {
   const { characters } = useBookConvex();
 

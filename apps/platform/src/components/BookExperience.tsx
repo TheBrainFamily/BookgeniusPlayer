@@ -15,7 +15,7 @@ import { Badge } from "@platform/components/ui/badge";
 import { books } from "@platform/books";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { detectLanguageFromDomain } from "@/utils/languageDetection";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection";
 
 const BookExperience = () => {
   const { slug } = useParams<{ slug: string }>();

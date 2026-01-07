@@ -17,7 +17,7 @@ export type Background = {
 
 // ---- globals ----------------------------------------------------------------
 
-type DebouncedLike<F extends (...args: unknown[]) => unknown> = F & {
+type DebouncedLike<F extends (...args: never[]) => unknown> = F & {
   cancel: () => void;
   flush?: () => void;
   pending?: () => boolean;
@@ -139,7 +139,68 @@ function isDarkColor(hex: string, threshold: number = 0.5): boolean {
   return getColorLuminance(hex) < threshold;
 }
 
-function applyScopedColors({
+function rgbToHex(r: number, g: number, b: number): string {
+  const toHex = (n: number) =>
+    Math.round(Math.max(0, Math.min(255, n)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function lerpColor(from: string, to: string, t: number): string {
+  const fromRgb = hexToRgb(from);
+  const toRgb = hexToRgb(to);
+  if (!fromRgb || !toRgb) return to;
+
+  const r = fromRgb.r + (toRgb.r - fromRgb.r) * t;
+  const g = fromRgb.g + (toRgb.g - fromRgb.g) * t;
+  const b = fromRgb.b + (toRgb.b - fromRgb.b) * t;
+  return rgbToHex(r, g, b);
+}
+
+// Animation state for color transitions
+let colorAnimationId: number | null = null;
+const COLOR_TRANSITION_DURATION = 800; // ms, matches the original CSS transition
+
+function animateColor(
+  element: HTMLElement,
+  property: string,
+  fromColor: string,
+  toColor: string,
+  duration: number = COLOR_TRANSITION_DURATION,
+): void {
+  // Cancel any existing animation
+  if (colorAnimationId !== null) {
+    cancelAnimationFrame(colorAnimationId);
+    colorAnimationId = null;
+  }
+
+  const startTime = performance.now();
+
+  function tick(currentTime: number) {
+    const elapsed = currentTime - startTime;
+    const t = Math.min(elapsed / duration, 1);
+
+    // Ease-in-out cubic
+    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const currentColor = lerpColor(fromColor, toColor, eased);
+    element.style.setProperty(property, currentColor);
+
+    if (t < 1) {
+      colorAnimationId = requestAnimationFrame(tick);
+    } else {
+      colorAnimationId = null;
+    }
+  }
+
+  colorAnimationId = requestAnimationFrame(tick);
+}
+
+// Default fallback color for --bg-content-light
+const DEFAULT_BG_COLOR = "#fdfaf4";
+
+export function applyScopedColors({
   backgroundColor,
   textColor,
 }: {
@@ -151,19 +212,23 @@ function applyScopedColors({
 
   if (backgroundColor && backgroundColor.trim().length > 0) {
     const isDark = isDarkColor(backgroundColor.trim());
+    console.log("[applyScopedColors]", { backgroundColor, isDark, textColor });
+
+    // Get the current color for animation
+    const currentColor =
+      scope.style.getPropertyValue("--bg-content-light").trim() || DEFAULT_BG_COLOR;
+
+    let targetColor: string;
+
     if (getBookFromUrl() === "Midsummer-Nights-Dream") {
-      scope.style.setProperty("--bg-content-light", backgroundColor.trim());
+      targetColor = backgroundColor.trim();
       if (textColor && textColor.trim().length > 0) {
         scope.style.setProperty("--text-light", textColor.trim());
       } else {
         scope.style.removeProperty("--text-light");
       }
     } else {
-      if (isDark) {
-        scope.style.setProperty("--bg-content-light", "#000000");
-      } else {
-        scope.style.setProperty("--bg-content-light", "#ffffff");
-      }
+      targetColor = isDark ? "#000000" : "#ffffff";
       if (isDark) {
         scope.style.setProperty("--text-light", "#f2e4c9");
         scope.style.setProperty("--bg-notes-rgb", "0, 0, 0");
@@ -172,6 +237,12 @@ function applyScopedColors({
         scope.style.setProperty("--bg-notes-rgb", "249, 249, 249");
       }
     }
+
+    // Animate the background color transition via JS to avoid Safari layout bug
+    if (currentColor !== targetColor) {
+      animateColor(scope, "--bg-content-light", currentColor, targetColor);
+    }
+
     if (isDark) {
       scope.style.setProperty("--bg-dark-gradient-opacity", "0.8");
     } else {
@@ -180,6 +251,40 @@ function applyScopedColors({
   } else {
     scope.style.removeProperty("--bg-content-light");
   }
+}
+
+export { detectImageBrightness };
+
+export async function updateBackgroundColors({
+  currentChapter,
+  currentParagraph,
+}: {
+  currentChapter: number;
+  currentParagraph: number;
+}): Promise<void> {
+  const backgrounds = getBackgrounds() as Background[];
+
+  const foundAll = backgrounds.filter((bg) => {
+    return (
+      (currentChapter == bg.startChapter && currentParagraph >= bg.startParagraph) ||
+      currentChapter > bg.startChapter
+    );
+  });
+
+  const found = foundAll[foundAll.length - 1];
+  if (!found) return;
+
+  const newSrc = getBookAssetUrl(found.file);
+  if (!newSrc) return;
+
+  const newType = getFileType(found.file);
+  let bgColor = found.backgroundColor;
+
+  if (!bgColor || bgColor.trim().length === 0) {
+    bgColor = newType === "video" ? "#ffffff" : await detectImageBrightness(newSrc);
+  }
+
+  applyScopedColors({ backgroundColor: bgColor, textColor: found.textColor });
 }
 
 // ---- helpers ----------------------------------------------------------------
@@ -281,6 +386,7 @@ export const dealWithBackground = ({
 
     /* ---------- main debounced handler ----------------------------------- */
     debouncedHandler = debounce(
+      // eslint-disable-next-line complexity
       async (currentLocation: { currentChapter: number; currentParagraph: number }) => {
         // Guards for lifecycle invalidation across teardown/re-entry
         const myToken = sessionToken; // snapshot current session
@@ -321,6 +427,11 @@ export const dealWithBackground = ({
           return;
         }
         const newSrc = getBookAssetUrl(newFile); // expected to resolve to the current book's absolute URL (or equivalent)
+        if (!newSrc) {
+          console.error("Failed to get asset URL for:", newFile);
+          transitionState = TransitionState.Idle;
+          return;
+        }
 
         const curType = legacy.dataset.type as "video" | "image";
         const curFrontId = legacy.dataset.front as "a" | "b";

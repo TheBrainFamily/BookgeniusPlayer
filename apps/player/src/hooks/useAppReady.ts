@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
+import { useNativeShell } from "@player/context/NativeShellContext";
 
 type TimeoutId = number | null;
 
@@ -74,7 +75,6 @@ const useVideoReadiness = ({
 
     if (bgVideoB) {
       if (bgVideoB.readyState >= READY_STATE_CAN_PLAY && !bgVideoB.paused) {
-         
         setVideoBReady(true);
       } else {
         bgVideoB.addEventListener("playing", onBPlaying);
@@ -164,7 +164,8 @@ const useImageReadiness = ({
 
     const imageUrls = chapterCharacters
       .filter((character) => character.media?.avatarUrl)
-      .map((character) => getBookAssetUrl(character.media?.avatarUrl));
+      .map((character) => getBookAssetUrl(character.media!.avatarUrl!))
+      .filter((url): url is string => !!url);
 
     let failedCount = 0;
 
@@ -194,7 +195,6 @@ const useImageReadiness = ({
               resolve();
             };
 
-            // Set timeout for this image
             timeoutId = window.setTimeout(() => {
               cleanup();
               console.warn(`Timeout loading: ${url}`);
@@ -213,15 +213,16 @@ const useImageReadiness = ({
     }
 
     console.log("All images processing completed!");
-  }, [chapter, imageTimeoutMs]);
+  }, [allCharacters, chapter, imageTimeoutMs]);
 
   // Cleanup function to clear all pending timeouts
   useEffect(() => {
+    const timeoutIds = timeoutIdsRef.current;
     return () => {
-      timeoutIdsRef.current.forEach((id) => {
+      timeoutIds.forEach((id) => {
         if (id) clearTimeout(id);
       });
-      timeoutIdsRef.current.clear();
+      timeoutIds.clear();
     };
   }, []);
 
@@ -279,6 +280,7 @@ const useImageReadiness = ({
 
 export const useAppReady = () => {
   const { charactersData, backgroundsForBook } = useBookConvex();
+  const isNativeShell = useNativeShell();
   const { videoBackgroundReady, setVideoBackgroundReady } = useVideoReadiness({
     videoTimeoutMs: 30000,
     minSplashMs: 100,
@@ -289,12 +291,11 @@ export const useAppReady = () => {
     charactersData,
   });
 
-  // If no backgrounds, mark video as ready immediately
   useEffect(() => {
-    if (backgroundsForBook.length === 0) {
+    if (backgroundsForBook.length === 0 || isNativeShell) {
       setVideoBackgroundReady(true);
     }
-  }, [backgroundsForBook, setVideoBackgroundReady]);
+  }, [backgroundsForBook, isNativeShell, setVideoBackgroundReady]);
 
   useEffect(() => {
     if (!videoBackgroundReady && !imageBackgroundReady) return;

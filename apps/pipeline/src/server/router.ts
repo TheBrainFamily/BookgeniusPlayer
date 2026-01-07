@@ -204,7 +204,7 @@ export const appRouter = router({
           `summaries-chapter-by-chapter-${chapterNumber}.txt`,
           FILE_TYPE.TEMPORARY,
         );
-      } catch (e) {
+      } catch {
         throw new Error(
           `Rolling summary not found for chapter ${chapterNumber}. Run full pipeline first.`,
         );
@@ -266,7 +266,7 @@ export const appRouter = router({
             `[regenerateChapterEmbeddings] Loaded existing embeddings with ${existingEmbeddings.size} chapters`,
           );
         }
-      } catch (e) {
+      } catch {
         console.log(`[regenerateChapterEmbeddings] No existing embeddings found, starting fresh`);
       }
 
@@ -664,6 +664,7 @@ export const appRouter = router({
 
   generateStylePreviews: procedure
     .input(z.object({ jobId: z.string() }))
+    // eslint-disable-next-line complexity -- multiple file operations and style processing steps
     .mutation(async ({ input }) => {
       const job = jobs.get(input.jobId);
       if (!job) throw new Error("Job not found");

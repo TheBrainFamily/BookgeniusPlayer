@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/refs */
 import React, { useEffect, useRef, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";
@@ -10,7 +9,7 @@ import Paywall from "./components/Paywall";
 import AuthRequiredModal from "./components/AuthRequiredModal";
 import { teardownPlayer } from "../../player/src/teardown";
 import { useAuth } from "./hooks/useAuth";
-import { detectLanguageFromDomain } from "@/utils/languageDetection";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
@@ -86,13 +85,13 @@ const WrappedPlayerApp = () => {
       setBookTitle(event.detail.bookTitle);
     };
 
-    window.addEventListener("ShowPaywall", handleShowPaywall);
-    return () => window.removeEventListener("ShowPaywall", handleShowPaywall);
+    window.addEventListener("ShowPaywall", handleShowPaywall as EventListener);
+    return () => window.removeEventListener("ShowPaywall", handleShowPaywall as EventListener);
   }, []);
 
   // Listen for auth modal trigger from player
   useEffect(() => {
-    const handleShowAuth = (event: Event) => {
+    const handleShowAuth = (_event: Event) => {
       // Optionally inspect (event as CustomEvent).detail?.reason
       setShowAuth(true);
     };
@@ -182,6 +181,7 @@ const WrappedPlayerApp = () => {
   }, [book, navigatedFromPlatform, navigating, startTransition, handleStartClick]);
 
   // Handle asset base resolution - waits for both book and auth to be ready
+
   useEffect(() => {
     if (!book) {
       return;
@@ -203,7 +203,6 @@ const WrappedPlayerApp = () => {
       { forceFreshToken = false }: { forceFreshToken?: boolean } = {},
     ) => {
       const headers: Record<string, string> = {};
-      let credentials: RequestCredentials = "omit";
 
       if (mode === "signed-in") {
         let token: string | null | undefined = null;
@@ -218,13 +217,7 @@ const WrappedPlayerApp = () => {
 
         if (token) {
           headers.Authorization = `Bearer ${token}`;
-        } else {
-          credentials = "same-origin";
         }
-      }
-
-      if (mode === "anon") {
-        credentials = "omit";
       }
 
       // const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", credentials, headers });
@@ -289,6 +282,7 @@ const WrappedPlayerApp = () => {
         }
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- FALSE POSITIVE: We intentionally depend on auth.ready and auth.isSignedIn, not the full auth object which changes on every render
   }, [book, auth.ready, auth.isSignedIn]);
 
   // On unmount (leaving /reader), fully tear down the player environment

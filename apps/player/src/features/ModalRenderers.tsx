@@ -5,7 +5,6 @@ import { BookChapterModalRenderer } from "./modals/bookChapter/BookChapterModalR
 import { BookMenuModalRenderer } from "./modals/bookMenu/BookMenuModalRenderer";
 import { EditorModeModalRenderer } from "./modals/editorMode/EditorModeModalRenderer";
 import { ApiKeyModalRenderer } from "./modals/apiKey/ApiKeyModalRenderer";
-import { SentenceModalRenderer } from "./modals/sentence/SentenceModalRenderer";
 import { DeepResearchModalRenderer } from "@player/features/modals/deepResearch/DeepResearchModalRenderer";
 import { PositionHistoryModalRenderer } from "./modals/positionHistory/PositionHistoryModalRenderer";
 import { FootnoteModalRenderer } from "./modals/footnote/FootnoteModalRenderer";
@@ -28,7 +27,6 @@ export const ModalRenderers: React.FC = () => {
       <PositionHistoryModalRenderer />
       <EditorModeModalRenderer />
       <ApiKeyModalRenderer />
-      <SentenceModalRenderer />
       <FootnoteModalRenderer />
       <AvatarEditModalRenderer />
       <BackgroundEditModalRenderer />

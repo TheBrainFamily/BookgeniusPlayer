@@ -9,14 +9,9 @@
  * - listens (video)
  */
 
-import { useState, useCallback, useMemo } from "react";
-import { useMutation } from "convex/react";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@convex/_generated/api";
-import { queries } from "@/lib/queries";
-import { useCharacterBundle, type CharacterBundle } from "@/lib/hooks/useCharacterBundle";
+import { useState } from "react";
+import { useCharacterBundle } from "@/lib/hooks/useCharacterBundle";
 import { MetadataEditor } from "../editors/MetadataEditor";
-import { getVersionUrl } from "@/lib/assetUrl";
 import {
   ArrowLeft,
   User,
@@ -31,7 +26,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 // =============================================================================
@@ -50,7 +44,6 @@ interface AssetSlotProps {
   icon: React.ReactNode;
   asset: { url: string; versionId: string; contentType?: string } | undefined;
   onUpload: () => void;
-  accept: string;
   isImage?: boolean;
 }
 
@@ -58,7 +51,7 @@ interface AssetSlotProps {
 // Asset Slot Component
 // =============================================================================
 
-function AssetSlot({ label, icon, asset, onUpload, accept, isImage = false }: AssetSlotProps) {
+function AssetSlot({ label, icon, asset, onUpload, isImage = false }: AssetSlotProps) {
   const hasAsset = !!asset;
 
   return (
@@ -121,6 +114,7 @@ function AssetSlot({ label, icon, asset, onUpload, accept, isImage = false }: As
 // Main Component
 // =============================================================================
 
+// eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
 export function CharacterDetailView({
   characterPath,
   onBack,
@@ -129,8 +123,6 @@ export function CharacterDetailView({
 }: CharacterDetailViewProps) {
   const { bundle, isLoading, error } = useCharacterBundle(characterPath);
   const [showMetadataEditor, setShowMetadataEditor] = useState(false);
-
-  const characterSlug = characterPath.split("/").pop() || "";
 
   const displayAvatar = optimisticAvatarUrl
     ? { url: optimisticAvatarUrl, versionId: "optimistic", contentType: "image/png" }
@@ -226,7 +218,6 @@ export function CharacterDetailView({
                   icon={<ImageIcon className="h-4 w-4" />}
                   asset={displayAvatar}
                   onUpload={() => onUploadAsset("avatar-large.png")}
-                  accept="image/*"
                   isImage
                 />
                 <AssetSlot
@@ -234,14 +225,12 @@ export function CharacterDetailView({
                   icon={<Video className="h-4 w-4" />}
                   asset={bundle.speaks}
                   onUpload={() => onUploadAsset("speaks.mp4")}
-                  accept="video/*"
                 />
                 <AssetSlot
                   label="Listens"
                   icon={<Video className="h-4 w-4" />}
                   asset={bundle.listens}
                   onUpload={() => onUploadAsset("listens.mp4")}
-                  accept="video/*"
                 />
               </div>
             </div>

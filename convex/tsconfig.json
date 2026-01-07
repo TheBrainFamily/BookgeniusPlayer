@@ -7,6 +7,9 @@
     /* These settings are not required by Convex and can be modified. */
     "allowJs": true,
     "strict": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "skipLibCheck": true,
@@ -19,11 +22,8 @@
     "module": "ESNext",
     "isolatedModules": true,
     "noEmit": true,
-    "paths": {
-      "@player/*": ["../apps/player/src/*"],
-      "@convex/*": ["./*"]
-    }
+    "paths": { "@player/*": ["../apps/player/src/*"], "@convex/*": ["./*"] }
   },
   "include": ["./**/*"],
-  "exclude": ["./_generated"]
+  "exclude": ["node_modules", "**/_generated/**"]
 }

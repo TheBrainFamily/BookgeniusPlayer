@@ -121,7 +121,19 @@
     will-change: padding, transform; /* Optimize for animations */
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    transition: color var(--transition-medium) var(--transition-timing);
+    & p,
+    & span,
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6,
+    & a,
+    & li,
+    & blockquote {
+      transition: color 0.8s ease-in-out;
+    }
     /* font-size: 16px; Base content font size */
     scrollbar-width: none;
     &::-webkit-scrollbar {
@@ -139,15 +151,39 @@
       background: linear-gradient(
         to bottom,
         rgb(from var(--bg-content-light) r g b / 0) 0%,
-        rgb(from var(--bg-content-light) r g b / calc(0.75 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 35%,
-        rgb(from var(--bg-content-light) r g b / calc(0.85 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 45%,
-        rgb(from var(--bg-content-light) r g b / calc(0.85 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 55%,
-        rgb(from var(--bg-content-light) r g b / calc(0.75 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))) 65%,
+        rgb(
+            from var(--bg-content-light) r g b /
+              calc(0.75 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))
+          )
+          35%,
+        rgb(
+            from var(--bg-content-light) r g b /
+              calc(0.85 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))
+          )
+          45%,
+        rgb(
+            from var(--bg-content-light) r g b /
+              calc(0.85 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))
+          )
+          55%,
+        rgb(
+            from var(--bg-content-light) r g b /
+              calc(0.75 * var(--gradient-opacity, 1) * var(--bg-dark-gradient-opacity, 1))
+          )
+          65%,
         rgb(from var(--bg-content-light) r g b / 0) 100%
       );
 
       mask-image:
-        linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 10%, rgba(0 0 0 / 1) 45%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 70%, transparent 100%),
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          rgba(0 0 0 / 0.05) 10%,
+          rgba(0 0 0 / 1) 45%,
+          rgba(0 0 0 / 1) 55%,
+          rgba(0 0 0 / 0.05) 70%,
+          transparent 100%
+        ),
         radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
 
       mask-composite: intersect;
@@ -155,13 +191,29 @@
 
       @media (max-width: 640px) {
         mask-image:
-          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 15%, rgba(0 0 0 / 1) 30%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 75%, transparent 100%),
+          linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0 0 0 / 0.05) 15%,
+            rgba(0 0 0 / 1) 30%,
+            rgba(0 0 0 / 1) 55%,
+            rgba(0 0 0 / 0.05) 75%,
+            transparent 100%
+          ),
           radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
       }
 
       @media (max-height: 640px) {
         mask-image:
-          linear-gradient(to bottom, transparent 0%, rgba(0 0 0 / 0.05) 5%, rgba(0 0 0 / 1) 30%, rgba(0 0 0 / 1) 55%, rgba(0 0 0 / 0.05) 80%, transparent 100%),
+          linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0 0 0 / 0.05) 5%,
+            rgba(0 0 0 / 1) 30%,
+            rgba(0 0 0 / 1) 55%,
+            rgba(0 0 0 / 0.05) 80%,
+            transparent 100%
+          ),
           radial-gradient(ellipse at 50% 30%, black 0%, black 70%, transparent 100%);
       }
 
@@ -570,7 +622,11 @@
     }
 
     span[id^="ch"][id*="-p"][id*="-s"]:hover {
-      background-color: color-mix(in srgb, var(--text-light, rgba(66, 68, 90, 0.1)) 20%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--text-light, rgba(66, 68, 90, 0.1)) 20%,
+        transparent
+      );
       transition: none;
       /* text-shadow: 0px 0px 16px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 80%, transparent); */
     }
@@ -755,7 +811,8 @@
         background-color: transparent;
 
         &:hover {
-          text-shadow: 0px 4px 8px color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 80%, transparent);
+          text-shadow: 0px 4px 8px
+            color-mix(in srgb, var(--text-light, rgba(0, 0, 0, 0.3)) 80%, transparent);
           transition: none;
         }
       }
@@ -829,7 +886,9 @@
         margin-bottom: clamp(1em, 3vh, 1.5em);
       }
 
-      .play-row .character-text p[data-is-didaskalia="false"]:has(> span:only-child > em.quote:first-child) {
+      .play-row
+        .character-text
+        p[data-is-didaskalia="false"]:has(> span:only-child > em.quote:first-child) {
         text-align: center;
         width: 100%;
         margin-left: auto;
@@ -1254,7 +1313,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg, rgba(255, 215, 140, 0) 0%, var(--talking-paragraph-shimmer-light) 50%, rgba(255, 215, 140, 0) 100%);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 215, 140, 0) 0%,
+      var(--talking-paragraph-shimmer-light) 50%,
+      rgba(255, 215, 140, 0) 100%
+    );
     animation: shimmerEffect 2s infinite;
     pointer-events: none;
     border-radius: 4px;
@@ -1509,8 +1573,16 @@ section[data-chapter] [data-index].edit-hover {
 
 .textured-bg {
   background:
-    radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--book-tertiary-color) 30%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--book-primary-color) 15%, transparent) 0%, transparent 50%),
+    radial-gradient(
+      circle at 20% 80%,
+      color-mix(in srgb, var(--book-tertiary-color) 30%, transparent) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      color-mix(in srgb, var(--book-primary-color) 15%, transparent) 0%,
+      transparent 50%
+    ),
     linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(30, 30, 30, 0.9) 100%);
 }
 
@@ -1734,7 +1806,12 @@ section[data-chapter] [data-index].edit-hover {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
   animation: shimmerSweep 1.2s infinite linear;
   pointer-events: none;
   border-radius: 0.75rem;
@@ -1845,8 +1922,14 @@ section[data-chapter] [data-index].edit-hover {
   padding-bottom: 30px;
 }
 
-#legacy #book-container.play-mode #content-container .play-container.mixed-container > section > section {
-  .character-text p[data-text-alignment="left"][data-is-character="false"][data-is-didaskalia="false"] {
+#legacy
+  #book-container.play-mode
+  #content-container
+  .play-container.mixed-container
+  > section
+  > section {
+  .character-text
+    p[data-text-alignment="left"][data-is-character="false"][data-is-didaskalia="false"] {
     padding: 0.6em;
     text-align: justify;
     text-indent: 1.4em;
@@ -1854,13 +1937,18 @@ section[data-chapter] [data-index].edit-hover {
     width: auto;
     display: block;
   }
-  .character-text p[data-is-character="true"] + p[data-is-character="false"][data-is-didaskalia="false"],
-  .character-text p[data-is-didaskalia="true"] + p[data-is-character="false"][data-is-didaskalia="false"],
+  .character-text
+    p[data-is-character="true"]
+    + p[data-is-character="false"][data-is-didaskalia="false"],
+  .character-text
+    p[data-is-didaskalia="true"]
+    + p[data-is-character="false"][data-is-didaskalia="false"],
   .character-text blockquote + p[data-is-character="false"][data-is-didaskalia="false"] {
     text-indent: 0;
   }
 
-  .character-text p[data-text-alignment="right"][data-is-character="false"][data-is-didaskalia="false"] {
+  .character-text
+    p[data-text-alignment="right"][data-is-character="false"][data-is-didaskalia="false"] {
     text-align: justify;
     padding: 0.6em;
     text-indent: 1.4em;
@@ -2171,4 +2259,27 @@ section[data-chapter] [data-index].edit-hover {
 
 #legacy[data-animation-speed="0"] .bg-element.zooming {
   animation-play-state: paused !important;
+}
+
+/* Native Shell Mode - transparent backgrounds for React Native WebView */
+#legacy.native-shell {
+  background-color: transparent !important;
+
+  &::before {
+    display: none !important;
+  }
+
+  .bg-element,
+  .bg-video {
+    display: none !important;
+  }
+
+  #book-container {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #video-blur-container {
+    display: none !important;
+  }
 }

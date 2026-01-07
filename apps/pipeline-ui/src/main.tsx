@@ -9,6 +9,7 @@ import "./index.css";
 
 const queryClient = new QueryClient();
 
+// eslint-disable-next-line react-refresh/only-export-components
 function Layout({ children }: { children: React.ReactNode }) {
   return <div className="min-h-screen bg-background">{children}</div>;
 }

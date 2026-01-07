@@ -304,6 +304,11 @@ test("updateFolder updates the folder path", async () => {
   await t.mutation(api.assetManager.createFolderByPath, { path: "some/place" });
 
   await t.mutation(api.assetManager.updateFolder, { path: "some/place", newPath: "other/place" });
+
+  const folder = await t.query(api.assetManager.getFolder, { path: "other/place" });
+
+  expect(folder?.path).toBe("other/place");
+  expect(folder?.name).toBe("some");
 });
 
 //TODO what about updating to paths of other users?

@@ -2,6 +2,7 @@ import React, { useEffect, useState, createContext, useContext } from "react";
 import type { ClerkProviderProps } from "@clerk/react-router";
 
 const ClerkReadyContext = createContext(false);
+// eslint-disable-next-line react-refresh/only-export-components
 export const useClerkReady = () => useContext(ClerkReadyContext);
 
 const ClerkProviderSafeClient: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({

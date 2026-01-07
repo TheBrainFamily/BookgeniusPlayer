@@ -158,7 +158,7 @@ export const updateVersionExtra = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
     return await ctx.runMutation(components.assetManager.assetManager.updateVersionExtra, {
-      versionId: args.versionId as any,
+      versionId: args.versionId,
       extra: args.extra,
     });
   },
@@ -179,7 +179,7 @@ export const getTextContent = action({
   args: { versionId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
-      versionId: args.versionId as any,
+      versionId: args.versionId,
     });
   },
 });

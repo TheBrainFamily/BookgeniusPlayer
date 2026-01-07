@@ -12,7 +12,7 @@ export async function requireAuth(ctx: MutationCtx) {
 
   if (!authRequired) {
     // Auth disabled - allow anonymous access
-    return "anonymous" as any;
+    return "anonymous";
   }
 
   const userId = await getAuthUserId(ctx);

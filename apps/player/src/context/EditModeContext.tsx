@@ -65,20 +65,24 @@ export function EditModeProvider({ children }: EditModeProviderProps) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useEditMode(): EditModeContextType {
   return useContext(EditModeContext);
 }
 
 let globalEditModeActive = false;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function setGlobalEditModeActive(active: boolean): void {
   globalEditModeActive = active;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getGlobalEditModeActive(): boolean {
   return globalEditModeActive;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useEditModeGlobalSync(): void {
   const { isEditModeActive } = useEditMode();
 

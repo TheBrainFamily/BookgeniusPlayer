@@ -108,21 +108,6 @@ export function joinPath(...parts: string[]) {
     .join("/");
 }
 
-/**
- * Build final URL using prefix. In Convex mode, we don't use prefixes
- * since assets come with absolute URLs.
- */
-function buildFromPrefix(_relativePath: string): string | null {
-  // In Convex-only mode, we don't use asset prefixes
-  return null;
-}
-
-// exported helpers (very small)
-export const getBookAssetBaseUrl = () => {
-  const built = buildFromPrefix(URL_SEGMENTS.ASSETS);
-  if (built) return built;
-};
-
 export const getBookAssetUrl = (assetPath: string) => {
   // If it's already an absolute URL (live mode), return as-is
   if (assetPath.startsWith("http://") || assetPath.startsWith("https://")) {
@@ -134,12 +119,6 @@ export const getBookAssetUrl = (assetPath: string) => {
   if (liveUrl) {
     return liveUrl;
   }
-
-  const rel = assetPath.replace(/^\//, "");
-  // ensure we build under the "assets" folder inside the versioned prefix
-  const built = buildFromPrefix(joinPath(URL_SEGMENTS.ASSETS, rel));
-
-  if (built) return built;
 };
 
 export const buildAudioUrl = (trackId: string) => {
@@ -149,11 +128,5 @@ export const buildAudioUrl = (trackId: string) => {
   }
 
   const file = `${trackId}${URL_SEGMENTS.AUDIO_EXT}`;
-  const built = buildFromPrefix(joinPath(URL_SEGMENTS.ASSETS, file));
-  if (built) return built;
-};
-export const getBookDataUrl = (fileName: string) => {
-  const rel = joinPath(URL_SEGMENTS.COMPILED, fileName);
-  const built = buildFromPrefix(rel);
-  if (built) return built;
+  return joinPath(URL_SEGMENTS.ASSETS, file);
 };

@@ -14,10 +14,10 @@ export interface Location {
   currentChapter: number;
   currentParagraph: number;
   lastScrollTimestamp?: number;
-  earliestVisibleParagraph: number | null;
-  latestVisibleParagraph: number | null;
-  earliestVisibleChapter: number | null;
-  latestVisibleChapter: number | null;
+  earliestVisibleParagraph: number;
+  latestVisibleParagraph: number;
+  earliestVisibleChapter: number;
+  latestVisibleChapter: number;
 }
 
 export interface LocationWithMetadata {
@@ -26,6 +26,7 @@ export interface LocationWithMetadata {
   source: "user" | "system";
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const DEFAULT_LOCATION: Location = {
   chapter: 1,
   paragraph: 1,
@@ -33,10 +34,10 @@ export const DEFAULT_LOCATION: Location = {
   endParagraph: 1,
   currentChapter: 1,
   currentParagraph: 1,
-  earliestVisibleParagraph: null,
-  latestVisibleParagraph: null,
-  earliestVisibleChapter: null,
-  latestVisibleChapter: null,
+  earliestVisibleParagraph: 1,
+  latestVisibleParagraph: 1,
+  earliestVisibleChapter: 1,
+  latestVisibleChapter: 1,
 };
 
 /* ------------------------------------------------------------------ */
@@ -56,6 +57,7 @@ interface LocationCtx {
   setLocation: (loc: Location, source?: "user" | "system") => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const LocationContext = createContext<LocationCtx>({
   location: DEFAULT_LOCATION,
   lastSystemLocation: null,
@@ -120,6 +122,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 };
 
 /* ------------------------------------------------------------------ */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLocation = () => {
   const ctx = React.useContext(LocationContext);
   if (!ctx) throw new Error("useLocation must be used within LocationProvider");

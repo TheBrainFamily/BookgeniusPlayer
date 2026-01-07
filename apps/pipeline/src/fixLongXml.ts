@@ -67,6 +67,7 @@ function formatChapterBlock(block: string): string {
   return `${openTag}\n${formattedChildren}\n</Chapter>`;
 }
 
+// eslint-disable-next-line complexity
 function splitTopLevelElements(inner: string): string[] {
   const children: string[] = [];
   let index = 0;

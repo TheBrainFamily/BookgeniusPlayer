@@ -26,12 +26,11 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getContentTypeCategory, formatBytes } from "@/lib/utils";
+import { cn, getContentTypeCategory, formatBytes } from "@/lib/utils";
 import { getVersionUrl } from "@/lib/assetUrl";
 import { toast } from "sonner";
 
@@ -58,6 +57,7 @@ function copyToClipboard(text: string, label: string) {
   toast.success(`${label} copied to clipboard`);
 }
 
+// eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
 export function AssetDetail({
   folderPath,
   basename,
@@ -121,7 +121,7 @@ export function AssetDetail({
     try {
       await publishDraft({ folderPath, basename });
       toast.success("Draft published successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to publish draft");
     }
   };
@@ -131,7 +131,7 @@ export function AssetDetail({
       const result = await restoreVersion({ versionId });
       onVersionSelect(result.versionId);
       toast.success(`Restored version ${versionNumber} as version ${result.version}`);
-    } catch (error) {
+    } catch {
       toast.error("Failed to restore version");
     }
   };
@@ -171,7 +171,7 @@ export function AssetDetail({
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-foreground">Preview</h3>
                 {selectedVersion && (
-                  <Badge variant={selectedVersion.state as any} className="text-xs">
+                  <Badge variant={selectedVersion.state} className="text-xs">
                     v{selectedVersion.version} ({selectedVersion.state})
                   </Badge>
                 )}
@@ -203,7 +203,7 @@ export function AssetDetail({
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Type</span>
-                  <Badge variant={category as any} className="capitalize">
+                  <Badge variant={category} className="capitalize">
                     {publishedFile?.contentType || "Unknown"}
                   </Badge>
                 </div>
@@ -339,7 +339,7 @@ export function AssetDetail({
                               <Archive className="h-4 w-4 text-muted-foreground" />
                             )}
                             <span className="font-medium text-sm">Version {version.version}</span>
-                            <Badge variant={version.state as any} className="text-[10px]">
+                            <Badge variant={version.state} className="text-[10px]">
                               {version.state}
                             </Badge>
                           </div>

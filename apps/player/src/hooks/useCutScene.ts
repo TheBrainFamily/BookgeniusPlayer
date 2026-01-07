@@ -8,7 +8,7 @@ const implRef = { current: impl };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/deal-with-cut-scenes", (mod) => {
-    implRef.current = mod.dealWithCutScenes;
+    if (mod) implRef.current = mod.dealWithCutScenes;
     console.info("[HMR] dealWithCutScenes updated");
   });
 }

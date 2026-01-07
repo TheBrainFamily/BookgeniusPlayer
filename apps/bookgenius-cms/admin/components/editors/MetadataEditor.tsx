@@ -25,7 +25,7 @@ import {
   isBookFolder,
   isCharacterFolder,
 } from "@/lib/types/book";
-import { detectFolderType, type DetectedFolderType } from "@/lib/utils/folderPatterns";
+import { detectFolderType } from "@/lib/utils/folderPatterns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -185,7 +185,7 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
   });
 
   // Get asset data if editing asset metadata
-  const { data: asset, isLoading: assetLoading } = useQuery({
+  const { isLoading: assetLoading } = useQuery({
     ...queries.asset(folderPath, basename || ""),
     enabled: !!basename,
   });
@@ -206,6 +206,7 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
   const updateVersionExtra = useMutation(api.cli.updateVersionExtra);
 
   // Detect entity type and get appropriate fields, including versionIds for asset types
+  // eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
   const { entityType, fields, currentExtra, publishedVersionId, draftVersionId } = useMemo(() => {
     const folderType = detectFolderType(folderPath, folder?.extra);
 

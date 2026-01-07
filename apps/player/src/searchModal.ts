@@ -150,11 +150,12 @@ const createContextualSummary = (
   return highlightMatchedWords(summary, query);
 };
 
+// eslint-disable-next-line complexity
 export function performCachedSearch(query: string, currentLocation: Location): SearchResultsData {
   const { textCache, isInitialized } = useBookContentStore.getState();
   const bookIsPlay =
     getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed";
-  let bookCharacters = [];
+  let bookCharacters: string[] = [];
   if (bookIsPlay) {
     bookCharacters = getCharactersData().map((character) => character.characterName.toLowerCase());
   }
@@ -199,6 +200,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
             const paragraphElement = bookIndex.getParagraphElement(chapterIdNum, paragraphNumber);
             const isCharacterLine = paragraphElement?.getAttribute("data-is-character") === "true";
 
+            // eslint-disable-next-line max-depth -- play format character line detection
             if (isCharacterLine) {
               const nextParagraphElement = bookIndex.getParagraphElement(
                 chapterIdNum,
@@ -207,6 +209,7 @@ export function performCachedSearch(query: string, currentLocation: Location): S
               const nextIsSpoken =
                 nextParagraphElement?.getAttribute("data-is-character") === "false";
 
+              // eslint-disable-next-line max-depth -- play format character line detection
               if (nextParagraphElement && nextIsSpoken) {
                 const rawName = (paragraphElement!.textContent || "").replace(/\s+/g, " ").trim();
                 const prettyName = rawName.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
@@ -215,14 +218,17 @@ export function performCachedSearch(query: string, currentLocation: Location): S
                   .replace(/\s+/g, " ")
                   .trim();
 
+                // eslint-disable-next-line max-depth -- play format character line detection
                 if (nextText) {
                   paragraphText = `${prettyName}: ${nextText}`;
                 }
               }
             } else {
               // Fallback to previous string-based detection if DOM attributes aren't usable
+              // eslint-disable-next-line max-depth -- play format fallback detection
               if (bookCharacters.includes(paragraphText.trim().toLowerCase())) {
                 const nextParagraphText = chapterCache[paragraphNumber + 1];
+                // eslint-disable-next-line max-depth -- play format fallback detection
                 if (nextParagraphText) {
                   paragraphText = `${paragraphText}: ${nextParagraphText}`;
                 }
@@ -392,6 +398,7 @@ export function findCharacterSentences(
       spottedCharacterHistory.forEach(({ chapter, paragraphs }) => {
         const totalParagraphsInChapter = getTotalParagraphsInChapter(chapter);
 
+        // eslint-disable-next-line complexity
         paragraphs.forEach((paragraph) => {
           const paragraphElement = bookIndex.getParagraphElement(chapter, paragraph);
           if (!paragraphElement) return;
@@ -699,8 +706,8 @@ export function findCharacterSentences(
   return { header, items, isLoading: false, isCharacterResults: true };
 }
 
-function stripHtmlTags(str) {
-  if (!str || typeof str !== "string") {
+function stripHtmlTags(str: string) {
+  if (!str) {
     return "";
   }
 
@@ -722,7 +729,7 @@ function extractSpeechContentFromLine(line: string): string {
   return line.slice(colonIndex + 1);
 }
 
-function filterParagraphByCharacter(paragraph, characterSlug) {
+function filterParagraphByCharacter(paragraph: string, characterSlug: string): string {
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = paragraph;
 
@@ -761,7 +768,7 @@ function filterParagraphByCharacter(paragraph, characterSlug) {
   return result;
 }
 
-function extractTextAroundMark(paragraph) {
+function extractTextAroundMark(paragraph: string): string | null {
   const markCloseTag = "</mark>";
   if (!paragraph.includes(markCloseTag)) {
     return null;
@@ -961,7 +968,7 @@ function buildSpotlightItems(
   return results.slice(0, limit);
 }
 
-function formatWithHangingIndent(text) {
+function formatWithHangingIndent(text: string) {
   const lines = text.split("\n").filter((line) => line.trim() !== "");
 
   if (lines.length === 0) return "";

@@ -7,6 +7,7 @@
 
 import { httpAction } from "./_generated/server";
 import { internal, components } from "./_generated/api";
+import { parseFormData } from "./lib/parseFormData";
 
 function getR2Config() {
   if (!process.env.R2_BUCKET) return undefined;
@@ -35,11 +36,11 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
 
   try {
     // 2. Parse multipart form data
-    const formData = await request.formData();
-    const mp4Blob = formData.get("mp4") as Blob | null;
-    const webpBlob = formData.get("webp") as Blob | null;
-    const bookPath = formData.get("bookPath") as string;
-    const fileBasename = formData.get("fileBasename") as string;
+    const formData = await parseFormData(request);
+    const mp4Blob = formData.getBlob("mp4");
+    const webpBlob = formData.getBlob("webp");
+    const bookPath = formData.getString("bookPath");
+    const fileBasename = formData.getString("fileBasename");
 
     if (!webpBlob || !bookPath || !fileBasename) {
       return new Response("Missing required fields: webp, bookPath, fileBasename", { status: 400 });

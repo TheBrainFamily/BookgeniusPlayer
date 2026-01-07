@@ -27,7 +27,7 @@ const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/helpers/findSimplifiedSentence", (mod) => {
-    findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
+    if (mod) findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
     console.info("[HMR] findSimplifiedSentence updated");
   });
 }
@@ -35,8 +35,13 @@ if (import.meta.hot) {
 const containerId = "content-container";
 
 export function useBookContent() {
-  const { textVersion, bookData, isReady, bookStringified, ensureCompiledChaptersLoaded } =
-    useBookConvex();
+  const {
+    textVersion,
+    bookData: _bookData,
+    isReady,
+    bookStringified,
+    ensureCompiledChaptersLoaded,
+  } = useBookConvex();
   const { location } = useLocation();
   const { currentChapter } = location;
   const { isPlayFormat } = useBookForm();
@@ -64,6 +69,7 @@ export function useBookContent() {
   }, [currentChapter, ensureCompiledChaptersLoaded]);
 
   const handlePointerUp = useCallback(
+    // eslint-disable-next-line complexity
     (event: PointerEvent) => {
       if (event.metaKey || event.ctrlKey) return;
 
@@ -102,8 +108,12 @@ export function useBookContent() {
       }
 
       const currentSentenceScore = complexitySpan.getAttribute("data-current-score") || "100";
-      const { text: simplifiedSentence, score: simplifiedSentenceScore } =
-        findSimplifiedSentenceRef.current(currentSentenceId, parseInt(currentSentenceScore));
+      const simplificationResult = findSimplifiedSentenceRef.current(
+        currentSentenceId,
+        parseInt(currentSentenceScore),
+      );
+      const simplifiedSentence = simplificationResult?.text;
+      const simplifiedSentenceScore = simplificationResult?.score;
 
       const sentenceNumber = parseInt(
         complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1",
@@ -141,7 +151,7 @@ export function useBookContent() {
         isPlayFormat,
         isFirstSentence,
       );
-      complexitySpan.setAttribute("data-current-score", simplifiedSentenceScore.toString());
+      complexitySpan.setAttribute("data-current-score", String(simplifiedSentenceScore ?? 0));
       complexitySpan.setAttribute("data-simplified", "true");
 
       wrapSimplifiedSentenceTail(complexitySpan);
@@ -259,6 +269,7 @@ export function useBookContent() {
     // by the textVersion effect using updateMountedChaptersInPlace().
     // Including bookStringified would cause cleanup to run (disposing virtualizer)
     // before the next effect run, triggering full re-initialization and scroll loss.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: bookStringified excluded to prevent re-initialization on content updates. See comment above.
   }, [handleContentChanged, isReady]);
 
   useEffect(() => {

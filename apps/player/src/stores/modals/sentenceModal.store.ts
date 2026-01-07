@@ -47,10 +47,10 @@ export const useSentenceModal = create<SentenceModalState>()(
         coordinator.releaseModal(MODAL_ID);
         set({
           isOpen: false,
-          currentSentence: null,
-          simplifiedSentence: null,
-          currentSentenceId: null,
-          simplifiedSentenceScore: null,
+          currentSentence: undefined,
+          simplifiedSentence: undefined,
+          currentSentenceId: undefined,
+          simplifiedSentenceScore: undefined,
         });
       },
     }),

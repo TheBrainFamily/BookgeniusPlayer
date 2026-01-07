@@ -104,7 +104,7 @@ export default function BookCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
           <Badge className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-library-gold/90 text-library-mahogany text-xs sm:text-sm py-0.5 sm:py-1">
-            {book.metadata[language].genre}
+            {book.metadata[language]?.genre}
           </Badge>
 
           <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 flex items-center space-x-1">
@@ -128,12 +128,12 @@ export default function BookCard({
 
       <CardContent className="flex flex-col flex-1 p-2 sm:p-3 md:p-6 !pt-2">
         <p className={`text-muted-foreground text-sm leading-relaxed ${descriptionClamp} mb-4`}>
-          {book.metadata[language].description}
+          {book.metadata[language]?.description}
         </p>
 
         <div className="mt-auto space-y-6 md:space-y-4">
           <div className="flex flex-wrap gap-1">
-            {book.metadata[language].features.slice(0, 2).map((feature, index) => (
+            {book.metadata[language]?.features.slice(0, 2).map((feature, index) => (
               <Badge
                 key={index}
                 variant="outline"

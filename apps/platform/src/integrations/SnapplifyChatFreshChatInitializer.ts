@@ -21,7 +21,7 @@ function initFreshChat() {
   }
 }
 
-export function snapplifyChatInitializer(i, t) {
+export function snapplifyChatInitializer(i: Document, t: string) {
   console.log("[SnapplifyChat] snapplifyChatInitializer called with:", {
     document: !!i,
     target: t,

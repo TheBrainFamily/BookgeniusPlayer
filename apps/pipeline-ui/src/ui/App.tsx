@@ -140,6 +140,7 @@ function recompileXml(preamble: string, chapters: ChapterInfo[], postamble: stri
   return preamble + reindexedChapters.join("\n") + postamble;
 }
 
+// eslint-disable-next-line complexity
 export default function App() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -150,7 +151,7 @@ export default function App() {
   const [status, setStatus] = useState<JobStatus | null>(null);
   const [polling, setPolling] = useState(false);
   const [slug, setSlug] = useState<string | null>(null);
-  const [rich, setRich] = useState<string>("");
+  const [_rich, setRich] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
 

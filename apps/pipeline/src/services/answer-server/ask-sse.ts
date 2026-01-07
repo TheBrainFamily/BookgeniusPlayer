@@ -8,7 +8,9 @@ export function initSSE(req: Request, res: Response) {
   // If you use compression middleware, disable it for this route.
 
   // Flush headers early so the client starts receiving immediately
-  (res as any).flushHeaders?.();
+  if ("flushHeaders" in res && typeof res.flushHeaders === "function") {
+    res.flushHeaders();
+  }
 
   // Keep-alive to stop proxies from closing idle connections
   const keepAlive = setInterval(() => {

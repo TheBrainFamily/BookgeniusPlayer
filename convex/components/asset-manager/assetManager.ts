@@ -6,7 +6,7 @@ import { getActorFields } from "./authAdapter";
 import { type Id } from "./_generated/dataModel";
 import { folderFields, assetFields, assetVersionFields } from "./validators";
 import { storageBackendValidator } from "./schema";
-import { createR2Client, type R2Config } from "./r2Client";
+import { createR2Client } from "./r2Client";
 
 // Validator for R2 config passed from app layer
 const r2ConfigValidator = v.object({
@@ -31,20 +31,20 @@ interface StorageConfig {
 // Storage Type Helpers
 // =============================================================================
 
-interface StorageReference {
-  storageId?: Id<"_storage">;
-  r2Key?: string;
-}
+// interface StorageReference {
+//   storageId?: Id<"_storage">;
+//   r2Key?: string;
+// }
 
-function isStoredOnConvex(
-  ref: StorageReference,
-): ref is StorageReference & { storageId: Id<"_storage"> } {
-  return ref.storageId !== undefined;
-}
+// function isStoredOnConvex(
+//   ref: StorageReference,
+// ): ref is StorageReference & { storageId: Id<"_storage"> } {
+//   return ref.storageId !== undefined;
+// }
 
-function isStoredOnR2(ref: StorageReference): ref is StorageReference & { r2Key: string } {
-  return ref.r2Key !== undefined;
-}
+// function isStoredOnR2(ref: StorageReference): ref is StorageReference & { r2Key: string } {
+//   return ref.r2Key !== undefined;
+// }
 
 /**
  * Get the current storage backend configuration.
@@ -271,6 +271,7 @@ export const finishUpload = mutation({
     versionId: v.id("assetVersions"),
     version: v.number(),
   }),
+  // eslint-disable-next-line complexity -- upload finalization with intent validation and asset versioning
   handler: async (ctx, args) => {
     const intent = await ctx.db.get(args.intentId);
     if (!intent) {
@@ -985,6 +986,7 @@ export const createVersionFromStorageId = mutation({
     versionId: v.id("assetVersions"),
     version: v.number(),
   }),
+  // eslint-disable-next-line complexity -- direct storage upload with versioning and publish logic
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.folderPath);
     if (args.basename.includes("/")) {
@@ -1527,7 +1529,7 @@ export const listPublishedAssetsInFolder = query({
       basename: string;
       version: number;
       label?: string;
-      extra?: any;
+      extra?: string | Record<string, unknown>;
       createdAt: number;
       publishedAt?: number;
       createdBy?: string;

@@ -14,9 +14,9 @@ const FeaturedBooks = () => {
   const language = detectLanguageFromDomain();
 
   const handleBookClick = (book: (typeof books)[0]) => {
-    const title = book?.title ?? "BookGenius";
-    const phrases = book?.metadata?.[language]?.phrases ?? [];
-    const author = book?.author;
+    const title = book.title ?? "BookGenius";
+    const phrases = book.metadata?.[language]?.phrases ?? [];
+    const author = book.author;
 
     // Indicate user came from platform for proper loader behavior
     setNavigatedFromPlatform(true);

@@ -14,7 +14,7 @@ import { getBookSettings } from "../helpers/getBookSettings";
 import { FILE_TYPE } from "../helpers/filesHelpers";
 import { readBookFile } from "../helpers/readBookFile";
 import { generateTagName } from "../helpers/generateTagName";
-import { getChapterFormat, type ChapterFormat } from "./getChapterFormat";
+import { getChapterFormat } from "./getChapterFormat";
 import { doesBookFileExist } from "../helpers/readBookFile";
 import { callGpt5 } from "../callO3";
 import { sleep } from "./sleep";
@@ -49,7 +49,7 @@ function buildJsonCharacters(charactersForChapter: { name: string; summary: stri
  */
 function buildChunkedPrompt(
   paragraphs: Paragraph[],
-  chapterId: number,
+  _chapterId: number,
   jsonCharacters: string,
   previousChunkOutput: string | null,
 ): string {
@@ -130,7 +130,7 @@ async function processChunk(
       `Using provider for chapter ${chapter} chunk ${chunkIndex}: ${selectedProvider.name}`,
     );
 
-    const originalChunkXml = buildChunkXml(chapter, chunk.paragraphs);
+    const originalChunkXml = buildChunkXml(chunk.paragraphs);
     writeBookFile(
       `original-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`,
       originalChunkXml,
@@ -285,9 +285,6 @@ export const identifyAndRewriteParagraphs = async (
       response.slice(0, 50),
     );
     const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
-    const allCharacters = JSON.parse(
-      readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
-    ) as { characters: { name: string }[] };
 
     let restored = clearedResponse;
     try {
@@ -407,7 +404,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
 
     // Chunk 1 (RAW chunk 0 text as context) - if exists
     if (chunks.length > 1) {
-      const rawChunk0Context = buildChunkXml(chapter, chunks[0].paragraphs);
+      const rawChunk0Context = buildChunkXml(chunks[0].paragraphs);
       logger.info(`📦 Queueing chapter ${chapter} chunk 1/${chunks.length} (with RAW context)`);
       phase1Promises.push(processChunk(chapter, 1, chunks[1], jsonCharacters, rawChunk0Context));
     }

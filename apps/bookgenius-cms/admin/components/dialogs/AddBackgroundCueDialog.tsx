@@ -138,9 +138,6 @@ export function AddBackgroundCueDialog({
     }
   }, [isCreating, onOpenChange]);
 
-  // Get selected file details
-  const selectedFileDetails = files?.find((f) => f.basename === selectedFile);
-
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
@@ -266,10 +263,7 @@ export function AddBackgroundCueDialog({
                   disabled={isCreating}
                 />
                 {backgroundColor && (
-                  <div
-                    className="h-9 w-9 rounded border shrink-0"
-                    style={{ backgroundColor }}
-                  />
+                  <div className="h-9 w-9 rounded border shrink-0" style={{ backgroundColor }} />
                 )}
               </div>
             </div>

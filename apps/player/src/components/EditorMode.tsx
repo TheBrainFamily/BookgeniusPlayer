@@ -1,4 +1,3 @@
-import React from "react";
 import { OptionalElement } from "./OptionalElement";
 
 export const EditorMode = () => {
