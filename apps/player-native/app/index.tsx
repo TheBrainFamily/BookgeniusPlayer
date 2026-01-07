@@ -11,7 +11,7 @@ import { SearchModal } from "@player-native/components/SearchModal";
 import { NativeMusicPlayer } from "@player-native/components/NativeMusicPlayer";
 
 export default function PlayerScreen() {
-  const { isLoading, isReady, error, book } = useBook();
+  const { isLoading, isReady, error, book, bookSlug } = useBook();
   const { isWebPlayerReady } = useNativeShell();
   const webViewRef = useRef<BookWebViewRef>(null);
   const insets = useSafeAreaInsets();
@@ -66,7 +66,7 @@ export default function PlayerScreen() {
       <View style={styles.fullScreen} pointerEvents="box-none">
         <BookWebView
           ref={webViewRef}
-          bookSlug="Othello"
+          bookSlug={bookSlug}
           onModalChange={handleWebModalChange}
           bottomPadding={insets.bottom + 70}
         />
