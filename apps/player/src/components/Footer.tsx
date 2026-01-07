@@ -3,6 +3,7 @@ import { AnimatePresence, motion, type Variants } from "motion/react";
 import useSplashHidden from "@player/hooks/useSplashHidden";
 import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 import { useBookForm } from "@player/hooks/useBookForm";
+import { useNativeShell } from "@player/context/NativeShellContext";
 import BottomInput from "./BottomInput";
 import CharactersOnStagePanel from "./CharactersOnStagePanel";
 import { cn } from "@player/lib/utils";
@@ -11,6 +12,7 @@ const Footer = () => {
   const isSplashHidden = useSplashHidden();
   const isMobileOrTablet = useIsMobileOrTablet();
   const { isPlayFormat } = useBookForm();
+  const isNativeShell = useNativeShell();
 
   return (
     <AnimatePresence>
@@ -35,7 +37,8 @@ const Footer = () => {
                 )}
               >
                 <CharactersOnStagePanel />
-                <BottomInput className={cn("max-w-[800px]")} />
+                {/* Hide BottomInput in native shell - native layer provides it */}
+                {!isNativeShell && <BottomInput className={cn("max-w-[800px]")} />}
               </div>
             </>
           ) : (
@@ -50,7 +53,8 @@ const Footer = () => {
                   "sm:flex-3 max-w-[800px] xl:max-w-[850px] xxl:max-w-[900px] pointer-events-auto w-full sm:w-auto px-2 sm:px-4 xl:px-0 ",
                 )}
               >
-                <BottomInput />
+                {/* Hide BottomInput in native shell - native layer provides it */}
+                {!isNativeShell && <BottomInput />}
               </div>
               <div
                 id="right-notes-blank"

@@ -55,6 +55,8 @@ import { useDraftMode } from "@player/context/DraftModeContext";
 import { useInlineAvatarSync } from "@player/hooks/useInlineAvatarSync";
 import { useEmbeddingsHeartbeat } from "@player/hooks/useEmbeddingsHeartbeat";
 import { useApplyGraphicsSettings } from "@player/hooks/useApplyGraphicsSettings";
+import { NativeShellProvider, useNativeShell } from "@player/context/NativeShellContext";
+import { NativeShellBridge } from "@player/components/NativeShellBridge";
 
 // =============================================================================
 // Convex Client
@@ -77,10 +79,8 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
   useElementVisibility();
   useTextCacheManager();
   useCutScene();
-  useBackgroundVideo();
   useAppReady();
   usePostReadyPrefetch();
-  useBackgroundSongs();
   useInlineAvatarSync();
   useEmbeddingsHeartbeat();
   useApplyGraphicsSettings();
@@ -109,6 +109,22 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
       {draftMode && <EditorMode />}
     </>
   );
+}
+
+/**
+ * Hooks that should only run when NOT in native shell mode.
+ * These are separated so the main LiveShell can remain hook-order-stable.
+ */
+function WebOnlyHooks() {
+  const isNativeShell = useNativeShell();
+
+  // Skip background/music hooks in native shell - native layer handles them
+  useBackgroundVideo();
+  useBackgroundSongs();
+
+  // Return null if in native shell (hooks still ran but we indicate this is a no-op)
+  if (isNativeShell) return null;
+  return null;
 }
 
 // =============================================================================
@@ -291,31 +307,35 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
 
   return (
     <ConvexProvider client={convex}>
-      <DraftModeProvider>
-        <EditModeProvider>
-          <BookConvexProvider bookPath={bookPath}>
-            <CriticalAssetPreloader />
-            <ParagraphEditConnector />
-            <I18nextProvider i18n={i18n}>
-              <ConvexAppInitializer>
-                <LocationProvider>
-                  <RealtimeProvider>
-                    <BookContentWrapper>
-                      <LiveShell onShellMounted={() => setReactDomReady(true)} />
-                      <ModalRenderers />
-                      <EditorToolbar />
-                      <AvatarGenerationBadge />
-                      <BackgroundGenerationBadge />
-                      <ContentShiftWrapper />
-                    </BookContentWrapper>
-                    <DebugLocationOverlay />
-                  </RealtimeProvider>
-                </LocationProvider>
-              </ConvexAppInitializer>
-            </I18nextProvider>
-          </BookConvexProvider>
-        </EditModeProvider>
-      </DraftModeProvider>
+      <NativeShellProvider>
+        <DraftModeProvider>
+          <EditModeProvider>
+            <BookConvexProvider bookPath={bookPath}>
+              <CriticalAssetPreloader />
+              <ParagraphEditConnector />
+              <I18nextProvider i18n={i18n}>
+                <ConvexAppInitializer>
+                  <LocationProvider>
+                    <RealtimeProvider>
+                      <NativeShellBridge />
+                      <WebOnlyHooks />
+                      <BookContentWrapper>
+                        <LiveShell onShellMounted={() => setReactDomReady(true)} />
+                        <ModalRenderers />
+                        <EditorToolbar />
+                        <AvatarGenerationBadge />
+                        <BackgroundGenerationBadge />
+                        <ContentShiftWrapper />
+                      </BookContentWrapper>
+                      <DebugLocationOverlay />
+                    </RealtimeProvider>
+                  </LocationProvider>
+                </ConvexAppInitializer>
+              </I18nextProvider>
+            </BookConvexProvider>
+          </EditModeProvider>
+        </DraftModeProvider>
+      </NativeShellProvider>
     </ConvexProvider>
   );
 }

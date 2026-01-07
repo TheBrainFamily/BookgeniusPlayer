@@ -139,7 +139,7 @@ function isDarkColor(hex: string, threshold: number = 0.5): boolean {
   return getColorLuminance(hex) < threshold;
 }
 
-function applyScopedColors({
+export function applyScopedColors({
   backgroundColor,
   textColor,
 }: {
@@ -151,6 +151,7 @@ function applyScopedColors({
 
   if (backgroundColor && backgroundColor.trim().length > 0) {
     const isDark = isDarkColor(backgroundColor.trim());
+    console.log("[applyScopedColors]", { backgroundColor, isDark, textColor });
     if (getBookFromUrl() === "Midsummer-Nights-Dream") {
       scope.style.setProperty("--bg-content-light", backgroundColor.trim());
       if (textColor && textColor.trim().length > 0) {
@@ -180,6 +181,40 @@ function applyScopedColors({
   } else {
     scope.style.removeProperty("--bg-content-light");
   }
+}
+
+export { detectImageBrightness };
+
+export async function updateBackgroundColors({
+  currentChapter,
+  currentParagraph,
+}: {
+  currentChapter: number;
+  currentParagraph: number;
+}): Promise<void> {
+  const backgrounds = getBackgrounds() as Background[];
+
+  const foundAll = backgrounds.filter((bg) => {
+    return (
+      (currentChapter == bg.startChapter && currentParagraph >= bg.startParagraph) ||
+      currentChapter > bg.startChapter
+    );
+  });
+
+  const found = foundAll[foundAll.length - 1];
+  if (!found) return;
+
+  const newSrc = getBookAssetUrl(found.file);
+  if (!newSrc) return;
+
+  const newType = getFileType(found.file);
+  let bgColor = found.backgroundColor;
+
+  if (!bgColor || bgColor.trim().length === 0) {
+    bgColor = newType === "video" ? "#ffffff" : await detectImageBrightness(newSrc);
+  }
+
+  applyScopedColors({ backgroundColor: bgColor, textColor: found.textColor });
 }
 
 // ---- helpers ----------------------------------------------------------------

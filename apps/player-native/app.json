@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "BookGenius Player",
+    "slug": "player-native",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "bookgenius",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.bookgenius.player" },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.bookgenius.player"
+    },
+    "web": { "favicon": "./assets/favicon.png", "bundler": "metro" },
+    "plugins": ["expo-router", "expo-asset"],
+    "experiments": { "typedRoutes": true }
+  }
+}

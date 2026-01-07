@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
+import { useNativeShell } from "@player/context/NativeShellContext";
 
 type TimeoutId = number | null;
 
@@ -278,6 +279,7 @@ const useImageReadiness = ({
 
 export const useAppReady = () => {
   const { charactersData, backgroundsForBook } = useBookConvex();
+  const isNativeShell = useNativeShell();
   const { videoBackgroundReady, setVideoBackgroundReady } = useVideoReadiness({
     videoTimeoutMs: 30000,
     minSplashMs: 100,
@@ -288,12 +290,11 @@ export const useAppReady = () => {
     charactersData,
   });
 
-  // If no backgrounds, mark video as ready immediately
   useEffect(() => {
-    if (backgroundsForBook.length === 0) {
+    if (backgroundsForBook.length === 0 || isNativeShell) {
       setVideoBackgroundReady(true);
     }
-  }, [backgroundsForBook, setVideoBackgroundReady]);
+  }, [backgroundsForBook, isNativeShell, setVideoBackgroundReady]);
 
   useEffect(() => {
     if (!videoBackgroundReady && !imageBackgroundReady) return;
