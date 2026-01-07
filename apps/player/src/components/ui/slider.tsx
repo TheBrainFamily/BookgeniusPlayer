@@ -44,4 +44,5 @@ const Slider = React.forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, S
 );
 Slider.displayName = SliderPrimitive.Root.displayName;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Slider, sliderVariants };

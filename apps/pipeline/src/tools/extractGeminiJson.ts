@@ -5,6 +5,7 @@
  * @param {string} input - The input string containing JSON somewhere within it
  * @returns {object|null} - The parsed JSON object or null if extraction failed
  */
+// eslint-disable-next-line complexity
 export const extractJSON = <T>(input: string): T | null => {
   if (!input || typeof input !== "string") {
     console.error("Input must be a non-empty string");

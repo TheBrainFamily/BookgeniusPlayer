@@ -9,7 +9,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { useBook } from "@/lib/contexts";
 import {
   Dialog,
   DialogContent,
@@ -143,7 +142,6 @@ export function CreateChapterDialog({
       setIsCreating(false);
     }
   }, [
-    bookPath,
     chaptersPath,
     chapterNumber,
     title,

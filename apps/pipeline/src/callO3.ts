@@ -1,17 +1,9 @@
 import "dotenv/config";
 import OpenAI from "openai";
 import { type z } from "zod";
-import { zodResponseFormat } from "openai/helpers/zod";
-import { logger } from "./logger";
 import { generateObject } from "ai";
 import { openai } from "@ai-sdk/openai";
 const client = new OpenAI();
-
-/**
- * Sleep function to wait between retry attempts
- * @param ms Time to sleep in milliseconds
- */
-const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Call a Large Language Model with optional schema validation and automatic retry
@@ -37,10 +29,9 @@ export const callO3WithSchema = async <T>(
   return object as T;
 };
 
- 
 export const callGpt5 = async <T = string>(
   prompt: string,
-  schema?: z.ZodSchema<T>,
+  _schema?: z.ZodSchema<T>,
   _maxRetries = 2,
 ) => {
   const chatCompletion = await client.chat.completions.create({

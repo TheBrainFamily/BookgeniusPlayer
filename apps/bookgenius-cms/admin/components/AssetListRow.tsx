@@ -101,7 +101,7 @@ export function AssetListRow({
       <div className="flex-1 min-w-0">
         <h3 className="font-medium text-sm text-foreground truncate">{asset.basename}</h3>
         <div className="flex items-center gap-2 mt-1">
-          <Badge variant={category as any} className="text-[10px] capitalize">
+          <Badge variant={category} className="text-[10px] capitalize">
             {category}
           </Badge>
         </div>

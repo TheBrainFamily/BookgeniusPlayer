@@ -1,16 +1,13 @@
 // convex/comicSubmissions.ts
 import { v } from "convex/values";
-import { query, mutation, internalMutation } from "./_generated/server";
+import { query, mutation, internalMutation, type QueryCtx } from "./_generated/server";
 import { components } from "./_generated/api";
 
 // Helper to get result URL from versionId via asset-manager component
-async function getResultUrl(
-  ctx: { runQuery: any },
-  versionId: string | undefined,
-): Promise<string | null> {
+async function getResultUrl(ctx: QueryCtx, versionId: string | undefined): Promise<string | null> {
   if (!versionId) return null;
   const result = await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
-    versionId: versionId as any,
+    versionId,
   });
   return result?.url ?? null;
 }

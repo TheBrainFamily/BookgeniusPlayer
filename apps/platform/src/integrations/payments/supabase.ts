@@ -19,7 +19,7 @@ const getSupabaseClient = () => {
 const startCheckout: PaymentsModule["startCheckout"] = async (
   paymentType: PaymentType,
   bookSlug: string,
-  user: { id: string; email?: string | null },
+  user?: { id: string; email?: string | null },
 ) => {
   if (!user) {
     throw new Error("User must be logged in to start checkout");
@@ -51,7 +51,7 @@ const startCheckout: PaymentsModule["startCheckout"] = async (
 
 const checkAccess: PaymentsModule["checkAccess"] = async (
   bookSlug: string,
-  user: { id: string },
+  user?: { id: string },
 ) => {
   if (!user) return false;
 

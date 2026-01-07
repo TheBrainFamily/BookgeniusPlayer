@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Play, Pause, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRealtime } from "@player/context/RealtimeContext";
@@ -8,7 +8,7 @@ const DebugMicPlaybackButton: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
-  const visible = useMemo(() => !!debugClipUrl, [debugClipUrl]);
+  const visible = !!debugClipUrl;
 
   const handleToggle = async () => {
     if (!audioRef.current || !debugClipUrl) return;
@@ -22,7 +22,7 @@ const DebugMicPlaybackButton: React.FC = () => {
         el.pause();
         setPlaying(false);
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   };

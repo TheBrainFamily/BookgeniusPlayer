@@ -247,6 +247,7 @@ const processVideoTasks = async (
           }
 
           if (response.output && !task.isDownloaded) {
+            // eslint-disable-next-line max-depth -- polling loop with status checks
             try {
               task.output = response.output;
               await downloadAndSaveVideo(response.output[0], task.fileName, videoOutputsPath);

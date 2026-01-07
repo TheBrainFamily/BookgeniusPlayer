@@ -39,7 +39,7 @@ export const editAvatarWithInstructions = internalAction({
       }
 
       const urlInfo = await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
-        versionId: publishedVersion._id as any,
+        versionId: publishedVersion._id,
       });
 
       if (!urlInfo?.url) {
@@ -138,7 +138,7 @@ export const editAvatarWithInstructions = internalAction({
 
           const newUrlInfo = await ctx.runQuery(
             components.assetManager.assetFsHttp.getVersionPreviewUrl,
-            { versionId: versionId as any },
+            { versionId },
           );
 
           return newUrlInfo?.url || null;
@@ -197,11 +197,7 @@ export const startAvatarEdit = action({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ctx.scheduler.runAfter(
-      0,
-      (internal as any).avatarEditing.editAvatarWithInstructions,
-      args,
-    );
+    await ctx.scheduler.runAfter(0, internal.avatarEditing.editAvatarWithInstructions, args);
     return null;
   },
 });

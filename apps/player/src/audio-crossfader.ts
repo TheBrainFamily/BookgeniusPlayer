@@ -111,6 +111,10 @@ export function getAudioContext(): AudioContext | null {
 
 function announceSongTransition(trackData?: TrackState | null) {
   const dataToSend = trackData !== undefined ? trackData : getCurrentTrackData();
+  if (!dataToSend) {
+    console.error("announceSongTransition: No track data to send");
+    return;
+  }
   window.dispatchEvent(new CustomEvent("songTransition", { detail: dataToSend }));
 }
 
@@ -321,6 +325,7 @@ function validateImageUrl(url: string): Promise<void> {
  * @param currentCoverArtUrl The existing cover art URL, which will be revoked if a new one is created.
  * @returns A promise that resolves to an object with the updated title, coverArtUrl, and duration.
  */
+
 async function parseMetadataAndUpdate(
   audioData: Uint8Array | ArrayBuffer,
   currentTitle: string,
@@ -355,6 +360,7 @@ async function parseMetadataAndUpdate(
             await validateImageUrl(newUrl);
 
             // Only revoke the old URL if it's different from the new one and not empty
+            // eslint-disable-next-line max-depth -- image validation nesting
             if (coverArtUrl && coverArtUrl !== newUrl && coverArtUrl.startsWith("blob:")) {
               URL.revokeObjectURL(coverArtUrl);
             }
@@ -406,6 +412,7 @@ interface CodecFrame {
   totalBytesOut: number;
 }
 
+// eslint-disable-next-line max-params, complexity
 async function streamingDecodeAudioData(
   audioContext: AudioContext,
   arrayBuffer: ArrayBuffer,
@@ -618,18 +625,27 @@ async function streamingDecodeAudioData(
 /**
  * Handles streaming download of audio files, starting playback as soon as enough data is available.
  */
+// eslint-disable-next-line complexity
 async function handleStreamingDownload(
   response: Response,
   trackId: string,
   transitionPoints?: number[],
   justDownload: boolean = false,
 ): Promise<boolean> {
-  if (!justDownload) {
-    if (!audioContext || !response.body) {
-      console.error("handleStreamingDownload: AudioContext or response body not available");
-      cleanupTrackState(trackId);
-      return false;
-    }
+  // Guard: response.body is required for streaming
+  if (!response.body) {
+    console.error(`handleStreamingDownload: response.body is null for '${trackId}'`);
+    cleanupTrackState(trackId);
+    return false;
+  }
+
+  // Guard: audioContext required unless just downloading
+  // Capture into local const for TypeScript narrowing in playback paths
+  const ctx = justDownload ? null : audioContext;
+  if (!justDownload && !ctx) {
+    console.error(`handleStreamingDownload: AudioContext not available for '${trackId}'`);
+    cleanupTrackState(trackId);
+    return false;
   }
 
   // Extract total file size from Content-Length header if available
@@ -668,6 +684,7 @@ async function handleStreamingDownload(
             coverArtUrl = metadata.coverArtUrl;
 
             /* ── just download mode ───────────────────────────────────── */
+            // eslint-disable-next-line max-depth -- streaming conditional logic
             if (justDownload) {
               // For justDownload mode, parse metadata early but continue downloading
               // We'll create a partial track state and update it when download completes
@@ -687,9 +704,9 @@ async function handleStreamingDownload(
               hasStartedPlayback = true; // Mark as started to avoid re-parsing
               // Continue downloading the rest of the file
             } else {
-              // Normal streaming playback mode
+              // Normal streaming playback mode - ctx is guaranteed non-null here
               const audioBuffer = await streamingDecodeAudioData(
-                audioContext,
+                ctx!,
                 combinedArray.buffer as ArrayBuffer,
                 trackId,
                 title,
@@ -699,6 +716,7 @@ async function handleStreamingDownload(
                 knownTotalBytes,
               );
 
+              // eslint-disable-next-line max-depth -- streaming conditional logic
               if (audioBuffer) {
                 hasStartedPlayback = true;
                 console.log(
@@ -768,9 +786,9 @@ async function handleStreamingDownload(
       return true;
     }
 
-    // Process the complete file
+    // Process the complete file - ctx is guaranteed non-null here (past justDownload return)
     const audioBuffer = await streamingDecodeAudioData(
-      audioContext,
+      ctx!,
       finalArray.buffer as ArrayBuffer,
       trackId,
       title,
@@ -792,7 +810,7 @@ async function handleStreamingDownload(
     // Fall back to regular decode if streaming decode fails
     const { title: refreshedTitle, coverArtUrl: refreshedCoverArtUrl } =
       await parseMetadataAndUpdate(finalArray, title, coverArtUrl);
-    const regularBuffer = await audioContext.decodeAudioData(finalArray.buffer as ArrayBuffer);
+    const regularBuffer = await ctx!.decodeAudioData(finalArray.buffer as ArrayBuffer);
     const trackState = createTrackState(regularBuffer, {
       title: refreshedTitle,
       coverArtUrl: refreshedCoverArtUrl,
@@ -907,6 +925,7 @@ async function downloadRemainingDataInBackground(
 }
 
 /* MAIN ------------------------------------------------------------------ */
+// eslint-disable-next-line complexity
 export async function loadTrack(
   trackId: string,
   transitionPoints?: number[],
@@ -1219,6 +1238,7 @@ export function isTrackDownloaded(trackId: string): boolean {
   return !!(trackState?.rawBuffer && !trackState.audioBuffer);
 }
 
+// eslint-disable-next-line complexity
 function playTrack(
   trackId: string,
   startTime: number = 0,
@@ -1233,12 +1253,21 @@ function playTrack(
     initAudioContext(); // Attempt to re-init/resume
     return false;
   }
+  // Capture audioContext for closures that run later (e.g., scheduleContinuation)
+  const ctx = audioContext;
 
   const state = tracks.get(trackId);
   if (!state?.audioBuffer) {
     console.error(`AudioBuffer missing for '${trackId}'. Cannot play.`);
     return false;
   }
+
+  // Guard: need at least one gain node to connect to
+  if (!backgroundGainNode && !masterGainNode) {
+    console.error(`playTrack: No gain nodes available for '${trackId}'. Cannot play.`);
+    return false;
+  }
+  const outputGainNode = backgroundGainNode ?? masterGainNode!;
 
   // Update background volume without stopping audiobook
   if (backgroundGainNode) {
@@ -1249,15 +1278,15 @@ function playTrack(
     stopTrackInternal(trackId); // Stop any previous instance of this specific track
   }
 
-  const source = audioContext.createBufferSource();
-  const gainNode = audioContext.createGain();
+  const source = ctx.createBufferSource();
+  const gainNode = ctx.createGain();
   source.buffer = state.audioBuffer;
   source.loop = false; // onended will handle sequence
   gainNode.gain.value = initialGain;
 
   // Connect to background gain node instead of master gain
   source.connect(gainNode);
-  gainNode.connect(backgroundGainNode || masterGainNode);
+  gainNode.connect(outputGainNode);
 
   liveSources.add(source);
 
@@ -1275,7 +1304,7 @@ function playTrack(
     const dbgTrackLen =
       typeof state.trackLength === "number" ? state.trackLength.toFixed(3) : "n/a";
     console.log(
-      `[PLAY] '${trackId}': now=${audioContext.currentTime.toFixed(3)} start=${startTime.toFixed(3)} offset=${offset.toFixed(3)} initialGain=${initialGain} | isPartial=${!!isPartialBuffer} bufDur=${state.audioBuffer.duration.toFixed(3)} trackLen=${dbgTrackLen}`,
+      `[PLAY] '${trackId}': now=${ctx.currentTime.toFixed(3)} start=${startTime.toFixed(3)} offset=${offset.toFixed(3)} initialGain=${initialGain} | isPartial=${!!isPartialBuffer} bufDur=${state.audioBuffer.duration.toFixed(3)} trackLen=${dbgTrackLen}`,
     );
   } catch {}
   if (isPartialBuffer) {
@@ -1283,7 +1312,7 @@ function playTrack(
     const originalPartialDuration = state.audioBuffer.duration; // Store the original partial duration
     let continuationScheduled = false;
     console.log(
-      `[CONT] '${trackId}': partial detected. partialEnd=${partialEndTime.toFixed(3)} origPartial=${originalPartialDuration.toFixed(3)} now=${audioContext.currentTime.toFixed(3)}`,
+      `[CONT] '${trackId}': partial detected. partialEnd=${partialEndTime.toFixed(3)} origPartial=${originalPartialDuration.toFixed(3)} now=${ctx.currentTime.toFixed(3)}`,
     );
 
     const scheduleContinuation = () => {
@@ -1291,7 +1320,7 @@ function playTrack(
 
       const currentState = tracks.get(trackId);
       console.log(
-        `[CONT] scheduleContinuation invoked for '${trackId}' (now=${audioContext.currentTime.toFixed(3)})`,
+        `[CONT] scheduleContinuation invoked for '${trackId}' (now=${ctx.currentTime.toFixed(3)})`,
       );
       console.log(
         `scheduleContinuation check: trackId=${trackId}, currentTrackId=${currentTrackId}, hasBuffer=${!!currentState?.audioBuffer}, bufferDuration=${currentState?.audioBuffer?.duration}, originalPartialDuration=${originalPartialDuration}`,
@@ -1299,15 +1328,15 @@ function playTrack(
 
       // Check if we have a full buffer (duration is significantly larger than the original partial)
       if (currentState?.isFullyLoaded && currentState.audioBuffer) {
-        const timeUntilEnd = partialEndTime - audioContext.currentTime;
+        const timeUntilEnd = partialEndTime - ctx.currentTime;
         const isCurrentTrack = trackId === currentTrackId;
         const hasCorrectSource = tracks.get(trackId)?.sourceNode === source;
 
         console.log(
-          `[CONT] timing: dt=${timeUntilEnd.toFixed(3)}s | isCurrent=${isCurrentTrack} hasCorrectSource=${hasCorrectSource} partialEnd=${partialEndTime.toFixed(3)} now=${audioContext.currentTime.toFixed(3)}`,
+          `[CONT] timing: dt=${timeUntilEnd.toFixed(3)}s | isCurrent=${isCurrentTrack} hasCorrectSource=${hasCorrectSource} partialEnd=${partialEndTime.toFixed(3)} now=${ctx.currentTime.toFixed(3)}`,
         );
         console.log(
-          `Continuation timing: timeUntilEnd=${timeUntilEnd.toFixed(3)}s, isCurrentTrack=${isCurrentTrack}, hasCorrectSource=${hasCorrectSource}, partialEndTime=${partialEndTime.toFixed(3)}, currentTime=${audioContext.currentTime.toFixed(3)}`,
+          `Continuation timing: timeUntilEnd=${timeUntilEnd.toFixed(3)}s, isCurrentTrack=${isCurrentTrack}, hasCorrectSource=${hasCorrectSource}, partialEndTime=${partialEndTime.toFixed(3)}, currentTime=${ctx.currentTime.toFixed(3)}`,
         );
 
         if (isCurrentTrack && hasCorrectSource) {
@@ -1317,8 +1346,8 @@ function playTrack(
           continuationScheduled = true;
 
           // Create the continuation source
-          const contSource = audioContext.createBufferSource();
-          const contGainNode = audioContext.createGain();
+          const contSource = ctx.createBufferSource();
+          const contGainNode = ctx.createGain();
           contSource.buffer = currentState.audioBuffer;
           contSource.loop = false;
           contGainNode.gain.value = 1.0;
@@ -1790,6 +1819,7 @@ async function performCrossfade(
   announceSongTransition(trackData);
 
   // ---------- unified clean-up helper ----------
+  // eslint-disable-next-line complexity
   const finishCrossfade = () => {
     // Ensure this cleanup corresponds to the still-active crossfade
     if (thisCrossfadeId !== currentCrossfadeId) {
@@ -1929,6 +1959,7 @@ async function performCrossfade(
   }
 }
 
+// eslint-disable-next-line complexity
 export function setActiveSection(newSectionTrackIds: string[] | null): void {
   if (!audioContext) {
     console.log("setActiveSection: No audio context, saving as pending change");
@@ -1938,12 +1969,14 @@ export function setActiveSection(newSectionTrackIds: string[] | null): void {
 
   if (isTransitioning) {
     const newPendingKey = newSectionTrackIds ? newSectionTrackIds.join(",") : "null";
-    const currentPendingKeyIsUndefined = pendingSectionTracks === undefined;
-    const currentPendingKeyValue = currentPendingKeyIsUndefined
-      ? "undefined"
-      : pendingSectionTracks === null
-        ? "null"
-        : pendingSectionTracks.join(",");
+    let currentPendingKeyValue: string;
+    if (pendingSectionTracks === undefined) {
+      currentPendingKeyValue = "undefined";
+    } else if (pendingSectionTracks === null) {
+      currentPendingKeyValue = "null";
+    } else {
+      currentPendingKeyValue = pendingSectionTracks.join(",");
+    }
 
     if (newPendingKey !== currentPendingKeyValue) {
       console.log(
@@ -2071,6 +2104,7 @@ export async function startFirstTrack(trackId: string): Promise<boolean> {
   }
 }
 
+// eslint-disable-next-line complexity
 export async function transitionToTrack(
   targetId: string,
   options?: { manual?: boolean },
@@ -2199,7 +2233,7 @@ export function stopAllPlayback() {
   liveSources.clear();
 
   // Stop all tracks but preserve their state for potential resume
-  tracks.forEach((state, id) => {
+  tracks.forEach((_, id) => {
     stopTrackInternal(id);
   });
 

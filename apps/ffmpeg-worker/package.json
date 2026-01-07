@@ -3,6 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "typecheck": "tsgo --noEmit --incremental --pretty"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

@@ -473,6 +473,7 @@ const preprocessMixedChapter = (
   characterMap: Map<string, CharacterInfo>,
   doc: Document,
   serializer: XmlSerializerLike,
+  // eslint-disable-next-line complexity
 ): void => {
   let current: Node | null = chapter.firstChild;
 
@@ -671,6 +672,7 @@ const renderParagraph = (
   dataIndex: number;
   currentCharacterAlignment: "left" | "right";
   lastSpeakerSlug: string | null;
+  // eslint-disable-next-line max-params, complexity -- play format renderer with many state variables
 } => {
   const segments: string[] = [];
   let { dataIndex, currentCharacterAlignment, lastSpeakerSlug } = state;

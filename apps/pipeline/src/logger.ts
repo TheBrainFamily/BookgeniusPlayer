@@ -1,13 +1,7 @@
 // logger.ts
-import chalk from "chalk";
-import PrettyError from "pretty-error";
-import { v4 as uuidv4 } from "uuid"; // If you need to generate IDs here
-import { pinoJsonLogger } from "./tools/setup/pino-setup"; // Import the configured Pino instance
-import { als, type LogContext } from "./tools/setup/als-context"; // Import ALS instance and context type
-
-const pe = new PrettyError();
-pe.skipNodeFiles();
-pe.skipPackage("chalk"); // Optional: Skip chalk internals in stack traces
+import { v4 as uuidv4 } from "uuid";
+import { pinoJsonLogger } from "./tools/setup/pino-setup";
+import { als, type LogContext } from "./tools/setup/als-context";
 
 // Your existing logger structure, now augmented
 export const logger = {

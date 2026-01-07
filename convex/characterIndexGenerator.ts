@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { action, internalAction } from "./_generated/server";
+import { action, internalAction, type ActionCtx } from "./_generated/server";
 import { api, components, internal } from "./_generated/api";
 import { buildCharacterIndex, type CharacterBundle } from "./lib/characterDataV2";
 
@@ -12,7 +12,7 @@ type CharacterBundleResult = {
   listens?: { url: string };
 };
 
-const ensureFolder = async (ctx: any, path: string): Promise<void> => {
+const ensureFolder = async (ctx: ActionCtx, path: string): Promise<void> => {
   try {
     await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, { path });
   } catch (error) {
@@ -24,7 +24,7 @@ const ensureFolder = async (ctx: any, path: string): Promise<void> => {
 };
 
 const uploadAsset = async (
-  ctx: any,
+  ctx: ActionCtx,
   args: {
     folderPath: string;
     basename: string;
@@ -78,7 +78,7 @@ function parseForm(extra: unknown): "prose" | "play" | "mixed" {
 }
 
 async function generateIndexForBook(
-  ctx: any,
+  ctx: ActionCtx,
   bookPath: string,
 ): Promise<{ characterCount: number; form: string }> {
   const book = await ctx.runQuery(api.bookQueries.getBookMetadata, { bookPath });

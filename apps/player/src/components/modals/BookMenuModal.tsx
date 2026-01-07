@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- BookMenuModal: UI modal with many feature toggles */
 import React, { useEffect, useState, useRef, memo, useMemo } from "react";
 import {
   List,
@@ -73,7 +74,7 @@ interface BookMenuModalProps {
 const BookMenuModal: React.FC<BookMenuModalProps> = ({
   onClose,
   openBookChapterModal,
-  openApiKeyModal,
+  openApiKeyModal: _openApiKeyModal,
   openPositionHistoryModal,
   resetFurthestPageLocation,
 }) => {
@@ -229,7 +230,7 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({
         shareIconTimerRef.current = setTimeout(() => setShareJustCopied(false), 1500);
         return;
       }
-    } catch (e) {
+    } catch {
       // fall through to fallback
     }
 

@@ -32,14 +32,6 @@ const knowCharactersFromAllPreviousBooks: { name: string; referenceCard: string 
 const knownCharactersArray = knowCharactersFromAllPreviousBooks.map(({ name }) => name);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-//Todo: should be taken from book directory
-const generalPrompt = `Avatar for a character in an ebook. Expressionist Graphic Noir
-Frank Miller's *Sin City* style. extreme black-and-white contrast with splashes of color
-Mid-century film noir cinematography.
-Propaganda posters for their graphic boldness and limited color palette.
-
-
-`;
 
 export const sanitizePromptForModeration = async (prompt: string): Promise<string> => {
   const sanitizationPrompt = `You are a prompt sanitizer. The following image generation prompt was rejected by a safety system for sexual content violations.

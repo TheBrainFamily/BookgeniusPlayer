@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useBookConvex, type CharacterBundle } from "@player/context/BookConvexContext";
@@ -186,6 +186,7 @@ const usePreloadedImages = (urls: string[]) => {
       };
       img.src = url;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: urlsKey is a string key that changes when urls array changes. Avoids array reference comparison issues.
   }, [urlsKey]);
 
   return loaded;
@@ -324,8 +325,14 @@ export const AvatarGenerationBadge: React.FC = () => {
       c.extra?.avatarGenerationState === "ready" && (c.extra?.avatarProposalUrls?.length ?? 0) > 0,
   );
 
-  const serverGeneratingSlugs = new Set(serverGenerating.map((c) => c.slug.toLowerCase()));
-  const serverReadySlugs = new Set(readyCharacters.map((c) => c.slug.toLowerCase()));
+  const serverGeneratingSlugs = useMemo(
+    () => new Set(serverGenerating.map((c) => c.slug.toLowerCase())),
+    [serverGenerating],
+  );
+  const serverReadySlugs = useMemo(
+    () => new Set(readyCharacters.map((c) => c.slug.toLowerCase())),
+    [readyCharacters],
+  );
 
   useEffect(() => {
     for (const slug of optimisticGenerating) {

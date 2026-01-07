@@ -1,5 +1,4 @@
-import fs from "fs";
-import { callClaude, callGeminiWrapper } from "../../callClaude";
+import { callClaude } from "../../callClaude";
 import { z } from "zod";
 import "dotenv/config";
 import { getParagraphsFromChapter } from "../createParagraphsWithPageNumbers";
@@ -8,8 +7,6 @@ import { readBookFile } from "../../helpers/readBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
-// Define a type for parsed chapters
-type Chapter = { number: number; title: string; content: string };
 
 // Define the schema for reference cards response
 const ScenesSummariesPerChapterSchema = z.object({
@@ -157,7 +154,7 @@ export const turnChapterSummariesIntoBulletPointsMappedToParagraphs = async () =
             FILE_TYPE.TEMPORARY,
           );
           previousSummaries.push(previousSummary);
-        } catch (e) {
+        } catch {
           if (chapterNum === chapterFrom) {
             console.log("No previous summary for chapter 1");
             process.exit(1);

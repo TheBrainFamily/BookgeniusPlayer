@@ -37,10 +37,12 @@ export const loadBookColorsCSS = async (): Promise<void> => {
     return;
   }
 
-  const cssPath = getBookAssetUrl("book-colors.css");
-
   // Always clear previously injected book colors so they do not bleed into the new book.
   removeExistingBookColorLinks();
+  const cssPath = getBookAssetUrl("book-colors.css");
+  if (!cssPath) {
+    return;
+  }
 
   try {
     const verifiedPath = verifiedBookColorPaths.get(bookSlug);

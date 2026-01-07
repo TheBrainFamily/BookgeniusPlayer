@@ -214,6 +214,7 @@ const getDisplayForCharacter = (
  * @param characterBundles - Character bundle data from Convex (for display names and summaries)
  * @param characterOverrides - Optional override data per character
  */
+
 export function extractCharacterMetadata(
   doc: Document,
   characterTags: Set<string>,
@@ -293,18 +294,23 @@ export function extractCharacterMetadata(
           for (let i = 0; i < allDescendants.length; i++) {
             const childNode = allDescendants[i];
 
+            // eslint-disable-next-line max-depth -- XML character tag parsing
             if (isElementNode(childNode)) {
               const tagName = childNode.tagName;
 
+              // eslint-disable-next-line max-depth -- XML character tag parsing
               if (characterTags.has(tagName)) {
+                // eslint-disable-next-line max-depth -- XML character tag parsing
                 if (childNode.getAttribute("dynasty") === "true") continue;
 
+                // eslint-disable-next-line max-depth -- XML character tag parsing
                 if (childNode.getAttribute("enters") === "true") {
                   entersInPara.add(tagName);
                 } else if (childNode.getAttribute("exits") === "true") {
                   exitsInPara.add(tagName);
                 }
 
+                // eslint-disable-next-line max-depth -- XML character tag parsing
                 if (childNode.getAttribute("talking") === "true") {
                   talksInPara.add(tagName);
                 } else {

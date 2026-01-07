@@ -11,6 +11,7 @@ import { existsSync, writeFileSync, unlinkSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { parseHTML } from "linkedom";
+import { logError } from "../lib/utils";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "../../../");
@@ -283,7 +284,7 @@ async function main() {
       process.exit(1);
     }
   } catch (err: unknown) {
-    console.error("Failed to get book metadata:", (err as Error).message);
+    logError("Failed to get book metadata:", err);
     process.exit(1);
   }
   console.log(`Found book: ${bookMeta.name}`);
@@ -299,7 +300,7 @@ async function main() {
       process.exit(1);
     }
   } catch (err: unknown) {
-    console.error("Failed to list compiled chapters:", (err as Error).message);
+    logError("Failed to list compiled chapters:", err);
     process.exit(1);
   }
   console.log(`Found ${compiledChapters.length} compiled chapters.`);
@@ -344,12 +345,10 @@ async function main() {
       );
       results.push({ chapterNumber: chapter.chapterNumber, success: true });
     } catch (err: unknown) {
-      console.log(`FAILED: ${(err as Error).message}`);
-      results.push({
-        chapterNumber: chapter.chapterNumber,
-        success: false,
-        error: (err as Error).message,
-      });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      logError(`Chapter ${chapter.chapterNumber} conversion failed:`, err);
+      console.log(`FAILED: ${errorMessage}`);
+      results.push({ chapterNumber: chapter.chapterNumber, success: false, error: errorMessage });
     }
   }
 
@@ -383,6 +382,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("Migration failed:", err);
+  logError("Migration failed:", err);
   process.exit(1);
 });

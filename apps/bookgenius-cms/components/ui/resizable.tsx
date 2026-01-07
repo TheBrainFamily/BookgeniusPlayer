@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-refresh/only-export-components */
 
 import { GripVertical } from "lucide-react";
 import {
@@ -6,7 +7,6 @@ import {
   Panel,
   Separator,
   type GroupProps,
-  type PanelProps,
   type SeparatorProps,
   type PanelImperativeHandle,
   usePanelRef,

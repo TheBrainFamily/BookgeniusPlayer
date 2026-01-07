@@ -38,7 +38,7 @@ export function askStream(query: string, location: Location, handlers: Handlers)
     try {
       const data = JSON.parse(ev.data);
       handlers.onMeta?.(!!data.needMore);
-    } catch (e) {
+    } catch {
       // ignore JSON errors
     }
   });
@@ -47,7 +47,7 @@ export function askStream(query: string, location: Location, handlers: Handlers)
     try {
       const data = JSON.parse(ev.data);
       if (typeof data.delta === "string") handlers.onChunk?.(data.delta);
-    } catch (e) {
+    } catch {
       // ignore JSON errors
     }
   });
@@ -56,7 +56,7 @@ export function askStream(query: string, location: Location, handlers: Handlers)
     try {
       const data = JSON.parse(ev.data);
       handlers.onDone?.(data);
-    } catch (e) {
+    } catch {
       handlers.onDone?.({ needMore: false });
     }
     es.close();

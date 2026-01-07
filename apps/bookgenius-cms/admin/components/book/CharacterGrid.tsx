@@ -21,10 +21,10 @@ import { useState, useMemo, useCallback } from "react";
 
 interface CharacterGridProps {
   onCharacterSelect: (characterPath: string) => void;
-  onCreateCharacter?: () => void; // Kept for backwards compatibility
+  onCreateCharacter?: () => void;
 }
 
-export function CharacterGrid({ onCharacterSelect, onCreateCharacter }: CharacterGridProps) {
+export function CharacterGrid({ onCharacterSelect }: CharacterGridProps) {
   const { characters, isLoading } = useCharacters();
   const { bookPath } = useBook();
   const [searchQuery, setSearchQuery] = useState("");

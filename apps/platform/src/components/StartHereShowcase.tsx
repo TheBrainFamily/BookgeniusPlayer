@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/library-hero.jpg";
+import { Button } from "@platform/components/ui/button";
+import heroImage from "@platform/assets/library-hero.jpg";
 import { Play, BookOpen } from "lucide-react";
 
 interface SelectedBook {

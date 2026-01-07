@@ -15,7 +15,6 @@ test("compare chapters xml", () => {
 
 // __tests__/restoreOriginalText.spec.ts
 import { DOMParser } from "@xmldom/xmldom";
-import * as Diff from "diff";
 
 const tagNames = ["Ksiaze-Ramzes", "Nikotris", "Sara", "Herhor"];
 

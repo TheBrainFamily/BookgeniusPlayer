@@ -14,13 +14,7 @@
  */
 
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { queries } from "@/lib/queries";
-import {
-  detectFolderType,
-  parseBookPath,
-  type DetectedFolderType,
-} from "@/lib/utils/folderPatterns";
+import { detectFolderType, parseBookPath } from "@/lib/utils/folderPatterns";
 import { BookProvider } from "@/lib/contexts";
 import { BookDashboard } from "./BookDashboard";
 import { CharacterGrid } from "./CharacterGrid";
@@ -28,7 +22,7 @@ import { CharacterDetailView } from "./CharacterDetailView";
 import { ChaptersView } from "./ChaptersView";
 import { BackgroundCuesView } from "./BackgroundCuesView";
 import { MusicCuesView } from "./MusicCuesView";
-import { AssetList, AssetListSkeleton } from "../AssetList";
+import { AssetList } from "../AssetList";
 
 interface BookAwareAssetListProps {
   folderPath: string;
@@ -45,18 +39,8 @@ interface BookAwareAssetListProps {
 export function BookAwareAssetList(props: BookAwareAssetListProps) {
   const { folderPath, onFolderSelect } = props;
 
-  // Get folder to access its extra field
-  const { data: folder, isLoading: folderLoading } = useQuery({
-    ...queries.folders(folderPath),
-    select: (folders) => folders?.find((f) => f.path === folderPath),
-    enabled: false, // We don't need this for type detection
-  });
-
   // Detect folder type from path
-  const folderType = useMemo(
-    () => detectFolderType(folderPath, folder?.extra),
-    [folderPath, folder?.extra],
-  );
+  const folderType = useMemo(() => detectFolderType(folderPath, undefined), [folderPath]);
 
   // Parse book path for context
   const bookInfo = useMemo(() => parseBookPath(folderPath), [folderPath]);

@@ -284,9 +284,9 @@ function buildSpeakerTimelineForChapter(
     if (!text) continue; // mirror filtering in getParagraphsFromChapterWithText
 
     // Detect a label paragraph: a direct child with talking="true"
-    const talkingChild = $clone.children('[talking="true"]').get(0) as any | undefined;
+    const talkingChild = $clone.children('[talking="true"]').get(0);
     // Cheerio nodes can have `.name` for tag name; fallback to `.tagName` if present
-    const tagName = talkingChild ? talkingChild.name || (talkingChild as any).tagName : undefined;
+    const tagName = talkingChild ? talkingChild.name || talkingChild.tagName : undefined;
     const isLabel = Boolean(talkingChild && tagName);
 
     rows.push({ idx: rows.length, isLabel, slug: isLabel ? String(tagName) : undefined });

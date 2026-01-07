@@ -79,6 +79,7 @@ export function useCharacterNotes(
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: loc object excluded, using destructured properties instead to avoid re-running on unrelated location changes (like scrollY).
   }, [
     loc.chapter,
     loc.paragraph,

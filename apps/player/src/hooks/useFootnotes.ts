@@ -40,7 +40,7 @@ export function useFootnotes(range: Location): Footnote[] {
     const notesContainer = document.getElementById("right-notes-scrollable-container");
     if (!notesContainer) {
       console.warn("Footnotes container 'right-notes-scrollable-container' not found.");
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Clearing state when container missing
+
       setNotes([]);
       return;
     }
@@ -101,6 +101,7 @@ export function useFootnotes(range: Location): Footnote[] {
     });
 
     setNotes(foundNotes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: range object excluded, using destructured properties to avoid re-running on unrelated range changes.
   }, [range.chapter, range.paragraph, range.endChapter, range.endParagraph, allNotes]);
 
   return notes;

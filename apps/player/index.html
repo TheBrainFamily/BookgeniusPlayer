@@ -4,7 +4,10 @@
   <head>
     <meta charset="UTF-8" />
     <title>BookGenius - <%= title %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
     <meta name="theme-color" content="#333333" />
     <meta name="description" content="Interactive book reader" />
 
@@ -21,7 +24,10 @@
 
     <link rel="icon" type="image/x-icon" href="/bookgenius-fav.ico" />
 
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Preloaded -->
     <link rel="preload" href="/clear-loader.png" as="image" />
@@ -36,6 +42,19 @@
 
       #player-scope {
         background-color: #2d2d2d;
+      }
+
+      #player-scope.native-shell {
+        background-color: transparent !important;
+      }
+
+      #player-scope.native-shell #legacy {
+        background-color: transparent !important;
+      }
+
+      #player-scope.native-shell #book-container {
+        background-color: transparent !important;
+        box-shadow: none !important;
       }
 
       #content-container {
@@ -92,17 +111,42 @@
     <video id="cutscene-video" class="cutscene-video" playsinline></video>
 
     <div id="legacy">
-      <video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>
-      <video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>
-
-      <div id="bg-image-a" class="bg-element faded"></div>
-      <div id="bg-image-b" class="bg-element faded"></div>
+      <script>
+        if (
+          new URLSearchParams(window.location.search).get("nativeShell") === "true" ||
+          window.ReactNativeWebView
+        ) {
+          document.getElementById("player-scope").classList.add("native-shell");
+          document.getElementById("legacy").classList.add("native-shell");
+        } else {
+          document.write(
+            '<video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>',
+          );
+          document.write(
+            '<video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>',
+          );
+          document.write('<div id="bg-image-a" class="bg-element faded"></div>');
+          document.write('<div id="bg-image-b" class="bg-element faded"></div>');
+        }
+      </script>
 
       <p id="cutscene-text"></p>
-      <div id="book-container" class="flex flex-row justify-center mx-auto max-w-[120rem] w-full xl:px-2">
-        <div id="left-notes" class="hidden sm:block sm:flex-1 sm:w-auto max-w-[700px] content-center overflow-y-auto mr-2"></div>
-        <div id="content-container" class="max-w-[800px] sm:flex-3 xl:flex-none xl:w-[850px] xl:max-w-[850px] xxl:w-[900px] xxl:max-w-[900px]"></div>
-        <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none ml-2">
+      <div
+        id="book-container"
+        class="flex flex-row justify-center mx-auto max-w-[120rem] w-full xl:px-2"
+      >
+        <div
+          id="left-notes"
+          class="hidden sm:block sm:flex-1 sm:w-auto max-w-[700px] content-center overflow-y-auto mr-2"
+        ></div>
+        <div
+          id="content-container"
+          class="max-w-[800px] sm:flex-3 xl:flex-none xl:w-[850px] xl:max-w-[850px] xxl:w-[900px] xxl:max-w-[900px]"
+        ></div>
+        <div
+          id="right-notes"
+          class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none ml-2"
+        >
           <div id="right-notes-scrollable-container"></div>
         </div>
       </div>
@@ -171,7 +215,9 @@
         setupEmbedded() {
           this.hideSplash();
           window.addEventListener("appReady", () => {
-            console.log("[Player] Sending 'player-is-ready-for-showtime' message to parent window.");
+            console.log(
+              "[Player] Sending 'player-is-ready-for-showtime' message to parent window.",
+            );
             window.parent.postMessage("player-is-ready-for-showtime", window.location.origin);
             setTimeout(async () => {
               console.log("[Player] Dispatching 'splashHidden' event.");
@@ -182,7 +228,10 @@
 
         getRandomPhrase() {
           if (this.loadingPhrases.length === 0) return "";
-          if (this.previousPhrases.size > this.loadingPhrases.length - 5 && this.loadingPhrases.length >= 5) {
+          if (
+            this.previousPhrases.size > this.loadingPhrases.length - 5 &&
+            this.loadingPhrases.length >= 5
+          ) {
             this.previousPhrases.clear();
           }
           let phrase;
@@ -192,7 +241,11 @@
             const randomIndex = Math.floor(Math.random() * this.loadingPhrases.length);
             phrase = this.loadingPhrases[randomIndex];
             attempts++;
-          } while (this.previousPhrases.has(phrase) && attempts < maxAttempts && this.loadingPhrases.length > 1);
+          } while (
+            this.previousPhrases.has(phrase) &&
+            attempts < maxAttempts &&
+            this.loadingPhrases.length > 1
+          );
           this.previousPhrases.add(phrase);
           return phrase;
         }

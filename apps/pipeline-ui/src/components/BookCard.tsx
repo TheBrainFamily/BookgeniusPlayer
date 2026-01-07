@@ -27,6 +27,7 @@ export interface BookCardProps {
   totalColumns: number;
 }
 
+// eslint-disable-next-line complexity
 export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: BookCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);

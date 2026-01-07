@@ -8,13 +8,14 @@ import {
 import { useLocationRange } from "./useLocationRange";
 import useSplashHidden from "./useSplashHidden";
 import { useIsAppReady } from "./useIsAppReady";
+import { useNativeShell } from "@player/context/NativeShellContext";
 
 /* We keep a mutable ref so we can swap the implementation on HMR */
 const implRef = { current: impl };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/deal-with-background-songs", (mod) => {
-    implRef.current = mod.dealWithBackgroundSongs;
+    if (mod) implRef.current = mod.dealWithBackgroundSongs;
     console.info("[HMR] useBackgroundSongs updated");
   });
 }
@@ -22,6 +23,7 @@ if (import.meta.hot) {
 export function useBackgroundSongs() {
   const isSplashHidden = useSplashHidden();
   const isAppReady = useIsAppReady();
+  const isNativeShell = useNativeShell();
   const {
     debouncedLocation: { currentChapter, currentParagraph },
   } = useLocationRange(300);
@@ -36,6 +38,8 @@ export function useBackgroundSongs() {
   };
 
   useEffect(() => {
+    // Skip music in native shell - native layer handles it via expo-audio
+    if (isNativeShell) return;
     if (!isAppReady) return;
 
     window.addEventListener("trackFullyLoaded", handleTrackFullyLoaded, { once: true });
@@ -43,14 +47,18 @@ export function useBackgroundSongs() {
     return () => {
       window.removeEventListener("trackFullyLoaded", handleTrackFullyLoaded);
     };
-  }, [isAppReady]);
+  }, [isAppReady, isNativeShell]);
 
   useEffect(() => {
+    // Skip music in native shell - native layer handles it via expo-audio
+    if (isNativeShell) return;
     if (!isAppReady) return;
     preloadCurrentTrack();
-  }, [isAppReady]);
+  }, [isAppReady, isNativeShell]);
 
   useEffect(() => {
+    // Skip music in native shell - native layer handles it via expo-audio
+    if (isNativeShell) return;
     if (!isSplashHidden || !isAppReady) return;
 
     const handleBackgroundMusic = async () => {
@@ -79,5 +87,12 @@ export function useBackgroundSongs() {
     handleBackgroundMusic().catch((error) => {
       console.error("Error handling background music:", error);
     });
-  }, [currentChapter, currentParagraph, isSplashHidden, isAppReady, isInitialTrackLoaded]);
+  }, [
+    currentChapter,
+    currentParagraph,
+    isSplashHidden,
+    isAppReady,
+    isInitialTrackLoaded,
+    isNativeShell,
+  ]);
 }

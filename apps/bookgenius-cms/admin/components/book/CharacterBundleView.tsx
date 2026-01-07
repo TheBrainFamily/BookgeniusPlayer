@@ -15,17 +15,8 @@
 import { useCharacterBundle, getMissingAssets } from "@/lib/hooks";
 import { isCharacterFolder, type CharacterFolderExtra } from "@/lib/types/book";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-  User,
-  Image as ImageIcon,
-  Video,
-  AlertCircle,
-  CheckCircle2,
-  Play,
-  Volume2,
-} from "lucide-react";
+import { User, Image as ImageIcon, AlertCircle, CheckCircle2, Play, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CharacterBundleViewProps {
@@ -79,9 +70,9 @@ export function CharacterBundleView({ characterPath, onClick }: CharacterBundleV
 
         {/* Asset indicators overlay */}
         <div className="absolute bottom-2 right-2 flex gap-1">
-          <AssetIndicator type="avatar" available={!!bundle.avatar} url={bundle.avatar?.url} />
-          <AssetIndicator type="speaks" available={!!bundle.speaks} url={bundle.speaks?.url} />
-          <AssetIndicator type="listens" available={!!bundle.listens} url={bundle.listens?.url} />
+          <AssetIndicator type="avatar" available={!!bundle.avatar} />
+          <AssetIndicator type="speaks" available={!!bundle.speaks} />
+          <AssetIndicator type="listens" available={!!bundle.listens} />
         </div>
 
         {/* Completeness badge */}
@@ -131,11 +122,9 @@ export function CharacterBundleView({ characterPath, onClick }: CharacterBundleV
 function AssetIndicator({
   type,
   available,
-  url,
 }: {
   type: "avatar" | "speaks" | "listens";
   available: boolean;
-  url?: string;
 }) {
   const icons = { avatar: ImageIcon, speaks: Play, listens: Volume2 };
   const Icon = icons[type];

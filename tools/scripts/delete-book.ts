@@ -9,7 +9,9 @@ import * as readline from "readline";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "../..");
 
-const envPath = existsSync(join(rootDir, ".env")) ? join(rootDir, ".env") : join(rootDir, "backend/.env");
+const envPath = existsSync(join(rootDir, ".env"))
+  ? join(rootDir, ".env")
+  : join(rootDir, "backend/.env");
 
 config({ path: envPath });
 
@@ -34,7 +36,11 @@ if (!R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET || !R2_ENDPOINT) {
 
 const endpoint = R2_ENDPOINT.startsWith("http") ? R2_ENDPOINT : `https://${R2_ENDPOINT}`;
 
-const s3 = new S3Client({ region: "auto", endpoint, credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY } });
+const s3 = new S3Client({
+  region: "auto",
+  endpoint,
+  credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY },
+});
 
 function convexRun(command: string, args: Record<string, unknown>): string {
   const argsJson = JSON.stringify(args);
@@ -62,7 +68,12 @@ async function deleteR2KeysBatch(keys: string[]): Promise<{ deleted: number; fai
   for (let i = 0; i < keys.length; i += batchSize) {
     const batch = keys.slice(i, i + batchSize);
     try {
-      const result = await s3.send(new DeleteObjectsCommand({ Bucket: R2_BUCKET, Delete: { Objects: batch.map((key) => ({ Key: key })), Quiet: true } }));
+      const result = await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: R2_BUCKET,
+          Delete: { Objects: batch.map((key) => ({ Key: key })), Quiet: true },
+        }),
+      );
       const errors = result.Errors?.length ?? 0;
       deleted += batch.length - errors;
       failed += errors;
@@ -70,8 +81,10 @@ async function deleteR2KeysBatch(keys: string[]): Promise<{ deleted: number; fai
         console.error(`Batch ${i / batchSize + 1}: ${errors} failures`);
         result.Errors?.forEach((e) => console.error(`  ${e.Key}: ${e.Message}`));
       }
-    } catch (err: any) {
-      console.error(`Batch ${i / batchSize + 1} failed: ${err.message}`);
+    } catch (err: unknown) {
+      console.error(
+        `Batch ${i / batchSize + 1} failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
       failed += batch.length;
     }
     console.log(`R2 progress: ${Math.min(i + batchSize, keys.length)}/${keys.length}`);
@@ -88,7 +101,9 @@ async function main() {
   console.log("");
   console.log("This will permanently delete:");
   console.log("  - All R2 storage files");
-  console.log("  - All Convex data (chapters, characters, backgrounds, music, notes, variants, cues)");
+  console.log(
+    "  - All Convex data (chapters, characters, backgrounds, music, notes, variants, cues)",
+  );
   console.log("");
 
   const confirmed = await confirm(`Type the book slug exactly to confirm: ${bookSlug}`, bookSlug);
@@ -104,8 +119,8 @@ async function main() {
   try {
     const result = convexRun("reset:getBookR2Keys", { bookSlug });
     r2Keys = JSON.parse(result);
-  } catch (err: any) {
-    console.error("Failed to get R2 keys:", err.message);
+  } catch (err: unknown) {
+    console.error("Failed to get R2 keys:", err instanceof Error ? err.message : String(err));
     process.exit(1);
   }
   console.log(`Found ${r2Keys.length} R2 keys.`);
@@ -137,8 +152,8 @@ async function main() {
       const parsed = JSON.parse(result);
       console.log(result.trim());
       hasMore = parsed.hasMore;
-    } catch (err: any) {
-      console.error("Failed:", err.message);
+    } catch (err) {
+      console.error("Failed:", err instanceof Error ? err.message : String(err));
       process.exit(1);
     }
   }
@@ -151,8 +166,8 @@ async function main() {
       const parsed = JSON.parse(result);
       console.log(result.trim());
       hasMore = parsed.hasMore;
-    } catch (err: any) {
-      console.error("Failed:", err.message);
+    } catch (err) {
+      console.error("Failed:", err instanceof Error ? err.message : String(err));
       process.exit(1);
     }
   }

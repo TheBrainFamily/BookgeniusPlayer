@@ -105,7 +105,10 @@ export async function extractInlineImages(opts: Options) {
 
   // Serialize DocumentFragment back to string
   const serializedBodyInner = Array.from(fragment.childNodes)
-    .map((node: any) => (node.outerHTML !== undefined ? node.outerHTML : node.textContent || ""))
+    .map((node) => {
+      const el = node as Element;
+      return el.outerHTML !== undefined ? el.outerHTML : node.textContent || "";
+    })
     .join("");
 
   const newInsideMain = insideMain.replace(

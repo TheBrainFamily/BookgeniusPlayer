@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 /**
@@ -12,6 +11,7 @@ import { useRef, useCallback, useEffect, useState } from "react";
 import Editor, { type OnMount, type OnChange } from "@monaco-editor/react";
 import type { editor, IDisposable, Position } from "monaco-editor";
 import { Loader2, AlertCircle, Cloud, CloudOff } from "lucide-react";
+import { logError } from "@/lib/utils";
 
 // =============================================================================
 // Types
@@ -137,6 +137,7 @@ export function XmlEditor({
       autoSaveTimerRef.current = null;
     }
     pendingAutoSaveRef.current = null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- currentValue is intentionally excluded to prevent infinite loops
   }, [value]); // Only depend on value, not currentValue
 
   // Validate XML
@@ -190,7 +191,7 @@ export function XmlEditor({
         setAutoSaveStatus("saved");
         setTimeout(() => setAutoSaveStatus("idle"), 2000);
       } catch (e) {
-        console.error("[XmlEditor] Auto-save failed:", e);
+        logError("[XmlEditor] Auto-save failed:", e);
         setAutoSaveStatus("error");
       }
     },
@@ -231,7 +232,7 @@ export function XmlEditor({
       editorRef.current = editor;
       monacoRef.current = monaco;
 
-      // @ts-ignore
+      // @ts-expect-error Monaco XML extension types not available
       monaco.languages.xml?.xmlDefaults?.setOptions?.({ format: { splitAttributes: true } });
 
       // Cmd+S shortcut

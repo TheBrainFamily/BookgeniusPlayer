@@ -300,6 +300,7 @@ function convertDramaTablesToPlayFormat(doc: Document): void {
   }
 }
 
+// eslint-disable-next-line complexity
 function extractChaptersFromFile(
   file: { filename: string; content: string },
   startChapter: number,

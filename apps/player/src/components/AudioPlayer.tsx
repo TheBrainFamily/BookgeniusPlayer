@@ -40,11 +40,11 @@ import { useOptionalElementVisibility } from "@player/stores/elementVisibility.s
 import { isMobileOrTablet } from "@player/utils/isMobileOrTablet";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
+// eslint-disable-next-line complexity
 const AudioPlayer = () => {
   const { t } = useTranslation();
   const { bookData, backgroundSongsForBook } = useBookConvex();
   const hasAudiobook = bookData?.hasAudiobook ?? false;
-  const slug = bookData?.slug ?? "";
   const bookForm = bookData?.metadata?.bookForm ?? "prose";
 
   const isInitialLoad = useRef(true);
@@ -63,7 +63,7 @@ const AudioPlayer = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isVolumeOpen, setIsVolumeOpen] = useState(false);
   const [isBigPlayerOpen, setIsBigPlayerOpen] = useState(false);
-  const [currentTrackData, setCurrentTrackData] = useState<TrackState | null>(null);
+  const [currentTrackData, setCurrentTrackData] = useState<TrackState | undefined>(undefined);
   const [showSongNotification, setShowSongNotification] = useState(false);
   const [playlistTracks, setPlaylistTracks] = useState<
     { id: string; title: string; duration: number }[]
@@ -79,7 +79,7 @@ const AudioPlayer = () => {
     if (!areElementsVisible) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- Closing UI panels when elements hide
       setIsBigPlayerOpen(false);
-       
+
       setIsVolumeOpen(false);
     }
   }, [areElementsVisible]);
@@ -253,6 +253,10 @@ const AudioPlayer = () => {
     let notificationTimer: ReturnType<typeof setTimeout> | null = null;
 
     const handleSongTransition = (event: CustomEvent<TrackState | null>) => {
+      if (!event || !event.detail) {
+        console.error("AudioPlayer: Song transition event is null");
+        return;
+      }
       const newCurrentTrack = event.detail;
       console.log("AudioPlayer: Song transition event received", newCurrentTrack);
 
@@ -406,7 +410,11 @@ const AudioPlayer = () => {
     if (!id) return;
 
     const url = getBookAssetUrl(`${id}.mp3`);
-    const name = `${(title || id).replace(/[\/\\:*?"<>|]+/g, "").trim()}.mp3`;
+    if (!url) {
+      console.error("Failed to get asset URL for:", id);
+      return;
+    }
+    const name = `${(title || id).replace(/[/\\:*?"<>|]+/g, "").trim()}.mp3`;
 
     try {
       await downloadFile(url, name);
@@ -656,7 +664,7 @@ const AudioPlayer = () => {
                       animate="open"
                     >
                       <span>{formatTime(currentTime)}</span>
-                      <span>{formatTime(currentTrackData?.duration)}</span>
+                      <span>{formatTime(currentTrackData?.duration ?? 0)}</span>
                     </motion.div>
 
                     <motion.div
@@ -915,7 +923,7 @@ const transitions = {
     duration: options?.duration ?? 0.25,
     delay: options?.delay ?? 0,
   }),
-  ease: (options?: { duration?: number; ease?: Easing | Easing[] }): Transition => ({
+  ease: (options?: { duration?: number; ease?: Easing }): Transition => ({
     duration: options?.duration ?? 0.25,
     ease: options?.ease ?? "easeInOut",
   }),

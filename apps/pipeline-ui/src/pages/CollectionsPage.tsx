@@ -196,7 +196,7 @@ export function CollectionsPage({ onSelectBook }: CollectionsPageProps) {
   const [isLoadingCollections, setIsLoadingCollections] = useState(true);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [gridColumns, setGridColumns] = useState(6);
+  const [_gridColumns, setGridColumns] = useState(6);
   const [modalBook, setModalBook] = useState<CollectionBook | null>(null);
 
   useEffect(() => {

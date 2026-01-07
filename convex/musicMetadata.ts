@@ -122,19 +122,6 @@ export const upsertMetadata = internalMutation({
 // =============================================================================
 
 /**
- * Get R2 config from env vars.
- */
-function getR2Config() {
-  if (!process.env.R2_BUCKET) return undefined;
-  return {
-    R2_BUCKET: process.env.R2_BUCKET,
-    R2_ENDPOINT: process.env.R2_ENDPOINT!,
-    R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
-    R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
-  };
-}
-
-/**
  * Extract metadata from an MP3 file.
  * Scheduled after upload to music/ folder.
  */

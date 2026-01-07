@@ -196,7 +196,7 @@ if (require.main === module) {
         process.exit(1);
       }
     } catch (error) {
-      if ((error as any).code === "ENOENT") {
+      if (error instanceof Error && "code" in error && error.code === "ENOENT") {
         console.error(`Error: Path does not exist: ${targetPath}`);
       } else {
         console.error(`An unexpected error occurred:`, error);

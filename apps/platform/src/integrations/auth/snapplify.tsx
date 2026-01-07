@@ -1,4 +1,5 @@
 // Cookie-based shortcut: if __session cookie exists, treat its value as our JWT/id_token
+/* eslint-disable react-refresh/only-export-components */
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "@platform/components/ui/use-toast";

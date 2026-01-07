@@ -69,7 +69,7 @@ export interface Chapter {
 export type BookData = {
   slug: string;
   metadata: BookMetadata;
-  chapters?: Chapter[];
+  chapters: Chapter[];
   hasAudiobook: boolean;
   audioPrompt?: string;
 };

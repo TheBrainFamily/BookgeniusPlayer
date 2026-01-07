@@ -33,7 +33,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { AssetCard, type AssetData } from "./AssetCard";
 import { AssetListRow } from "./AssetListRow";
-import { getContentTypeCategory } from "@/lib/utils";
+import { getContentTypeCategory, logError } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface AssetListProps {
@@ -173,6 +173,7 @@ async function getFilesFromEntry(
   return [];
 }
 
+// eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
 export function AssetList({
   folderPath,
   onAssetSelect,
@@ -343,6 +344,7 @@ export function AssetList({
               });
             }
           } catch (err) {
+            logError(`Failed to read folder: ${entry.name}`, err);
             toast.error(`Failed to read folder: ${entry.name}`);
           }
         } else {

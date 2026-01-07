@@ -21,6 +21,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
+import { logError } from "../lib/utils";
 
 // Import the actual source data
 import { getBackgroundsForBook } from "../../../books/1984-English/getBackgroundsForBook";
@@ -146,7 +147,7 @@ async function createFolderIfNeeded(folderPath: string, extra?: object): Promise
     await client.mutation(api.cli.createFolderByPath, { path: folderPath, extra });
     console.log(`  Created folder: ${folderPath}`);
   } catch (error) {
-    console.error(`  Failed to create folder ${folderPath}:`, error);
+    logError(`  Failed to create folder ${folderPath}:`, error);
   }
 }
 
@@ -196,7 +197,7 @@ async function uploadFile(
 
     console.log(`  Uploaded: ${folderPath}/${basename}`);
   } catch (error) {
-    console.error(`  Failed to upload ${basename}:`, error);
+    logError(`  Failed to upload ${basename}:`, error);
   }
 }
 
@@ -414,6 +415,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Import failed:", error);
+  logError("Import failed:", error);
   process.exit(1);
 });

@@ -15,8 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Loader2, Upload, FileUp, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { formatBytes } from "@/lib/utils";
+import { cn, formatBytes, logError } from "@/lib/utils";
 
 // Detect asset type from folder path
 type AssetType = "background" | "music" | "generic";
@@ -124,7 +123,7 @@ export function UploadDialog({
         });
       } catch (fetchError) {
         // CORS errors show as generic "Failed to fetch" - make it clearer
-        console.error("Upload fetch failed:", fetchError);
+        logError("Upload fetch failed:", fetchError);
         throw new Error(
           backend === "r2"
             ? "Upload to R2 failed - check CORS configuration on your R2 bucket"
@@ -162,8 +161,10 @@ export function UploadDialog({
       setBackgroundColor("#000000");
       setTextColor("#ffffff");
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to upload file");
+    } catch (error: unknown) {
+      logError("Upload failed:", error);
+      const message = error instanceof Error ? error.message : "Failed to upload file";
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }

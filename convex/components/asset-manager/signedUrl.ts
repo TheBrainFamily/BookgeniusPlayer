@@ -6,6 +6,7 @@ import { type Id } from "./_generated/dataModel";
 
 // Use anyApi to avoid circular type references when calling internal queries
 // from actions in the same component
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: fix this, need to look into the circular dependency
 const internal = anyApi as { internalQueries: { getVersionStorageInfo: any } };
 
 // Validator for R2 config passed from app layer

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { logError } from "@/lib/utils";
 
 interface CreateFolderDialogProps {
   open: boolean;
@@ -39,8 +40,10 @@ export function CreateFolderDialog({ open, onOpenChange, parentPath }: CreateFol
       toast.success(`Folder "${name}" created`);
       setName("");
       onOpenChange(false);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create folder");
+    } catch (error: unknown) {
+      logError("Create folder failed:", error);
+      const message = error instanceof Error ? error.message : "Failed to create folder";
+      toast.error(message);
     } finally {
       setIsCreating(false);
     }

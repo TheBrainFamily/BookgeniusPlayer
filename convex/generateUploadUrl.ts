@@ -160,7 +160,7 @@ export const finishUpload = mutation({
 
     await requireAuth(ctx);
     const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
-      intentId: args.intentId as any,
+      intentId: args.intentId,
       uploadResponse: args.uploadResponse,
       r2Config: getR2Config(),
       size: args.size,
@@ -224,7 +224,7 @@ export const finishUploadInternal = internalMutation({
   returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
     const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
-      intentId: args.intentId as any,
+      intentId: args.intentId,
       uploadResponse: args.uploadResponse,
       r2Config: getR2Config(),
       size: args.size,
@@ -276,7 +276,7 @@ export const getSignedUrl = action({
   returns: v.union(v.null(), v.string()),
   handler: async (ctx, { versionId, expiresIn }) => {
     return await ctx.runAction(components.assetManager.signedUrl.getSignedUrl, {
-      versionId: versionId as any,
+      versionId,
       expiresIn,
       r2Config: getR2Config(),
     });

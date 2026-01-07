@@ -2,7 +2,7 @@
 
 import { useState, Suspense, useMemo, useCallback } from "react";
 import { Toaster } from "sonner";
-import { FolderTree, FolderTreeSkeleton, FolderTreeCollapsed } from "./components/FolderTree";
+import { FolderTree, FolderTreeSkeleton } from "./components/FolderTree";
 import { AssetListSkeleton } from "./components/AssetList";
 import { BookAwareAssetList, ChapterEditorView } from "./components/book";
 import { AssetDetail, AssetDetailSkeleton } from "./components/AssetDetail";
@@ -16,7 +16,7 @@ import {
   ResizableHandle,
   usePanelRef,
 } from "@/components/ui/resizable";
-import { Loader2, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Loader2, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // =============================================================================
@@ -48,11 +48,6 @@ interface AdminPanelProps {
   onAssetSelect: (asset: { folderPath: string; basename: string } | null) => void;
   onVersionSelect: (versionId: string | null) => void;
 }
-
-// Storage keys for persisting panel state
-const STORAGE_KEY_LEFT_COLLAPSED = "cms-left-panel-collapsed";
-const STORAGE_KEY_LEFT_SIZE = "cms-left-panel-size";
-const STORAGE_KEY_RIGHT_SIZE = "cms-right-panel-size";
 
 export function AdminPanel({
   folderPath,

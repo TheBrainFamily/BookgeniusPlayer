@@ -57,12 +57,17 @@ interface BottomInputProps {
 
 const setMicActiveFromGesture = (active: boolean) => {
   try {
-    navigator.mediaSession?.setMicrophoneActive?.(active);
+    // setMicrophoneActive is an experimental API not in TS types
+    const session = navigator.mediaSession as MediaSession & {
+      setMicrophoneActive?: (active: boolean) => void;
+    };
+    session?.setMicrophoneActive?.(active);
   } catch (err) {
     console.debug("[ptt] setMicrophoneActive (gesture) suppressed:", (err as Error)?.name);
   }
 };
 
+// eslint-disable-next-line complexity
 const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
   const { t } = useTranslation();
 
@@ -247,6 +252,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
         inputEl.setSelectionRange(length, length);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: inputRef is stable ref, handleActivity changes identity but we want stable behavior. These deps cover the actual state changes we care about.
   }, [
     isDeepResearchActive,
     isSearchModalOpen,
@@ -546,6 +552,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
     setIsDeepResearchActive(newState);
   }, [handleActivity, isDeepResearchActive, isThinking]);
 
+  // eslint-disable-next-line complexity
   const handleRecordingStart = useCallback(async () => {
     const t0 = performance.now();
     console.log("[ptt] press at", t0.toFixed(1));

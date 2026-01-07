@@ -54,7 +54,7 @@ export const finishUpload = mutation({
   returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
     const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
-      intentId: args.intentId as any,
+      intentId: args.intentId,
       uploadResponse: args.uploadResponse,
       r2Config: getR2Config(),
       size: args.size,

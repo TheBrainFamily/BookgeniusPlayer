@@ -15,6 +15,32 @@ import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator"
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
+type ParagraphInfo = { chapter: number | null; paragraph: number | null };
+type ParagraphKey = { chapter: number; paragraph: number };
+
+const isParagraphKey = (info: ParagraphInfo | null): info is ParagraphKey => {
+  if (!info) return false;
+  const { chapter, paragraph } = info;
+
+  return (
+    typeof chapter === "number" &&
+    Number.isFinite(chapter) &&
+    typeof paragraph === "number" &&
+    Number.isFinite(paragraph)
+  );
+};
+
+const compareParagraphKey = (a: ParagraphKey, b: ParagraphKey): number => {
+  if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+  return a.paragraph - b.paragraph;
+};
+
+const areSameParagraphKey = (a: ParagraphKey | null, b: ParagraphKey | null): boolean => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.chapter === b.chapter && a.paragraph === b.paragraph;
+};
+
 function getIsPlayFormat(): boolean {
   return getIsPlayLayout();
 }
@@ -30,9 +56,7 @@ window.addEventListener(
 );
 
 /** Extract Chapter and Paragraph Info **/
-const getParagraphInfo = (
-  element: Element,
-): { chapter: number | null; paragraph: number | null } => {
+const getParagraphInfo = (element: Element): ParagraphInfo => {
   const el = element as HTMLElement;
 
   const chapterElement = el.closest("section[data-chapter]") as HTMLElement | null;
@@ -110,7 +134,7 @@ export function setupPageObserver(): {
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
-  let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
+  let currentlyActiveParagraph: ParagraphKey | null = null;
 
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
@@ -199,6 +223,7 @@ export function setupPageObserver(): {
     );
   };
 
+  // eslint-disable-next-line complexity -- intersection processing with many visibility calculations
   const processIntersections = () => {
     // Skip heavy processing during system navigation or viewport stabilization
     // This covers: systemNavigateTo, resize/orientation transaction, any programmatic scroll
@@ -245,7 +270,7 @@ export function setupPageObserver(): {
       drawFocusZone(rangeVisualizer, rootEl, focusZoneTop, focusZoneBottom);
     }
 
-    let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
+    let activeParagraph: ParagraphInfo | null = null;
     let maxPercentageOverlapRatio = -1;
     let chosenElement: Element | null = null;
     let foundFullyVisible = false;
@@ -349,7 +374,9 @@ export function setupPageObserver(): {
     rootEl.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
     });
-    chosenElement?.classList.add("active-paragraph");
+    if (chosenElement) {
+      (chosenElement as HTMLElement).classList.add("active-paragraph");
+    }
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       if (chosenElement) {
@@ -379,19 +406,11 @@ export function setupPageObserver(): {
         const topFocusedPageElement = focusedPages[0];
         const bottomFocusedPageElement = focusedPages[focusedPages.length - 1];
 
-        let activeParagraphChanged = false;
-        if (!currentlyActiveParagraph && activeParagraph) {
-          activeParagraphChanged = true;
-        } else if (currentlyActiveParagraph && !activeParagraph) {
-          activeParagraphChanged = true;
-        } else if (currentlyActiveParagraph && activeParagraph) {
-          if (
-            currentlyActiveParagraph.chapter !== activeParagraph.chapter ||
-            currentlyActiveParagraph.paragraph !== activeParagraph.paragraph
-          ) {
-            activeParagraphChanged = true;
-          }
-        }
+        const activeParagraphKey = isParagraphKey(activeParagraph) ? activeParagraph : null;
+        const activeParagraphChanged = !areSameParagraphKey(
+          currentlyActiveParagraph,
+          activeParagraphKey,
+        );
 
         // --- Determine if topFocusedPageElement has changed (value-based) ---
         let topElementChanged = false;
@@ -438,19 +457,10 @@ export function setupPageObserver(): {
 
         // Always calculate the intersecting paragraphs and visible range for media
         // This ensures media is activated even on initial load without scroll
-        const allIntersectingParagraphs = Array.from(intersectingPages)
+        const allIntersectingParagraphs: ParagraphKey[] = Array.from(intersectingPages)
           .map((element) => getParagraphInfo(element))
-          .filter(
-            (info) =>
-              info.chapter !== null &&
-              !isNaN(info.chapter) &&
-              info.paragraph !== null &&
-              !isNaN(info.paragraph),
-          )
-          .sort((a, b) => {
-            if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-            return a.paragraph - b.paragraph;
-          });
+          .filter(isParagraphKey)
+          .sort(compareParagraphKey);
 
         const isMobile = viewportHeight < 700 || viewportWidth < 768;
 
@@ -461,24 +471,15 @@ export function setupPageObserver(): {
           : rootRect.top + rootRect.height * 0.7;
 
         // Filter intersecting paragraphs to only include those within the visibility zone
-        const focusZoneIntersectingParagraphs = Array.from(intersectingPages)
+        const focusZoneIntersectingParagraphs: ParagraphKey[] = Array.from(intersectingPages)
           .filter((element) => {
             const elementRect = element.getBoundingClientRect();
             // Check if element's vertical range overlaps with the visibility zone
             return elementRect.top < visibilityZoneBottom && elementRect.bottom > visibilityZoneTop;
           })
           .map((element) => getParagraphInfo(element))
-          .filter(
-            (info) =>
-              info.chapter !== null &&
-              !isNaN(info.chapter) &&
-              info.paragraph !== null &&
-              !isNaN(info.paragraph),
-          )
-          .sort((a, b) => {
-            if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-            return a.paragraph - b.paragraph;
-          });
+          .filter(isParagraphKey)
+          .sort(compareParagraphKey);
 
         const RANGE_PADDING = 1;
         const isPlayFormat = getIsPlayFormat();
@@ -487,32 +488,19 @@ export function setupPageObserver(): {
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
-          currentlyActiveParagraph = activeParagraph
-            ? { chapter: activeParagraph.chapter, paragraph: activeParagraph.paragraph }
-            : null;
+          currentlyActiveParagraph = activeParagraphKey;
 
           // Use startInfo and endInfo derived from the NEW topFocusedPageElement and bottomFocusedPageElement
-          const startInfo = newTopInfo; // Already derived
-          const endInfo = newBottomInfo; // Already derived
+          const startInfo = newTopInfo;
+          const endInfo = newBottomInfo;
 
-          // Allow location updates when we have valid start/end info.
-          // Fall back to startInfo if activeParagraph is null (e.g., when scrolling over figures/images)
-          const effectiveActiveParagraph = activeParagraph ?? startInfo;
+          const rangeStartInfo = isParagraphKey(startInfo) ? startInfo : null;
+          const rangeEndInfo = isParagraphKey(endInfo) ? endInfo : null;
 
-          if (
-            startInfo &&
-            startInfo.chapter !== null &&
-            startInfo.paragraph !== null &&
-            endInfo &&
-            endInfo.chapter !== null &&
-            endInfo.paragraph !== null &&
-            effectiveActiveParagraph &&
-            effectiveActiveParagraph.chapter !== null &&
-            effectiveActiveParagraph.paragraph !== null
-          ) {
-            const rangeStartInfo = startInfo;
-            const rangeEndInfo = endInfo;
+          // Fall back to start paragraph if active paragraph is unknown (e.g. image/figure)
+          const effectiveActive = activeParagraphKey ?? rangeStartInfo;
 
+          if (rangeStartInfo && rangeEndInfo && effectiveActive) {
             let expandedStartParagraph = Math.max(1, rangeStartInfo.paragraph - RANGE_PADDING);
             const expandedEndParagraph = rangeEndInfo.paragraph + RANGE_PADDING;
 
@@ -525,38 +513,38 @@ export function setupPageObserver(): {
               paragraph: expandedStartParagraph,
               endChapter: rangeEndInfo.chapter,
               endParagraph: expandedEndParagraph,
-              currentChapter: effectiveActiveParagraph.chapter,
-              currentParagraph: effectiveActiveParagraph.paragraph,
+              currentChapter: effectiveActive.chapter,
+              currentParagraph: effectiveActive.paragraph,
             };
 
             if (!isSameLoc(lastSentLocation, nextLoc)) {
-              // Avoid overriding programmatic navigation mid-scroll
-              if (isSystemNavigationInProgress()) {
-                // Defer location update until system navigation finishes
-              } else {
+              if (!isSystemNavigationInProgress()) {
+                // Defensive defaults to satisfy Location's non-nullable number fields
+                const firstVisible = focusZoneIntersectingParagraphs[0] ?? rangeStartInfo;
+                const lastVisible =
+                  focusZoneIntersectingParagraphs.length > 0
+                    ? focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]
+                    : rangeEndInfo;
+
                 setCurrentLocation({
                   chapter: rangeStartInfo.chapter,
                   paragraph: expandedStartParagraph,
                   endChapter: rangeEndInfo.chapter,
                   endParagraph: expandedEndParagraph,
-                  currentChapter: effectiveActiveParagraph.chapter,
-                  currentParagraph: effectiveActiveParagraph.paragraph,
-                  earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
-                  latestVisibleParagraph:
-                    focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]
-                      ?.paragraph ?? null,
-                  earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
-                  latestVisibleChapter:
-                    focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]
-                      ?.chapter ?? null,
+                  currentChapter: effectiveActive.chapter,
+                  currentParagraph: effectiveActive.paragraph,
+                  earliestVisibleParagraph: firstVisible.paragraph,
+                  latestVisibleParagraph: lastVisible.paragraph,
+                  earliestVisibleChapter: firstVisible.chapter,
+                  latestVisibleChapter: lastVisible.chapter,
                 });
+
                 lastSentLocation = nextLoc;
               }
             }
           } else {
             console.warn("[Observer] Could not update location: start/end info is invalid.", {
               activePgh: activeParagraph,
-              effectiveActiveParagraph,
               startInfo,
               endInfo,
             });
@@ -575,22 +563,19 @@ export function setupPageObserver(): {
             mediaEndInfo.paragraph,
             isPlayFormat,
           );
-        } else if (
-          newTopInfo &&
-          newBottomInfo &&
-          newTopInfo.chapter !== null &&
-          newTopInfo.paragraph !== null &&
-          newBottomInfo.chapter !== null &&
-          newBottomInfo.paragraph !== null
-        ) {
-          // Fallback to focus zone range if no intersecting paragraphs found
-          activateMediaInRange(
-            newTopInfo.chapter,
-            newTopInfo.paragraph,
-            newBottomInfo.chapter,
-            newBottomInfo.paragraph,
-            isPlayFormat,
-          );
+        } else {
+          const fallbackStart = isParagraphKey(newTopInfo) ? newTopInfo : null;
+          const fallbackEnd = isParagraphKey(newBottomInfo) ? newBottomInfo : null;
+
+          if (fallbackStart && fallbackEnd) {
+            activateMediaInRange(
+              fallbackStart.chapter,
+              fallbackStart.paragraph,
+              fallbackEnd.chapter,
+              fallbackEnd.paragraph,
+              isPlayFormat,
+            );
+          }
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
@@ -747,6 +732,7 @@ export function setupPageObserver(): {
 
       let shouldApplyBlur = false;
 
+      // eslint-disable-next-line complexity -- spacer visibility calculation with blur effects
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
 

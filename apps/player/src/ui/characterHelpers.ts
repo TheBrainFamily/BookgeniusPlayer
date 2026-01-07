@@ -1,6 +1,3 @@
-import { type BOOK_SLUGS } from "@player/consts";
-import { getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
-
 export function isAppearanceWithinRange(
   appearance: { chapterNumber: number; paragraphNumber: number },
   startChapter: number,
@@ -40,10 +37,10 @@ export function isAppearanceWithinRange(
   return false; // Not in range
 }
 
+//TODO the endChapter and endParagraph are never set, same for onlyTalking
 export function activateCharacters(
   chapterNum: number,
   paragraphNum: number,
-  bookSlug: string,
   endChapter?: number,
   endParagraph?: number,
   onlyTalking = false,
@@ -80,12 +77,7 @@ export function activateCharacters(
         note.classList.add("highlighted-talking-entity");
         // Swap image to GIF if talking
         if (imageElement && imageElement.dataset.originalSrc) {
-          const gifSrc = getTalkingMediaFilePathForName(canonicalName, bookSlug as BOOK_SLUGS);
-          const currentSrcFilename = imageElement.src.split("/").pop();
-          const gifSrcFilename = gifSrc.split("/").pop();
-          if (currentSrcFilename !== gifSrcFilename) {
-            imageElement.src = gifSrc;
-          }
+          throw new Error("using old getTalkingMediaFilePathForName");
         }
       } else if (isInRange && !onlyTalking) {
         console.log("are we in this weird !onlyTalking case?", canonicalName);

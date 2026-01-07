@@ -308,6 +308,7 @@ export const systemNavigateTo = async (
      */
     expandChapterRange?: boolean;
   } = {},
+  // eslint-disable-next-line complexity
 ) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);
@@ -458,19 +459,7 @@ export const goToParagraph = (
       return;
     }
 
-    const contentContainer = document.getElementById("content-container");
-    // if (!contentContainer) {
-    //   // Fallback for safety, though the container should always exist.
-    //   element.scrollIntoView({ behavior: options.behavior, block: "start" });
-
-    //   if (options.behavior === "instant") {
-    //     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-    //   } else {
-    //     // For smooth scroll without a container, we can't detect the end, so we use a timeout.
-    //     setTimeout(resolve, 1000);
-    //   }
-    //   return;
-    // }
+    const contentContainer = document.getElementById("content-container")!;
 
     const containerRect = contentContainer.getBoundingClientRect();
     const elementRect = element.getBoundingClientRect();

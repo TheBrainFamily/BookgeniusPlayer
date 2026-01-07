@@ -33,7 +33,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ResizablePanelGroup,
@@ -53,6 +53,13 @@ interface ChapterEditorViewProps {
   selectedVersionId: string | null;
   onVersionSelect: (versionId: string | null) => void;
   onBack: () => void;
+}
+
+type VersionBadgeVariant = NonNullable<BadgeProps["variant"]>;
+
+function getVersionBadgeVariant(state: string): VersionBadgeVariant {
+  if (state === "draft" || state === "published" || state === "archived") return state;
+  return "default";
 }
 
 // =============================================================================
@@ -170,7 +177,7 @@ function ChapterEditorContent({
             </div>
             <div className="flex items-center gap-2">
               {selectedVersion && (
-                <Badge variant={selectedVersion.state as any} className="text-xs">
+                <Badge variant={getVersionBadgeVariant(selectedVersion.state)} className="text-xs">
                   v{selectedVersion.version} ({selectedVersion.state})
                 </Badge>
               )}
@@ -288,7 +295,10 @@ function ChapterEditorContent({
                           <Archive className="h-3 w-3 text-muted-foreground" />
                         )}
                         <span className="font-medium">v{version.version}</span>
-                        <Badge variant={version.state as any} className="text-[10px] ml-auto">
+                        <Badge
+                          variant={getVersionBadgeVariant(version.state)}
+                          className="text-[10px] ml-auto"
+                        >
                           {version.state}
                         </Badge>
                       </div>

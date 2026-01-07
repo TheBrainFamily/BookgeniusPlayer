@@ -7,6 +7,9 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import vitest from "eslint-plugin-vitest";
 import convexPlugin from "@convex-dev/eslint-plugin";
 
+// Get the directory of this config file (monorepo root)
+const tsconfigRootDir = import.meta.dirname;
+
 export default tseslint.config(
   // ===== GLOBAL IGNORES =====
   {
@@ -38,12 +41,16 @@ export default tseslint.config(
 
   {
     files: ["**/*.{ts,tsx,mts,cts}"],
-    languageOptions: { ecmaVersion: 2022, sourceType: "module" },
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      parserOptions: { tsconfigRootDir },
+    },
     rules: {
       // ===== TYPE SAFETY (non-type-checked rules only) =====
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_", destructuredArrayIgnorePattern: "^_" },
       ],
 
@@ -51,14 +58,14 @@ export default tseslint.config(
       // Note: This rule flags import() type annotations but can't auto-fix them
       // Those are intentional for dynamic imports and can be ignored
       "@typescript-eslint/consistent-type-imports": [
-        "warn",
+        "error",
         { prefer: "type-imports", fixStyle: "inline-type-imports", disallowTypeAnnotations: false },
       ],
 
       // ===== COMPLEXITY LIMITS (AI guidance) =====
-      complexity: ["warn", { max: 20 }],
-      "max-depth": ["warn", { max: 5 }],
-      "max-params": ["warn", { max: 6 }],
+      complexity: ["error", { max: 20 }],
+      "max-depth": ["error", { max: 5 }],
+      "max-params": ["error", { max: 6 }],
 
       // ===== MODERN PATTERNS =====
       "prefer-const": "error",
@@ -69,34 +76,34 @@ export default tseslint.config(
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/ban-ts-comment": [
-        "warn",
+        "error",
         { "ts-expect-error": "allow-with-description", "ts-ignore": true, "ts-nocheck": true },
       ],
       "@typescript-eslint/no-require-imports": "off",
 
       // ===== TURNED OFF (TypeScript handles these) =====
-      // "no-undef": "off",
-      // "no-redeclare": "off",
-      // "no-func-assign": "off",
-      // "no-unsafe-optional-chaining": "off",
-      // "no-unsafe-finally": "off",
+      "no-undef": "off",
+      "no-redeclare": "off",
+      "no-func-assign": "off",
+      "no-unsafe-optional-chaining": "off",
+      "no-unsafe-finally": "off",
 
       // ===== TURNED OFF (intentional patterns or too many violations) =====
       "@typescript-eslint/no-unused-expressions": "off", // Many false positives with optional chaining
       "@typescript-eslint/no-this-alias": "off", // Used intentionally in some patterns
-      "no-empty": ["warn", { allowEmptyCatch: true }], // Allow empty catch blocks
+      "no-empty": ["error", { allowEmptyCatch: true }], // Allow empty catch blocks
       "no-console": "off", // Allow console in dev, enforce per-context
       "no-control-regex": "off", // Used intentionally for ANSI stripping
       "no-irregular-whitespace": "off", // Book content has special chars
       "no-cond-assign": "off", // Sometimes intentional (while assignments)
       "no-constant-condition": "off", // Used in while(true) patterns
 
-      // ===== WARNINGS (few/no violations, catch regressions) =====
-      "no-useless-escape": "warn",
-      "no-case-declarations": "warn",
-      "no-prototype-builtins": "warn",
-      "no-fallthrough": "warn",
-      "no-misleading-character-class": "warn",
+      // ===== ERROR (catch regressions) =====
+      "no-useless-escape": "error",
+      "no-case-declarations": "error",
+      "no-prototype-builtins": "error",
+      "no-fallthrough": "error",
+      "no-misleading-character-class": "error",
     },
   },
 
@@ -127,7 +134,7 @@ export default tseslint.config(
 
       // React best practices
       "react/prop-types": "off",
-      "react/jsx-key": ["warn", { checkFragmentShorthand: true }],
+      "react/jsx-key": ["error", { checkFragmentShorthand: true }],
       "react/no-array-index-key": "off",
       "react/self-closing-comp": "warn",
 
@@ -146,7 +153,7 @@ export default tseslint.config(
       // Convex-specific
       "no-console": "off",
       "@typescript-eslint/no-unused-vars": [
-        "warn",
+        "error",
         { argsIgnorePattern: "^_|^ctx$", varsIgnorePattern: "^_" },
       ],
     },
@@ -187,10 +194,10 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node, ...vitest.environments.env.globals } },
     rules: {
       // Vitest rules
-      "vitest/expect-expect": "warn",
+      "vitest/expect-expect": "error",
       "vitest/no-identical-title": "error",
       "vitest/no-focused-tests": "error",
-      "vitest/no-disabled-tests": "warn",
+      "vitest/no-disabled-tests": "error",
       "vitest/valid-expect": "error",
 
       // Relaxed for tests

@@ -6,7 +6,7 @@ type AuthComponentsWrapperProps = {
   fallbackComponent: React.ComponentType;
 };
 
-const Wrapper = ({ children }) => (
+const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="min-h-screen flex items-center justify-center">{children}</div>
 );
 
@@ -23,7 +23,8 @@ const AuthComponentsWrapper = (props: AuthComponentsWrapperProps) => {
     return null;
   }
 
-  const ComponentToRender = authContext.components?.[componentName];
+  const ComponentToRender =
+    authContext.components?.[componentName as keyof typeof authContext.components];
   if (!ComponentToRender) {
     return <Fallback />;
   }

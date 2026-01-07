@@ -10,7 +10,7 @@ const implRef = { current: impl };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/deal-with-audiobook-playback", (mod) => {
-    implRef.current = mod.dealWithAudiobookTracks;
+    if (mod) implRef.current = mod.dealWithAudiobookTracks;
     console.info("[HMR] dealWithAudiobookTracks updated");
   });
 }

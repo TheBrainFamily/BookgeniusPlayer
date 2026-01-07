@@ -64,6 +64,7 @@ export const startGeneration = mutation({
 // Internal action that performs the actual generation
 export const generateComicStrip = internalAction({
   args: { submissionId: v.id("comicSubmissions"), scenarioPath: v.string() },
+  // eslint-disable-next-line complexity -- multi-step comic generation with AI and image processing
   handler: async (ctx, args) => {
     const { submissionId, scenarioPath } = args;
 
