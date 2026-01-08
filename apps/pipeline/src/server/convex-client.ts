@@ -118,7 +118,11 @@ export const convex = {
     }[];
   }) {
     if (args.notes.length === 0) return [];
-    return await client.mutation(api.notes.bulkCreate, args);
+    // Extract bookPath from first note (all notes should have the same bookPath)
+    const bookPath = args.notes[0].bookPath;
+    // Strip bookPath from individual notes since it's now a top-level arg
+    const notes = args.notes.map(({ bookPath: _bp, ...rest }) => rest);
+    return await client.mutation(api.notes.bulkCreate, { bookPath, notes });
   },
 
   async getGenerationStatus(bookPath: string) {

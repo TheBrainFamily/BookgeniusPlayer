@@ -1,9 +1,10 @@
 // convex/importHelpers.ts
-// Unauthenticated helpers for import scripts and generator pipeline
+// Helpers for import scripts and generator pipeline
+// All mutations require admin access
 
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
 import { components, internal } from "./_generated/api";
+import { adminMutation } from "./functions";
 
 function getR2Config() {
   if (!process.env.R2_BUCKET) return undefined;
@@ -17,9 +18,11 @@ function getR2Config() {
 
 const storageBackendValidator = v.union(v.literal("convex"), v.literal("r2"));
 
-// Unauthenticated version of startUpload for import
-// Returns intentId + uploadUrl for the new intent-based flow
-export const startUpload = mutation({
+/**
+ * Start an upload for import - ADMIN ONLY.
+ * Returns intentId + uploadUrl for the intent-based flow.
+ */
+export const startUpload = adminMutation({
   args: {
     folderPath: v.string(),
     basename: v.string(),
@@ -41,7 +44,10 @@ export const startUpload = mutation({
   },
 });
 
-export const finishUpload = mutation({
+/**
+ * Finish an upload for import - ADMIN ONLY.
+ */
+export const finishUpload = adminMutation({
   args: {
     intentId: v.string(),
     storageId: v.optional(v.id("_storage")),
@@ -98,9 +104,11 @@ export const finishUpload = mutation({
   },
 });
 
-// Unauthenticated version of createVersionFromStorageId for import
-// Use this for migrations - copying files by reference without re-uploading
-export const createVersionFromStorageId = mutation({
+/**
+ * Create version from storage ID for migrations - ADMIN ONLY.
+ * Use this for copying files by reference without re-uploading.
+ */
+export const createVersionFromStorageId = adminMutation({
   args: {
     folderPath: v.string(),
     basename: v.string(),
@@ -118,16 +126,20 @@ export const createVersionFromStorageId = mutation({
   },
 });
 
-// Unauthenticated folder creation for import
-export const createFolderByPath = mutation({
+/**
+ * Create folder by path - ADMIN ONLY.
+ */
+export const createFolderByPath = adminMutation({
   args: { path: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, args);
   },
 });
 
-// Unauthenticated character metadata update for import
-export const updateCharacterMetadata = mutation({
+/**
+ * Update character metadata - ADMIN ONLY.
+ */
+export const updateCharacterMetadata = adminMutation({
   args: {
     characterKey: v.string(),
     metadata: v.object({
@@ -154,8 +166,10 @@ export const updateCharacterMetadata = mutation({
   },
 });
 
-// Unauthenticated scenario creation for import
-export const createOrUpdateScenario = mutation({
+/**
+ * Create or update scenario - ADMIN ONLY.
+ */
+export const createOrUpdateScenario = adminMutation({
   args: {
     name: v.string(),
     scenario: v.object({

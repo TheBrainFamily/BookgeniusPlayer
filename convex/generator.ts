@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
 import { components } from "./_generated/api";
+import { adminMutation, publicQuery } from "./functions";
 
 const PIPELINE_STEPS = [
   "import_epub",
@@ -22,7 +22,7 @@ const stepStatusValidator = v.union(
   v.literal("skipped"),
 );
 
-export const ensureBookStructure = mutation({
+export const ensureBookStructure = adminMutation({
   args: {
     jobId: v.string(),
     bookSlug: v.string(),
@@ -105,7 +105,7 @@ export const ensureBookStructure = mutation({
   },
 });
 
-export const reportProgress = mutation({
+export const reportProgress = adminMutation({
   args: {
     bookPath: v.string(),
     step: v.string(),
@@ -153,7 +153,7 @@ export const reportProgress = mutation({
   },
 });
 
-export const heartbeat = mutation({
+export const heartbeat = adminMutation({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const job = await ctx.db
@@ -167,7 +167,7 @@ export const heartbeat = mutation({
   },
 });
 
-export const updateBookMetadata = mutation({
+export const updateBookMetadata = adminMutation({
   args: {
     bookPath: v.string(),
     metadata: v.object({
@@ -196,7 +196,7 @@ export const updateBookMetadata = mutation({
   },
 });
 
-export const updateGraphicalStyle = mutation({
+export const updateGraphicalStyle = adminMutation({
   args: {
     bookPath: v.string(),
     backgroundStyle: v.optional(v.string()),
@@ -227,7 +227,7 @@ export const updateGraphicalStyle = mutation({
   },
 });
 
-export const ensureCharacterFolder = mutation({
+export const ensureCharacterFolder = adminMutation({
   args: {
     bookPath: v.string(),
     characterSlug: v.string(),
@@ -265,7 +265,7 @@ export const ensureCharacterFolder = mutation({
   },
 });
 
-export const markCharacterAvatarState = mutation({
+export const markCharacterAvatarState = adminMutation({
   args: {
     characterPath: v.string(),
     state: v.union(
@@ -292,7 +292,7 @@ export const markCharacterAvatarState = mutation({
   },
 });
 
-export const upsertBackgroundCue = mutation({
+export const upsertBackgroundCue = adminMutation({
   args: {
     bookPath: v.string(),
     chapter: v.number(),
@@ -327,7 +327,7 @@ export const upsertBackgroundCue = mutation({
   },
 });
 
-export const upsertMusicCue = mutation({
+export const upsertMusicCue = adminMutation({
   args: {
     bookPath: v.string(),
     chapter: v.number(),
@@ -351,7 +351,7 @@ export const upsertMusicCue = mutation({
   },
 });
 
-export const incrementReadyChapters = mutation({
+export const incrementReadyChapters = adminMutation({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const job = await ctx.db
@@ -368,7 +368,7 @@ export const incrementReadyChapters = mutation({
   },
 });
 
-export const markCompleted = mutation({
+export const markCompleted = adminMutation({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const job = await ctx.db
@@ -394,7 +394,7 @@ export const markCompleted = mutation({
   },
 });
 
-export const markFailed = mutation({
+export const markFailed = adminMutation({
   args: { bookPath: v.string(), error: v.string() },
   handler: async (ctx, { bookPath, error }) => {
     const job = await ctx.db
@@ -420,7 +420,7 @@ export const markFailed = mutation({
   },
 });
 
-export const getGenerationStatus = query({
+export const getGenerationStatus = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const job = await ctx.db

@@ -270,7 +270,7 @@ export function BackgroundCuesView({
 }: BackgroundCuesViewProps) {
   const { cues, files, isLoading } = useBackgroundCues();
   const { chapters } = useChapters();
-  useBook();
+  const { bookPath } = useBook();
   const [viewMode, setViewMode] = useState<ViewMode>("cuesheet");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [addDialogChapter, setAddDialogChapter] = useState(1);
@@ -316,19 +316,19 @@ export function BackgroundCuesView({
 
   const handleDeleteCue = useCallback(
     async (id: Id<"backgroundCues">) => {
-      await deleteCue({ id });
+      await deleteCue({ bookPath, id });
     },
-    [deleteCue],
+    [bookPath, deleteCue],
   );
 
   const handleParagraphEdit = useCallback(
     async (id: Id<"backgroundCues">, newParagraph: number) => {
       const cue = cues?.find((c) => c._id === id);
       if (cue) {
-        await updatePosition({ id, chapter: cue.chapter, paragraph: newParagraph });
+        await updatePosition({ bookPath, id, chapter: cue.chapter, paragraph: newParagraph });
       }
     },
-    [cues, updatePosition],
+    [bookPath, cues, updatePosition],
   );
 
   const handleEditCue = useCallback(

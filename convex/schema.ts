@@ -8,6 +8,30 @@ import { authTables } from "@convex-dev/auth/server";
 export default defineSchema({
   ...authTables,
 
+  // Book ownership - tracks who owns each book
+  books: defineTable({
+    path: v.string(), // "books/{slug}" - matches asset manager folder
+    slug: v.string(), // For quick lookups
+    ownerId: v.string(), // tokenIdentifier of owner
+    title: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_path", ["path"])
+    .index("by_slug", ["slug"])
+    .index("by_owner", ["ownerId"]),
+
+  // Book members - collaborators (future: invitations/teams)
+  bookMembers: defineTable({
+    bookPath: v.string(),
+    principal: v.string(), // tokenIdentifier
+    role: v.union(v.literal("owner"), v.literal("editor"), v.literal("viewer")),
+    createdAt: v.number(),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_principal", ["principal"])
+    .index("by_book_principal", ["bookPath", "principal"]),
+
   // Notes (footnotes/annotations)
   notes: defineTable({
     bookPath: v.string(),

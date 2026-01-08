@@ -694,7 +694,7 @@ async function step4_ImportBackgrounds(): Promise<number> {
     }));
 
   if (cues.length > 0) {
-    await client.mutation(api.backgroundCues.bulkCreate, { cues });
+    await client.mutation(api.backgroundCues.bulkCreate, { bookPath: BOOK_PATH, cues });
     console.log(`  Created ${cues.length} background cue points`);
   }
 
@@ -765,7 +765,7 @@ async function step5_ImportMusic(): Promise<number> {
   }
 
   if (cues.length > 0) {
-    await client.mutation(api.musicCues.bulkCreate, { cues });
+    await client.mutation(api.musicCues.bulkCreate, { bookPath: BOOK_PATH, cues });
     console.log(`  Created ${cues.length} music cue points`);
   }
 
@@ -854,7 +854,7 @@ async function step6_ImportNotes(): Promise<number> {
   // Bulk insert notes
   if (notesToInsert.length > 0) {
     console.log(`  Inserting ${notesToInsert.length} notes...`);
-    await client.mutation(api.notes.bulkCreate, { notes: notesToInsert });
+    await client.mutation(api.notes.bulkCreate, { bookPath: BOOK_PATH, notes: notesToInsert });
     console.log(`  Imported ${notesToInsert.length} notes`);
   }
 
@@ -913,7 +913,12 @@ async function step7_ImportVariants(): Promise<number> {
 
   for (let i = 0; i < variantsToInsert.length; i += BATCH_SIZE) {
     const batch = variantsToInsert.slice(i, i + BATCH_SIZE);
-    await client.mutation(api.variants.bulkCreate, { variants: batch });
+    // bookPath is extracted by bookMutation wrapper, variants don't include it
+    const variantsWithoutBookPath = batch.map(({ bookPath: _, ...rest }) => rest);
+    await client.mutation(api.variants.bulkCreate, {
+      bookPath: BOOK_PATH,
+      variants: variantsWithoutBookPath,
+    });
     inserted += batch.length;
     console.log(`  Inserted ${inserted}/${variantsToInsert.length} variants...`);
   }

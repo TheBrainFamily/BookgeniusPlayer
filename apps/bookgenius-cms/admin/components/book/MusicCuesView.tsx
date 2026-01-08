@@ -480,9 +480,9 @@ export function MusicCuesView({ folderPath, onAssetSelect, onUploadNew }: MusicC
 
   const handleDeleteCue = useCallback(
     async (id: Id<"musicCues">) => {
-      await deleteCue({ id });
+      await deleteCue({ bookPath, id });
     },
-    [deleteCue],
+    [bookPath, deleteCue],
   );
 
   const handleParagraphEdit = useCallback(
@@ -491,18 +491,18 @@ export function MusicCuesView({ folderPath, onAssetSelect, onUploadNew }: MusicC
       for (const id of ids) {
         const cue = cues?.find((c) => c._id === id);
         if (cue) {
-          await updatePosition({ id, chapter: cue.chapter, paragraph: newParagraph });
+          await updatePosition({ bookPath, id, chapter: cue.chapter, paragraph: newParagraph });
         }
       }
     },
-    [cues, updatePosition],
+    [bookPath, cues, updatePosition],
   );
 
   const handleReorder = useCallback(
     async (cueIds: Id<"musicCues">[]) => {
-      await reorderCues({ cueIds });
+      await reorderCues({ bookPath, cueIds });
     },
-    [reorderCues],
+    [bookPath, reorderCues],
   );
 
   const handleEditCue = useCallback(

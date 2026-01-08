@@ -6,7 +6,7 @@
  */
 
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { publicQuery, bookMutation } from "./functions";
 import { components } from "./_generated/api";
 
 // =============================================================================
@@ -17,7 +17,7 @@ import { components } from "./_generated/api";
  * List all music cues for a book, with file URLs and cover art.
  * Sorted by chapter, then paragraph.
  */
-export const listByBook = query({
+export const listByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -74,7 +74,7 @@ export const listByBook = query({
  * List cues in player format (matches existing backgroundSongsForBook shape).
  * For backwards compatibility with player.
  */
-export const listForPlayer = query({
+export const listForPlayer = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -107,7 +107,7 @@ export const listForPlayer = query({
  * List cues in player format, preferring draft files over published.
  * For live edit mode.
  */
-export const listForPlayerWithDrafts = query({
+export const listForPlayerWithDrafts = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -163,7 +163,7 @@ export const listForPlayerWithDrafts = query({
  * Get available music files (for picker UI).
  * Includes cover art URLs from extracted metadata.
  */
-export const listFiles = query({
+export const listFiles = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const files = await ctx.runQuery(
@@ -203,7 +203,7 @@ export const listFiles = query({
 /**
  * Count cues for a book.
  */
-export const countByBook = query({
+export const countByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -223,31 +223,31 @@ export const countByBook = query({
  * Create a new cue point.
  * Automatically assigns order to be last in the chapter/paragraph group.
  */
-export const create = mutation({
-  args: {
-    bookPath: v.string(),
-    fileBasename: v.string(),
-    chapter: v.number(),
-    paragraph: v.number(),
-  },
+export const create = bookMutation({
+  args: { fileBasename: v.string(), chapter: v.number(), paragraph: v.number() },
   handler: async (ctx, args) => {
-    console.log("[musicCues.create] Creating music cue", args);
+    console.log("[musicCues.create] Creating music cue", { ...args, bookPath: ctx.bookPath });
 
-    const existingCues = await ctx.db
+    // Query existing cues to determine order
+    const existingCues = await ctx.bookDb
       .query("musicCues")
-      .withIndex("by_book_position", (q) =>
-        q.eq("bookPath", args.bookPath).eq("chapter", args.chapter).eq("paragraph", args.paragraph),
+      .filter((q) =>
+        q.and(q.eq(q.field("chapter"), args.chapter), q.eq(q.field("paragraph"), args.paragraph)),
       )
       .collect();
 
-    const maxOrder = existingCues.reduce((max, cue) => Math.max(max, cue.order ?? 0), -1);
+    const maxOrder = existingCues.reduce(
+      (max: number, cue: { order?: number }) => Math.max(max, cue.order ?? 0),
+      -1,
+    );
     const order = maxOrder + 1;
 
     console.log("[musicCues.create] Inserting with order", {
       order,
       existingCount: existingCues.length,
     });
-    const id = await ctx.db.insert("musicCues", { ...args, order });
+    // bookDb.insert auto-adds bookPath
+    const id = await ctx.bookDb.insert("musicCues", { ...args, order });
     console.log("[musicCues.create] Created cue with id", id);
 
     return id;
@@ -257,22 +257,23 @@ export const create = mutation({
 /**
  * Update a cue's position.
  */
-export const updatePosition = mutation({
+export const updatePosition = bookMutation({
   args: { id: v.id("musicCues"), chapter: v.number(), paragraph: v.number() },
   handler: async (ctx, { id, chapter, paragraph }) => {
-    return await ctx.db.patch(id, { chapter, paragraph });
+    return await ctx.bookDb.patch(id, { chapter, paragraph });
   },
 });
 
 /**
  * Update a cue's file.
  */
-export const updateFile = mutation({
+export const updateFile = bookMutation({
   args: { id: v.id("musicCues"), fileBasename: v.string() },
   handler: async (ctx, { id, fileBasename }) => {
     console.log("[musicCues.updateFile] Updating cue file", { id, fileBasename });
 
-    const existingCue = await ctx.db.get(id);
+    // bookDb.get auto-verifies record belongs to this book
+    const existingCue = await ctx.bookDb.get(id);
     if (!existingCue) {
       console.error("[musicCues.updateFile] Cue not found", { id });
       throw new Error(`Music cue not found: ${id}`);
@@ -284,7 +285,7 @@ export const updateFile = mutation({
       paragraph: existingCue.paragraph,
     });
 
-    await ctx.db.patch(id, { fileBasename });
+    await ctx.bookDb.patch(id, { fileBasename });
     console.log("[musicCues.updateFile] Updated successfully");
 
     return id;
@@ -295,12 +296,13 @@ export const updateFile = mutation({
  * Reorder cues within the same chapter/paragraph group.
  * Takes an array of cue IDs in the new order.
  */
-export const reorder = mutation({
+export const reorder = bookMutation({
   args: { cueIds: v.array(v.id("musicCues")) },
   handler: async (ctx, { cueIds }) => {
     // Update each cue's order based on its position in the array
     for (let i = 0; i < cueIds.length; i++) {
-      await ctx.db.patch(cueIds[i], { order: i });
+      // bookDb.patch auto-verifies each record belongs to this book
+      await ctx.bookDb.patch(cueIds[i], { order: i });
     }
   },
 });
@@ -308,31 +310,27 @@ export const reorder = mutation({
 /**
  * Delete a cue.
  */
-export const remove = mutation({
+export const remove = bookMutation({
   args: { id: v.id("musicCues") },
   handler: async (ctx, { id }) => {
-    return await ctx.db.delete(id);
+    return await ctx.bookDb.delete(id);
   },
 });
 
 /**
  * Bulk create cues (for import).
  */
-export const bulkCreate = mutation({
+export const bulkCreate = bookMutation({
   args: {
     cues: v.array(
-      v.object({
-        bookPath: v.string(),
-        fileBasename: v.string(),
-        chapter: v.number(),
-        paragraph: v.number(),
-      }),
+      v.object({ fileBasename: v.string(), chapter: v.number(), paragraph: v.number() }),
     ),
   },
   handler: async (ctx, { cues }) => {
     const ids = [];
     for (const cue of cues) {
-      const id = await ctx.db.insert("musicCues", cue);
+      // bookDb.insert auto-adds bookPath
+      const id = await ctx.bookDb.insert("musicCues", cue);
       ids.push(id);
     }
     return ids;
@@ -342,16 +340,14 @@ export const bulkCreate = mutation({
 /**
  * Delete all cues for a book (for re-import).
  */
-export const deleteAllForBook = mutation({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const cues = await ctx.db
-      .query("musicCues")
-      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
-      .collect();
+export const deleteAllForBook = bookMutation({
+  args: {},
+  handler: async (ctx) => {
+    // bookDb.query auto-filters by bookPath
+    const cues = await ctx.bookDb.query("musicCues").collect();
 
     for (const cue of cues) {
-      await ctx.db.delete(cue._id);
+      await ctx.bookDb.delete(cue._id);
     }
 
     return cues.length;

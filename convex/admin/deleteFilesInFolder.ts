@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation } from "../_generated/server";
+import { adminMutation } from "../functions";
 import { components } from "../_generated/api";
 
 /**
@@ -12,7 +12,7 @@ import { components } from "../_generated/api";
  * To delete only avatar files:
  *   npx convex run admin/deleteFilesInFolder:deleteFilesInFolder '{"folderPath": "books/my-book/characters/hero", "basenames": ["avatar-large.png", "avatar.webp"]}'
  */
-export const deleteFilesInFolder = mutation({
+export const deleteFilesInFolder = adminMutation({
   args: {
     folderPath: v.string(),
     // Optional: only delete files matching these basenames (e.g., ["avatar-large.png", "avatar.webp"])

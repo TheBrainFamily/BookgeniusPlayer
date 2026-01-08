@@ -115,7 +115,11 @@ const MusicEditModal: React.FC = () => {
       console.log("[MusicEditModal] Upload finished");
 
       console.log("[MusicEditModal] Updating cue to new file", { cueId, fileBasename: basename });
-      await updateFile({ id: cueId as Id<"musicCues">, fileBasename: basename });
+      await updateFile({
+        bookPath: book!.path,
+        id: cueId as Id<"musicCues">,
+        fileBasename: basename,
+      });
       console.log("[MusicEditModal] Cue updated successfully");
 
       console.log("[MusicEditModal] SUCCESS: Music replaced successfully");

@@ -21,7 +21,7 @@
  */
 
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { publicQuery, adminQuery } from "./functions";
 import { components } from "./_generated/api";
 
 // =============================================================================
@@ -32,7 +32,7 @@ import { components } from "./_generated/api";
  * List all books (folders under "books/").
  * Returns book metadata from folder.extra.
  */
-export const listBooks = query({
+export const listBooks = adminQuery({
   args: {},
   handler: async (ctx) => {
     const folders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
@@ -53,7 +53,7 @@ export const listBooks = query({
 /**
  * Get metadata for a specific book.
  */
-export const getBookMetadata = query({
+export const getBookMetadata = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
@@ -81,7 +81,7 @@ export const getBookMetadata = query({
  * List all characters for a book.
  * Returns character folders with their metadata.
  */
-export const listCharacters = query({
+export const listCharacters = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const charactersPath = `${bookPath}/characters`;
@@ -105,7 +105,7 @@ export const listCharacters = query({
  * Get a character bundle (metadata + all asset URLs).
  * Returns the character's folder.extra plus URLs for avatar, speaks, listens.
  */
-export const getCharacterBundle = query({
+export const getCharacterBundle = publicQuery({
   args: { characterPath: v.string() },
   handler: async (ctx, { characterPath }) => {
     // Get character folder metadata
@@ -177,7 +177,7 @@ export const getCharacterBundle = query({
  * List all chapters for a book, sorted by chapter number.
  * Chapter number comes from version.extra.chapterNumber.
  */
-export const listChapters = query({
+export const listChapters = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const chaptersPath = `${bookPath}/chapters`;
@@ -221,66 +221,11 @@ export const listChapters = query({
 // Compiled Chapter HTML Queries
 // =============================================================================
 
-/**
- * List per-chapter character data fragments for a book.
- */
-export const listCharacterDataFragments = query({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const dataPath = `${bookPath}/characters-data`;
-
-    const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: dataPath },
-    );
-
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: dataPath },
-    );
-
-    const jsonFiles = files.filter((file) => file.basename.endsWith(".json"));
-    const selectedFiles =
-      jsonFiles.length > 0
-        ? jsonFiles
-        : files.filter(
-            (file) => file.basename.endsWith(".json") || file.basename.endsWith(".html"),
-          );
-    const selectedBasenames = new Set(selectedFiles.map((file) => file.basename));
-    const assetByBasename = new Map(
-      assets
-        .filter((asset) => selectedBasenames.has(asset.basename))
-        .map((asset) => [asset.basename, asset]),
-    );
-
-    const fragments = selectedFiles.map((file) => {
-      const asset = assetByBasename.get(file.basename);
-      const extra = asset?.extra as
-        | { chapterNumber?: number; sourceVersionId?: string }
-        | undefined;
-
-      return {
-        path: `${dataPath}/${file.basename}`,
-        basename: file.basename,
-        url: file.url,
-        versionId: file.versionId as string,
-        contentType: file.contentType,
-        size: file.size,
-        publishedAt: file.publishedAt,
-        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
-        sourceVersionId: extra?.sourceVersionId,
-      };
-    });
-
-    return fragments.sort((a, b) => a.chapterNumber - b.chapterNumber);
-  },
-});
-
 // =============================================================================
 // V2 Format Queries (combined HTML + occurrences)
 // =============================================================================
 
-export const listCompiledChapters = query({
+export const listCompiledChapters = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const compiledPath = `${bookPath}/chapters-compiled`;
@@ -317,7 +262,7 @@ export const listCompiledChapters = query({
   },
 });
 
-export const listHtmlSourceChapters = query({
+export const listHtmlSourceChapters = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const sourcePath = `${bookPath}/chapters-source`;
@@ -355,7 +300,7 @@ export const listHtmlSourceChapters = query({
   },
 });
 
-export const getCharacterIndexV2 = query({
+export const getCharacterIndexV2 = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const indexPath = `${bookPath}/characters-v2`;
@@ -380,7 +325,7 @@ export const getCharacterIndexV2 = query({
  * List all backgrounds for a book.
  * Sorted by chapter, then paragraph.
  */
-export const listBackgrounds = query({
+export const listBackgrounds = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const backgroundsPath = `${bookPath}/backgrounds`;
@@ -434,7 +379,7 @@ export const listBackgrounds = query({
  * List all figures/images for a book.
  * Returns filename -> URL mapping for use in HTML img src transformation.
  */
-export const listFigures = query({
+export const listFigures = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const figuresPath = `${bookPath}/figures`;
@@ -460,7 +405,7 @@ export const listFigures = query({
  * List all music tracks for a book.
  * Sorted by chapter, then paragraph.
  */
-export const listMusic = query({
+export const listMusic = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const musicPath = `${bookPath}/music`;
@@ -510,7 +455,7 @@ export const listMusic = query({
  * List chapters preferring draft over published.
  * For live preview mode - shows latest version being edited.
  */
-export const listChaptersWithDrafts = query({
+export const listChaptersWithDrafts = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const chaptersPath = `${bookPath}/chapters`;
@@ -567,7 +512,7 @@ export const listChaptersWithDrafts = query({
 /**
  * List backgrounds preferring draft over published.
  */
-export const listBackgroundsWithDrafts = query({
+export const listBackgroundsWithDrafts = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const backgroundsPath = `${bookPath}/backgrounds`;
@@ -627,7 +572,7 @@ export const listBackgroundsWithDrafts = query({
 /**
  * List music preferring draft over published.
  */
-export const listMusicWithDrafts = query({
+export const listMusicWithDrafts = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const musicPath = `${bookPath}/music`;
@@ -683,7 +628,7 @@ export const listMusicWithDrafts = query({
  * Get character bundles with draft-aware asset URLs.
  * Uses bulk query to fetch all folders and assets in a single operation.
  */
-export const listCharacterBundlesWithDrafts = query({
+export const listCharacterBundlesWithDrafts = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const charactersPath = `${bookPath}/characters`;
@@ -763,7 +708,7 @@ function extractChapterNumber(basename: string): number {
 /**
  * Get summary stats for a book (character count, chapter count, etc.)
  */
-export const getBookStats = query({
+export const getBookStats = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     // Count characters
@@ -817,7 +762,7 @@ export const getBookStats = query({
  * List audiobook tracks for a book.
  * STUB: Returns empty array - audiobook data not yet in CMS.
  */
-export const listAudiobookTracks = query({
+export const listAudiobookTracks = publicQuery({
   args: { bookPath: v.string() },
   handler: async () => {
     // TODO: Implement when audiobook data is added to CMS
@@ -829,7 +774,7 @@ export const listAudiobookTracks = query({
  * List cut scenes for a book.
  * STUB: Returns empty array - cut scene data not yet in CMS.
  */
-export const listCutScenes = query({
+export const listCutScenes = publicQuery({
   args: { bookPath: v.string() },
   handler: async () => {
     // TODO: Implement when cut scene data is added to CMS
@@ -841,7 +786,7 @@ export const listCutScenes = query({
  * List notes for a book.
  * Returns all footnotes/annotations for the specified book.
  */
-export const listNotes = query({
+export const listNotes = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const notes = await ctx.db
@@ -857,7 +802,7 @@ export const listNotes = query({
  * List text variants for a book.
  * Returns all sentence simplifications for the specified book.
  */
-export const listVariants = query({
+export const listVariants = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const variants = await ctx.db
@@ -877,7 +822,7 @@ export const listVariants = query({
  * Get the current generation status for a book.
  * Used by player/CMS to show progress and determine what's readable.
  */
-export const getGenerationStatus = query({
+export const getGenerationStatus = adminQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const job = await ctx.db
@@ -904,7 +849,7 @@ export const getGenerationStatus = query({
 /**
  * List all books currently being generated.
  */
-export const listGeneratingBooks = query({
+export const listGeneratingBooks = adminQuery({
   args: {},
   handler: async (ctx) => {
     const jobs = await ctx.db
