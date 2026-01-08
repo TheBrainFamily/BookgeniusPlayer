@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as admin_deleteFilesInFolder from "../admin/deleteFilesInFolder.js";
 import type * as admin_regenerateAvatarWebp from "../admin/regenerateAvatarWebp.js";
 import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
@@ -35,6 +36,7 @@ import type * as importHelpers from "../importHelpers.js";
 import type * as kanban from "../kanban.js";
 import type * as lib_characterDataV2 from "../lib/characterDataV2.js";
 import type * as lib_extractDominantColor from "../lib/extractDominantColor.js";
+import type * as lib_parseFormData from "../lib/parseFormData.js";
 import type * as musicCues from "../musicCues.js";
 import type * as musicMetadata from "../musicMetadata.js";
 import type * as notes from "../notes.js";
@@ -44,13 +46,10 @@ import type * as prompts_storyContext from "../prompts/storyContext.js";
 import type * as reset from "../reset.js";
 import type * as variants from "../variants.js";
 
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
+import type { ApiFromModules, FilterApi, FunctionReference } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "admin/deleteFilesInFolder": typeof admin_deleteFilesInFolder;
   "admin/regenerateAvatarWebp": typeof admin_regenerateAvatarWebp;
   auth: typeof auth;
   authHelpers: typeof authHelpers;
@@ -78,6 +77,7 @@ declare const fullApi: ApiFromModules<{
   kanban: typeof kanban;
   "lib/characterDataV2": typeof lib_characterDataV2;
   "lib/extractDominantColor": typeof lib_extractDominantColor;
+  "lib/parseFormData": typeof lib_parseFormData;
   musicCues: typeof musicCues;
   musicMetadata: typeof musicMetadata;
   notes: typeof notes;
@@ -96,10 +96,7 @@ declare const fullApi: ApiFromModules<{
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-export declare const api: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "public">
->;
+export declare const api: FilterApi<typeof fullApi, FunctionReference<any, "public">>;
 
 /**
  * A utility for referencing Convex functions in your app's internal API.
@@ -109,10 +106,7 @@ export declare const api: FilterApi<
  * const myFunctionReference = internal.myModule.myFunction;
  * ```
  */
-export declare const internal: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "internal">
->;
+export declare const internal: FilterApi<typeof fullApi, FunctionReference<any, "internal">>;
 
 export declare const components: {
   assetManager: {
@@ -128,12 +122,7 @@ export declare const components: {
         "internal",
         { basename: string; folderPath: string },
         | null
-        | {
-            cacheControl?: string;
-            contentType?: string;
-            kind: "blob";
-            storageId: string;
-          }
+        | { cacheControl?: string; contentType?: string; kind: "blob"; storageId: string }
         | { cacheControl?: string; kind: "redirect"; location: string }
       >;
       getTextContent: FunctionReference<
@@ -147,12 +136,7 @@ export declare const components: {
         "internal",
         { versionId: string },
         | null
-        | {
-            cacheControl?: string;
-            contentType?: string;
-            kind: "blob";
-            storageId: string;
-          }
+        | { cacheControl?: string; contentType?: string; kind: "blob"; storageId: string }
         | { cacheControl?: string; kind: "redirect"; location: string }
       >;
       getVersionPreviewUrl: FunctionReference<
@@ -166,23 +150,13 @@ export declare const components: {
       commitVersion: FunctionReference<
         "mutation",
         "internal",
-        {
-          basename: string;
-          extra?: any;
-          folderPath: string;
-          label?: string;
-          publish?: boolean;
-        },
+        { basename: string; extra?: any; folderPath: string; label?: string; publish?: boolean },
         { assetId: string; version: number; versionId: string }
       >;
       configureStorageBackend: FunctionReference<
         "mutation",
         "internal",
-        {
-          backend: "convex" | "r2";
-          r2KeyPrefix?: string;
-          r2PublicUrl?: string;
-        },
+        { backend: "convex" | "r2"; r2KeyPrefix?: string; r2PublicUrl?: string },
         null
       >;
       createAsset: FunctionReference<
@@ -241,6 +215,12 @@ export declare const components: {
           deletedVersions: number;
           hasMore: boolean;
         }
+      >;
+      deleteFilesInFolder: FunctionReference<
+        "mutation",
+        "internal",
+        { basenames?: Array<string>; folderPath: string },
+        { deletedAssets: number; deletedVersions: number }
       >;
       finishUpload: FunctionReference<
         "mutation",
@@ -387,12 +367,7 @@ export declare const components: {
         { pathPrefix: string },
         Array<string>
       >;
-      getStorageBackendConfig: FunctionReference<
-        "query",
-        "internal",
-        {},
-        "convex" | "r2"
-      >;
+      getStorageBackendConfig: FunctionReference<"query", "internal", {}, "convex" | "r2">;
       listAssetEvents: FunctionReference<
         "query",
         "internal",
@@ -522,12 +497,7 @@ export declare const components: {
         "mutation",
         "internal",
         { label?: string; versionId: string },
-        {
-          assetId: string;
-          restoredFromVersion: number;
-          version: number;
-          versionId: string;
-        }
+        { assetId: string; restoredFromVersion: number; version: number; versionId: string }
       >;
       startUpload: FunctionReference<
         "mutation",
@@ -546,12 +516,7 @@ export declare const components: {
             R2_SECRET_ACCESS_KEY: string;
           };
         },
-        {
-          backend: "convex" | "r2";
-          intentId: string;
-          r2Key?: string;
-          uploadUrl: string;
-        }
+        { backend: "convex" | "r2"; intentId: string; r2Key?: string; uploadUrl: string }
       >;
       updateFolder: FunctionReference<
         "mutation",

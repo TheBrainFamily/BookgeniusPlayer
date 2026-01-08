@@ -12,7 +12,7 @@ import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { bookFileExists } from "../../helpers/bookFileExists";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { type NewReferenceCardsResponse } from "../../types";
-import { generateFluxImage } from "./generate-flux-schnel-image";
+import { generateCharacterImageWithFlux } from "./generate-flux-schnel-image";
 import { generateTagName } from "../../helpers/generateTagName";
 import {
   callGeminiWithThinking,
@@ -97,13 +97,7 @@ export const generateCharacterImageWithOpenAI = async (
     if (isModerationBlocked && !useSanitizedPrompt) {
       console.log(`Moderation blocked for ${characterName}, sanitizing prompt with Gemini...`);
       const sanitizedPrompt = await sanitizePromptForModeration(prompt);
-      return await generateCharacterImageWithOpenAI(
-        sanitizedPrompt,
-        characterName,
-        generalPrompt,
-        1,
-        true,
-      );
+      return await generateCharacterImageWithOpenAI(sanitizedPrompt, "", generalPrompt, 1, true);
     }
 
     if (attempt < 3) {
@@ -139,7 +133,8 @@ const generateAndSaveCharacterImage = async (
   characterName: string,
   generalPrompt: string,
 ): Promise<void> => {
-  const imageBuffer = await generateCharacterImageWithOpenAI(prompt, characterName, generalPrompt);
+  const generator = FREE_RUN ? generateCharacterImageWithFlux : generateCharacterImageWithOpenAI;
+  const imageBuffer = await generator(prompt, characterName, generalPrompt);
   if (!imageBuffer) return;
 
   const originalFilePath = getPictureFileNameForName(characterName);
@@ -255,17 +250,8 @@ Propaganda posters for their graphic boldness and limited color palette.
         // console.log(visulGuideTranslatedAndCleaned);
         // const image = await generateImage(visulGuideTranslatedAndCleaned, prompt.name);
         // const image = await generateImage(visulGuideTranslatedAndCleaned, prompt.name);
-        if (FREE_RUN) {
-          const image = await generateFluxImage(
-            prompt.visualGuide,
-            prompt.name,
-            generalPrompt,
-            "avatar",
-          );
-          console.log(`image: ${image}`);
-        } else {
-          await generateAndSaveCharacterImage(prompt.visualGuide, prompt.name, generalPrompt);
-        }
+
+        await generateAndSaveCharacterImage(prompt.visualGuide, prompt.name, generalPrompt);
       }
     }),
   );

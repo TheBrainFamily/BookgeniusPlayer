@@ -1716,6 +1716,65 @@ export const listAssetEvents = query({
 });
 
 /**
+ * Delete all files (assets and their versions) in a specific folder.
+ * Does NOT delete the folder itself or subfolders.
+ * Does NOT delete files from R2/storage - only database records.
+ */
+export const deleteFilesInFolder = mutation({
+  args: {
+    folderPath: v.string(),
+    // Optional: only delete files matching these basenames (e.g., ["avatar-large.png", "avatar.webp"])
+    basenames: v.optional(v.array(v.string())),
+  },
+  returns: v.object({ deletedAssets: v.number(), deletedVersions: v.number() }),
+  handler: async (ctx, { folderPath, basenames }) => {
+    const normalizedPath = normalizeFolderPath(folderPath);
+    let deletedAssets = 0;
+    let deletedVersions = 0;
+
+    // Get all assets in this folder
+    const assets = await ctx.db
+      .query("assets")
+      .withIndex("by_folder_basename", (q) => q.eq("folderPath", normalizedPath))
+      .collect();
+
+    for (const asset of assets) {
+      // If basenames filter provided, skip assets that don't match
+      if (basenames && !basenames.includes(asset.basename)) {
+        continue;
+      }
+
+      // Get and delete all versions of this asset
+      const versions = await ctx.db
+        .query("assetVersions")
+        .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
+        .collect();
+
+      for (const version of versions) {
+        await ctx.db.delete(version._id);
+        deletedVersions++;
+      }
+
+      // Delete any events for this asset
+      const events = await ctx.db
+        .query("assetEvents")
+        .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
+        .collect();
+
+      for (const event of events) {
+        await ctx.db.delete(event._id);
+      }
+
+      // Delete the asset itself
+      await ctx.db.delete(asset._id);
+      deletedAssets++;
+    }
+
+    return { deletedAssets, deletedVersions };
+  },
+});
+
+/**
  * Delete a batch of data from asset-manager tables.
  * Call repeatedly until all data is deleted.
  * Used for development reset - does NOT delete files from R2/storage.

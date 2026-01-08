@@ -1,11 +1,58 @@
 import Replicate from "replicate";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
-import { getPictureFileNameForName } from "../../helpers/getPictureFileNameForName";
 import { logger } from "../../logger";
 import { getFilePath } from "../../helpers/filesHelpers";
+import type { GenericBackgroundPrompt } from "./generate-prompts-for-backgrounds";
+import { sanitizePromptForModeration } from "./generate-pictures-for-entities";
 
 const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+
+export const generateImageWithFluxToFolder = async (
+  sceneDescription: string,
+  chapter: number,
+  startingParagraph: number,
+  genericPrompt: GenericBackgroundPrompt,
+  outputFolder: string,
+  attempt = 1,
+  _quality: "medium" | "auto" | "standard" | "hd" | "low" | "high" | null | undefined = "medium",
+  _size:
+    | "1536x1024"
+    | "1024x1536"
+    | "256x256"
+    | "512x512"
+    | "1792x1024"
+    | "1024x1792"
+    | "auto"
+    | null
+    | undefined = "1536x1024",
+  // eslint-disable-next-line max-params
+) =>
+  generateFluxImage(
+    sceneDescription,
+    "",
+    genericPrompt.backgroundStyle,
+    "background",
+    `${outputFolder}/openai-medium-${chapter}-${startingParagraph}.webp`,
+    attempt,
+  );
+
+export const generateCharacterImageWithFlux = async (
+  prompt: string,
+  characterName: string,
+  generalPrompt: string,
+  attempt = 1,
+): Promise<Buffer | undefined> => {
+  return generateFluxImage(
+    prompt,
+    characterName,
+    generalPrompt,
+    "avatar",
+    undefined,
+    attempt,
+    true,
+  ) as Promise<Buffer | undefined>;
+};
 
 type PictureType = "avatar" | "background";
 export const generateFluxImage = async (
@@ -13,33 +60,47 @@ export const generateFluxImage = async (
   characterName: string,
   generalPrompt: string,
   type: PictureType,
+  filePath?: string,
   attempt = 1,
-  fileName?: string,
-): Promise<string | null> => {
+  returnBuffer = false,
+  // eslint-disable-next-line max-params
+): Promise<string | Buffer | undefined> => {
   let finalPrompt;
   if (type === "avatar") {
-    finalPrompt = `${generalPrompt} ${prompt} ${characterName}`;
+    switch (attempt) {
+      case 1:
+        finalPrompt = `${generalPrompt} ${prompt} ${characterName}`;
+        break;
+      case 2:
+        finalPrompt = `${generalPrompt} ${prompt}`;
+        break;
+      case 3: {
+        const sanitizedPrompt = await sanitizePromptForModeration(prompt);
+        finalPrompt = `${generalPrompt} ${sanitizedPrompt}`;
+        break;
+      }
+    }
   } else {
-    finalPrompt = `${generalPrompt} No foreground characters or objects, only scene-setting environment. ${prompt}`;
+    finalPrompt = `${generalPrompt} Only scene-setting environment. ${prompt}`;
   }
+
   const input = {
-    prompt: finalPrompt,
-    go_fast: true,
-    megapixels: "1",
-    num_outputs: 1,
     aspect_ratio: type === "avatar" ? "1:1" : "16:9",
-    output_format: "png",
+    input_images: [],
+    output_format: type === "background" ? "webp" : "png",
     output_quality: 80,
-    num_inference_steps: 4,
-    seed: 972314174,
+    prompt: finalPrompt,
+    resolution: "1 MP",
+    safety_tolerance: 5,
+    seed: 43605,
   };
 
   let url: string;
   try {
-    const output = await replicate.run("black-forest-labs/flux-schnell", { input });
+    const output = await replicate.run("black-forest-labs/flux-2-pro", { input });
 
-    // @ts-expect-error wrong types of replicate
-    url = output[0].toString();
+    // @ts-expect-error wrong types of replicate - flux-2-pro returns object with .url() method
+    url = output.url();
   } catch (e) {
     console.error(`Failed to generate image after ${attempt} attempts: ${e}`);
     if (attempt < 3) {
@@ -48,12 +109,14 @@ export const generateFluxImage = async (
         characterName,
         generalPrompt,
         type,
+        filePath,
         attempt + 1,
-        fileName,
       );
     } else {
-      logger.error("Failed to generate image after 3 attempts");
-      return null;
+      logger.error(
+        `Failed to generate image after 3 attempts for prompt: ${characterName} ${prompt}`,
+      );
+      return undefined;
     }
   }
 
@@ -68,19 +131,26 @@ export const generateFluxImage = async (
   const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  let filePath;
-  if (type === "avatar") {
-    const originalFilePath = getPictureFileNameForName(characterName);
-    filePath = `characters/${originalFilePath.replace(".png", ".png")}`;
-  } else {
-    filePath = `backgrounds/${fileName}`;
-  }
+  // let filePath;
+  // if (type === "avatar") {
+  //   const originalFilePath = getPictureFileNameForName(characterName);
+  //   filePath = `characters/${originalFilePath}`;
+  // } else {
+  //   filePath = `backgrounds/${fileName}`;
+  // }
   // const filePath = `characters/${originalFilePath.replace(".png", ".webp")}`;
 
-  writeBookFile(filePath, buffer, FILE_TYPE.PERMANENT);
-  logger.info(`Image saved: getFilePath(filePath): ${getFilePath(filePath, FILE_TYPE.PERMANENT)}`);
-
-  return filePath;
+  if (returnBuffer) {
+    return buffer;
+  }
+  if (filePath) {
+    writeBookFile(filePath, buffer, FILE_TYPE.PERMANENT);
+    logger.info(
+      `Image saved: getFilePath(filePath): ${getFilePath(filePath, FILE_TYPE.PERMANENT)}`,
+    );
+    return filePath;
+  }
+  return undefined;
 };
 
 if (require.main === module) {
@@ -89,6 +159,7 @@ if (require.main === module) {
     "test",
     "SinCity style",
     "avatar",
+    "test.webp",
   ).then((image) => {
     console.log(`image: ${image}`);
   });

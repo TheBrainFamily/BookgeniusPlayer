@@ -7,7 +7,10 @@ import { writeBookFile } from "../../helpers/writeBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { z } from "zod";
 import { readBookFile } from "../../helpers/readBookFile";
-import { generateFluxImage } from "./generate-flux-schnel-image";
+import {
+  generateCharacterImageWithFlux,
+  generateImageWithFluxToFolder,
+} from "./generate-flux-schnel-image";
 import { type GraphicalStyle } from "./create-graphical-style";
 import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { generateCharacterImageWithOpenAI } from "./generate-pictures-for-entities";
@@ -192,35 +195,19 @@ export const generateBackgrounds = async (options: GenerateBackgroundsOptions = 
 
   console.log(`Cleaned prompts: ${JSON.stringify(cleanedPrompts)}`);
 
-  if (FREE_RUN) {
-    await Promise.all(
-      cleanedPrompts.map(async (prompt) => {
-        const fileName = `${outputSubfolder}/flux-schnell-${prompt.chapter}-${prompt.startingParagraph}.png`;
-        const imageOpenAi = await generateFluxImage(
-          prompt.sceneDescription,
-          "skip avatar name",
-          genericPrompt.backgroundStyle,
-          "background",
-          1,
-          fileName,
-        );
-        console.log(imageOpenAi);
-      }),
-    );
-  } else {
-    await Promise.all(
-      cleanedPrompts.map(async (prompt) => {
-        const imageOpenAi = await generateImageWithOpenAIToFolder(
-          prompt.sceneDescription,
-          prompt.chapter,
-          prompt.startingParagraph,
-          genericPrompt,
-          outputSubfolder,
-        );
-        console.log(imageOpenAi);
-      }),
-    );
-  }
+  const generator = FREE_RUN ? generateImageWithFluxToFolder : generateImageWithOpenAIToFolder;
+  await Promise.all(
+    cleanedPrompts.map(async (prompt) => {
+      const imagePath = await generator(
+        prompt.sceneDescription,
+        prompt.chapter,
+        prompt.startingParagraph,
+        genericPrompt,
+        outputSubfolder,
+      );
+      console.log(imagePath);
+    }),
+  );
 };
 
 export const generateImageWithOpenAIToFolder = async (
@@ -328,13 +315,14 @@ Chapter Text: <chapter>${chapter.content}</chapter>
   const response = await callSlowGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
 
   const outputFolder = "style-previews";
-  const imagePath = await generateImageWithOpenAIToFolder(
+  const generator = FREE_RUN ? generateImageWithFluxToFolder : generateImageWithOpenAIToFolder;
+  const imagePath = (await generator(
     response.sceneDescription,
     chapterNumber,
     0,
     style,
     outputFolder,
-  );
+  )) as string;
 
   if (!imagePath) {
     return undefined;
@@ -368,11 +356,11 @@ Chapter Text: <chapter>${chapter.content}</chapter>
         logger.info(`Generating avatar preview for character: ${firstCharacter.name}`);
 
         const avatarPrompt = `Portrait of ${firstCharacter.name}. ${firstCharacter.referenceCard}`;
-        const avatarBuffer = await generateCharacterImageWithOpenAI(
-          avatarPrompt,
-          firstCharacter.name,
-          style.avatarStyle,
-        );
+
+        const generator = FREE_RUN
+          ? generateCharacterImageWithFlux
+          : generateCharacterImageWithOpenAI;
+        const avatarBuffer = await generator(avatarPrompt, firstCharacter.name, style.avatarStyle);
 
         if (avatarBuffer) {
           const avatarFileName = `${styleType}-preview-avatar.webp`;
