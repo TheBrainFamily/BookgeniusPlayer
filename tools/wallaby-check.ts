@@ -2,9 +2,11 @@
 /**
  * Calls Wallaby MCP server to check for failing tests.
  * Used as a PostToolUse hook to get instant test feedback after code changes.
+ *
+ * Uses polling to wait for Wallaby to process file changes before reporting.
  */
 
-import { spawn } from "child_process";
+import { spawn, type ChildProcess } from "child_process";
 import { homedir } from "os";
 import { join } from "path";
 
@@ -28,6 +30,7 @@ interface WallabyTest {
   status: string;
   file: string;
   line: number;
+  time?: number;
   errors?: Array<{ message: string }>;
 }
 
@@ -38,126 +41,177 @@ interface WallabyResult {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function callWallabyMcp(): Promise<void> {
-  // Wait for Wallaby to process file changes before querying
-  await sleep(500);
+class WallabyMcpClient {
+  private proc: ChildProcess;
+  private buffer = "";
+  private requestId = 0;
+  private responseHandlers = new Map<number, (response: JsonRpcResponse) => void>();
 
-  const mcpPath = join(homedir(), ".wallaby", "mcp");
+  constructor() {
+    const mcpPath = join(homedir(), ".wallaby", "mcp");
+    this.proc = spawn("node", [mcpPath], { stdio: ["pipe", "pipe", "pipe"] });
 
-  const proc = spawn("node", [mcpPath], { stdio: ["pipe", "pipe", "pipe"] });
+    this.proc.stdout?.on("data", (data: Buffer) => {
+      this.buffer += data.toString();
+      this.processBuffer();
+    });
+  }
 
-  let buffer = "";
-  let requestId = 0;
+  private processBuffer() {
+    const lines = this.buffer.split("\n");
+    this.buffer = lines.pop() || "";
 
-  const sendRequest = (method: string, params?: Record<string, unknown>): number => {
-    const id = ++requestId;
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const response = JSON.parse(line) as JsonRpcResponse;
+        const handler = this.responseHandlers.get(response.id);
+        if (handler) {
+          this.responseHandlers.delete(response.id);
+          handler(response);
+        }
+      } catch {
+        // Ignore non-JSON lines
+      }
+    }
+  }
+
+  async sendRequest(method: string, params?: Record<string, unknown>): Promise<JsonRpcResponse> {
+    const id = ++this.requestId;
     const request: JsonRpcRequest = { jsonrpc: "2.0", method, params, id };
-    proc.stdin.write(JSON.stringify(request) + "\n");
-    return id;
-  };
 
-  const waitForResponse = (expectedId: number): Promise<JsonRpcResponse> => {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error("Timeout waiting for MCP response"));
+        this.responseHandlers.delete(id);
+        reject(new Error("Timeout"));
       }, 5000);
 
-      const onData = (data: Buffer) => {
-        buffer += data.toString();
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
+      this.responseHandlers.set(id, (response) => {
+        clearTimeout(timeout);
+        resolve(response);
+      });
 
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const response = JSON.parse(line) as JsonRpcResponse;
-            if (response.id === expectedId) {
-              clearTimeout(timeout);
-              proc.stdout.off("data", onData);
-              resolve(response);
-            }
-          } catch {
-            // Ignore parse errors for non-JSON lines
-          }
-        }
-      };
-
-      proc.stdout.on("data", onData);
+      this.proc.stdin?.write(JSON.stringify(request) + "\n");
     });
-  };
+  }
 
-  try {
-    // Initialize MCP connection
-    const initId = sendRequest("initialize", {
+  sendNotification(method: string) {
+    this.proc.stdin?.write(JSON.stringify({ jsonrpc: "2.0", method }) + "\n");
+  }
+
+  async initialize() {
+    await this.sendRequest("initialize", {
       protocolVersion: "2024-11-05",
       capabilities: {},
       clientInfo: { name: "wallaby-check", version: "1.0.0" },
     });
-    await waitForResponse(initId);
+    this.sendNotification("notifications/initialized");
+  }
 
-    // Send initialized notification (no response expected)
-    proc.stdin.write(
-      JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\n",
-    );
+  async getFailingTests(): Promise<WallabyResult> {
+    const response = await this.sendRequest("tools/call", {
+      name: "wallaby_failingTests",
+      arguments: {},
+    });
 
-    // Call the failing tests tool
-    const toolId = sendRequest("tools/call", { name: "wallaby_failingTests", arguments: {} });
-    const toolResponse = await waitForResponse(toolId);
-
-    if (toolResponse.error) {
-      console.error(`Wallaby error: ${toolResponse.error.message}`);
-      process.exit(1);
+    if (response.error) {
+      throw new Error(response.error.message);
     }
 
-    // Parse the result
-    const content = toolResponse.result as { content: Array<{ type: string; text: string }> };
-    if (content?.content?.[0]?.text) {
-      const result = JSON.parse(content.content[0].text) as WallabyResult;
+    const content = response.result as { content: Array<{ type: string; text: string }> };
+    return JSON.parse(content.content[0].text) as WallabyResult;
+  }
 
-      if (result.tests.length === 0) {
-        // Success - exit silently
-        process.exit(0);
-      } else {
-        // Build error message
-        const lines: string[] = [];
-        lines.push("");
-        lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        lines.push(`Wallaby: ${result.tests.length} failing test(s)`);
-        lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        lines.push("");
-
-        for (const test of result.tests.slice(0, 5)) {
-          const testName = test.name.join(" > ");
-          const error = test.errors?.[0]?.message || "Unknown error";
-          lines.push(`• ${test.file}:${test.line}`);
-          lines.push(`  ${testName}`);
-          lines.push(`  Error: ${error.slice(0, 100)}`);
-          lines.push("");
-        }
-
-        if (result.tests.length > 5) {
-          lines.push(`... and ${result.tests.length - 5} more`);
-          lines.push("");
-        }
-
-        lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-
-        const errorMessage = lines.join("\n");
-
-        // Output JSON for Claude Code hook system
-        const output = { decision: "block", reason: errorMessage, systemMessage: errorMessage };
-        console.log(JSON.stringify(output));
-
-        // Exit 0 so JSON is processed (exit 1 would ignore the JSON)
-        process.exit(0);
-      }
-    }
-  } finally {
-    proc.kill();
+  kill() {
+    this.proc.kill();
   }
 }
 
-callWallabyMcp().catch((err) => {
+// Create a hash of test state to detect changes
+function hashTestState(result: WallabyResult): string {
+  const testStates = result.tests.map((t) => `${t.id}:${t.status}`).sort();
+  return testStates.join("|");
+}
+
+async function main() {
+  const client = new WallabyMcpClient();
+
+  try {
+    await client.initialize();
+
+    // Get initial state
+    let result = await client.getFailingTests();
+    let lastHash = hashTestState(result);
+    let stableCount = 0;
+
+    // Poll until state is stable (same hash for 2 consecutive checks)
+    // or timeout after 1.5s
+    const startTime = Date.now();
+    const maxWait = 1500;
+    const pollInterval = 100;
+
+    while (Date.now() - startTime < maxWait) {
+      await sleep(pollInterval);
+
+      result = await client.getFailingTests();
+      const newHash = hashTestState(result);
+
+      if (newHash === lastHash) {
+        stableCount++;
+        if (stableCount >= 2) {
+          // State has been stable, we're done
+          break;
+        }
+      } else {
+        // State changed, reset stability counter
+        stableCount = 0;
+        lastHash = newHash;
+      }
+    }
+
+    // Report results
+    if (result.tests.length === 0) {
+      // Success - exit silently
+      process.exit(0);
+    }
+
+    // Build error message
+    const lines: string[] = [];
+    lines.push("");
+    lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    lines.push(`Wallaby: ${result.tests.length} failing test(s)`);
+    lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    lines.push("");
+
+    for (const test of result.tests.slice(0, 5)) {
+      const testName = test.name.join(" > ");
+      const error = test.errors?.[0]?.message || "Unknown error";
+      lines.push(`• ${test.file}:${test.line}`);
+      lines.push(`  ${testName}`);
+      lines.push(`  Error: ${error.slice(0, 100)}`);
+      lines.push("");
+    }
+
+    if (result.tests.length > 5) {
+      lines.push(`... and ${result.tests.length - 5} more`);
+      lines.push("");
+    }
+
+    lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
+    const errorMessage = lines.join("\n");
+
+    // Output JSON for Claude Code hook system
+    const output = { decision: "block", reason: errorMessage, systemMessage: errorMessage };
+    console.log(JSON.stringify(output));
+
+    process.exit(0);
+  } finally {
+    client.kill();
+  }
+}
+
+main().catch((err) => {
   console.error("Wallaby check failed:", err.message);
   process.exit(1);
 });
