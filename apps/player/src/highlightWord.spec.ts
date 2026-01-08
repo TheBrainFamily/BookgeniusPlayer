@@ -16,6 +16,7 @@ function highlightNthOccurrence(
 */
 // --- End of function definition assumption ---
 
+import { describe, test, expect, beforeEach } from "vitest";
 import { highlightNthOccurrence } from "@player/highlightWord";
 
 describe("highlightNthOccurrence", () => {
