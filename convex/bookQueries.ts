@@ -143,7 +143,7 @@ export const getCharacterBundle = query({
       const basename = file.basename.toLowerCase();
       const assetInfo: AssetInfo = {
         url: file.url,
-        versionId: file.versionId as string,
+        versionId: file.versionId,
         contentType: file.contentType,
         publishedAt: file.publishedAt,
       };
@@ -201,14 +201,14 @@ export const listChapters = query({
         path: `${chaptersPath}/${file.basename}`,
         basename: file.basename,
         url: file.url,
-        versionId: file.versionId as string,
+        versionId: file.versionId,
         contentType: file.contentType,
         size: file.size,
         publishedAt: file.publishedAt,
         extra: asset?.extra,
         // Extract chapter number for sorting
-        chapterNumber: (asset?.extra as { chapterNumber?: number })?.chapterNumber ?? 0,
-        title: (asset?.extra as { title?: string })?.title,
+        chapterNumber: asset?.extra?.chapterNumber ?? 0,
+        title: asset?.extra?.title,
       };
     });
 

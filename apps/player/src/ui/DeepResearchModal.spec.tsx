@@ -1,4 +1,4 @@
-import { describe, it, expect } from "@jest/globals";
+import { describe, it, expect } from "vitest";
 import { extractQuotes } from "./utils/extractQuotes"; // adjust the path!
 
 const exampleMarkdown = `Oto fragmenty z tekstu, które mogą posłużyć do odpowiedzi na zadane pytania:

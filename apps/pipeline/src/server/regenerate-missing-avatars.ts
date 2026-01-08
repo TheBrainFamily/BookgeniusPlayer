@@ -8,6 +8,7 @@ import {
 } from "./convex-client";
 import { generateCharacterImageWithOpenAI } from "../../src/tools/new-tooling/generate-pictures-for-entities";
 import "dotenv/config";
+import { generateCharacterImageWithFlux } from "src/tools/new-tooling/generate-flux-schnel-image";
 
 interface GeneratedPrompt {
   name: string;
@@ -121,11 +122,11 @@ async function generateSingleAvatar(
       state: "generating",
     });
 
-    const imageBuffer = await generateCharacterImageWithOpenAI(
-      character.aiPrompt,
-      character.displayName,
-      avatarStyle,
-    );
+    const generator =
+      process.env.FREE_RUN === "true"
+        ? generateCharacterImageWithFlux
+        : generateCharacterImageWithOpenAI;
+    const imageBuffer = await generator(character.aiPrompt, character.displayName, avatarStyle);
 
     if (!imageBuffer) {
       await convex.markCharacterAvatarState({
@@ -237,24 +238,15 @@ async function main() {
     `../../books-data/${bookSlug}/temporary-output/graphicalStyle.json`,
   );
 
-  let avatarStyle = `Avatar for a character in an ebook. Expressionist Graphic Noir
-Frank Miller's *Sin City* style. extreme black-and-white contrast with splashes of color
-Mid-century film noir cinematography.
-Propaganda posters for their graphic boldness and limited color palette.`;
+  console.log(`graphicalStylePath: ${graphicalStylePath}`);
 
-  if (fs.existsSync(graphicalStylePath)) {
-    try {
-      const styleData = JSON.parse(fs.readFileSync(graphicalStylePath, "utf-8"));
-      if (styleData.avatarStyle) {
-        avatarStyle = styleData.avatarStyle;
-        console.log(`\n🎨 Using avatarStyle from graphicalStyle.json`);
-      }
-    } catch {
-      console.log(`⚠️  Could not parse graphicalStyle.json, using default style`);
-    }
+  const styleData = JSON.parse(fs.readFileSync(graphicalStylePath, "utf-8"));
+  if (!styleData.avatarStyle) {
+    console.log(`⚠️  No avatarStyle found in graphicalStyle.json`);
+    process.exit(1);
   }
 
-  await regenerateMissingAvatars(bookPath, avatarStyle);
+  await regenerateMissingAvatars(bookPath, styleData.avatarStyle);
 }
 
 main().catch((e) => {

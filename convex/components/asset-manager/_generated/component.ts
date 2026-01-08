@@ -162,6 +162,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         },
         Name
       >;
+      deleteFilesInFolder: FunctionReference<
+        "mutation",
+        "internal",
+        { basenames?: Array<string>; folderPath: string },
+        { deletedAssets: number; deletedVersions: number },
+        Name
+      >;
       finishUpload: FunctionReference<
         "mutation",
         "internal",

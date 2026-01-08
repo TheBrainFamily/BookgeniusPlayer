@@ -16,14 +16,13 @@ Interactive audiobook platform with AI-powered content. Monorepo with React apps
 - **Runtime**: Bun (not Node)
 - **Frontend**: React 19, TypeScript 5.8.2
 - **Backend**: Convex
-- **Style**: No semicolons, camelCase, Prettier
+- **Style**: Semicolons, camelCase, Prettier (printWidth: 100)
 
 ## Commands
 
 ```bash
 bun run typecheck        # Type check all
 bun run lint             # Lint all
-npx convex dev           # Start Convex (required for player/CMS)
 ```
 
 ## Standard Ebooks Sync
@@ -42,9 +41,5 @@ bun apps/pipeline/src/tools/generateSEDescriptions.ts   # Generate descriptions
 
 ## Git Rules
 
-- **NEVER force push** (`git push --force`, `git push -f`, `git push --force-with-lease`) unless explicitly requested by the user
+- **NEVER force push** (`git push --force`, `git push -f`, `git push --force-with-lease`)
 - Always use regular `git push` for pushing commits
-
-## Serena MCP
-
-This project has Serena memories. Run `mcp__serena__list_memories` to see available context about project structure, conventions, and commands.

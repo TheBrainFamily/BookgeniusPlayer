@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { wrapPunctuationAdvanced } from "../../src/services/wrapPunctuation";
 
 describe("wrapPunctuationAdvanced", () => {

@@ -82,7 +82,6 @@ export const SearchModalRenderer: React.FC = () => {
         <SearchModal
           key="search-modal"
           onClose={closeModal}
-          layoutView={isSidePanel}
           searchResults={results}
           clickedAppearanceId={lastClickedAppearanceId}
           searchQuery={query}

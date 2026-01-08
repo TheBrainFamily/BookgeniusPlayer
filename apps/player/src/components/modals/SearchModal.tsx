@@ -36,7 +36,6 @@ import { FILTER_OPTIONS, FILTER_VALUE_MAP, type SearchFilter } from "@player/uti
 
 interface SearchModalProps {
   onClose: () => void;
-  layoutView?: boolean;
   searchResults: SearchResultsData;
   clickedAppearanceId?: string;
   searchQuery?: string;
@@ -45,7 +44,6 @@ interface SearchModalProps {
 
 export const SearchModal: React.FC<SearchModalProps> = ({
   onClose,
-  layoutView: _layoutView,
   searchResults,
   clickedAppearanceId,
   searchQuery,

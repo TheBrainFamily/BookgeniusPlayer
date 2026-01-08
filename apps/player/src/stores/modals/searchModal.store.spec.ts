@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useSearchModal } from "./searchModal.store";
 
-jest.mock("../modalCoordinator.store", () => ({
+vi.mock("../modalCoordinator.store", () => ({
   useModalCoordinator: {
     getState: () => ({ requestModalOpen: () => true, releaseModal: () => {} }),
   },
