@@ -1,4 +1,4 @@
-import type { useAuth as ClerkUseAuth } from "@clerk/clerk-react";
+import type { useAuth as ClerkUseAuth } from "@clerk/react-router";
 
 type AuthCtxComponents = { SignIn?: React.ComponentType; SignUp?: React.ComponentType };
 
