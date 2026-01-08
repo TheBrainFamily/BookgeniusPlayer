@@ -16,7 +16,7 @@ Interactive audiobook platform with AI-powered content. Monorepo with React apps
 - **Runtime**: Bun (not Node)
 - **Frontend**: React 19, TypeScript 5.8.2
 - **Backend**: Convex
-- **Style**: No semicolons, camelCase, Prettier
+- **Style**: Semicolons, camelCase, Prettier (printWidth: 100)
 
 ## Commands
 
@@ -44,6 +44,16 @@ bun apps/pipeline/src/tools/generateSEDescriptions.ts   # Generate descriptions
 
 - **NEVER force push** (`git push --force`, `git push -f`, `git push --force-with-lease`) unless explicitly requested by the user
 - Always use regular `git push` for pushing commits
+
+## Safety Hook Modes
+
+Use `/interactive` to toggle between modes:
+
+- `/interactive enable` - Prompts for approval on dangerous operations (user at computer)
+- `/interactive disable` - Denies dangerous operations (agent must find safer alternatives)
+- `/interactive status` - Check current mode
+
+When denied for `rm -rf` in autonomous mode, list files explicitly instead.
 
 ## Serena MCP
 

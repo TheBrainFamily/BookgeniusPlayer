@@ -43,7 +43,8 @@ describe("folders: createdBy / updatedBy attribution", () => {
       name: "Kanban",
     });
 
-    const folder = await asUser.query(api.assetManager.getFolder, { path: "Kanban" });
+    // path is slugified to lowercase
+    const folder = await asUser.query(api.assetManager.getFolder, { path: "kanban" });
 
     expect(folder?._id).toEqual(id);
     expect(folder?.createdBy).toBe("user-1");
@@ -57,16 +58,17 @@ describe("folders: createdBy / updatedBy attribution", () => {
 
     await asUser1.mutation(api.assetManager.createFolderByName, { parentPath: "", name: "Kanban" });
 
-    const afterCreate = await asUser1.query(api.assetManager.getFolder, { path: "Kanban" });
+    // path is slugified to lowercase
+    const afterCreate = await asUser1.query(api.assetManager.getFolder, { path: "kanban" });
 
     expect(afterCreate?.createdBy).toBe("user-1");
     expect(afterCreate?.updatedBy).toBe("user-1");
 
     const asUser2 = t.withIdentity({ tokenIdentifier: "user-2" });
 
-    await asUser2.mutation(api.assetManager.updateFolder, { path: "Kanban", name: "Kanban board" });
+    await asUser2.mutation(api.assetManager.updateFolder, { path: "kanban", name: "Kanban board" });
 
-    const afterUpdate = await asUser2.query(api.assetManager.getFolder, { path: "Kanban" });
+    const afterUpdate = await asUser2.query(api.assetManager.getFolder, { path: "kanban" });
 
     expect(afterUpdate?.createdBy).toBe("user-1");
     expect(afterUpdate?.updatedBy).toBe("user-2");
@@ -117,7 +119,8 @@ describe("folders: createdBy / updatedBy attribution", () => {
     const folders = await asUser.query(api.assetManager.listFolders, {});
 
     expect(folders).toHaveLength(1);
-    expect(folders[0].path).toBe("Kanban");
+    // path is slugified to lowercase
+    expect(folders[0].path).toBe("kanban");
     expect(folders[0].createdBy).toBe("user-1");
     expect(folders[0].updatedBy).toBe("user-1");
   });

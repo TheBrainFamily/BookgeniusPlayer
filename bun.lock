@@ -12,6 +12,8 @@
         "@types/diff-match-patch": "^1.0.36",
         "@types/jsdom": "^27.0.0",
         "@typescript/native-preview": "7.0.0-dev.20260104.1",
+        "@vitest/runner": "^4.0.16",
+        "@vitest/snapshot": "^4.0.16",
         "convex": "^1.31.2",
         "eslint": "^9.33.0",
         "eslint-plugin-react": "^7.37.5",

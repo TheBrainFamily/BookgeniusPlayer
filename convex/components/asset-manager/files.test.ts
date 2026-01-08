@@ -1,3 +1,4 @@
+// @vitest-environment node
 // convex/assetManager.files.test.ts
 import { describe, it, expect } from "vitest";
 import { convexTest } from "convex-test";

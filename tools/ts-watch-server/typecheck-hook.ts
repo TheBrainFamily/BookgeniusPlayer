@@ -139,37 +139,47 @@ async function main() {
     }
   }
 
-  // If no errors, exit silently
+  // If no errors, exit silently (success)
   if (allErrors.length === 0) {
     process.exit(0);
   }
 
-  // Format output to stderr
-  console.error("");
-  console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.error(`TypeScript Errors (${allErrors.length} total, checked in ${totalDuration}ms)`);
-  console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.error("");
+  // Build error message for display
+  const lines: string[] = [];
+  lines.push("");
+  lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  lines.push(`TypeScript Errors (${allErrors.length} total, checked in ${totalDuration}ms)`);
+  lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  lines.push("");
 
   // Show first 10 errors
   for (const error of allErrors.slice(0, 10)) {
     const relPath = relative(PROJECT_ROOT, error.file);
     const shortPath = relPath.split("/").slice(-3).join("/");
-    console.error(`[${error.code}] ${shortPath}:${error.line}:${error.column}`);
-    console.error(`    ${error.message}`);
+    lines.push(`[${error.code}] ${shortPath}:${error.line}:${error.column}`);
+    lines.push(`    ${error.message}`);
+    lines.push("");
   }
 
   if (allErrors.length > 10) {
-    console.error("");
-    console.error(`... and ${allErrors.length - 10} more error(s)`);
+    lines.push(`... and ${allErrors.length - 10} more error(s)`);
+    lines.push("");
   }
 
-  console.error("");
-  console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.error("");
+  lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-  // Exit with error to signal issues
-  process.exit(2);
+  const errorMessage = lines.join("\n");
+
+  // Output JSON for Claude Code:
+  // - decision: "block" prompts Claude with the reason
+  // - reason: shown to Claude
+  // - systemMessage: shown to the USER in terminal
+  const output = { decision: "block", reason: errorMessage, systemMessage: errorMessage };
+
+  console.log(JSON.stringify(output));
+
+  // Exit with code 0 so JSON is processed (exit code 2 ignores JSON)
+  process.exit(0);
 }
 
 main().catch((err) => {

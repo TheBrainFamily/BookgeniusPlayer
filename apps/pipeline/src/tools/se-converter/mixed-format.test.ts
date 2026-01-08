@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect } from "vitest";
 import { convertSeXhtmlToHtml } from "./index";
 
 describe("SE Converter - Mixed prose and play format", () => {

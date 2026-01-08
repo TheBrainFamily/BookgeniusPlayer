@@ -1,3 +1,4 @@
+// @vitest-environment node
 // convex/components/asset-manager/assetFsHttp.test.ts
 /**
  * Tests for HTTP file serving functionality.
