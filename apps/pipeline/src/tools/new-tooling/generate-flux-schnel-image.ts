@@ -74,6 +74,7 @@ export const generateFluxImage = async (
       case 2:
         finalPrompt = `${generalPrompt} ${prompt}`;
         break;
+      default:
       case 3: {
         const sanitizedPrompt = await sanitizePromptForModeration(prompt);
         finalPrompt = `${generalPrompt} ${sanitizedPrompt}`;

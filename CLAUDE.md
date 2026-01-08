@@ -23,7 +23,6 @@ Interactive audiobook platform with AI-powered content. Monorepo with React apps
 ```bash
 bun run typecheck        # Type check all
 bun run lint             # Lint all
-npx convex dev           # Start Convex (required for player/CMS)
 ```
 
 ## Standard Ebooks Sync
@@ -42,19 +41,5 @@ bun apps/pipeline/src/tools/generateSEDescriptions.ts   # Generate descriptions
 
 ## Git Rules
 
-- **NEVER force push** (`git push --force`, `git push -f`, `git push --force-with-lease`) unless explicitly requested by the user
+- **NEVER force push** (`git push --force`, `git push -f`, `git push --force-with-lease`)
 - Always use regular `git push` for pushing commits
-
-## Safety Hook Modes
-
-Use `/interactive` to toggle between modes:
-
-- `/interactive enable` - Prompts for approval on dangerous operations (user at computer)
-- `/interactive disable` - Denies dangerous operations (agent must find safer alternatives)
-- `/interactive status` - Check current mode
-
-When denied for `rm -rf` in autonomous mode, list files explicitly instead.
-
-## Serena MCP
-
-This project has Serena memories. Run `mcp__serena__list_memories` to see available context about project structure, conventions, and commands.
