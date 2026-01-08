@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import type { ClerkProviderProps } from "@clerk/react-router";
 import type { LoadedClerk, UseUserReturn, UseAuthReturn } from "@clerk/types";
+import type { useAuth as ClerkUseAuthType } from "@clerk/clerk-react";
 import type { AuthCtx, AuthModule } from "./types";
 import { Button } from "@platform/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,9 @@ import { enUS, plPL } from "@clerk/localizations";
 const Ctx = createContext<AuthCtx>({ ready: false, isSignedIn: false, openSignIn: () => {} });
 
 const WidgetCtx = createContext<React.ComponentType | undefined>(undefined);
+
+// Context to expose Clerk's native useAuth hook for ConvexProviderWithClerk
+const ClerkUseAuthCtx = createContext<typeof ClerkUseAuthType | null>(null);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [ClerkProvider, setClerkProvider] =
@@ -180,17 +184,19 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
-      <ClerkProvider
-        localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
-        publishableKey={publishableKey}
-        domain={shouldUseRedirect ? clerkDomain : undefined}
-        signInUrl={signInUrl}
-        signUpUrl={signUpUrl}
-        isSatellite={isSatellite}
-        allowedRedirectOrigins={allowedRedirectOrigins}
-      >
-        <Inner>{children}</Inner>
-      </ClerkProvider>
+      <ClerkUseAuthCtx.Provider value={hooks.useClerkAuth}>
+        <ClerkProvider
+          localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
+          publishableKey={publishableKey}
+          domain={shouldUseRedirect ? clerkDomain : undefined}
+          signInUrl={signInUrl}
+          signUpUrl={signUpUrl}
+          isSatellite={isSatellite}
+          allowedRedirectOrigins={allowedRedirectOrigins}
+        >
+          <Inner>{children}</Inner>
+        </ClerkProvider>
+      </ClerkUseAuthCtx.Provider>
     </WidgetCtx.Provider>
   );
 };
@@ -217,6 +223,9 @@ const AuthProviderSafe: React.FC<{ children: React.ReactNode }> = ({ children })
 const useAuth = () => useContext(Ctx);
 
 const useUserWidget = () => useContext(WidgetCtx);
+
+// Hook to get Clerk's native useAuth for ConvexProviderWithClerk
+const useClerkAuthHook = () => useContext(ClerkUseAuthCtx);
 const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   const { t } = useTranslation();
 
@@ -231,6 +240,7 @@ const mod: AuthModule = {
   useAuth,
   useUserWidget,
   useSignInWidget: () => SignInWidget,
+  clerkUseAuth: useClerkAuthHook,
 };
 
 export default mod;
