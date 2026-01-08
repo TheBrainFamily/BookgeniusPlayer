@@ -89,7 +89,14 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-library-gold">{t("footer.helpCenter")}</h4>
             <div className="space-y-2 flex flex-col">
-              {["privacyPolicy", "termsOfService", "cookiePolicy"].map((linkKey) => (
+              <Button
+                asChild
+                variant="ghost"
+                className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
+              >
+                <a href="/terms">{t("footer.termsOfService")}</a>
+              </Button>
+              {["privacyPolicy", "cookiePolicy"].map((linkKey) => (
                 <Button
                   key={linkKey}
                   variant="ghost"

@@ -7,6 +7,7 @@ import { Toaster as Sonner } from "@platform/components/ui/sonner";
 import { TooltipProvider } from "@platform/components/ui/tooltip";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Terms from "./pages/Terms";
 import AuthComponentsWrapper from "./pages/AuthComponentsWrapper";
 import { RouteTransitionProvider } from "./providers/RouteTransitionProvider";
 import { UniversalRouter } from "./UniversalRouter";
@@ -44,6 +45,7 @@ const AppWithAuth = () => {
           <SnapplifyChat />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/experience/:slug" element={<BookExperience />} />
             <Route path="/GenreExploration" element={<GenreExploration />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
