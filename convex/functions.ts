@@ -147,9 +147,7 @@ export const bookMutation = customMutation(baseMutation, {
         if (recordWithBookPath.bookPath !== bookPath) {
           throw new Error("Access denied: record belongs to different book");
         }
-        // Type assertion needed because Convex's patch expects exact table document type
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await ctx.db.patch(id, fields as any);
+        await ctx.db.patch(id, fields);
       },
 
       delete: async <T extends BookTableNames>(id: Id<T>): Promise<void> => {

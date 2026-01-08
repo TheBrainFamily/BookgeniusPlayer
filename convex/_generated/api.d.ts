@@ -11,6 +11,7 @@
 import type * as admin_deleteFilesInFolder from "../admin/deleteFilesInFolder.js";
 import type * as authHelpers from "../authHelpers.js";
 import type * as authz from "../authz.js";
+import type * as authzQueries from "../authzQueries.js";
 import type * as avatarEditing from "../avatarEditing.js";
 import type * as avatarGeneration from "../avatarGeneration.js";
 import type * as backgroundCues from "../backgroundCues.js";
@@ -52,6 +53,7 @@ declare const fullApi: ApiFromModules<{
   "admin/deleteFilesInFolder": typeof admin_deleteFilesInFolder;
   authHelpers: typeof authHelpers;
   authz: typeof authz;
+  authzQueries: typeof authzQueries;
   avatarEditing: typeof avatarEditing;
   avatarGeneration: typeof avatarGeneration;
   backgroundCues: typeof backgroundCues;

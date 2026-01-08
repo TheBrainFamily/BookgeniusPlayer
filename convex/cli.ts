@@ -1,19 +1,19 @@
 // convex/cli.ts
-// CLI operations for asset management - admin only for mutations
+// CLI operations for asset management - admin only
 import { v } from "convex/values";
 import { components, internal } from "./_generated/api";
-import { publicQuery, adminMutation, publicAction } from "./functions";
+import { adminQuery, adminMutation, adminAction } from "./functions";
 
 // --- Folder Operations ---
 
-export const listFolders = publicQuery({
+export const listFolders = adminQuery({
   args: { parentPath: v.optional(v.string()) },
   handler: async (ctx, args) => {
     return await ctx.runQuery(components.assetManager.assetManager.listFolders, args);
   },
 });
 
-export const getFolder = publicQuery({
+export const getFolder = adminQuery({
   args: { path: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(components.assetManager.assetManager.getFolder, args);
@@ -43,14 +43,14 @@ export const updateFolder = adminMutation({
 
 // --- Asset Operations ---
 
-export const listAssets = publicQuery({
+export const listAssets = adminQuery({
   args: { folderPath: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(components.assetManager.assetManager.listAssets, args);
   },
 });
 
-export const getAsset = publicQuery({
+export const getAsset = adminQuery({
   args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(components.assetManager.assetManager.getAsset, args);
@@ -73,21 +73,21 @@ export const renameAsset = adminMutation({
 
 // --- Version Operations ---
 
-export const getAssetVersions = publicQuery({
+export const getAssetVersions = adminQuery({
   args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, args);
   },
 });
 
-export const getPublishedFile = publicQuery({
+export const getPublishedFile = adminQuery({
   args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(components.assetManager.assetManager.getPublishedFile, args);
   },
 });
 
-export const listPublishedFilesInFolder = publicQuery({
+export const listPublishedFilesInFolder = adminQuery({
   args: { folderPath: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(
@@ -155,7 +155,7 @@ export const updateVersionExtra = adminMutation({
 
 // --- Admin Preview (any version state) ---
 
-export const getVersionPreviewUrl = publicQuery({
+export const getVersionPreviewUrl = adminQuery({
   args: { versionId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, args);
@@ -164,7 +164,7 @@ export const getVersionPreviewUrl = publicQuery({
 
 // --- Text Content Fetching (bypasses CORS for text files) ---
 
-export const getTextContent = publicAction({
+export const getTextContent = adminAction({
   args: { versionId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
