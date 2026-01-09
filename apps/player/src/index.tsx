@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import "./styles/index.css";
 
 import { AppWithResolve } from "@player/AppWithResolve";
+import { SplashScreenController } from "@player/components/SplashScreen";
 
 // Try to find container immediately, or wait for DOMContentLoaded if DOM isn't ready yet
 function mountApp() {
@@ -13,6 +14,8 @@ function mountApp() {
   }
   createRoot(container).render(
     <React.StrictMode>
+      {/* Controls the existing HTML splash screen */}
+      <SplashScreenController autoStart={false} />
       <AppWithResolve />
     </React.StrictMode>,
   );

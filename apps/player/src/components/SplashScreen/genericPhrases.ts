@@ -1,0 +1,22 @@
+/**
+ * Generic loading phrases used when book-specific phrases are exhausted
+ * or not available.
+ */
+export const genericPhrases = [
+  "Creating a virtual library...",
+  "Invoking fictional characters...",
+  "Crafting literary elixirs...",
+  "Cleaning up ancient books...",
+  "Setting the final dots...",
+  "Turning pages...",
+  "Connecting imagination to reality...",
+  "Deciphering author's intentions...",
+  "Arranging words in perfect order...",
+  "Releasing narrative magic...",
+  "Opening doors to the world of books...",
+  "Igniting the fire of imagination...",
+  "Polishing literary gems...",
+  "Adding the final touches...",
+  "Weaving the threads of stories...",
+  "Awakening dormant heroes...",
+];
