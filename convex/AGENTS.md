@@ -4,7 +4,6 @@ Backend-as-a-Service providing data persistence, media orchestration, and AI-pow
 
 ## SCHEMA
 
-- `comicSubmissions`: Tracking for AI-powered comic generation jobs.
 - `notes`: Annotations and footnotes for book chapters/paragraphs.
 - `variants`: AI-generated sentence simplifications for different reading levels.
 - `backgroundCues` / `musicCues`: Spatial mapping of media assets to book positions.

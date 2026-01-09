@@ -158,6 +158,25 @@ export default tseslint.config(
       ],
     },
   },
+  // Restrict direct imports from _generated/server (components have their own _generated)
+  {
+    files: ["convex/**/*.ts"],
+    ignores: ["convex/components/**/*.ts", "convex/functions.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["./_generated/server", "../_generated/server"],
+              importNames: ["query", "mutation", "action"],
+              message: "Use functions.ts for query, mutation, or action",
+            },
+          ],
+        },
+      ],
+    },
+  },
 
   // ===== BUN RUNTIME: Server-side apps =====
   {

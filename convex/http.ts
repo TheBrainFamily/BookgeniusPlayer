@@ -1,13 +1,9 @@
 import { httpRouter } from "convex/server";
-import { auth } from "./auth";
 import { components } from "./_generated/api";
 import { registerAssetFsRoutes } from "./components/asset-manager/registerAssetFsRoutes";
 import { uploadBackgroundPreview } from "./backgroundPreviewHttp";
 
 const http = httpRouter();
-
-// Auth routes
-auth.addHttpRoutes(http);
 
 // Asset file serving routes
 registerAssetFsRoutes(http, components.assetManager);

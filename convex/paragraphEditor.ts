@@ -1,6 +1,7 @@
 import { v } from "convex/values";
-import { action, type ActionCtx } from "./_generated/server";
+import type { ActionCtx } from "./_generated/server";
 import { components, internal } from "./_generated/api";
+import { bookAction } from "./functions";
 import {
   DOMParser,
   XMLSerializer,
@@ -156,9 +157,8 @@ async function uploadAndPublishContent(
   return { versionId: finishResult.versionId };
 }
 
-export const setParagraphSpeaker = action({
+export const setParagraphSpeaker = bookAction({
   args: {
-    bookPath: v.string(),
     chapterNumber: v.number(),
     paragraphIndex: v.number(),
     characterSlug: v.optional(v.string()),
@@ -169,7 +169,8 @@ export const setParagraphSpeaker = action({
     action: v.union(v.literal("set"), v.literal("removed")),
     characterSlug: v.union(v.string(), v.null()),
   }),
-  handler: async (ctx, { bookPath, chapterNumber, paragraphIndex, characterSlug }) => {
+  handler: async (ctx, { chapterNumber, paragraphIndex, characterSlug }) => {
+    const bookPath = ctx.bookPath;
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
@@ -262,9 +263,8 @@ export const setParagraphSpeaker = action({
   },
 });
 
-export const modifyCharacterTag = action({
+export const modifyCharacterTag = bookAction({
   args: {
-    bookPath: v.string(),
     chapterNumber: v.number(),
     paragraphIndex: v.number(),
     currentCharacterSlug: v.string(),
@@ -279,15 +279,9 @@ export const modifyCharacterTag = action({
   }),
   handler: async (
     ctx,
-    {
-      bookPath,
-      chapterNumber,
-      paragraphIndex,
-      currentCharacterSlug,
-      textContent,
-      newCharacterSlug,
-    },
+    { chapterNumber, paragraphIndex, currentCharacterSlug, textContent, newCharacterSlug },
   ) => {
+    const bookPath = ctx.bookPath;
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
@@ -368,9 +362,8 @@ export const modifyCharacterTag = action({
   },
 });
 
-export const wrapTextWithCharacter = action({
+export const wrapTextWithCharacter = bookAction({
   args: {
-    bookPath: v.string(),
     chapterNumber: v.number(),
     paragraphIndex: v.number(),
     textToWrap: v.string(),
@@ -380,8 +373,9 @@ export const wrapTextWithCharacter = action({
   returns: v.object({ success: v.boolean(), versionId: v.string(), characterSlug: v.string() }),
   handler: async (
     ctx,
-    { bookPath, chapterNumber, paragraphIndex, textToWrap, occurrenceIndex, characterSlug },
+    { chapterNumber, paragraphIndex, textToWrap, occurrenceIndex, characterSlug },
   ) => {
+    const bookPath = ctx.bookPath;
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
@@ -477,10 +471,11 @@ export const wrapTextWithCharacter = action({
   },
 });
 
-export const removeNoteFromChapter = action({
-  args: { bookPath: v.string(), chapterNumber: v.number(), noteNumber: v.string() },
+export const removeNoteFromChapter = bookAction({
+  args: { chapterNumber: v.number(), noteNumber: v.string() },
   returns: v.object({ success: v.boolean(), versionId: v.string() }),
-  handler: async (ctx, { bookPath, chapterNumber, noteNumber }) => {
+  handler: async (ctx, { chapterNumber, noteNumber }) => {
+    const bookPath = ctx.bookPath;
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
@@ -573,15 +568,15 @@ export const removeNoteFromChapter = action({
   },
 });
 
-export const createCharacter = action({
+export const createCharacter = bookAction({
   args: {
-    bookPath: v.string(),
     characterName: v.string(),
     chapterNumber: v.optional(v.number()),
     paragraphIndex: v.optional(v.number()),
   },
   returns: v.object({ slug: v.string(), displayName: v.string(), characterPath: v.string() }),
-  handler: async (ctx, { bookPath, characterName, chapterNumber, paragraphIndex }) => {
+  handler: async (ctx, { characterName, chapterNumber, paragraphIndex }) => {
+    const bookPath = ctx.bookPath;
     const displayName = characterName.trim();
     if (!displayName) {
       throw new Error("Character name is required");

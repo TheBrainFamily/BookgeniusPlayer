@@ -9,8 +9,8 @@
  */
 
 import { v } from "convex/values";
-import { query, mutation, internalAction, internalMutation } from "./_generated/server";
 import { internal, components } from "./_generated/api";
+import { publicQuery, bookMutation, internalAction, internalMutation } from "./functions";
 
 // =============================================================================
 // Queries
@@ -19,7 +19,7 @@ import { internal, components } from "./_generated/api";
 /**
  * Get metadata for a specific background file.
  */
-export const getByFile = query({
+export const getByFile = publicQuery({
   args: { bookPath: v.string(), fileBasename: v.string() },
   handler: async (ctx, { bookPath, fileBasename }) => {
     const metadata = await ctx.db
@@ -51,7 +51,7 @@ export const getByFile = query({
 /**
  * List all metadata for a book (for batch loading).
  */
-export const listByBook = query({
+export const listByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const allMetadata = await ctx.db
@@ -395,13 +395,10 @@ export const generateVideoPreview = internalAction({
 /**
  * Manually trigger preview generation for a single file.
  */
-export const triggerPreviewGeneration = mutation({
-  args: {
-    bookPath: v.string(),
-    fileBasename: v.string(),
-    fileType: v.union(v.literal("video"), v.literal("image")),
-  },
-  handler: async (ctx, { bookPath, fileBasename, fileType }) => {
+export const triggerPreviewGeneration = bookMutation({
+  args: { fileBasename: v.string(), fileType: v.union(v.literal("video"), v.literal("image")) },
+  handler: async (ctx, { fileBasename, fileType }) => {
+    const bookPath = ctx.bookPath;
     if (fileType === "video") {
       await ctx.scheduler.runAfter(0, internal.backgroundMetadata.generateVideoPreview, {
         bookPath,
@@ -420,9 +417,10 @@ export const triggerPreviewGeneration = mutation({
 /**
  * Trigger preview generation for all background files in a book.
  */
-export const triggerForBook = mutation({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
+export const triggerForBook = bookMutation({
+  args: {},
+  handler: async (ctx) => {
+    const bookPath = ctx.bookPath;
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/backgrounds` },

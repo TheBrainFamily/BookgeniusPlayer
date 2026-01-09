@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { action, mutation, internalAction, internalMutation } from "./_generated/server";
 import { internal, components } from "./_generated/api";
+import { internalAction, internalMutation, bookAction, bookMutation } from "./functions";
 import OpenAI from "openai";
 
 const PROPOSALS_FOLDER = "avatar-proposals";
@@ -311,24 +311,31 @@ export const selectAvatar = internalAction({
   },
 });
 
-export const startAvatarGeneration = action({
-  args: {
-    bookPath: v.string(),
-    characterSlug: v.string(),
-    characterDisplayName: v.string(),
-    visualPrompt: v.string(),
-  },
+export const startAvatarGeneration = bookAction({
+  args: { characterSlug: v.string(), characterDisplayName: v.string(), visualPrompt: v.string() },
   returns: v.null(),
-  handler: async (ctx, args) => {
-    await ctx.scheduler.runAfter(0, internal.avatarGeneration.generateAvatarOptions, args);
+  handler: async (ctx, { characterSlug, characterDisplayName, visualPrompt }) => {
+    await ctx.scheduler.runAfter(0, internal.avatarGeneration.generateAvatarOptions, {
+      bookPath: ctx.bookPath,
+      characterSlug,
+      characterDisplayName,
+      visualPrompt,
+    });
     return null;
   },
 });
 
-export const confirmAvatarSelection = action({
-  args: { bookPath: v.string(), characterSlug: v.string(), selectedOptionUrl: v.string() },
-  handler: async (ctx, args): Promise<{ success: boolean; error?: string }> => {
-    return await ctx.runAction(internal.avatarGeneration.selectAvatar, args);
+export const confirmAvatarSelection = bookAction({
+  args: { characterSlug: v.string(), selectedOptionUrl: v.string() },
+  handler: async (
+    ctx,
+    { characterSlug, selectedOptionUrl },
+  ): Promise<{ success: boolean; error?: string }> => {
+    return await ctx.runAction(internal.avatarGeneration.selectAvatar, {
+      bookPath: ctx.bookPath,
+      characterSlug,
+      selectedOptionUrl,
+    });
   },
 });
 
@@ -488,14 +495,14 @@ export const repairMissingAvatarWebp = internalAction({
   },
 });
 
-export const updateBookGraphicalStyle = mutation({
+export const updateBookGraphicalStyle = bookMutation({
   args: {
-    bookPath: v.string(),
     backgroundStyle: v.optional(v.string()),
     periodStyle: v.optional(v.string()),
     avatarStyle: v.optional(v.string()),
   },
-  handler: async (ctx, { bookPath, backgroundStyle, periodStyle, avatarStyle }) => {
+  handler: async (ctx, { backgroundStyle, periodStyle, avatarStyle }) => {
+    const bookPath = ctx.bookPath;
     const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
       path: bookPath,
     });

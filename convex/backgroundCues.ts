@@ -6,7 +6,7 @@
  */
 
 import { v } from "convex/values";
-import { query, mutation, internalMutation } from "./_generated/server";
+import { publicQuery, bookMutation, internalMutation } from "./functions";
 import { components } from "./_generated/api";
 
 // =============================================================================
@@ -17,7 +17,7 @@ import { components } from "./_generated/api";
  * List all background cues for a book, with file URLs and preview thumbnails.
  * Sorted by chapter, then paragraph.
  */
-export const listByBook = query({
+export const listByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -77,7 +77,7 @@ export const listByBook = query({
  * List cues in player format (matches existing backgroundsForBook shape).
  * For backwards compatibility with player.
  */
-export const listForPlayer = query({
+export const listForPlayer = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -114,7 +114,7 @@ export const listForPlayer = query({
  * List cues in player format, preferring draft files over published.
  * For live edit mode.
  */
-export const listForPlayerWithDrafts = query({
+export const listForPlayerWithDrafts = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -175,7 +175,7 @@ export const listForPlayerWithDrafts = query({
  * Get available background files (for picker UI).
  * Includes preview URLs for thumbnails.
  */
-export const listFiles = query({
+export const listFiles = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const files = await ctx.runQuery(
@@ -218,7 +218,7 @@ export const listFiles = query({
 /**
  * Count cues for a book.
  */
-export const countByBook = query({
+export const countByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const cues = await ctx.db
@@ -237,9 +237,8 @@ export const countByBook = query({
 /**
  * Create a new cue point.
  */
-export const create = mutation({
+export const create = bookMutation({
   args: {
-    bookPath: v.string(),
     fileBasename: v.string(),
     chapter: v.number(),
     paragraph: v.number(),
@@ -247,62 +246,62 @@ export const create = mutation({
     textColor: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("backgroundCues", args);
+    // bookDb.insert auto-adds bookPath
+    return await ctx.bookDb.insert("backgroundCues", args);
   },
 });
 
 /**
  * Update a cue's position.
  */
-export const updatePosition = mutation({
+export const updatePosition = bookMutation({
   args: { id: v.id("backgroundCues"), chapter: v.number(), paragraph: v.number() },
   handler: async (ctx, { id, chapter, paragraph }) => {
-    return await ctx.db.patch(id, { chapter, paragraph });
+    return await ctx.bookDb.patch(id, { chapter, paragraph });
   },
 });
 
 /**
  * Update a cue's file.
  */
-export const updateFile = mutation({
+export const updateFile = bookMutation({
   args: { id: v.id("backgroundCues"), fileBasename: v.string() },
   handler: async (ctx, { id, fileBasename }) => {
-    return await ctx.db.patch(id, { fileBasename });
+    return await ctx.bookDb.patch(id, { fileBasename });
   },
 });
 
 /**
  * Update a cue's colors.
  */
-export const updateColors = mutation({
+export const updateColors = bookMutation({
   args: {
     id: v.id("backgroundCues"),
     backgroundColor: v.optional(v.string()),
     textColor: v.optional(v.string()),
   },
   handler: async (ctx, { id, backgroundColor, textColor }) => {
-    return await ctx.db.patch(id, { backgroundColor, textColor });
+    return await ctx.bookDb.patch(id, { backgroundColor, textColor });
   },
 });
 
 /**
  * Delete a cue.
  */
-export const remove = mutation({
+export const remove = bookMutation({
   args: { id: v.id("backgroundCues") },
   handler: async (ctx, { id }) => {
-    return await ctx.db.delete(id);
+    return await ctx.bookDb.delete(id);
   },
 });
 
 /**
  * Bulk create cues (for import).
  */
-export const bulkCreate = mutation({
+export const bulkCreate = bookMutation({
   args: {
     cues: v.array(
       v.object({
-        bookPath: v.string(),
         fileBasename: v.string(),
         chapter: v.number(),
         paragraph: v.number(),
@@ -314,7 +313,8 @@ export const bulkCreate = mutation({
   handler: async (ctx, { cues }) => {
     const ids = [];
     for (const cue of cues) {
-      const id = await ctx.db.insert("backgroundCues", cue);
+      // bookDb.insert auto-adds bookPath
+      const id = await ctx.bookDb.insert("backgroundCues", cue);
       ids.push(id);
     }
     return ids;
@@ -324,16 +324,14 @@ export const bulkCreate = mutation({
 /**
  * Delete all cues for a book (for re-import).
  */
-export const deleteAllForBook = mutation({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const cues = await ctx.db
-      .query("backgroundCues")
-      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
-      .collect();
+export const deleteAllForBook = bookMutation({
+  args: {},
+  handler: async (ctx) => {
+    // bookDb.query auto-filters by bookPath
+    const cues = await ctx.bookDb.query("backgroundCues").collect();
 
     for (const cue of cues) {
-      await ctx.db.delete(cue._id);
+      await ctx.bookDb.delete(cue._id);
     }
 
     return cues.length;

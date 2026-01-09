@@ -3,8 +3,8 @@
 import { type ReactNode, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConvexQueryClient } from "@convex-dev/react-query";
-import { ConvexProvider } from "convex/react";
-import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import { ClerkProvider, useAuth } from "@clerk/nextjs";
+import { ConvexProviderWithClerk } from "convex/react-clerk";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [clients] = useState(() => {
@@ -28,10 +28,10 @@ export function Providers({ children }: { children: ReactNode }) {
   });
 
   return (
-    <ConvexAuthProvider client={clients.convexQueryClient.convexClient}>
-      <ConvexProvider client={clients.convexQueryClient.convexClient}>
+    <ClerkProvider>
+      <ConvexProviderWithClerk client={clients.convexQueryClient.convexClient} useAuth={useAuth}>
         <QueryClientProvider client={clients.queryClient}>{children}</QueryClientProvider>
-      </ConvexProvider>
-    </ConvexAuthProvider>
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
   );
 }

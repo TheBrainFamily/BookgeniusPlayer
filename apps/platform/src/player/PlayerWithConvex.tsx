@@ -8,7 +8,7 @@
 import React from "react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { useAuth } from "@clerk/clerk-react";
+import { useIntegrations } from "@platform/integrations";
 import { LiveModeAppCore } from "../../../player/src/LiveModeApp";
 import { getBookFromUrl } from "../../../player/src/getBookFromUrl";
 
@@ -27,10 +27,20 @@ const convex = new ConvexReactClient(convexUrl || "");
 /**
  * Inner component that renders with Clerk-authenticated Convex context.
  * Must be rendered inside ClerkProvider tree.
+ * Gets useAuth from platform's integrations context (dynamically loaded) to avoid
+ * static import issues with Clerk hooks outside ClerkProvider.
  */
 const PlayerWithClerkAuth: React.FC<{ bookPath: string }> = ({ bookPath }) => {
+  const { authMod } = useIntegrations();
+  const clerkUseAuth = authMod?.clerkUseAuth?.();
+
+  // Wait for Clerk's useAuth to be available
+  if (!clerkUseAuth) {
+    return null;
+  }
+
   return (
-    <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+    <ConvexProviderWithClerk client={convex} useAuth={clerkUseAuth}>
       <LiveModeAppCore bookPath={bookPath} />
     </ConvexProviderWithClerk>
   );
