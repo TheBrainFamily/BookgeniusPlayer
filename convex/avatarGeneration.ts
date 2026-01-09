@@ -1,6 +1,12 @@
 import { v } from "convex/values";
 import { internal, components } from "./_generated/api";
-import { internalAction, internalMutation, bookAction, bookMutation } from "./functions";
+import {
+  internalAction,
+  internalMutation,
+  bookAction,
+  bookMutation,
+  adminAction,
+} from "./functions";
 import OpenAI from "openai";
 
 const PROPOSALS_FOLDER = "avatar-proposals";
@@ -426,6 +432,10 @@ export const processUploadedAvatarLarge = internalAction({
   },
 });
 
+// Batch size for parallel avatar processing. Keep modest to avoid
+// Cloudflare worker memory limits when processing large images.
+const REPAIR_BATCH_SIZE = 10;
+
 export const repairMissingAvatarWebp = internalAction({
   args: { bookPath: v.string() },
   returns: v.object({
@@ -447,10 +457,11 @@ export const repairMissingAvatarWebp = internalAction({
     const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
       parentPath: charactersPath,
     });
-    const repaired: string[] = [];
-    const skipped: string[] = [];
-    const failed: string[] = [];
 
+    const skipped: string[] = [];
+    const toProcess: { characterPath: string; characterSlug: string }[] = [];
+
+    // First pass: identify which characters need processing
     for (const charFolder of characterFolders) {
       const characterPath = charFolder.path;
       const characterSlug = characterPath.split("/").pop() || "";
@@ -475,16 +486,39 @@ export const repairMissingAvatarWebp = internalAction({
         continue;
       }
 
-      console.log(`[repairMissingAvatarWebp] Processing ${characterSlug}...`);
-      const result = await ctx.runAction(internal.avatarGeneration.processUploadedAvatarLarge, {
-        characterPath,
-        retryCount: 0,
-      });
+      toProcess.push({ characterPath, characterSlug });
+    }
 
-      if (result.success) {
-        repaired.push(characterSlug);
-      } else {
-        failed.push(`${characterSlug}: ${result.error}`);
+    console.log(
+      `[repairMissingAvatarWebp] Processing ${toProcess.length} characters in batches of ${REPAIR_BATCH_SIZE}...`,
+    );
+
+    const repaired: string[] = [];
+    const failed: string[] = [];
+
+    // Process in parallel batches
+    for (let i = 0; i < toProcess.length; i += REPAIR_BATCH_SIZE) {
+      const batch = toProcess.slice(i, i + REPAIR_BATCH_SIZE);
+      console.log(
+        `[repairMissingAvatarWebp] Batch ${Math.floor(i / REPAIR_BATCH_SIZE) + 1}: ${batch.map((c) => c.characterSlug).join(", ")}`,
+      );
+
+      const results = await Promise.all(
+        batch.map(async ({ characterPath, characterSlug }) => {
+          const result = await ctx.runAction(internal.avatarGeneration.processUploadedAvatarLarge, {
+            characterPath,
+            retryCount: 0,
+          });
+          return { characterSlug, result };
+        }),
+      );
+
+      for (const { characterSlug, result } of results) {
+        if (result.success) {
+          repaired.push(characterSlug);
+        } else {
+          failed.push(`${characterSlug}: ${result.error}`);
+        }
       }
     }
 
@@ -492,6 +526,25 @@ export const repairMissingAvatarWebp = internalAction({
       `[repairMissingAvatarWebp] Done. Repaired: ${repaired.length}, Skipped: ${skipped.length}, Failed: ${failed.length}`,
     );
     return { repaired, skipped, failed };
+  },
+});
+
+/**
+ * CLI-callable wrapper for repairMissingAvatarWebp.
+ * Usage: ./scripts/convex run avatarGeneration:repairAvatarsForBook '{"bookPath": "books/Lalka"}'
+ */
+export const repairAvatarsForBook = adminAction({
+  args: { bookPath: v.string() },
+  returns: v.object({
+    repaired: v.array(v.string()),
+    skipped: v.array(v.string()),
+    failed: v.array(v.string()),
+  }),
+  handler: async (
+    ctx,
+    { bookPath },
+  ): Promise<{ repaired: string[]; skipped: string[]; failed: string[] }> => {
+    return await ctx.runAction(internal.avatarGeneration.repairMissingAvatarWebp, { bookPath });
   },
 });
 

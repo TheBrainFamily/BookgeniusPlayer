@@ -14,6 +14,7 @@ This monorepo contains the entire ecosystem for our interactive book platform, i
   - [1. Clone the Repository](#1-clone-the-repository)
   - [2. Install Dependencies](#2-install-dependencies)
   - [3. Configure Environment Variables](#3-configure-environment-variables)
+  - [4. Set Up Convex CLI Authentication](#4-set-up-convex-cli-authentication)
 - [💻 Local Development Workflow](#-local-development-workflow)
   - [Running the Full Stack](#running-the-full-stack)
     - [Build Book Assets](#build-book-assets-first-time-or-when-assets-change)
@@ -97,6 +98,56 @@ S3_SECRET_ACCESS_KEY=minioadmin
 S3_BUCKET=bookgenius-assets
 
 # Add any other required variables for your services
+```
+
+### 4. Set Up Convex CLI Authentication
+
+The project uses Convex with Clerk authentication. To run Convex CLI commands (like `convex run`) locally, you need to set up the admin CLI wrapper.
+
+**Required `.env` variables** (should already be set):
+
+```env
+CONVEX_ADMIN_EMAIL=gozdak@gmail.com
+CONVEX_ADMIN_KEY=<your-admin-key>
+```
+
+**Option A: Using direnv (recommended)**
+
+Install direnv if you haven't:
+
+```bash
+brew install direnv
+```
+
+Add the hook to your shell (add to `~/.zshrc`):
+
+```bash
+eval "$(direnv hook zsh)"
+```
+
+Then allow the project's `.envrc`:
+
+```bash
+direnv allow
+```
+
+Now `convex run` will automatically use admin authentication.
+
+**Option B: Manual PATH setup**
+
+Add to your `~/.zshrc`:
+
+```bash
+export PATH="$HOME/projects/bookgenius/frontend/scripts:$PATH"
+```
+
+Then reload: `source ~/.zshrc`
+
+**Usage:**
+
+```bash
+# Use 'convex run' (not 'npx convex run')
+convex run cli:listFolders '{"parentPath": "books"}'
 ```
 
 ---

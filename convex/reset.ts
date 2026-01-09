@@ -2,7 +2,8 @@ import { adminMutation, publicQuery } from "./functions";
 import { components } from "./_generated/api";
 import { v } from "convex/values";
 
-const BATCH_SIZE = 100;
+// Convex allows ~8000 document ops per mutation, so 1000 is safe
+const BATCH_SIZE = 1000;
 
 /**
  * Delete notes in batches - ADMIN ONLY.

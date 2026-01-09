@@ -8,7 +8,7 @@
  * 4. Otherwise → throw Forbidden
  */
 import type { MutationCtx, QueryCtx, ActionCtx } from "./_generated/server";
-import { isAdmin, principalId, requireIdentity } from "./authz";
+import { isAdmin, isValidAdminKey, principalId, requireIdentity } from "./authz";
 import { internal } from "./_generated/api";
 
 type MutationOrQueryCtx = MutationCtx | QueryCtx;
@@ -21,16 +21,38 @@ export interface BookAccessResult {
 }
 
 /**
+ * Extract admin key - checks explicit arg first, then ctx._adminKey.
+ */
+function getAdminKey(ctx: unknown, explicitKey?: string): string | undefined {
+  if (explicitKey) return explicitKey;
+  if (ctx && typeof ctx === "object" && "_adminKey" in ctx) {
+    return (ctx as { _adminKey?: string })._adminKey;
+  }
+  return undefined;
+}
+
+/**
  * Require write access to a book.
  * Admins can edit any book. Owners and editors can edit their books.
+ *
+ * Admin key is checked from:
+ * 1. Explicit adminKey argument (for wrappers)
+ * 2. ctx._adminKey (for handlers where wrapper already added it)
  *
  * @throws Error if not authenticated or no write access
  */
 export async function requireBookWriteAccess(
   ctx: MutationOrQueryCtx,
   bookPath: string,
+  adminKey?: string,
 ): Promise<BookAccessResult> {
-  const identity = await requireIdentity(ctx);
+  // Admin key bypass for scripts/CLI
+  const key = getAdminKey(ctx, adminKey);
+  if (isValidAdminKey(key)) {
+    return { principalId: "admin-key", role: "admin" };
+  }
+
+  const identity = await requireIdentity(ctx, key);
   const principal = principalId(identity);
 
   // Admins can edit anything
@@ -70,8 +92,15 @@ export async function requireBookWriteAccess(
 export async function requireBookReadAccess(
   ctx: MutationOrQueryCtx,
   bookPath: string,
+  adminKey?: string,
 ): Promise<BookAccessResult> {
-  const identity = await requireIdentity(ctx);
+  // Admin key bypass for scripts/CLI
+  const key = getAdminKey(ctx, adminKey);
+  if (isValidAdminKey(key)) {
+    return { principalId: "admin-key", role: "admin" };
+  }
+
+  const identity = await requireIdentity(ctx, key);
   const principal = principalId(identity);
 
   // Admins can read anything
@@ -112,8 +141,15 @@ export async function requireBookReadAccess(
 export async function requireBookWriteAccessFromAction(
   ctx: ActionCtx,
   bookPath: string,
+  adminKey?: string,
 ): Promise<BookAccessResult> {
-  const identity = await requireIdentity(ctx);
+  // Admin key bypass for scripts/CLI
+  const key = getAdminKey(ctx, adminKey);
+  if (isValidAdminKey(key)) {
+    return { principalId: "admin-key", role: "admin" };
+  }
+
+  const identity = await requireIdentity(ctx, key);
   const principal = principalId(identity);
   const adminFlag = isAdmin(identity);
 

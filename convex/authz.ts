@@ -2,6 +2,7 @@
  * Authorization utilities - admin checks by email from JWT.
  *
  * No Clerk API calls - email is in the JWT token, validated locally.
+ * Supports admin key bypass for scripts and CLI.
  */
 import type { MutationCtx, QueryCtx, ActionCtx } from "./_generated/server";
 
@@ -20,10 +21,34 @@ const adminEmails = new Set(
 );
 
 /**
+ * Validate admin key for script/CLI authentication.
+ * Returns true if key matches CONVEX_ADMIN_KEY env var.
+ */
+export function isValidAdminKey(key: string | undefined): boolean {
+  const adminKey = process.env.CONVEX_ADMIN_KEY;
+  return !!adminKey && !!key && key === adminKey;
+}
+
+/**
+ * Create a synthetic admin identity for admin key authentication.
+ * Uses first admin email as the identity email.
+ */
+function createAdminKeyIdentity(): Identity {
+  const adminEmail = process.env.ADMIN_EMAILS?.split(",")[0]?.trim() || "admin@system";
+  return { tokenIdentifier: "admin-key", email: adminEmail } as Identity;
+}
+
+/**
  * Get the authenticated user's identity.
  * Throws if not authenticated.
+ * @param adminKey - Optional admin key for script/CLI bypass
  */
-export async function requireIdentity(ctx: Ctx): Promise<Identity> {
+export async function requireIdentity(ctx: Ctx, adminKey?: string): Promise<Identity> {
+  // Admin key bypass for scripts/CLI
+  if (isValidAdminKey(adminKey)) {
+    return createAdminKeyIdentity();
+  }
+
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
     throw new Error("Unauthenticated");
@@ -43,8 +68,14 @@ export function isAdmin(identity: Identity): boolean {
 /**
  * Require the user to be an admin.
  * Throws if not authenticated or not an admin.
+ * @param adminKey - Optional admin key for script/CLI bypass
  */
-export async function requireAdmin(ctx: Ctx): Promise<Identity> {
+export async function requireAdmin(ctx: Ctx, adminKey?: string): Promise<Identity> {
+  // Admin key bypass for scripts/CLI
+  if (isValidAdminKey(adminKey)) {
+    return createAdminKeyIdentity();
+  }
+
   const identity = await requireIdentity(ctx);
   if (!isAdmin(identity)) {
     throw new Error("Forbidden: admin required");

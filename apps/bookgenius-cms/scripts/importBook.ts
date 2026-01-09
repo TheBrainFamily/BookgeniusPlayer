@@ -14,195 +14,56 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { execSync } from "child_process";
-import { ConvexHttpClient } from "convex/browser";
+import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@convex/_generated/api";
-import { parseHTML } from "linkedom";
+import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
+import {
+  renderChapterFromXmlDocument,
+  type CharacterBundleInfo,
+} from "../../../apps/player/src/services/live/xmlRendererCore";
 import { logError } from "../lib/utils";
 
 // =============================================================================
-// XML to HTML Conversion (Node-compatible version)
+// XML to HTML Conversion (using xmlRendererCore - same as chapterCompiler)
 // =============================================================================
 
-const STANDARD_TAGS = new Set([
-  "p",
-  "h3",
-  "h4",
-  "h5",
-  "em",
-  "strong",
-  "br",
-  "div",
-  "blockquote",
-  "note",
-  "linebreak",
-  "chapter",
-  "span",
-  "i",
-  "b",
-  "a",
-  "pre",
-  "code",
-  "ul",
-  "ol",
-  "li",
-  "table",
-  "tr",
-  "td",
-  "th",
-  "thead",
-  "tbody",
-  "act",
-  "title",
-  "subtitle",
-]);
+// Module-level character bundles (populated in main)
+let globalCharacterBundles: CharacterBundleInfo[] = [];
+let globalBookSlug = "";
+let globalBookLang = "english";
+let globalBookForm = "book";
 
-function isCharacterTag(tagName: string): boolean {
-  return !STANDARD_TAGS.has(tagName.toLowerCase()) && /^[A-Z]/.test(tagName);
-}
+function convertXmlChapterToHtml(
+  xml: string,
+  chapterNum: number,
+): { html: string; title: string; paragraphCount: number } {
+  const parser = new DOMParser();
+  const serializer = new XMLSerializer();
 
-function slugifyTagName(tagName: string): string {
-  return tagName
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function convertCharacterElement(el: Element): { html: string; speaker: string | null } {
-  const slug = slugifyTagName(el.tagName);
-  const isTalking = el.getAttribute("talking") === "true";
-  const isEntering = el.getAttribute("enters") === "true";
-  const isExiting = el.getAttribute("exits") === "true";
-  const text = el.textContent || "";
-
-  if (isTalking) {
-    return { html: text, speaker: slug };
-  }
-  if (text.trim()) {
-    const attrs = [`data-c="${slug}"`];
-    if (isEntering) attrs.push('data-enters="true"');
-    if (isExiting) attrs.push('data-exits="true"');
-    return { html: `<span ${attrs.join(" ")}>${text}</span>`, speaker: null };
-  }
-  return { html: "", speaker: slug };
-}
-
-function convertNote(el: Element): string {
-  const id = el.getAttribute("id") || "";
-  const text = el.textContent?.trim() || `[${id}]`;
-  return `<a data-note="${id}">${text}</a>`;
-}
-
-function convertPlayElement(el: Element): string {
-  const text = el.textContent || "";
-  switch (el.tagName.toLowerCase()) {
-    case "act":
-      return `<h3 class="act">${text}</h3>`;
-    case "title":
-      return `<h4 class="scene-title">${text}</h4>`;
-    case "subtitle":
-      return `<p class="scene-subtitle"><em>${text}</em></p>`;
-    default:
-      return `<div>${text}</div>`;
-  }
-}
-
-function convertElement(el: Element): { html: string; speakers: string[] } {
-  const tag = el.tagName.toLowerCase();
-
-  if (isCharacterTag(el.tagName)) {
-    const result = convertCharacterElement(el);
-    return { html: result.html, speakers: result.speaker ? [result.speaker] : [] };
+  // Normalize XML to have Chapter wrapper
+  let normalizedXml = xml.trim();
+  if (!normalizedXml.startsWith("<Chapter")) {
+    normalizedXml = `<Chapter id="${chapterNum}">${normalizedXml}</Chapter>`;
   }
 
-  switch (tag) {
-    case "note":
-      return { html: convertNote(el), speakers: [] };
-    case "linebreak":
-    case "br":
-      return { html: "<br>", speakers: [] };
-    case "act":
-    case "title":
-    case "subtitle":
-      return { html: convertPlayElement(el), speakers: [] };
-    default:
-      return convertStandardElement(el, tag);
-  }
-}
-
-function convertStandardElement(
-  el: Element,
-  htmlTag: string,
-): { html: string; speakers: string[] } {
-  let inner = "";
-  const speakers: string[] = [];
-
-  for (const node of Array.from(el.childNodes)) {
-    if (node.nodeType === 3 /* TEXT_NODE */) {
-      inner += node.textContent || "";
-    } else if (node.nodeType === 1 /* ELEMENT_NODE */) {
-      const converted = convertElement(node as Element);
-      inner += converted.html;
-      speakers.push(...converted.speakers);
-    }
+  const xmlDoc = parser.parseFromString(normalizedXml, "text/xml") as unknown as Document;
+  const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
+  if (parseError) {
+    throw new Error(`XML parse error: ${parseError.textContent || "unknown error"}`);
   }
 
-  const attrs: string[] = [];
-  if (speakers.length > 0) {
-    attrs.push(`data-speaker="${speakers.join(" ")}"`);
-  }
-  for (const attr of Array.from(el.attributes)) {
-    if (attr.name === "id" || attr.name === "class") {
-      attrs.push(`${attr.name}="${attr.value}"`);
-    }
-  }
+  const { html, title } = renderChapterFromXmlDocument(xmlDoc, {
+    bookSlug: globalBookSlug,
+    bookLang: globalBookLang,
+    bookForm: globalBookForm,
+    characterBundles: globalCharacterBundles,
+    serializer,
+  });
 
-  const attrStr = attrs.length ? " " + attrs.join(" ") : "";
-  const validTag = STANDARD_TAGS.has(htmlTag) ? htmlTag : "div";
+  // Count paragraphs by data-index attributes
+  const paragraphCount = (html.match(/data-index="/g) ?? []).length;
 
-  return { html: `<${validTag}${attrStr}>${inner}</${validTag}>`, speakers: [] };
-}
-
-function convertXmlChapterToHtml(xml: string): string {
-  // Use linkedom to parse XML as HTML (works for our simple XML structure)
-  const { document } = parseHTML(`<html><body>${xml}</body></html>`);
-
-  const chapter = document.querySelector("Chapter");
-  if (!chapter) {
-    throw new Error("No Chapter element found in XML");
-  }
-
-  const chapterId = chapter.getAttribute("id") || "1";
-  let html = `<section data-chapter="${chapterId}">`;
-
-  for (const child of Array.from(chapter.children) as Element[]) {
-    const converted = convertElement(child);
-    html += converted.html;
-  }
-
-  html += "</section>";
-  return html;
-}
-
-function extractChapterMetadata(html: string): {
-  chapterNumber: number;
-  title: string | null;
-  paragraphCount: number;
-} {
-  const { document } = parseHTML(html);
-  const section = document.querySelector("section[data-chapter]");
-
-  if (!section) {
-    throw new Error("No section[data-chapter] found");
-  }
-
-  const chapterNumber = parseInt(section.getAttribute("data-chapter") || "1", 10);
-  const titleEl = section.querySelector("h3, h4, h5");
-  const title = titleEl?.textContent?.trim() || null;
-  const paragraphCount = section.children.length;
-
-  return { chapterNumber, title, paragraphCount };
+  return { html, title, paragraphCount };
 }
 
 // =============================================================================
@@ -268,7 +129,7 @@ if (!CONVEX_URL) {
   process.exit(1);
 }
 
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = new AdminConvexHttpClient(CONVEX_URL);
 
 // Get book slug from command line
 const bookSlug = process.argv[2];
@@ -358,20 +219,6 @@ function parseMetadataXml(xmlContent: string): {
   }
 
   return { book, characters };
-}
-
-function parseChapterTitle(xmlContent: string, chapterNum: number): string {
-  // Try various title patterns
-  const h3Match = xmlContent.match(/<h3>([^<]+)<\/h3>/);
-  if (h3Match) return h3Match[1];
-
-  const h4Match = xmlContent.match(/<h4>([^<]+)<\/h4>/);
-  if (h4Match) return h4Match[1];
-
-  const titleMatch = xmlContent.match(/<Title>([^<]+)<\/Title>/);
-  if (titleMatch) return titleMatch[1];
-
-  return `Chapter ${chapterNum}`;
 }
 
 function findNoteReferencesInChapter(xmlContent: string): string[] {
@@ -541,14 +388,8 @@ async function step2_ImportCharacters(
   return characters.length;
 }
 
-async function step3_ImportChapters(book: { form?: string; language: string }): Promise<number> {
-  const isPlayFormat = book.form === "Play" || book.form === "Mixed";
-
-  if (isPlayFormat) {
-    console.log("\n=== Step 3: Import Chapters (XML for plays - use migrate script after) ===");
-    return step3_ImportChaptersAsXml();
-  }
-
+// Uses xmlRendererCore.renderChapterFromXmlDocument for proper play/prose formatting
+async function step3_ImportChapters(): Promise<number> {
   console.log("\n=== Step 3: Import Chapters (HTML Source Format) ===");
 
   if (!fs.existsSync(CONTENT_DIR)) {
@@ -569,78 +410,20 @@ async function step3_ImportChapters(book: { form?: string; language: string }): 
     const chapterNum = parseInt(file.match(/chapter(\d+)/)?.[1] || "0");
     const filePath = path.join(CONTENT_DIR, file);
     const xmlContent = fs.readFileSync(filePath, "utf-8");
-    const htmlContent = convertXmlChapterToHtml(xmlContent);
-    const metadata = extractChapterMetadata(htmlContent);
-    return { chapterNum, htmlContent, metadata };
+    const { html, title, paragraphCount } = convertXmlChapterToHtml(xmlContent, chapterNum);
+    return { chapterNum, htmlContent: html, title, paragraphCount };
   });
 
-  await runInBatches(chapters, async ({ chapterNum, htmlContent, metadata }) => {
-    console.log(
-      `  Chapter ${chapterNum}: ${metadata.title || "(no title)"} (${metadata.paragraphCount} paragraphs)`,
-    );
+  await runInBatches(chapters, async ({ chapterNum, htmlContent, title, paragraphCount }) => {
+    console.log(`  Chapter ${chapterNum}: ${title || "(no title)"} (${paragraphCount} paragraphs)`);
     await client.action(api.chapterCompiler.uploadHtmlSourceChapter, {
       bookPath: BOOK_PATH,
       chapterNumber: chapterNum,
       htmlContent,
-      title: metadata.title || undefined,
-      paragraphCount: metadata.paragraphCount,
+      title: title || undefined,
+      paragraphCount,
     });
   });
-
-  return files.length;
-}
-
-async function step3_ImportChaptersAsXml(): Promise<number> {
-  const chaptersPath = `${BOOK_PATH}/chapters`;
-
-  if (!fs.existsSync(CONTENT_DIR)) {
-    console.log("  No booksContent directory found");
-    return 0;
-  }
-
-  const files = fs
-    .readdirSync(CONTENT_DIR)
-    .filter((f) => f.startsWith("chapter") && f.endsWith(".xml"));
-  files.sort((a, b) => {
-    const numA = parseInt(a.match(/chapter(\d+)/)?.[1] || "0");
-    const numB = parseInt(b.match(/chapter(\d+)/)?.[1] || "0");
-    return numA - numB;
-  });
-
-  for (const file of files) {
-    const chapterNum = parseInt(file.match(/chapter(\d+)/)?.[1] || "0");
-    const filePath = path.join(CONTENT_DIR, file);
-    const content = fs.readFileSync(filePath, "utf-8");
-    const title = parseChapterTitle(content, chapterNum);
-
-    console.log(`  Chapter ${chapterNum}: ${title}`);
-
-    const extra = { type: "chapter", chapterNumber: chapterNum, title };
-    await uploadFile(chaptersPath, file, filePath, extra);
-  }
-
-  console.log("\n  🔄 Triggering chapter compilation...");
-  try {
-    console.log("__dirname", __dirname);
-    execSync(`npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`, {
-      stdio: "inherit",
-    });
-    console.log("  ✅ Compilation complete");
-
-    console.log("\n  🔄 Migrating to HTML source format...");
-    execSync(`bun ./migrate-book-to-html.ts ${bookSlug}`, {
-      stdio: "inherit",
-      cwd: path.join(__dirname),
-    });
-    console.log("  ✅ Migration complete");
-  } catch (error) {
-    logError("  ❌ Auto-compilation/migration failed:", error);
-    console.log("\n  Manual steps:");
-    console.log(
-      `     npx convex run chapterCompiler:recompileAllChapters '{"bookPath": "${BOOK_PATH}"}'`,
-    );
-    console.log(`     bun tools/scripts/migrate-book-to-html.ts ${bookSlug}`);
-  }
 
   return files.length;
 }
@@ -682,10 +465,10 @@ async function step4_ImportBackgrounds(): Promise<number> {
   console.log(`  Uploaded ${uploadedFiles.size} unique background files`);
 
   // Step 2: Create cue points for ALL entries (supports reuse)
+  // Note: bookPath is passed at top level, not in each cue (bookMutation extracts it)
   const cues = backgrounds
     .filter((bg) => uploadedFiles.has(bg.file))
     .map((bg) => ({
-      bookPath: BOOK_PATH,
       fileBasename: bg.file,
       chapter: bg.chapter,
       paragraph: bg.paragraph,
@@ -748,18 +531,14 @@ async function step5_ImportMusic(): Promise<number> {
 
   // Step 2: Create cue points for ALL entries (supports reuse)
   // Each track entry can have multiple files, create one cue per file
-  const cues: { bookPath: string; fileBasename: string; chapter: number; paragraph: number }[] = [];
+  // Note: bookPath is passed at top level, not in each cue (bookMutation extracts it)
+  const cues: { fileBasename: string; chapter: number; paragraph: number }[] = [];
 
   for (const track of musicTracks) {
     for (const file of track.files) {
       const basename = path.basename(file);
       if (uploadedFiles.has(basename)) {
-        cues.push({
-          bookPath: BOOK_PATH,
-          fileBasename: basename,
-          chapter: track.chapter,
-          paragraph: track.paragraph,
-        });
+        cues.push({ fileBasename: basename, chapter: track.chapter, paragraph: track.paragraph });
       }
     }
   }
@@ -801,8 +580,8 @@ async function step6_ImportNotes(): Promise<number> {
   }
 
   // Scan chapters for note references
-  const notesToInsert: { bookPath: string; noteId: string; content: string; chapter: number }[] =
-    [];
+  // Note: bookPath is passed at top level, not in each note (bookMutation extracts it)
+  const notesToInsert: { noteId: string; content: string; chapter: number }[] = [];
 
   const usedNoteIds = new Set<string>();
 
@@ -827,12 +606,7 @@ async function step6_ImportNotes(): Promise<number> {
       for (const noteId of noteIds) {
         const note = noteMap.get(noteId);
         if (note && !usedNoteIds.has(noteId)) {
-          notesToInsert.push({
-            bookPath: BOOK_PATH,
-            noteId: note.id,
-            content: note.content,
-            chapter: chapterNum,
-          });
+          notesToInsert.push({ noteId: note.id, content: note.content, chapter: chapterNum });
           usedNoteIds.add(noteId);
         }
       }
@@ -952,10 +726,21 @@ async function main() {
   console.log(`  Form: ${book.form || "(not set)"}`);
   console.log(`  Characters: ${characters.length}`);
 
+  // Set up global state for XML→HTML conversion
+  globalBookSlug = book.slug || bookSlug;
+  globalBookLang = book.language.toLowerCase();
+  globalBookForm = (book.form || "book").toLowerCase();
+  globalCharacterBundles = characters.map((c) => ({
+    slug: c.slug,
+    name: c.displayName,
+    extra: { displayName: c.displayName, summary: c.summary },
+  }));
+
   // Run import steps
   await step1_CreateFolderStructure(book);
   const characterCount = await step2_ImportCharacters(characters);
-  const chapterCount = await step3_ImportChapters(book);
+  await step2b_GenerateAvatarWebps();
+  const chapterCount = await step3_ImportChapters();
   const backgroundCount = await step4_ImportBackgrounds();
   const musicCount = await step5_ImportMusic();
   const noteCount = await step6_ImportNotes();
@@ -968,6 +753,46 @@ async function main() {
   console.log(`   Music: ${musicCount}`);
   console.log(`   Notes: ${noteCount}`);
   console.log(`   Variants: ${variantCount}`);
+}
+
+async function step2b_GenerateAvatarWebps(): Promise<void> {
+  console.log("\n=== Step 2b: Generate Avatar WebPs ===");
+
+  // Run up to 5 times to catch transient failures from Cloudflare worker memory limits
+  const MAX_PASSES = 5;
+  for (let pass = 1; pass <= MAX_PASSES; pass++) {
+    console.log(`  Pass ${pass}/${MAX_PASSES}...`);
+    try {
+      const result = await client.action(api.avatarGeneration.repairAvatarsForBook, {
+        bookPath: BOOK_PATH,
+      });
+
+      console.log(`    Repaired: ${result.repaired.length}`);
+      console.log(`    Skipped: ${result.skipped.length}`);
+      if (result.failed.length > 0) {
+        console.log(`    Failed: ${result.failed.length}`);
+        if (pass === MAX_PASSES) {
+          result.failed.forEach((f) => console.log(`      - ${f}`));
+        }
+      }
+
+      // If nothing left to repair, we're done
+      if (result.repaired.length === 0 && result.failed.length === 0) {
+        console.log(`  All avatars processed.`);
+        break;
+      }
+      // If no failures, we're done
+      if (result.failed.length === 0) {
+        console.log(`  All avatars processed successfully.`);
+        break;
+      }
+    } catch (error) {
+      logError(`  Pass ${pass} failed:`, error);
+      if (pass === MAX_PASSES) {
+        console.log("  (Continuing with import - avatars can be regenerated later)");
+      }
+    }
+  }
 }
 
 main().catch((error) => {

@@ -4,11 +4,14 @@
  * Used as a PostToolUse hook to get instant test feedback after code changes.
  *
  * Uses polling to wait for Wallaby to process file changes before reporting.
+ *
+ * NOTE: Skips execution in git worktrees since Wallaby runs only in the main repo.
  */
 
 import { spawn, type ChildProcess } from "child_process";
 import { homedir } from "os";
 import { join } from "path";
+import { existsSync, statSync } from "fs";
 
 interface JsonRpcRequest {
   jsonrpc: "2.0";
@@ -133,7 +136,22 @@ function hashTestState(result: WallabyResult): string {
   return testStates.join("|");
 }
 
+/**
+ * Detect if we're running in a git worktree.
+ * In a worktree, .git is a file (pointing to main repo) instead of a directory.
+ */
+function isGitWorktree(): boolean {
+  const gitPath = join(process.cwd(), ".git");
+  if (!existsSync(gitPath)) return false;
+  return statSync(gitPath).isFile();
+}
+
 async function main() {
+  // Skip Wallaby checks in worktrees (Wallaby only runs in main repo)
+  if (isGitWorktree()) {
+    process.exit(0);
+  }
+
   const client = new WallabyMcpClient();
 
   try {
