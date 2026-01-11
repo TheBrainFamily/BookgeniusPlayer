@@ -86,59 +86,12 @@ type JobStatus = {
   };
 };
 
-type ChapterInfo = { originalIndex: number; content: string; title: string; selected: boolean };
+// Import chapter parsing utilities
+import { parseChapters, recompileXml, type ChapterInfo } from "../utils/xmlParser";
 
 const serverURL = "http://localhost:4000";
 
 const statusIcons = { pending: Circle, running: Loader2, done: CheckCircle2, error: AlertCircle };
-
-// Parse chapters from rich XML
-function parseChapters(xml: string): {
-  preamble: string;
-  chapters: ChapterInfo[];
-  postamble: string;
-} {
-  const sectionRegex = /<section\s+data-chapter="(\d+)"[^>]*>([\s\S]*?)<\/section>/g;
-  const chapters: ChapterInfo[] = [];
-  let match;
-  let lastIndex = 0;
-  let preamble = "";
-
-  // Find the first section to get preamble
-  const firstMatch = xml.match(/<section\s+data-chapter="/);
-  if (firstMatch && firstMatch.index !== undefined) {
-    preamble = xml.slice(0, firstMatch.index);
-  }
-
-  while ((match = sectionRegex.exec(xml)) !== null) {
-    const originalIndex = parseInt(match[1], 10);
-    const content = match[0];
-    // Try to extract a title from the first heading or first line
-    const titleMatch = content.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i);
-    let title = titleMatch
-      ? titleMatch[1].replace(/<[^>]+>/g, "").trim()
-      : `Chapter ${originalIndex}`;
-    if (title.length > 50) title = title.slice(0, 47) + "...";
-
-    chapters.push({ originalIndex, content, title, selected: true });
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Get postamble (everything after last section)
-  const postamble = xml.slice(lastIndex);
-
-  return { preamble, chapters, postamble };
-}
-
-// Recompile chapters with renumbered indices
-function recompileXml(preamble: string, chapters: ChapterInfo[], postamble: string): string {
-  const selectedChapters = chapters.filter((c) => c.selected);
-  const reindexedChapters = selectedChapters.map((chapter, idx) => {
-    // Replace the data-chapter attribute with new index
-    return chapter.content.replace(/data-chapter="\d+"/, `data-chapter="${idx + 1}"`);
-  });
-  return preamble + reindexedChapters.join("\n") + postamble;
-}
 
 // eslint-disable-next-line complexity
 export default function App() {

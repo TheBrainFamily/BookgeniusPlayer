@@ -2,9 +2,12 @@ import Replicate from "replicate";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { logger } from "../../logger";
-import { getFilePath } from "../../helpers/filesHelpers";
 import type { GenericBackgroundPrompt } from "./generate-prompts-for-backgrounds";
-import { sanitizePromptForModeration } from "./generate-pictures-for-entities";
+import {
+  lightSanitizePrompt,
+  sanitizePromptForModeration,
+  generateAbstractPortraitPrompt,
+} from "./generate-pictures-for-entities";
 
 const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
@@ -12,7 +15,7 @@ export const generateImageWithFluxToFolder = async (
   sceneDescription: string,
   chapter: number,
   startingParagraph: number,
-  genericPrompt: GenericBackgroundPrompt,
+  abstractPrompt: GenericBackgroundPrompt,
   outputFolder: string,
   attempt = 1,
   _quality: "medium" | "auto" | "standard" | "hd" | "low" | "high" | null | undefined = "medium",
@@ -26,16 +29,21 @@ export const generateImageWithFluxToFolder = async (
     | "auto"
     | null
     | undefined = "1536x1024",
+  suffix?: string,
   // eslint-disable-next-line max-params
-) =>
-  generateFluxImage(
+) => {
+  const filename = suffix
+    ? `${outputFolder}/openai-medium-${chapter}-${startingParagraph}-${suffix}.webp`
+    : `${outputFolder}/openai-medium-${chapter}-${startingParagraph}.webp`;
+  return generateFluxImage(
     sceneDescription,
     "",
-    genericPrompt.backgroundStyle,
+    abstractPrompt.backgroundStyle,
     "background",
-    `${outputFolder}/openai-medium-${chapter}-${startingParagraph}.webp`,
+    filename,
     attempt,
   );
+};
 
 export const generateCharacterImageWithFlux = async (
   prompt: string,
@@ -54,6 +62,47 @@ export const generateCharacterImageWithFlux = async (
   ) as Promise<Buffer | undefined>;
 };
 
+/**
+ * Generate character image with metadata about which attempt succeeded.
+ * Use this when you need to track sanitization level for verification.
+ */
+export const generateCharacterImageWithFluxAndMetadata = async (
+  prompt: string,
+  characterName: string,
+  generalPrompt: string,
+): Promise<{
+  buffer: Buffer;
+  attempt: number;
+  sanitizationLevel: "original" | "light" | "heavy" | "abstract";
+} | undefined> => {
+  // Try each attempt level and track which one succeeds
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    try {
+      const result = await generateFluxImage(
+        prompt,
+        characterName,
+        generalPrompt,
+        "avatar",
+        undefined,
+        attempt,
+        true,
+      );
+
+      if (result && result instanceof Buffer) {
+        const levels = ["original", "light", "heavy", "abstract"] as const;
+        return {
+          buffer: result,
+          attempt,
+          sanitizationLevel: levels[attempt - 1],
+        };
+      }
+    } catch {
+      // Continue to next attempt
+    }
+  }
+  return undefined;
+};
+
 type PictureType = "avatar" | "background";
 export const generateFluxImage = async (
   prompt: string,
@@ -69,15 +118,29 @@ export const generateFluxImage = async (
   if (type === "avatar") {
     switch (attempt) {
       case 1:
+        // Attempt 1: Original prompt with character name
         finalPrompt = `${generalPrompt} ${prompt} ${characterName}`;
         break;
-      case 2:
-        finalPrompt = `${generalPrompt} ${prompt}`;
+      case 2: {
+        // Attempt 2: Light sanitization (regex-based) without character name
+        const lightSanitized = lightSanitizePrompt(prompt);
+        console.log(`[Flux] Attempt 2 - light sanitization for ${characterName}`);
+        finalPrompt = `${generalPrompt} ${lightSanitized}`;
         break;
-      default:
+      }
       case 3: {
+        // Attempt 3: Heavy sanitization (LLM rewrite)
+        console.log(`[Flux] Attempt 3 - heavy sanitization (LLM) for ${characterName}`);
         const sanitizedPrompt = await sanitizePromptForModeration(prompt);
         finalPrompt = `${generalPrompt} ${sanitizedPrompt}`;
+        break;
+      }
+      default:
+      case 4: {
+        // Attempt 4: AI-generated abstract fallback based on character name only
+        console.log(`[Flux] Attempt 4 - AI abstract fallback for ${characterName}`);
+        const abstractPrompt = await generateAbstractPortraitPrompt(characterName);
+        finalPrompt = `${generalPrompt} ${abstractPrompt}`;
         break;
       }
     }
@@ -104,7 +167,7 @@ export const generateFluxImage = async (
     url = output.url();
   } catch (e) {
     console.error(`Failed to generate image after ${attempt} attempts: ${e}`);
-    if (attempt < 3) {
+    if (attempt < 4) {
       return await generateFluxImage(
         prompt,
         characterName,
@@ -112,10 +175,11 @@ export const generateFluxImage = async (
         type,
         filePath,
         attempt + 1,
+        returnBuffer,
       );
     } else {
       logger.error(
-        `Failed to generate image after 3 attempts for prompt: ${characterName} ${prompt}`,
+        `Failed to generate image after 4 attempts for prompt: ${characterName} ${prompt}`,
       );
       return undefined;
     }
@@ -145,11 +209,9 @@ export const generateFluxImage = async (
     return buffer;
   }
   if (filePath) {
-    writeBookFile(filePath, buffer, FILE_TYPE.PERMANENT);
-    logger.info(
-      `Image saved: getFilePath(filePath): ${getFilePath(filePath, FILE_TYPE.PERMANENT)}`,
-    );
-    return filePath;
+    const absolutePath = writeBookFile(filePath, buffer, FILE_TYPE.PERMANENT);
+    logger.info(`Image saved: ${absolutePath}`);
+    return absolutePath;
   }
   return undefined;
 };

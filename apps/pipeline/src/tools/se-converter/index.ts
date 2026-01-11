@@ -522,7 +522,7 @@ export function getSEBookImagesDir(bookSlug: string): string {
   return path.resolve(__dirname, `../../../standardebooks-data/books/${bookSlug}/images`);
 }
 
-function wrapInRichXml(html: string): string {
+export function wrapInRichXml(html: string): string {
   const dom = new JSDOM(html);
   const body = dom.window.document.body;
   const content = htmlToValidXml(body.innerHTML);

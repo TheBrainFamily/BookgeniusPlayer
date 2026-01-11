@@ -126,6 +126,17 @@ export const appRouter = router({
       const repoRoot = path.resolve(__dirname, "../../");
       const richPath = path.join(repoRoot, "books-data", input.slug, "input", "rich.xml");
       ensureDir(path.dirname(richPath));
+
+      // Debug logging to verify fix
+      const openingSections = (input.rich.match(/<section/g) || []).length;
+      const closingSections = (input.rich.match(/<\/section>/g) || []).length;
+      console.log(
+        `[saveRichXml] Writing rich.xml for ${input.slug} - opens: ${openingSections}, closes: ${closingSections}`,
+      );
+      if (openingSections !== closingSections) {
+        console.error(`[saveRichXml ERROR] Unbalanced sections!`);
+      }
+
       fs.writeFileSync(richPath, input.rich, "utf8");
       return { ok: true };
     }),
