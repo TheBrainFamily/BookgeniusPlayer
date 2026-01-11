@@ -11,7 +11,7 @@ describe("xmlParser", () => {
 </body>
 </main>`;
 
-      const { preamble, chapters, postamble } = parseChapters(xml);
+      const { preamble: _preamble, chapters, postamble: _postamble } = parseChapters(xml);
 
       expect(chapters).toHaveLength(2);
       expect(chapters[0].originalIndex).toBe(1);
