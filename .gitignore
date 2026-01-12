@@ -34,3 +34,6 @@ backend/wolnelektury-data/
 backend/standardebooks-data/
 .serena/
 tools/convex-fuse/.gocache/
+
+# Synced Convex assets (local only)
+ConvexAssets/

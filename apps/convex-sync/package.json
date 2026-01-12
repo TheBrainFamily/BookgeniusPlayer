@@ -1,0 +1,23 @@
+{
+  "name": "convex-sync",
+  "version": "0.1.0",
+  "description": "Real-time sync daemon for Convex assets to local filesystem",
+  "type": "module",
+  "bin": {
+    "convex-sync": "./src/cli.ts"
+  },
+  "scripts": {
+    "dev": "bun run src/cli.ts",
+    "build": "bun build src/cli.ts --compile --outfile dist/convex-sync",
+    "typecheck": "tsc --noEmit",
+    "install-daemon": "bun run src/install.ts"
+  },
+  "dependencies": {
+    "convex": "^1.21.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22",
+    "typescript": "^5.8.2"
+  }
+}
