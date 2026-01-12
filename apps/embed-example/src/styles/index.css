@@ -1,0 +1,8 @@
+/* Tailwind CSS initialization for embed-example */
+@import "tailwindcss";
+
+/* Scan embed-example source files only */
+@source "../**/*.{ts,tsx,js,jsx,html}";
+
+/* Import pre-built player CSS (includes all Tailwind classes + custom styles) */
+@import "../../../player/dist-lib/styles.css";

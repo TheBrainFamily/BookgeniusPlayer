@@ -14,6 +14,9 @@ export const CharacterModalRenderer: React.FC = () => {
 
   const shouldShow = isOpen && slug && mediaSrc;
 
+  // Portal to #root-player (inside #player-scope) so CSS scoped to #player-scope applies
+  const portalTarget = document.getElementById("root-player") || document.body;
+
   return createPortal(
     <AnimatePresence>
       {shouldShow && (
@@ -28,6 +31,6 @@ export const CharacterModalRenderer: React.FC = () => {
         />
       )}
     </AnimatePresence>,
-    document.body,
+    portalTarget,
   );
 };

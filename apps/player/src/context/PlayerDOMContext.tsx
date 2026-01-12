@@ -99,10 +99,19 @@ function createRootPlayer(parent: HTMLElement): HTMLElement {
 /**
  * Create all player DOM elements dynamically
  */
-function createPlayerDOM(isNativeShell: boolean): PlayerDOM {
-  const playerScope = document.getElementById("player-scope");
+function createPlayerDOM(isNativeShell: boolean): { dom: PlayerDOM; createdPlayerScope: boolean } {
+  let playerScope = document.getElementById("player-scope");
+  let createdPlayerScope = false;
+
+  // Create #player-scope if it doesn't exist
   if (!playerScope) {
-    throw new Error("PlayerDOMProvider requires #player-scope element to exist");
+    playerScope = document.createElement("div");
+    playerScope.id = "player-scope";
+    // Start hidden - will be made visible when player is ready
+    playerScope.setAttribute("inert", "");
+    playerScope.setAttribute("aria-hidden", "true");
+    document.body.appendChild(playerScope);
+    createdPlayerScope = true;
   }
 
   // Create cutscene video
@@ -197,30 +206,38 @@ function createPlayerDOM(isNativeShell: boolean): PlayerDOM {
   playerScope.appendChild(rootPlayer);
 
   return {
-    playerScope,
-    legacy,
-    bgVideoA,
-    bgVideoB,
-    bgImageA,
-    bgImageB,
-    cutsceneVideo,
-    cutsceneText,
-    bookContainer,
-    leftNotes,
-    contentContainer,
-    rightNotes,
-    rightNotesScrollable,
-    rootPlayer,
+    dom: {
+      playerScope,
+      legacy,
+      bgVideoA,
+      bgVideoB,
+      bgImageA,
+      bgImageB,
+      cutsceneVideo,
+      cutsceneText,
+      bookContainer,
+      leftNotes,
+      contentContainer,
+      rightNotes,
+      rightNotesScrollable,
+      rootPlayer,
+    },
+    createdPlayerScope,
   };
 }
 
 /**
  * Cleanup dynamically created DOM elements
  */
-function cleanupCreatedDOM(dom: PlayerDOM) {
+function cleanupCreatedDOM(dom: PlayerDOM, createdPlayerScope: boolean) {
   dom.cutsceneVideo?.remove();
   dom.legacy.remove();
   dom.rootPlayer.remove();
+
+  // Remove #player-scope if we created it
+  if (createdPlayerScope) {
+    dom.playerScope.remove();
+  }
 }
 
 /**
@@ -230,22 +247,23 @@ function cleanupCreatedDOM(dom: PlayerDOM) {
 export function initializePlayerDOM(
   isNativeShell: boolean,
   forceCreate: boolean = false,
-): { dom: PlayerDOM; wasCreated: boolean } {
+): { dom: PlayerDOM; wasCreated: boolean; createdPlayerScope: boolean } {
   if (!forceCreate) {
     const existing = findExistingDOM();
     if (existing) {
-      return { dom: existing, wasCreated: false };
+      return { dom: existing, wasCreated: false, createdPlayerScope: false };
     }
   }
 
-  const dom = createPlayerDOM(isNativeShell);
-  return { dom, wasCreated: true };
+  const { dom, createdPlayerScope } = createPlayerDOM(isNativeShell);
+  return { dom, wasCreated: true, createdPlayerScope };
 }
 
 interface PlayerDOMProviderWithDOMProps {
   children: React.ReactNode;
   dom: PlayerDOM;
   wasCreated: boolean;
+  createdPlayerScope: boolean;
 }
 
 /**
@@ -256,15 +274,16 @@ export function PlayerDOMProviderWithDOM({
   children,
   dom,
   wasCreated,
+  createdPlayerScope,
 }: PlayerDOMProviderWithDOMProps) {
   // Cleanup on unmount if we created the DOM
   useLayoutEffect(() => {
     return () => {
       if (wasCreated) {
-        cleanupCreatedDOM(dom);
+        cleanupCreatedDOM(dom, createdPlayerScope);
       }
     };
-  }, [dom, wasCreated]);
+  }, [dom, wasCreated, createdPlayerScope]);
 
   return <PlayerDOMContext.Provider value={dom}>{children}</PlayerDOMContext.Provider>;
 }
@@ -277,16 +296,18 @@ export function PlayerDOMProvider({ children, forceCreate = false }: PlayerDOMPr
   const isNativeShell = useNativeShell();
 
   // useState with initializer function runs once synchronously on first render
-  const [{ dom, wasCreated }] = useState(() => initializePlayerDOM(isNativeShell, forceCreate));
+  const [{ dom, wasCreated, createdPlayerScope }] = useState(() =>
+    initializePlayerDOM(isNativeShell, forceCreate),
+  );
 
   // Cleanup on unmount if we created the DOM
   useLayoutEffect(() => {
     return () => {
       if (wasCreated) {
-        cleanupCreatedDOM(dom);
+        cleanupCreatedDOM(dom, createdPlayerScope);
       }
     };
-  }, [dom, wasCreated]);
+  }, [dom, wasCreated, createdPlayerScope]);
 
   return <PlayerDOMContext.Provider value={dom}>{children}</PlayerDOMContext.Provider>;
 }

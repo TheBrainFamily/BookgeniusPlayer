@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useLocation } from "react-router-dom";
-import { BookLoader } from "@platform/components/BookLoader";
+import { SplashScreen } from "../../../player/src/components/SplashScreen";
 
 type LoaderMeta = {
   title: string;
@@ -146,11 +146,10 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
           <div className="relative z-10 flex h-full items-center justify-center">
             {meta ? (
               <div className="pointer-events-auto">
-                <BookLoader
-                  title={meta.title}
-                  author={meta.author}
-                  loadingPhrases={meta.phrases}
-                  // While overlay is visible, pretend it's not loaded
+                <SplashScreen
+                  book={{ title: meta.title, author: meta.author, loadingPhrases: meta.phrases }}
+                  autoStart={false}
+                  // External control mode: isLoaded controls visibility
                   isLoaded={!navigating}
                   showStartButton={meta.showStartButton}
                   onStartClick={meta.onStartClick}

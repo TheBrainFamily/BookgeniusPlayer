@@ -32,6 +32,7 @@ import {
 } from "@player/services/htmlNormalizer";
 import {
   setBookDataStore,
+  setBookIdentifier,
   clearBookDataStore,
   type Note,
   type Variant,
@@ -167,6 +168,8 @@ const buildBookHtmlFromChapters = (
 };
 
 interface BookConvexContextType {
+  bookSlug: string;
+  bookPath: string;
   isLoading: boolean;
   isReady: boolean;
   error: string | null;
@@ -196,6 +199,8 @@ interface BookConvexContextType {
 }
 
 const defaultContext: BookConvexContextType = {
+  bookSlug: "",
+  bookPath: "",
   isLoading: true,
   isReady: false,
   error: null,
@@ -254,6 +259,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const bookSlug = useMemo(() => bookPath.split("/").pop() || "", [bookPath]);
 
+  // Set book identifier synchronously during render, so it's available to hooks
+  // in child components before useLayoutEffect runs
+  setBookIdentifier(bookSlug, bookPath);
+
   // =============================================================================
   // Queries - HTML Source format only
   // =============================================================================
@@ -263,7 +272,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     | HtmlSourceChapterQueryItem[]
     | null
     | undefined;
-  const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
+  const charactersQuery = useQuery(api.bookQueries.listCharacterBundles, { bookPath });
   const backgroundsQuery = useQuery(
     draftMode ? api.backgroundCues.listForPlayerWithDrafts : api.backgroundCues.listForPlayer,
     { bookPath },
@@ -834,6 +843,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const value = useMemo<BookConvexContextType>(
     () => ({
+      bookSlug,
+      bookPath,
       isLoading,
       isReady,
       error,
@@ -862,6 +873,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       prefetchChaptersUpTo,
     }),
     [
+      bookSlug,
+      bookPath,
       isLoading,
       isReady,
       error,
@@ -893,6 +906,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   useLayoutEffect(() => {
     setBookDataStore({
+      bookSlug,
+      bookPath,
       isLoading,
       isReady,
       error,
@@ -916,6 +931,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       audiobookTracks: audiobookTracksQuery ?? [],
     });
   }, [
+    bookSlug,
+    bookPath,
     isLoading,
     isReady,
     error,

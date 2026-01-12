@@ -34,6 +34,17 @@ export interface SplashScreenProps {
   autoStart: boolean;
   /** Optional callback when splash is hidden */
   onHidden?: () => void;
+  /**
+   * External control mode (for platform RouteTransitionProvider):
+   * - When provided, this controls visibility instead of internal appReady listener
+   * - When true, splash hides
+   * - When false/undefined, splash shows
+   */
+  isLoaded?: boolean;
+  /** Show start button (external control) - overrides autoStart behavior */
+  showStartButton?: boolean;
+  /** Callback when start button is clicked (for external control) */
+  onStartClick?: () => void;
 }
 
 /**
@@ -47,7 +58,16 @@ function pickRandomPhrase(arr: string[], previousPhrases: Set<string>): string |
   return choice;
 }
 
-export function SplashScreen({ book, autoStart, onHidden }: SplashScreenProps) {
+export function SplashScreen({
+  book,
+  autoStart,
+  onHidden,
+  isLoaded,
+  showStartButton: externalShowStartButton,
+  onStartClick: externalOnStartClick,
+}: SplashScreenProps) {
+  // External control mode: isLoaded prop overrides internal ready state
+  const isExternalControlled = isLoaded !== undefined;
   // Track which phrases have been shown to avoid repetition
   const previousPhrasesRef = useRef(new Set<string>());
   const usingGenericRef = useRef(false);
@@ -136,32 +156,61 @@ export function SplashScreen({ book, autoStart, onHidden }: SplashScreenProps) {
   }, [getRandomPhrase, initialPhrase]);
 
   /**
-   * Listen for 'appReady' event from the player
+   * Listen for 'appReady' event from the player (only in internal control mode)
    */
   useEffect(() => {
+    if (isExternalControlled) return;
+
     const handleReady = () => {
       setIsReady(true);
     };
 
     window.addEventListener("appReady", handleReady);
     return () => window.removeEventListener("appReady", handleReady);
-  }, []);
+  }, [isExternalControlled]);
 
   /**
-   * Auto-hide when ready if autoStart is true.
+   * Auto-hide when ready if autoStart is true (internal control mode)
    */
   useEffect(() => {
+    if (isExternalControlled) return;
     if (autoStart && isReady && !isHiding) {
       hideSplash();
     }
-  }, [autoStart, isReady, isHiding, hideSplash]);
+  }, [isExternalControlled, autoStart, isReady, isHiding, hideSplash]);
+
+  /**
+   * External control mode: visibility is driven by the parent overlay.
+   * We intentionally do NOT auto-hide here to avoid race conditions.
+   * The parent decides when to dispatch splashHidden and fade out.
+   */
+  useEffect(() => {
+    if (!isExternalControlled) return;
+    if (isHiding) {
+      setIsHiding(false);
+    }
+  }, [isExternalControlled, isHiding]);
 
   /**
    * Handle Start button click
    */
   const handleStartClick = () => {
-    hideSplash();
+    if (externalOnStartClick) {
+      externalOnStartClick();
+    } else {
+      hideSplash();
+    }
   };
+
+  // Determine if start button should be shown
+  // External mode: use externalShowStartButton prop
+  // Internal mode: show if !autoStart
+  const shouldShowStartButton = isExternalControlled ? externalShowStartButton : !autoStart;
+
+  // Determine if start button is enabled
+  // External mode: enabled when externalShowStartButton is true
+  // Internal mode: enabled when isReady
+  const isButtonEnabled = isExternalControlled ? externalShowStartButton : isReady;
 
   return (
     <div id="splash-screen" className={`splash-screen ${isHiding ? "splash-screen--hide" : ""}`}>
@@ -192,11 +241,11 @@ export function SplashScreen({ book, autoStart, onHidden }: SplashScreenProps) {
           </p>
         </div>
 
-        {!autoStart && (
+        {shouldShowStartButton && (
           <button
-            className={`splash-start-button ${isReady ? "visible" : "disabled"}`}
+            className={`splash-start-button ${isButtonEnabled ? "visible" : "disabled"}`}
             onClick={handleStartClick}
-            disabled={!isReady}
+            disabled={!isButtonEnabled}
           >
             <div className="play-icon">
               <div className="play-triangle" />

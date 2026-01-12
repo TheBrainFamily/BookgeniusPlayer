@@ -6,13 +6,14 @@ import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useScreenSize } from "@player/hooks/useScreenSize";
 import { useFootnoteModal } from "@player/stores/modals/footnoteModal.store";
 
-const target = document.getElementById("right-notes");
-
 export const RightNotesPanel: React.FC = () => {
   const { isLargeScreen } = useScreenSize();
   const { locationRange } = useLocationRange();
   const notes = useFootnotes(locationRange);
   const { openModal } = useFootnoteModal();
+
+  // Get target inside component - DOM may not exist at module import time
+  const target = document.getElementById("right-notes");
 
   if (!target || !isLargeScreen) return null;
 

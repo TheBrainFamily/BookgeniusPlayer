@@ -34,3 +34,4 @@ backend/wolnelektury-data/
 backend/standardebooks-data/
 .serena/
 tools/convex-fuse/.gocache/
+apps/player/dist-lib/

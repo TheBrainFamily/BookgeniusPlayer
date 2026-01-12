@@ -3,6 +3,7 @@ import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 import { useNativeShell } from "@player/context/NativeShellContext";
+import { usePlayerDOM } from "@player/context/PlayerDOMContext";
 
 type TimeoutId = number | null;
 
@@ -35,6 +36,7 @@ const useVideoReadiness = ({
   minSplashMs = 1500,
   postReadyDelayMs = 100,
 }: UseVideoReadinessOpts = {}) => {
+  const { bgVideoA, bgVideoB } = usePlayerDOM();
   const [videoAReady, setVideoAReady] = useState(false);
   const [videoBReady, setVideoBReady] = useState(false);
   const [postReadyDelayElapsed, setPostReadyDelayElapsed] = useState(false);
@@ -46,9 +48,6 @@ const useVideoReadiness = ({
   const splashTimeoutIdRef = useRef<TimeoutId>(null);
 
   useEffect(() => {
-    const bgVideoA = document.getElementById("bg-video-a") as HTMLVideoElement | null;
-    const bgVideoB = document.getElementById("bg-video-b") as HTMLVideoElement | null;
-
     const onAPlaying = () => setVideoAReady(true);
     const onACanPlay = () => {
       // Only set if not already ready; prefer playing but accept canplay
@@ -107,7 +106,7 @@ const useVideoReadiness = ({
         bgVideoB.removeEventListener("canplay", onBCanPlay);
       }
     };
-  }, [videoTimeoutMs]);
+  }, [bgVideoA, bgVideoB, videoTimeoutMs]);
 
   // When any one video becomes ready, start the post-ready delay once.
   useEffect(() => {
@@ -150,6 +149,7 @@ const useImageReadiness = ({
 }: UseImageReadinessOpts & {
   charactersData: ReturnType<typeof useBookConvex>["charactersData"];
 }) => {
+  const { bgImageA, bgImageB } = usePlayerDOM();
   const [imageBackgroundReady, setImageBackgroundReady] = useState(false);
   const allCharacters = charactersData;
   const timeoutIdsRef = useRef<Set<TimeoutId>>(new Set());
@@ -227,10 +227,7 @@ const useImageReadiness = ({
   }, []);
 
   useEffect(() => {
-    const bgImageA = document.getElementById("bg-image-a") as HTMLImageElement | null;
-    const bgImageB = document.getElementById("bg-image-b") as HTMLImageElement | null;
-
-    const isBackgroundImageLoaded = (bgImage: HTMLImageElement | null): Promise<boolean> => {
+    const isBackgroundImageLoaded = (bgImage: HTMLElement | null): Promise<boolean> => {
       if (!bgImage || !bgImage.style.backgroundImage) return Promise.resolve(false);
 
       // Extract URL from backgroundImage style (remove url() wrapper and quotes)
@@ -273,7 +270,7 @@ const useImageReadiness = ({
     };
 
     void checkImages();
-  }, [imageTimeoutMs]);
+  }, [bgImageA, bgImageB, imageTimeoutMs]);
 
   return { loadImages, imageBackgroundReady };
 };

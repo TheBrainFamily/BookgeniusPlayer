@@ -1,0 +1,16 @@
+/**
+ * BookGenius Player - Library Styles
+ *
+ * This file is the entry point for the library's CSS bundle.
+ * It includes all Tailwind classes used by player components + custom styles.
+ */
+
+/* Tailwind base + components + utilities */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Scan all player source files for Tailwind classes */
+@source "../**/*.{ts,tsx}";
+
+/* Custom player styles */
+@import "../styles/imports.css";

@@ -62,7 +62,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({ bookPath, children }
 
   const htmlSourceChaptersQuery = useQuery(api.bookQueries.listHtmlSourceChapters, { bookPath });
 
-  const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
+  const charactersQuery = useQuery(api.bookQueries.listCharacterBundles, { bookPath });
 
   const backgroundsQuery = useQuery(api.backgroundCues.listForPlayer, { bookPath });
 

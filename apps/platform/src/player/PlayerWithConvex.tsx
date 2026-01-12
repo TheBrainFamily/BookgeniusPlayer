@@ -6,11 +6,14 @@
  * - Snapplify/Default: Uses bare ConvexProvider (anonymous/read-only)
  */
 import React from "react";
+import { createPortal } from "react-dom";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useIntegrations } from "@platform/integrations";
 import { LiveModeAppCore } from "../../../player/src/LiveModeApp";
 import { getBookFromUrl } from "../../../player/src/getBookFromUrl";
+import { NativeShellProvider } from "../../../player/src/context/NativeShellContext";
+import { PlayerDOMProvider, usePlayerDOM } from "../../../player/src/context/PlayerDOMContext";
 
 // Import player styles
 import "../../../player/src/styles/imports.css";
@@ -23,6 +26,11 @@ if (!convexUrl) {
 }
 
 const convex = new ConvexReactClient(convexUrl || "");
+
+const PlayerPortal: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { rootPlayer } = usePlayerDOM();
+  return createPortal(children, rootPlayer);
+};
 
 /**
  * Inner component that renders with Clerk-authenticated Convex context.
@@ -40,9 +48,15 @@ const PlayerWithClerkAuth: React.FC<{ bookPath: string }> = ({ bookPath }) => {
   }
 
   return (
-    <ConvexProviderWithClerk client={convex} useAuth={clerkUseAuth}>
-      <LiveModeAppCore bookPath={bookPath} />
-    </ConvexProviderWithClerk>
+    <NativeShellProvider>
+      <PlayerDOMProvider>
+        <PlayerPortal>
+          <ConvexProviderWithClerk client={convex} useAuth={clerkUseAuth}>
+            <LiveModeAppCore bookPath={bookPath} />
+          </ConvexProviderWithClerk>
+        </PlayerPortal>
+      </PlayerDOMProvider>
+    </NativeShellProvider>
   );
 };
 
@@ -52,9 +66,15 @@ const PlayerWithClerkAuth: React.FC<{ bookPath: string }> = ({ bookPath }) => {
  */
 const PlayerWithAnonymousConvex: React.FC<{ bookPath: string }> = ({ bookPath }) => {
   return (
-    <ConvexProvider client={convex}>
-      <LiveModeAppCore bookPath={bookPath} />
-    </ConvexProvider>
+    <NativeShellProvider>
+      <PlayerDOMProvider>
+        <PlayerPortal>
+          <ConvexProvider client={convex}>
+            <LiveModeAppCore bookPath={bookPath} />
+          </ConvexProvider>
+        </PlayerPortal>
+      </PlayerDOMProvider>
+    </NativeShellProvider>
   );
 };
 

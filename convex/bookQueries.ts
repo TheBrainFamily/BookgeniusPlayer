@@ -628,7 +628,7 @@ export const listMusicWithDrafts = publicQuery({
  * Get character bundles with draft-aware asset URLs.
  * Uses bulk query to fetch all folders and assets in a single operation.
  */
-export const listCharacterBundlesWithDrafts = publicQuery({
+export const listCharacterBundles = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const charactersPath = `${bookPath}/characters`;

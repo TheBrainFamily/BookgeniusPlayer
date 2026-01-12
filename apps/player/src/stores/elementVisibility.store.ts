@@ -140,14 +140,29 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       setIsTimersPausedSticky: (sticky) => set({ isTimersPausedSticky: sticky }),
 
       // Complex actions
-      showAllElements: () =>
-        set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null }),
+      showAllElements: () => {
+        console.log("[elementVisibility] showAllElements called");
+        set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null });
+      },
 
-      hideAllElements: (reason = null) =>
-        set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason }),
+      hideAllElements: (reason = null) => {
+        console.log(
+          "[elementVisibility] hideAllElements called, reason:",
+          reason,
+          "stack:",
+          new Error().stack,
+        );
+        set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason });
+      },
 
       handleScreenTap: () => {
         const { areElementsVisible, isScrollMode, clearInactivityTimer } = get();
+        console.log(
+          "[elementVisibility] handleScreenTap called, areElementsVisible:",
+          areElementsVisible,
+          "stack:",
+          new Error().stack?.split("\n").slice(0, 5).join("\n"),
+        );
 
         clearInactivityTimer();
 
