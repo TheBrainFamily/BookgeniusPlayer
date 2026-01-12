@@ -15,7 +15,7 @@ const PLIST_DIR = join(homedir(), "Library/LaunchAgents");
 const PLIST_PATH = join(PLIST_DIR, `${LABEL}.plist`);
 const LOG_DIR = join(homedir(), "Library/Logs/ConvexSync");
 
-function getPlist(binPath: string, workingDir: string): string {
+function getPlist(bunPath: string, scriptPath: string, workingDir: string): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -24,7 +24,8 @@ function getPlist(binPath: string, workingDir: string): string {
     <string>${LABEL}</string>
     <key>ProgramArguments</key>
     <array>
-        <string>${binPath}</string>
+        <string>${bunPath}</string>
+        <string>${scriptPath}</string>
     </array>
     <key>WorkingDirectory</key>
     <string>${workingDir}</string>
@@ -96,20 +97,17 @@ Make sure CONVEX_URL and CONVEX_ADMIN_KEY are set in your .env file.
   // Determine binary path
   const scriptDir = import.meta.dir;
   const cliScript = join(scriptDir, "cli.ts");
-
-  // Use bun to run the script
   const bunPath = process.execPath;
-  const binPath = `${bunPath} ${cliScript}`;
 
   console.log(`📁 Project root: ${projectRoot}`);
-  console.log(`📦 Using: ${binPath}`);
+  console.log(`📦 Using: ${bunPath} ${cliScript}`);
 
   // Create directories
   mkdirSync(PLIST_DIR, { recursive: true });
   mkdirSync(LOG_DIR, { recursive: true });
 
   // Write plist
-  const plist = getPlist(binPath, projectRoot);
+  const plist = getPlist(bunPath, cliScript, projectRoot);
   writeFileSync(PLIST_PATH, plist);
   console.log(`✅ Created ${PLIST_PATH}`);
 

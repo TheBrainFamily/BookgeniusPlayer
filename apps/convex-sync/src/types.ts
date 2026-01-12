@@ -26,7 +26,7 @@ export interface ChangelogEntry {
   basename?: string;
   oldFolderPath?: string;
   oldBasename?: string;
-  _creationTime: number;
+  createdAt: number;
 }
 
 export interface ChangelogResponse {

@@ -1249,9 +1249,12 @@ export const publishDraft = mutation({
       publishedBy: actorFields.updatedBy,
     });
 
+    // Save versionId before clearing draft
+    const versionId = asset.draftVersionId!;
+
     // Update asset
     await ctx.db.patch(asset._id, {
-      publishedVersionId: asset.draftVersionId,
+      publishedVersionId: versionId,
       draftVersionId: undefined,
       updatedAt: now,
       updatedBy: actorFields.updatedBy,
@@ -1263,7 +1266,7 @@ export const publishDraft = mutation({
       performedBy: actorFields.updatedBy,
     });
 
-    return { assetId: asset._id, versionId: asset.draftVersionId };
+    return { assetId: asset._id, versionId };
   },
 });
 
