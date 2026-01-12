@@ -1,113 +1,83 @@
 export interface ChapterInfo {
   originalIndex: number;
-  content: string;
   title: string;
+  content: string; // For display in editor
   selected: boolean;
 }
 
 /**
- * Parse chapters from rich XML - handles nested sections correctly.
+ * Parse chapters from XML using DOM parsing.
  *
- * This parser correctly handles chapters that contain nested <section> elements
- * (like Paradise Lost which has preamble and poem sections inside each chapter).
- * It uses depth counting instead of a simple regex to find the correct closing tag.
+ * Returns the original XML string and extracted chapter info.
+ * The original XML is preserved for recompilation - no string manipulation needed.
  */
-export function parseChapters(xml: string): {
-  preamble: string;
-  chapters: ChapterInfo[];
-  postamble: string;
-} {
+export function parseChapters(xml: string): { originalXml: string; chapters: ChapterInfo[] } {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, "text/xml");
+
+  // Find all chapter sections
+  const chapterSections = doc.querySelectorAll("section[data-chapter]");
+
   const chapters: ChapterInfo[] = [];
-  let preamble = "";
+  for (const section of chapterSections) {
+    const chapterNum = parseInt(section.getAttribute("data-chapter") || "0", 10);
 
-  // Find the first data-chapter section to get preamble
-  const firstMatch = xml.match(/<section\s+data-chapter="/);
-  if (firstMatch && firstMatch.index !== undefined) {
-    preamble = xml.slice(0, firstMatch.index);
+    // Extract title from first heading
+    const heading = section.querySelector("h1, h2, h3, h4, h5, h6");
+    let title = heading
+      ? heading.textContent?.trim() || `Chapter ${chapterNum}`
+      : `Chapter ${chapterNum}`;
+    if (title.length > 50) title = title.slice(0, 47) + "...";
+
+    // Serialize chapter content for editor display
+    const serializer = new XMLSerializer();
+    const content = serializer.serializeToString(section);
+
+    chapters.push({ originalIndex: chapterNum, title, content, selected: true });
   }
 
-  // Find all chapter section start tags
-  const chapterStartRegex = /<section\s+data-chapter="(\d+)"[^>]*>/g;
-  const chapterStarts: { index: number; chapterNum: number; fullMatch: string }[] = [];
-
-  let match;
-  while ((match = chapterStartRegex.exec(xml)) !== null) {
-    chapterStarts.push({
-      index: match.index,
-      chapterNum: parseInt(match[1], 10),
-      fullMatch: match[0],
-    });
-  }
-
-  // For each chapter, find its proper closing tag by counting nested sections
-  for (let i = 0; i < chapterStarts.length; i++) {
-    const start = chapterStarts[i];
-    const searchStart = start.index + start.fullMatch.length;
-
-    // Find the matching closing </section> by counting nesting
-    let depth = 1;
-    let pos = searchStart;
-    while (depth > 0 && pos < xml.length) {
-      const nextOpen = xml.indexOf("<section", pos);
-      const nextClose = xml.indexOf("</section>", pos);
-
-      if (nextClose === -1) break; // No more closing tags
-
-      if (nextOpen !== -1 && nextOpen < nextClose) {
-        // Found an opening tag before the closing tag
-        depth++;
-        pos = nextOpen + 8; // Move past "<section"
-      } else {
-        // Found a closing tag
-        depth--;
-        if (depth === 0) {
-          // This is the matching close tag
-          const endPos = nextClose + "</section>".length;
-          const content = xml.slice(start.index, endPos);
-
-          // Extract title
-          const titleMatch = content.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i);
-          let title = titleMatch
-            ? titleMatch[1].replace(/<[^>]+>/g, "").trim()
-            : `Chapter ${start.chapterNum}`;
-          if (title.length > 50) title = title.slice(0, 47) + "...";
-
-          chapters.push({
-            originalIndex: start.chapterNum,
-            content,
-            title,
-            selected: true,
-          });
-        }
-        pos = nextClose + 10; // Move past "</section>"
-      }
-    }
-  }
-
-  // Get postamble (everything after last chapter section)
-  let postamble = "";
-  if (chapters.length > 0) {
-    const lastChapter = chapters[chapters.length - 1];
-    const lastChapterEnd = xml.indexOf(lastChapter.content) + lastChapter.content.length;
-    postamble = xml.slice(lastChapterEnd);
-  }
-
-  return { preamble, chapters, postamble };
+  return { originalXml: xml, chapters };
 }
 
 /**
- * Recompile chapters with renumbered indices.
- * Only includes selected chapters and renumbers them sequentially starting from 1.
+ * Recompile XML with chapter modifications using pure DOM manipulation.
+ *
+ * - Removes unselected chapters
+ * - Renumbers remaining chapters sequentially (1, 2, 3, ...)
+ * - Preserves all document structure, attributes, and non-chapter content
  */
-export function recompileXml(
-  preamble: string,
-  chapters: ChapterInfo[],
-  postamble: string,
-): string {
-  const selectedChapters = chapters.filter((c) => c.selected);
-  const reindexedChapters = selectedChapters.map((chapter, idx) => {
-    // Replace the data-chapter attribute with new index
-    return chapter.content.replace(/data-chapter="\d+"/, `data-chapter="${idx + 1}"`);
-  });
-  return preamble + reindexedChapters.join("\n") + postamble;
+export function recompileXml(originalXml: string, chapters: ChapterInfo[]): string {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(originalXml, "text/xml");
+
+  // Find all chapter sections in DOM order
+  const chapterSections = doc.querySelectorAll("section[data-chapter]");
+
+  // Build a map of originalIndex -> selected status
+  const selectionMap = new Map<number, boolean>();
+  for (const chapter of chapters) {
+    selectionMap.set(chapter.originalIndex, chapter.selected);
+  }
+
+  // Track new chapter number for renumbering
+  let newChapterNum = 1;
+
+  // Process each chapter section
+  for (const section of chapterSections) {
+    const originalIndex = parseInt(section.getAttribute("data-chapter") || "0", 10);
+    const isSelected = selectionMap.get(originalIndex) ?? true;
+
+    if (isSelected) {
+      // Renumber the chapter
+      section.setAttribute("data-chapter", String(newChapterNum));
+      newChapterNum++;
+    } else {
+      // Remove unselected chapter from DOM
+      section.parentNode?.removeChild(section);
+    }
+  }
+
+  // Serialize back to string
+  const serializer = new XMLSerializer();
+  return serializer.serializeToString(doc);
 }
