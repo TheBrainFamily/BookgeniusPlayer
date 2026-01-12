@@ -70,37 +70,27 @@ export const generateCharacterImageWithFluxAndMetadata = async (
   prompt: string,
   characterName: string,
   generalPrompt: string,
-): Promise<{
-  buffer: Buffer;
-  attempt: number;
-  sanitizationLevel: "original" | "light" | "heavy" | "abstract";
-} | undefined> => {
-  // Try each attempt level and track which one succeeds
-  for (let attempt = 1; attempt <= 4; attempt++) {
-    try {
-      const result = await generateFluxImage(
-        prompt,
-        characterName,
-        generalPrompt,
-        "avatar",
-        undefined,
-        attempt,
-        true,
-      );
-
-      if (result && result instanceof Buffer) {
-        const levels = ["original", "light", "heavy", "abstract"] as const;
-        return {
-          buffer: result,
-          attempt,
-          sanitizationLevel: levels[attempt - 1],
-        };
-      }
-    } catch {
-      // Continue to next attempt
+): Promise<
+  | {
+      buffer: Buffer;
+      attempt: number;
+      sanitizationLevel: "original" | "light" | "heavy" | "abstract";
     }
+  | undefined
+> => {
+  const buffer = await generateFluxImage(
+    prompt,
+    characterName,
+    generalPrompt,
+    "avatar",
+    undefined,
+    1,
+    true,
+  );
+  if (!buffer) {
+    return undefined;
   }
-  return undefined;
+  return { buffer: buffer as Buffer, attempt: 1, sanitizationLevel: "original" };
 };
 
 type PictureType = "avatar" | "background";
