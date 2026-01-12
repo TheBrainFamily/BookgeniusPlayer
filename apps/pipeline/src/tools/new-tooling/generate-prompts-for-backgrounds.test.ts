@@ -16,6 +16,7 @@ vi.mock("./generate-flux-schnel-image", () => ({
       _quality?: string,
       _size?: string,
       suffix?: string,
+      // eslint-disable-next-line max-params
     ) => {
       // Fixed filename pattern includes suffix when provided
       const filename = suffix
