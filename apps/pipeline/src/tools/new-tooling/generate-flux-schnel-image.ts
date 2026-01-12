@@ -149,14 +149,34 @@ export const generateFluxImage = async (
     seed: 43605,
   };
 
-  let url: string;
   try {
     const output = await replicate.run("black-forest-labs/flux-2-pro", { input });
 
     // @ts-expect-error wrong types of replicate - flux-2-pro returns object with .url() method
-    url = output.url();
+    const url = output.url();
+
+    logger.info(`Replicate returned URL: ${url}`);
+
+    // Download the image and save it to the book output folder
+    const res = await fetch(url);
+    if (!res.ok || !res.body) {
+      throw new Error(`Failed to download image: ${res.status} ${res.statusText}`);
+    }
+
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    if (returnBuffer) {
+      return buffer;
+    }
+    if (filePath) {
+      const absolutePath = writeBookFile(filePath, buffer, FILE_TYPE.PERMANENT);
+      logger.info(`Image saved: ${absolutePath}`);
+      return absolutePath;
+    }
+    return undefined;
   } catch (e) {
-    console.error(`Failed to generate image after ${attempt} attempts: ${e}`);
+    console.error(`Failed to generate/download image on attempt ${attempt}: ${e}`);
     if (attempt < 4) {
       return await generateFluxImage(
         prompt,
@@ -174,36 +194,6 @@ export const generateFluxImage = async (
       return undefined;
     }
   }
-
-  logger.info(`Replicate returned URL: ${url}`);
-
-  // Download the image and save it to the book output folder
-  const res = await fetch(url);
-  if (!res.ok || !res.body) {
-    throw new Error(`Failed to download image: ${res.status} ${res.statusText}`);
-  }
-
-  const arrayBuffer = await res.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  // let filePath;
-  // if (type === "avatar") {
-  //   const originalFilePath = getPictureFileNameForName(characterName);
-  //   filePath = `characters/${originalFilePath}`;
-  // } else {
-  //   filePath = `backgrounds/${fileName}`;
-  // }
-  // const filePath = `characters/${originalFilePath.replace(".png", ".webp")}`;
-
-  if (returnBuffer) {
-    return buffer;
-  }
-  if (filePath) {
-    const absolutePath = writeBookFile(filePath, buffer, FILE_TYPE.PERMANENT);
-    logger.info(`Image saved: ${absolutePath}`);
-    return absolutePath;
-  }
-  return undefined;
 };
 
 if (require.main === module) {
