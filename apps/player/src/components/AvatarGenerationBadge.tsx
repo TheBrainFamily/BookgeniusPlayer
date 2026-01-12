@@ -16,7 +16,7 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
   const startAvatarGeneration = useAction(api.avatarGeneration.startAvatarGeneration);
   const { setOptimisticAvatar, clearOptimisticAvatar, startOptimisticGeneration } =
     useAvatarGenerationStore();
-  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [editablePrompt, setEditablePrompt] = useState(character.extra?.aiPrompt || "");
   const [isRegenerating, setIsRegenerating] = useState(false);
@@ -25,15 +25,19 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
   const displayName = character.extra?.displayName || character.name;
 
   const handleConfirm = () => {
-    if (!selectedUrl || !book?.path) return;
+    if (selectedIndex === null || !book?.path) return;
 
-    setOptimisticAvatar(character.slug, selectedUrl);
+    // Use URL for optimistic UI display only
+    const selectedUrl = proposalUrls[selectedIndex];
+    if (selectedUrl) {
+      setOptimisticAvatar(character.slug, selectedUrl);
+    }
     onClose();
 
     confirmAvatarSelection({
       bookPath: book.path,
       characterSlug: character.slug,
-      selectedOptionUrl: selectedUrl,
+      optionIndex: selectedIndex,
     })
       .then((result) => {
         if (!result.success) {
@@ -76,9 +80,9 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
           {proposalUrls.map((url, index) => (
             <button
               key={index}
-              onClick={() => setSelectedUrl(url)}
+              onClick={() => setSelectedIndex(index)}
               className={`relative rounded-lg overflow-hidden border-2 transition-all ${
-                selectedUrl === url
+                selectedIndex === index
                   ? "border-purple-500 ring-2 ring-purple-500/50"
                   : "border-zinc-600 hover:border-zinc-500"
               }`}
@@ -88,7 +92,7 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
                 alt={`Option ${index + 1}`}
                 className="w-full aspect-square object-cover"
               />
-              {selectedUrl === url && (
+              {selectedIndex === index && (
                 <div className="absolute top-2 right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
                   <svg
                     className="w-4 h-4 text-white"
@@ -153,7 +157,7 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedUrl}
+            disabled={selectedIndex === null}
             className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Use This Avatar
