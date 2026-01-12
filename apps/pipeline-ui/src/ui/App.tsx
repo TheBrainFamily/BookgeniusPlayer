@@ -86,59 +86,12 @@ type JobStatus = {
   };
 };
 
-type ChapterInfo = { originalIndex: number; content: string; title: string; selected: boolean };
+// Import chapter parsing utilities
+import { parseChapters, recompileXml, type ChapterInfo } from "../utils/xmlParser";
 
 const serverURL = "http://localhost:4000";
 
 const statusIcons = { pending: Circle, running: Loader2, done: CheckCircle2, error: AlertCircle };
-
-// Parse chapters from rich XML
-function parseChapters(xml: string): {
-  preamble: string;
-  chapters: ChapterInfo[];
-  postamble: string;
-} {
-  const sectionRegex = /<section\s+data-chapter="(\d+)"[^>]*>([\s\S]*?)<\/section>/g;
-  const chapters: ChapterInfo[] = [];
-  let match;
-  let lastIndex = 0;
-  let preamble = "";
-
-  // Find the first section to get preamble
-  const firstMatch = xml.match(/<section\s+data-chapter="/);
-  if (firstMatch && firstMatch.index !== undefined) {
-    preamble = xml.slice(0, firstMatch.index);
-  }
-
-  while ((match = sectionRegex.exec(xml)) !== null) {
-    const originalIndex = parseInt(match[1], 10);
-    const content = match[0];
-    // Try to extract a title from the first heading or first line
-    const titleMatch = content.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i);
-    let title = titleMatch
-      ? titleMatch[1].replace(/<[^>]+>/g, "").trim()
-      : `Chapter ${originalIndex}`;
-    if (title.length > 50) title = title.slice(0, 47) + "...";
-
-    chapters.push({ originalIndex, content, title, selected: true });
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Get postamble (everything after last section)
-  const postamble = xml.slice(lastIndex);
-
-  return { preamble, chapters, postamble };
-}
-
-// Recompile chapters with renumbered indices
-function recompileXml(preamble: string, chapters: ChapterInfo[], postamble: string): string {
-  const selectedChapters = chapters.filter((c) => c.selected);
-  const reindexedChapters = selectedChapters.map((chapter, idx) => {
-    // Replace the data-chapter attribute with new index
-    return chapter.content.replace(/data-chapter="\d+"/, `data-chapter="${idx + 1}"`);
-  });
-  return preamble + reindexedChapters.join("\n") + postamble;
-}
 
 // eslint-disable-next-line complexity
 export default function App() {
@@ -168,8 +121,7 @@ export default function App() {
 
   // Chapter management
   const [chapters, setChapters] = useState<ChapterInfo[]>([]);
-  const [preamble, setPreamble] = useState("");
-  const [postamble, setPostamble] = useState("");
+  const [originalXml, setOriginalXml] = useState("");
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -231,9 +183,8 @@ export default function App() {
 
       // Parse chapters
       const parsed = parseChapters(prep.rich);
-      setPreamble(parsed.preamble);
+      setOriginalXml(parsed.originalXml);
       setChapters(parsed.chapters);
-      setPostamble(parsed.postamble);
       setSelectedChapterIdx(0);
     } finally {
       setIsUploading(false);
@@ -273,9 +224,8 @@ export default function App() {
       setSlug(result.slug);
       setRich(result.rich);
       const parsed = parseChapters(result.rich);
-      setPreamble(parsed.preamble);
+      setOriginalXml(parsed.originalXml);
       setChapters(parsed.chapters);
-      setPostamble(parsed.postamble);
       setSelectedChapterIdx(0);
     } catch (e) {
       console.error("Download failed:", e);
@@ -296,9 +246,8 @@ export default function App() {
       setRich(result.rich);
       const parsed = parseChapters(result.rich);
       console.log("[SE] parsed chapters:", parsed.chapters.length);
-      setPreamble(parsed.preamble);
+      setOriginalXml(parsed.originalXml);
       setChapters(parsed.chapters);
-      setPostamble(parsed.postamble);
       setSelectedChapterIdx(0);
       console.log("[SE] state updated, chapters:", parsed.chapters.length);
     } catch (e) {
@@ -350,12 +299,12 @@ export default function App() {
     if (!slug) return;
     setIsStartingPipeline(true);
     // Recompile with renumbered chapters
-    const compiledXml = recompileXml(preamble, chapters, postamble);
+    const compiledXml = recompileXml(originalXml, chapters);
     await trpc.saveRichXml.mutate({ slug, rich: compiledXml });
     const resp = await trpc.startPipeline.mutate({ slug });
     setJobId(resp.jobId);
     setPolling(true);
-  }, [slug, preamble, chapters, postamble]);
+  }, [slug, originalXml, chapters]);
 
   const submitStyleDescription = useCallback(
     async (description: string | null) => {

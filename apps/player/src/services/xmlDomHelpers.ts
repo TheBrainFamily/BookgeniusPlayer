@@ -39,6 +39,15 @@ export const renderEmElement = (element: Element): string => {
     } else if (isElementNode(emChild)) {
       if (emChild.tagName === "LineBreak") {
         emInner += renderLineBreakSpan();
+      } else if (isLikelyCharacterTag(emChild.tagName)) {
+        // Preserve character elements with enters/exits attributes
+        const slug = emChild.tagName.toLowerCase();
+        const isEntering = emChild.getAttribute("enters") === "true";
+        const isExiting = emChild.getAttribute("exits") === "true";
+        const dataAttrs = [`data-c="${slug}"`];
+        if (isEntering) dataAttrs.push('data-enters="true"');
+        if (isExiting) dataAttrs.push('data-exits="true"');
+        emInner += `<span ${dataAttrs.join(" ")}>${emChild.textContent || ""}</span>`;
       } else {
         emInner += emChild.textContent || "";
       }

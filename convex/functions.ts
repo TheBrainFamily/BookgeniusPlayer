@@ -119,9 +119,9 @@ export interface BookMutationCtx {
  * });
  */
 export const bookMutation = customMutation(baseMutation, {
-  args: { bookPath: v.string() },
-  input: async (ctx, { bookPath }) => {
-    const { principalId, role } = await requireBookWriteAccess(ctx, bookPath);
+  args: { bookPath: v.string(), _adminKey: v.optional(v.string()) },
+  input: async (ctx, { bookPath, _adminKey }) => {
+    const { principalId, role } = await requireBookWriteAccess(ctx, bookPath, _adminKey);
 
     // Create typed wrapper for database operations
     const bookDb: BookDb = {
@@ -218,10 +218,13 @@ export const internalQuery = baseInternalQuery;
  * Use for user-specific operations that don't need book ownership.
  */
 export const authedMutation = customMutation(baseMutation, {
-  args: {},
-  input: async (ctx) => {
-    const identity = await requireIdentity(ctx);
-    return { ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity) }, args: {} };
+  args: { _adminKey: v.optional(v.string()) },
+  input: async (ctx, { _adminKey }) => {
+    const identity = await requireIdentity(ctx, _adminKey);
+    return {
+      ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity), _adminKey },
+      args: {},
+    };
   },
 });
 
@@ -231,6 +234,8 @@ export const authedMutation = customMutation(baseMutation, {
 export interface AuthedMutationCtx {
   principalId: string;
   isAdmin: boolean;
+  /** Admin key for nested auth calls (undefined for normal users) */
+  _adminKey?: string;
 }
 
 // ============================================================================
@@ -242,9 +247,9 @@ export interface AuthedMutationCtx {
  * Use for system management, dangerous operations.
  */
 export const adminMutation = customMutation(baseMutation, {
-  args: {},
-  input: async (ctx) => {
-    const identity = await requireAdmin(ctx);
+  args: { _adminKey: v.optional(v.string()) },
+  input: async (ctx, { _adminKey }) => {
+    const identity = await requireAdmin(ctx, _adminKey);
     return { ctx: { principalId: principalId(identity) }, args: {} };
   },
 });
@@ -254,9 +259,9 @@ export const adminMutation = customMutation(baseMutation, {
  * Use for admin-only data access.
  */
 export const adminQuery = customQuery(baseQuery, {
-  args: {},
-  input: async (ctx) => {
-    const identity = await requireAdmin(ctx);
+  args: { _adminKey: v.optional(v.string()) },
+  input: async (ctx, { _adminKey }) => {
+    const identity = await requireAdmin(ctx, _adminKey);
     return { ctx: { principalId: principalId(identity) }, args: {} };
   },
 });
@@ -266,9 +271,9 @@ export const adminQuery = customQuery(baseQuery, {
  * Use for admin-only background jobs.
  */
 export const adminAction = customAction(baseAction, {
-  args: {},
-  input: async (ctx) => {
-    const identity = await requireAdmin(ctx);
+  args: { _adminKey: v.optional(v.string()) },
+  input: async (ctx, { _adminKey }) => {
+    const identity = await requireAdmin(ctx, _adminKey);
     return { ctx: { principalId: principalId(identity) }, args: {} };
   },
 });
@@ -299,10 +304,13 @@ export const publicAction = baseAction;
  * Use for user-specific actions that don't need book ownership.
  */
 export const authedAction = customAction(baseAction, {
-  args: {},
-  input: async (ctx) => {
-    const identity = await requireIdentity(ctx);
-    return { ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity) }, args: {} };
+  args: { _adminKey: v.optional(v.string()) },
+  input: async (ctx, { _adminKey }) => {
+    const identity = await requireIdentity(ctx, _adminKey);
+    return {
+      ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity), _adminKey },
+      args: {},
+    };
   },
 });
 
@@ -324,10 +332,9 @@ export const authedAction = customAction(baseAction, {
  * });
  */
 export const bookAction = customAction(baseAction, {
-  args: { bookPath: v.string() },
-  input: async (ctx, { bookPath }) => {
-    // Use action-specific auth check (calls internal query since actions lack ctx.db)
-    const { principalId, role } = await requireBookWriteAccessFromAction(ctx, bookPath);
+  args: { bookPath: v.string(), _adminKey: v.optional(v.string()) },
+  input: async (ctx, { bookPath, _adminKey }) => {
+    const { principalId, role } = await requireBookWriteAccessFromAction(ctx, bookPath, _adminKey);
     return {
       ctx: { principalId, role, bookPath },
       args: {}, // bookPath consumed by wrapper, not passed to handler

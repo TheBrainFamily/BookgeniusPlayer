@@ -101,7 +101,7 @@ async function findCharactersMissingAvatars(bookPath: string): Promise<MissingAv
     console.log(`Found ${missingWebp.length} characters missing avatar.webp (run repair):`);
     missingWebp.forEach((slug) => {
       console.log(
-        `  npx convex run admin/regenerateAvatarWebp:regenerateAvatarWebp '{"characterPath": "${bookPath}/characters/${slug}"}'`,
+        `  ./scripts/convex run admin/regenerateAvatarWebp:regenerateAvatarWebp '{"characterPath": "${bookPath}/characters/${slug}"}'`,
       );
     });
   }

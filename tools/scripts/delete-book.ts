@@ -44,7 +44,11 @@ const s3 = new S3Client({
 
 function convexRun(command: string, args: Record<string, unknown>): string {
   const argsJson = JSON.stringify(args);
-  return execSync(`npx convex run ${command} '${argsJson}'`, { encoding: "utf-8", cwd: rootDir });
+  // Use wrapper script that injects admin identity
+  return execSync(`./scripts/convex run ${command} '${argsJson}'`, {
+    encoding: "utf-8",
+    cwd: rootDir,
+  });
 }
 
 async function confirm(message: string, expected: string): Promise<boolean> {

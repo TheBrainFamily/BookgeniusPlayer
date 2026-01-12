@@ -17,7 +17,6 @@ export const convertBook = (
   startFromNoteId: number = 0,
 ) => {
   const bookDataDirInput = `./books-data/${bookSlug}/input`;
-
   const bookFb2FilePath = findFb2FilePath(`${bookDataDirInput}`);
   const text = fs.readFileSync(`./${bookFb2FilePath}`, "utf-8");
 
@@ -33,8 +32,18 @@ export const convertBook = (
     const bookTextXml = convertHtmlToXml(result.textHtml);
     const bookTextXmlPath = `${bookDataDirInput}/rich.xml`;
 
+    // Debug logging
+    const openingSections = (bookTextXml.match(/<section/g) || []).length;
+    const closingSections = (bookTextXml.match(/<\/section>/g) || []).length;
+    console.log(
+      `[FB2 Converter DEBUG] Writing rich.xml - opens: ${openingSections}, closes: ${closingSections}`,
+    );
+    if (openingSections !== closingSections) {
+      console.error(`[FB2 Converter ERROR] Unbalanced sections being saved!`);
+    }
+
     fs.writeFileSync(bookTextXmlPath, bookTextXml, "utf8");
-    console.log(`${bookSlug} Rich XML saved to ${bookDataDirInput}/rich.xml`);
+    console.log(`[FB2 Converter] ${bookSlug} Rich XML saved to ${bookDataDirInput}/rich.xml`);
 
     return result;
   } catch (error) {

@@ -1,4 +1,4 @@
-import { ConvexHttpClient } from "convex/browser";
+import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import "dotenv/config";
 
@@ -8,7 +8,7 @@ if (!CONVEX_URL) {
   throw new Error("Missing CONVEX_URL environment variable");
 }
 
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = new AdminConvexHttpClient(CONVEX_URL);
 
 export type StepStatus = "pending" | "running" | "done" | "error" | "skipped";
 export type AvatarState = "generating" | "ready" | "error" | "none";

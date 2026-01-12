@@ -12,7 +12,7 @@
  * Files in R2/storage are left orphaned (not deleted).
  */
 
-import { ConvexHttpClient } from "convex/browser";
+import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@convex/_generated/api";
 import { logError } from "../lib/utils";
 
@@ -22,7 +22,7 @@ if (!CONVEX_URL) {
   process.exit(1);
 }
 
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = new AdminConvexHttpClient(CONVEX_URL);
 
 async function main() {
   console.log("🗑️  Nuking all book data from Convex...\n");
