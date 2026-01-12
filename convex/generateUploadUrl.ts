@@ -89,7 +89,6 @@ export const startUpload = authedMutation({
     folderPath: v.string(),
     basename: v.string(),
     filename: v.optional(v.string()),
-    publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
   },
@@ -103,7 +102,6 @@ export const startUpload = authedMutation({
     console.log("[startUpload] Called with", {
       folderPath: args.folderPath,
       basename: args.basename,
-      publish: args.publish,
     });
 
     // Check book write access if this is a book folder
@@ -134,7 +132,6 @@ export const startUploadInternal = internalMutation({
     folderPath: v.string(),
     basename: v.string(),
     filename: v.optional(v.string()), // Original filename with extension for URLs
-    publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
   },

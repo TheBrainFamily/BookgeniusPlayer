@@ -111,67 +111,6 @@ export const listForPlayer = publicQuery({
 });
 
 /**
- * List cues in player format, preferring draft files over published.
- * For live edit mode.
- */
-export const listForPlayerWithDrafts = publicQuery({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const cues = await ctx.db
-      .query("backgroundCues")
-      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
-      .collect();
-
-    const backgroundsPath = `${bookPath}/backgrounds`;
-
-    // Get all assets (not just published)
-    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
-      folderPath: backgroundsPath,
-    });
-
-    // Build fileBasename -> url map, preferring drafts
-    const fileMap = new Map<string, string>();
-
-    for (const asset of assets) {
-      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-        folderPath: backgroundsPath,
-        basename: asset.basename,
-      });
-
-      const draftVersion = versions.find((v) => v.state === "draft");
-      const publishedVersion = versions.find((v) => v.state === "published");
-      const bestVersion = draftVersion || publishedVersion || versions[0];
-
-      if (bestVersion) {
-        const urlInfo = await ctx.runQuery(
-          components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id },
-        );
-        if (urlInfo?.url) {
-          fileMap.set(asset.basename, urlInfo.url);
-        }
-      }
-    }
-
-    return cues
-      .filter((cue) => fileMap.has(cue.fileBasename))
-      .map((cue) => ({
-        startChapter: cue.chapter,
-        startParagraph: cue.paragraph,
-        file: cue.fileBasename,
-        url: fileMap.get(cue.fileBasename),
-        backgroundColor: cue.backgroundColor,
-        textColor: cue.textColor,
-      }))
-      .sort((a, b) =>
-        a.startChapter !== b.startChapter
-          ? a.startChapter - b.startChapter
-          : a.startParagraph - b.startParagraph,
-      );
-  },
-});
-
-/**
  * Get available background files (for picker UI).
  * Includes preview URLs for thumbnails.
  */

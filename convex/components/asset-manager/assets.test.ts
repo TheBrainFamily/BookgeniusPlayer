@@ -85,11 +85,10 @@ describe("assets (logical layer)", () => {
       basename: "test-published.txt",
     });
 
-    // Commit a published version
+    // Commit a version
     const result = await t.mutation(api.assetManager.commitVersion, {
       folderPath: "",
       basename: "test-published.txt",
-      publish: true,
       label: "v1",
     });
 
@@ -101,30 +100,6 @@ describe("assets (logical layer)", () => {
 
     expect(asset).not.toBeNull();
     expect(asset?.publishedVersionId).toBe(result.versionId);
-  });
-
-  it("getAsset includes draftVersionId when asset has a draft version", async () => {
-    const t = convexTest(schema, modules);
-
-    // Create asset
-    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "test-draft.txt" });
-
-    // Commit a draft version
-    const result = await t.mutation(api.assetManager.commitVersion, {
-      folderPath: "",
-      basename: "test-draft.txt",
-      publish: false,
-      label: "draft-v1",
-    });
-
-    // Get the asset and verify draftVersionId is included
-    const asset = await t.query(api.assetManager.getAsset, {
-      folderPath: "",
-      basename: "test-draft.txt",
-    });
-
-    expect(asset).not.toBeNull();
-    expect(asset?.draftVersionId).toBe(result.versionId);
   });
 
   it("listAssets returns assets only for the given folderPath", async () => {
@@ -188,11 +163,10 @@ describe("assets (logical layer)", () => {
       basename: "test-with-version.txt",
     });
 
-    // Commit a version with publish=true to set publishedVersionId
+    // Commit a version to set publishedVersionId
     const result = await t.mutation(api.assetManager.commitVersion, {
       folderPath: "",
       basename: "test-with-version.txt",
-      publish: true,
       label: "v1",
     });
 
@@ -206,38 +180,6 @@ describe("assets (logical layer)", () => {
     // publishedVersionId should be present after a version is published
     expect(asset.publishedVersionId).toBeDefined();
     expect(asset.publishedVersionId).toBe(result.versionId);
-
-    // draftVersionId may be undefined or not present since we published directly
-    expect(asset.draftVersionId).toBeUndefined();
-  });
-
-  it("listAssets includes draftVersionId when asset has a draft version", async () => {
-    const t = convexTest(schema, modules);
-
-    // Create asset and commit a draft version
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "test-with-draft.txt",
-    });
-
-    // Commit a version with publish=false to set draftVersionId
-    await t.mutation(api.assetManager.commitVersion, {
-      folderPath: "",
-      basename: "test-with-draft.txt",
-      publish: false,
-      label: "draft-v1",
-    });
-
-    // List assets and verify draftVersionId is included
-    const assets = await t.query(api.assetManager.listAssets, { folderPath: "" });
-
-    expect(assets).toHaveLength(1);
-    const asset = assets[0];
-    expect(asset.basename).toBe("test-with-draft.txt");
-
-    // draftVersionId should be present after a draft is created
-    expect(asset).toHaveProperty("draftVersionId");
-    expect(asset.draftVersionId).toBeDefined();
   });
 });
 
@@ -426,7 +368,6 @@ describe("renameAsset", () => {
     const result = await t.mutation(api.assetManager.commitVersion, {
       folderPath: "",
       basename: "versioned.txt",
-      publish: true,
       label: "v1",
     });
 
@@ -680,7 +621,6 @@ describe("deleteByPathPrefixBatch", () => {
     await t.mutation(api.assetManager.commitVersion, {
       folderPath: "books/test-book",
       basename: "cover.jpg",
-      publish: true,
     });
 
     const result = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {

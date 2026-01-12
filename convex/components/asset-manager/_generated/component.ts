@@ -78,13 +78,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       commitVersion: FunctionReference<
         "mutation",
         "internal",
-        {
-          basename: string;
-          extra?: any;
-          folderPath: string;
-          label?: string;
-          publish?: boolean;
-        },
+        { basename: string; extra?: any; folderPath: string; label?: string },
         { assetId: string; version: number; versionId: string },
         Name
       >;
@@ -128,7 +122,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           extra?: any;
           folderPath: string;
           label?: string;
-          publish?: boolean;
           storageId: string;
         },
         { assetId: string; version: number; versionId: string },
@@ -197,7 +190,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           basename: string;
           createdAt: number;
           createdBy?: string;
-          draftVersionId?: string;
           extra?: any;
           folderPath: string;
           publishedVersionId?: string;
@@ -228,7 +220,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           r2Key?: string;
           sha256?: string;
           size?: number;
-          state: "draft" | "published" | "archived";
+          state: "published" | "archived";
           storageId?: string;
           updatedBy?: string;
           uploadStatus?: "pending" | "ready";
@@ -264,7 +256,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             basename: string;
             createdAt: number;
             createdBy?: string;
-            draftVersionId?: string;
             extra?: any;
             folderPath: string;
             publishedVersionId?: string;
@@ -371,7 +362,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           basename: string;
           createdAt: number;
           createdBy?: string;
-          draftVersionId?: string;
           extra?: any;
           folderPath: string;
           publishedVersionId?: string;
@@ -401,7 +391,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       listFoldersWithAssets: FunctionReference<
         "query",
         "internal",
-        { parentPath: string; preferDraft?: boolean },
+        { parentPath: string },
         Array<{
           assets: Array<{
             basename: string;
@@ -466,13 +456,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         { assetId: string; fromFolderPath: string; toFolderPath: string },
         Name
       >;
-      publishDraft: FunctionReference<
-        "mutation",
-        "internal",
-        { basename: string; folderPath: string },
-        any,
-        Name
-      >;
       renameAsset: FunctionReference<
         "mutation",
         "internal",
@@ -501,7 +484,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           filename?: string;
           folderPath: string;
           label?: string;
-          publish?: boolean;
           r2Config?: {
             R2_ACCESS_KEY_ID: string;
             R2_BUCKET: string;

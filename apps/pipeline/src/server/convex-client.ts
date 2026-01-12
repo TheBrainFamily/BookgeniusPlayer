@@ -133,7 +133,6 @@ export const convex = {
     folderPath: string;
     basename: string;
     filename?: string;
-    publish?: boolean;
     extra?: unknown;
   }) {
     return await client.mutation(api.importHelpers.startUpload, args);
@@ -155,13 +154,11 @@ export const convex = {
     basename: string;
     content: Buffer | Uint8Array;
     contentType: string;
-    publish?: boolean;
     extra?: unknown;
   }): Promise<{ assetId: string; versionId: string; version: number }> {
     const { intentId, uploadUrl, backend } = await this.startUpload({
       folderPath: args.folderPath,
       basename: args.basename,
-      publish: args.publish ?? true,
       extra: args.extra,
     });
 

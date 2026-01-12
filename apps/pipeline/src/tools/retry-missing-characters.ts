@@ -28,10 +28,7 @@ interface ReferenceCards {
   characters: Character[];
 }
 
-const MISSING_CHARACTERS = [
-  "god",
-  "adramelech",
-];
+const MISSING_CHARACTERS = ["god", "adramelech"];
 
 function getCharacterFileName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, "-") + ".png";
@@ -55,7 +52,7 @@ async function main() {
   }
 
   const referenceCards = JSON.parse(
-    readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT)
+    readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
   ) as ReferenceCards;
 
   // Read graphical style
@@ -70,7 +67,7 @@ async function main() {
 
   // Filter to only missing characters
   const missingCharacters = referenceCards.characters.filter((c) =>
-    MISSING_CHARACTERS.includes(c.name.toLowerCase())
+    MISSING_CHARACTERS.includes(c.name.toLowerCase()),
   );
 
   console.log(`Found ${missingCharacters.length} characters to retry:\n`);
@@ -78,7 +75,8 @@ async function main() {
   console.log("");
 
   const convex = await getConvexClient();
-  const results: { name: string; success: boolean; error?: string; sanitizationLevel?: string }[] = [];
+  const results: { name: string; success: boolean; error?: string; sanitizationLevel?: string }[] =
+    [];
 
   for (const character of missingCharacters) {
     const fileName = getCharacterFileName(character.name);
@@ -89,7 +87,7 @@ async function main() {
       const result = await generateCharacterImageWithFluxAndMetadata(
         character.referenceCard,
         character.name,
-        style.avatarStyle
+        style.avatarStyle,
       );
 
       if (!result) {
@@ -114,7 +112,6 @@ async function main() {
         basename: fileName,
         content: buffer,
         contentType: "image/png",
-        publish: true,
         extra: {
           type: "avatar",
           characterName: character.name,

@@ -41,7 +41,6 @@ async function uploadChapters(bookSlug: string) {
         basename,
         content,
         contentType: "text/html",
-        publish: true,
         extra: { type: "chapter", chapterNumber, title: `Chapter ${chapterNumber}` },
       });
       console.log(`✔ Chapter ${chapterNumber} uploaded`);

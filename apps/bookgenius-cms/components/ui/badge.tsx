@@ -22,7 +22,6 @@ const badgeVariants = cva(
         text: "border-transparent bg-success/20 text-success",
         json: "border-transparent bg-primary/20 text-primary",
         other: "border-transparent bg-accent text-accent-foreground",
-        draft: "border-transparent bg-warning/20 text-warning",
         published: "border-transparent bg-success/20 text-success",
         archived: "border-transparent bg-muted text-muted-foreground",
       },

@@ -108,7 +108,6 @@ export function CreateChapterDialog({
       const { intentId, backend, uploadUrl } = await startUpload({
         folderPath: chaptersPath,
         basename: filename,
-        publish: true, // Publish immediately
         extra: { type: "chapter", chapterNumber: num, title: title.trim() },
       });
 

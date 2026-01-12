@@ -140,7 +140,6 @@ export async function regenerateChapterFromConvex(
       basename: `chapter-${chapterNumber}.xml`,
       content: Buffer.from(newXml),
       contentType: "application/xml",
-      publish: true,
       extra: {
         type: "chapter",
         chapterNumber,

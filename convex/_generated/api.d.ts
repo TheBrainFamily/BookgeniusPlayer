@@ -164,13 +164,7 @@ export declare const components: {
       commitVersion: FunctionReference<
         "mutation",
         "internal",
-        {
-          basename: string;
-          extra?: any;
-          folderPath: string;
-          label?: string;
-          publish?: boolean;
-        },
+        { basename: string; extra?: any; folderPath: string; label?: string },
         { assetId: string; version: number; versionId: string }
       >;
       configureStorageBackend: FunctionReference<
@@ -209,7 +203,6 @@ export declare const components: {
           extra?: any;
           folderPath: string;
           label?: string;
-          publish?: boolean;
           storageId: string;
         },
         { assetId: string; version: number; versionId: string }
@@ -273,7 +266,6 @@ export declare const components: {
           basename: string;
           createdAt: number;
           createdBy?: string;
-          draftVersionId?: string;
           extra?: any;
           folderPath: string;
           publishedVersionId?: string;
@@ -303,7 +295,7 @@ export declare const components: {
           r2Key?: string;
           sha256?: string;
           size?: number;
-          state: "draft" | "published" | "archived";
+          state: "published" | "archived";
           storageId?: string;
           updatedBy?: string;
           uploadStatus?: "pending" | "ready";
@@ -337,7 +329,6 @@ export declare const components: {
             basename: string;
             createdAt: number;
             createdBy?: string;
-            draftVersionId?: string;
             extra?: any;
             folderPath: string;
             publishedVersionId?: string;
@@ -437,7 +428,6 @@ export declare const components: {
           basename: string;
           createdAt: number;
           createdBy?: string;
-          draftVersionId?: string;
           extra?: any;
           folderPath: string;
           publishedVersionId?: string;
@@ -465,7 +455,7 @@ export declare const components: {
       listFoldersWithAssets: FunctionReference<
         "query",
         "internal",
-        { parentPath: string; preferDraft?: boolean },
+        { parentPath: string },
         Array<{
           assets: Array<{
             basename: string;
@@ -526,12 +516,6 @@ export declare const components: {
         { basename: string; fromFolderPath: string; toFolderPath: string },
         { assetId: string; fromFolderPath: string; toFolderPath: string }
       >;
-      publishDraft: FunctionReference<
-        "mutation",
-        "internal",
-        { basename: string; folderPath: string },
-        any
-      >;
       renameAsset: FunctionReference<
         "mutation",
         "internal",
@@ -558,7 +542,6 @@ export declare const components: {
           filename?: string;
           folderPath: string;
           label?: string;
-          publish?: boolean;
           r2Config?: {
             R2_ACCESS_KEY_ID: string;
             R2_BUCKET: string;

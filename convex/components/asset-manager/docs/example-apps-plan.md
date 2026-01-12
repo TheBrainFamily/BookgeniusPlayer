@@ -37,11 +37,13 @@ convex-asset-manager/              # New repo or folder
 ## Example Apps Detail
 
 ### 01-basic-upload (Vite)
+
 **Concepts**: Upload flow, startUpload → finishUpload
 **Complexity**: Minimal
 **Storage**: Convex
 
 Single page with:
+
 - File input
 - Upload button
 - Progress indicator
@@ -49,7 +51,11 @@ Single page with:
 
 ```tsx
 // The simplest possible upload
-const { uploadUrl } = await startUpload({ folderPath: "uploads", basename: "myfile", filename: file.name });
+const { uploadUrl } = await startUpload({
+  folderPath: "uploads",
+  basename: "myfile",
+  filename: file.name,
+});
 await fetch(uploadUrl, { method: "POST", body: file });
 await finishUpload({ intentId });
 ```
@@ -59,11 +65,13 @@ await finishUpload({ intentId });
 ---
 
 ### 02-public-gallery (Vite)
+
 **Concepts**: Public files, CDN URLs, listPublishedFilesInFolder
 **Complexity**: Low
 **Storage**: Convex
 
 Image gallery that:
+
 - Lists all published images in a folder
 - Displays them using direct URLs
 - Shows how URLs are stable (can be bookmarked)
@@ -71,7 +79,7 @@ Image gallery that:
 
 ```tsx
 const files = useQuery(api.gallery.listImages, { folder: "gallery" });
-return files.map(f => <img src={f.url} key={f.versionId} />);
+return files.map((f) => <img src={f.url} key={f.versionId} />);
 ```
 
 **Testing**: Upload images, refresh page, check Network tab shows cached responses.
@@ -79,18 +87,21 @@ return files.map(f => <img src={f.url} key={f.versionId} />);
 ---
 
 ### 03-versioned-text (Vite)
-**Concepts**: Version history, draft/published/archived states, restoreVersion
+
+**Concepts**: Version history, published/archived states, restoreVersion
 **Complexity**: Medium
 **Storage**: Convex
 
 Text editor with:
+
 - Textarea to edit content
-- "Save Draft" and "Publish" buttons
+- "Save" button
 - Version history sidebar
 - Ability to restore old versions
-- Display shows which version is published vs draft
+- Display shows which version is published
 
 Uses **text files** so content is easily verifiable:
+
 ```
 Version 1: "Hello World"
 Version 2: "Hello World - Updated"
@@ -102,16 +113,18 @@ Version 3: "Hello World - Final"
 ---
 
 ### 04-reactive-updates (Vite)
+
 **Concepts**: Convex reactivity, real-time updates across windows
 **Complexity**: Medium
 **Storage**: Convex
 
 Two-panel demo:
-- Left panel: "Editor" with upload/publish controls
+
+- Left panel: "Editor" with upload controls
 - Right panel: "Viewer" showing current published version
 - Open in two browser windows
 
-When you publish in Window A, Window B updates instantly without refresh.
+When you upload a new version in Window A, Window B updates instantly without refresh.
 
 ```tsx
 // Viewer just subscribes
@@ -119,22 +132,25 @@ const file = useQuery(api.files.getPublished, { path: "demo/content" });
 return <div>{file?.url && <img src={file.url} />}</div>;
 ```
 
-**Testing**: Open two windows, publish in one, watch other update. Record timestamp of updates.
+**Testing**: Open two windows, upload in one, watch other update. Record timestamp of updates.
 
 ---
 
 ### 05-private-files (Vite)
+
 **Concepts**: Signed URLs, HTTP endpoint, auth headers, versionId in URL
 **Complexity**: Medium-High
 **Storage**: Convex
 
 User dashboard with:
+
 - Login using Convex Auth
 - Upload private files
 - View own files via signed URLs
 - Files inaccessible without auth
 
 HTTP endpoint pattern:
+
 ```
 GET /private/v/{versionId}/path/to/file
 → Verify auth
@@ -147,11 +163,13 @@ GET /private/v/{versionId}/path/to/file
 ---
 
 ### 06-private-video (Vite)
+
 **Concepts**: Long TTL for video, Range requests, seeking behavior
 **Complexity**: Medium
 **Storage**: Convex (or R2 for larger files)
 
 Video player demo:
+
 - Upload a video file
 - Play with seeking enabled
 - Show why short TTL breaks (signed URL expires mid-seek)
@@ -170,11 +188,13 @@ const signedUrl = await getSignedUrl({
 ---
 
 ### 07-team-permissions (Vite)
+
 **Concepts**: Team-based access, permission checks in app layer
 **Complexity**: High
 **Storage**: Convex
 
 Multi-user app with:
+
 - Users belong to teams
 - Files belong to teams
 - Only team members can access team files
@@ -203,11 +223,13 @@ export const getTeamFile = query({
 ---
 
 ### 08-static-marketing (Next.js)
+
 **Concepts**: SSG, build-time URLs, no client-side Convex
 **Complexity**: Medium
 **Storage**: Convex (or R2 for production scale)
 
 Marketing site with:
+
 - Images/assets fetched at build time
 - Static HTML output
 - No WebSocket connection to Convex
@@ -230,11 +252,13 @@ export default async function Page() {
 ---
 
 ### 09-hybrid-static (Next.js)
+
 **Concepts**: SSG + client hydration, static build with live updates
 **Complexity**: Medium-High
 **Storage**: Convex
 
 Marketing site that:
+
 - Builds statically (fast initial load)
 - Hydrates with Convex client
 - Shows stale content briefly, then live content
@@ -254,11 +278,13 @@ const file = useQuery(api.marketing.getHero); // Reactive after hydration
 ---
 
 ### 10-prefetch-nextjs (Next.js)
+
 **Concepts**: RSC data fetching, client cache, streaming
 **Complexity**: High
 **Storage**: Convex
 
 Admin panel showing:
+
 - Server Components fetch initial data
 - Client Components subscribe to updates
 - Prefetching on hover
@@ -269,11 +295,13 @@ Based on existing `next-app/admin/` but cleaned up and documented.
 ---
 
 ### 11-prefetch-tanstack (TanStack Start)
+
 **Concepts**: Loader pattern, route prefetching, stale-while-revalidate
 **Complexity**: High
 **Storage**: Convex
 
 Admin panel showing:
+
 - Route loaders prefetch data
 - `router.preloadRoute()` on hover
 - React Query caching
@@ -284,11 +312,13 @@ Based on existing `src/routes/admin.tsx` but cleaned up and documented.
 ---
 
 ### 12-r2-storage (Vite)
+
 **Concepts**: R2 backend, identical frontend code, configuration only
 **Complexity**: Low (if 02-public-gallery exists)
 **Storage**: R2
 
 **Identical to 02-public-gallery** except:
+
 - Different `convex/` folder with R2 configuration
 - Environment variables for R2 credentials
 - Run `configureStorageBackend({ backend: "r2", ... })` once
@@ -302,24 +332,29 @@ Demonstrates that frontend code doesn't change between backends.
 ## Implementation Order
 
 ### Phase 1: Foundation (Start Here)
+
 1. **01-basic-upload** - Simplest possible, proves component works
 2. **02-public-gallery** - Public files, CDN pattern
 3. **03-versioned-text** - Version management with verifiable content
 
 ### Phase 2: Reactivity
+
 4. **04-reactive-updates** - Cross-window reactivity demo
 5. **12-r2-storage** - Prove backend abstraction (copy of 02 with R2)
 
 ### Phase 3: Private Access
+
 6. **05-private-files** - Auth + signed URLs
 7. **06-private-video** - Long TTL for streaming
 
 ### Phase 4: Advanced Patterns
+
 8. **07-team-permissions** - Multi-tenant access control
 9. **08-static-marketing** - Pure SSG
 10. **09-hybrid-static** - SSG + hydration
 
 ### Phase 5: Framework Comparison
+
 11. **10-prefetch-nextjs** - Clean up existing next-app/admin
 12. **11-prefetch-tanstack** - Clean up existing src/admin
 
@@ -352,14 +387,14 @@ Each example should verify:
 
 As we build examples, we may discover missing pieces:
 
-| Gap | Example That Needs It | Priority |
-|-----|----------------------|----------|
-| `getFileByVersionId` query | 05-private-files | High |
-| Batch upload support | 02-public-gallery | Medium |
-| Upload progress events | 01-basic-upload | Medium |
-| File deletion | 07-team-permissions | Medium |
-| Folder deletion | Admin panels | Low |
-| Search/filter queries | Admin panels | Low |
+| Gap                        | Example That Needs It | Priority |
+| -------------------------- | --------------------- | -------- |
+| `getFileByVersionId` query | 05-private-files      | High     |
+| Batch upload support       | 02-public-gallery     | Medium   |
+| Upload progress events     | 01-basic-upload       | Medium   |
+| File deletion              | 07-team-permissions   | Medium   |
+| Folder deletion            | Admin panels          | Low      |
+| Search/filter queries      | Admin panels          | Low      |
 
 ---
 
@@ -377,7 +412,7 @@ Each example gets a short video (2-5 min):
 8. **08-static-marketing**: "Static sites with Convex assets"
 9. **09-hybrid-static**: "Best of both: Static + Live updates"
 10. **10 & 11**: "Prefetching patterns: Next.js vs TanStack"
-12. **12-r2-storage**: "Switching to R2 without changing frontend"
+11. **12-r2-storage**: "Switching to R2 without changing frontend"
 
 ---
 

@@ -104,22 +104,6 @@ export const listPublishedFilesInFolder = adminQuery({
   },
 });
 
-export const publishDraft = adminMutation({
-  args: { folderPath: v.string(), basename: v.string() },
-  handler: async (ctx, args) => {
-    const result = await ctx.runMutation(components.assetManager.assetManager.publishDraft, args);
-    if (args.folderPath.endsWith("/chapters")) {
-      const bookPath = args.folderPath.replace(/\/chapters$/, "");
-      await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
-        bookPath,
-        chapterBasename: args.basename,
-        versionId: result.versionId,
-      });
-    }
-    return result;
-  },
-});
-
 /**
  * Backfill compiled chapter HTML and character fragments for a book.
  */

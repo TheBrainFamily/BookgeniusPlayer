@@ -26,7 +26,6 @@ export const startUpload = adminMutation({
   args: {
     folderPath: v.string(),
     basename: v.string(),
-    publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
   },
@@ -113,7 +112,6 @@ export const createVersionFromStorageId = adminMutation({
     folderPath: v.string(),
     basename: v.string(),
     storageId: v.id("_storage"),
-    publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
   },
@@ -158,7 +156,6 @@ export const updateCharacterMetadata = adminMutation({
     await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
       folderPath,
       basename: "metadata.json",
-      publish: true,
       extra: args.metadata,
     });
 
@@ -208,7 +205,6 @@ export const createOrUpdateScenario = adminMutation({
     await ctx.runMutation(components.assetManager.assetManager.commitVersion, {
       folderPath,
       basename,
-      publish: true,
       extra: args.scenario,
     });
 

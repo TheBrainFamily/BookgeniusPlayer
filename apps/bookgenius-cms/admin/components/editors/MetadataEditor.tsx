@@ -207,16 +207,14 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
 
   // Detect entity type and get appropriate fields, including versionIds for asset types
   // eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
-  const { entityType, fields, currentExtra, publishedVersionId, draftVersionId } = useMemo(() => {
+  const { entityType, fields, currentExtra, publishedVersionId } = useMemo(() => {
     const folderType = detectFolderType(folderPath, folder?.extra);
 
     // If editing an asset version, check its extra OR infer from folder path
     if (basename && versions?.length) {
       const publishedVersion = versions.find((v: { state: string }) => v.state === "published");
-      const draftVersion = versions.find((v: { state: string }) => v.state === "draft");
-
       // IMPORTANT: Always show PUBLISHED version's extra to match what's displayed in lists
-      const sourceVersion = publishedVersion || draftVersion;
+      const sourceVersion = publishedVersion;
       const extra = sourceVersion?.extra;
 
       // Check extra.type first, then fall back to folder path pattern
@@ -230,7 +228,6 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
           fields: CHAPTER_FIELDS,
           currentExtra: (extra as ChapterExtra) || { type: "chapter", chapterNumber: 0, title: "" },
           publishedVersionId: publishedVersion?._id,
-          draftVersionId: draftVersion?._id,
         };
       }
       if (isBackground) {
@@ -245,7 +242,6 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
             textColor: "#ffffff",
           },
           publishedVersionId: publishedVersion?._id,
-          draftVersionId: draftVersion?._id,
         };
       }
       if (isMusic) {
@@ -254,7 +250,6 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
           fields: MUSIC_FIELDS,
           currentExtra: (extra as MusicExtra) || { type: "music", chapter: 0, paragraph: 0 },
           publishedVersionId: publishedVersion?._id,
-          draftVersionId: draftVersion?._id,
         };
       }
     }
@@ -266,7 +261,6 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
         fields: BOOK_FIELDS,
         currentExtra: folder?.extra as BookFolderExtra | undefined,
         publishedVersionId: undefined,
-        draftVersionId: undefined,
       };
     }
     if (folderType === "character" || isCharacterFolder(folder?.extra)) {
@@ -275,17 +269,10 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
         fields: CHARACTER_FIELDS,
         currentExtra: folder?.extra as CharacterFolderExtra | undefined,
         publishedVersionId: undefined,
-        draftVersionId: undefined,
       };
     }
 
-    return {
-      entityType: null,
-      fields: [],
-      currentExtra: undefined,
-      publishedVersionId: undefined,
-      draftVersionId: undefined,
-    };
+    return { entityType: null, fields: [], currentExtra: undefined, publishedVersionId: undefined };
   }, [folderPath, folder?.extra, basename, versions]);
 
   // Initialize form data from current extra
@@ -348,16 +335,9 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
         await updateFolder({ path: folderPath, extra: newExtra });
         toast.success("Metadata saved");
       }
-      // For asset version types (chapter, background, music), update BOTH versions for consistency
-      else if (publishedVersionId || draftVersionId) {
-        // Update published version (so changes are immediately visible in lists)
-        if (publishedVersionId) {
-          await updateVersionExtra({ versionId: publishedVersionId, extra: newExtra });
-        }
-        // Also update draft version (so changes are preserved when publishing)
-        if (draftVersionId) {
-          await updateVersionExtra({ versionId: draftVersionId, extra: newExtra });
-        }
+      // For asset version types (chapter, background, music), update the published version
+      else if (publishedVersionId) {
+        await updateVersionExtra({ versionId: publishedVersionId, extra: newExtra });
         toast.success("Metadata saved");
       } else {
         toast.error("No version found to update");
@@ -379,7 +359,6 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
     updateFolder,
     updateVersionExtra,
     publishedVersionId,
-    draftVersionId,
     onSaveComplete,
   ]);
 

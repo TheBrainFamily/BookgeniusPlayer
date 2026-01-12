@@ -82,11 +82,7 @@ const MusicEditModal: React.FC = () => {
       const basename = uploadedFile.name;
 
       console.log("[MusicEditModal] Calling startUpload", { folderPath, basename });
-      const { intentId, uploadUrl, backend } = await startUpload({
-        folderPath,
-        basename,
-        publish: true,
-      });
+      const { intentId, uploadUrl, backend } = await startUpload({ folderPath, basename });
       console.log("[MusicEditModal] Got upload URL", { intentId, backend });
 
       console.log("[MusicEditModal] Uploading file to", backend);

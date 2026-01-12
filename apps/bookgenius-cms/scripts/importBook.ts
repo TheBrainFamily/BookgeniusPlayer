@@ -272,7 +272,7 @@ async function uploadFile(
   try {
     const { intentId, uploadUrl, backend } = await client.mutation(
       api.generateUploadUrl.startUpload,
-      { folderPath, basename, publish: true, extra },
+      { folderPath, basename, extra },
     );
 
     const response = await fetch(uploadUrl, {

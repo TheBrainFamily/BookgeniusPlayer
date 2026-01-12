@@ -213,7 +213,6 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
         basename,
         content,
         contentType: "application/html",
-        publish: true,
         extra: { type: "chapter", chapterNumber, title: `Chapter ${chapterNumber}` },
       });
       addLog(job, `✔ Chapter ${chapterNumber} uploaded`);
@@ -276,7 +275,6 @@ async function uploadCharactersToConvex(
             basename: `avatar-large${ext}`,
             content,
             contentType: getContentType(avatarPath),
-            publish: true,
           });
           await convex.markCharacterAvatarState({
             characterPath: `${job.bookPath}/characters/${characterSlug}`,
@@ -313,7 +311,6 @@ async function uploadBackgroundsToConvex(job: Job, outputDir: string) {
         basename: file,
         content,
         contentType: getContentType(file),
-        publish: true,
       });
 
       const match = file.match(/(\d+)-(\d+)/);

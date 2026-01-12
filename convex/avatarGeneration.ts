@@ -82,7 +82,7 @@ export const generateAvatarOptions = internalAction({
 
           const { intentId, uploadUrl, backend } = await ctx.runMutation(
             internal.generateUploadUrl.startUploadInternal,
-            { folderPath: proposalsPath, basename, publish: true },
+            { folderPath: proposalsPath, basename },
           );
 
           const uploadRes = await fetch(uploadUrl, {
@@ -244,7 +244,6 @@ export const selectAvatar = internalAction({
       } = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
         folderPath: characterPath,
         basename: "avatar-large.png",
-        publish: true,
       });
       log("got large upload URL");
 
@@ -303,7 +302,6 @@ export const selectAvatar = internalAction({
       } = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
         folderPath: characterPath,
         basename: "avatar.webp",
-        publish: true,
       });
       log("got small upload URL");
 
@@ -432,7 +430,7 @@ export const processUploadedAvatarLarge = internalAction({
 
       const { intentId, uploadUrl, backend } = await ctx.runMutation(
         internal.generateUploadUrl.startUploadInternal,
-        { folderPath: characterPath, basename: "avatar.webp", publish: true },
+        { folderPath: characterPath, basename: "avatar.webp" },
       );
 
       const uploadRes = await fetch(uploadUrl, {

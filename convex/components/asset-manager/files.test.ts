@@ -22,7 +22,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
         folderPath: "odyssey/ch1",
         basename: "01-intro.mp3",
         storageId,
-        publish: true,
         label: "Intro",
         extra: { chapter: 1 },
       },
@@ -38,7 +37,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     expect(asset?._id).toEqual(assetId);
     expect(asset?.versionCounter).toBe(1);
     expect(asset?.publishedVersionId).toEqual(versionId);
-    expect(asset?.draftVersionId ?? null).toBeNull();
 
     const versions = await t.query(api.assetManager.getAssetVersions, {
       folderPath: "odyssey/ch1",
@@ -80,51 +78,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     expect((publishedFile?.url ?? "").length).toBeGreaterThan(0);
   });
 
-  it("createVersionFromStorageId with publish=false creates a draft version only", async () => {
-    const t = convexTest(schema, modules);
-
-    const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 42,
-      contentType: "text/plain",
-    });
-
-    const res = await t.mutation(api.assetManager.createVersionFromStorageId, {
-      folderPath: "drafts",
-      basename: "note.txt",
-      storageId,
-      publish: false,
-      label: "Draft v1",
-    });
-
-    expect(res.version).toBe(1);
-
-    const asset = await t.query(api.assetManager.getAsset, {
-      folderPath: "drafts",
-      basename: "note.txt",
-    });
-
-    expect(asset?.versionCounter).toBe(1);
-    expect(asset?.draftVersionId).toEqual(res.versionId);
-    expect(asset?.publishedVersionId ?? null).toBeNull();
-
-    const versions = await t.query(api.assetManager.getAssetVersions, {
-      folderPath: "drafts",
-      basename: "note.txt",
-    });
-
-    expect(versions).toHaveLength(1);
-    const v1 = versions[0];
-    expect(v1.state).toBe("draft");
-    expect(v1.publishedAt ?? null).toBeNull();
-
-    const publishedFile = await t.query(api.assetManager.getPublishedFile, {
-      folderPath: "drafts",
-      basename: "note.txt",
-    });
-
-    expect(publishedFile).toBeNull();
-  });
-
   it("second published upload archives the previous published version", async () => {
     const t = convexTest(schema, modules);
 
@@ -141,7 +94,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
       folderPath: "",
       basename: "cover.png",
       storageId: s1,
-      publish: true,
       label: "v1",
     });
 
@@ -149,7 +101,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
       folderPath: "",
       basename: "cover.png",
       storageId: s2,
-      publish: true,
       label: "v2",
     });
 
@@ -163,7 +114,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
 
     expect(asset?.versionCounter).toBe(2);
     expect(asset?.publishedVersionId).toEqual(v2.versionId);
-    expect(asset?.draftVersionId ?? null).toBeNull();
 
     const versions = await t.query(api.assetManager.getAssetVersions, {
       folderPath: "",
@@ -195,117 +145,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     expect(publishedFile?.storageId).toEqual(s2);
   });
 
-  it("saving another draft reuses existing draft version instead of creating new version", async () => {
-    const t = convexTest(schema, modules);
-
-    // Create first draft
-    const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 100,
-      contentType: "text/plain",
-    });
-
-    const v1 = await t.mutation(api.assetManager.createVersionFromStorageId, {
-      folderPath: "test",
-      basename: "doc.txt",
-      storageId: s1,
-      publish: false,
-      label: "Draft 1",
-    });
-
-    expect(v1.version).toBe(1);
-
-    // Save another draft - should UPDATE existing draft, not create v2
-    const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 200,
-      contentType: "text/plain",
-    });
-
-    const v2 = await t.mutation(api.assetManager.createVersionFromStorageId, {
-      folderPath: "test",
-      basename: "doc.txt",
-      storageId: s2,
-      publish: false,
-      label: "Draft 2",
-    });
-
-    // Version should stay at 1 (reused existing draft)
-    expect(v2.version).toBe(1);
-    // Same version ID (updated in place)
-    expect(v2.versionId).toEqual(v1.versionId);
-
-    // Verify only 1 version exists
-    const versions = await t.query(api.assetManager.getAssetVersions, {
-      folderPath: "test",
-      basename: "doc.txt",
-    });
-    expect(versions).toHaveLength(1);
-
-    // Verify it has the new file data
-    const draft = versions[0];
-    expect(draft.storageId).toEqual(s2);
-    expect(draft.size).toBe(200);
-    expect(draft.state).toBe("draft");
-
-    // Verify asset versionCounter didn't increment
-    const asset = await t.query(api.assetManager.getAsset, {
-      folderPath: "test",
-      basename: "doc.txt",
-    });
-    expect(asset?.versionCounter).toBe(1);
-  });
-
-  it("publishing after draft reuse works correctly", async () => {
-    const t = convexTest(schema, modules);
-
-    // Create initial draft
-    const s1 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 100 });
-
-    await t.mutation(api.assetManager.createVersionFromStorageId, {
-      folderPath: "test",
-      basename: "file.txt",
-      storageId: s1,
-      publish: false,
-    });
-
-    // Update draft (reuse)
-    const s2 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 200 });
-
-    await t.mutation(api.assetManager.createVersionFromStorageId, {
-      folderPath: "test",
-      basename: "file.txt",
-      storageId: s2,
-      publish: false,
-    });
-
-    // Now publish - should create a NEW version (v2)
-    const s3 = await t.action(internal._testInsertFakeFile._testStoreFakeFile, { size: 300 });
-
-    const published = await t.mutation(api.assetManager.createVersionFromStorageId, {
-      folderPath: "test",
-      basename: "file.txt",
-      storageId: s3,
-      publish: true,
-    });
-
-    // Publishing creates new version
-    expect(published.version).toBe(2);
-
-    const asset = await t.query(api.assetManager.getAsset, {
-      folderPath: "test",
-      basename: "file.txt",
-    });
-    expect(asset?.versionCounter).toBe(2);
-    expect(asset?.publishedVersionId).toEqual(published.versionId);
-    expect(asset?.draftVersionId).toBeUndefined();
-
-    // Should have 2 versions total
-    const versions = await t.query(api.assetManager.getAssetVersions, {
-      folderPath: "test",
-      basename: "file.txt",
-    });
-    expect(versions).toHaveLength(2);
-  });
-
   it("listPublishedFilesInFolder returns only published assets for that folder", async () => {
     const t = convexTest(schema, modules);
 
@@ -318,21 +157,18 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
       folderPath: "",
       basename: "root-a.txt",
       storageId: s1,
-      publish: true,
     });
 
-    // backlog published + draft only
+    // backlog files
     await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "kanban/backlog",
       basename: "card-1.json",
       storageId: s2,
-      publish: true,
     });
     await t.mutation(api.assetManager.createVersionFromStorageId, {
       folderPath: "kanban/backlog",
       basename: "card-2.json",
       storageId: s3,
-      publish: false,
     });
 
     const rootFiles = await t.query(api.assetManager.listPublishedFilesInFolder, {
@@ -346,7 +182,7 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     const backlogNames = backlogFiles.map((f) => f.basename).sort();
 
     expect(rootNames).toEqual(["root-a.txt"]);
-    expect(backlogNames).toEqual(["card-1.json"]);
+    expect(backlogNames).toEqual(["card-1.json", "card-2.json"]);
 
     for (const f of [...rootFiles, ...backlogFiles]) {
       expect(typeof f.url).toBe("string");

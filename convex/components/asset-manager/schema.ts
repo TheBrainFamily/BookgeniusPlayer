@@ -37,7 +37,6 @@ const schema = defineSchema({
     ),
 
     // Options for version creation
-    publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
     extra: v.optional(v.any()),
 
@@ -63,7 +62,6 @@ const schema = defineSchema({
     extra: v.optional(v.any()),
     versionCounter: v.number(),
     publishedVersionId: v.optional(v.id("assetVersions")),
-    draftVersionId: v.optional(v.id("assetVersions")),
     createdAt: v.number(),
     updatedAt: v.number(),
     createdBy: v.optional(v.string()),
@@ -72,7 +70,7 @@ const schema = defineSchema({
   assetVersions: defineTable({
     assetId: v.id("assets"),
     version: v.number(),
-    state: v.union(v.literal("draft"), v.literal("published"), v.literal("archived")),
+    state: v.union(v.literal("published"), v.literal("archived")),
 
     label: v.optional(v.string()),
     extra: v.optional(v.any()),

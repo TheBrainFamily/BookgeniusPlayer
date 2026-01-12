@@ -462,17 +462,14 @@ describe("listFoldersWithAssets", () => {
     await t.mutation(api.assetManager.commitVersion, {
       folderPath: "characters/alice",
       basename: "avatar.png",
-      publish: true,
     });
     await t.mutation(api.assetManager.commitVersion, {
       folderPath: "characters/alice",
       basename: "speaks.mp4",
-      publish: true,
     });
     await t.mutation(api.assetManager.commitVersion, {
       folderPath: "characters/bob",
       basename: "avatar.png",
-      publish: true,
     });
 
     const result = await t.query(api.assetManager.listFoldersWithAssets, {
@@ -500,35 +497,6 @@ describe("listFoldersWithAssets", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].folder.path).toBe("parent/child");
-  });
-
-  it("preferDraft=true returns draft version over published", async () => {
-    const t = convexTest(schema, modules);
-
-    await t.mutation(api.assetManager.createFolderByPath, { path: "items/item1" });
-
-    await t.mutation(api.assetManager.commitVersion, {
-      folderPath: "items/item1",
-      basename: "data.json",
-      publish: true,
-      label: "published-v1",
-    });
-
-    await t.mutation(api.assetManager.commitVersion, {
-      folderPath: "items/item1",
-      basename: "data.json",
-      publish: false,
-      label: "draft-v2",
-    });
-
-    const asset = await t.query(api.assetManager.getAsset, {
-      folderPath: "items/item1",
-      basename: "data.json",
-    });
-
-    expect(asset?.publishedVersionId).toBeDefined();
-    expect(asset?.draftVersionId).toBeDefined();
-    expect(asset?.publishedVersionId).not.toBe(asset?.draftVersionId);
   });
 
   it("excludes assets without any version", async () => {
@@ -559,7 +527,6 @@ describe("listFoldersWithAssets", () => {
     await t.mutation(api.assetManager.commitVersion, {
       folderPath: "books/mybook/characters/hero",
       basename: "avatar.png",
-      publish: true,
     });
 
     const result = await t.query(api.assetManager.listFoldersWithAssets, {

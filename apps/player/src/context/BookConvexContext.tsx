@@ -20,7 +20,6 @@ import React, {
 } from "react";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { useDraftMode } from "./DraftModeContext";
 import {
   detectSourceFormat,
   normalizeChapterHtml,
@@ -67,7 +66,6 @@ export interface ChapterInfo {
   title?: string;
   url?: string;
   state?: string;
-  hasDraft?: boolean;
 }
 
 type HtmlSourceChapterQueryItem = {
@@ -244,8 +242,6 @@ interface BookConvexProviderProps {
 }
 
 export function BookConvexProvider({ bookPath, children }: BookConvexProviderProps) {
-  const draftMode = useDraftMode();
-
   const [bookStringified, setBookStringified] = useState<string | null>(null);
   const [chaptersData, setChaptersData] = useState<ChapterTitle[]>([]);
   const [charactersData, setCharactersData] = useState<CharacterData[]>([]);
@@ -271,15 +267,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     | HtmlSourceChapterQueryItem[]
     | null
     | undefined;
-  const charactersQuery = useQuery(api.bookQueries.listCharacterBundlesWithDrafts, { bookPath });
-  const backgroundsQuery = useQuery(
-    draftMode ? api.backgroundCues.listForPlayerWithDrafts : api.backgroundCues.listForPlayer,
-    { bookPath },
-  );
-  const musicQuery = useQuery(
-    draftMode ? api.musicCues.listForPlayerWithDrafts : api.musicCues.listForPlayer,
-    { bookPath },
-  );
+  const charactersQuery = useQuery(api.bookQueries.listCharacterBundles, { bookPath });
+  const backgroundsQuery = useQuery(api.backgroundCues.listForPlayer, { bookPath });
+  const musicQuery = useQuery(api.musicCues.listForPlayer, { bookPath });
   const figuresQuery = useQuery(api.bookQueries.listFigures, { bookPath });
   const audiobookTracksQuery = useQuery(api.bookQueries.listAudiobookTracks, { bookPath });
   const cutScenesQuery = useQuery(api.bookQueries.listCutScenes, { bookPath });
@@ -322,7 +312,6 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       title: c.title,
       url: c.url,
       state: "published",
-      hasDraft: false,
     }));
   }, [htmlSourceChaptersQuery]);
 
@@ -336,14 +325,14 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   );
 
   useEffect(() => {
-    if (draftMode || chapterStructure.length === 0) return;
+    if (chapterStructure.length === 0) return;
     bookIndex.setParagraphCountOverrides(chapterStructure);
     const totalParagraphs = chapterStructure.reduce((sum, entry) => sum + entry.paragraphCount, 0);
     console.log("[BookConvex] Paragraph counts set", {
       chapters: chapterStructure.length,
       totalParagraphs,
     });
-  }, [draftMode, chapterStructure]);
+  }, [chapterStructure]);
 
   const characters = useMemo<CharacterBundle[]>(() => {
     if (!charactersQuery) return [];
@@ -729,7 +718,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     setChaptersData([]);
     setCharactersData([]);
     setError(null);
-  }, [draftMode, bookPath]);
+  }, [bookPath]);
 
   useEffect(() => {
     if (htmlSourceChaptersQuery === undefined) return;

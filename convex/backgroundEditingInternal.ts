@@ -118,7 +118,6 @@ export const editBackgroundWithInstructions = internalAction({
         await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
           folderPath: backgroundsPath,
           basename: newBasename,
-          publish: true,
         });
 
       const uploadRes: Response = await fetch(uploadIntent.uploadUrl, {
@@ -250,7 +249,6 @@ export const generateNewBackground = internalAction({
         await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
           folderPath: backgroundsPath,
           basename: newBasename,
-          publish: true,
         });
 
       const uploadRes2: Response = await fetch(uploadIntent2.uploadUrl, {

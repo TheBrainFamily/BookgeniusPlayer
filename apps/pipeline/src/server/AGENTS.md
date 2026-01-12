@@ -96,7 +96,7 @@ await convex.reportProgress({ bookPath, step, status: "running" });
 await convex.ensureCharacterFolder({ bookPath, characterSlug, displayName, summary, aiPrompt });
 
 // File uploads (intent-based)
-await convex.uploadFile({ folderPath, basename, content, contentType, publish: true });
+await convex.uploadFile({ folderPath, basename, content, contentType });
 
 // Background/music cues
 await convex.upsertBackgroundCue({ bookPath, chapter, paragraph, fileBasename });

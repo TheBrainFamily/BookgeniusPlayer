@@ -124,7 +124,6 @@ async function uploadAndPublishContent(
     folderPath,
     basename,
     filename: basename,
-    publish: true,
     label,
     extra,
   });

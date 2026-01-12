@@ -113,7 +113,7 @@ export const editAvatarWithInstructions = internalAction({
 
           const { intentId, uploadUrl, backend } = await ctx.runMutation(
             internal.generateUploadUrl.startUploadInternal,
-            { folderPath: proposalsPath, basename, publish: true },
+            { folderPath: proposalsPath, basename },
           );
 
           const uploadRes = await fetch(uploadUrl, {

@@ -55,14 +55,7 @@ const uploadGeneratedAsset = async (
   const { folderPath, basename, content, contentType, extra } = args;
   const { intentId, backend, uploadUrl } = await ctx.runMutation(
     internal.generateUploadUrl.startUploadInternal,
-    {
-      folderPath,
-      basename,
-      filename: basename,
-      publish: true,
-      label: "Generated chapter artifact",
-      extra,
-    },
+    { folderPath, basename, filename: basename, label: "Generated chapter artifact", extra },
   );
 
   const encoded = new TextEncoder().encode(content);
@@ -88,7 +81,7 @@ const uploadGeneratedAsset = async (
 
 /**
  * Compile a single published chapter into HTML + per-chapter character fragments.
- * Intended to be triggered by scheduler after publishDraft.
+ * Intended to be triggered by scheduler after a chapter is saved.
  */
 export const processPublishedChapter = internalAction({
   args: { bookPath: v.string(), chapterBasename: v.string(), versionId: v.string() },

@@ -157,7 +157,6 @@ export async function fixLowercaseTags(
       basename: `chapter-${chapterNumber}.xml`,
       content: Buffer.from(fixedXml),
       contentType: "application/xml",
-      publish: true,
       extra: {
         type: "chapter",
         chapterNumber,
