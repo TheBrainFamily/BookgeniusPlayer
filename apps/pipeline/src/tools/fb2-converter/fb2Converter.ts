@@ -314,17 +314,20 @@ function identifyChaptersFromStrongPatterns(doc: Document): Set<Element> {
 function identifyAllChapterSections(doc: Document): Set<Element> {
   let chapterSectionsSet = identifyChapterSections(doc);
 
-  // Try strong-based fallback when standard detection finds 0-1 chapters
-  if (chapterSectionsSet.size <= 1) {
+  // Try strong-based fallback only when standard detection finds 0 chapters
+  // (Don't trigger if we already found valid chapters - they would be lost)
+  if (chapterSectionsSet.size === 0) {
     const strongChapters = identifyChaptersFromStrongPatterns(doc);
     if (strongChapters.size > 1) {
       chapterSectionsSet = strongChapters;
     }
   }
 
-  // Final fallback: treat content sections as chapters
-  if (chapterSectionsSet.size === 0) {
-    chapterSectionsSet = identifyChapterInABookWithNoChapters(doc);
+  // Always include content sections that weren't detected by other methods
+  // This ensures sections without <title> elements are still treated as chapters
+  const contentSections = identifyChapterInABookWithNoChapters(doc);
+  for (const section of contentSections) {
+    chapterSectionsSet.add(section);
   }
 
   return chapterSectionsSet;

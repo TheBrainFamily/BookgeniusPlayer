@@ -27,21 +27,50 @@ import {
 import { requireIdentity, requireAdmin, principalId, isAdmin } from "./authz";
 
 // ============================================================================
+// Testable helper functions (extracted for unit testing)
+// ============================================================================
+
+/**
+ * Creates a bookDb.patch function with the given db and authorized bookPath.
+ * Extracted for testability - verifies record belongs to authorized book before patching.
+ *
+ * SECURITY: This function should strip bookPath from fields to prevent privilege escalation.
+ */
+export function createBookDbPatch(
+  db: {
+    get: (id: unknown) => Promise<{ bookPath: string } | null>;
+    patch: (id: unknown, fields: unknown) => Promise<void>;
+  },
+  authorizedBookPath: string,
+) {
+  return async (id: unknown, fields: Record<string, unknown>): Promise<void> => {
+    const record = await db.get(id);
+    if (!record) throw new Error("Not found");
+    if (record.bookPath !== authorizedBookPath) {
+      throw new Error("Access denied: record belongs to different book");
+    }
+    // SECURITY: Strip bookPath from fields to prevent privilege escalation
+    // (moving records between books by patching their bookPath)
+    const { bookPath: _, ...safeFields } = fields;
+    await db.patch(id, safeFields);
+  };
+}
+
+// ============================================================================
 // Type definitions
 // ============================================================================
 
 /**
- * Tables that have a bookPath field and can be used with bookDb operations.
+ * Tables that have a bookPath field AND a "by_book" index.
+ * These can be used with bookDb operations (get, patch, delete, insert, query).
+ *
+ * Note: The following tables have bookPath but use different index names,
+ * so they must be queried directly with ctx.db.query() using their specific indexes:
+ * - musicFileMetadata: uses "by_book_file" index
+ * - backgroundFileMetadata: uses "by_book_file" index
+ * - bookGenerationJobs: uses "by_bookPath" index
  */
-export type BookTableNames =
-  | "notes"
-  | "variants"
-  | "backgroundCues"
-  | "musicCues"
-  | "musicFileMetadata"
-  | "backgroundFileMetadata"
-  | "bookMembers"
-  | "bookGenerationJobs";
+export type BookTableNames = "notes" | "variants" | "backgroundCues" | "musicCues" | "bookMembers";
 
 /**
  * Fields that are auto-added by bookDb.insert (don't include in insert calls).
@@ -147,7 +176,10 @@ export const bookMutation = customMutation(baseMutation, {
         if (recordWithBookPath.bookPath !== bookPath) {
           throw new Error("Access denied: record belongs to different book");
         }
-        await ctx.db.patch(id, fields);
+        // SECURITY: Strip bookPath from fields to prevent privilege escalation
+        // (moving records between books by patching their bookPath)
+        const { bookPath: _stripBookPath, ...safeFields } = fields as Record<string, unknown>;
+        await ctx.db.patch(id, safeFields as Partial<Doc<T>>);
       },
 
       delete: async <T extends BookTableNames>(id: Id<T>): Promise<void> => {

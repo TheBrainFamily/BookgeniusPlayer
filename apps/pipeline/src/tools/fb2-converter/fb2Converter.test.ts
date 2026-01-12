@@ -299,4 +299,69 @@ describe("fb2Converter", () => {
       expect(result.chaptersXml).toContain('<chapter number="6">');
     });
   });
+
+  describe("convertFb2 - XML and HTML consistency", () => {
+    it("should have consistent chapter counts between XML and HTML outputs for strong-based detection", () => {
+      // Wolne Lektury style: single section with <p><strong>Title</strong></p> chapter markers
+      // The strong-based fallback modifies the DOM, but both XML and HTML should detect the same chapters
+      const xml = `<?xml version="1.0"?>
+        <FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0">
+          <body>
+            <section>
+              <p><strong>Chapter 1</strong></p>
+              <p>First chapter content.</p>
+              <p><strong>Chapter 2</strong></p>
+              <p>Second chapter content.</p>
+              <p><strong>Chapter 3</strong></p>
+              <p>Third chapter content.</p>
+            </section>
+          </body>
+        </FictionBook>`;
+
+      const result = convertFb2(xml);
+
+      // Count chapters in XML output
+      const xmlChapterMatches = result.chaptersXml.match(/<chapter number="/g);
+      const xmlChapterCount = xmlChapterMatches ? xmlChapterMatches.length : 0;
+
+      // Count chapters in HTML output
+      const htmlChapterMatches = result.textHtml.match(/data-chapter="/g);
+      const htmlChapterCount = htmlChapterMatches ? htmlChapterMatches.length : 0;
+
+      // Both outputs should have the same number of chapters
+      expect(xmlChapterCount).toBe(htmlChapterCount);
+      expect(xmlChapterCount).toBe(3);
+
+      // Both should include all chapter titles
+      expect(result.chaptersXml).toContain("Chapter 1");
+      expect(result.chaptersXml).toContain("Chapter 2");
+      expect(result.chaptersXml).toContain("Chapter 3");
+    });
+  });
+
+  describe("convertFb2 - multiple sections without titles", () => {
+    it("should detect two sections as two chapters", () => {
+      // Two sections = two chapters, regardless of whether they have <title> elements
+      const xml = `<?xml version="1.0"?>
+        <FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0">
+          <body>
+            <section>
+              <title><p>Prologue</p></title>
+              <p>Prologue content here.</p>
+            </section>
+            <section>
+              <p>Second section content without a title.</p>
+              <p>More content here.</p>
+            </section>
+          </body>
+        </FictionBook>`;
+
+      const result = convertFb2(xml);
+
+      // Should have 2 chapters
+      expect(result.chaptersXml).toContain('<chapter number="0">');
+      expect(result.chaptersXml).toContain('<chapter number="1">');
+      expect(result.chaptersXml).toContain("Prologue");
+    });
+  });
 });

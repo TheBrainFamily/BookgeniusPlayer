@@ -186,18 +186,48 @@ export const updateCharacterAvatarState = internalMutation({
 });
 
 export const selectAvatar = internalAction({
-  args: { bookPath: v.string(), characterSlug: v.string(), selectedOptionUrl: v.string() },
+  args: { bookPath: v.string(), characterSlug: v.string(), optionIndex: v.number() },
   returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
-  handler: async (ctx, { bookPath, characterSlug, selectedOptionUrl }) => {
+  handler: async (ctx, { bookPath, characterSlug, optionIndex }) => {
     const startTime = Date.now();
     const log = (step: string) =>
       console.log(`[selectAvatar] ${step}: ${Date.now() - startTime}ms`);
 
     try {
+      // Validate optionIndex to prevent path traversal or invalid lookups
+      if (optionIndex !== 0 && optionIndex !== 1) {
+        return { success: false, error: "Invalid option index. Must be 0 or 1." };
+      }
+
       const characterPath = `${bookPath}/characters/${characterSlug}`;
       log("start");
 
-      const response = await fetch(selectedOptionUrl);
+      // Resolve the URL server-side from our asset storage (SSRF-safe)
+      const proposalPath = `${bookPath}/${PROPOSALS_FOLDER}/${characterSlug}`;
+      const proposalBasename = `option-${optionIndex + 1}.png`;
+      const proposalVersions = await ctx.runQuery(
+        components.assetManager.assetManager.getAssetVersions,
+        { folderPath: proposalPath, basename: proposalBasename },
+      );
+
+      if (!proposalVersions.length) {
+        return { success: false, error: `Proposal option ${optionIndex + 1} not found` };
+      }
+
+      const latestProposal = proposalVersions.at(-1);
+      const proposalUrlInfo = latestProposal
+        ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
+            versionId: latestProposal._id,
+          })
+        : null;
+
+      if (!proposalUrlInfo?.url) {
+        return { success: false, error: "Failed to get proposal URL from storage" };
+      }
+
+      log("resolved proposal URL from storage");
+
+      const response = await fetch(proposalUrlInfo.url);
       if (!response.ok) {
         return { success: false, error: "Failed to fetch selected image" };
       }
@@ -332,15 +362,15 @@ export const startAvatarGeneration = bookAction({
 });
 
 export const confirmAvatarSelection = bookAction({
-  args: { characterSlug: v.string(), selectedOptionUrl: v.string() },
+  args: { characterSlug: v.string(), optionIndex: v.number() },
   handler: async (
     ctx,
-    { characterSlug, selectedOptionUrl },
+    { characterSlug, optionIndex },
   ): Promise<{ success: boolean; error?: string }> => {
     return await ctx.runAction(internal.avatarGeneration.selectAvatar, {
       bookPath: ctx.bookPath,
       characterSlug,
-      selectedOptionUrl,
+      optionIndex,
     });
   },
 });
