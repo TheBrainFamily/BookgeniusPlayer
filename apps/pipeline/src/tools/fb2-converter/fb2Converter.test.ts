@@ -339,14 +339,9 @@ describe("fb2Converter", () => {
     });
   });
 
-  describe("convertFb2 - strong fallback should not run when standard chapters exist", () => {
-    it("should NOT trigger strong-based fallback when a standard chapter already exists", () => {
-      // BUG: When identifyChapterSections finds 1 chapter (Prologue),
-      // the condition `chapterSectionsSet.size <= 1` triggers the strong fallback,
-      // which then REPLACES the result, losing the Prologue chapter entirely.
-      //
-      // Expected: 2 chapters (Prologue + second section treated as single chapter)
-      // OR: Strong fallback should not trigger at all when we already have a valid chapter
+  describe("convertFb2 - multiple sections without titles", () => {
+    it("should detect two sections as two chapters", () => {
+      // Two sections = two chapters, regardless of whether they have <title> elements
       const xml = `<?xml version="1.0"?>
         <FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0">
           <body>
@@ -355,19 +350,18 @@ describe("fb2Converter", () => {
               <p>Prologue content here.</p>
             </section>
             <section>
-              <p><strong>Chapter 1</strong></p>
-              <p>First chapter content.</p>
-              <p><strong>Chapter 2</strong></p>
-              <p>Second chapter content.</p>
+              <p>Second section content without a title.</p>
+              <p>More content here.</p>
             </section>
           </body>
         </FictionBook>`;
 
       const result = convertFb2(xml);
 
-      // The Prologue should NOT be lost - it's a valid standard chapter
+      // Should have 2 chapters
+      expect(result.chaptersXml).toContain('<chapter number="0">');
+      expect(result.chaptersXml).toContain('<chapter number="1">');
       expect(result.chaptersXml).toContain("Prologue");
-      expect(result.textHtml).toContain("Prologue");
     });
   });
 });

@@ -323,9 +323,11 @@ function identifyAllChapterSections(doc: Document): Set<Element> {
     }
   }
 
-  // Final fallback: treat content sections as chapters
-  if (chapterSectionsSet.size === 0) {
-    chapterSectionsSet = identifyChapterInABookWithNoChapters(doc);
+  // Always include content sections that weren't detected by other methods
+  // This ensures sections without <title> elements are still treated as chapters
+  const contentSections = identifyChapterInABookWithNoChapters(doc);
+  for (const section of contentSections) {
+    chapterSectionsSet.add(section);
   }
 
   return chapterSectionsSet;
