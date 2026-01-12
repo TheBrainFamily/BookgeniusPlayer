@@ -237,7 +237,7 @@ export function detectSourceFormat(html: string): "compiled" | "source" {
   return html.includes('data-index="') ? "compiled" : "source";
 }
 
-export type RenderMode = "default" | "enhancedProse";
+export type RenderMode = "default" | "enhancedProse" | "poemProse";
 
 export type EnhancedProseOptions = { speakerDisplayNames?: Map<string, string> };
 
@@ -402,6 +402,186 @@ export function normalizeChapterHtmlEnhanced(
   transformProseToPlayRows(section, doc, options);
   section.setAttribute("data-chapter-format", "mixed");
   wrapPlayElements(section, doc);
+  injectDataIndex(section);
+  injectAvatarShells(section, doc);
+  transformFigureUrls(section);
+
+  const wrapper = doc.createElement("section");
+  wrapper.appendChild(section.cloneNode(true));
+
+  return wrapper.outerHTML;
+}
+
+export type PoemProseOptions = { speakerDisplayNames?: Map<string, string> };
+
+/**
+ * Create a play-row from a single speaker paragraph.
+ * Unlike enhancedProse, this does NOT group consecutive paragraphs.
+ * Supports data-label attribute for custom speaker labels.
+ */
+function createPlayRowFromParagraph(
+  paragraph: Element,
+  doc: Document,
+  state: { lastSpeaker: string | null; alignment: "left" | "right" },
+  options: PoemProseOptions,
+): Element {
+  const speakers = paragraph.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
+  const firstSpeaker = speakers[0] || "";
+  const explicitLabel = paragraph.getAttribute("data-label");
+
+  // Update alignment state based on speaker change
+  if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
+    state.alignment =
+      state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+    state.lastSpeaker = firstSpeaker;
+  }
+
+  const playRow = doc.createElement("div");
+  playRow.className = "play-row";
+  playRow.setAttribute("data-text-alignment", state.alignment);
+  playRow.setAttribute("data-speaker", speakers.join(" "));
+
+  const characterAvatar = doc.createElement("div");
+  characterAvatar.className = "character-avatar";
+
+  const characterText = doc.createElement("div");
+  characterText.className = "character-text";
+
+  // Add speaker label
+  const labelP = doc.createElement("p");
+  labelP.setAttribute("data-text-alignment", state.alignment);
+  labelP.setAttribute("data-is-character", "true");
+  labelP.setAttribute("data-is-didaskalia", "false");
+
+  // Use explicit label if present, otherwise derive from slug or displayNames
+  let displayName: string;
+  if (explicitLabel) {
+    displayName = explicitLabel;
+  } else {
+    displayName =
+      options.speakerDisplayNames?.get(firstSpeaker) ??
+      firstSpeaker
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+  }
+  const strong = doc.createElement("strong");
+  strong.textContent = displayName;
+  labelP.appendChild(strong);
+  characterText.appendChild(labelP);
+
+  // Add the content paragraph
+  const contentP = paragraph.cloneNode(true) as Element;
+  contentP.removeAttribute("data-speaker");
+  contentP.removeAttribute("data-label");
+  contentP.setAttribute("data-text-alignment", state.alignment);
+  contentP.setAttribute("data-is-character", "false");
+  contentP.setAttribute("data-is-didaskalia", "false");
+  characterText.appendChild(contentP);
+
+  playRow.appendChild(characterAvatar);
+  playRow.appendChild(characterText);
+
+  return playRow;
+}
+
+/**
+ * Recursively transform paragraphs with data-speaker into play-rows.
+ * Handles nested sections (like poem sections in Paradise Lost).
+ */
+function transformPoemToPlayRows(
+  container: Element,
+  doc: Document,
+  state: { lastSpeaker: string | null; alignment: "left" | "right" },
+  options: PoemProseOptions,
+): void {
+  const children = Array.from(container.children);
+
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    const tagName = child.tagName.toLowerCase();
+
+    // Recursively process nested sections (but not data-chapter sections)
+    if (tagName === "section" && !child.hasAttribute("data-chapter")) {
+      transformPoemToPlayRows(child, doc, state, options);
+      continue;
+    }
+
+    // Skip if not a paragraph or already processed
+    if (tagName !== "p") {
+      continue;
+    }
+
+    const speaker = child.getAttribute("data-speaker");
+    const isPureEm = isPureEmParagraph(child);
+
+    if (speaker) {
+      // Transform speaker paragraph into play-row
+      const playRow = createPlayRowFromParagraph(child, doc, state, options);
+      container.replaceChild(playRow, child);
+    } else if (isPureEm) {
+      // Stage direction
+      const playRow = createDidaskaliaPlayRow(child, doc);
+      container.replaceChild(playRow, child);
+    }
+    // Non-speaker, non-didaskalia paragraphs are left as-is (narrative text)
+  }
+}
+
+/**
+ * Unwrap nested poem/verse/song sections so play-rows become direct children
+ * of section[data-chapter]. This ensures CSS applies consistently.
+ */
+function unwrapPoemSections(section: Element): void {
+  const poemSelectors = [
+    'section[data-epub-type~="z3998:poem"]',
+    'section[data-epub-type~="z3998:verse"]',
+    'section[data-epub-type~="z3998:song"]',
+    'section[data-epub-type~="z3998:hymn"]',
+  ];
+
+  for (const selector of poemSelectors) {
+    // Keep querying because DOM changes as we unwrap
+    let poemSection: Element | null;
+    while ((poemSection = section.querySelector(selector))) {
+      const parent = poemSection.parentElement;
+      if (!parent) break;
+
+      // Move all children before the poem section
+      while (poemSection.firstChild) {
+        parent.insertBefore(poemSection.firstChild, poemSection);
+      }
+      // Remove the empty wrapper
+      parent.removeChild(poemSection);
+    }
+  }
+}
+
+/**
+ * Normalize chapter HTML using poemProse mode.
+ * Key differences from enhancedProse:
+ * - Each data-speaker paragraph becomes its own play-row (no grouping)
+ * - Supports data-label attribute for custom speaker labels
+ * - Unwraps poem sections so play-rows are direct children (matching enhancedProse structure)
+ */
+export function normalizeChapterHtmlPoemProse(
+  html: string,
+  options: PoemProseOptions = {},
+): string {
+  const sanitized = sanitizeHtml(html);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(sanitized, "text/html");
+  const section = doc.querySelector("section[data-chapter]");
+
+  if (!section) {
+    console.warn("[normalizeChapterHtmlPoemProse] No section[data-chapter] found");
+    return sanitized;
+  }
+
+  const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
+  transformPoemToPlayRows(section, doc, state, options);
+  unwrapPoemSections(section); // Remove poem wrappers so structure matches enhancedProse
+  section.setAttribute("data-chapter-format", "mixed");
   injectDataIndex(section);
   injectAvatarShells(section, doc);
   transformFigureUrls(section);
