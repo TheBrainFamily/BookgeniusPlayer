@@ -121,8 +121,7 @@ export default function App() {
 
   // Chapter management
   const [chapters, setChapters] = useState<ChapterInfo[]>([]);
-  const [preamble, setPreamble] = useState("");
-  const [postamble, setPostamble] = useState("");
+  const [originalXml, setOriginalXml] = useState("");
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -184,9 +183,8 @@ export default function App() {
 
       // Parse chapters
       const parsed = parseChapters(prep.rich);
-      setPreamble(parsed.preamble);
+      setOriginalXml(parsed.originalXml);
       setChapters(parsed.chapters);
-      setPostamble(parsed.postamble);
       setSelectedChapterIdx(0);
     } finally {
       setIsUploading(false);
@@ -226,9 +224,8 @@ export default function App() {
       setSlug(result.slug);
       setRich(result.rich);
       const parsed = parseChapters(result.rich);
-      setPreamble(parsed.preamble);
+      setOriginalXml(parsed.originalXml);
       setChapters(parsed.chapters);
-      setPostamble(parsed.postamble);
       setSelectedChapterIdx(0);
     } catch (e) {
       console.error("Download failed:", e);
@@ -249,9 +246,8 @@ export default function App() {
       setRich(result.rich);
       const parsed = parseChapters(result.rich);
       console.log("[SE] parsed chapters:", parsed.chapters.length);
-      setPreamble(parsed.preamble);
+      setOriginalXml(parsed.originalXml);
       setChapters(parsed.chapters);
-      setPostamble(parsed.postamble);
       setSelectedChapterIdx(0);
       console.log("[SE] state updated, chapters:", parsed.chapters.length);
     } catch (e) {
@@ -303,12 +299,12 @@ export default function App() {
     if (!slug) return;
     setIsStartingPipeline(true);
     // Recompile with renumbered chapters
-    const compiledXml = recompileXml(preamble, chapters, postamble);
+    const compiledXml = recompileXml(originalXml, chapters);
     await trpc.saveRichXml.mutate({ slug, rich: compiledXml });
     const resp = await trpc.startPipeline.mutate({ slug });
     setJobId(resp.jobId);
     setPolling(true);
-  }, [slug, preamble, chapters, postamble]);
+  }, [slug, originalXml, chapters]);
 
   const submitStyleDescription = useCallback(
     async (description: string | null) => {

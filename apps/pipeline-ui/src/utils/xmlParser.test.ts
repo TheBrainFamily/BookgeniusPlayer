@@ -11,7 +11,7 @@ describe("xmlParser", () => {
 </body>
 </main>`;
 
-      const { preamble: _preamble, chapters, postamble: _postamble } = parseChapters(xml);
+      const { chapters } = parseChapters(xml);
 
       expect(chapters).toHaveLength(2);
       expect(chapters[0].originalIndex).toBe(1);
@@ -21,8 +21,6 @@ describe("xmlParser", () => {
     });
 
     it("handles chapters with nested sections (Paradise Lost structure)", () => {
-      // This is the critical test case - Paradise Lost has nested sections
-      // that are NOT data-chapter sections (preamble, poem, etc.)
       const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <main>
 <body><section data-chapter="1" data-epub-type="chapter">
@@ -48,38 +46,53 @@ describe("xmlParser", () => {
 
       const { chapters } = parseChapters(xml);
 
-      // Should find exactly 2 chapters
+      // Should find exactly 2 chapters (nested sections don't have data-chapter)
       expect(chapters).toHaveLength(2);
-
-      // Each chapter should contain ALL its nested sections
-      // Chapter 1 should have 3 sections: outer + preamble + poem
-      const ch1Opens = (chapters[0].content.match(/<section/g) || []).length;
-      const ch1Closes = (chapters[0].content.match(/<\/section>/g) || []).length;
-      expect(ch1Opens).toBe(3);
-      expect(ch1Closes).toBe(3);
-
-      // Chapter 2 should also have 3 sections
-      const ch2Opens = (chapters[1].content.match(/<section/g) || []).length;
-      const ch2Closes = (chapters[1].content.match(/<\/section>/g) || []).length;
-      expect(ch2Opens).toBe(3);
-      expect(ch2Closes).toBe(3);
+      expect(chapters[0].title).toBe("Book I");
+      expect(chapters[1].title).toBe("Book II");
     });
 
-    it("preserves content inside nested sections", () => {
-      const xml = `<?xml version="1.0"?>
-<main>
-<body><section data-chapter="1">
-<h2>Book I</h2>
-<section id="nested">
-<p>Nested content should be preserved</p>
-</section>
-</section>
-</body>
-</main>`;
+    it("returns empty chapters array when no chapters exist", () => {
+      const xml = `<main><body><p>No chapters here</p></body></main>`;
 
       const { chapters } = parseChapters(xml);
 
-      expect(chapters[0].content).toContain("Nested content should be preserved");
+      expect(chapters).toHaveLength(0);
+    });
+
+    it("uses fallback title when chapter has no heading", () => {
+      const xml = `<main><body><section data-chapter="1"><p>Content without heading</p></section></body></main>`;
+
+      const { chapters } = parseChapters(xml);
+
+      expect(chapters[0].title).toBe("Chapter 1");
+    });
+
+    it("uses fallback title when heading has empty text", () => {
+      const xml = `<main><body><section data-chapter="1"><h2>   </h2><p>Content</p></section></body></main>`;
+
+      const { chapters } = parseChapters(xml);
+
+      expect(chapters[0].title).toBe("Chapter 1");
+    });
+
+    it("truncates long titles to 50 characters", () => {
+      const longTitle =
+        "This is a very long chapter title that exceeds fifty characters and should be truncated";
+      const xml = `<main><body><section data-chapter="1"><h2>${longTitle}</h2></section></body></main>`;
+
+      const { chapters } = parseChapters(xml);
+
+      expect(chapters[0].title).toHaveLength(50);
+      expect(chapters[0].title).toBe("This is a very long chapter title that exceeds ...");
+    });
+
+    it("preserves originalXml for recompilation", () => {
+      const xml = `<main><body><section data-chapter="1"><h2>Ch</h2></section></body></main>`;
+
+      const { originalXml } = parseChapters(xml);
+
+      expect(originalXml).toBe(xml);
     });
   });
 
@@ -108,8 +121,8 @@ describe("xmlParser", () => {
 </body>
 </main>`;
 
-      const { preamble, chapters, postamble } = parseChapters(xml);
-      const compiled = recompileXml(preamble, chapters, postamble);
+      const { originalXml, chapters } = parseChapters(xml);
+      const compiled = recompileXml(originalXml, chapters);
 
       // CRITICAL: The compiled XML must have balanced section tags
       const opens = (compiled.match(/<section/g) || []).length;
@@ -121,8 +134,8 @@ describe("xmlParser", () => {
     it("renumbers chapters correctly", () => {
       const xml = `<main><body><section data-chapter="5"><h2>Ch</h2></section><section data-chapter="10"><h2>Ch</h2></section></body></main>`;
 
-      const { preamble, chapters, postamble } = parseChapters(xml);
-      const compiled = recompileXml(preamble, chapters, postamble);
+      const { originalXml, chapters } = parseChapters(xml);
+      const compiled = recompileXml(originalXml, chapters);
 
       expect(compiled).toContain('data-chapter="1"');
       expect(compiled).toContain('data-chapter="2"');
@@ -133,14 +146,62 @@ describe("xmlParser", () => {
     it("only includes selected chapters", () => {
       const xml = `<main><body><section data-chapter="1"><h2>One</h2></section><section data-chapter="2"><h2>Two</h2></section></body></main>`;
 
-      const { preamble, chapters, postamble } = parseChapters(xml);
+      const { originalXml, chapters } = parseChapters(xml);
       chapters[1].selected = false; // Deselect chapter 2
 
-      const compiled = recompileXml(preamble, chapters, postamble);
+      const compiled = recompileXml(originalXml, chapters);
 
       expect(compiled).toContain('data-chapter="1"');
       expect(compiled).not.toContain('data-chapter="2"');
       expect(compiled).not.toContain("Two");
+    });
+
+    it("preserves document structure (wrapper elements, attributes)", () => {
+      const xml = `<?xml version="1.0"?><root id="doc" lang="en"><wrapper class="content"><section data-chapter="1"><h2>Ch1</h2></section></wrapper></root>`;
+
+      const { originalXml, chapters } = parseChapters(xml);
+      const compiled = recompileXml(originalXml, chapters);
+
+      // Should preserve root element with attributes
+      expect(compiled).toContain("<root");
+      expect(compiled).toContain("</root>");
+      // Should preserve wrapper
+      expect(compiled).toContain("<wrapper");
+      expect(compiled).toContain("</wrapper>");
+    });
+
+    it("preserves content before and after chapters", () => {
+      const xml = `<doc><header><title>Book Title</title></header><body><section data-chapter="1"><h2>Ch</h2></section></body><footer>The End</footer></doc>`;
+
+      const { originalXml, chapters } = parseChapters(xml);
+      const compiled = recompileXml(originalXml, chapters);
+
+      expect(compiled).toContain("<title>Book Title</title>");
+      expect(compiled).toContain("<footer>The End</footer>");
+    });
+
+    it("handles removing all chapters gracefully", () => {
+      const xml = `<doc><body><section data-chapter="1"><h2>Ch1</h2></section><section data-chapter="2"><h2>Ch2</h2></section></body></doc>`;
+
+      const { originalXml, chapters } = parseChapters(xml);
+      chapters.forEach((c) => (c.selected = false));
+
+      const compiled = recompileXml(originalXml, chapters);
+
+      // Document structure preserved, but no chapters
+      expect(compiled).toContain("<doc>");
+      expect(compiled).toContain("</doc>");
+      expect(compiled).not.toContain("data-chapter");
+    });
+
+    it("preserves nested sections inside chapters", () => {
+      const xml = `<main><body><section data-chapter="1"><h2>Book I</h2><section id="nested"><p>Nested content</p></section></section></body></main>`;
+
+      const { originalXml, chapters } = parseChapters(xml);
+      const compiled = recompileXml(originalXml, chapters);
+
+      expect(compiled).toContain("Nested content");
+      expect(compiled).toContain('id="nested"');
     });
   });
 });

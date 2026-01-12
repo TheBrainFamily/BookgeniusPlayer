@@ -38,31 +38,33 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * Preserves most of the original description while removing the most problematic words.
  */
 export const lightSanitizePrompt = (prompt: string): string => {
-  return prompt
-    // Religious terms -> neutral alternatives
-    .replace(/\bgod\b/gi, "divine being")
-    .replace(/\bsatan\b/gi, "dark lord")
-    .replace(/\bdevil\b/gi, "dark figure")
-    .replace(/\bdemon\b/gi, "dark spirit")
-    .replace(/\bangel\b/gi, "celestial being")
-    .replace(/\blucifer\b/gi, "fallen one")
-    // Nudity -> clothed
-    .replace(/\bnaked\b/gi, "in flowing robes")
-    .replace(/\bnude\b/gi, "in simple garments")
-    .replace(/\bunclothed\b/gi, "draped in fabric")
-    // Violence -> neutral
-    .replace(/\bblood\b/gi, "crimson")
-    .replace(/\bbesmeared with crimson\b/gi, "wearing deep red")
-    .replace(/\bgore\b/gi, "red coloring")
-    .replace(/\bdeath\b/gi, "shadow")
-    // Monsters -> humanized
-    .replace(/\bmonster\b/gi, "imposing figure")
-    .replace(/\bfish.?tail\b/gi, "aquatic-themed robes")
-    .replace(/\bserpent\b/gi, "scaled")
-    // Weapons -> ceremonial
-    .replace(/\bsword\b/gi, "staff")
-    .replace(/\bweapon/gi, "implement")
-    .replace(/\barmou?r\b/gi, "ceremonial attire");
+  return (
+    prompt
+      // Religious terms -> neutral alternatives
+      .replace(/\bgod\b/gi, "divine being")
+      .replace(/\bsatan\b/gi, "dark lord")
+      .replace(/\bdevil\b/gi, "dark figure")
+      .replace(/\bdemon\b/gi, "dark spirit")
+      .replace(/\bangel\b/gi, "celestial being")
+      .replace(/\blucifer\b/gi, "fallen one")
+      // Nudity -> clothed
+      .replace(/\bnaked\b/gi, "in flowing robes")
+      .replace(/\bnude\b/gi, "in simple garments")
+      .replace(/\bunclothed\b/gi, "draped in fabric")
+      // Violence -> neutral
+      .replace(/\bblood\b/gi, "crimson")
+      .replace(/\bbesmeared with crimson\b/gi, "wearing deep red")
+      .replace(/\bgore\b/gi, "red coloring")
+      .replace(/\bdeath\b/gi, "shadow")
+      // Monsters -> humanized
+      .replace(/\bmonster\b/gi, "imposing figure")
+      .replace(/\bfish.?tail\b/gi, "aquatic-themed robes")
+      .replace(/\bserpent\b/gi, "scaled")
+      // Weapons -> ceremonial
+      .replace(/\bsword\b/gi, "staff")
+      .replace(/\bweapon/gi, "implement")
+      .replace(/\barmou?r\b/gi, "ceremonial attire")
+  );
 };
 
 /**
@@ -115,7 +117,7 @@ Rewrite this prompt following these rules:
 
 ## Nudity (even non-sexual/classical)
 - Replace "naked", "nude", "unclothed" with clothing descriptions
-- Use: "draped in flowing white fabric", "wearing simple robes", "classical Greco-Roman attire"
+- Use: "draped in flowing white fabric", "wearing simple robes"
 - For innocence themes: "wearing pure white garments" or "dressed in ethereal flowing cloth"
 
 ## Violence/Gore
@@ -138,7 +140,7 @@ Rewrite this prompt following these rules:
 - Keep the character's essential personality (stern, gentle, wise, etc.)
 - Preserve hair color, eye color, build, age
 - Focus on face, expression, posture, and clothing
-- Make it sound like a classical portrait commission
+- Make it sound like a portrait commission
 
 Reply ONLY with the sanitized prompt. No explanations.`;
 
