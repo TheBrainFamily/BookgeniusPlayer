@@ -179,8 +179,9 @@ describe("fb2Converter", () => {
       expect(result.textHtml).not.toContain('data-chapter="2"');
     });
 
-    it("handles Polish chapter numbering pattern (I, II, III, IV, V, VI, VII)", () => {
+    it("works with krolowa-sniegu style content (Roman numeral prefixes)", () => {
       // Pattern from krolowa-sniegu: "I. Czarodziejskie zwierciadło", "II. Sąsiedzi", etc.
+      // Note: No special handling for Roman numerals - they're just text content
       const xml = `<?xml version="1.0"?>
         <FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0">
           <body>
@@ -205,13 +206,14 @@ describe("fb2Converter", () => {
           </body>
         </FictionBook>`;
 
-      const result = convertFb2(xml);
+      // Using startFromChapter: 1 as that's the production default
+      const result = convertFb2(xml, { startFromChapter: 1 });
 
-      // Should detect 4 chapters
-      expect(result.chaptersXml).toContain('<chapter number="0">');
+      // Should detect 4 chapters, numbered 1-4
       expect(result.chaptersXml).toContain('<chapter number="1">');
       expect(result.chaptersXml).toContain('<chapter number="2">');
       expect(result.chaptersXml).toContain('<chapter number="3">');
+      expect(result.chaptersXml).toContain('<chapter number="4">');
 
       // Titles should be extracted correctly
       expect(result.chaptersXml).toContain("I. Czarodziejskie zwierciadło");
