@@ -1,4 +1,4 @@
-import { adminMutation, publicQuery } from "./functions";
+import { adminMutation, adminQuery } from "./functions";
 import { components } from "./_generated/api";
 import { v } from "convex/values";
 
@@ -61,7 +61,7 @@ export const deleteAssetsBatch = adminMutation({
 /**
  * Get R2 keys for a book - used to prepare for deletion.
  */
-export const getBookR2Keys = publicQuery({
+export const getBookR2Keys = adminQuery({
   args: { bookSlug: v.string() },
   returns: v.array(v.string()),
   handler: async (ctx, { bookSlug }) => {
@@ -75,7 +75,7 @@ export const getBookR2Keys = publicQuery({
 /**
  * Get info about what will be deleted for a book.
  */
-export const getBookDeleteInfo = publicQuery({
+export const getBookDeleteInfo = adminQuery({
   args: { bookSlug: v.string() },
   returns: v.object({
     bookPath: v.string(),
