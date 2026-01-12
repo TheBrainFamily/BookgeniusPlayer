@@ -7,7 +7,7 @@
  */
 
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { publicQuery, bookMutation } from "./functions";
 
 // Simplification type for reuse
 const simplificationValidator = v.object({ score: v.number(), sentences: v.array(v.string()) });
@@ -20,7 +20,7 @@ const simplificationValidator = v.object({ score: v.number(), sentences: v.array
  * List all variants for a book.
  * Returns simplified format for player consumption.
  */
-export const listByBook = query({
+export const listByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const variants = await ctx.db
@@ -36,7 +36,7 @@ export const listByBook = query({
  * List variants for a specific chapter.
  * Used for per-chapter loading in sliding window pattern.
  */
-export const listByChapter = query({
+export const listByChapter = publicQuery({
   args: { bookPath: v.string(), chapter: v.number() },
   handler: async (ctx, { bookPath, chapter }) => {
     const variants = await ctx.db
@@ -52,7 +52,7 @@ export const listByChapter = query({
  * List variants for a range of chapters.
  * Useful for preloading adjacent chapters.
  */
-export const listByChapterRange = query({
+export const listByChapterRange = publicQuery({
   args: { bookPath: v.string(), fromChapter: v.number(), toChapter: v.number() },
   handler: async (ctx, { bookPath, fromChapter, toChapter }) => {
     const variants = await ctx.db
@@ -74,7 +74,7 @@ export const listByChapterRange = query({
 /**
  * Get a single variant by ID.
  */
-export const getByVariantId = query({
+export const getByVariantId = publicQuery({
   args: { bookPath: v.string(), variantId: v.string() },
   handler: async (ctx, { bookPath, variantId }) => {
     const variant = await ctx.db
@@ -97,7 +97,7 @@ export const getByVariantId = query({
  * Count variants for a book.
  * Used for dashboard stats.
  */
-export const countByBook = query({
+export const countByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const variants = await ctx.db
@@ -116,77 +116,75 @@ export const countByBook = query({
 /**
  * Create a new variant.
  */
-export const create = mutation({
+export const create = bookMutation({
   args: {
-    bookPath: v.string(),
     variantId: v.string(),
     chapter: v.number(),
     simplifications: v.array(simplificationValidator),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("variants", args);
+    return await ctx.bookDb.insert("variants", args);
   },
 });
 
 /**
  * Update a variant's simplifications.
  */
-export const update = mutation({
+export const update = bookMutation({
   args: { id: v.id("variants"), simplifications: v.array(simplificationValidator) },
   handler: async (ctx, { id, simplifications }) => {
-    return await ctx.db.patch(id, { simplifications });
+    return await ctx.bookDb.patch(id, { simplifications });
   },
 });
 
 /**
  * Add a simplification level to a variant.
  */
-export const addSimplification = mutation({
+export const addSimplification = bookMutation({
   args: { id: v.id("variants"), simplification: simplificationValidator },
   handler: async (ctx, { id, simplification }) => {
-    const variant = await ctx.db.get(id);
+    const variant = await ctx.bookDb.get(id);
     if (!variant) throw new Error("Variant not found");
 
     const updated = [...variant.simplifications, simplification];
     // Sort by score descending (higher = more complex)
     updated.sort((a, b) => b.score - a.score);
 
-    return await ctx.db.patch(id, { simplifications: updated });
+    return await ctx.bookDb.patch(id, { simplifications: updated });
   },
 });
 
 /**
  * Remove a simplification level from a variant by score.
  */
-export const removeSimplification = mutation({
+export const removeSimplification = bookMutation({
   args: { id: v.id("variants"), score: v.number() },
   handler: async (ctx, { id, score }) => {
-    const variant = await ctx.db.get(id);
+    const variant = await ctx.bookDb.get(id);
     if (!variant) throw new Error("Variant not found");
 
     const updated = variant.simplifications.filter((s) => s.score !== score);
-    return await ctx.db.patch(id, { simplifications: updated });
+    return await ctx.bookDb.patch(id, { simplifications: updated });
   },
 });
 
 /**
  * Delete a variant.
  */
-export const remove = mutation({
+export const remove = bookMutation({
   args: { id: v.id("variants") },
   handler: async (ctx, { id }) => {
-    return await ctx.db.delete(id);
+    return await ctx.bookDb.delete(id);
   },
 });
 
 /**
  * Bulk create variants (for import).
  */
-export const bulkCreate = mutation({
+export const bulkCreate = bookMutation({
   args: {
     variants: v.array(
       v.object({
-        bookPath: v.string(),
         variantId: v.string(),
         chapter: v.number(),
         simplifications: v.array(simplificationValidator),
@@ -196,7 +194,7 @@ export const bulkCreate = mutation({
   handler: async (ctx, { variants }) => {
     const ids = [];
     for (const variant of variants) {
-      const id = await ctx.db.insert("variants", variant);
+      const id = await ctx.bookDb.insert("variants", variant);
       ids.push(id);
     }
     return ids;

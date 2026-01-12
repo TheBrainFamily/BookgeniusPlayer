@@ -1,23 +1,21 @@
-import { type MutationCtx } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { type MutationCtx, type QueryCtx } from "./_generated/server";
 
 /**
  * Require authentication for a mutation.
- * Throws an error if the user is not logged in (unless AUTH_REQUIRED=false).
+ * Uses Clerk JWT validated by Convex auth.config.ts
  * @returns The authenticated user's ID (or "anonymous" if auth disabled)
  */
-export async function requireAuth(ctx: MutationCtx) {
-  // Check if auth is required (default: false for easy collaboration)
+export async function requireAuth(ctx: MutationCtx | QueryCtx) {
   const authRequired = process.env.AUTH_REQUIRED === "true";
 
   if (!authRequired) {
-    // Auth disabled - allow anonymous access
     return "anonymous";
   }
 
-  const userId = await getAuthUserId(ctx);
-  if (!userId) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
     throw new Error("Unauthorized: You must be logged in to perform this action");
   }
-  return userId;
+  // Return Clerk's subject (user ID) from the JWT
+  return identity.subject;
 }

@@ -103,9 +103,9 @@ bun run prettier:check          # Check formatting
 # Testing
 cd convex && bun test           # Convex tests
 
-# CLI operations
-npx convex run cli:listPublishedFilesInFolder '{"folderPath": "books/BOOK/characters/SLUG"}'
-npx convex run admin/regenerateAvatarWebp:regenerateAvatarWebp '{"characterPath": "books/BOOK/characters/SLUG"}'
+# CLI operations (use wrapper script for admin identity)
+./scripts/convex run cli:listPublishedFilesInFolder '{"folderPath": "books/BOOK/characters/SLUG"}'
+./scripts/convex run admin/regenerateAvatarWebp:regenerateAvatarWebp '{"characterPath": "books/BOOK/characters/SLUG"}'
 ```
 
 ## DATA FLOW

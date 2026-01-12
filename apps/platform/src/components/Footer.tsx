@@ -1,6 +1,7 @@
 import { BookOpen, Mail, MapPin, Phone } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 interface FooterProps {
   onSearchQuery: (query: string) => void;
@@ -89,7 +90,14 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-library-gold">{t("footer.helpCenter")}</h4>
             <div className="space-y-2 flex flex-col">
-              {["privacyPolicy", "termsOfService", "cookiePolicy"].map((linkKey) => (
+              <Button
+                asChild
+                variant="ghost"
+                className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
+              >
+                <Link to="/terms">{t("footer.termsOfService")}</Link>
+              </Button>
+              {["privacyPolicy", "cookiePolicy"].map((linkKey) => (
                 <Button
                   key={linkKey}
                   variant="ghost"

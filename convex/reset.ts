@@ -1,10 +1,15 @@
-import { mutation, query } from "./_generated/server";
+import { adminMutation, adminQuery } from "./functions";
 import { components } from "./_generated/api";
 import { v } from "convex/values";
 
-const BATCH_SIZE = 100;
+// Convex allows ~8000 document ops per mutation, so 1000 is safe
+const BATCH_SIZE = 1000;
 
-export const deleteNotesBatch = mutation({
+/**
+ * Delete notes in batches - ADMIN ONLY.
+ * This is a dangerous operation that deletes ALL notes.
+ */
+export const deleteNotesBatch = adminMutation({
   args: {},
   returns: v.object({ deletedNotes: v.number(), hasMore: v.boolean() }),
   handler: async (ctx) => {
@@ -16,7 +21,11 @@ export const deleteNotesBatch = mutation({
   },
 });
 
-export const deleteVariantsBatch = mutation({
+/**
+ * Delete variants in batches - ADMIN ONLY.
+ * This is a dangerous operation that deletes ALL variants.
+ */
+export const deleteVariantsBatch = adminMutation({
   args: {},
   returns: v.object({ deletedVariants: v.number(), hasMore: v.boolean() }),
   handler: async (ctx) => {
@@ -28,7 +37,11 @@ export const deleteVariantsBatch = mutation({
   },
 });
 
-export const deleteAssetsBatch = mutation({
+/**
+ * Delete all assets in batches - ADMIN ONLY.
+ * This is a dangerous operation that deletes ALL assets.
+ */
+export const deleteAssetsBatch = adminMutation({
   args: {},
   returns: v.object({
     deletedFolders: v.number(),
@@ -45,7 +58,10 @@ export const deleteAssetsBatch = mutation({
   },
 });
 
-export const getBookR2Keys = query({
+/**
+ * Get R2 keys for a book - used to prepare for deletion.
+ */
+export const getBookR2Keys = adminQuery({
   args: { bookSlug: v.string() },
   returns: v.array(v.string()),
   handler: async (ctx, { bookSlug }) => {
@@ -56,7 +72,10 @@ export const getBookR2Keys = query({
   },
 });
 
-export const getBookDeleteInfo = query({
+/**
+ * Get info about what will be deleted for a book.
+ */
+export const getBookDeleteInfo = adminQuery({
   args: { bookSlug: v.string() },
   returns: v.object({
     bookPath: v.string(),
@@ -119,7 +138,11 @@ export const getBookDeleteInfo = query({
   },
 });
 
-export const deleteBookDataBatch = mutation({
+/**
+ * Delete book data in batches - ADMIN ONLY.
+ * This deletes all notes, variants, cues, metadata for a specific book.
+ */
+export const deleteBookDataBatch = adminMutation({
   args: { bookSlug: v.string() },
   returns: v.object({
     deletedNotes: v.number(),
@@ -290,7 +313,11 @@ export const deleteBookDataBatch = mutation({
   },
 });
 
-export const deleteBookAssetsBatch = mutation({
+/**
+ * Delete book assets in batches - ADMIN ONLY.
+ * This deletes all assets (files) for a specific book.
+ */
+export const deleteBookAssetsBatch = adminMutation({
   args: { bookSlug: v.string() },
   returns: v.object({
     deletedFolders: v.number(),

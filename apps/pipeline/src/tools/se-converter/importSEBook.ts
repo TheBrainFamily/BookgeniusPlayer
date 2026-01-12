@@ -14,7 +14,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { ConvexHttpClient } from "convex/browser";
+import { AdminConvexHttpClient } from "../../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import { convertSEBook, getSEBookImagesDir, type SEImageReference } from "./index";
 import { JSDOM } from "jsdom";
@@ -57,7 +57,7 @@ if (!CONVEX_URL) {
   process.exit(1);
 }
 
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = new AdminConvexHttpClient(CONVEX_URL);
 
 function parseArgs(): { seSlug: string; targetSlug: string } {
   const args = process.argv.slice(2);

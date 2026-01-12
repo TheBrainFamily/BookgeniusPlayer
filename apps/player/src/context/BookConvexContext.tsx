@@ -25,6 +25,7 @@ import {
   detectSourceFormat,
   normalizeChapterHtml,
   normalizeChapterHtmlEnhanced,
+  normalizeChapterHtmlPoemProse,
   extractCharacterOccurrences,
   type CharacterOccurrence,
   type RenderMode,
@@ -130,7 +131,10 @@ const buildChapterPlaceholderHtml = (chapterNumber: number): string => {
 const getRenderModeFromUrl = (): RenderMode => {
   if (typeof window === "undefined") return "default";
   const params = new URLSearchParams(window.location.search);
-  return params.get("renderMode") === "enhancedProse" ? "enhancedProse" : "default";
+  const mode = params.get("renderMode");
+  if (mode === "enhancedProse") return "enhancedProse";
+  if (mode === "poemProse") return "poemProse";
+  return "default";
 };
 
 const buildBookHtmlFromChapters = (
@@ -141,12 +145,16 @@ const buildBookHtmlFromChapters = (
 ): string => {
   const form = bookForm.toLowerCase();
   const useEnhancedProse = renderMode === "enhancedProse" && form !== "play";
+  const usePoemProse = renderMode === "poemProse";
 
   let html = chapters
     .map((chapter) => {
       const chapterHtml = chapter.html ?? buildChapterPlaceholderHtml(chapter.chapterNumber);
       const format = detectSourceFormat(chapterHtml);
       if (format === "source") {
+        if (usePoemProse) {
+          return normalizeChapterHtmlPoemProse(chapterHtml, enhancedOptions);
+        }
         return useEnhancedProse
           ? normalizeChapterHtmlEnhanced(chapterHtml, enhancedOptions)
           : normalizeChapterHtml(chapterHtml);
@@ -159,7 +167,7 @@ const buildBookHtmlFromChapters = (
     html = `<div class="play-container">${html}</div>`;
   } else if (form === "mixed") {
     html = `<div class="play-container mixed-container">${html}</div>`;
-  } else if (useEnhancedProse) {
+  } else if (useEnhancedProse || usePoemProse) {
     html = `<div class="play-container">${html}</div>`;
   }
 
@@ -413,7 +421,11 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     [book?.extra?.form],
   );
   const isPlayLayout = useMemo(
-    () => bookFormValue === "play" || bookFormValue === "mixed" || renderMode === "enhancedProse",
+    () =>
+      bookFormValue === "play" ||
+      bookFormValue === "mixed" ||
+      renderMode === "enhancedProse" ||
+      renderMode === "poemProse",
     [bookFormValue, renderMode],
   );
 

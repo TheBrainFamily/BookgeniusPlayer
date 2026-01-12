@@ -33,24 +33,116 @@ const knownCharactersArray = knowCharactersFromAllPreviousBooks.map(({ name }) =
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Light sanitization (attempt 2): Quick regex-based replacements for obvious triggers.
+ * Preserves most of the original description while removing the most problematic words.
+ */
+export const lightSanitizePrompt = (prompt: string): string => {
+  return (
+    prompt
+      // Religious terms -> neutral alternatives
+      .replace(/\bgod\b/gi, "divine being")
+      .replace(/\bsatan\b/gi, "dark lord")
+      .replace(/\bdevil\b/gi, "dark figure")
+      .replace(/\bdemon\b/gi, "dark spirit")
+      .replace(/\bangel\b/gi, "celestial being")
+      .replace(/\blucifer\b/gi, "fallen one")
+      // Nudity -> clothed
+      .replace(/\bnaked\b/gi, "in flowing robes")
+      .replace(/\bnude\b/gi, "in simple garments")
+      .replace(/\bunclothed\b/gi, "draped in fabric")
+      // Violence -> neutral
+      .replace(/\bblood\b/gi, "crimson")
+      .replace(/\bbesmeared with crimson\b/gi, "wearing deep red")
+      .replace(/\bgore\b/gi, "red coloring")
+      .replace(/\bdeath\b/gi, "shadow")
+      // Monsters -> humanized
+      .replace(/\bmonster\b/gi, "imposing figure")
+      .replace(/\bfish.?tail\b/gi, "aquatic-themed robes")
+      .replace(/\bserpent\b/gi, "scaled")
+      // Weapons -> ceremonial
+      .replace(/\bsword\b/gi, "staff")
+      .replace(/\bweapon/gi, "implement")
+      .replace(/\barmou?r\b/gi, "ceremonial attire")
+  );
+};
+
+/**
+ * Abstract fallback (attempt 4): Generate an abstract/symbolic representation
+ * inspired by the character name, avoiding any literal depiction.
+ */
+export const generateAbstractPortraitPrompt = async (characterName: string): Promise<string> => {
+  const abstractPrompt = `Create an ABSTRACT, SYMBOLIC visual description inspired by the name "${characterName}".
+
+This is NOT a portrait of a person. Instead, create an abstract or symbolic representation.
+
+Examples of what you might describe:
+- For a powerful name: "Rays of golden light emanating from clouds"
+- For a dark name: "Swirling shadows with hints of deep purple"
+- For a nature name: "Flowing water patterns with soft blue tones"
+- For a fiery name: "Abstract warm gradients suggesting heat and energy"
+
+Rules:
+- NO people, faces, figures, or humanoid shapes
+- NO religious, mythological, or controversial imagery
+- Think abstract art, light, color, shapes, patterns, nature elements
+- Keep it safe for any AI image generator
+- Under 25 words
+
+Reply ONLY with the abstract description. No explanations.`;
+
+  const result = await callGeminiWithThinking(abstractPrompt);
+  console.log(`Abstract prompt for ${characterName}: ${result}`);
+  return result || `Abstract patterns of light and shadow with flowing organic shapes.`;
+};
+
+/**
+ * Heavy sanitization (attempt 3): Full LLM rewrite to bypass content filters
+ * while preserving the character's essence.
+ */
 export const sanitizePromptForModeration = async (prompt: string): Promise<string> => {
-  const sanitizationPrompt = `You are a prompt sanitizer. The following image generation prompt was rejected by a safety system for sexual content violations.
+  const sanitizationPrompt = `You are a prompt sanitizer for AI image generation. The following prompt was rejected by a safety system. Your job is to rewrite it to bypass content filters while preserving the character's essence.
 
 Original prompt:
 """
 ${prompt}
 """
 
-Rewrite this prompt to describe the same character but remove or rephrase any content that could be flagged as sexual, suggestive, or inappropriate. Keep the essential visual characteristics (face, hair, clothing style, age, build, etc.) but make it completely safe for image generation.
+Rewrite this prompt following these rules:
 
-Rules:
-- Remove any references to nudity, revealing clothing, or suggestive poses
-- Remove any romantic or sensual descriptions
-- Keep descriptions professional and focused on neutral visual attributes
-- If clothing is mentioned, make it modest and appropriate
-- Focus on face, expression, and general appearance
+## Religious/Mythological Figures
+- Never use names like "god", "satan", "devil", "demon", "angel" directly
+- Use euphemisms: "divine celestial being", "dark ethereal lord", "fallen celestial", "winged messenger", "infernal spirit"
+- For biblical figures: "the first woman" instead of "Eve", "the first man" instead of "Adam"
 
-Reply ONLY with the sanitized prompt, no explanations or preamble.`;
+## Nudity (even non-sexual/classical)
+- Replace "naked", "nude", "unclothed" with clothing descriptions
+- Use: "draped in flowing white fabric", "wearing simple robes"
+- For innocence themes: "wearing pure white garments" or "dressed in ethereal flowing cloth"
+
+## Violence/Gore
+- Remove all references to blood, wounds, gore, killing
+- Replace "besmeared with blood" → "wearing deep crimson robes"
+- Replace "warrior" → "noble figure in ceremonial attire"
+- Replace weapons with symbolic objects: "carrying a staff" instead of "wielding a sword"
+
+## Monsters/Hybrids
+- Humanize the description, remove monster terminology
+- "Sea creature with fish tail" → "dignified figure with aquatic-themed decorative robes in oceanic blues and greens"
+- Focus on human features, add thematic clothing/accessories instead of non-human body parts
+
+## Military/Weapons
+- Replace armor → "formal ceremonial attire" or "ornate robes"
+- Replace weapons → "carrying a ceremonial staff" or "holding a symbolic object"
+- Replace "trophies of war" → "decorative medallions"
+
+## General
+- Keep the character's essential personality (stern, gentle, wise, etc.)
+- Preserve hair color, eye color, build, age
+- Focus on face, expression, posture, and clothing
+- Make it sound like a portrait commission
+
+Reply ONLY with the sanitized prompt. No explanations.`;
 
   const sanitizedPrompt = await callGeminiWithThinking(sanitizationPrompt);
   console.log(`Sanitized prompt for moderation: ${sanitizedPrompt}`);

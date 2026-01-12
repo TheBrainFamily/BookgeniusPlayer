@@ -1,4 +1,4 @@
-import { ConvexHttpClient } from "convex/browser";
+import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import "dotenv/config";
 
@@ -8,7 +8,7 @@ if (!CONVEX_URL) {
   throw new Error("Missing CONVEX_URL environment variable");
 }
 
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = new AdminConvexHttpClient(CONVEX_URL);
 
 export type StepStatus = "pending" | "running" | "done" | "error" | "skipped";
 export type AvatarState = "generating" | "ready" | "error" | "none";
@@ -118,7 +118,11 @@ export const convex = {
     }[];
   }) {
     if (args.notes.length === 0) return [];
-    return await client.mutation(api.notes.bulkCreate, args);
+    // Extract bookPath from first note (all notes should have the same bookPath)
+    const bookPath = args.notes[0].bookPath;
+    // Strip bookPath from individual notes since it's now a top-level arg
+    const notes = args.notes.map(({ bookPath: _bp, ...rest }) => rest);
+    return await client.mutation(api.notes.bulkCreate, { bookPath, notes });
   },
 
   async getGenerationStatus(bookPath: string) {

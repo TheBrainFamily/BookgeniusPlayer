@@ -9,9 +9,9 @@
  */
 
 import type * as admin_deleteFilesInFolder from "../admin/deleteFilesInFolder.js";
-import type * as admin_regenerateAvatarWebp from "../admin/regenerateAvatarWebp.js";
-import type * as auth from "../auth.js";
 import type * as authHelpers from "../authHelpers.js";
+import type * as authz from "../authz.js";
+import type * as authzQueries from "../authzQueries.js";
 import type * as avatarEditing from "../avatarEditing.js";
 import type * as avatarGeneration from "../avatarGeneration.js";
 import type * as backgroundCues from "../backgroundCues.js";
@@ -19,21 +19,18 @@ import type * as backgroundEditing from "../backgroundEditing.js";
 import type * as backgroundEditingInternal from "../backgroundEditingInternal.js";
 import type * as backgroundMetadata from "../backgroundMetadata.js";
 import type * as backgroundPreviewHttp from "../backgroundPreviewHttp.js";
+import type * as bookAuthz from "../bookAuthz.js";
 import type * as bookQueries from "../bookQueries.js";
 import type * as chapterCompiler from "../chapterCompiler.js";
-import type * as characterIndexGenerator from "../characterIndexGenerator.js";
 import type * as characterPromptGeneration from "../characterPromptGeneration.js";
 import type * as cli from "../cli.js";
 import type * as colorExtraction from "../colorExtraction.js";
-import type * as comicGeneration from "../comicGeneration.js";
-import type * as comicSubmissions from "../comicSubmissions.js";
-import type * as comics from "../comics.js";
+import type * as functions from "../functions.js";
 import type * as generateUploadUrl from "../generateUploadUrl.js";
 import type * as generator from "../generator.js";
 import type * as http from "../http.js";
 import type * as imageProcessing from "../imageProcessing.js";
 import type * as importHelpers from "../importHelpers.js";
-import type * as kanban from "../kanban.js";
 import type * as lib_characterDataV2 from "../lib/characterDataV2.js";
 import type * as lib_extractDominantColor from "../lib/extractDominantColor.js";
 import type * as lib_parseFormData from "../lib/parseFormData.js";
@@ -54,9 +51,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   "admin/deleteFilesInFolder": typeof admin_deleteFilesInFolder;
-  "admin/regenerateAvatarWebp": typeof admin_regenerateAvatarWebp;
-  auth: typeof auth;
   authHelpers: typeof authHelpers;
+  authz: typeof authz;
+  authzQueries: typeof authzQueries;
   avatarEditing: typeof avatarEditing;
   avatarGeneration: typeof avatarGeneration;
   backgroundCues: typeof backgroundCues;
@@ -64,21 +61,18 @@ declare const fullApi: ApiFromModules<{
   backgroundEditingInternal: typeof backgroundEditingInternal;
   backgroundMetadata: typeof backgroundMetadata;
   backgroundPreviewHttp: typeof backgroundPreviewHttp;
+  bookAuthz: typeof bookAuthz;
   bookQueries: typeof bookQueries;
   chapterCompiler: typeof chapterCompiler;
-  characterIndexGenerator: typeof characterIndexGenerator;
   characterPromptGeneration: typeof characterPromptGeneration;
   cli: typeof cli;
   colorExtraction: typeof colorExtraction;
-  comicGeneration: typeof comicGeneration;
-  comicSubmissions: typeof comicSubmissions;
-  comics: typeof comics;
+  functions: typeof functions;
   generateUploadUrl: typeof generateUploadUrl;
   generator: typeof generator;
   http: typeof http;
   imageProcessing: typeof imageProcessing;
   importHelpers: typeof importHelpers;
-  kanban: typeof kanban;
   "lib/characterDataV2": typeof lib_characterDataV2;
   "lib/extractDominantColor": typeof lib_extractDominantColor;
   "lib/parseFormData": typeof lib_parseFormData;

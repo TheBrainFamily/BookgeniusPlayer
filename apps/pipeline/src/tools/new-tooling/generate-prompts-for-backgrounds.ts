@@ -228,6 +228,7 @@ export const generateImageWithOpenAIToFolder = async (
     | "auto"
     | null
     | undefined = "1536x1024",
+  suffix?: string,
   // eslint-disable-next-line max-params
 ): Promise<string | undefined> => {
   const finalPrompt = `${genericPrompt.backgroundStyle} ${prompt}`;
@@ -255,6 +256,7 @@ export const generateImageWithOpenAIToFolder = async (
         attempt + 1,
         quality,
         size,
+        suffix,
       );
     } else {
       logger.error(`Failed to generate image after 3 attempts: ${JSON.stringify(e)}`);
@@ -268,7 +270,9 @@ export const generateImageWithOpenAIToFolder = async (
   }
   const image_base64 = result.data[0].b64_json;
   const image_bytes = Buffer.from(image_base64, "base64");
-  const fileName = `${outputFolder}/openai-${quality}-${chapter}-${startingParagraph}.webp`;
+  const fileName = suffix
+    ? `${outputFolder}/openai-${quality}-${chapter}-${startingParagraph}-${suffix}.webp`
+    : `${outputFolder}/openai-${quality}-${chapter}-${startingParagraph}.webp`;
   const filePath = writeBookFile(fileName, image_bytes, FILE_TYPE.PERMANENT);
   logger.info(`Image successfully saved to: ${filePath}`);
   return filePath;
@@ -322,6 +326,10 @@ Chapter Text: <chapter>${chapter.content}</chapter>
     0,
     style,
     outputFolder,
+    1, // attempt
+    "medium", // quality
+    "1536x1024", // size
+    styleType, // suffix to prevent race condition
   )) as string;
 
   if (!imagePath) {

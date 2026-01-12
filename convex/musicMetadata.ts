@@ -7,8 +7,8 @@
  */
 
 import { v } from "convex/values";
-import { query, mutation, internalAction, internalMutation } from "./_generated/server";
 import { internal, components } from "./_generated/api";
+import { publicQuery, bookMutation, internalAction, internalMutation } from "./functions";
 import * as mm from "music-metadata";
 
 // =============================================================================
@@ -18,7 +18,7 @@ import * as mm from "music-metadata";
 /**
  * Get metadata for a specific music file.
  */
-export const getByFile = query({
+export const getByFile = publicQuery({
   args: { bookPath: v.string(), fileBasename: v.string() },
   handler: async (ctx, { bookPath, fileBasename }) => {
     const metadata = await ctx.db
@@ -44,7 +44,7 @@ export const getByFile = query({
 /**
  * List all metadata for a book (for batch loading).
  */
-export const listByBook = query({
+export const listByBook = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const allMetadata = await ctx.db
@@ -238,9 +238,10 @@ export const extractFromFile = internalAction({
  * Manually trigger metadata extraction for a file.
  * Useful for re-extracting or processing existing files.
  */
-export const triggerExtraction = mutation({
-  args: { bookPath: v.string(), fileBasename: v.string() },
-  handler: async (ctx, { bookPath, fileBasename }) => {
+export const triggerExtraction = bookMutation({
+  args: { fileBasename: v.string() },
+  handler: async (ctx, { fileBasename }) => {
+    const bookPath = ctx.bookPath;
     await ctx.scheduler.runAfter(0, internal.musicMetadata.extractFromFile, {
       bookPath,
       fileBasename,
@@ -252,9 +253,10 @@ export const triggerExtraction = mutation({
 /**
  * Trigger extraction for all music files in a book.
  */
-export const triggerExtractionForBook = mutation({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
+export const triggerExtractionForBook = bookMutation({
+  args: {},
+  handler: async (ctx) => {
+    const bookPath = ctx.bookPath;
     const files = await ctx.runQuery(
       components.assetManager.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music` },

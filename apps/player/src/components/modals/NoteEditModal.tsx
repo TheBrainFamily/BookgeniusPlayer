@@ -48,7 +48,7 @@ const NoteEditModal: React.FC = () => {
     setIsSubmitting(true);
     try {
       const htmlContent = `<p>${editedContent}</p>`;
-      await updateNote({ id: noteData._id, content: htmlContent });
+      await updateNote({ bookPath: effectiveBookPath!, id: noteData._id, content: htmlContent });
       updateFootnoteCache(noteId, htmlContent);
       closeModal();
     } catch (error) {
@@ -70,7 +70,7 @@ const NoteEditModal: React.FC = () => {
         chapterNumber: noteData.chapter,
         noteNumber,
       });
-      await deleteNote({ id: noteData._id });
+      await deleteNote({ bookPath: effectiveBookPath!, id: noteData._id });
       removeNoteElementFromDOM(noteNumber);
       invalidateFootnoteCache(noteId);
       closeModal();

@@ -119,6 +119,218 @@ function identifyChapterInABookWithNoChapters(doc: Document): Set<Element> {
   return noChapterSections;
 }
 
+/**
+ * Checks if a <p> element contains only a <strong> element as its sole meaningful child.
+ * This pattern is used in some FB2 books (like krolowa-sniegu) to mark chapter headers.
+ *
+ * Valid pattern: <p><strong>Chapter Title</strong></p>
+ * Invalid: <p>Text <strong>bold</strong> more text</p>
+ *
+ * @param pElement - The <p> element to check.
+ * @returns The <strong> element if it's the only child, null otherwise.
+ */
+function getStrongOnlyChild(pElement: Element): Element | null {
+  let strongElement: Element | null = null;
+
+  for (const node of Array.from(pElement.childNodes)) {
+    if (node.nodeType === node.TEXT_NODE) {
+      // Allow whitespace-only text nodes
+      if (node.textContent && node.textContent.trim() !== "") {
+        return null; // Has non-whitespace text, not a chapter header
+      }
+    } else if (node.nodeType === node.ELEMENT_NODE) {
+      const element = node as Element;
+      if (element.tagName.toLowerCase() === "strong") {
+        if (strongElement) {
+          return null; // Multiple strong elements
+        }
+        strongElement = element;
+      } else {
+        return null; // Has other element types
+      }
+    }
+  }
+
+  return strongElement;
+}
+
+interface ChapterMarker {
+  pElement: Element;
+  title: string;
+}
+
+/**
+ * Finds all <p><strong>TITLE</strong></p> chapter markers in a section.
+ */
+function findChapterMarkers(parentSection: Element): ChapterMarker[] {
+  const allParagraphs = parentSection.querySelectorAll(":scope > p");
+  const markers: ChapterMarker[] = [];
+
+  for (const p of allParagraphs) {
+    const strongChild = getStrongOnlyChild(p);
+    if (strongChild && strongChild.textContent?.trim()) {
+      markers.push({ pElement: p, title: strongChild.textContent.trim() });
+    }
+  }
+
+  return markers;
+}
+
+/**
+ * Creates a section element with a title for a chapter.
+ */
+function createChapterSection(doc: Document, title: string): Element {
+  const section = doc.createElement("section");
+  const titleElement = doc.createElement("title");
+  const titleP = doc.createElement("p");
+  titleP.textContent = title;
+  titleElement.appendChild(titleP);
+  section.appendChild(titleElement);
+  return section;
+}
+
+/**
+ * Copies nodes between two indices into a section.
+ */
+function copyNodesBetween(
+  children: Node[],
+  startIdx: number,
+  endIdx: number,
+  section: Element,
+): void {
+  for (let j = startIdx; j < endIdx; j++) {
+    const node = children[j];
+    if (!node) continue;
+
+    const isElement = node.nodeType === node.ELEMENT_NODE;
+    const isNonEmptyText = node.nodeType === node.TEXT_NODE && node.textContent?.trim();
+
+    if (isElement || isNonEmptyText) {
+      section.appendChild(node.cloneNode(true));
+    }
+  }
+}
+
+/**
+ * Fallback chapter detection for books that use <p><strong>TITLE</strong></p> pattern.
+ * This pattern is used in some Wolne Lektury FB2 files (e.g., krolowa-sniegu).
+ */
+function splitSectionByStrongPatterns(doc: Document, parentSection: Element): Set<Element> {
+  const chapterSections = new Set<Element>();
+  const markers = findChapterMarkers(parentSection);
+
+  // Need at least 2 chapter markers to consider this a valid pattern
+  if (markers.length < 2) {
+    return chapterSections;
+  }
+
+  const children = Array.from(parentSection.childNodes);
+
+  for (let i = 0; i < markers.length; i++) {
+    const marker = markers[i];
+    const nextMarker = markers[i + 1];
+
+    const newSection = createChapterSection(doc, marker.title);
+    const markerIndex = children.indexOf(marker.pElement);
+    const endIndex = nextMarker ? children.indexOf(nextMarker.pElement) : children.length;
+
+    copyNodesBetween(children, markerIndex + 1, endIndex, newSection);
+
+    // Only add section if it has content (beyond just the title)
+    if (newSection.children.length > 1) {
+      chapterSections.add(newSection);
+      parentSection.appendChild(newSection);
+    }
+  }
+
+  // Remove original content, keeping only new sections
+  const nodesToRemove: Node[] = [];
+  for (const child of Array.from(parentSection.childNodes)) {
+    if (child.nodeType === child.ELEMENT_NODE && chapterSections.has(child as Element)) {
+      continue;
+    }
+    nodesToRemove.push(child);
+  }
+  for (const node of nodesToRemove) {
+    parentSection.removeChild(node);
+  }
+
+  return chapterSections;
+}
+
+/**
+ * Attempts to use the <p><strong>TITLE</strong></p> fallback pattern for chapter detection.
+ * Called when standard chapter detection finds only 0-1 chapters.
+ *
+ * @param doc - The parsed FB2 Document.
+ * @returns A Set containing chapter section Elements, or empty set if fallback doesn't apply.
+ */
+function identifyChaptersFromStrongPatterns(doc: Document): Set<Element> {
+  // Find sections that are candidates for splitting
+  const allSections = doc.querySelectorAll("section");
+  const candidateSections: Element[] = [];
+
+  for (const section of allSections) {
+    // Skip footnote sections
+    if (section.getAttribute("id")?.startsWith("fn")) continue;
+
+    // Check if this section has <p><strong> patterns
+    const paragraphs = section.querySelectorAll(":scope > p");
+    let strongMarkerCount = 0;
+
+    for (const p of paragraphs) {
+      if (getStrongOnlyChild(p)) {
+        strongMarkerCount++;
+      }
+    }
+
+    // Needs at least 2 markers to be a candidate
+    if (strongMarkerCount >= 2) {
+      candidateSections.push(section);
+    }
+  }
+
+  // Process candidate sections
+  const chapterSections = new Set<Element>();
+  for (const section of candidateSections) {
+    const newChapters = splitSectionByStrongPatterns(doc, section);
+    for (const chapter of newChapters) {
+      chapterSections.add(chapter);
+    }
+  }
+
+  return chapterSections;
+}
+
+/**
+ * Identifies all chapter sections in a document using multiple detection strategies:
+ * 1. Standard detection: sections with <title> and content elements
+ * 2. Strong-based fallback: <p><strong>TITLE</strong></p> patterns (for Wolne Lektury books)
+ * 3. No-chapter fallback: treat content sections as single chapters
+ *
+ * @param doc - The parsed FB2 Document.
+ * @returns A Set containing the chapter section Elements.
+ */
+function identifyAllChapterSections(doc: Document): Set<Element> {
+  let chapterSectionsSet = identifyChapterSections(doc);
+
+  // Try strong-based fallback only when standard detection finds 0 chapters
+  // (Don't trigger if we already found valid chapters - they would be lost)
+  if (chapterSectionsSet.size === 0) {
+    const strongChapters = identifyChaptersFromStrongPatterns(doc);
+    if (strongChapters.size > 1) {
+      chapterSectionsSet = strongChapters;
+    }
+  }
+
+  // Final fallback: treat content sections as chapters
+  if (chapterSectionsSet.size === 0) {
+    chapterSectionsSet = identifyChapterInABookWithNoChapters(doc);
+  }
+
+  return chapterSectionsSet;
+}
+
 // --- Core Parsing Logic ---
 
 /**
@@ -263,12 +475,7 @@ function escapeXml(text: string): string {
  * @returns A string containing the simple XML output.
  */
 function convertToChaptersXml(doc: Document, startChapterNumber: number = 0): string {
-  let chapterSectionsSet = identifyChapterSections(doc); // Use the refined identifier
-  console.log("chapterSectionsSet", [...chapterSectionsSet]);
-  // when the book has no chapters, we need to identify the main chapter in the book
-  if (chapterSectionsSet.size === 0) {
-    chapterSectionsSet = identifyChapterInABookWithNoChapters(doc);
-  }
+  const chapterSectionsSet = identifyAllChapterSections(doc);
 
   // Optional: Sort sections based on document order if needed
   // uniqueChapterSections.sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1);
@@ -561,11 +768,7 @@ function convertToTextHtml(
   startNoteId: number = 0,
 ): { htmlDom: string; lastChapter: number; lastNoteId: number } {
   const binaryData = extractBinaryData(doc);
-  let chapterSectionsSet = identifyChapterSections(doc); // Get the set of chapter elements
-
-  if (chapterSectionsSet.size === 0) {
-    chapterSectionsSet = identifyChapterInABookWithNoChapters(doc);
-  }
+  const chapterSectionsSet = identifyAllChapterSections(doc);
 
   const htmlDom = new JSDOM(
     '<!DOCTYPE html><html><head><meta charset="UTF-8"><title></title></head><body></body></html>',

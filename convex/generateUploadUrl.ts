@@ -1,7 +1,18 @@
 import { v } from "convex/values";
-import { mutation, internalMutation, query, action } from "./_generated/server";
+import { internalMutation } from "./_generated/server";
 import { internal, components } from "./_generated/api";
-import { requireAuth } from "./authHelpers";
+import { adminMutation, authedMutation, publicQuery, publicAction } from "./functions";
+import { requireBookWriteAccess } from "./bookAuthz";
+
+/**
+ * Extract book path from a folder path.
+ * e.g., "books/jane-eyre/music" → "books/jane-eyre"
+ * Returns null if not a book folder.
+ */
+function extractBookPath(folderPath: string): string | null {
+  const match = folderPath.match(/^(books\/[^/]+)/);
+  return match ? match[1] : null;
+}
 
 /**
  * Get R2 config from env vars. Returns undefined if not configured.
@@ -24,7 +35,7 @@ function getR2Config() {
 const storageBackendValidator = v.union(v.literal("convex"), v.literal("r2"));
 
 /**
- * Configure which storage backend to use for new uploads.
+ * Configure which storage backend to use for new uploads - ADMIN ONLY.
  * Default is "convex". Call with "r2" to use Cloudflare R2.
  *
  * For R2, you must provide:
@@ -32,7 +43,7 @@ const storageBackendValidator = v.union(v.literal("convex"), v.literal("r2"));
  * - r2PublicUrl: The public URL for your R2 bucket (requires custom domain setup in Cloudflare)
  * - r2KeyPrefix (optional): Prefix for R2 keys to avoid collisions when sharing a bucket
  */
-export const configureStorageBackend = mutation({
+export const configureStorageBackend = adminMutation({
   args: {
     backend: storageBackendValidator,
     // Required when backend is "r2" - the public URL for serving files
@@ -42,7 +53,6 @@ export const configureStorageBackend = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
     return await ctx.runMutation(
       components.assetManager.assetManager.configureStorageBackend,
       args,
@@ -53,7 +63,7 @@ export const configureStorageBackend = mutation({
 /**
  * Get the current storage backend configuration.
  */
-export const getStorageBackendConfig = query({
+export const getStorageBackendConfig = publicQuery({
   args: {},
   returns: storageBackendValidator,
   handler: async (ctx) => {
@@ -67,13 +77,14 @@ export const getStorageBackendConfig = query({
 
 /**
  * Start an upload. Creates an upload intent and returns the upload URL.
+ * Requires book write access for book folders.
  *
  * Flow:
  * 1. Call startUpload() to get intentId + uploadUrl
  * 2. Upload file to the URL
  * 3. Call finishUpload() with intentId (+ storageId for Convex backend)
  */
-export const startUpload = mutation({
+export const startUpload = authedMutation({
   args: {
     folderPath: v.string(),
     basename: v.string(),
@@ -95,7 +106,15 @@ export const startUpload = mutation({
       publish: args.publish,
     });
 
-    await requireAuth(ctx);
+    // Check book write access if this is a book folder
+    const bookPath = extractBookPath(args.folderPath);
+    if (bookPath) {
+      await requireBookWriteAccess(ctx, bookPath);
+    } else if (!ctx.isAdmin) {
+      // Non-book folders require admin
+      throw new Error("Forbidden: Only admins can upload to non-book folders");
+    }
+
     const result = await ctx.runMutation(components.assetManager.assetManager.startUpload, {
       ...args,
       r2Config: getR2Config(),
@@ -135,11 +154,12 @@ export const startUploadInternal = internalMutation({
 
 /**
  * Finish an upload. Creates the asset version from a completed upload intent.
+ * Requires book write access for book folders.
  *
  * Pass the raw JSON response from the upload POST. The backend extracts what
  * it needs based on the storage backend (Convex or R2).
  */
-export const finishUpload = mutation({
+export const finishUpload = authedMutation({
   args: {
     intentId: v.string(),
     uploadResponse: v.optional(v.any()),
@@ -158,7 +178,15 @@ export const finishUpload = mutation({
       size: args.size,
     });
 
-    await requireAuth(ctx);
+    // Check book write access if this is a book folder
+    if (args.folderPath) {
+      const bookPath = extractBookPath(args.folderPath);
+      if (bookPath) {
+        await requireBookWriteAccess(ctx, bookPath);
+      } else if (!ctx.isAdmin) {
+        throw new Error("Forbidden: Only admins can upload to non-book folders");
+      }
+    }
     const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
       intentId: args.intentId,
       uploadResponse: args.uploadResponse,
@@ -262,13 +290,12 @@ export const finishUploadInternal = internalMutation({
  * Generate a signed URL for private file access.
  * Works with both Convex storage and R2.
  *
- * NOTE: This does NOT check auth - that's your app's responsibility.
- * Wrap this in your own action that checks permissions first.
+ * NOTE: This is public - for private files, implement your own auth wrapper.
  *
  * For audio/video files, use longer expiration (e.g., 3600 = 1 hour)
  * to handle seeking and buffering during playback.
  */
-export const getSignedUrl = action({
+export const getSignedUrl = publicAction({
   args: {
     versionId: v.string(),
     expiresIn: v.optional(v.number()), // seconds, default 300 (5 min)

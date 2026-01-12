@@ -2,14 +2,11 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCallback } from "react";
-import { useConvexAuth } from "convex/react";
 import { AdminPanel } from "@/admin/AdminPanel";
-import { LoginModal } from "@/admin/components/LoginModal";
 
 export default function AdminPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
 
   // Get search params
   const folder = searchParams.get("folder") ?? "";
@@ -52,16 +49,13 @@ export default function AdminPage() {
   );
 
   return (
-    <>
-      <LoginModal open={!isAuthLoading && !isAuthenticated} />
-      <AdminPanel
-        folderPath={folder}
-        selectedAsset={asset ? { folderPath: folder, basename: asset } : null}
-        selectedVersionId={version ?? null}
-        onFolderSelect={handleFolderSelect}
-        onAssetSelect={handleAssetSelect}
-        onVersionSelect={handleVersionSelect}
-      />
-    </>
+    <AdminPanel
+      folderPath={folder}
+      selectedAsset={asset ? { folderPath: folder, basename: asset } : null}
+      selectedVersionId={version ?? null}
+      onFolderSelect={handleFolderSelect}
+      onAssetSelect={handleAssetSelect}
+      onVersionSelect={handleVersionSelect}
+    />
   );
 }

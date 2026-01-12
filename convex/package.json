@@ -11,13 +11,14 @@
     "typecheck": "tsgo --noEmit --incremental"
   },
   "dependencies": {
+    "@convex-dev/auth": "^0.0.90",
     "@convex-dev/r2": "^0.8.1",
     "@xmldom/xmldom": "^0.9.8",
+    "convex": "^1.31.2",
+    "convex-helpers": "^0.1.108",
+    "convex-test": "^0.0.41",
     "jimp": "^1.6.0",
     "music-metadata": "^11.10.3",
-    "openai": "^6.15.0",
-    "@convex-dev/auth": "^0.0.90",
-    "convex": "^1.31.2",
-    "convex-test": "^0.0.41"
+    "openai": "^6.15.0"
   }
 }

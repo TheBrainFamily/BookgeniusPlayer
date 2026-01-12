@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { action, type ActionCtx, internalAction } from "./_generated/server";
+import { type ActionCtx, internalAction } from "./_generated/server";
 import { api, components, internal } from "./_generated/api";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import {
@@ -8,6 +8,7 @@ import {
 } from "../apps/player/src/services/live/xmlRendererCore";
 import { extractCharacterMetadata } from "../apps/player/src/services/live/characterExtractor";
 import { extractOccurrences, type CompiledChapter } from "./lib/characterDataV2";
+import { adminAction } from "@convex/functions";
 
 type ChapterExtra = { chapterNumber?: number; title?: string };
 
@@ -277,7 +278,7 @@ type RecompileResult = {
   failures?: { chapterNumber: number; success: boolean; error?: string }[];
 };
 
-export const uploadHtmlSourceChapter = action({
+export const uploadHtmlSourceChapter = adminAction({
   args: {
     bookPath: v.string(),
     chapterNumber: v.number(),
@@ -312,7 +313,7 @@ export const uploadHtmlSourceChapter = action({
   },
 });
 
-export const recompileAllChapters = action({
+export const recompileAllChapters = adminAction({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }): Promise<RecompileResult> => {
     const chapters = (await ctx.runQuery(api.bookQueries.listChapters, {

@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { action, internalAction } from "./_generated/server";
 import { internal, components } from "./_generated/api";
+import { internalAction, bookAction } from "./functions";
 import OpenAI, { toFile } from "openai";
 
 const PROPOSALS_FOLDER = "avatar-proposals";
@@ -188,16 +188,16 @@ export const editAvatarWithInstructions = internalAction({
   },
 });
 
-export const startAvatarEdit = action({
-  args: {
-    bookPath: v.string(),
-    characterSlug: v.string(),
-    characterDisplayName: v.string(),
-    instructions: v.string(),
-  },
+export const startAvatarEdit = bookAction({
+  args: { characterSlug: v.string(), characterDisplayName: v.string(), instructions: v.string() },
   returns: v.null(),
-  handler: async (ctx, args) => {
-    await ctx.scheduler.runAfter(0, internal.avatarEditing.editAvatarWithInstructions, args);
+  handler: async (ctx, { characterSlug, characterDisplayName, instructions }) => {
+    await ctx.scheduler.runAfter(0, internal.avatarEditing.editAvatarWithInstructions, {
+      bookPath: ctx.bookPath,
+      characterSlug,
+      characterDisplayName,
+      instructions,
+    });
     return null;
   },
 });

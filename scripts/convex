@@ -1,0 +1,21 @@
+#!/bin/bash
+# Convex CLI wrapper that injects admin identity for 'run' commands
+# Place this in your PATH before the real convex, or alias npx convex to this
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Load .env from project root
+if [ -f "$PROJECT_ROOT/.env" ]; then
+  export $(grep -v '^#' "$PROJECT_ROOT/.env" | grep CONVEX_ADMIN_EMAIL | xargs)
+fi
+
+# Check if this is a 'run' command
+if [ "$1" = "run" ] && [ -n "$CONVEX_ADMIN_EMAIL" ]; then
+  # Inject --identity for run commands
+  shift  # remove 'run'
+  exec npx convex run --identity "{\"email\": \"${CONVEX_ADMIN_EMAIL}\"}" "$@"
+else
+  # Pass through to real convex for all other commands
+  exec npx convex "$@"
+fi

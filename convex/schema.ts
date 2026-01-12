@@ -8,29 +8,29 @@ import { authTables } from "@convex-dev/auth/server";
 export default defineSchema({
   ...authTables,
 
-  // Comic generation submissions tracking
-  comicSubmissions: defineTable({
-    scenarioPath: v.string(),
-    status: v.union(
-      v.literal("pending"),
-      v.literal("processing"),
-      v.literal("completed"),
-      v.literal("failed"),
-    ),
-    progress: v.optional(v.number()),
-    progressMessage: v.optional(v.string()),
+  // Book ownership - tracks who owns each book
+  books: defineTable({
+    path: v.string(), // "books/{slug}" - matches asset manager folder
+    slug: v.string(), // For quick lookups
+    ownerId: v.string(), // tokenIdentifier of owner
+    title: v.optional(v.string()),
     createdAt: v.number(),
-    completedAt: v.optional(v.number()),
-    error: v.optional(v.string()),
-    // Result reference - versionId from asset-manager component
-    resultVersionId: v.optional(v.string()),
-    // Story generation results
-    storySlug: v.optional(v.string()),
-    storyName: v.optional(v.string()),
-    firstScenarioName: v.optional(v.string()),
+    updatedAt: v.number(),
   })
-    .index("by_scenarioPath", ["scenarioPath"])
-    .index("by_status", ["status"]),
+    .index("by_path", ["path"])
+    .index("by_slug", ["slug"])
+    .index("by_owner", ["ownerId"]),
+
+  // Book members - collaborators (future: invitations/teams)
+  bookMembers: defineTable({
+    bookPath: v.string(),
+    principal: v.string(), // tokenIdentifier
+    role: v.union(v.literal("owner"), v.literal("editor"), v.literal("viewer")),
+    createdAt: v.number(),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_principal", ["principal"])
+    .index("by_book_principal", ["bookPath", "principal"]),
 
   // Notes (footnotes/annotations)
   notes: defineTable({

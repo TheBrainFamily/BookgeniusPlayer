@@ -242,14 +242,19 @@ function ConvexAppInitializer({ children }: ConvexAppInitializerProps) {
 }
 
 // =============================================================================
-// Main LiveModeApp Component
+// Main LiveModeApp Components
 // =============================================================================
 
 interface LiveModeAppProps {
   bookPath: string;
 }
 
-export function LiveModeApp({ bookPath }: LiveModeAppProps) {
+/**
+ * Core app component without ConvexProvider.
+ * Use this when embedding player in a parent app that provides its own Convex context
+ * (e.g., platform with ConvexProviderWithClerk for authenticated access).
+ */
+export function LiveModeAppCore({ bookPath }: LiveModeAppProps) {
   const splashHidden = useSplashHidden();
   const [fontSize] = useLocalStorageState("fontSize", { defaultValue: 1 });
   const [reactDomReady, setReactDomReady] = useState(false);
@@ -283,6 +288,44 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
     return cleanup;
   }, []);
 
+  return (
+    <NativeShellProvider>
+      <DraftModeProvider>
+        <EditModeProvider>
+          <BookConvexProvider bookPath={bookPath}>
+            <CriticalAssetPreloader />
+            <ParagraphEditConnector />
+            <I18nextProvider i18n={i18n}>
+              <ConvexAppInitializer>
+                <LocationProvider>
+                  <RealtimeProvider>
+                    <NativeShellBridge />
+                    <WebOnlyHooks />
+                    <BookContentWrapper>
+                      <LiveShell onShellMounted={() => setReactDomReady(true)} />
+                      <ModalRenderers />
+                      <EditorToolbar />
+                      <AvatarGenerationBadge />
+                      <BackgroundGenerationBadge />
+                      <ContentShiftWrapper />
+                    </BookContentWrapper>
+                    <DebugLocationOverlay />
+                  </RealtimeProvider>
+                </LocationProvider>
+              </ConvexAppInitializer>
+            </I18nextProvider>
+          </BookConvexProvider>
+        </EditModeProvider>
+      </DraftModeProvider>
+    </NativeShellProvider>
+  );
+}
+
+/**
+ * Standalone player with its own ConvexProvider.
+ * Use this for running player independently (dev mode, standalone deployment).
+ */
+export function LiveModeApp({ bookPath }: LiveModeAppProps) {
   if (!convexUrl) {
     return (
       <div
@@ -307,35 +350,7 @@ export function LiveModeApp({ bookPath }: LiveModeAppProps) {
 
   return (
     <ConvexProvider client={convex}>
-      <NativeShellProvider>
-        <DraftModeProvider>
-          <EditModeProvider>
-            <BookConvexProvider bookPath={bookPath}>
-              <CriticalAssetPreloader />
-              <ParagraphEditConnector />
-              <I18nextProvider i18n={i18n}>
-                <ConvexAppInitializer>
-                  <LocationProvider>
-                    <RealtimeProvider>
-                      <NativeShellBridge />
-                      <WebOnlyHooks />
-                      <BookContentWrapper>
-                        <LiveShell onShellMounted={() => setReactDomReady(true)} />
-                        <ModalRenderers />
-                        <EditorToolbar />
-                        <AvatarGenerationBadge />
-                        <BackgroundGenerationBadge />
-                        <ContentShiftWrapper />
-                      </BookContentWrapper>
-                      <DebugLocationOverlay />
-                    </RealtimeProvider>
-                  </LocationProvider>
-                </ConvexAppInitializer>
-              </I18nextProvider>
-            </BookConvexProvider>
-          </EditModeProvider>
-        </DraftModeProvider>
-      </NativeShellProvider>
+      <LiveModeAppCore bookPath={bookPath} />
     </ConvexProvider>
   );
 }
