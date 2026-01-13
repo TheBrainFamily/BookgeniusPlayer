@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { convertSeXhtmlToHtml } from "./index";
+import { convertSeXhtmlToHtml, wrapInRichXml } from "./index";
 
 describe("SE Converter", () => {
   describe("simple chapters (no nesting)", () => {
@@ -604,6 +604,182 @@ describe("SE Converter", () => {
 
       // Speaker label should be uppercase
       expect(result.textHtml).toContain(">MACDUFF<");
+    });
+  });
+
+  describe("poetry books with nested non-chapter sections (like Paradise Lost)", () => {
+    it("properly closes chapter sections when chapters contain preamble and poem subsections", () => {
+      // Paradise Lost structure: each file has <section epub:type="chapter"> containing
+      // <section epub:type="preamble"> and <section epub:type="z3998:poem">
+      // These nested sections should NOT be promoted to chapters
+      const files = [
+        {
+          filename: "book-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter z3998:fiction">
+    <section id="book-1" epub:type="chapter">
+      <h2>
+        <span epub:type="label">Book</span>
+        <span epub:type="ordinal z3998:roman">I</span>
+      </h2>
+      <section id="argument-1" epub:type="preamble">
+        <header><p>The Argument</p></header>
+        <p>This First Book proposes the whole subject.</p>
+      </section>
+      <section id="poem-1" epub:type="z3998:poem">
+        <p>
+          <span>Of Man's first disobedience, and the fruit</span><br/>
+          <span>Of that forbidden Tree.</span>
+        </p>
+      </section>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "book-2.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter z3998:fiction">
+    <section id="book-2" epub:type="chapter">
+      <h2>
+        <span epub:type="label">Book</span>
+        <span epub:type="ordinal z3998:roman">II</span>
+      </h2>
+      <section id="argument-2" epub:type="preamble">
+        <header><p>The Argument</p></header>
+        <p>The consultation begun, Satan debates.</p>
+      </section>
+      <section id="poem-2" epub:type="z3998:poem">
+        <p>
+          <span>High on a throne of royal state.</span><br/>
+          <span>Satan exalted sat.</span>
+        </p>
+      </section>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Should have exactly 2 chapters (one per file)
+      expect(result.lastChapter).toBe(2);
+      expect(result.textHtml).toContain('data-chapter="1"');
+      expect(result.textHtml).toContain('data-chapter="2"');
+
+      // Verify content is preserved
+      expect(result.textHtml).toContain("Of Man's first disobedience");
+      expect(result.textHtml).toContain("High on a throne of royal state");
+
+      // CRITICAL: Verify that each chapter section is properly closed
+      // Count opening and closing section tags - they should match
+      const openingSections = (result.textHtml.match(/<section/g) || []).length;
+      const closingSections = (result.textHtml.match(/<\/section>/g) || []).length;
+      expect(closingSections).toBe(openingSections);
+
+      // Verify the outer chapter sections are closed by checking pattern:
+      // </section> should appear before next <section data-chapter
+      const chapterPattern =
+        /<section data-chapter="1"[\s\S]*?<\/section>\s*<section data-chapter="2"/;
+      expect(result.textHtml).toMatch(chapterPattern);
+    });
+
+    it("does NOT promote preamble or poem sections to chapters", () => {
+      const files = [
+        {
+          filename: "book-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter z3998:fiction">
+    <section id="book-1" epub:type="chapter">
+      <h2>Book I</h2>
+      <section id="argument-1" epub:type="preamble">
+        <p>The Argument content.</p>
+      </section>
+      <section id="poem-1" epub:type="z3998:poem">
+        <p>The poem content.</p>
+      </section>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      // Should be only 1 chapter, not 3 (preamble and poem should NOT be promoted)
+      expect(result.lastChapter).toBe(1);
+      expect(result.textHtml).toContain('data-chapter="1"');
+      expect(result.textHtml).not.toContain('data-chapter="2"');
+      expect(result.textHtml).not.toContain('data-chapter="3"');
+    });
+
+    it("produces well-formed XML after wrapInRichXml transformation", () => {
+      // This test specifically catches the bug where JSDOM restructures nested sections
+      const files = [
+        {
+          filename: "book-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter z3998:fiction">
+    <section id="book-1" epub:type="chapter">
+      <h2>Book I</h2>
+      <section id="argument-1" epub:type="preamble">
+        <p>The Argument.</p>
+      </section>
+      <section id="poem-1" epub:type="z3998:poem">
+        <p>The poem.</p>
+      </section>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "book-2.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter z3998:fiction">
+    <section id="book-2" epub:type="chapter">
+      <h2>Book II</h2>
+      <section id="argument-2" epub:type="preamble">
+        <p>The Argument 2.</p>
+      </section>
+      <section id="poem-2" epub:type="z3998:poem">
+        <p>The poem 2.</p>
+      </section>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+      const richXml = wrapInRichXml(result.textHtml);
+
+      // Verify content is preserved
+      expect(richXml).toContain("The Argument.");
+      expect(richXml).toContain("The poem.");
+      expect(richXml).toContain("The Argument 2.");
+      expect(richXml).toContain("The poem 2.");
+
+      // CRITICAL: Count opening and closing section tags - they MUST match
+      const openingSections = (richXml.match(/<section/g) || []).length;
+      const closingSections = (richXml.match(/<\/section>/g) || []).length;
+      expect(closingSections).toBe(openingSections);
+
+      // Verify chapter 1 is closed before chapter 2 opens
+      const chapter1Pos = richXml.indexOf('data-chapter="1"');
+      const chapter2Pos = richXml.indexOf('data-chapter="2"');
+      const closingBetween = richXml.substring(chapter1Pos, chapter2Pos);
+
+      // Count sections in chapter 1: outer chapter section + 2 inner sections = 3 opens
+      // Should also have 3 closes before chapter 2
+      const opensInCh1 = (closingBetween.match(/<section/g) || []).length;
+      const closesInCh1 = (closingBetween.match(/<\/section>/g) || []).length;
+      expect(closesInCh1).toBe(opensInCh1);
     });
   });
 

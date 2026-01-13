@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
-import { internal, components } from "./_generated/api";
+import { api, internal, components } from "./_generated/api";
 import OpenAI from "openai";
 
 function extractParagraphsAroundPosition(
@@ -81,11 +81,8 @@ export const editBackgroundWithInstructions = internalAction({
 
       const openai = new OpenAI({ apiKey });
 
-      const bookFolder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-        path: bookPath,
-      });
-      const bookExtra = (bookFolder?.extra as Record<string, unknown>) || {};
-      const backgroundStyle = (bookExtra.backgroundStyle as string) || "";
+      const book = await ctx.runQuery(api.metadata.getBookMetadata, { bookPath });
+      const backgroundStyle = book?.backgroundStyle || "";
 
       const editPrompt = backgroundStyle ? `${backgroundStyle}\n${instructions}` : instructions;
 
@@ -118,7 +115,6 @@ export const editBackgroundWithInstructions = internalAction({
         await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
           folderPath: backgroundsPath,
           basename: newBasename,
-          publish: true,
         });
 
       const uploadRes: Response = await fetch(uploadIntent.uploadUrl, {
@@ -202,11 +198,8 @@ export const generateNewBackground = internalAction({
 
       const openai = new OpenAI({ apiKey });
 
-      const bookFolder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-        path: bookPath,
-      });
-      const bookExtra = (bookFolder?.extra as Record<string, unknown>) || {};
-      const backgroundStyle = (bookExtra.backgroundStyle as string) || "";
+      const book = await ctx.runQuery(api.metadata.getBookMetadata, { bookPath });
+      const backgroundStyle = book?.backgroundStyle || "";
 
       let fullPrompt = prompt;
       if (contextText) {
@@ -250,7 +243,6 @@ export const generateNewBackground = internalAction({
         await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
           folderPath: backgroundsPath,
           basename: newBasename,
-          publish: true,
         });
 
       const uploadRes2: Response = await fetch(uploadIntent2.uploadUrl, {

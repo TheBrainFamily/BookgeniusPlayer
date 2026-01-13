@@ -35,3 +35,7 @@ backend/standardebooks-data/
 .serena/
 tools/convex-fuse/.gocache/
 apps/player/dist-lib/
+
+# Synced Convex assets (local only)
+ConvexAssets/
+convex-test

@@ -13,6 +13,13 @@ export const listFolders = adminQuery({
   },
 });
 
+export const listAllFolders = adminQuery({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.runQuery(components.assetManager.assetManager.listAllFolders, {});
+  },
+});
+
 export const getFolder = adminQuery({
   args: { path: v.string() },
   handler: async (ctx, args) => {
@@ -21,21 +28,21 @@ export const getFolder = adminQuery({
 });
 
 export const createFolderByName = adminMutation({
-  args: { parentPath: v.string(), name: v.string(), extra: v.optional(v.any()) },
+  args: { parentPath: v.string(), name: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.createFolderByName, args);
   },
 });
 
 export const createFolderByPath = adminMutation({
-  args: { path: v.string(), name: v.optional(v.string()), extra: v.optional(v.any()) },
+  args: { path: v.string(), name: v.optional(v.string()) },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, args);
   },
 });
 
 export const updateFolder = adminMutation({
-  args: { path: v.string(), name: v.optional(v.string()), extra: v.optional(v.any()) },
+  args: { path: v.string(), name: v.optional(v.string()) },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.updateFolder, args);
   },
@@ -58,7 +65,7 @@ export const getAsset = adminQuery({
 });
 
 export const createAsset = adminMutation({
-  args: { folderPath: v.string(), basename: v.string(), extra: v.optional(v.any()) },
+  args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.createAsset, args);
   },
@@ -97,22 +104,6 @@ export const listPublishedFilesInFolder = adminQuery({
   },
 });
 
-export const publishDraft = adminMutation({
-  args: { folderPath: v.string(), basename: v.string() },
-  handler: async (ctx, args) => {
-    const result = await ctx.runMutation(components.assetManager.assetManager.publishDraft, args);
-    if (args.folderPath.endsWith("/chapters")) {
-      const bookPath = args.folderPath.replace(/\/chapters$/, "");
-      await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
-        bookPath,
-        chapterBasename: args.basename,
-        versionId: result.versionId,
-      });
-    }
-    return result;
-  },
-});
-
 /**
  * Backfill compiled chapter HTML and character fragments for a book.
  */
@@ -143,16 +134,6 @@ export const restoreVersion = adminMutation({
   },
 });
 
-export const updateVersionExtra = adminMutation({
-  args: { versionId: v.string(), extra: v.any() },
-  handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.updateVersionExtra, {
-      versionId: args.versionId,
-      extra: args.extra,
-    });
-  },
-});
-
 // --- Admin Preview (any version state) ---
 
 export const getVersionPreviewUrl = adminQuery({
@@ -170,5 +151,21 @@ export const getTextContent = adminAction({
     return await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
       versionId: args.versionId,
     });
+  },
+});
+
+// --- Changelog Operations (for real-time sync) ---
+
+export const watchChangelog = adminQuery({
+  args: { cursor: v.number(), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    return await ctx.runQuery(components.assetManager.changelog.listSince, args);
+  },
+});
+
+export const watchFolderChanges = adminQuery({
+  args: { folderPath: v.string(), cursor: v.number(), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    return await ctx.runQuery(components.assetManager.changelog.listForFolder, args);
   },
 });

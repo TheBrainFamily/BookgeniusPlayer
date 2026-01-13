@@ -74,12 +74,11 @@ export const BookProvider: React.FC<BookProviderProps> = ({ bookPath, children }
 
   const book = useMemo<BookMetadata | null>(() => {
     if (!bookMetadata) return null;
-    const extra = bookMetadata.extra as Record<string, unknown> | undefined;
     return {
-      title: (extra?.title as string) || bookMetadata.name || bookSlug,
-      author: (extra?.author as string) || "Unknown",
-      language: extra?.language as string | undefined,
-      bookForm: extra?.bookForm as string | undefined,
+      title: bookMetadata.metadata?.title || bookMetadata.name || bookSlug,
+      author: bookMetadata.metadata?.author || "Unknown",
+      language: bookMetadata.metadata?.language,
+      bookForm: bookMetadata.metadata?.form,
     };
   }, [bookMetadata, bookSlug]);
 
@@ -117,7 +116,7 @@ export const BookProvider: React.FC<BookProviderProps> = ({ bookPath, children }
         path: string;
         slug: string;
         name: string;
-        extra: Record<string, unknown>;
+        metadata: Record<string, unknown>;
         avatar?: { url: string; versionId: string };
         speaks?: { url: string; versionId: string };
         listens?: { url: string; versionId: string };
@@ -126,9 +125,9 @@ export const BookProvider: React.FC<BookProviderProps> = ({ bookPath, children }
       path: c.path,
       slug: c.slug,
       name: c.name,
-      extra: {
-        displayName: c.extra?.displayName as string | undefined,
-        summary: c.extra?.summary as string | undefined,
+      metadata: {
+        displayName: c.metadata?.displayName as string | undefined,
+        summary: c.metadata?.summary as string | undefined,
       },
       avatar: c.avatar,
       speaks: c.speaks,

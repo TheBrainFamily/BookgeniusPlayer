@@ -1,0 +1,14 @@
+# Convex Sync Daemon Configuration
+# Copy to ~/.convex-sync.toml and fill in your values
+
+# Your Convex deployment URL (required)
+convex_url = "https://your-app.convex.cloud"
+
+# Admin key for authentication (must match CONVEX_ADMIN_KEY in Convex env vars)
+admin_key = "your-secret-admin-key"
+
+# Directory to sync files to (default: ~/ConvexAssets)
+# sync_dir = "/path/to/sync"
+
+# Number of parallel downloads (default: 20)
+# concurrency = 20

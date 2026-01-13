@@ -11,7 +11,6 @@ import {
   Upload,
   Pencil,
   CheckCircle,
-  AlertCircle,
   Circle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -51,14 +50,8 @@ function getAssetStatus(asset: AssetData): {
   if (asset.versionCounter === 0) {
     return { label: "Empty", icon: Circle, color: "text-muted-foreground" };
   }
-  if (asset.publishedVersionId && !asset.draftVersionId) {
+  if (asset.publishedVersionId) {
     return { label: "Published", icon: CheckCircle, color: "text-success" };
-  }
-  if (asset.publishedVersionId && asset.draftVersionId) {
-    return { label: "Draft", icon: AlertCircle, color: "text-warning" };
-  }
-  if (asset.draftVersionId) {
-    return { label: "Draft only", icon: AlertCircle, color: "text-warning" };
   }
   return { label: "Unknown", icon: Circle, color: "text-muted-foreground" };
 }

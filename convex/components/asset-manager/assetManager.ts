@@ -7,6 +7,7 @@ import { type Id } from "./_generated/dataModel";
 import { folderFields, assetFields, assetVersionFields } from "./validators";
 import { storageBackendValidator } from "./schema";
 import { createR2Client } from "./r2Client";
+import { logChange } from "./helpers/changelog";
 
 // Validator for R2 config passed from app layer
 const r2ConfigValidator = v.object({
@@ -96,6 +97,29 @@ function normalizeFolderPath(raw: string): string {
   return withoutSlashes;
 }
 
+// Default retention period for soft-deleted R2 files (30 days)
+const R2_DELETION_RETENTION_DAYS = 30;
+
+/**
+ * Queue an R2 key for deferred deletion.
+ * The key will be eligible for hard-deletion after the retention period.
+ */
+async function queueR2Deletion(
+  ctx: MutationCtx,
+  r2Key: string,
+  originalPath: string,
+  deletedBy?: string,
+): Promise<void> {
+  const now = Date.now();
+  await ctx.db.insert("pendingR2Deletions", {
+    r2Key,
+    originalPath,
+    deletedAt: now,
+    deleteAfter: now + R2_DELETION_RETENTION_DAYS * 24 * 60 * 60 * 1000,
+    deletedBy,
+  });
+}
+
 // =============================================================================
 // Storage Backend Configuration
 // =============================================================================
@@ -181,9 +205,7 @@ export const startUpload = mutation({
     folderPath: v.string(),
     basename: v.string(),
     filename: v.optional(v.string()), // Original filename with extension for URLs
-    publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
-    extra: v.optional(v.any()),
     // R2 config passed from app layer (components can't access env vars)
     r2Config: v.optional(r2ConfigValidator),
   },
@@ -212,9 +234,7 @@ export const startUpload = mutation({
       backend,
       r2Key: undefined, // Will be set below for R2
       status: "created",
-      publish: args.publish,
       label: args.label,
-      extra: args.extra,
       createdAt: now,
       expiresAt: now + UPLOAD_INTENT_EXPIRY_MS,
       createdBy: actorFields.createdBy,
@@ -271,7 +291,7 @@ export const finishUpload = mutation({
     versionId: v.id("assetVersions"),
     version: v.number(),
   }),
-  // eslint-disable-next-line complexity -- upload finalization with intent validation and asset versioning
+
   handler: async (ctx, args) => {
     const intent = await ctx.db.get(args.intentId);
     if (!intent) {
@@ -287,8 +307,6 @@ export const finishUpload = mutation({
 
     const now = Date.now();
     const actorFields = await getActorFields(ctx);
-    const publish = intent.publish ?? false;
-
     // Get file metadata based on backend
     let storageId: Id<"_storage"> | undefined;
     let r2Key: string | undefined;
@@ -333,7 +351,6 @@ export const finishUpload = mutation({
       .first();
 
     let assetId: Id<"assets">;
-    let versionId: Id<"assetVersions">;
     let nextVersion: number;
 
     if (!asset) {
@@ -342,62 +359,14 @@ export const finishUpload = mutation({
       assetId = await ctx.db.insert("assets", {
         folderPath: intent.folderPath,
         basename: intent.basename,
-        extra: undefined,
         versionCounter: nextVersion,
         publishedVersionId: undefined,
-        draftVersionId: undefined,
         createdAt: now,
         updatedAt: now,
         ...actorFields,
       });
       asset = await ctx.db.get(assetId);
-
-      // Insert new version
-      versionId = await ctx.db.insert("assetVersions", {
-        assetId,
-        version: nextVersion,
-        state: publish ? "published" : "draft",
-        label: intent.label,
-        extra: intent.extra,
-        storageId,
-        r2Key,
-        originalFilename: intent.filename ?? intent.basename,
-        uploadStatus: "ready",
-        size,
-        contentType,
-        sha256,
-        createdAt: now,
-        createdBy: actorFields.createdBy,
-        publishedAt: publish ? now : undefined,
-        publishedBy: publish ? actorFields.updatedBy : undefined,
-        archivedAt: undefined,
-        archivedBy: undefined,
-      });
-    } else if (!publish && asset.draftVersionId) {
-      // UPDATE existing draft instead of creating new version
-      // This prevents creating many versions during auto-save
-      assetId = asset._id;
-      versionId = asset.draftVersionId;
-      nextVersion = asset.versionCounter ?? 1;
-
-      // Update the existing draft version with new file data
-      await ctx.db.patch(versionId, {
-        storageId,
-        r2Key,
-        originalFilename: intent.filename ?? intent.basename,
-        uploadStatus: "ready",
-        size,
-        contentType,
-        sha256,
-        // Update label and extra if provided
-        ...(intent.label !== undefined && { label: intent.label }),
-        ...(intent.extra !== undefined && { extra: intent.extra }),
-      });
-
-      // Update asset timestamp
-      await ctx.db.patch(assetId, { updatedAt: now, updatedBy: actorFields.updatedBy });
     } else {
-      // Create new version (either publishing or no existing draft)
       assetId = asset._id;
       nextVersion = (asset.versionCounter ?? 0) + 1;
       await ctx.db.patch(asset._id, {
@@ -405,58 +374,52 @@ export const finishUpload = mutation({
         updatedAt: now,
         updatedBy: actorFields.updatedBy,
       });
+    }
 
-      // Insert new version
-      versionId = await ctx.db.insert("assetVersions", {
-        assetId,
-        version: nextVersion,
-        state: publish ? "published" : "draft",
-        label: intent.label,
-        extra: intent.extra,
-        storageId,
-        r2Key,
-        originalFilename: intent.filename ?? intent.basename,
-        uploadStatus: "ready",
-        size,
-        contentType,
-        sha256,
-        createdAt: now,
-        createdBy: actorFields.createdBy,
-        publishedAt: publish ? now : undefined,
-        publishedBy: publish ? actorFields.updatedBy : undefined,
-        archivedAt: undefined,
-        archivedBy: undefined,
+    // Insert new version (always published)
+    const versionId = await ctx.db.insert("assetVersions", {
+      assetId,
+      version: nextVersion,
+      state: "published",
+      label: intent.label,
+      storageId,
+      r2Key,
+      originalFilename: intent.filename ?? intent.basename,
+      uploadStatus: "ready",
+      size,
+      contentType,
+      sha256,
+      createdAt: now,
+      createdBy: actorFields.createdBy,
+      publishedAt: now,
+      publishedBy: actorFields.updatedBy,
+      archivedAt: undefined,
+      archivedBy: undefined,
+    });
+
+    // Archive old published version if needed
+    if (asset?.publishedVersionId) {
+      await ctx.db.patch(asset.publishedVersionId, {
+        state: "archived",
+        archivedAt: now,
+        archivedBy: actorFields.updatedBy,
       });
     }
 
-    // Update asset pointers and archive old published if needed
-    if (publish) {
-      if (asset?.publishedVersionId) {
-        await ctx.db.patch(asset.publishedVersionId, {
-          state: "archived",
-          archivedAt: now,
-          archivedBy: actorFields.updatedBy,
-        });
-      }
-
-      await ctx.db.patch(assetId, {
-        publishedVersionId: versionId,
-        draftVersionId: undefined,
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
-    } else if (!asset?.draftVersionId) {
-      // Only update draftVersionId if we created a new draft
-      // (not when updating existing draft)
-      await ctx.db.patch(assetId, {
-        draftVersionId: versionId,
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
-    }
+    await ctx.db.patch(assetId, {
+      publishedVersionId: versionId,
+      updatedAt: now,
+      updatedBy: actorFields.updatedBy,
+    });
 
     // Mark intent as finalized
     await ctx.db.patch(args.intentId, { status: "finalized" });
+
+    // Log for real-time sync (files are always published now)
+    await logChange(ctx, "asset:publish", intent.folderPath, {
+      basename: intent.basename,
+      performedBy: actorFields.updatedBy,
+    });
 
     return { assetId, versionId, version: nextVersion };
   },
@@ -467,7 +430,7 @@ export const finishUpload = mutation({
 // =============================================================================
 
 export const createFolderByPath = mutation({
-  args: { path: v.string(), name: v.optional(v.string()), extra: v.optional(v.any()) },
+  args: { path: v.string(), name: v.optional(v.string()) },
   returns: v.id("folders"),
   handler: async (ctx, args) => {
     const newFolderPath = normalizeFolderPath(args.path);
@@ -485,14 +448,17 @@ export const createFolderByPath = mutation({
 
     const now = Date.now();
 
+    const actorFields = await getActorFields(ctx);
     const id = await ctx.db.insert("folders", {
       path: newFolderPath,
       name: args.name ?? newFolderPath.split("/").pop()!,
-      extra: args.extra,
       createdAt: now,
       updatedAt: now,
-      ...(await getActorFields(ctx)),
+      ...actorFields,
     });
+
+    // Log for real-time sync
+    await logChange(ctx, "folder:create", newFolderPath, { performedBy: actorFields.createdBy });
 
     return id;
   },
@@ -503,7 +469,7 @@ function joinPath(parent: string, segment: string): string {
 }
 
 export const createFolderByName = mutation({
-  args: { parentPath: v.string(), name: v.string(), extra: v.optional(v.any()) },
+  args: { parentPath: v.string(), name: v.string() },
   returns: v.id("folders"),
   handler: async (ctx, args) => {
     const normalizedParentPath = normalizeFolderPath(args.parentPath);
@@ -525,14 +491,17 @@ export const createFolderByName = mutation({
     }
 
     const now = Date.now();
+    const actorFields = await getActorFields(ctx);
     const id = await ctx.db.insert("folders", {
       path: newFolderPath,
       name: args.name,
-      extra: args.extra,
       createdAt: now,
       updatedAt: now,
-      ...(await getActorFields(ctx)),
+      ...actorFields,
     });
+
+    // Log for real-time sync
+    await logChange(ctx, "folder:create", newFolderPath, { performedBy: actorFields.createdBy });
 
     return id;
   },
@@ -574,8 +543,20 @@ export const listFolders = query({
   },
 });
 
+/**
+ * List ALL folders in the system (for bulk sync operations).
+ * Returns all folders sorted by path.
+ */
+export const listAllFolders = query({
+  args: {},
+  returns: v.array(v.object(folderFields)),
+  handler: async (ctx) => {
+    return await ctx.db.query("folders").withIndex("by_path").order("asc").collect();
+  },
+});
+
 export const listFoldersWithAssets = query({
-  args: { parentPath: v.string(), preferDraft: v.optional(v.boolean()) },
+  args: { parentPath: v.string() },
   returns: v.array(
     v.object({
       folder: v.object(folderFields),
@@ -594,8 +575,6 @@ export const listFoldersWithAssets = query({
     const parentPath = normalizeFolderPath(args.parentPath);
     const parentPrefix = parentPath ? `${parentPath}/` : "";
     const end = `${parentPrefix}${SUFFIX}`;
-    const preferDraft = args.preferDraft ?? false;
-
     const folders = await ctx.db
       .query("folders")
       .withIndex("by_path", (q) => q.gte("path", parentPrefix).lt("path", end))
@@ -619,9 +598,7 @@ export const listFoldersWithAssets = query({
 
     const versionIdsToFetch = new Set<Id<"assetVersions">>();
     for (const asset of assetsInDirectChildren) {
-      const versionId = preferDraft
-        ? asset.draftVersionId || asset.publishedVersionId
-        : asset.publishedVersionId || asset.draftVersionId;
+      const versionId = asset.publishedVersionId;
       if (versionId) versionIdsToFetch.add(versionId);
     }
 
@@ -665,9 +642,7 @@ export const listFoldersWithAssets = query({
       const folderAssets = assetsByFolder.get(folder.path) || [];
       const assetsWithUrls = folderAssets
         .map((asset) => {
-          const versionId = preferDraft
-            ? asset.draftVersionId || asset.publishedVersionId
-            : asset.publishedVersionId || asset.draftVersionId;
+          const versionId = asset.publishedVersionId;
           if (!versionId) return null;
 
           const url = urlsMap.get(versionId);
@@ -690,12 +665,7 @@ export const listFoldersWithAssets = query({
 });
 
 export const updateFolder = mutation({
-  args: {
-    path: v.string(),
-    name: v.optional(v.string()),
-    newPath: v.optional(v.string()),
-    extra: v.optional(v.any()),
-  },
+  args: { path: v.string(), name: v.optional(v.string()), newPath: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const normalized = normalizeFolderPath(args.path);
     if (!normalized) {
@@ -724,57 +694,23 @@ export const updateFolder = mutation({
 
     const now = Date.now();
     const actorFields = await getActorFields(ctx);
+    const finalPath = args.newPath ?? existing.path;
     await ctx.db.patch(existing._id, {
       name: args.name ?? existing.name,
-      path: args.newPath ?? existing.path,
-      extra: args.extra !== undefined ? args.extra : existing.extra,
+      path: finalPath,
       updatedAt: now,
       updatedBy: actorFields.updatedBy,
     });
+
+    // Log for real-time sync
+    await logChange(ctx, "folder:update", finalPath, { performedBy: actorFields.updatedBy });
+
     return existing._id;
   },
 });
-// Idempotent: returns existing folder id if it already exists.
-// export const ensureFolder = mutation({
-//   args: {
-//     path: v.string(),
-//     name: v.optional(v.string()),
-//     extra: v.optional(v.any()),
-//   },
-//   returns: v.id("folders"),
-//   handler: async (ctx, args) => {
-//     const normalized = normalizeFolderPath(args.path);
-//     if (!normalized) {
-//       throw new Error("Folder path cannot be empty");
-//     }
-
-//     const existing = await ctx.db
-//       .query("folders")
-//       .withIndex("by_path", (q) => q.eq("path", normalized))
-//       .first();
-
-//     if (existing) {
-//       return existing._id;
-//     }
-
-//     const { parentPath, name: defaultName } = splitParent(normalized);
-//     const now = Date.now();
-
-//     const id = await ctx.db.insert("folders", {
-//       path: normalized,
-//       parentPath,
-//       name: args.name ?? defaultName,
-//       extra: args.extra,
-//       createdAt: now,
-//       updatedAt: now,
-//     });
-
-//     return id;
-//   },
-// });
 
 export const createAsset = mutation({
-  args: { folderPath: v.string(), basename: v.string(), extra: v.optional(v.any()) },
+  args: { folderPath: v.string(), basename: v.string() },
   returns: v.id("assets"),
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.folderPath);
@@ -799,7 +735,6 @@ export const createAsset = mutation({
     return await ctx.db.insert("assets", {
       folderPath,
       basename: args.basename,
-      extra: args.extra,
       versionCounter: 0,
       createdAt: now,
       updatedAt: now,
@@ -869,13 +804,7 @@ export const getFolderWithAssets = query({
   },
 });
 export const commitVersion = mutation({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-    publish: v.optional(v.boolean()),
-    label: v.optional(v.string()),
-    extra: v.optional(v.any()),
-  },
+  args: { folderPath: v.string(), basename: v.string(), label: v.optional(v.string()) },
   returns: v.object({
     assetId: v.id("assets"),
     versionId: v.id("assetVersions"),
@@ -888,7 +817,6 @@ export const commitVersion = mutation({
       throw new Error("basename cannot be empty");
     }
 
-    const publish = args.publish ?? false;
     const now = Date.now();
     const actorFields = await getActorFields(ctx);
 
@@ -928,39 +856,29 @@ export const commitVersion = mutation({
     const versionId = await ctx.db.insert("assetVersions", {
       assetId,
       version: newVersionNumber,
-      state: publish ? "published" : "draft",
+      state: "published",
       label: args.label,
-      extra: args.extra,
       createdAt: now,
       ...actorFields,
-      ...(publish ? { publishedAt: now, publishedBy: actorFields.createdBy } : {}),
+      publishedAt: now,
+      publishedBy: actorFields.createdBy,
     });
 
-    if (publish) {
-      // If there's an existing published version, archive it
-      if (asset?.publishedVersionId) {
-        await ctx.db.patch(asset.publishedVersionId, {
-          state: "archived",
-          archivedAt: now,
-          archivedBy: actorFields.updatedBy,
-        });
-      }
-
-      // Update asset with new published version
-      await ctx.db.patch(assetId, {
-        publishedVersionId: versionId,
-        draftVersionId: undefined,
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
-    } else {
-      // Update asset with new draft version
-      await ctx.db.patch(assetId, {
-        draftVersionId: versionId,
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
+    // If there's an existing published version, archive it
+    if (asset?.publishedVersionId) {
+      await ctx.db.patch(asset.publishedVersionId, {
+        state: "archived",
+        archivedAt: now,
+        archivedBy: actorFields.updatedBy,
       });
     }
+
+    // Update asset with new published version
+    await ctx.db.patch(assetId, {
+      publishedVersionId: versionId,
+      updatedAt: now,
+      updatedBy: actorFields.updatedBy,
+    });
 
     return { assetId, versionId, version: newVersionNumber };
   },
@@ -977,16 +895,14 @@ export const createVersionFromStorageId = mutation({
     folderPath: v.string(),
     basename: v.string(),
     storageId: v.id("_storage"),
-    publish: v.optional(v.boolean()),
     label: v.optional(v.string()),
-    extra: v.optional(v.any()),
   },
   returns: v.object({
     assetId: v.id("assets"),
     versionId: v.id("assetVersions"),
     version: v.number(),
   }),
-  // eslint-disable-next-line complexity -- direct storage upload with versioning and publish logic
+
   handler: async (ctx, args) => {
     const folderPath = normalizeFolderPath(args.folderPath);
     if (args.basename.includes("/")) {
@@ -995,8 +911,6 @@ export const createVersionFromStorageId = mutation({
 
     const now = Date.now();
     const actorFields = await getActorFields(ctx);
-    const publish = args.publish ?? false;
-
     // Get metadata from Convex _storage
     const fileDoc = await ctx.db.system.get(args.storageId);
     if (!fileDoc) {
@@ -1012,7 +926,6 @@ export const createVersionFromStorageId = mutation({
       .first();
 
     let assetId: Id<"assets">;
-    let versionId: Id<"assetVersions">;
     let nextVersion: number;
 
     if (!asset) {
@@ -1021,58 +934,14 @@ export const createVersionFromStorageId = mutation({
       assetId = await ctx.db.insert("assets", {
         folderPath,
         basename: args.basename,
-        extra: undefined,
         versionCounter: nextVersion,
         publishedVersionId: undefined,
-        draftVersionId: undefined,
         createdAt: now,
         updatedAt: now,
         ...actorFields,
       });
       asset = await ctx.db.get(assetId);
-
-      // Insert new version
-      versionId = await ctx.db.insert("assetVersions", {
-        assetId,
-        version: nextVersion,
-        state: publish ? "published" : "draft",
-        label: args.label,
-        extra: args.extra,
-        storageId: args.storageId,
-        r2Key: undefined,
-        size: fileDoc.size,
-        contentType: fileDoc.contentType,
-        sha256: fileDoc.sha256,
-        createdAt: now,
-        createdBy: actorFields.createdBy,
-        publishedAt: publish ? now : undefined,
-        publishedBy: publish ? actorFields.updatedBy : undefined,
-        archivedAt: undefined,
-        archivedBy: undefined,
-      });
-    } else if (!publish && asset.draftVersionId) {
-      // UPDATE existing draft instead of creating new version
-      // This prevents creating many versions during auto-save
-      assetId = asset._id;
-      versionId = asset.draftVersionId;
-      nextVersion = asset.versionCounter ?? 1;
-
-      // Update the existing draft version with new file data
-      await ctx.db.patch(versionId, {
-        storageId: args.storageId,
-        r2Key: undefined,
-        size: fileDoc.size,
-        contentType: fileDoc.contentType,
-        sha256: fileDoc.sha256,
-        // Update label and extra if provided
-        ...(args.label !== undefined && { label: args.label }),
-        ...(args.extra !== undefined && { extra: args.extra }),
-      });
-
-      // Update asset timestamp
-      await ctx.db.patch(assetId, { updatedAt: now, updatedBy: actorFields.updatedBy });
     } else {
-      // Create new version (either publishing or no existing draft)
       assetId = asset._id;
       nextVersion = (asset.versionCounter ?? 0) + 1;
       await ctx.db.patch(asset._id, {
@@ -1080,53 +949,47 @@ export const createVersionFromStorageId = mutation({
         updatedAt: now,
         updatedBy: actorFields.updatedBy,
       });
+    }
 
-      // Insert new version
-      versionId = await ctx.db.insert("assetVersions", {
-        assetId,
-        version: nextVersion,
-        state: publish ? "published" : "draft",
-        label: args.label,
-        extra: args.extra,
-        storageId: args.storageId,
-        r2Key: undefined,
-        size: fileDoc.size,
-        contentType: fileDoc.contentType,
-        sha256: fileDoc.sha256,
-        createdAt: now,
-        createdBy: actorFields.createdBy,
-        publishedAt: publish ? now : undefined,
-        publishedBy: publish ? actorFields.updatedBy : undefined,
-        archivedAt: undefined,
-        archivedBy: undefined,
+    // Insert new version (always published)
+    const versionId = await ctx.db.insert("assetVersions", {
+      assetId,
+      version: nextVersion,
+      state: "published",
+      label: args.label,
+      storageId: args.storageId,
+      r2Key: undefined,
+      size: fileDoc.size,
+      contentType: fileDoc.contentType,
+      sha256: fileDoc.sha256,
+      createdAt: now,
+      createdBy: actorFields.createdBy,
+      publishedAt: now,
+      publishedBy: actorFields.updatedBy,
+      archivedAt: undefined,
+      archivedBy: undefined,
+    });
+
+    // Archive old published version if needed
+    if (asset?.publishedVersionId) {
+      await ctx.db.patch(asset.publishedVersionId, {
+        state: "archived",
+        archivedAt: now,
+        archivedBy: actorFields.updatedBy,
       });
     }
 
-    // Update asset pointers and archive old published if needed
-    if (publish) {
-      if (asset?.publishedVersionId) {
-        await ctx.db.patch(asset.publishedVersionId, {
-          state: "archived",
-          archivedAt: now,
-          archivedBy: actorFields.updatedBy,
-        });
-      }
+    await ctx.db.patch(assetId, {
+      publishedVersionId: versionId,
+      updatedAt: now,
+      updatedBy: actorFields.updatedBy,
+    });
 
-      await ctx.db.patch(assetId, {
-        publishedVersionId: versionId,
-        draftVersionId: undefined,
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
-    } else if (!asset?.draftVersionId) {
-      // Only update draftVersionId if we created a new draft
-      // (not when updating existing draft)
-      await ctx.db.patch(assetId, {
-        draftVersionId: versionId,
-        updatedAt: now,
-        updatedBy: actorFields.updatedBy,
-      });
-    }
+    // Log for real-time sync (files are always published now)
+    await logChange(ctx, "asset:publish", folderPath, {
+      basename: args.basename,
+      performedBy: actorFields.updatedBy,
+    });
 
     return { assetId, versionId, version: nextVersion };
   },
@@ -1156,96 +1019,6 @@ export const getAssetVersions = query({
       .collect();
 
     return versions;
-  },
-});
-
-export const publishDraft = mutation({
-  args: { folderPath: v.string(), basename: v.string() },
-  handler: async (ctx, args) => {
-    const normalizedFolderPath = normalizeFolderPath(args.folderPath);
-    const now = Date.now();
-    const actorFields = await getActorFields(ctx);
-
-    // Find the asset
-    const asset = await ctx.db
-      .query("assets")
-      .withIndex("by_folder_basename", (q) =>
-        q.eq("folderPath", normalizedFolderPath).eq("basename", args.basename),
-      )
-      .first();
-
-    if (!asset) {
-      throw new Error(`Asset not found: ${normalizedFolderPath}/${args.basename}`);
-    }
-
-    // Check that asset has a draft version
-    if (!asset.draftVersionId) {
-      throw new Error(
-        `No draft version exists for asset: ${normalizedFolderPath}/${args.basename}`,
-      );
-    }
-
-    // Get the draft version and verify it's actually a draft
-    const draftVersion = await ctx.db.get(asset.draftVersionId);
-    if (!draftVersion || draftVersion.state !== "draft") {
-      throw new Error(`Draft version not found or not in draft state`);
-    }
-
-    // Archive existing published version if any
-    if (asset.publishedVersionId) {
-      await ctx.db.patch(asset.publishedVersionId, {
-        state: "archived",
-        archivedAt: now,
-        archivedBy: actorFields.updatedBy,
-      });
-    }
-
-    // Patch draft version to published
-    await ctx.db.patch(asset.draftVersionId, {
-      state: "published",
-      publishedAt: now,
-      publishedBy: actorFields.updatedBy,
-    });
-
-    // Update asset
-    await ctx.db.patch(asset._id, {
-      publishedVersionId: asset.draftVersionId,
-      draftVersionId: undefined,
-      updatedAt: now,
-      updatedBy: actorFields.updatedBy,
-    });
-
-    return { assetId: asset._id, versionId: asset.draftVersionId };
-  },
-});
-
-/**
- * Update the extra metadata on an existing version.
- * This allows editing metadata (chapterNumber, title, etc.) without creating a new version.
- */
-export const updateVersionExtra = mutation({
-  args: { versionId: v.id("assetVersions"), extra: v.any() },
-  returns: v.object({ versionId: v.id("assetVersions"), extra: v.any() }),
-  handler: async (ctx, args) => {
-    const now = Date.now();
-    const actorFields = await getActorFields(ctx);
-
-    // Get the version
-    const version = await ctx.db.get(args.versionId);
-    if (!version) {
-      throw new Error("Version not found");
-    }
-
-    // Update the version's extra field
-    await ctx.db.patch(args.versionId, { extra: args.extra });
-
-    // Also update the asset's updatedAt timestamp
-    const asset = await ctx.db.get(version.assetId);
-    if (asset) {
-      await ctx.db.patch(asset._id, { updatedAt: now, updatedBy: actorFields.updatedBy });
-    }
-
-    return { versionId: args.versionId, extra: args.extra };
   },
 });
 
@@ -1326,7 +1099,6 @@ export const restoreVersion = mutation({
       version: nextVersion,
       state: "published",
       label,
-      extra: sourceVersion.extra,
       storageId: sourceVersion.storageId,
       r2Key: sourceVersion.r2Key,
       size: sourceVersion.size,
@@ -1353,7 +1125,6 @@ export const restoreVersion = mutation({
     await ctx.db.patch(asset._id, {
       versionCounter: nextVersion,
       publishedVersionId: newVersionId,
-      draftVersionId: undefined,
       updatedAt: now,
       updatedBy: actorFields.updatedBy,
     });
@@ -1509,7 +1280,6 @@ export const listPublishedAssetsInFolder = query({
       basename: v.string(),
       version: v.number(),
       label: v.optional(v.string()),
-      extra: v.optional(v.any()),
       createdAt: v.number(),
       publishedAt: v.optional(v.number()),
       createdBy: v.optional(v.string()),
@@ -1529,7 +1299,6 @@ export const listPublishedAssetsInFolder = query({
       basename: string;
       version: number;
       label?: string;
-      extra?: string | Record<string, unknown>;
       createdAt: number;
       publishedAt?: number;
       createdBy?: string;
@@ -1547,7 +1316,6 @@ export const listPublishedAssetsInFolder = query({
         basename: asset.basename,
         version: version.version,
         label: version.label,
-        extra: version.extra,
         createdAt: version.createdAt,
         publishedAt: version.publishedAt,
         createdBy: version.createdBy,
@@ -1610,6 +1378,13 @@ export const moveAsset = mutation({
       createdBy: actorFields.createdBy,
     });
 
+    // Log for real-time sync
+    await logChange(ctx, "asset:move", to, {
+      basename: args.basename,
+      oldFolderPath: from,
+      performedBy: actorFields.updatedBy,
+    });
+
     return { assetId: asset._id, fromFolderPath: from, toFolderPath: to };
   },
 });
@@ -1668,6 +1443,13 @@ export const renameAsset = mutation({
       createdBy: actorFields.createdBy,
     });
 
+    // Log for real-time sync
+    await logChange(ctx, "asset:rename", folderPath, {
+      basename: args.newBasename,
+      oldBasename: args.basename,
+      performedBy: actorFields.updatedBy,
+    });
+
     return { assetId: asset._id, oldBasename: args.basename, newBasename: args.newBasename };
   },
 });
@@ -1716,9 +1498,71 @@ export const listAssetEvents = query({
 });
 
 /**
+ * Delete a single file (asset and all its versions) by path.
+ * Queues R2 keys for deferred deletion and logs to changelog.
+ */
+export const deleteFile = mutation({
+  args: { folderPath: v.string(), basename: v.string() },
+  returns: v.object({ deleted: v.boolean(), deletedVersions: v.number() }),
+  handler: async (ctx, { folderPath, basename }) => {
+    const normalizedPath = normalizeFolderPath(folderPath);
+    const actorFields = await getActorFields(ctx);
+
+    const asset = await ctx.db
+      .query("assets")
+      .withIndex("by_folder_basename", (q) =>
+        q.eq("folderPath", normalizedPath).eq("basename", basename),
+      )
+      .first();
+
+    if (!asset) {
+      return { deleted: false, deletedVersions: 0 };
+    }
+
+    let deletedVersions = 0;
+    const originalPath = `${normalizedPath}/${basename}`;
+
+    // Get and delete all versions, queue R2 keys for deletion
+    const versions = await ctx.db
+      .query("assetVersions")
+      .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
+      .collect();
+
+    for (const version of versions) {
+      if (version.r2Key) {
+        await queueR2Deletion(ctx, version.r2Key, originalPath, actorFields.updatedBy);
+      }
+      await ctx.db.delete(version._id);
+      deletedVersions++;
+    }
+
+    // Delete any events for this asset
+    const events = await ctx.db
+      .query("assetEvents")
+      .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
+      .collect();
+
+    for (const event of events) {
+      await ctx.db.delete(event._id);
+    }
+
+    // Delete the asset itself
+    await ctx.db.delete(asset._id);
+
+    // Log to changelog
+    await logChange(ctx, "asset:delete", normalizedPath, {
+      basename,
+      performedBy: actorFields.updatedBy,
+    });
+
+    return { deleted: true, deletedVersions };
+  },
+});
+
+/**
  * Delete all files (assets and their versions) in a specific folder.
  * Does NOT delete the folder itself or subfolders.
- * Does NOT delete files from R2/storage - only database records.
+ * Queues R2 keys for deferred deletion and logs to changelog.
  */
 export const deleteFilesInFolder = mutation({
   args: {
@@ -1729,6 +1573,7 @@ export const deleteFilesInFolder = mutation({
   returns: v.object({ deletedAssets: v.number(), deletedVersions: v.number() }),
   handler: async (ctx, { folderPath, basenames }) => {
     const normalizedPath = normalizeFolderPath(folderPath);
+    const actorFields = await getActorFields(ctx);
     let deletedAssets = 0;
     let deletedVersions = 0;
 
@@ -1744,13 +1589,18 @@ export const deleteFilesInFolder = mutation({
         continue;
       }
 
-      // Get and delete all versions of this asset
+      const originalPath = `${normalizedPath}/${asset.basename}`;
+
+      // Get and delete all versions, queue R2 keys for deletion
       const versions = await ctx.db
         .query("assetVersions")
         .withIndex("by_asset", (q) => q.eq("assetId", asset._id))
         .collect();
 
       for (const version of versions) {
+        if (version.r2Key) {
+          await queueR2Deletion(ctx, version.r2Key, originalPath, actorFields.updatedBy);
+        }
         await ctx.db.delete(version._id);
         deletedVersions++;
       }
@@ -1768,6 +1618,12 @@ export const deleteFilesInFolder = mutation({
       // Delete the asset itself
       await ctx.db.delete(asset._id);
       deletedAssets++;
+
+      // Log to changelog
+      await logChange(ctx, "asset:delete", normalizedPath, {
+        basename: asset.basename,
+        performedBy: actorFields.updatedBy,
+      });
     }
 
     return { deletedAssets, deletedVersions };
@@ -2024,5 +1880,102 @@ export const deleteByPathPrefixBatch = mutation({
       r2KeysToDelete,
       hasMore: false,
     };
+  },
+});
+
+// =============================================================================
+// R2 Soft-Delete Management
+// =============================================================================
+
+/**
+ * List pending R2 deletions (for debugging/admin).
+ */
+export const listPendingR2Deletions = query({
+  args: { limit: v.optional(v.number()), onlyExpired: v.optional(v.boolean()) },
+  returns: v.array(
+    v.object({
+      _id: v.id("pendingR2Deletions"),
+      _creationTime: v.number(),
+      r2Key: v.string(),
+      originalPath: v.string(),
+      deletedAt: v.number(),
+      deleteAfter: v.number(),
+      deletedBy: v.optional(v.string()),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const limit = args.limit ?? 100;
+
+    if (args.onlyExpired) {
+      return await ctx.db
+        .query("pendingR2Deletions")
+        .withIndex("by_delete_after", (q) => q.lte("deleteAfter", now))
+        .take(limit);
+    }
+
+    return await ctx.db.query("pendingR2Deletions").take(limit);
+  },
+});
+
+/**
+ * Process expired R2 deletions and return keys that should be deleted from R2.
+ * Call this from a cron job or cleanup script.
+ * The caller is responsible for actually deleting the files from R2.
+ */
+export const processExpiredR2Deletions = mutation({
+  args: {
+    batchSize: v.optional(v.number()),
+    // If true, process ALL pending deletions regardless of deleteAfter time
+    forceAll: v.optional(v.boolean()),
+  },
+  returns: v.object({
+    processed: v.number(),
+    r2KeysToDelete: v.array(v.string()),
+    hasMore: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const batchSize = args.batchSize ?? 100;
+
+    let batch;
+    if (args.forceAll) {
+      batch = await ctx.db.query("pendingR2Deletions").take(batchSize);
+    } else {
+      batch = await ctx.db
+        .query("pendingR2Deletions")
+        .withIndex("by_delete_after", (q) => q.lte("deleteAfter", now))
+        .take(batchSize);
+    }
+
+    const r2KeysToDelete: string[] = [];
+    for (const deletion of batch) {
+      r2KeysToDelete.push(deletion.r2Key);
+      await ctx.db.delete(deletion._id);
+    }
+
+    return { processed: batch.length, r2KeysToDelete, hasMore: batch.length === batchSize };
+  },
+});
+
+/**
+ * Cancel a pending R2 deletion (restore before hard-delete).
+ * Returns true if the deletion was found and cancelled.
+ */
+export const cancelPendingR2Deletion = mutation({
+  args: { r2Key: v.string() },
+  returns: v.object({ cancelled: v.boolean() }),
+  handler: async (ctx, { r2Key }) => {
+    const pending = await ctx.db
+      .query("pendingR2Deletions")
+      .withIndex("by_r2_key", (q) => q.eq("r2Key", r2Key))
+      .first();
+
+    if (!pending) {
+      return { cancelled: false };
+    }
+
+    await ctx.db.delete(pending._id);
+    return { cancelled: true };
   },
 });

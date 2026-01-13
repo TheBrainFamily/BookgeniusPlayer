@@ -1,6 +1,7 @@
 import { BookOpen, Mail, MapPin, Phone } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 interface FooterProps {
   onSearchQuery: (query: string) => void;
@@ -94,7 +95,7 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
                 variant="ghost"
                 className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
               >
-                <a href="/terms">{t("footer.termsOfService")}</a>
+                <Link to="/terms">{t("footer.termsOfService")}</Link>
               </Button>
               {["privacyPolicy", "cookiePolicy"].map((linkKey) => (
                 <Button

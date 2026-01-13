@@ -4,7 +4,7 @@ A Convex component for managing versioned assets with support for both Convex st
 
 ## Features
 
-- **Versioned assets**: Track file versions with draft/published/archived states
+- **Versioned assets**: Track file versions with published/archived states
 - **Dual storage backends**: Use Convex storage or Cloudflare R2
 - **CDN support**: Serve public files through Cloudflare's global CDN
 - **Signed URLs**: Time-limited access for private files
@@ -37,7 +37,7 @@ export default app;
 // Upload a file
 const { intentId, uploadUrl } = await ctx.runMutation(
   components.assetManager.assetManager.startUpload,
-  { folderPath: "images", basename: "hero", filename: "hero.png", publish: true },
+  { folderPath: "images", basename: "hero", filename: "hero.png" },
 );
 
 // Upload to the URL, then finish
@@ -138,11 +138,10 @@ images/hero
 
 ### Version States
 
-| State       | Description                            |
-| ----------- | -------------------------------------- |
-| `draft`     | Work in progress, not publicly visible |
-| `published` | Current live version                   |
-| `archived`  | Previous versions, kept for history    |
+| State       | Description                         |
+| ----------- | ----------------------------------- |
+| `published` | Current live version                |
+| `archived`  | Previous versions, kept for history |
 
 ### Upload Flow
 
@@ -164,7 +163,6 @@ startUpload() → Upload to URL → finishUpload()
 | `startUpload`             | Begin an upload, get presigned URL |
 | `finishUpload`            | Complete upload, create version    |
 | `createFolderByPath`      | Create a folder                    |
-| `publishDraft`            | Publish a draft version            |
 | `restoreVersion`          | Restore a previous version         |
 | `moveAsset`               | Move asset to different folder     |
 | `renameAsset`             | Rename an asset                    |

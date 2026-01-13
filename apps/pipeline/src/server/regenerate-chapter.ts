@@ -98,8 +98,14 @@ export async function regenerateChapter(
         basename: `chapter-${chapter}.xml`,
         content: Buffer.from(chapterXml),
         contentType: "application/xml",
-        publish: true,
-        extra: { type: "chapter", chapterNumber: chapter, title: `Chapter ${chapter}` },
+      });
+      await convex.updateChapterMetadata({
+        bookPath: options.bookPath,
+        folderPath: `${options.bookPath}/chapters`,
+        basename: `chapter-${chapter}.xml`,
+        chapterNumber: chapter,
+        title: `Chapter ${chapter}`,
+        sourceFormat: "xml",
       });
       console.log(`[regenerateChapter] Uploaded chapter ${chapter} to Convex`);
     } catch (e) {

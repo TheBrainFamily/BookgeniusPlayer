@@ -27,9 +27,7 @@ export interface AssetData {
   basename: string;
   versionCounter: number;
   publishedVersionId?: string;
-  draftVersionId?: string;
   updatedAt: number;
-  extra?: unknown;
 }
 
 interface AssetCardProps {
@@ -58,21 +56,12 @@ const typeColors = {
   other: "bg-accent text-accent-foreground",
 };
 
-function getAssetStatus(asset: AssetData): {
-  label: string;
-  variant: "published" | "draft" | "muted";
-} {
+function getAssetStatus(asset: AssetData): { label: string; variant: "published" | "muted" } {
   if (asset.versionCounter === 0) {
     return { label: "Empty", variant: "muted" };
   }
-  if (asset.publishedVersionId && !asset.draftVersionId) {
+  if (asset.publishedVersionId) {
     return { label: "Published", variant: "published" };
-  }
-  if (asset.publishedVersionId && asset.draftVersionId) {
-    return { label: "Draft + Published", variant: "draft" };
-  }
-  if (asset.draftVersionId) {
-    return { label: "Draft", variant: "draft" };
   }
   return { label: "Unknown", variant: "muted" };
 }

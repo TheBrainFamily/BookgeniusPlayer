@@ -11,7 +11,6 @@ describe("assets (logical layer)", () => {
     const assetId = await t.mutation(api.assetManager.createAsset, {
       folderPath: "", // root
       basename: "cover.jpg",
-      extra: { kind: "image" },
     });
 
     const asset = await t.query(api.assetManager.getAsset, {
@@ -22,7 +21,6 @@ describe("assets (logical layer)", () => {
     expect(asset?._id).toEqual(assetId);
     expect(asset?.folderPath).toBe(""); // normalized root
     expect(asset?.basename).toBe("cover.jpg");
-    expect(asset?.extra).toEqual({ kind: "image" });
     expect(asset?.versionCounter).toBe(0);
 
     expect(asset?.createdAt).toBeGreaterThan(0);
@@ -85,11 +83,10 @@ describe("assets (logical layer)", () => {
       basename: "test-published.txt",
     });
 
-    // Commit a published version
+    // Commit a version
     const result = await t.mutation(api.assetManager.commitVersion, {
       folderPath: "",
       basename: "test-published.txt",
-      publish: true,
       label: "v1",
     });
 
@@ -101,30 +98,6 @@ describe("assets (logical layer)", () => {
 
     expect(asset).not.toBeNull();
     expect(asset?.publishedVersionId).toBe(result.versionId);
-  });
-
-  it("getAsset includes draftVersionId when asset has a draft version", async () => {
-    const t = convexTest(schema, modules);
-
-    // Create asset
-    await t.mutation(api.assetManager.createAsset, { folderPath: "", basename: "test-draft.txt" });
-
-    // Commit a draft version
-    const result = await t.mutation(api.assetManager.commitVersion, {
-      folderPath: "",
-      basename: "test-draft.txt",
-      publish: false,
-      label: "draft-v1",
-    });
-
-    // Get the asset and verify draftVersionId is included
-    const asset = await t.query(api.assetManager.getAsset, {
-      folderPath: "",
-      basename: "test-draft.txt",
-    });
-
-    expect(asset).not.toBeNull();
-    expect(asset?.draftVersionId).toBe(result.versionId);
   });
 
   it("listAssets returns assets only for the given folderPath", async () => {
@@ -188,11 +161,10 @@ describe("assets (logical layer)", () => {
       basename: "test-with-version.txt",
     });
 
-    // Commit a version with publish=true to set publishedVersionId
+    // Commit a version to set publishedVersionId
     const result = await t.mutation(api.assetManager.commitVersion, {
       folderPath: "",
       basename: "test-with-version.txt",
-      publish: true,
       label: "v1",
     });
 
@@ -206,38 +178,6 @@ describe("assets (logical layer)", () => {
     // publishedVersionId should be present after a version is published
     expect(asset.publishedVersionId).toBeDefined();
     expect(asset.publishedVersionId).toBe(result.versionId);
-
-    // draftVersionId may be undefined or not present since we published directly
-    expect(asset.draftVersionId).toBeUndefined();
-  });
-
-  it("listAssets includes draftVersionId when asset has a draft version", async () => {
-    const t = convexTest(schema, modules);
-
-    // Create asset and commit a draft version
-    await t.mutation(api.assetManager.createAsset, {
-      folderPath: "",
-      basename: "test-with-draft.txt",
-    });
-
-    // Commit a version with publish=false to set draftVersionId
-    await t.mutation(api.assetManager.commitVersion, {
-      folderPath: "",
-      basename: "test-with-draft.txt",
-      publish: false,
-      label: "draft-v1",
-    });
-
-    // List assets and verify draftVersionId is included
-    const assets = await t.query(api.assetManager.listAssets, { folderPath: "" });
-
-    expect(assets).toHaveLength(1);
-    const asset = assets[0];
-    expect(asset.basename).toBe("test-with-draft.txt");
-
-    // draftVersionId should be present after a draft is created
-    expect(asset).toHaveProperty("draftVersionId");
-    expect(asset.draftVersionId).toBeDefined();
   });
 });
 
@@ -282,13 +222,11 @@ describe("getFolderWithAssets", () => {
     await t.mutation(api.assetManager.createAsset, {
       folderPath: "project/docs",
       basename: "readme.md",
-      extra: { type: "markdown" },
     });
 
     await t.mutation(api.assetManager.createAsset, {
       folderPath: "project/docs",
       basename: "api.md",
-      extra: { type: "api-docs" },
     });
 
     const result = await t.query(api.assetManager.getFolderWithAssets, { path: "project/docs" });
@@ -305,7 +243,6 @@ describe("getFolderWithAssets", () => {
     const readmeAsset = result!.assets.find((a) => a.basename === "readme.md");
     expect(readmeAsset).toBeDefined();
     expect(readmeAsset!.folderPath).toBe("project/docs");
-    expect(readmeAsset!.extra).toEqual({ type: "markdown" });
     expect(readmeAsset!.versionCounter).toBe(0);
   });
 
@@ -345,15 +282,11 @@ describe("getFolderWithAssets", () => {
     const t = convexTest(schema, modules);
     const asUser = t.withIdentity({ tokenIdentifier: "user-1" });
 
-    await asUser.mutation(api.assetManager.createFolderByPath, {
-      path: "test-folder",
-      extra: { description: "Test folder" },
-    });
+    await asUser.mutation(api.assetManager.createFolderByPath, { path: "test-folder" });
 
     await asUser.mutation(api.assetManager.createAsset, {
       folderPath: "test-folder",
       basename: "test-asset.txt",
-      extra: { size: 1024 },
     });
 
     const result = await asUser.query(api.assetManager.getFolderWithAssets, {
@@ -367,7 +300,6 @@ describe("getFolderWithAssets", () => {
     expect(folder._id).toBeDefined();
     expect(folder.path).toBe("test-folder");
     expect(folder.name).toBe("test-folder");
-    expect(folder.extra).toEqual({ description: "Test folder" });
     expect(folder.createdAt).toBeGreaterThan(0);
     expect(folder.updatedAt).toBeGreaterThan(0);
     expect(folder.createdBy).toBe("user-1");
@@ -379,7 +311,6 @@ describe("getFolderWithAssets", () => {
     expect(asset._id).toBeDefined();
     expect(asset.folderPath).toBe("test-folder");
     expect(asset.basename).toBe("test-asset.txt");
-    expect(asset.extra).toEqual({ size: 1024 });
     expect(asset.versionCounter).toBe(0);
     expect(asset.createdAt).toBeGreaterThan(0);
     expect(asset.updatedAt).toBeGreaterThan(0);
@@ -426,7 +357,6 @@ describe("renameAsset", () => {
     const result = await t.mutation(api.assetManager.commitVersion, {
       folderPath: "",
       basename: "versioned.txt",
-      publish: true,
       label: "v1",
     });
 
@@ -680,7 +610,6 @@ describe("deleteByPathPrefixBatch", () => {
     await t.mutation(api.assetManager.commitVersion, {
       folderPath: "books/test-book",
       basename: "cover.jpg",
-      publish: true,
     });
 
     const result = await t.mutation(api.assetManager.deleteByPathPrefixBatch, {

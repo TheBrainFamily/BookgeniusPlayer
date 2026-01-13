@@ -6,7 +6,7 @@
  * This module handles serving asset versions over HTTP with intelligent caching:
  * - Small files (≤20MB): Served as blobs with immutable caching (1 year)
  * - Large files (>20MB): Served via redirect to storage URL with short caching (60s)
- * - Any version with storage is served (draft, published, archived)
+ * - Any version with storage is served (published, archived)
  * - Version IDs are opaque UUIDs - knowing the ID is sufficient authorization
  */
 import { describe, it, expect } from "vitest";
@@ -33,7 +33,6 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
       folderPath: "",
       basename: "preview-test.png",
       storageId: s1,
-      publish: true,
     });
 
     // Publishing v2 archives v1
@@ -41,7 +40,6 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
       folderPath: "",
       basename: "preview-test.png",
       storageId: s2,
-      publish: true,
     });
 
     // Verify v1 is archived
@@ -61,36 +59,6 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
     expect((result?.url ?? "").length).toBeGreaterThan(0);
   });
 
-  it("returns URL for draft versions (for admin preview)", async () => {
-    const t = convexTest(schema, modules);
-
-    const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-      size: 100,
-      contentType: "application/json",
-    });
-
-    const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
-      folderPath: "",
-      basename: "draft-preview.json",
-      storageId,
-      publish: false, // Draft only
-    });
-
-    // Verify it's a draft
-    const versions = await t.query(api.assetManager.getAssetVersions, {
-      folderPath: "",
-      basename: "draft-preview.json",
-    });
-    expect(versions[0]?.state).toBe("draft");
-
-    // Draft version should be previewable in admin
-    const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, { versionId });
-
-    expect(result).not.toBeNull();
-    expect(result?.url).toBeDefined();
-    expect((result?.url ?? "").length).toBeGreaterThan(0);
-  });
-
   it("returns URL for published versions", async () => {
     const t = convexTest(schema, modules);
 
@@ -103,7 +71,6 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
       folderPath: "",
       basename: "published-preview.txt",
       storageId,
-      publish: true,
     });
 
     const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, { versionId });
@@ -120,7 +87,6 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
     const { versionId } = await t.mutation(api.assetManager.commitVersion, {
       folderPath: "",
       basename: "no-storage.txt",
-      publish: true,
     });
 
     const result = await t.query(api.assetFsHttp.getVersionPreviewUrl, { versionId });
@@ -132,28 +98,6 @@ describe("getVersionPreviewUrl (admin preview - any version state)", () => {
 
 describe("getVersionForServing (HTTP file serving logic)", () => {
   describe("access - any version with storage is served", () => {
-    it("serves draft versions (version IDs are opaque, no access restriction)", async () => {
-      const t = convexTest(schema, modules);
-
-      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-        size: 100,
-        contentType: "text/plain",
-      });
-
-      const { versionId } = await t.mutation(api.assetManager.createVersionFromStorageId, {
-        folderPath: "drafts",
-        basename: "secret.txt",
-        storageId,
-        publish: false, // Draft only
-      });
-
-      const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
-
-      // Draft versions ARE served - knowing the version ID is sufficient
-      expect(result).not.toBeNull();
-      expect(result?.storageId).toEqual(storageId);
-    });
-
     it("serves archived versions (old links should not break)", async () => {
       const t = convexTest(schema, modules);
 
@@ -171,7 +115,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "",
         basename: "doc.txt",
         storageId: s1,
-        publish: true,
       });
 
       // Publishing v2 archives v1
@@ -179,7 +122,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "",
         basename: "doc.txt",
         storageId: s2,
-        publish: true,
       });
 
       // v1 is now archived - should STILL be servable
@@ -203,7 +145,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "api",
         basename: "config.json",
         storageId,
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
@@ -219,7 +160,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
       const { versionId } = await t.mutation(api.assetManager.commitVersion, {
         folderPath: "",
         basename: "no-file.txt",
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
@@ -242,7 +182,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "images",
         basename: "icon.png",
         storageId,
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
@@ -271,7 +210,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "videos",
         basename: "intro.mp4",
         storageId,
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
@@ -300,7 +238,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "archives",
         basename: "data.zip",
         storageId,
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
@@ -322,7 +259,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "archives",
         basename: "big-data.zip",
         storageId,
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
@@ -344,7 +280,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "docs",
         basename: "report.pdf",
         storageId,
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });
@@ -367,7 +302,6 @@ describe("getVersionForServing (HTTP file serving logic)", () => {
         folderPath: "misc",
         basename: "unknown.bin",
         storageId,
-        publish: true,
       });
 
       const result = await t.query(api.assetFsHttp.getVersionForServing, { versionId });

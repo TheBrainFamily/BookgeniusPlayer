@@ -40,7 +40,7 @@ export function BookAwareAssetList(props: BookAwareAssetListProps) {
   const { folderPath, onFolderSelect } = props;
 
   // Detect folder type from path
-  const folderType = useMemo(() => detectFolderType(folderPath, undefined), [folderPath]);
+  const folderType = useMemo(() => detectFolderType(folderPath), [folderPath]);
 
   // Parse book path for context
   const bookInfo = useMemo(() => parseBookPath(folderPath), [folderPath]);

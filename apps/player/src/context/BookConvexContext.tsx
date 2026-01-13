@@ -20,11 +20,11 @@ import React, {
 } from "react";
 import { useQuery, useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { useDraftMode } from "./DraftModeContext";
 import {
   detectSourceFormat,
   normalizeChapterHtml,
   normalizeChapterHtmlEnhanced,
+  normalizeChapterHtmlPoemProse,
   extractCharacterOccurrences,
   type CharacterOccurrence,
   type RenderMode,
@@ -67,7 +67,6 @@ export interface ChapterInfo {
   title?: string;
   url?: string;
   state?: string;
-  hasDraft?: boolean;
 }
 
 type HtmlSourceChapterQueryItem = {
@@ -84,7 +83,7 @@ export interface CharacterBundle {
   path: string;
   slug: string;
   name: string;
-  extra: {
+  metadata: {
     displayName?: string;
     summary?: string;
     aiPrompt?: string;
@@ -119,7 +118,7 @@ export interface BookMetadata {
   path: string;
   slug: string;
   name: string;
-  extra: { title: string; author: string; language?: string; form?: string };
+  metadata: { title: string; author: string; language?: string; form?: string };
 }
 
 type ChapterHtmlEntry = { chapterNumber: number; html?: string };
@@ -131,7 +130,10 @@ const buildChapterPlaceholderHtml = (chapterNumber: number): string => {
 const getRenderModeFromUrl = (): RenderMode => {
   if (typeof window === "undefined") return "default";
   const params = new URLSearchParams(window.location.search);
-  return params.get("renderMode") === "enhancedProse" ? "enhancedProse" : "default";
+  const mode = params.get("renderMode");
+  if (mode === "enhancedProse") return "enhancedProse";
+  if (mode === "poemProse") return "poemProse";
+  return "default";
 };
 
 const buildBookHtmlFromChapters = (
@@ -142,12 +144,16 @@ const buildBookHtmlFromChapters = (
 ): string => {
   const form = bookForm.toLowerCase();
   const useEnhancedProse = renderMode === "enhancedProse" && form !== "play";
+  const usePoemProse = renderMode === "poemProse";
 
   let html = chapters
     .map((chapter) => {
       const chapterHtml = chapter.html ?? buildChapterPlaceholderHtml(chapter.chapterNumber);
       const format = detectSourceFormat(chapterHtml);
       if (format === "source") {
+        if (usePoemProse) {
+          return normalizeChapterHtmlPoemProse(chapterHtml, enhancedOptions);
+        }
         return useEnhancedProse
           ? normalizeChapterHtmlEnhanced(chapterHtml, enhancedOptions)
           : normalizeChapterHtml(chapterHtml);
@@ -160,7 +166,7 @@ const buildBookHtmlFromChapters = (
     html = `<div class="play-container">${html}</div>`;
   } else if (form === "mixed") {
     html = `<div class="play-container mixed-container">${html}</div>`;
-  } else if (useEnhancedProse) {
+  } else if (useEnhancedProse || usePoemProse) {
     html = `<div class="play-container">${html}</div>`;
   }
 
@@ -241,8 +247,6 @@ interface BookConvexProviderProps {
 }
 
 export function BookConvexProvider({ bookPath, children }: BookConvexProviderProps) {
-  const draftMode = useDraftMode();
-
   const [bookStringified, setBookStringified] = useState<string | null>(null);
   const [chaptersData, setChaptersData] = useState<ChapterTitle[]>([]);
   const [charactersData, setCharactersData] = useState<CharacterData[]>([]);
@@ -273,14 +277,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     | null
     | undefined;
   const charactersQuery = useQuery(api.bookQueries.listCharacterBundles, { bookPath });
-  const backgroundsQuery = useQuery(
-    draftMode ? api.backgroundCues.listForPlayerWithDrafts : api.backgroundCues.listForPlayer,
-    { bookPath },
-  );
-  const musicQuery = useQuery(
-    draftMode ? api.musicCues.listForPlayerWithDrafts : api.musicCues.listForPlayer,
-    { bookPath },
-  );
+  const backgroundsQuery = useQuery(api.backgroundCues.listForPlayer, { bookPath });
+  const musicQuery = useQuery(api.musicCues.listForPlayer, { bookPath });
   const figuresQuery = useQuery(api.bookQueries.listFigures, { bookPath });
   const audiobookTracksQuery = useQuery(api.bookQueries.listAudiobookTracks, { bookPath });
   const cutScenesQuery = useQuery(api.bookQueries.listCutScenes, { bookPath });
@@ -299,7 +297,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       path: bookMetadata.path,
       slug: bookMetadata.slug,
       name: bookMetadata.name,
-      extra: bookMetadata.extra as BookMetadata["extra"],
+      metadata: bookMetadata.metadata as BookMetadata["metadata"],
     };
   }, [bookMetadata]);
 
@@ -323,7 +321,6 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       title: c.title,
       url: c.url,
       state: "published",
-      hasDraft: false,
     }));
   }, [htmlSourceChaptersQuery]);
 
@@ -337,14 +334,14 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   );
 
   useEffect(() => {
-    if (draftMode || chapterStructure.length === 0) return;
+    if (chapterStructure.length === 0) return;
     bookIndex.setParagraphCountOverrides(chapterStructure);
     const totalParagraphs = chapterStructure.reduce((sum, entry) => sum + entry.paragraphCount, 0);
     console.log("[BookConvex] Paragraph counts set", {
       chapters: chapterStructure.length,
       totalParagraphs,
     });
-  }, [draftMode, chapterStructure]);
+  }, [chapterStructure]);
 
   const characters = useMemo<CharacterBundle[]>(() => {
     if (!charactersQuery) return [];
@@ -352,7 +349,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       path: c.path,
       slug: c.slug,
       name: c.name,
-      extra: c.extra as CharacterBundle["extra"],
+      metadata: c.metadata as CharacterBundle["metadata"],
       avatar: c.avatar,
       avatarLarge: c.avatarLarge,
       speaks: c.speaks,
@@ -418,11 +415,15 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const renderMode = useMemo(() => getRenderModeFromUrl(), []);
   const bookFormValue = useMemo(
-    () => book?.extra?.form?.toLowerCase() || "book",
-    [book?.extra?.form],
+    () => book?.metadata?.form?.toLowerCase() || "book",
+    [book?.metadata?.form],
   );
   const isPlayLayout = useMemo(
-    () => bookFormValue === "play" || bookFormValue === "mixed" || renderMode === "enhancedProse",
+    () =>
+      bookFormValue === "play" ||
+      bookFormValue === "mixed" ||
+      renderMode === "enhancedProse" ||
+      renderMode === "poemProse",
     [bookFormValue, renderMode],
   );
 
@@ -432,9 +433,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       slug: bookSlug,
       metadata: {
         title: book.name,
-        author: book.extra.author,
-        language: book.extra.language,
-        bookForm: book.extra.form?.toLowerCase(),
+        author: book.metadata.author,
+        language: book.metadata.language,
+        bookForm: book.metadata.form?.toLowerCase(),
       },
       chapters: chaptersData,
       hasAudiobook: false,
@@ -520,7 +521,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
     const speakerDisplayNames = new Map<string, string>();
     for (const char of characters) {
-      speakerDisplayNames.set(char.slug.toLowerCase(), char.extra.displayName ?? char.name);
+      speakerDisplayNames.set(char.slug.toLowerCase(), char.metadata.displayName ?? char.name);
     }
     const htmlResult = buildBookHtmlFromChapters(
       buildHtmlSourceChapterEntries(),
@@ -558,8 +559,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     const characterIndex: CharacterIndex = { form, characters: {} };
     for (const char of characters) {
       characterIndex.characters[char.slug] = {
-        name: char.extra.displayName ?? char.name,
-        summary: char.extra.summary ?? "",
+        name: char.metadata.displayName ?? char.name,
+        summary: char.metadata.summary ?? "",
       };
     }
 
@@ -726,7 +727,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     setChaptersData([]);
     setCharactersData([]);
     setError(null);
-  }, [draftMode, bookPath]);
+  }, [bookPath]);
 
   useEffect(() => {
     if (htmlSourceChaptersQuery === undefined) return;
@@ -764,10 +765,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
         return {
           ...char,
-          characterName: bundle.extra.displayName ?? bundle.name,
+          characterName: bundle.metadata.displayName ?? bundle.name,
           infoPerChapter: char.infoPerChapter.map((chapterInfo) => ({
             ...chapterInfo,
-            summary: bundle.extra.summary ?? "",
+            summary: bundle.metadata.summary ?? "",
           })),
           media: {
             avatarUrl: bundle.avatar?.url,

@@ -120,7 +120,7 @@ export function ChaptersView({ onChapterSelect }: ChaptersViewProps) {
                   "w-full text-left p-4 rounded-lg border transition-all",
                   "hover:border-primary/50 hover:bg-accent/50",
                   "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                  isPublished ? "border-success/30 bg-success/5" : "border-warning/30 bg-warning/5",
+                  isPublished ? "border-success/30 bg-success/5" : "border-border bg-surface-1",
                 )}
               >
                 <div className="flex items-start gap-3">
@@ -136,9 +136,9 @@ export function ChaptersView({ onChapterSelect }: ChaptersViewProps) {
                           Published
                         </Badge>
                       ) : (
-                        <Badge variant="draft" className="text-xs">
+                        <Badge variant="muted" className="text-xs">
                           <AlertCircle className="h-3 w-3 mr-1" />
-                          Draft
+                          Unpublished
                         </Badge>
                       )}
                     </div>

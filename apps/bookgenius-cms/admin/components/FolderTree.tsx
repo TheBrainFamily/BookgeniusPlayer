@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { detectFolderType, getFolderIcon } from "../../lib/utils/folderPatterns";
-import type { FolderExtra } from "../../lib/types/book";
 import { Button } from "@/components/ui/button";
 import {
   ContextMenu,
@@ -37,7 +36,6 @@ interface FolderData {
   _id: string;
   path: string;
   name: string;
-  extra?: FolderExtra;
   _creationTime: number;
 }
 
@@ -110,7 +108,7 @@ function FolderItem({
               )}
             </span>
             <span className="text-sm shrink-0" role="img" aria-label="folder icon">
-              {getFolderIcon(detectFolderType(folder.path, folder.extra))}
+              {getFolderIcon(detectFolderType(folder.path))}
             </span>
             <span className="truncate">{folder.name}</span>
           </button>

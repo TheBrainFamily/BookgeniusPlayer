@@ -13,6 +13,8 @@ import type * as allocateFolderSegment from "../allocateFolderSegment.js";
 import type * as assetFsHttp from "../assetFsHttp.js";
 import type * as assetManager from "../assetManager.js";
 import type * as authAdapter from "../authAdapter.js";
+import type * as changelog from "../changelog.js";
+import type * as helpers_changelog from "../helpers/changelog.js";
 import type * as helpers_parseVersionIdFromPath from "../helpers/parseVersionIdFromPath.js";
 import type * as internalQueries from "../internalQueries.js";
 import type * as r2Client from "../r2Client.js";
@@ -34,6 +36,8 @@ const fullApi: ApiFromModules<{
   assetFsHttp: typeof assetFsHttp;
   assetManager: typeof assetManager;
   authAdapter: typeof authAdapter;
+  changelog: typeof changelog;
+  "helpers/changelog": typeof helpers_changelog;
   "helpers/parseVersionIdFromPath": typeof helpers_parseVersionIdFromPath;
   internalQueries: typeof internalQueries;
   r2Client: typeof r2Client;

@@ -16,24 +16,28 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
   const startAvatarGeneration = useAction(api.avatarGeneration.startAvatarGeneration);
   const { setOptimisticAvatar, clearOptimisticAvatar, startOptimisticGeneration } =
     useAvatarGenerationStore();
-  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showPromptEditor, setShowPromptEditor] = useState(false);
-  const [editablePrompt, setEditablePrompt] = useState(character.extra?.aiPrompt || "");
+  const [editablePrompt, setEditablePrompt] = useState(character.metadata?.aiPrompt || "");
   const [isRegenerating, setIsRegenerating] = useState(false);
 
-  const proposalUrls = character.extra?.avatarProposalUrls || [];
-  const displayName = character.extra?.displayName || character.name;
+  const proposalUrls = character.metadata?.avatarProposalUrls || [];
+  const displayName = character.metadata?.displayName || character.name;
 
   const handleConfirm = () => {
-    if (!selectedUrl || !book?.path) return;
+    if (selectedIndex === null || !book?.path) return;
 
-    setOptimisticAvatar(character.slug, selectedUrl);
+    // Use URL for optimistic UI display only
+    const selectedUrl = proposalUrls[selectedIndex];
+    if (selectedUrl) {
+      setOptimisticAvatar(character.slug, selectedUrl);
+    }
     onClose();
 
     confirmAvatarSelection({
       bookPath: book.path,
       characterSlug: character.slug,
-      selectedOptionUrl: selectedUrl,
+      optionIndex: selectedIndex,
     })
       .then((result) => {
         if (!result.success) {
@@ -76,9 +80,9 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
           {proposalUrls.map((url, index) => (
             <button
               key={index}
-              onClick={() => setSelectedUrl(url)}
+              onClick={() => setSelectedIndex(index)}
               className={`relative rounded-lg overflow-hidden border-2 transition-all ${
-                selectedUrl === url
+                selectedIndex === index
                   ? "border-purple-500 ring-2 ring-purple-500/50"
                   : "border-zinc-600 hover:border-zinc-500"
               }`}
@@ -88,7 +92,7 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
                 alt={`Option ${index + 1}`}
                 className="w-full aspect-square object-cover"
               />
-              {selectedUrl === url && (
+              {selectedIndex === index && (
                 <div className="absolute top-2 right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
                   <svg
                     className="w-4 h-4 text-white"
@@ -153,7 +157,7 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedUrl}
+            disabled={selectedIndex === null}
             className="flex-1 bg-purple-600 text-white hover:bg-purple-500 h-11 px-4 py-2 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Use This Avatar
@@ -203,7 +207,7 @@ const GeneratingBanner: React.FC<{ character: CharacterBundle }> = ({ character 
   >
     <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
     <span className="text-sm text-zinc-300">
-      Generating avatar for {character.extra?.displayName || character.name}...
+      Generating avatar for {character.metadata?.displayName || character.name}...
     </span>
   </motion.div>
 );
@@ -213,7 +217,7 @@ const ReadyBannerWithPreload: React.FC<{ character: CharacterBundle; onClick: ()
   onClick,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const proposalUrls = character.extra?.avatarProposalUrls || [];
+  const proposalUrls = character.metadata?.avatarProposalUrls || [];
   const previewUrls = proposalUrls.slice(0, 2);
   const imagesLoaded = usePreloadedImages(previewUrls);
 
@@ -284,7 +288,7 @@ const ReadyBannerWithPreload: React.FC<{ character: CharacterBundle; onClick: ()
 
       <span className="relative text-sm font-medium text-emerald-50">
         Avatar ready for{" "}
-        <span className="font-semibold">{character.extra?.displayName || character.name}</span>
+        <span className="font-semibold">{character.metadata?.displayName || character.name}</span>
       </span>
 
       <motion.div
@@ -318,11 +322,12 @@ export const AvatarGenerationBadge: React.FC = () => {
   } = useAvatarGenerationStore();
 
   const serverGenerating = characters.filter(
-    (c) => c.extra?.avatarGenerationState === "generating",
+    (c) => c.metadata?.avatarGenerationState === "generating",
   );
   const readyCharacters = characters.filter(
     (c) =>
-      c.extra?.avatarGenerationState === "ready" && (c.extra?.avatarProposalUrls?.length ?? 0) > 0,
+      c.metadata?.avatarGenerationState === "ready" &&
+      (c.metadata?.avatarProposalUrls?.length ?? 0) > 0,
   );
 
   const serverGeneratingSlugs = useMemo(
@@ -345,7 +350,7 @@ export const AvatarGenerationBadge: React.FC = () => {
   useEffect(() => {
     for (const slug of Object.keys(optimisticAvatars)) {
       const character = characters.find((c) => c.slug.toLowerCase() === slug);
-      const stateIsComplete = character?.extra?.avatarGenerationState !== "ready";
+      const stateIsComplete = character?.metadata?.avatarGenerationState !== "ready";
       if (character?.avatar?.url && stateIsComplete) {
         clearOptimisticAvatar(slug);
       }
@@ -363,7 +368,7 @@ export const AvatarGenerationBadge: React.FC = () => {
         ({
           slug: o.slug,
           name: o.displayName,
-          extra: { displayName: o.displayName },
+          metadata: { displayName: o.displayName },
         }) as CharacterBundle,
     ),
   ];

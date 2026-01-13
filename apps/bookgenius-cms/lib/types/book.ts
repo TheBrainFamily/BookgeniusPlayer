@@ -1,80 +1,55 @@
 /**
  * BookGenius CMS Type System
  *
- * These types define the structure of metadata stored in folder.extra and asset.extra fields.
- * Type safety is enforced at the app layer (TypeScript + Zod validators), not at the DB level.
- *
- * Folder Structure:
- *   books/
- *     {book-slug}/                   <- BookFolderExtra
- *       characters/
- *         {character-slug}/          <- CharacterFolderExtra
- *           avatar.png
- *           speaks.mp4
- *           listens.mp4
- *       chapters/
- *         chapter-{n}.xml            <- ChapterExtra
- *       backgrounds/
- *         ch{n}-p{m}.mp4             <- BackgroundExtra
- *       music/
- *         {scene}.mp3                <- MusicExtra
+ * Metadata is stored in app-level tables:
+ * - books (book metadata)
+ * - characterMetadata (character metadata)
+ * - chapterMetadata (chapter metadata)
+ * - backgroundCues / musicCues (cue positions)
  */
 
 // =============================================================================
-// Folder Extra Types (stored in folder.extra)
+// Metadata Types
 // =============================================================================
 
-export interface BookFolderExtra {
-  type: "book";
-  title: string;
-  author: string;
-  language: string;
-  form?: string; // e.g., "novel", "play", "poem"
-  visualStyle?: string; // AI prompt for generating character visuals
+export interface BookMetadata {
+  title?: string;
+  author?: string;
+  language?: string;
+  form?: string;
+  visualStyle?: string;
+  backgroundStyle?: string;
+  periodStyle?: string;
+  avatarStyle?: string;
 }
 
-export interface CharacterFolderExtra {
-  type: "character";
+export interface CharacterMetadata {
   displayName: string;
   summary: string;
-  aiPrompt?: string; // Additional prompt for generating this character's visuals
+  aiPrompt?: string;
+  avatarGenerationState?: "generating" | "ready" | "error" | "none";
+  avatarProposalUrls?: string[];
 }
 
-// Generic folder extras (characters, chapters, backgrounds, music containers)
-export interface ContainerFolderExtra {
-  type: "characters-container" | "chapters-container" | "backgrounds-container" | "music-container";
-}
-
-export type FolderExtra = BookFolderExtra | CharacterFolderExtra | ContainerFolderExtra | undefined;
-
-// =============================================================================
-// Asset Version Extra Types (stored in assetVersion.extra - versioned!)
-// =============================================================================
-
-export interface ChapterExtra {
-  type: "chapter";
+export interface ChapterMetadata {
   chapterNumber: number;
-  title: string;
+  title?: string;
+  paragraphCount?: number;
+  sourceFormat?: string;
 }
 
-export interface BackgroundExtra {
-  type: "background";
+export interface BackgroundCueMetadata {
   chapter: number;
   paragraph: number;
-  backgroundColor: string; // hex color
-  textColor: string; // hex color
+  backgroundColor?: string;
+  textColor?: string;
 }
 
-export interface MusicExtra {
-  type: "music";
+export interface MusicCueMetadata {
   chapter: number;
   paragraph: number;
+  order?: number;
 }
-
-// Character assets don't need extra - they're identified by filename (avatar, speaks, listens)
-export type CharacterAssetType = "avatar" | "speaks" | "listens";
-
-export type AssetExtra = ChapterExtra | BackgroundExtra | MusicExtra | undefined;
 
 // =============================================================================
 // Derived Types (for UI components)
@@ -83,7 +58,7 @@ export type AssetExtra = ChapterExtra | BackgroundExtra | MusicExtra | undefined
 export interface CharacterBundle {
   path: string; // Full path to character folder, e.g., "books/1984/characters/winston"
   slug: string; // Character slug, e.g., "winston"
-  meta: CharacterFolderExtra;
+  metadata: CharacterMetadata;
   avatar?: { url: string; versionId: string };
   speaks?: { url: string; versionId: string };
   listens?: { url: string; versionId: string };
@@ -92,7 +67,7 @@ export interface CharacterBundle {
 export interface ChapterInfo {
   path: string; // Full path to chapter asset
   basename: string; // e.g., "chapter-1.xml"
-  extra: ChapterExtra;
+  metadata: ChapterMetadata;
   url: string;
   versionId: string;
 }
@@ -100,7 +75,7 @@ export interface ChapterInfo {
 export interface BackgroundInfo {
   path: string;
   basename: string;
-  extra: BackgroundExtra;
+  metadata?: BackgroundCueMetadata;
   url: string;
   versionId: string;
 }
@@ -108,7 +83,7 @@ export interface BackgroundInfo {
 export interface MusicInfo {
   path: string;
   basename: string;
-  extra: MusicExtra;
+  metadata?: MusicCueMetadata;
   url: string;
   versionId: string;
 }
@@ -116,63 +91,16 @@ export interface MusicInfo {
 export interface BookInfo {
   path: string; // e.g., "books/1984-English"
   slug: string; // e.g., "1984-English"
-  meta: BookFolderExtra;
+  metadata: BookMetadata;
   characterCount?: number;
   chapterCount?: number;
 }
 
 // =============================================================================
-// Type Guards
-// =============================================================================
-
-export function isBookFolder(extra: unknown): extra is BookFolderExtra {
-  return (
-    typeof extra === "object" &&
-    extra !== null &&
-    "type" in extra &&
-    (extra as BookFolderExtra).type === "book"
-  );
-}
-
-export function isCharacterFolder(extra: unknown): extra is CharacterFolderExtra {
-  return (
-    typeof extra === "object" &&
-    extra !== null &&
-    "type" in extra &&
-    (extra as CharacterFolderExtra).type === "character"
-  );
-}
-
-export function isChapterAsset(extra: unknown): extra is ChapterExtra {
-  return (
-    typeof extra === "object" &&
-    extra !== null &&
-    "type" in extra &&
-    (extra as ChapterExtra).type === "chapter"
-  );
-}
-
-export function isBackgroundAsset(extra: unknown): extra is BackgroundExtra {
-  return (
-    typeof extra === "object" &&
-    extra !== null &&
-    "type" in extra &&
-    (extra as BackgroundExtra).type === "background"
-  );
-}
-
-export function isMusicAsset(extra: unknown): extra is MusicExtra {
-  return (
-    typeof extra === "object" &&
-    extra !== null &&
-    "type" in extra &&
-    (extra as MusicExtra).type === "music"
-  );
-}
-
-// =============================================================================
 // Character Asset Identification
 // =============================================================================
+
+export type CharacterAssetType = "avatar" | "speaks" | "listens";
 
 const CHARACTER_ASSET_PATTERNS: Record<CharacterAssetType, RegExp> = {
   avatar: /^avatar\.(png|jpg|jpeg|webp)$/i,

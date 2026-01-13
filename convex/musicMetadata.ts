@@ -183,11 +183,7 @@ export const extractFromFile = internalAction({
 
         const { intentId, uploadUrl, backend } = await ctx.runMutation(
           internal.generateUploadUrl.startUploadInternal,
-          {
-            folderPath: coversPath,
-            basename: coverBasename,
-            publish: true, // Auto-publish covers
-          },
+          { folderPath: coversPath, basename: coverBasename },
         );
 
         const uploadRes = await fetch(uploadUrl, {

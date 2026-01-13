@@ -147,7 +147,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
         characterSlug: selectedCharacter,
         characterDisplayName: charData.characterName,
         currentAvatarUrl: bundle?.avatar?.url,
-        aiPrompt: bundle?.extra?.aiPrompt as string | undefined,
+        aiPrompt: bundle?.metadata?.aiPrompt as string | undefined,
       },
       true,
     );

@@ -39,7 +39,7 @@ export interface SimpleCharacterMetadata {
 export interface CharacterBundleForExtractor {
   slug: string;
   name: string;
-  extra: { displayName?: string; summary?: string };
+  metadata: { displayName?: string; summary?: string };
   avatar?: { url: string };
   listens?: { url: string };
   speaks?: { url: string };
@@ -187,7 +187,7 @@ const getSummaryForCharacter = (
   if (!bundle) {
     throw new Error(`Character bundle not found for slug: ${slug}`);
   }
-  return bundle.extra.summary ?? "";
+  return bundle.metadata.summary ?? "";
 };
 
 const getDisplayForCharacter = (
@@ -198,7 +198,7 @@ const getDisplayForCharacter = (
   if (!bundle) {
     throw new Error(`Character bundle not found for slug: ${slug}`);
   }
-  return bundle.extra.displayName ?? bundle.name;
+  return bundle.metadata.displayName ?? bundle.name;
 };
 
 /**

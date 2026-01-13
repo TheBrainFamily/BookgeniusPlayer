@@ -1,4 +1,4 @@
-import { ConvexHttpClient } from "convex/browser";
+import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import "dotenv/config";
 
@@ -8,7 +8,7 @@ if (!CONVEX_URL) {
   throw new Error("Missing CONVEX_URL environment variable");
 }
 
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = new AdminConvexHttpClient(CONVEX_URL);
 
 export type StepStatus = "pending" | "running" | "done" | "error" | "skipped";
 export type AvatarState = "generating" | "ready" | "error" | "none";
@@ -59,6 +59,17 @@ export const convex = {
     avatarStyle?: string;
   }) {
     return await client.mutation(api.generator.updateGraphicalStyle, args);
+  },
+
+  async updateChapterMetadata(args: {
+    bookPath: string;
+    folderPath: string;
+    basename: string;
+    chapterNumber: number;
+    title?: string;
+    sourceFormat?: string;
+  }) {
+    return await client.mutation(api.metadata.updateChapterMetadata, args);
   },
 
   async ensureCharacterFolder(args: {
@@ -129,13 +140,7 @@ export const convex = {
     return await client.query(api.generator.getGenerationStatus, { bookPath });
   },
 
-  async startUpload(args: {
-    folderPath: string;
-    basename: string;
-    filename?: string;
-    publish?: boolean;
-    extra?: unknown;
-  }) {
+  async startUpload(args: { folderPath: string; basename: string; filename?: string }) {
     return await client.mutation(api.importHelpers.startUpload, args);
   },
 
@@ -155,14 +160,10 @@ export const convex = {
     basename: string;
     content: Buffer | Uint8Array;
     contentType: string;
-    publish?: boolean;
-    extra?: unknown;
   }): Promise<{ assetId: string; versionId: string; version: number }> {
     const { intentId, uploadUrl, backend } = await this.startUpload({
       folderPath: args.folderPath,
       basename: args.basename,
-      publish: args.publish ?? true,
-      extra: args.extra,
     });
 
     const body = toArrayBufferView(args.content);
@@ -221,23 +222,13 @@ export async function getChapterXml(
 export async function getCharacterReferenceCards(
   bookPath: string,
 ): Promise<CharacterReferenceCard[]> {
-  const folders = await client.query(api.cli.listFolders, { parentPath: `${bookPath}/characters` });
+  const characters = await client.query(api.metadata.listCharacterMetadata, { bookPath });
 
-  if (!folders || folders.length === 0) {
+  if (!characters || characters.length === 0) {
     return [];
   }
 
-  return folders
-    .filter((f) => f.extra?.summary)
-    .map((f) => {
-      const pathParts = f.path.split("/");
-      const slug = pathParts[pathParts.length - 1];
-      return {
-        name: f.name || slug || "Unknown",
-        slug: slug || f.name || "unknown",
-        summary: (f.extra as { summary?: string })?.summary || "",
-      };
-    });
+  return characters.map((c) => ({ name: c.displayName, slug: c.slug, summary: c.summary }));
 }
 
 export interface CharacterFolder {
@@ -250,32 +241,20 @@ export interface CharacterFolder {
 }
 
 export async function getCharacterFolders(bookPath: string): Promise<CharacterFolder[]> {
-  const folders = await client.query(api.cli.listFolders, { parentPath: `${bookPath}/characters` });
+  const characters = await client.query(api.metadata.listCharacterMetadata, { bookPath });
 
-  if (!folders || folders.length === 0) {
+  if (!characters || characters.length === 0) {
     return [];
   }
 
-  return folders.map((f) => {
-    const pathParts = f.path.split("/");
-    const slug = pathParts[pathParts.length - 1];
-    const extra = f.extra as
-      | {
-          displayName?: string;
-          summary?: string;
-          aiPrompt?: string;
-          avatarGenerationState?: "generating" | "ready" | "error" | "none";
-        }
-      | undefined;
-    return {
-      path: f.path,
-      slug: slug || "",
-      displayName: extra?.displayName || f.name || slug || "Unknown",
-      summary: extra?.summary || "",
-      aiPrompt: extra?.aiPrompt,
-      avatarGenerationState: extra?.avatarGenerationState,
-    };
-  });
+  return characters.map((c) => ({
+    path: c.characterPath,
+    slug: c.slug,
+    displayName: c.displayName,
+    summary: c.summary,
+    aiPrompt: c.aiPrompt,
+    avatarGenerationState: c.avatarGenerationState ?? undefined,
+  }));
 }
 
 export async function getPublishedFilesInFolder(

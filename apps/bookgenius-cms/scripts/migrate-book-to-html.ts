@@ -239,7 +239,8 @@ function convexRun(command: string, args: Record<string, unknown>): string {
   const tempFile = join(rootDir, ".convex-args-temp.json");
   writeFileSync(tempFile, argsJson);
   try {
-    const result = execSync(`npx convex run ${command} "$(cat ${tempFile})"`, {
+    // Use wrapper script that injects admin identity
+    const result = execSync(`./scripts/convex run ${command} "$(cat ${tempFile})"`, {
       encoding: "utf-8",
       cwd: rootDir,
       shell: "/bin/bash",

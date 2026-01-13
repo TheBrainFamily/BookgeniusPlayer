@@ -14,7 +14,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { ConvexHttpClient } from "convex/browser";
+import { AdminConvexHttpClient } from "../../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import { convertSEBook, getSEBookImagesDir, type SEImageReference } from "./index";
 import { JSDOM } from "jsdom";
@@ -36,28 +36,13 @@ interface SEMetadata {
   published: string;
 }
 
-interface BookFolderExtra {
-  type: "book";
-  title: string;
-  author: string;
-  language: string;
-  form: string;
-  description?: string;
-}
-
-interface CharacterFolderExtra {
-  type: "character";
-  displayName: string;
-  summary: string;
-}
-
 const CONVEX_URL = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
 if (!CONVEX_URL) {
   console.error("Missing CONVEX_URL environment variable");
   process.exit(1);
 }
 
-const client = new ConvexHttpClient(CONVEX_URL);
+const client = new AdminConvexHttpClient(CONVEX_URL);
 
 function parseArgs(): { seSlug: string; targetSlug: string } {
   const args = process.argv.slice(2);
@@ -153,7 +138,7 @@ function splitHtmlIntoChapters(
   return chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
 }
 
-async function createFolderIfNeeded(folderPath: string, extra?: object): Promise<void> {
+async function createFolderIfNeeded(folderPath: string): Promise<void> {
   try {
     const existing = await client.query(api.cli.getFolder, { path: folderPath });
     if (existing) {
@@ -163,7 +148,7 @@ async function createFolderIfNeeded(folderPath: string, extra?: object): Promise
   } catch {}
 
   try {
-    await client.mutation(api.cli.createFolderByPath, { path: folderPath, extra });
+    await client.mutation(api.cli.createFolderByPath, { path: folderPath });
     console.log(`  Created folder: ${folderPath}`);
   } catch (error) {
     console.error(`  Failed to create folder ${folderPath}:`, error);
@@ -201,7 +186,7 @@ async function uploadFile(
   try {
     const { intentId, uploadUrl, backend } = await client.mutation(
       api.generateUploadUrl.startUpload,
-      { folderPath, basename, publish: true },
+      { folderPath, basename },
     );
 
     const response = await fetch(uploadUrl, {
@@ -236,15 +221,14 @@ async function step1_CreateFolderStructure(bookPath: string, metadata: SEMetadat
 
   await createFolderIfNeeded("books");
 
-  const bookExtra: BookFolderExtra = {
-    type: "book",
+  await createFolderIfNeeded(bookPath);
+  await client.mutation(api.metadata.updateBookMetadata, {
+    bookPath,
     title: metadata.title,
     author: metadata.author,
     language: metadata.language.split("-")[0],
     form: "Prose",
-    description: metadata.description,
-  };
-  await createFolderIfNeeded(bookPath, bookExtra);
+  });
 
   await createFolderIfNeeded(`${bookPath}/characters`);
   await createFolderIfNeeded(`${bookPath}/chapters`);
@@ -266,12 +250,13 @@ async function step2_ImportCharacters(
     console.log(`  Processing: ${char.displayName} (${char.slug})`);
 
     const charPath = `${bookPath}/characters/${char.slug}`;
-    const charExtra: CharacterFolderExtra = {
-      type: "character",
+    await createFolderIfNeeded(charPath);
+    await client.mutation(api.metadata.updateCharacterMetadata, {
+      bookPath,
+      characterSlug: char.slug,
       displayName: char.displayName,
       summary: "",
-    };
-    await createFolderIfNeeded(charPath, charExtra);
+    });
 
     if (legacyAssetsDir) {
       const avatarExtensions = [".png", ".jpg", ".jpeg", ".webp"];

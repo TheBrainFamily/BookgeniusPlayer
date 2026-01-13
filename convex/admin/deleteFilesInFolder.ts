@@ -7,10 +7,10 @@ import { components } from "../_generated/api";
  * Does NOT delete the folder itself or subfolders.
  *
  * Usage:
- *   npx convex run admin/deleteFilesInFolder:deleteFilesInFolder '{"folderPath": "books/my-book/characters/hero"}'
+ *   ./scripts/convex run admin/deleteFilesInFolder:deleteFilesInFolder '{"folderPath": "books/my-book/characters/hero"}'
  *
  * To delete only avatar files:
- *   npx convex run admin/deleteFilesInFolder:deleteFilesInFolder '{"folderPath": "books/my-book/characters/hero", "basenames": ["avatar-large.png", "avatar.webp"]}'
+ *   ./scripts/convex run admin/deleteFilesInFolder:deleteFilesInFolder '{"folderPath": "books/my-book/characters/hero", "basenames": ["avatar-large.png", "avatar.webp"]}'
  */
 export const deleteFilesInFolder = adminMutation({
   args: {

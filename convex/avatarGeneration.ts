@@ -1,6 +1,12 @@
 import { v } from "convex/values";
-import { internal, components } from "./_generated/api";
-import { internalAction, internalMutation, bookAction, bookMutation } from "./functions";
+import { api, internal, components } from "./_generated/api";
+import {
+  internalAction,
+  internalMutation,
+  bookAction,
+  bookMutation,
+  adminAction,
+} from "./functions";
 import OpenAI from "openai";
 
 const PROPOSALS_FOLDER = "avatar-proposals";
@@ -15,16 +21,12 @@ export const generateAvatarOptions = internalAction({
   returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
   handler: async (ctx, { bookPath, characterSlug, characterDisplayName, visualPrompt }) => {
     try {
-      const bookFolder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-        path: bookPath,
-      });
-
-      if (!bookFolder) {
+      const book = await ctx.runQuery(api.metadata.getBookMetadata, { bookPath });
+      if (!book) {
         return { success: false, error: "Book folder not found" };
       }
 
-      const bookExtra = (bookFolder.extra as Record<string, unknown>) || {};
-      const avatarStyle = (bookExtra.avatarStyle as string) || "";
+      const avatarStyle = book.avatarStyle || "";
 
       if (!avatarStyle) {
         console.warn(`[generateAvatarOptions] No avatarStyle found for book ${bookPath}`);
@@ -76,7 +78,7 @@ export const generateAvatarOptions = internalAction({
 
           const { intentId, uploadUrl, backend } = await ctx.runMutation(
             internal.generateUploadUrl.startUploadInternal,
-            { folderPath: proposalsPath, basename, publish: true },
+            { folderPath: proposalsPath, basename },
           );
 
           const uploadRes = await fetch(uploadUrl, {
@@ -161,37 +163,81 @@ export const updateCharacterAvatarState = internalMutation({
     proposalUrls: v.optional(v.array(v.string())),
   },
   handler: async (ctx, { characterPath, state, proposalUrls }) => {
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: characterPath,
-    });
+    const now = Date.now();
+    const slug = characterPath.split("/").pop() || characterPath;
+    const bookPath = characterPath.split("/").slice(0, 2).join("/");
 
-    if (!folder) {
-      console.error(`[updateCharacterAvatarState] Folder not found: ${characterPath}`);
+    const existing = await ctx.db
+      .query("characterMetadata")
+      .withIndex("by_path", (q) => q.eq("characterPath", characterPath))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        avatarGenerationState: state,
+        avatarProposalUrls: proposalUrls,
+        updatedAt: now,
+      });
       return;
     }
 
-    const existingExtra = (folder.extra as Record<string, unknown>) || {};
-
-    await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-      path: characterPath,
-      extra: { ...existingExtra, avatarGenerationState: state, avatarProposalUrls: proposalUrls },
+    await ctx.db.insert("characterMetadata", {
+      bookPath,
+      characterPath,
+      slug,
+      displayName: slug,
+      summary: "",
+      avatarGenerationState: state,
+      avatarProposalUrls: proposalUrls,
+      createdAt: now,
+      updatedAt: now,
     });
   },
 });
 
 export const selectAvatar = internalAction({
-  args: { bookPath: v.string(), characterSlug: v.string(), selectedOptionUrl: v.string() },
+  args: { bookPath: v.string(), characterSlug: v.string(), optionIndex: v.number() },
   returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
-  handler: async (ctx, { bookPath, characterSlug, selectedOptionUrl }) => {
+  handler: async (ctx, { bookPath, characterSlug, optionIndex }) => {
     const startTime = Date.now();
     const log = (step: string) =>
       console.log(`[selectAvatar] ${step}: ${Date.now() - startTime}ms`);
 
     try {
+      // Validate optionIndex to prevent path traversal or invalid lookups
+      if (optionIndex !== 0 && optionIndex !== 1) {
+        return { success: false, error: "Invalid option index. Must be 0 or 1." };
+      }
+
       const characterPath = `${bookPath}/characters/${characterSlug}`;
       log("start");
 
-      const response = await fetch(selectedOptionUrl);
+      // Resolve the URL server-side from our asset storage (SSRF-safe)
+      const proposalPath = `${bookPath}/${PROPOSALS_FOLDER}/${characterSlug}`;
+      const proposalBasename = `option-${optionIndex + 1}.png`;
+      const proposalVersions = await ctx.runQuery(
+        components.assetManager.assetManager.getAssetVersions,
+        { folderPath: proposalPath, basename: proposalBasename },
+      );
+
+      if (!proposalVersions.length) {
+        return { success: false, error: `Proposal option ${optionIndex + 1} not found` };
+      }
+
+      const latestProposal = proposalVersions.at(-1);
+      const proposalUrlInfo = latestProposal
+        ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
+            versionId: latestProposal._id,
+          })
+        : null;
+
+      if (!proposalUrlInfo?.url) {
+        return { success: false, error: "Failed to get proposal URL from storage" };
+      }
+
+      log("resolved proposal URL from storage");
+
+      const response = await fetch(proposalUrlInfo.url);
       if (!response.ok) {
         return { success: false, error: "Failed to fetch selected image" };
       }
@@ -208,7 +254,6 @@ export const selectAvatar = internalAction({
       } = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
         folderPath: characterPath,
         basename: "avatar-large.png",
-        publish: true,
       });
       log("got large upload URL");
 
@@ -267,7 +312,6 @@ export const selectAvatar = internalAction({
       } = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
         folderPath: characterPath,
         basename: "avatar.webp",
-        publish: true,
       });
       log("got small upload URL");
 
@@ -326,15 +370,15 @@ export const startAvatarGeneration = bookAction({
 });
 
 export const confirmAvatarSelection = bookAction({
-  args: { characterSlug: v.string(), selectedOptionUrl: v.string() },
+  args: { characterSlug: v.string(), optionIndex: v.number() },
   handler: async (
     ctx,
-    { characterSlug, selectedOptionUrl },
+    { characterSlug, optionIndex },
   ): Promise<{ success: boolean; error?: string }> => {
     return await ctx.runAction(internal.avatarGeneration.selectAvatar, {
       bookPath: ctx.bookPath,
       characterSlug,
-      selectedOptionUrl,
+      optionIndex,
     });
   },
 });
@@ -396,7 +440,7 @@ export const processUploadedAvatarLarge = internalAction({
 
       const { intentId, uploadUrl, backend } = await ctx.runMutation(
         internal.generateUploadUrl.startUploadInternal,
-        { folderPath: characterPath, basename: "avatar.webp", publish: true },
+        { folderPath: characterPath, basename: "avatar.webp" },
       );
 
       const uploadRes = await fetch(uploadUrl, {
@@ -426,6 +470,10 @@ export const processUploadedAvatarLarge = internalAction({
   },
 });
 
+// Batch size for parallel avatar processing. Keep modest to avoid
+// Cloudflare worker memory limits when processing large images.
+const REPAIR_BATCH_SIZE = 10;
+
 export const repairMissingAvatarWebp = internalAction({
   args: { bookPath: v.string() },
   returns: v.object({
@@ -447,10 +495,11 @@ export const repairMissingAvatarWebp = internalAction({
     const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
       parentPath: charactersPath,
     });
-    const repaired: string[] = [];
-    const skipped: string[] = [];
-    const failed: string[] = [];
 
+    const skipped: string[] = [];
+    const toProcess: { characterPath: string; characterSlug: string }[] = [];
+
+    // First pass: identify which characters need processing
     for (const charFolder of characterFolders) {
       const characterPath = charFolder.path;
       const characterSlug = characterPath.split("/").pop() || "";
@@ -475,16 +524,39 @@ export const repairMissingAvatarWebp = internalAction({
         continue;
       }
 
-      console.log(`[repairMissingAvatarWebp] Processing ${characterSlug}...`);
-      const result = await ctx.runAction(internal.avatarGeneration.processUploadedAvatarLarge, {
-        characterPath,
-        retryCount: 0,
-      });
+      toProcess.push({ characterPath, characterSlug });
+    }
 
-      if (result.success) {
-        repaired.push(characterSlug);
-      } else {
-        failed.push(`${characterSlug}: ${result.error}`);
+    console.log(
+      `[repairMissingAvatarWebp] Processing ${toProcess.length} characters in batches of ${REPAIR_BATCH_SIZE}...`,
+    );
+
+    const repaired: string[] = [];
+    const failed: string[] = [];
+
+    // Process in parallel batches
+    for (let i = 0; i < toProcess.length; i += REPAIR_BATCH_SIZE) {
+      const batch = toProcess.slice(i, i + REPAIR_BATCH_SIZE);
+      console.log(
+        `[repairMissingAvatarWebp] Batch ${Math.floor(i / REPAIR_BATCH_SIZE) + 1}: ${batch.map((c) => c.characterSlug).join(", ")}`,
+      );
+
+      const results = await Promise.all(
+        batch.map(async ({ characterPath, characterSlug }) => {
+          const result = await ctx.runAction(internal.avatarGeneration.processUploadedAvatarLarge, {
+            characterPath,
+            retryCount: 0,
+          });
+          return { characterSlug, result };
+        }),
+      );
+
+      for (const { characterSlug, result } of results) {
+        if (result.success) {
+          repaired.push(characterSlug);
+        } else {
+          failed.push(`${characterSlug}: ${result.error}`);
+        }
       }
     }
 
@@ -492,6 +564,25 @@ export const repairMissingAvatarWebp = internalAction({
       `[repairMissingAvatarWebp] Done. Repaired: ${repaired.length}, Skipped: ${skipped.length}, Failed: ${failed.length}`,
     );
     return { repaired, skipped, failed };
+  },
+});
+
+/**
+ * CLI-callable wrapper for repairMissingAvatarWebp.
+ * Usage: ./scripts/convex run avatarGeneration:repairAvatarsForBook '{"bookPath": "books/Lalka"}'
+ */
+export const repairAvatarsForBook = adminAction({
+  args: { bookPath: v.string() },
+  returns: v.object({
+    repaired: v.array(v.string()),
+    skipped: v.array(v.string()),
+    failed: v.array(v.string()),
+  }),
+  handler: async (
+    ctx,
+    { bookPath },
+  ): Promise<{ repaired: string[]; skipped: string[]; failed: string[] }> => {
+    return await ctx.runAction(internal.avatarGeneration.repairMissingAvatarWebp, { bookPath });
   },
 });
 
@@ -503,25 +594,32 @@ export const updateBookGraphicalStyle = bookMutation({
   },
   handler: async (ctx, { backgroundStyle, periodStyle, avatarStyle }) => {
     const bookPath = ctx.bookPath;
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: bookPath,
-    });
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("books")
+      .withIndex("by_path", (q) => q.eq("path", bookPath))
+      .first();
 
-    if (!folder) {
-      throw new Error(`Book folder not found: ${bookPath}`);
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        backgroundStyle: backgroundStyle ?? existing.backgroundStyle,
+        periodStyle: periodStyle ?? existing.periodStyle,
+        avatarStyle: avatarStyle ?? existing.avatarStyle,
+        updatedAt: now,
+      });
+    } else {
+      const slug = bookPath.split("/").pop() || bookPath;
+      await ctx.db.insert("books", {
+        path: bookPath,
+        slug,
+        ownerId: ctx.principalId,
+        backgroundStyle,
+        periodStyle,
+        avatarStyle,
+        createdAt: now,
+        updatedAt: now,
+      });
     }
-
-    const existingExtra = (folder.extra as Record<string, unknown>) || {};
-    const updatedExtra = { ...existingExtra };
-
-    if (backgroundStyle !== undefined) updatedExtra.backgroundStyle = backgroundStyle;
-    if (periodStyle !== undefined) updatedExtra.periodStyle = periodStyle;
-    if (avatarStyle !== undefined) updatedExtra.avatarStyle = avatarStyle;
-
-    await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-      path: bookPath,
-      extra: updatedExtra,
-    });
 
     return { success: true };
   },

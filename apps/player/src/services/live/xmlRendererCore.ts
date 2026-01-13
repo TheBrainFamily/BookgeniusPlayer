@@ -22,7 +22,7 @@ import { getFigureUrl } from "@player/utils/assetUrls";
 export type CharacterBundleInfo = {
   slug: string;
   name: string;
-  extra: { displayName?: string; summary?: string };
+  metadata: { displayName?: string; summary?: string };
   avatar?: { url: string };
   listens?: { url: string };
   speaks?: { url: string };
@@ -110,12 +110,18 @@ const renderCharacterElement = (
   const tagName = element.tagName;
   const slug = tagName.toLowerCase(); // Lowercase to match Convex folder slugs
   const isTalking = element.getAttribute("talking") === "true";
+  const isEntering = element.getAttribute("enters") === "true";
+  const isExiting = element.getAttribute("exits") === "true";
 
   if (isTalking) {
     const startOfParagraphClass = options.isAtParagraphStart ? " start-of-paragraph" : "";
     const spokenText = element.textContent || "";
+    // Build enters/exits attributes for talking characters (e.g., Wukong has enters="true" talking="true")
+    let enterExitAttrs = "";
+    if (isEntering) enterExitAttrs += ' data-enters="true"';
+    if (isExiting) enterExitAttrs += ' data-exits="true"';
     return {
-      html: `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-is-talking="true"></span>${spokenText ? `<strong>${spokenText}</strong>` : ""}`,
+      html: `<span class="character-placeholder character-talking${startOfParagraphClass}" data-character="${slug}" data-is-talking="true"${enterExitAttrs}></span>${spokenText ? `<strong>${spokenText}</strong>` : ""}`,
       isTalking: true,
       slug,
     };
@@ -128,11 +134,12 @@ const renderCharacterElement = (
   const charInfo = characterMap.get(tagName) ?? characterMap.get(slug);
   const displayText = element.textContent || (charInfo?.display ?? tagName);
 
-  return {
-    html: `<span class="character-highlighted" data-character="${slug}">${displayText}</span>`,
-    isTalking: false,
-    slug,
-  };
+  // Build data attributes for enters/exits (used by characters-on-stage panel)
+  const dataAttrs = [`data-c="${slug}"`];
+  if (isEntering) dataAttrs.push('data-enters="true"');
+  if (isExiting) dataAttrs.push('data-exits="true"');
+
+  return { html: `<span ${dataAttrs.join(" ")}>${displayText}</span>`, isTalking: false, slug };
 };
 
 type ParagraphRenderContext = {
@@ -622,7 +629,7 @@ const buildCharacterMapFromBundles = (
     const tagName = allEls[i].tagName;
     if (isLikelyCharacterTag(tagName) && !characterMap.has(tagName)) {
       const bundle = bundleBySlug.get(tagName.toLowerCase());
-      const display = bundle?.extra.displayName ?? bundle?.name ?? tagName.replace(/-/g, " ");
+      const display = bundle?.metadata.displayName ?? bundle?.name ?? tagName.replace(/-/g, " ");
       characterMap.set(tagName, { display });
     }
   }

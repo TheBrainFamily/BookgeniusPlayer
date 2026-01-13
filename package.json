@@ -41,6 +41,7 @@
     "@vitest/runner": "^4.0.16",
     "@vitest/snapshot": "^4.0.16",
     "convex": "^1.31.2",
+    "dotenv": "^17.2.3",
     "eslint": "^9.33.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -71,7 +72,10 @@
       "prettier --write"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
   "workspaces": [
     "apps/*",
     "convex"

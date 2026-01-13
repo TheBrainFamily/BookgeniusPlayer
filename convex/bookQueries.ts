@@ -13,7 +13,7 @@
  *           speaks.mp4
  *           listens.mp4
  *       chapters/
- *         chapter-1.xml              <- Asset with ChapterExtra in version.extra
+ *         chapter-1.xml              <- Asset with chapter metadata stored in chapterMetadata
  *       backgrounds/
  *         ch1-p0.mp4                 <- Asset with BackgroundExtra
  *       music/
@@ -30,22 +30,29 @@ import { components } from "./_generated/api";
 
 /**
  * List all books (folders under "books/").
- * Returns book metadata from folder.extra.
+ * Returns book metadata from the books table.
  */
 export const listBooks = adminQuery({
   args: {},
   handler: async (ctx) => {
-    const folders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
-      parentPath: "books",
-    });
+    const books = await ctx.db.query("books").collect();
 
-    return folders.map((folder) => ({
-      path: folder.path,
-      slug: folder.path.split("/").pop()!,
-      name: folder.name,
-      extra: folder.extra,
-      createdAt: folder.createdAt,
-      updatedAt: folder.updatedAt,
+    return books.map((book) => ({
+      path: book.path,
+      slug: book.slug,
+      name: book.title ?? book.slug,
+      metadata: {
+        title: book.title,
+        author: book.author,
+        language: book.language,
+        form: book.form,
+        visualStyle: book.visualStyle,
+        backgroundStyle: book.backgroundStyle,
+        periodStyle: book.periodStyle,
+        avatarStyle: book.avatarStyle,
+      },
+      createdAt: book.createdAt,
+      updatedAt: book.updatedAt,
     }));
   },
 });
@@ -56,19 +63,29 @@ export const listBooks = adminQuery({
 export const getBookMetadata = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: bookPath,
-    });
+    const book = await ctx.db
+      .query("books")
+      .withIndex("by_path", (q) => q.eq("path", bookPath))
+      .first();
 
-    if (!folder) return null;
+    if (!book) return null;
 
     return {
-      path: folder.path,
-      slug: folder.path.split("/").pop()!,
-      name: folder.name,
-      extra: folder.extra,
-      createdAt: folder.createdAt,
-      updatedAt: folder.updatedAt,
+      path: book.path,
+      slug: book.slug,
+      name: book.title ?? book.slug,
+      metadata: {
+        title: book.title,
+        author: book.author,
+        language: book.language,
+        form: book.form,
+        visualStyle: book.visualStyle,
+        backgroundStyle: book.backgroundStyle,
+        periodStyle: book.periodStyle,
+        avatarStyle: book.avatarStyle,
+      },
+      createdAt: book.createdAt,
+      updatedAt: book.updatedAt,
     };
   },
 });
@@ -84,36 +101,41 @@ export const getBookMetadata = publicQuery({
 export const listCharacters = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
-    const charactersPath = `${bookPath}/characters`;
+    const characters = await ctx.db
+      .query("characterMetadata")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
 
-    const folders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
-      parentPath: charactersPath,
-    });
-
-    return folders.map((folder) => ({
-      path: folder.path,
-      slug: folder.path.split("/").pop()!,
-      name: folder.name,
-      extra: folder.extra,
-      createdAt: folder.createdAt,
-      updatedAt: folder.updatedAt,
+    return characters.map((character) => ({
+      path: character.characterPath,
+      slug: character.slug,
+      name: character.displayName,
+      metadata: {
+        displayName: character.displayName,
+        summary: character.summary,
+        aiPrompt: character.aiPrompt,
+        avatarGenerationState: character.avatarGenerationState,
+        avatarProposalUrls: character.avatarProposalUrls,
+      },
+      createdAt: character.createdAt,
+      updatedAt: character.updatedAt,
     }));
   },
 });
 
 /**
  * Get a character bundle (metadata + all asset URLs).
- * Returns the character's folder.extra plus URLs for avatar, speaks, listens.
+ * Returns the character metadata plus URLs for avatar, speaks, listens.
  */
 export const getCharacterBundle = publicQuery({
   args: { characterPath: v.string() },
   handler: async (ctx, { characterPath }) => {
-    // Get character folder metadata
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: characterPath,
-    });
+    const character = await ctx.db
+      .query("characterMetadata")
+      .withIndex("by_path", (q) => q.eq("characterPath", characterPath))
+      .first();
 
-    if (!folder) return null;
+    if (!character) return null;
 
     // Get published files in the character folder
     const files = await ctx.runQuery(
@@ -127,16 +149,28 @@ export const getCharacterBundle = publicQuery({
       path: string;
       slug: string;
       name: string;
-      extra: unknown;
+      metadata: {
+        displayName: string;
+        summary: string;
+        aiPrompt?: string;
+        avatarGenerationState?: "generating" | "ready" | "error" | "none";
+        avatarProposalUrls?: string[];
+      };
       avatar?: AssetInfo;
       avatarLarge?: AssetInfo;
       speaks?: AssetInfo;
       listens?: AssetInfo;
     } = {
-      path: folder.path,
-      slug: folder.path.split("/").pop()!,
-      name: folder.name,
-      extra: folder.extra,
+      path: character.characterPath,
+      slug: character.slug,
+      name: character.displayName,
+      metadata: {
+        displayName: character.displayName,
+        summary: character.summary,
+        aiPrompt: character.aiPrompt,
+        avatarGenerationState: character.avatarGenerationState ?? undefined,
+        avatarProposalUrls: character.avatarProposalUrls ?? undefined,
+      },
     };
 
     for (const file of files) {
@@ -175,7 +209,7 @@ export const getCharacterBundle = publicQuery({
 
 /**
  * List all chapters for a book, sorted by chapter number.
- * Chapter number comes from version.extra.chapterNumber.
+ * Chapter number comes from chapterMetadata.
  */
 export const listChapters = publicQuery({
   args: { bookPath: v.string() },
@@ -187,16 +221,15 @@ export const listChapters = publicQuery({
       { folderPath: chaptersPath },
     );
 
-    // We need the version.extra for chapter metadata
-    // listPublishedFilesInFolder doesn't return extra, so we need to use listPublishedAssetsInFolder
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: chaptersPath },
-    );
+    const metadataEntries = await ctx.db
+      .query("chapterMetadata")
+      .withIndex("by_folder", (q) => q.eq("folderPath", chaptersPath))
+      .collect();
 
-    // Join files with assets to get both URLs and extra
+    const metadataByBasename = new Map(metadataEntries.map((entry) => [entry.basename, entry]));
+
     const chapters = files.map((file) => {
-      const asset = assets.find((a) => a.basename === file.basename);
+      const metadata = metadataByBasename.get(file.basename);
       return {
         path: `${chaptersPath}/${file.basename}`,
         basename: file.basename,
@@ -205,10 +238,16 @@ export const listChapters = publicQuery({
         contentType: file.contentType,
         size: file.size,
         publishedAt: file.publishedAt,
-        extra: asset?.extra,
-        // Extract chapter number for sorting
-        chapterNumber: asset?.extra?.chapterNumber ?? 0,
-        title: asset?.extra?.title,
+        metadata: metadata
+          ? {
+              chapterNumber: metadata.chapterNumber,
+              title: metadata.title,
+              paragraphCount: metadata.paragraphCount,
+              sourceFormat: metadata.sourceFormat,
+            }
+          : undefined,
+        chapterNumber: metadata?.chapterNumber ?? extractChapterNumber(file.basename),
+        title: metadata?.title,
       };
     });
 
@@ -237,24 +276,22 @@ export const listCompiledChapters = publicQuery({
 
     if (files.length === 0) return null;
 
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: compiledPath },
-    );
+    const metadataEntries = await ctx.db
+      .query("chapterMetadata")
+      .withIndex("by_folder", (q) => q.eq("folderPath", compiledPath))
+      .collect();
+    const metadataByBasename = new Map(metadataEntries.map((entry) => [entry.basename, entry]));
 
     const chapters = files.map((file) => {
-      const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as
-        | { chapterNumber?: number; title?: string; paragraphCount?: number }
-        | undefined;
+      const metadata = metadataByBasename.get(file.basename);
 
       return {
         basename: file.basename,
         url: file.url,
         versionId: file.versionId as string,
-        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
-        title: extra?.title,
-        paragraphCount: extra?.paragraphCount,
+        chapterNumber: metadata?.chapterNumber ?? extractChapterNumber(file.basename),
+        title: metadata?.title,
+        paragraphCount: metadata?.paragraphCount,
       };
     });
 
@@ -274,25 +311,23 @@ export const listHtmlSourceChapters = publicQuery({
 
     if (files.length === 0) return null;
 
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: sourcePath },
-    );
+    const metadataEntries = await ctx.db
+      .query("chapterMetadata")
+      .withIndex("by_folder", (q) => q.eq("folderPath", sourcePath))
+      .collect();
+    const metadataByBasename = new Map(metadataEntries.map((entry) => [entry.basename, entry]));
 
     const chapters = files.map((file) => {
-      const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as
-        | { chapterNumber?: number; title?: string; paragraphCount?: number; sourceFormat?: string }
-        | undefined;
+      const metadata = metadataByBasename.get(file.basename);
 
       return {
         basename: file.basename,
         url: file.url,
         versionId: file.versionId as string,
-        chapterNumber: extra?.chapterNumber ?? extractChapterNumber(file.basename),
-        title: extra?.title,
-        paragraphCount: extra?.paragraphCount,
-        sourceFormat: extra?.sourceFormat ?? "html",
+        chapterNumber: metadata?.chapterNumber ?? extractChapterNumber(file.basename),
+        title: metadata?.title,
+        paragraphCount: metadata?.paragraphCount,
+        sourceFormat: metadata?.sourceFormat ?? "html",
       };
     });
 
@@ -335,16 +370,33 @@ export const listBackgrounds = publicQuery({
       { folderPath: backgroundsPath },
     );
 
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: backgroundsPath },
-    );
+    const cues = await ctx.db
+      .query("backgroundCues")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+
+    const cueByFile = new Map<
+      string,
+      { chapter: number; paragraph: number; backgroundColor?: string; textColor?: string }
+    >();
+    for (const cue of cues) {
+      const existing = cueByFile.get(cue.fileBasename);
+      if (
+        !existing ||
+        cue.chapter < existing.chapter ||
+        (cue.chapter === existing.chapter && cue.paragraph < existing.paragraph)
+      ) {
+        cueByFile.set(cue.fileBasename, {
+          chapter: cue.chapter,
+          paragraph: cue.paragraph,
+          backgroundColor: cue.backgroundColor,
+          textColor: cue.textColor,
+        });
+      }
+    }
 
     const backgrounds = files.map((file) => {
-      const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as
-        | { chapter?: number; paragraph?: number; backgroundColor?: string; textColor?: string }
-        | undefined;
+      const cue = cueByFile.get(file.basename);
 
       return {
         path: `${backgroundsPath}/${file.basename}`,
@@ -354,12 +406,11 @@ export const listBackgrounds = publicQuery({
         contentType: file.contentType,
         size: file.size,
         publishedAt: file.publishedAt,
-        extra: asset?.extra,
-        // Extract for sorting
-        chapter: extra?.chapter ?? 0,
-        paragraph: extra?.paragraph ?? 0,
-        backgroundColor: extra?.backgroundColor,
-        textColor: extra?.textColor,
+        metadata: cue,
+        chapter: cue?.chapter ?? 0,
+        paragraph: cue?.paragraph ?? 0,
+        backgroundColor: cue?.backgroundColor,
+        textColor: cue?.textColor,
       };
     });
 
@@ -415,14 +466,25 @@ export const listMusic = publicQuery({
       { folderPath: musicPath },
     );
 
-    const assets = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedAssetsInFolder,
-      { folderPath: musicPath },
-    );
+    const cues = await ctx.db
+      .query("musicCues")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+
+    const cueByFile = new Map<string, { chapter: number; paragraph: number }>();
+    for (const cue of cues) {
+      const existing = cueByFile.get(cue.fileBasename);
+      if (
+        !existing ||
+        cue.chapter < existing.chapter ||
+        (cue.chapter === existing.chapter && cue.paragraph < existing.paragraph)
+      ) {
+        cueByFile.set(cue.fileBasename, { chapter: cue.chapter, paragraph: cue.paragraph });
+      }
+    }
 
     const music = files.map((file) => {
-      const asset = assets.find((a) => a.basename === file.basename);
-      const extra = asset?.extra as { chapter?: number; paragraph?: number } | undefined;
+      const cue = cueByFile.get(file.basename);
 
       return {
         path: `${musicPath}/${file.basename}`,
@@ -432,10 +494,9 @@ export const listMusic = publicQuery({
         contentType: file.contentType,
         size: file.size,
         publishedAt: file.publishedAt,
-        extra: asset?.extra,
-        // Extract for sorting
-        chapter: extra?.chapter ?? 0,
-        paragraph: extra?.paragraph ?? 0,
+        metadata: cue,
+        chapter: cue?.chapter ?? 0,
+        paragraph: cue?.paragraph ?? 0,
       };
     });
 
@@ -447,185 +508,8 @@ export const listMusic = publicQuery({
   },
 });
 
-// =============================================================================
-// Draft-Aware Queries (for Live Mode)
-// =============================================================================
-
 /**
- * List chapters preferring draft over published.
- * For live preview mode - shows latest version being edited.
- */
-export const listChaptersWithDrafts = publicQuery({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const chaptersPath = `${bookPath}/chapters`;
-
-    // Get all assets (not just published)
-    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
-      folderPath: chaptersPath,
-    });
-
-    // For each asset, get the best version (draft > published)
-    const chapters = await Promise.all(
-      assets.map(async (asset) => {
-        const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-          folderPath: chaptersPath,
-          basename: asset.basename,
-        });
-
-        // Prefer draft, then published, then latest
-        const draftVersion = versions.find((v) => v.state === "draft");
-        const publishedVersion = versions.find((v) => v.state === "published");
-        const bestVersion = draftVersion || publishedVersion || versions[0];
-
-        if (!bestVersion) return null;
-
-        // Get URL for the version
-        const urlInfo = await ctx.runQuery(
-          components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id },
-        );
-
-        const extra = asset.extra as { chapterNumber?: number; title?: string } | undefined;
-
-        return {
-          path: `${chaptersPath}/${asset.basename}`,
-          basename: asset.basename,
-          versionId: bestVersion._id,
-          state: bestVersion.state,
-          url: urlInfo?.url,
-          contentType: urlInfo?.contentType,
-          chapterNumber: extra?.chapterNumber ?? extractChapterNumber(asset.basename),
-          title: extra?.title,
-          hasDraft: !!draftVersion,
-        };
-      }),
-    );
-
-    // Filter nulls and sort by chapter number
-    return chapters
-      .filter((c): c is NonNullable<typeof c> => c !== null)
-      .sort((a, b) => a.chapterNumber - b.chapterNumber);
-  },
-});
-
-/**
- * List backgrounds preferring draft over published.
- */
-export const listBackgroundsWithDrafts = publicQuery({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const backgroundsPath = `${bookPath}/backgrounds`;
-
-    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
-      folderPath: backgroundsPath,
-    });
-
-    const backgrounds = await Promise.all(
-      assets.map(async (asset) => {
-        const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-          folderPath: backgroundsPath,
-          basename: asset.basename,
-        });
-
-        const draftVersion = versions.find((v) => v.state === "draft");
-        const publishedVersion = versions.find((v) => v.state === "published");
-        const bestVersion = draftVersion || publishedVersion || versions[0];
-
-        if (!bestVersion) return null;
-
-        const urlInfo = await ctx.runQuery(
-          components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id },
-        );
-
-        // Extra metadata is on the version, not the asset
-        const extra = bestVersion.extra as
-          | { chapter?: number; paragraph?: number; backgroundColor?: string; textColor?: string }
-          | undefined;
-
-        return {
-          path: `${backgroundsPath}/${asset.basename}`,
-          basename: asset.basename,
-          versionId: bestVersion._id,
-          state: bestVersion.state,
-          url: urlInfo?.url,
-          contentType: urlInfo?.contentType,
-          chapter: extra?.chapter ?? 0,
-          paragraph: extra?.paragraph ?? 0,
-          backgroundColor: extra?.backgroundColor,
-          textColor: extra?.textColor,
-          hasDraft: !!draftVersion,
-        };
-      }),
-    );
-
-    return backgrounds
-      .filter((b): b is NonNullable<typeof b> => b !== null)
-      .sort((a, b) => {
-        if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-        return a.paragraph - b.paragraph;
-      });
-  },
-});
-
-/**
- * List music preferring draft over published.
- */
-export const listMusicWithDrafts = publicQuery({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const musicPath = `${bookPath}/music`;
-
-    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
-      folderPath: musicPath,
-    });
-
-    const music = await Promise.all(
-      assets.map(async (asset) => {
-        const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-          folderPath: musicPath,
-          basename: asset.basename,
-        });
-
-        const draftVersion = versions.find((v) => v.state === "draft");
-        const publishedVersion = versions.find((v) => v.state === "published");
-        const bestVersion = draftVersion || publishedVersion || versions[0];
-
-        if (!bestVersion) return null;
-
-        const urlInfo = await ctx.runQuery(
-          components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id },
-        );
-
-        // Extra metadata is on the version, not the asset
-        const extra = bestVersion.extra as { chapter?: number; paragraph?: number } | undefined;
-
-        return {
-          path: `${musicPath}/${asset.basename}`,
-          basename: asset.basename,
-          versionId: bestVersion._id,
-          state: bestVersion.state,
-          url: urlInfo?.url,
-          contentType: urlInfo?.contentType,
-          chapter: extra?.chapter ?? 0,
-          paragraph: extra?.paragraph ?? 0,
-          hasDraft: !!draftVersion,
-        };
-      }),
-    );
-
-    return music
-      .filter((m): m is NonNullable<typeof m> => m !== null)
-      .sort((a, b) => {
-        if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-        return a.paragraph - b.paragraph;
-      });
-  },
-});
-/**
- * Get character bundles with draft-aware asset URLs.
+ * Get character bundles with asset URLs.
  * Uses bulk query to fetch all folders and assets in a single operation.
  */
 export const listCharacterBundles = publicQuery({
@@ -635,17 +519,31 @@ export const listCharacterBundles = publicQuery({
 
     const foldersWithAssets = await ctx.runQuery(
       components.assetManager.assetManager.listFoldersWithAssets,
-      { parentPath: charactersPath, preferDraft: true },
+      { parentPath: charactersPath },
     );
 
+    const metadata = await ctx.db
+      .query("characterMetadata")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+    const metadataByPath = new Map(metadata.map((m) => [m.characterPath, m]));
+
+    // eslint-disable-next-line complexity
     return foldersWithAssets.map(({ folder, assets }) => {
       type AssetInfo = { url: string; versionId: string; contentType?: string };
 
+      const meta = metadataByPath.get(folder.path);
       const bundle: {
         path: string;
         slug: string;
         name: string;
-        extra: unknown;
+        metadata: {
+          displayName: string;
+          summary: string;
+          aiPrompt?: string;
+          avatarGenerationState?: "generating" | "ready" | "error" | "none";
+          avatarProposalUrls?: string[];
+        };
         avatar?: AssetInfo;
         avatarLarge?: AssetInfo;
         speaks?: AssetInfo;
@@ -653,8 +551,14 @@ export const listCharacterBundles = publicQuery({
       } = {
         path: folder.path,
         slug: folder.path.split("/").pop()!,
-        name: folder.name,
-        extra: folder.extra,
+        name: meta?.displayName ?? folder.name ?? folder.path.split("/").pop()!,
+        metadata: {
+          displayName: meta?.displayName ?? folder.name ?? folder.path.split("/").pop()!,
+          summary: meta?.summary ?? "",
+          aiPrompt: meta?.aiPrompt,
+          avatarGenerationState: meta?.avatarGenerationState,
+          avatarProposalUrls: meta?.avatarProposalUrls,
+        },
       };
 
       for (const asset of assets) {
