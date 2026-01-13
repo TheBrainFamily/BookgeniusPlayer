@@ -8,10 +8,18 @@ tsconfig.tsbuildinfo
 src/data/tools/Text-Editor/.cursor/
 .claude
 src/books/*
+# Environment files (except .example and .default templates)
 .env
+.env.*
+!.env.example
+!.env.default
+!.env.snapplify
+*.env.server
+*.env.local
+*.env.prod
+
 build/
 gateway.zip
-.env.prod
 Support/
 apps/platform/public/books/
 cdk.out
@@ -39,3 +47,4 @@ apps/player/dist-lib/
 # Synced Convex assets (local only)
 ConvexAssets/
 convex-test
+books/
