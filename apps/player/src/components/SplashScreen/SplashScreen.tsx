@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+ 
 /**
  * SplashScreen - Unified loading screen for BookGenius Player
  *
@@ -19,6 +19,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { genericPhrases } from "./genericPhrases";
+import { SPLASH_FADE_DURATION_MS } from "./constants";
 import "./SplashScreen.css";
 
 export interface SplashScreenBook {
@@ -132,7 +133,7 @@ export function SplashScreen({
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent("splashHidden"));
       onHidden?.();
-    }, 1000);
+    }, SPLASH_FADE_DURATION_MS);
   }, [isHiding, onHidden]);
 
   /**
@@ -193,7 +194,8 @@ export function SplashScreen({
     if (isLoaded && !isHiding) {
       setIsHiding(true);
     }
-  }, [isExternalControlled, isLoaded, isHiding]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only trigger on isLoaded change
+  }, [isExternalControlled, isLoaded]);
 
   /**
    * Handle Start button click

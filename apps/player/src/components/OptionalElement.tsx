@@ -79,12 +79,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
     }
 
     element.style.opacity = currentlyVisible ? "1" : "0";
-    console.log(
-      "[OptionalElement] useEffect SET opacity:",
-      element.style.opacity,
-      "element id:",
-      element.id || "(no id)",
-    );
+
     previousVisibilityRef.current = currentlyVisible;
   }, [shouldBeVisible, lastHideReason, isHovered]);
 

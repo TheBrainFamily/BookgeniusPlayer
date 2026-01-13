@@ -49,15 +49,9 @@ const useVideoReadiness = ({
 
   useEffect(() => {
     const onAPlaying = () => setVideoAReady(true);
-    const onACanPlay = () => {
-      // Only set if not already ready; prefer playing but accept canplay
-      setVideoAReady((prev) => prev || true);
-    };
-
+    const onACanPlay = () => setVideoAReady(true);
     const onBPlaying = () => setVideoBReady(true);
-    const onBCanPlay = () => {
-      setVideoBReady((prev) => prev || true);
-    };
+    const onBCanPlay = () => setVideoBReady(true);
 
     // Attach listeners only if element exists
     if (bgVideoA) {

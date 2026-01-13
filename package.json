@@ -14,7 +14,6 @@
     "build:platform": "bun --filter platform build",
     "build:wukong": "bun --filter wukong build",
     "prepare:docker": "bun ./tools/scripts/prepare-docker-build.ts",
-    "build:front-parallel": "bun --filter player --filter platform build",
     "prettier:check": "bun --filter '*' prettier:check",
     "process-all-books": "bun --filter player process-all-books",
     "update-prod-versions": "bun ./tools/scripts/update-prod-versions.ts",

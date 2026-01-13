@@ -47,17 +47,12 @@ export default defineConfig({
         "react/jsx-runtime",
         "convex",
         "convex/react",
-        // Don't bundle these large deps - let consumer tree-shake
         "motion",
         "motion/react",
         "zustand",
         "i18next",
         "react-i18next",
         "lucide-react",
-        // Radix UI components
-        /^@radix-ui\//,
-        // OpenAI agents has Vite-specific code
-        "@openai/agents-realtime",
       ],
       output: {
         // Preserve module structure for better tree-shaking

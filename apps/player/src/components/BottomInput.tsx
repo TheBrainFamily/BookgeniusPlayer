@@ -69,7 +69,6 @@ const setMicActiveFromGesture = (active: boolean) => {
 
 // eslint-disable-next-line complexity
 const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
-  console.log("[BottomInput] rendering");
   const { t } = useTranslation();
 
   const { value, setValue } = useBottomInput();

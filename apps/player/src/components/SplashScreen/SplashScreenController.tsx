@@ -1,4 +1,3 @@
- 
 /**
  * SplashScreenController - Controls an existing splash screen element
  *
@@ -7,6 +6,7 @@
  */
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import { genericPhrases } from "./genericPhrases";
+import { SPLASH_FADE_DURATION_MS } from "./constants";
 
 export interface SplashScreenControllerProps {
   /** Book data - if provided, updates the splash with real content */
@@ -104,7 +104,7 @@ export function SplashScreenController({
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent("splashHidden"));
       onHidden?.();
-    }, 1000);
+    }, SPLASH_FADE_DURATION_MS);
   }, [isHiding, onHidden]);
 
   /**

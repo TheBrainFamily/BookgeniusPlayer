@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
+import { SPLASH_FADE_DURATION_MS } from "../../../player/src/components/SplashScreen";
 import { getBooksByCurrentLanguage } from "@platform/utils/bookLanguageFilter";
 import { books } from "@platform/books";
 import BookCard from "./BookCard";
@@ -49,7 +50,7 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
     // Wait for overlay to fade in before navigating (prevents flash of gray body background)
     setTimeout(() => {
       navigate(`/reader?book=${book.slug}`, { state: { meta: { title, phrases, author } } });
-    }, 1000); // Match the 1s fade-in duration
+    }, SPLASH_FADE_DURATION_MS);
   };
 
   return (

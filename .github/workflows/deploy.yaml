@@ -112,8 +112,8 @@ jobs:
       #      - name: Build local artifacts (for S3 upload)
       #        run: pnpm build:docker
 
-      - name: Build web apps
-        run: bun build:front-parallel
+      - name: Build Platform
+        run: bun build:platform
         env:
           VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}

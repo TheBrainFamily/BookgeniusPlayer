@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
+import { SPLASH_FADE_DURATION_MS } from "../../../player/src/components/SplashScreen";
 import type { books } from "@platform/books";
 import BookCard from "./BookCard";
 import { useTranslation } from "react-i18next";
@@ -26,7 +27,7 @@ const FeaturedBooks = () => {
     // Wait for overlay to fade in before navigating (prevents flash of gray body background)
     setTimeout(() => {
       navigate(`/reader?book=${book.slug}`, { state: { meta: { title, phrases, author } } });
-    }, 1000); // Match the 1s fade-in duration
+    }, SPLASH_FADE_DURATION_MS);
   };
 
   return (

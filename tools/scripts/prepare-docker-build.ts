@@ -10,11 +10,6 @@ const s3AssetsDir = path.join(s3DataDir, "assets");
 const booksSourceDir = path.join(projectRoot, "compiled-books");
 const apps = [
   {
-    name: "player",
-    sourceDir: path.join(projectRoot, "apps", "player", "dist"),
-    targetDir: path.join(buildDir, "player-app"),
-  },
-  {
     name: "platform-intl",
     sourceDir: path.join(projectRoot, "apps", "platform", "dist-intl"),
     targetDir: path.join(buildDir, "platform-app-intl"),

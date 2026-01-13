@@ -13,6 +13,8 @@
 
 /* ================================================
  * Route Transition Overlay - fade in/out animations
+ * Duration (1s) should match SPLASH_FADE_DURATION_MS in
+ * apps/player/src/components/SplashScreen/constants.ts
  * ================================================ */
 .transition-overlay {
   pointer-events: none;
@@ -27,7 +29,7 @@
 }
 
 .transition-overlay--fading-in {
-  animation: overlayFadeIn 1s ease-out forwards;
+  animation: overlayFadeIn 1s ease-out forwards; /* 1s - match SPLASH_FADE_DURATION_MS */
   pointer-events: auto;
   visibility: visible;
 }
@@ -39,7 +41,7 @@
 }
 
 .transition-overlay--fading-out {
-  animation: overlayFadeOut 1s ease-in forwards;
+  animation: overlayFadeOut 1s ease-in forwards; /* 1s - match SPLASH_FADE_DURATION_MS */
   pointer-events: none;
 }
 

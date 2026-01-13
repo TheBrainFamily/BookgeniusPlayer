@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useLocation } from "react-router-dom";
-import { SplashScreen } from "../../../player/src/components/SplashScreen";
+import { SplashScreen, SPLASH_FADE_DURATION_MS } from "@player/components/SplashScreen";
 
 type LoaderMeta = {
   title: string;
@@ -61,6 +61,8 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   const [navigatedFromPlatform, setNavigatedFromPlatform] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
+  const outerTimeoutRef = useRef<number | null>(null);
+  const innerTimeoutRef = useRef<number | null>(null);
   const location = useLocation(); // used to reset if user navigates away quickly
 
   // Derived state for context consumers
@@ -79,26 +81,30 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   }, []);
 
   const finishTransition = useCallback(() => {
+    // Clear any pending timeouts first
+    if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
+    if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+
     const now = performance.now();
     const start = startTimeRef.current ?? now;
     const elapsed = now - start;
     const remaining = Math.max(0, minDurationMs - elapsed);
 
     // Ensure the overlay is visible at least minDurationMs
-    const timeout = window.setTimeout(() => {
+    outerTimeoutRef.current = window.setTimeout(() => {
       setOverlayState("fading-out");
 
       // After fade-out animation completes, hide fully
-      window.setTimeout(() => {
+      innerTimeoutRef.current = window.setTimeout(() => {
         setOverlayState("hidden");
         setMeta(null);
-      }, 1000);
+      }, SPLASH_FADE_DURATION_MS);
     }, remaining);
-
-    return () => clearTimeout(timeout);
   }, [minDurationMs]);
 
   const cancelTransition = useCallback(() => {
+    if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
+    if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
     setOverlayState("hidden");
     setMeta(null);
     startTimeRef.current = null;
@@ -114,6 +120,14 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   useEffect(() => {
     // no-op; location access ensures provider updates on route change
   }, [location]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
+      if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+    };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -141,7 +155,10 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
       {/* Platform content - blurs when transitioning */}
       <div
         className={`platform-content ${navigating ? "platform-content--blurring" : ""}`}
-        style={{ transition: "filter 1s ease-out", filter: navigating ? "blur(8px)" : "blur(0px)" }}
+        style={{
+          transition: `filter ${SPLASH_FADE_DURATION_MS}ms ease-out`,
+          filter: navigating ? "blur(8px)" : "blur(0px)",
+        }}
       >
         {children}
       </div>

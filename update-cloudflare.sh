@@ -47,19 +47,6 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
 
 
 
-# --- player app ---
-s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-  --cache-control "$short_cache" \
-  --content-type "text/html; charset=utf-8" \
-  build/player-app/index.html \
-  "s3://${S3_BUCKET}/app/player/${ASSET_CONTEXT}/index.html"
-
-s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-  --exclude "index.html" \
-  --cache-control "$long_cache" \
-  build/player-app/ \
-  "s3://${S3_BUCKET}/app/player/${ASSET_CONTEXT}/"
-
 # --- optional: books/assets + versions.json when explicitly requested ---
 if [[ "$*" == *"--with-books"* ]]; then
   s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
@@ -102,7 +89,6 @@ fi
 
 # --- CloudFlare cache purge for production ---
   curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=platform-intl&warm=1&host=${DOMAIN}" -H "x-preview-key: $PREVIEW_KEY"
-  curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=player" -H "x-preview-key: $PREVIEW_KEY"
 
   if [[ "${ASSET_CONTEXT}" == "prod" ]]; then
     curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=platform&warm=1&host=bookgeniusz.pl" -H "x-preview-key: $PREVIEW_KEY"

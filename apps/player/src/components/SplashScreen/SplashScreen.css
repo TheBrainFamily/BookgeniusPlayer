@@ -10,6 +10,14 @@
  */
 
 /* ================================================
+ * TIMING CONSTANTS
+ * Keep in sync with SPLASH_FADE_DURATION_MS in constants.ts
+ * ================================================ */
+:root {
+  --splash-fade-duration: 1000ms; /* 1000ms - keep in sync with constants.ts */
+}
+
+/* ================================================
  * SPLASH SCREEN CONTAINER
  * ================================================ */
 .splash-screen {
@@ -35,15 +43,15 @@
   opacity: 1;
   visibility: visible;
   transition:
-    opacity 1s ease-in-out,
-    transform 1s ease-in-out,
-    filter 1s ease-in-out,
-    visibility 0s 1s;
+    opacity var(--splash-fade-duration) ease-in-out,
+    transform var(--splash-fade-duration) ease-in-out,
+    filter var(--splash-fade-duration) ease-in-out,
+    visibility 0s var(--splash-fade-duration);
 }
 
-/* Fade-in mode: start invisible, fade in over 1s */
+/* Fade-in mode: start invisible, fade in */
 .splash-screen.splash-screen--fade-in {
-  animation: splashFadeIn 1s ease-out forwards;
+  animation: splashFadeIn var(--splash-fade-duration) ease-out forwards;
 }
 
 @keyframes splashFadeIn {
@@ -56,7 +64,7 @@
 }
 
 .splash-screen.splash-screen--hide {
-  animation: splashFadeOut 1s ease-in-out forwards;
+  animation: splashFadeOut var(--splash-fade-duration) ease-in-out forwards;
   pointer-events: none;
 }
 
@@ -244,7 +252,7 @@
   cursor: pointer; /* cursor-pointer */
   opacity: 0;
   pointer-events: none;
-  transition: all 1000ms ease-out; /* transition-all duration-1000 ease-out */
+  transition: all var(--splash-fade-duration) ease-out; /* transition-all duration-1000 ease-out */
   will-change: transform, opacity, box-shadow;
 }
 

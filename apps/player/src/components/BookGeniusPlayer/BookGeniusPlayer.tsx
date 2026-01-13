@@ -71,6 +71,15 @@ export function BookGeniusPlayer({
     return new ConvexReactClient(clientUrl);
   }, [convexClient, clientUrl]);
 
+  // Cleanup ConvexReactClient on unmount to prevent WebSocket memory leak
+  useEffect(() => {
+    return () => {
+      if (ownClient) {
+        ownClient.close();
+      }
+    };
+  }, [ownClient]);
+
   const activeClient = convexClient || ownClient;
 
   // Handle missing configuration

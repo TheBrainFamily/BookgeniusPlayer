@@ -20,7 +20,10 @@ import { LiveModeAppCore } from "@player/LiveModeApp";
 // Note: Player styles are imported in main.tsx via styles/index.css
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
-const convex = new ConvexReactClient(convexUrl || "");
+if (!convexUrl) {
+  throw new Error("VITE_CONVEX_URL environment variable is not set");
+}
+const convex = new ConvexReactClient(convexUrl);
 
 export interface PlayerWrapperProps {
   bookSlug: string;
