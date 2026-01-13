@@ -1,4 +1,3 @@
- 
 /**
  * SplashScreen - Unified loading screen for BookGenius Player
  *
@@ -46,11 +45,6 @@ export interface SplashScreenProps {
   showStartButton?: boolean;
   /** Callback when start button is clicked (for external control) */
   onStartClick?: () => void;
-  /**
-   * When true, the splash screen fades in on mount (for platform use).
-   * When false/undefined, it appears immediately (for player standalone).
-   */
-  fadeIn?: boolean;
 }
 
 /**
@@ -71,7 +65,6 @@ export function SplashScreen({
   isLoaded,
   showStartButton: externalShowStartButton,
   onStartClick: externalOnStartClick,
-  fadeIn = false,
 }: SplashScreenProps) {
   // External control mode: isLoaded prop overrides internal ready state
   const isExternalControlled = isLoaded !== undefined;
@@ -219,10 +212,7 @@ export function SplashScreen({
   const isButtonEnabled = isExternalControlled ? externalShowStartButton : isReady;
 
   return (
-    <div
-      id="splash-screen"
-      className={`splash-screen ${fadeIn ? "splash-screen--fade-in" : ""} ${isHiding ? "splash-screen--hide" : ""}`}
-    >
+    <div id="splash-screen" className={`splash-screen ${isHiding ? "splash-screen--hide" : ""}`}>
       <div className="splash-container">
         <div className="splash-inner">
           <div className="splash-title-container">
