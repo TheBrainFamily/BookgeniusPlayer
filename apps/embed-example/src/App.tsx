@@ -1,33 +1,98 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
+import { SplashScreen } from "@player/components/SplashScreen";
 
 // Lazy load the player - this is what we'd prefetch
 const BookGeniusPlayer = React.lazy(() => import("./PlayerWrapper"));
 
-// Hardcoded book data
+// Hardcoded book data - includes loading phrases for splash screen
 const books = [
-  { slug: "Othello", title: "Othello", author: "William Shakespeare" },
-  { slug: "Lalka", title: "Lalka", author: "Bolesław Prus" },
+  {
+    slug: "Othello",
+    title: "Othello",
+    author: "William Shakespeare",
+    loadingPhrases: [
+      "Preparing the stage...",
+      "Summoning the Moor...",
+      "Setting the scene in Venice...",
+    ],
+  },
+  {
+    slug: "Lalka",
+    title: "Lalka",
+    author: "Bolesław Prus",
+    loadingPhrases: [
+      "Przygotowuję scenę...",
+      "Wczytywanie postaci...",
+      "Warszawa XIX wieku ożywa...",
+    ],
+  },
 ];
 
+type SelectedBook = (typeof books)[number] | null;
+
 export function App() {
-  const [selectedBook, setSelectedBook] = useState<string | null>(null);
+  const [selectedBook, setSelectedBook] = useState<SelectedBook>(null);
   const [isPrefetched, setIsPrefetched] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
+  const [splashLoaded, setSplashLoaded] = useState(false);
+  const fadeInCompleteRef = useRef(false);
 
   // Prefetch player on page load
   useEffect(() => {
-    // Start prefetching the player chunk
     import("./PlayerWrapper").then(() => {
       setIsPrefetched(true);
       console.log("Player prefetched");
     });
   }, []);
 
+  // When a book is selected, wait for splash fade-in before showing player
+  useEffect(() => {
+    if (selectedBook && !fadeInCompleteRef.current) {
+      // Wait for splash screen fade-in to complete before loading player
+      const timer = setTimeout(() => {
+        fadeInCompleteRef.current = true;
+        setShowPlayer(true);
+      }, 1000); // Match the 1s fade-in duration
+      return () => clearTimeout(timer);
+    }
+  }, [selectedBook]);
+
+  // Reset state when deselecting book
+  useEffect(() => {
+    if (!selectedBook) {
+      setShowPlayer(false);
+      setSplashLoaded(false);
+      fadeInCompleteRef.current = false;
+    }
+  }, [selectedBook]);
+
+  const handleBookClick = (book: (typeof books)[number]) => {
+    setSelectedBook(book);
+  };
+
+  // Show splash screen when book is selected
   if (selectedBook) {
-    // Player takes over full screen - no host app UI should be visible
     return (
-      <Suspense fallback={<LoadingFallback />}>
-        <BookGeniusPlayer bookSlug={selectedBook} />
-      </Suspense>
+      <>
+        {/* Splash screen fades in immediately */}
+        <SplashScreen
+          book={{
+            title: selectedBook.title,
+            author: selectedBook.author,
+            loadingPhrases: selectedBook.loadingPhrases,
+          }}
+          autoStart={false}
+          isLoaded={splashLoaded}
+          fadeIn
+        />
+
+        {/* Player loads after splash fade-in completes */}
+        {showPlayer && (
+          <Suspense fallback={null}>
+            <BookGeniusPlayer bookSlug={selectedBook.slug} onReady={() => setSplashLoaded(true)} />
+          </Suspense>
+        )}
+      </>
     );
   }
 
@@ -42,7 +107,7 @@ export function App() {
         {books.map((book) => (
           <button
             key={book.slug}
-            onClick={() => setSelectedBook(book.slug)}
+            onClick={() => handleBookClick(book)}
             style={{
               padding: 24,
               background: "linear-gradient(135deg, #2d2d2d, #1a1a1a)",
@@ -58,25 +123,6 @@ export function App() {
             <div style={{ fontSize: 14, color: "#888" }}>{book.author}</div>
           </button>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function LoadingFallback() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        background: "linear-gradient(135deg, #1a1a1a, #2d2d2d)",
-      }}
-    >
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 24, marginBottom: 16 }}>Loading Player...</div>
-        <div style={{ color: "#888" }}>This is the embed-example fallback</div>
       </div>
     </div>
   );

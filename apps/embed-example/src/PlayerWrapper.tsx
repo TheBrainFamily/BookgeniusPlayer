@@ -22,11 +22,13 @@ import { LiveModeAppCore } from "@player/LiveModeApp";
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
 const convex = new ConvexReactClient(convexUrl || "");
 
-interface PlayerWrapperProps {
+export interface PlayerWrapperProps {
   bookSlug: string;
+  /** Called when the player is ready (backgrounds loaded) */
+  onReady?: () => void;
 }
 
-export default function PlayerWrapper({ bookSlug }: PlayerWrapperProps) {
+export default function PlayerWrapper({ bookSlug, onReady }: PlayerWrapperProps) {
   const bookPath = `books/${bookSlug}`;
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
@@ -39,23 +41,26 @@ export default function PlayerWrapper({ bookSlug }: PlayerWrapperProps) {
 
     console.log("[PlayerWrapper] App is ready");
 
+    // Notify parent that player is ready (for splash screen fade-out)
+    onReady?.();
+
     // Match platform's 1 second delay before hiding splash
     window.setTimeout(() => {
       console.log("[PlayerWrapper] Dispatching splashHidden");
       window.dispatchEvent(new CustomEvent("splashHidden"));
     }, 1000);
-  }, []);
+  }, [onReady]);
 
   // Listen for appReady event (fired when backgrounds loaded)
   useEffect(() => {
-    const onReady = () => {
+    const handleAppReady = () => {
       console.log("[PlayerWrapper] appReady received");
       setIsPlayerReady(true);
       safeFinish();
     };
 
-    window.addEventListener("appReady", onReady);
-    return () => window.removeEventListener("appReady", onReady);
+    window.addEventListener("appReady", handleAppReady);
+    return () => window.removeEventListener("appReady", handleAppReady);
   }, [safeFinish]);
 
   // Manage #player-scope visibility - exactly like platform's WrappedPlayerApp

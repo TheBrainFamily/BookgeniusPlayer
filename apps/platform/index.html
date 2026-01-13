@@ -60,8 +60,8 @@
         visibility: hidden;
         pointer-events: none;
         transition:
-          opacity 0.3s ease-in-out,
-          visibility 0s linear 0.3s;
+          opacity 1000ms ease-in-out,
+          visibility 0s linear 1000ms;
       }
 
       #player-scope.visible {
@@ -70,7 +70,7 @@
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
-        transition: opacity 0.3s ease-in-out;
+        transition: opacity 1000ms ease-in-out;
       }
 
       body:has(#player-scope.visible) {

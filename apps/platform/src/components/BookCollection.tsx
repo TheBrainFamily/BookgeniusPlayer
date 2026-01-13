@@ -46,10 +46,10 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
     // Start the transition overlay with book-specific meta
     startTransition({ title, phrases, author, showStartButton: false, onStartClick: undefined });
 
-    // Let the overlay paint before route switch for a smooth fade
-    requestAnimationFrame(() => {
+    // Wait for overlay to fade in before navigating (prevents flash of gray body background)
+    setTimeout(() => {
       navigate(`/reader?book=${book.slug}`, { state: { meta: { title, phrases, author } } });
-    });
+    }, 1000); // Match the 1s fade-in duration
   };
 
   return (
