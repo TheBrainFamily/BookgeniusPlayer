@@ -244,7 +244,94 @@ const renderParagraphContent = (
 };
 
 // =============================================================================
-// Play Row State (for Play/Mixed formats)
+// Format B State (compact storage format for plays)
+// =============================================================================
+
+/**
+ * Format B outputs compact HTML for storage:
+ * - Speaker blocks: <div data-speaker="slug" data-label="LABEL">paragraphs</div>
+ * - Stage directions: <p data-is-didaskalia="true">content</p>
+ *
+ * This is expanded to verbose play-row structure at render time by htmlNormalizer.
+ */
+class FormatBState {
+  private currentSpeaker: string | null = null;
+  private currentLabel: string | null = null;
+  private currentEnters: boolean = false;
+  private currentExits: boolean = false;
+  private pendingParagraphs: string[] = [];
+  private output: string[] = [];
+
+  /**
+   * Start or continue a speaker block. If speaker changes, flush previous block.
+   */
+  setSpeaker(slug: string, label: string, enters: boolean = false, exits: boolean = false): void {
+    if (this.currentSpeaker !== slug) {
+      this.flush();
+      this.currentSpeaker = slug;
+      this.currentLabel = label;
+      this.currentEnters = enters;
+      this.currentExits = exits;
+    }
+  }
+
+  /**
+   * Add a content paragraph to the current speaker block.
+   * If no speaker is active, outputs as standalone paragraph.
+   */
+  addParagraph(html: string): void {
+    if (this.currentSpeaker) {
+      this.pendingParagraphs.push(html);
+    } else {
+      // No active speaker - output as standalone paragraph
+      this.output.push(`<p>${html}</p>`);
+    }
+  }
+
+  /**
+   * Add a standalone didaskalia paragraph (flushes any open speaker block).
+   */
+  addDidaskalia(html: string): void {
+    this.flush();
+    this.output.push(`<p data-is-didaskalia="true">${html}</p>`);
+  }
+
+  /**
+   * Flush any pending speaker block to output.
+   */
+  flush(): void {
+    if (this.currentSpeaker) {
+      // Build data attributes
+      let attrs = `data-speaker="${this.currentSpeaker}" data-label="${this.currentLabel}"`;
+      if (this.currentEnters) attrs += ' data-enters="true"';
+      if (this.currentExits) attrs += ' data-exits="true"';
+
+      if (this.pendingParagraphs.length > 0) {
+        const paragraphs = this.pendingParagraphs.map((p) => `<p>${p}</p>`).join("\n");
+        this.output.push(`<div ${attrs}>\n${paragraphs}\n</div>`);
+      } else {
+        // Speaker with no content paragraphs - still output the div for enters/exits tracking
+        this.output.push(`<div ${attrs}></div>`);
+      }
+    }
+    this.currentSpeaker = null;
+    this.currentLabel = null;
+    this.currentEnters = false;
+    this.currentExits = false;
+    this.pendingParagraphs = [];
+  }
+
+  /**
+   * Get the final HTML output.
+   */
+  getOutput(): string {
+    this.flush();
+    return this.output.join("\n");
+  }
+}
+
+// =============================================================================
+// Play Row State (legacy verbose format - kept for non-play formats)
 // =============================================================================
 
 class PlayRowState {
@@ -849,6 +936,132 @@ const getChapterTitles = (
   return chapterTitles;
 };
 
+/**
+ * Extract the speaker label from a paragraph that starts with a talking character.
+ * Returns the text content of the <strong> tag if present, or the character display name.
+ */
+const extractSpeakerLabel = (
+  paragraph: Element,
+  characterMap: Map<string, CharacterInfo>,
+): string | null => {
+  // Look for <strong> tag which contains the speaker label (e.g., "THESEUS", "LORD THESEUS")
+  const strongElements = paragraph.getElementsByTagName("strong");
+  if (strongElements.length > 0) {
+    return (strongElements[0].textContent || "").trim();
+  }
+
+  // Fallback to character display name
+  const talkingElement = findFirstTalkingElement(paragraph);
+  if (talkingElement) {
+    const slug = talkingElement.tagName;
+    const charInfo = characterMap.get(slug);
+    return charInfo?.display ?? slug.replace(/-/g, " ");
+  }
+
+  return null;
+};
+
+/**
+ * Render a chapter in Format B (compact storage format).
+ *
+ * Format B structure:
+ * - Speaker blocks: <div data-speaker="slug" data-label="LABEL">paragraphs</div>
+ * - Stage directions: <p data-is-didaskalia="true">content</p>
+ * - Headings: <h3>/<h4>/<h5> with data-act where applicable
+ */
+const renderChapterFormatB = (
+  chapter: Element,
+  characterMap: Map<string, CharacterInfo>,
+  bookSlug: string,
+  serializer: XmlSerializerLike,
+): string => {
+  const formatB = new FormatBState();
+  const outputParts: string[] = [];
+
+  for (const node of Array.from(chapter.childNodes)) {
+    if (!isElementNode(node)) continue;
+
+    const tagName = node.tagName.toLowerCase();
+
+    switch (tagName) {
+      case "h3":
+      case "act":
+        formatB.flush();
+        outputParts.push(formatB.getOutput());
+        outputParts.push(`<h3 data-act="true">${node.textContent || ""}</h3>`);
+        break;
+
+      case "h4":
+      case "title":
+        formatB.flush();
+        outputParts.push(formatB.getOutput());
+        outputParts.push(`<h4>${node.textContent || ""}</h4>`);
+        break;
+
+      case "h5":
+      case "subtitle":
+        formatB.flush();
+        outputParts.push(formatB.getOutput());
+        outputParts.push(`<h5>${node.textContent || ""}</h5>`);
+        break;
+
+      case "p": {
+        const rawHtml = extractInnerHTML(node, serializer);
+        const isPureDidaskalia = isDidaskaliaHTML(rawHtml);
+        const talkingSlug = findFirstTalkingCharacterSlug(node, characterMap);
+
+        // Render paragraph content
+        const paragraphRender = renderParagraphContent(node, {
+          characterMap,
+          isLikelyCharacterTag,
+          bookSlug,
+        });
+
+        const content = normalizeParagraphWhitespace(paragraphRender.content);
+        if (!content.trim()) break;
+
+        // Remove character placeholder spans from content (Format B doesn't need them)
+        const cleanContent = content
+          .replace(/<span class="character-placeholder[^>]*>.*?<\/span>/g, "")
+          .trim();
+
+        if (talkingSlug) {
+          // This is a speaker label paragraph - start new speaker block
+          const label = extractSpeakerLabel(node, characterMap);
+          // Find the talking element to get enters/exits attributes
+          const talkingEl = findFirstTalkingElement(node);
+          const enters = talkingEl?.getAttribute("enters") === "true";
+          const exits = talkingEl?.getAttribute("exits") === "true";
+          formatB.setSpeaker(talkingSlug.toLowerCase(), label || talkingSlug, enters, exits);
+          // Don't add the label paragraph itself - it's stored in data-label
+        } else if (isPureDidaskalia) {
+          // Stage direction
+          formatB.addDidaskalia(cleanContent);
+        } else {
+          // Content paragraph - add to current speaker block
+          formatB.addParagraph(cleanContent);
+        }
+        break;
+      }
+
+      default: {
+        // Other elements pass through
+        formatB.flush();
+        outputParts.push(formatB.getOutput());
+        const serializedInner = serializeLowercaseChildren(node, serializer);
+        outputParts.push(`<${tagName}>${serializedInner}</${tagName}>`);
+      }
+    }
+  }
+
+  // Flush any remaining speaker block
+  formatB.flush();
+  outputParts.push(formatB.getOutput());
+
+  const innerHtml = outputParts.filter(Boolean).join("\n");
+  return `<section data-chapter="${chapter.getAttribute("id")}">\n${innerHtml}\n</section>`;
+};
+
 const renderChapter = (
   chapter: Element,
   characterMap: Map<string, CharacterInfo>,
@@ -856,10 +1069,16 @@ const renderChapter = (
   bookSlug: string,
   serializer: XmlSerializerLike,
 ): string => {
+  // Use Format B for play formats
+  if (isPlayFormat) {
+    return renderChapterFormatB(chapter, characterMap, bookSlug, serializer);
+  }
+
+  // Legacy rendering for non-play formats
   let currentCharacterAlignment: "left" | "right" = "left";
   let lastSpeakerSlug: string | null = null;
 
-  const playRowState = isPlayFormat ? new PlayRowState() : null;
+  const playRowState = new PlayRowState();
 
   const paragraphMetadata = getParagraphMetadata(chapter, characterMap, serializer);
 
@@ -880,7 +1099,7 @@ const renderChapter = (
             paragraphMetadata,
             paragraphMetaIndex,
             { dataIndex, currentCharacterAlignment, lastSpeakerSlug, playRowState },
-            isPlayFormat,
+            false, // Not play format - use legacy renderer
             bookSlug,
             characterMap,
           );
@@ -908,10 +1127,7 @@ const renderChapter = (
     });
 
   htmlResult += htmlResults.join("");
-
-  if (isPlayFormat && playRowState) {
-    htmlResult += playRowState.closeRow();
-  }
+  htmlResult += playRowState.closeRow();
 
   htmlResult += "\n  </section></section>";
   return htmlResult;

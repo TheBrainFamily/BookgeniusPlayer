@@ -48,3 +48,4 @@ apps/player/dist-lib/
 ConvexAssets/
 convex-test
 books/
+.env.test

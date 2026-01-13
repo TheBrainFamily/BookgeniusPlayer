@@ -45,6 +45,18 @@ function isDramaDialogue(element: Element): boolean {
   );
 }
 
+/**
+ * Check if element is a Format B speaker block:
+ * <div data-speaker="..." data-label="...">
+ */
+function isFormatBSpeakerBlock(element: Element): boolean {
+  return (
+    element.tagName.toLowerCase() === "div" &&
+    element.hasAttribute("data-speaker") &&
+    element.hasAttribute("data-label")
+  );
+}
+
 function processPlayContainer(
   container: Element,
   doc: Document,
@@ -114,6 +126,102 @@ function processPlayContainer(
 export function wrapPlayElements(section: Element, doc: Document): void {
   const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
   processPlayContainer(section, doc, state);
+}
+
+/**
+ * Transform Format B input into play-row structure.
+ *
+ * Format B:
+ *   <div data-speaker="bob" data-label="BOB"><p>Line 1</p><p>Line 2</p></div>
+ *
+ * Becomes:
+ *   <div class="play-row" data-speaker="bob" data-text-alignment="left">
+ *     <div class="character-avatar"></div>
+ *     <div class="character-text">
+ *       <p data-is-character="true"><strong>BOB</strong></p>
+ *       <p>Line 1</p>
+ *       <p>Line 2</p>
+ *     </div>
+ *   </div>
+ */
+function transformFormatBToPlayRows(section: Element, doc: Document): void {
+  const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
+  const children = Array.from(section.children);
+
+  for (const child of children) {
+    const tagName = child.tagName.toLowerCase();
+
+    // Handle Format B speaker blocks
+    if (isFormatBSpeakerBlock(child)) {
+      const speakers = child.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
+      const label = child.getAttribute("data-label") || "";
+      const firstSpeaker = speakers[0] || "";
+
+      // Update alignment based on speaker change
+      if (firstSpeaker && firstSpeaker !== state.lastSpeaker) {
+        state.alignment =
+          state.lastSpeaker === null ? "left" : state.alignment === "left" ? "right" : "left";
+        state.lastSpeaker = firstSpeaker;
+      }
+
+      // Create play-row structure
+      const playRow = doc.createElement("div");
+      playRow.className = "play-row";
+      playRow.setAttribute("data-text-alignment", state.alignment);
+      playRow.setAttribute("data-speaker", speakers.join(" "));
+
+      const characterAvatar = doc.createElement("div");
+      characterAvatar.className = "character-avatar";
+
+      const characterText = doc.createElement("div");
+      characterText.className = "character-text";
+
+      // Create label paragraph
+      const labelP = doc.createElement("p");
+      labelP.setAttribute("data-text-alignment", state.alignment);
+      labelP.setAttribute("data-is-character", "true");
+      labelP.setAttribute("data-is-didaskalia", "false");
+      const strong = doc.createElement("strong");
+      strong.textContent = label;
+      labelP.appendChild(strong);
+      characterText.appendChild(labelP);
+
+      // Move content paragraphs
+      for (const innerChild of Array.from(child.children)) {
+        const p = innerChild.cloneNode(true) as Element;
+        p.setAttribute("data-text-alignment", state.alignment);
+        p.setAttribute("data-is-character", "false");
+        p.setAttribute("data-is-didaskalia", "false");
+        characterText.appendChild(p);
+      }
+
+      playRow.appendChild(characterAvatar);
+      playRow.appendChild(characterText);
+      section.replaceChild(playRow, child);
+      continue;
+    }
+
+    // Handle didaskalia paragraphs (explicit data-is-didaskalia or pure em)
+    if (tagName === "p") {
+      const isExplicitDidaskalia = child.getAttribute("data-is-didaskalia") === "true";
+      const isPureEm = isPureEmParagraph(child);
+
+      if (isExplicitDidaskalia || isPureEm) {
+        const playRow = doc.createElement("div");
+        playRow.className = "play-row didaskalia-row";
+
+        const didaskaliaText = doc.createElement("div");
+        didaskaliaText.className = "didaskalia-text";
+
+        const p = child.cloneNode(true) as Element;
+        p.setAttribute("data-is-didaskalia", "true");
+        didaskaliaText.appendChild(p);
+
+        playRow.appendChild(didaskaliaText);
+        section.replaceChild(playRow, child);
+      }
+    }
+  }
 }
 
 function indexPlayRowParagraphs(playRow: Element, startIndex: number): number {
@@ -619,6 +727,8 @@ export function normalizeChapterHtml(html: string): string {
     return sanitized;
   }
 
+  // Transform Format B speaker blocks first (before other transformations)
+  transformFormatBToPlayRows(section, doc);
   wrapPlayElements(section, doc);
   injectDataIndex(section);
   injectAvatarShells(section, doc);
