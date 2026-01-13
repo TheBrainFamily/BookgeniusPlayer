@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
 import { detectFolderType, parseBookPath, parseCharacterPath } from "@/lib/utils/folderPatterns";
+import { parseChapterNumberFromBasename } from "@/lib/chapterUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,13 +104,6 @@ const CHAPTER_FIELDS: FormField[] = [
 // =============================================================================
 // Field Renderer
 // =============================================================================
-
-const parseChapterNumberFromBasename = (basename: string): number | undefined => {
-  const match = basename.match(/chapter[-_ ]?(\\d+)/i) || basename.match(/^(\\d+)/);
-  if (!match) return undefined;
-  const value = Number.parseInt(match[1], 10);
-  return Number.isFinite(value) ? value : undefined;
-};
 
 interface FieldRendererProps {
   field: FormField;

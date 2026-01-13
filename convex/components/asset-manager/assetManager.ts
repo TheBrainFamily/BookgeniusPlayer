@@ -120,6 +120,26 @@ async function queueR2Deletion(
   });
 }
 
+/**
+ * Queue a Convex storage file for deferred deletion.
+ * The file will be eligible for hard-deletion after the retention period.
+ */
+async function queueConvexDeletion(
+  ctx: MutationCtx,
+  storageId: Id<"_storage">,
+  originalPath: string,
+  deletedBy?: string,
+): Promise<void> {
+  const now = Date.now();
+  await ctx.db.insert("pendingConvexDeletions", {
+    storageId,
+    originalPath,
+    deletedAt: now,
+    deleteAfter: now + R2_DELETION_RETENTION_DAYS * 24 * 60 * 60 * 1000,
+    deletedBy,
+  });
+}
+
 // =============================================================================
 // Storage Backend Configuration
 // =============================================================================
@@ -343,7 +363,7 @@ export const finishUpload = mutation({
     }
 
     // Look up or create asset
-    let asset = await ctx.db
+    const asset = await ctx.db
       .query("assets")
       .withIndex("by_folder_basename", (q) =>
         q.eq("folderPath", intent.folderPath).eq("basename", intent.basename),
@@ -365,7 +385,8 @@ export const finishUpload = mutation({
         updatedAt: now,
         ...actorFields,
       });
-      asset = await ctx.db.get(assetId);
+      // Note: asset stays null here, which is fine - new assets have no old
+      // publishedVersionId to archive, and asset?.publishedVersionId handles this
     } else {
       assetId = asset._id;
       nextVersion = (asset.versionCounter ?? 0) + 1;
@@ -918,7 +939,7 @@ export const createVersionFromStorageId = mutation({
     }
 
     // Look up or create asset
-    let asset = await ctx.db
+    const asset = await ctx.db
       .query("assets")
       .withIndex("by_folder_basename", (q) =>
         q.eq("folderPath", folderPath).eq("basename", args.basename),
@@ -940,7 +961,8 @@ export const createVersionFromStorageId = mutation({
         updatedAt: now,
         ...actorFields,
       });
-      asset = await ctx.db.get(assetId);
+      // Note: asset stays null here, which is fine - new assets have no old
+      // publishedVersionId to archive, and asset?.publishedVersionId handles this
     } else {
       assetId = asset._id;
       nextVersion = (asset.versionCounter ?? 0) + 1;
@@ -1531,6 +1553,8 @@ export const deleteFile = mutation({
     for (const version of versions) {
       if (version.r2Key) {
         await queueR2Deletion(ctx, version.r2Key, originalPath, actorFields.updatedBy);
+      } else if (version.storageId) {
+        await queueConvexDeletion(ctx, version.storageId, originalPath, actorFields.updatedBy);
       }
       await ctx.db.delete(version._id);
       deletedVersions++;
@@ -1600,6 +1624,8 @@ export const deleteFilesInFolder = mutation({
       for (const version of versions) {
         if (version.r2Key) {
           await queueR2Deletion(ctx, version.r2Key, originalPath, actorFields.updatedBy);
+        } else if (version.storageId) {
+          await queueConvexDeletion(ctx, version.storageId, originalPath, actorFields.updatedBy);
         }
         await ctx.db.delete(version._id);
         deletedVersions++;
@@ -1969,6 +1995,99 @@ export const cancelPendingR2Deletion = mutation({
     const pending = await ctx.db
       .query("pendingR2Deletions")
       .withIndex("by_r2_key", (q) => q.eq("r2Key", r2Key))
+      .first();
+
+    if (!pending) {
+      return { cancelled: false };
+    }
+
+    await ctx.db.delete(pending._id);
+    return { cancelled: true };
+  },
+});
+
+// =============================================================================
+// Convex Storage Pending Deletions
+// =============================================================================
+
+/**
+ * List pending Convex storage deletions (for debugging/admin).
+ */
+export const listPendingConvexDeletions = query({
+  args: { limit: v.optional(v.number()), onlyExpired: v.optional(v.boolean()) },
+  returns: v.array(
+    v.object({
+      _id: v.id("pendingConvexDeletions"),
+      _creationTime: v.number(),
+      storageId: v.id("_storage"),
+      originalPath: v.string(),
+      deletedAt: v.number(),
+      deleteAfter: v.number(),
+      deletedBy: v.optional(v.string()),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const limit = args.limit ?? 100;
+
+    if (args.onlyExpired) {
+      return await ctx.db
+        .query("pendingConvexDeletions")
+        .withIndex("by_delete_after", (q) => q.lte("deleteAfter", now))
+        .take(limit);
+    }
+
+    return await ctx.db.query("pendingConvexDeletions").take(limit);
+  },
+});
+
+/**
+ * Process expired Convex storage deletions.
+ * Unlike R2 deletions, this mutation actually performs the deletion
+ * since Convex storage can be deleted within the mutation context.
+ * Call this from a cron job or cleanup script.
+ */
+export const processExpiredConvexDeletions = mutation({
+  args: {
+    batchSize: v.optional(v.number()),
+    // If true, process ALL pending deletions regardless of deleteAfter time
+    forceAll: v.optional(v.boolean()),
+  },
+  returns: v.object({ processed: v.number(), hasMore: v.boolean() }),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const batchSize = args.batchSize ?? 100;
+
+    let batch;
+    if (args.forceAll) {
+      batch = await ctx.db.query("pendingConvexDeletions").take(batchSize);
+    } else {
+      batch = await ctx.db
+        .query("pendingConvexDeletions")
+        .withIndex("by_delete_after", (q) => q.lte("deleteAfter", now))
+        .take(batchSize);
+    }
+
+    for (const deletion of batch) {
+      await ctx.storage.delete(deletion.storageId);
+      await ctx.db.delete(deletion._id);
+    }
+
+    return { processed: batch.length, hasMore: batch.length === batchSize };
+  },
+});
+
+/**
+ * Cancel a pending Convex storage deletion (restore before hard-delete).
+ * Returns true if the deletion was found and cancelled.
+ */
+export const cancelPendingConvexDeletion = mutation({
+  args: { storageId: v.id("_storage") },
+  returns: v.object({ cancelled: v.boolean() }),
+  handler: async (ctx, { storageId }) => {
+    const pending = await ctx.db
+      .query("pendingConvexDeletions")
+      .withIndex("by_storage_id", (q) => q.eq("storageId", storageId))
       .first();
 
     if (!pending) {

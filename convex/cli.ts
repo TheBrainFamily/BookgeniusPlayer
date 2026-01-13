@@ -1,7 +1,7 @@
 // convex/cli.ts
 // CLI operations for asset management - admin only
 import { v } from "convex/values";
-import { components, internal } from "./_generated/api";
+import { components } from "./_generated/api";
 import { adminQuery, adminMutation, adminAction } from "./functions";
 
 // --- Folder Operations ---
@@ -101,29 +101,6 @@ export const listPublishedFilesInFolder = adminQuery({
       components.assetManager.assetManager.listPublishedFilesInFolder,
       args,
     );
-  },
-});
-
-/**
- * Backfill compiled chapter HTML and character fragments for a book.
- */
-export const backfillCompiledChapters = adminMutation({
-  args: { bookPath: v.string() },
-  handler: async (ctx, args) => {
-    const chapters = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: `${args.bookPath}/chapters` },
-    );
-
-    for (const chapter of chapters) {
-      await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
-        bookPath: args.bookPath,
-        chapterBasename: chapter.basename,
-        versionId: chapter.versionId,
-      });
-    }
-
-    return { scheduled: chapters.length };
   },
 });
 

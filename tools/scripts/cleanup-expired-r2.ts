@@ -111,6 +111,42 @@ async function main() {
   let totalR2Failed = 0;
   let hasMore = true;
 
+  // Dry-run mode: use read-only query to list what would be deleted
+  if (dryRun) {
+    console.log("Fetching pending deletions from Convex (read-only)...");
+
+    type PendingDeletion = { r2Key: string; scheduledAt: number; expiresAt: number };
+    let pendingDeletions: PendingDeletion[];
+    try {
+      const output = convexRun("admin/r2Deletions:listPendingR2Deletions", {
+        limit: 1000,
+        onlyExpired: !forceAll,
+      });
+      pendingDeletions = JSON.parse(output);
+    } catch (err: unknown) {
+      console.error(
+        "Failed to fetch pending deletions:",
+        err instanceof Error ? err.message : String(err),
+      );
+      process.exit(1);
+    }
+
+    if (pendingDeletions.length === 0) {
+      console.log("No pending deletions to process.");
+    } else {
+      console.log(`\nFound ${pendingDeletions.length} R2 keys that would be deleted:\n`);
+      pendingDeletions.forEach((d) => console.log(`  - ${d.r2Key}`));
+      console.log("\nDRY RUN: No changes were made to Convex or R2.");
+    }
+
+    console.log("");
+    console.log("=========================================");
+    console.log("  DRY RUN COMPLETE");
+    console.log("=========================================");
+    return;
+  }
+
+  // Normal mode: process and delete
   while (hasMore) {
     console.log("Fetching pending deletions from Convex...");
 
@@ -135,15 +171,6 @@ async function main() {
     }
 
     console.log(`Found ${result.r2KeysToDelete.length} R2 keys to delete.`);
-
-    if (dryRun) {
-      console.log("\nKeys that would be deleted:");
-      result.r2KeysToDelete.forEach((key) => console.log(`  - ${key}`));
-      // In dry run, we already consumed the records from Convex, so we need to exit
-      console.log("\nDRY RUN: Exiting without deleting from R2.");
-      console.log("Note: The pending deletion records were already removed from Convex.");
-      break;
-    }
 
     console.log("\nDeleting from R2...");
     const { deleted, failed } = await deleteR2KeysBatch(result.r2KeysToDelete);
