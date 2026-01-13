@@ -216,10 +216,24 @@ export class SyncDaemon {
   private async subscribeToChanges(): Promise<void> {
     this.log("✅ Sync daemon running - watching for changes via WebSocket...");
 
-    // Use Convex client's watchQuery for real-time WebSocket subscription
+    this.setupChangeSubscription(this.state.cursor);
+
+    // Keep the process running
+    while (this.isRunning) {
+      await Bun.sleep(1000);
+    }
+  }
+
+  /** Setup subscription with a specific cursor, resubscribing when cursor advances */
+  private setupChangeSubscription(cursor: number): void {
+    // Unsubscribe from previous subscription if exists
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+
     this.unsubscribe = this.realtimeClient.onUpdate(
       api.cli.watchChangelog,
-      { cursor: this.state.cursor, limit: 100, _adminKey: this.config.adminKey },
+      { cursor, limit: 100, _adminKey: this.config.adminKey },
       async (response) => {
         if (response.changes.length > 0) {
           this.log(`📬 Received ${response.changes.length} changes`);
@@ -228,14 +242,12 @@ export class SyncDaemon {
           this.state.cursor = response.nextCursor;
           this.state.lastSync = new Date().toISOString();
           saveState(this.config.syncDir, this.state);
+
+          // Resubscribe with new cursor to advance pagination
+          this.setupChangeSubscription(response.nextCursor);
         }
       },
     );
-
-    // Keep the process running
-    while (this.isRunning) {
-      await Bun.sleep(1000);
-    }
   }
 
   /** Process changelog entries */

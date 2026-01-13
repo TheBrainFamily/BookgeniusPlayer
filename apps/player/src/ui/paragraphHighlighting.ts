@@ -247,8 +247,8 @@ export function setupParagraphHighlighting() {
           const closeModal = () => {
             if (modal) modal.classList.remove("visible");
             if (modalOverlay) modalOverlay.classList.remove("visible");
-            // Remove body class to allow scrolling again
-            document.body.classList.remove("modal-open");
+            // Remove player-scope class to allow scrolling again
+            document.getElementById("player-scope")?.classList.remove("modal-open");
           };
 
           if (!modal) {
@@ -296,8 +296,8 @@ export function setupParagraphHighlighting() {
             modalContent.innerHTML = modifiedHTML; // Use innerHTML to preserve formatting
             modal.classList.add("visible"); // Use class
             modalOverlay.classList.add("visible"); // Use class
-            // Add body class to prevent background scrolling
-            document.body.classList.add("modal-open");
+            // Add player-scope class to prevent background scrolling
+            document.getElementById("player-scope")?.classList.add("modal-open");
           }
         }
       }

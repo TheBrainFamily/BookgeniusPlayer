@@ -5,3 +5,4 @@ reviews:
     base_branches:
       - "convex-cms" # This adds your staging branch
       - "convex-reactive-assets" # This adds your staging branch
+      - "simplified-asset-manager"

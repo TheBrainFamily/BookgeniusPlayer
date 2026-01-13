@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import { usePlayerDOM } from "@player/context/PlayerDOMContext";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { setupPageObserver } from "@player/ui/pageObserver";
 import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
@@ -35,6 +36,7 @@ if (import.meta.hot) {
 const containerId = "content-container";
 
 export function useBookContent() {
+  const { contentContainer, bookContainer } = usePlayerDOM();
   const {
     textVersion,
     bookData: _bookData,
@@ -165,23 +167,21 @@ export function useBookContent() {
   );
 
   useEffect(() => {
-    containerRef.current = document.getElementById(containerId);
-  }, []);
+    containerRef.current = contentContainer;
+  }, [contentContainer]);
 
   // Initialize ScrollCoordinator when container is available
   useEffect(() => {
-    const container = document.getElementById(containerId);
-    if (container) {
-      scrollCoordinator.initialize(container);
+    if (contentContainer) {
+      scrollCoordinator.initialize(contentContainer);
     }
 
     return () => {
       scrollCoordinator.destroy();
     };
-  }, []);
+  }, [contentContainer]);
 
   useEffect(() => {
-    const bookContainer = document.getElementById("book-container");
     if (bookContainer) {
       if (isPlayFormat) {
         bookContainer.classList.add("play-mode");
@@ -189,7 +189,7 @@ export function useBookContent() {
         bookContainer.classList.remove("play-mode");
       }
     }
-  }, [isPlayFormat]);
+  }, [bookContainer, isPlayFormat]);
 
   useEffect(() => {
     currentChapterRef.current = currentChapter;

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>BookGenius - Basic Bun Example</title>
+
+    <!-- Player fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Polyfill process.env for packages that expect Node.js environment -->
+    <script>
+      if (typeof globalThis.process === "undefined") {
+        globalThis.process = { env: {} };
+      }
+    </script>
+
+    <!-- App entry point -->
+    <script src="./app.tsx" type="module"></script>
+
+    <style>
+      /* Minimal host app styles */
+      html, body {
+        height: 100vh;
+        margin: 0;
+        background: #1a1a1a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        color: white;
+      }
+
+      #root {
+        height: 100vh;
+      }
+
+      /* Hide host app when player is active */
+      body:has(#player-scope.visible) #root {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

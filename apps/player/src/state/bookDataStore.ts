@@ -38,6 +38,10 @@ export type Note = { id: string; content: string };
 export type Variant = { id: string; simplifications: { score: number; sentences: string[] }[] };
 
 export interface BookDataStore {
+  // Book identification (available immediately from props)
+  bookSlug: string;
+  bookPath: string;
+
   // Loading states
   isLoading: boolean;
   isReady: boolean;
@@ -73,8 +77,23 @@ export interface BookDataStore {
 // Module-level store
 let _store: BookDataStore | null = null;
 
+// Separate storage for book identifier - set synchronously during render
+// before useLayoutEffect runs, so it's available to hooks in child components
+let _bookSlug: string = "";
+let _bookPath: string = "";
+
 // Flag to track if store has ever been set (helps with debugging)
 let _storeInitialized = false;
+
+/**
+ * Set just the book identifier (slug/path) synchronously.
+ * Call this during render, before returning children.
+ * This ensures getBookSlug() works for hooks in child components.
+ */
+export function setBookIdentifier(bookSlug: string, bookPath: string): void {
+  _bookSlug = bookSlug;
+  _bookPath = bookPath;
+}
 
 /**
  * Set the book data store. Called by BookConvexProvider when context value changes.
@@ -89,6 +108,8 @@ export function setBookDataStore(store: BookDataStore): void {
  */
 export function clearBookDataStore(): void {
   _store = null;
+  _bookSlug = "";
+  _bookPath = "";
 }
 
 /**
@@ -222,21 +243,30 @@ export function getAudiobookTracksForBook(): unknown[] {
 
 /**
  * Get the current book's slug.
- * Returns null if not ready.
+ * Uses the synchronously-set identifier (not the async store).
+ * Throws if called before BookConvexProvider has rendered.
  */
 export function getBookSlug(): string {
-  if (!_store) {
+  if (!_bookSlug) {
     throw new Error(
-      "[bookDataStore] Store not initialized. " +
-        "This usually means a store function was called before BookConvexProvider mounted. " +
-        "Ensure your component tree is wrapped in <BookConvexProvider>.",
+      "[bookDataStore] Book slug not set. " +
+        "Ensure BookConvexProvider has rendered before calling getBookSlug().",
     );
   }
-  if (!_store.bookData) {
+  return _bookSlug;
+}
+
+/**
+ * Get the current book's path.
+ * Uses the synchronously-set identifier (not the async store).
+ * Throws if called before BookConvexProvider has rendered.
+ */
+export function getBookPath(): string {
+  if (!_bookPath) {
     throw new Error(
-      "[bookDataStore] Book data not found. " +
-        "This usually means the book data is not loaded yet.",
+      "[bookDataStore] Book path not set. " +
+        "Ensure BookConvexProvider has rendered before calling getBookPath().",
     );
   }
-  return _store.bookData.slug;
+  return _bookPath;
 }

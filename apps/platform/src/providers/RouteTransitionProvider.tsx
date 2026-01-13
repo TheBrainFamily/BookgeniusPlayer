@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useLocation } from "react-router-dom";
-import { BookLoader } from "@platform/components/BookLoader";
+import { SplashScreen, SPLASH_FADE_DURATION_MS } from "@player/components/SplashScreen";
 
 type LoaderMeta = {
   title: string;
@@ -52,14 +52,21 @@ type Props = {
   minDurationMs?: number; // default 100ms
 };
 
+// Overlay states for CSS animation sequencing
+type OverlayState = "hidden" | "fading-in" | "fading-out";
+
 export const RouteTransitionProvider: React.FC<Props> = ({ children, minDurationMs = 100 }) => {
-  const [navigating, setNavigating] = useState(false);
+  const [overlayState, setOverlayState] = useState<OverlayState>("hidden");
   const [meta, setMeta] = useState<LoaderMeta | null>(null);
   const [navigatedFromPlatform, setNavigatedFromPlatform] = useState(false);
-  const [shouldRenderOverlay, setShouldRenderOverlay] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
+  const outerTimeoutRef = useRef<number | null>(null);
+  const innerTimeoutRef = useRef<number | null>(null);
   const location = useLocation(); // used to reset if user navigates away quickly
+
+  // Derived state for context consumers
+  const navigating = overlayState === "fading-in";
 
   const startTransition = useCallback((m: LoaderMeta) => {
     setMeta({
@@ -70,32 +77,35 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
       onStartClick: m.onStartClick,
     });
     startTimeRef.current = performance.now();
-    setShouldRenderOverlay(true);
-    setNavigating(true);
+    setOverlayState("fading-in");
   }, []);
 
   const finishTransition = useCallback(() => {
+    // Clear any pending timeouts first
+    if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
+    if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+
     const now = performance.now();
     const start = startTimeRef.current ?? now;
     const elapsed = now - start;
     const remaining = Math.max(0, minDurationMs - elapsed);
 
     // Ensure the overlay is visible at least minDurationMs
-    const timeout = window.setTimeout(() => {
-      setNavigating(false);
+    outerTimeoutRef.current = window.setTimeout(() => {
+      setOverlayState("fading-out");
 
-      window.setTimeout(() => {
-        setShouldRenderOverlay(false);
+      // After fade-out animation completes, hide fully
+      innerTimeoutRef.current = window.setTimeout(() => {
+        setOverlayState("hidden");
         setMeta(null);
-      }, 1000);
+      }, SPLASH_FADE_DURATION_MS);
     }, remaining);
-
-    return () => clearTimeout(timeout);
   }, [minDurationMs]);
 
   const cancelTransition = useCallback(() => {
-    setNavigating(false);
-    setShouldRenderOverlay(false);
+    if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
+    if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+    setOverlayState("hidden");
     setMeta(null);
     startTimeRef.current = null;
   }, []);
@@ -110,6 +120,14 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   useEffect(() => {
     // no-op; location access ensures provider updates on route change
   }, [location]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (outerTimeoutRef.current) clearTimeout(outerTimeoutRef.current);
+      if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+    };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -134,31 +152,26 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
 
   return (
     <RouteTransitionContext.Provider value={value}>
-      {children}
+      {/* Platform content - blurs when transitioning */}
+      <div
+        className={`platform-content ${navigating ? "platform-content--blurring" : ""}`}
+        style={{
+          transition: `filter ${SPLASH_FADE_DURATION_MS}ms ease-out`,
+          filter: navigating ? "blur(8px)" : "blur(0px)",
+        }}
+      >
+        {children}
+      </div>
 
-      {shouldRenderOverlay && (
-        <div
-          className={`pointer-events-none fixed inset-0 z-40 transition-opacity duration-1000 ${navigating ? "opacity-100" : "opacity-0"}`}
-          aria-hidden={!navigating}
-        >
-          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d]" />
-
-          <div className="relative z-10 flex h-full items-center justify-center">
-            {meta ? (
-              <div className="pointer-events-auto">
-                <BookLoader
-                  title={meta.title}
-                  author={meta.author}
-                  loadingPhrases={meta.phrases}
-                  // While overlay is visible, pretend it's not loaded
-                  isLoaded={!navigating}
-                  showStartButton={meta.showStartButton}
-                  onStartClick={meta.onStartClick}
-                />
-              </div>
-            ) : null}
-          </div>
-        </div>
+      {/* SplashScreen - fade is handled by #player-scope.visible transition */}
+      {meta && (
+        <SplashScreen
+          book={{ title: meta.title, author: meta.author, loadingPhrases: meta.phrases }}
+          autoStart={false}
+          isLoaded={overlayState === "fading-out" || overlayState === "hidden"}
+          showStartButton={meta.showStartButton}
+          onStartClick={meta.onStartClick}
+        />
       )}
     </RouteTransitionContext.Provider>
   );

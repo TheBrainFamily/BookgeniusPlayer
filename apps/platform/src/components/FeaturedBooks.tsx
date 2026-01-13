@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
+import { SPLASH_FADE_DURATION_MS } from "../../../player/src/components/SplashScreen";
 import type { books } from "@platform/books";
 import BookCard from "./BookCard";
 import { useTranslation } from "react-i18next";
@@ -23,10 +24,10 @@ const FeaturedBooks = () => {
     // Start the transition overlay with book-specific meta
     startTransition({ title, phrases, author, showStartButton: false, onStartClick: undefined });
 
-    // Let the overlay paint before route switch for a smooth fade
-    requestAnimationFrame(() => {
+    // Wait for overlay to fade in before navigating (prevents flash of gray body background)
+    setTimeout(() => {
       navigate(`/reader?book=${book.slug}`, { state: { meta: { title, phrases, author } } });
-    });
+    }, SPLASH_FADE_DURATION_MS);
   };
 
   return (

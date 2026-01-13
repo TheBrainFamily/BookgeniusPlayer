@@ -5,7 +5,7 @@ import { renderEmElement, isLikelyCharacterTag } from "./xmlDomHelpers";
 const parseElement = (xml: string): Element => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(`<root>${xml}</root>`, "text/xml");
-   
+
   return doc.documentElement!.firstChild! as unknown as Element;
 };
 

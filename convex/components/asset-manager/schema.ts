@@ -115,6 +115,20 @@ const schema = defineSchema({
     .index("by_r2_key", ["r2Key"]),
 
   /**
+   * Pending Convex storage deletions for soft-delete with grace period.
+   * Storage IDs are queued here when assets are deleted, then hard-deleted after retention period.
+   */
+  pendingConvexDeletions: defineTable({
+    storageId: v.id("_storage"),
+    originalPath: v.string(), // "folderPath/basename" for audit trail
+    deletedAt: v.number(), // Timestamp when soft-deleted
+    deleteAfter: v.number(), // Timestamp when eligible for hard-delete
+    deletedBy: v.optional(v.string()),
+  })
+    .index("by_delete_after", ["deleteAfter"])
+    .index("by_storage_id", ["storageId"]),
+
+  /**
    * Changelog for real-time sync.
    * Records all changes to folders and assets for FileProvider subscriptions.
    * Uses createdAt as the sync cursor (monotonically increasing).

@@ -1,0 +1,436 @@
+/**
+ * SplashScreen styles - exact port from BookLoader.tsx Tailwind classes
+ *
+ * Source HTML structure:
+ * .book-loader-splash.relative.px-4.sm:px-6.lg:px-8
+ *   .text-center.space-y-6.sm:space-y-8.lg:space-y-10.max-w-4xl.mx-auto
+ *     .mb-6.sm:mb-8.lg:mb-16 (title container)
+ *     .h-6.sm:h-8.lg:h-10 (text container)
+ *     .mt-6.sm:mt-8.lg:mt-16.h-12.sm:h-14.lg:h-16 (button container)
+ */
+
+/* ================================================
+ * TIMING CONSTANTS
+ * Keep in sync with SPLASH_FADE_DURATION_MS in constants.ts
+ * ================================================ */
+:root {
+  --splash-fade-duration: 1000ms; /* 1000ms - keep in sync with constants.ts */
+}
+
+/* ================================================
+ * SPLASH SCREEN CONTAINER
+ * ================================================ */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  touch-action: none;
+  overscroll-behavior: none;
+  background-color: #2d2d2d;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  z-index: 999999;
+  overflow: hidden;
+  will-change: transform, opacity;
+  contain: layout paint;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--splash-fade-duration) ease-in-out,
+    transform var(--splash-fade-duration) ease-in-out,
+    filter var(--splash-fade-duration) ease-in-out,
+    visibility 0s var(--splash-fade-duration);
+}
+
+.splash-screen.splash-screen--hide {
+  animation: splashFadeOut var(--splash-fade-duration) ease-in-out forwards;
+  pointer-events: none;
+}
+
+@keyframes splashFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.1);
+    filter: brightness(1.5);
+    visibility: hidden;
+  }
+}
+
+/* ================================================
+ * MAIN CONTAINER: .book-loader-splash.relative.px-4.sm:px-6.lg:px-8
+ * ================================================ */
+.splash-container {
+  position: relative;
+  padding-left: 1rem; /* px-4 */
+  padding-right: 1rem;
+}
+
+/* ================================================
+ * INNER CONTAINER: .text-center.space-y-6.sm:space-y-8.lg:space-y-10.max-w-4xl.mx-auto
+ * ================================================ */
+.splash-inner {
+  text-align: center;
+  max-width: 56rem; /* max-w-4xl */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* space-y-6: all children except first get margin-top: 1.5rem */
+.splash-inner > * + * {
+  margin-top: 1.5rem; /* space-y-6 */
+}
+
+/* ================================================
+ * TITLE CONTAINER: .mb-6.sm:mb-8.lg:mb-16
+ * ================================================ */
+.splash-title-container {
+  margin-bottom: 1.5rem; /* mb-6 */
+}
+
+/* ================================================
+ * TITLE: .splash-title.text-3xl.sm:text-4xl.md:text-5xl.lg:text-6xl.xl:text-7xl
+ * ================================================ */
+.splash-title {
+  font-family: "EB Garamond", serif;
+  font-weight: 700;
+  font-size: clamp(2.5rem, 8vw, 5rem); /* fluid sizing from original */
+  line-height: 1.2;
+  color: #e0e0e0;
+  text-shadow: 0 0 15px rgba(255, 223, 186, 0.2);
+  animation: titleGlowPulse 4s ease-in-out infinite;
+  margin: 0;
+}
+
+/* ================================================
+ * SUBTITLE: .splash-subtitle.text-sm.sm:text-base.md:text-lg.lg:text-xl.mt-2.sm:mt-3
+ * ================================================ */
+.splash-subtitle {
+  font-family: "Libre Caslon Text", serif;
+  font-size: clamp(1rem, 3vw, 1.5rem); /* fluid sizing from original */
+  line-height: 1.4;
+  color: #a0a0a0;
+  font-weight: normal;
+}
+
+/* ================================================
+ * TEXT CONTAINER: .h-6.sm:h-8.lg:h-10
+ * ================================================ */
+.splash-text-container {
+  height: 1.5rem; /* h-6 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================================================
+ * LOADING TEXT: .splash-loading-text.text-sm.sm:text-base.lg:text-lg.px-2.sm:px-4
+ * ================================================ */
+.splash-loading-text {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  color: #b0b0b0;
+  margin: 0;
+  padding-left: 0.5rem; /* px-2 */
+  padding-right: 0.5rem;
+}
+
+/* Phrase fade animations */
+@keyframes textFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes textFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.fading-in {
+  animation: textFadeIn 0.5s ease-out forwards;
+}
+
+.fading-out {
+  animation: textFadeOut 0.3s ease-out forwards;
+}
+
+/* ================================================
+ * BUTTON CONTAINER: .mt-6.sm:mt-8.lg:mt-16.h-12.sm:h-14.lg:h-16.flex.items-center.justify-center
+ * ================================================ */
+.splash-button-container {
+  margin-top: 1.5rem; /* mt-6 (in addition to space-y) */
+  height: 3rem; /* h-12 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================================================
+ * START BUTTON - exact Tailwind conversion:
+ * bg-black/20 backdrop-blur-sm rounded-full border border-white/20
+ * text-white font-semibold
+ * px-4 sm:px-6 md:px-8 py-2 sm:py-2 md:py-4
+ * min-h-[40px] sm:min-h-[44px] text-sm sm:text-base
+ * flex items-center justify-center gap-2 sm:gap-2 md:gap-3
+ * shadow-2xl transition-all duration-1000 ease-out
+ * hover:scale-105 hover:border-white/40 hover:bg-black/30 hover:shadow-white/25
+ * active:scale-100 active:shadow-white/15
+ * cursor-pointer
+ * ================================================ */
+.splash-start-button {
+  background: rgba(0, 0, 0, 0.2); /* bg-black/20 */
+  backdrop-filter: blur(4px); /* backdrop-blur-sm */
+  border-radius: 9999px; /* rounded-full */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* border border-white/20 */
+  color: white; /* text-white */
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif; /* inherit system font like original */
+  font-weight: 600; /* font-semibold */
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  min-height: 40px; /* min-h-[40px] */
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  display: flex; /* flex */
+  align-items: center; /* items-center */
+  justify-content: center; /* justify-center */
+  gap: 0.5rem; /* gap-2 */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+  cursor: pointer; /* cursor-pointer */
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--splash-fade-duration) ease-out; /* transition-all duration-1000 ease-out */
+  will-change: transform, opacity, box-shadow;
+}
+
+/* hover:scale-105 hover:border-white/40 hover:bg-black/30 hover:shadow-white/25 */
+.splash-start-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.25);
+}
+
+/* active:scale-100 active:shadow-white/15 */
+.splash-start-button:active:not(:disabled) {
+  transform: scale(1);
+  box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.15);
+}
+
+.splash-start-button.disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-start-button.visible {
+  opacity: 1;
+  pointer-events: auto;
+  animation: buttonPulse 4s ease-in-out infinite;
+}
+
+/* ================================================
+ * PLAY ICON: .play-icon (wrapper)
+ * ================================================ */
+.play-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================================================
+ * PLAY TRIANGLE: .w-0.h-0.border-l-[10px].sm:border-l-[12px].border-l-white
+ *                .border-t-[6px].sm:border-t-[8px].border-t-transparent
+ *                .border-b-[6px].sm:border-b-[8px].border-b-transparent.ml-1
+ * ================================================ */
+.play-triangle {
+  width: 0; /* w-0 */
+  height: 0; /* h-0 */
+  border-left: 10px solid white; /* border-l-[10px] border-l-white */
+  border-top: 6px solid transparent; /* border-t-[6px] border-t-transparent */
+  border-bottom: 6px solid transparent; /* border-b-[6px] border-b-transparent */
+  margin-left: 0.25rem; /* ml-1 */
+}
+
+/* ================================================
+ * BUTTON TEXT: .min-w-[3em].sm:min-w-[4em].text-center.transition-opacity.duration-300
+ * ================================================ */
+.splash-start-button span {
+  min-width: 3em; /* min-w-[3em] */
+  text-align: center; /* text-center */
+  transition: opacity 300ms; /* transition-opacity duration-300 */
+}
+
+/* ================================================
+ * ANIMATIONS
+ * ================================================ */
+@keyframes buttonPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+@keyframes titleGlowPulse {
+  0%,
+  100% {
+    text-shadow:
+      0 0 15px rgba(255, 223, 186, 0.2),
+      0 0 25px rgba(255, 223, 186, 0.1);
+  }
+  50% {
+    text-shadow:
+      0 0 25px rgba(255, 223, 186, 0.4),
+      0 0 35px rgba(255, 223, 186, 0.2),
+      0 0 45px rgba(255, 223, 186, 0.1);
+  }
+}
+
+/* ================================================
+ * RESPONSIVE: sm (640px+)
+ * ================================================ */
+@media (min-width: 640px) {
+  .splash-container {
+    padding-left: 1.5rem; /* sm:px-6 */
+    padding-right: 1.5rem;
+  }
+
+  /* sm:space-y-8 */
+  .splash-inner > * + * {
+    margin-top: 2rem;
+  }
+
+  .splash-title-container {
+    margin-bottom: 2rem; /* sm:mb-8 */
+  }
+
+  /* Title uses clamp() for fluid sizing - no breakpoint override needed */
+
+  .splash-text-container {
+    height: 2rem; /* sm:h-8 */
+  }
+
+  .splash-loading-text {
+    font-size: 1rem; /* sm:text-base */
+    line-height: 1.5rem;
+    padding-left: 1rem; /* sm:px-4 */
+    padding-right: 1rem;
+  }
+
+  .splash-button-container {
+    margin-top: 2rem; /* sm:mt-8 */
+    height: 3.5rem; /* sm:h-14 */
+  }
+
+  .splash-start-button {
+    padding: 0.5rem 1.5rem; /* sm:py-2 sm:px-6 */
+    min-height: 44px; /* sm:min-h-[44px] */
+    font-size: 1rem; /* sm:text-base */
+    line-height: 1.5rem;
+    /* gap stays 0.5rem (sm:gap-2) */
+  }
+
+  .play-triangle {
+    border-left-width: 12px; /* sm:border-l-[12px] */
+    border-top-width: 8px; /* sm:border-t-[8px] */
+    border-bottom-width: 8px; /* sm:border-b-[8px] */
+  }
+
+  .splash-start-button span {
+    min-width: 4em; /* sm:min-w-[4em] */
+  }
+}
+
+/* ================================================
+ * RESPONSIVE: md (768px+)
+ * ================================================ */
+@media (min-width: 768px) {
+  /* Title/subtitle use clamp() for fluid sizing - no overrides needed */
+
+  .splash-start-button {
+    padding: 1rem 2rem; /* md:py-4 md:px-8 */
+    gap: 0.75rem; /* md:gap-3 */
+  }
+}
+
+/* ================================================
+ * RESPONSIVE: lg (1024px+)
+ * ================================================ */
+@media (min-width: 1024px) {
+  .splash-container {
+    padding-left: 2rem; /* lg:px-8 */
+    padding-right: 2rem;
+  }
+
+  /* lg:space-y-10 */
+  .splash-inner > * + * {
+    margin-top: 2.5rem;
+  }
+
+  .splash-title-container {
+    margin-bottom: 4rem; /* lg:mb-16 */
+  }
+
+  /* Title/subtitle use clamp() for fluid sizing - no overrides needed */
+
+  .splash-text-container {
+    height: 2.5rem; /* lg:h-10 */
+  }
+
+  .splash-loading-text {
+    font-size: 1.125rem; /* lg:text-lg */
+    line-height: 1.75rem;
+  }
+
+  .splash-button-container {
+    margin-top: 4rem; /* lg:mt-16 */
+    height: 4rem; /* lg:h-16 */
+  }
+}
+
+/* xl breakpoint not needed - title/subtitle use clamp() for fluid sizing */
+
+/* ================================================
+ * VIDEO/IMAGE (optional)
+ * ================================================ */
+.splash-image-container {
+  margin: 1.5rem 0;
+}
+
+.splash-loading-image {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: contain;
+}

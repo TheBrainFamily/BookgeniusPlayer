@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>BookGenius Embed Example</title>
+
+    <!-- Player fonts (same as platform) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* Host app styles - player styles come from the imported CSS bundle */
+      html,
+      body {
+        height: 100vh;
+        margin: 0;
+        background: #2d2d2d;
+        scroll-behavior: smooth;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        color: white;
+      }
+
+      /* Host app root */
+      #root {
+        height: 100vh;
+        position: relative;
+      }
+
+      /* When player is visible, hide #root completely - player takes over full screen */
+      body:has(#player-scope.visible) #root {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Player DOM (#player-scope and children) is created dynamically by PlayerDOMProvider -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -79,6 +79,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
     }
 
     element.style.opacity = currentlyVisible ? "1" : "0";
+
     previousVisibilityRef.current = currentlyVisible;
   }, [shouldBeVisible, lastHideReason, isHovered]);
 
@@ -111,6 +112,8 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
       aria-hidden={!isElementVisible}
       data-optional-element-visible={isElementVisible}
       style={{
+        // Set initial opacity - useEffect may not run if ref is null on mount
+        opacity: isElementVisible ? 1 : 0,
         // Always allow pointer events on desktop, and on mobile only disable when truly hidden
         pointerEvents: isDesktop ? "auto" : shouldBeVisible || isHovered ? "auto" : "none",
       }}

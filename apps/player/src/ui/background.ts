@@ -3,7 +3,7 @@ import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@player/preloadBackgrounds";
 import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
-import { getBookFromUrl } from "@player/getBookFromUrl";
+import { getBookSlug } from "@player/state/bookDataStore";
 
 export type Background = {
   startChapter: number;
@@ -220,7 +220,7 @@ export function applyScopedColors({
 
     let targetColor: string;
 
-    if (getBookFromUrl() === "Midsummer-Nights-Dream") {
+    if (getBookSlug() === "Midsummer-Nights-Dream") {
       targetColor = backgroundColor.trim();
       if (textColor && textColor.trim().length > 0) {
         scope.style.setProperty("--text-light", textColor.trim());

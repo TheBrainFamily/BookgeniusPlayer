@@ -75,6 +75,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       >;
     };
     assetManager: {
+      cancelPendingConvexDeletion: FunctionReference<
+        "mutation",
+        "internal",
+        { storageId: string },
+        { cancelled: boolean },
+        Name
+      >;
       cancelPendingR2Deletion: FunctionReference<
         "mutation",
         "internal",
@@ -418,6 +425,21 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         }>,
         Name
       >;
+      listPendingConvexDeletions: FunctionReference<
+        "query",
+        "internal",
+        { limit?: number; onlyExpired?: boolean },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          deleteAfter: number;
+          deletedAt: number;
+          deletedBy?: string;
+          originalPath: string;
+          storageId: string;
+        }>,
+        Name
+      >;
       listPendingR2Deletions: FunctionReference<
         "query",
         "internal",
@@ -472,6 +494,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         { basename: string; fromFolderPath: string; toFolderPath: string },
         { assetId: string; fromFolderPath: string; toFolderPath: string },
+        Name
+      >;
+      processExpiredConvexDeletions: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; forceAll?: boolean },
+        { hasMore: boolean; processed: number },
         Name
       >;
       processExpiredR2Deletions: FunctionReference<

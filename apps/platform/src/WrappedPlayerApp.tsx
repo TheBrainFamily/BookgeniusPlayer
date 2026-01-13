@@ -33,6 +33,7 @@ const WrappedPlayerApp = () => {
   const book = searchParams.get("book");
 
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  const [hasUserStarted, setHasUserStarted] = useState(false);
   const [assetBaseReady, setAssetBaseReady] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallVisible, setPaywallVisible] = useState(false);
@@ -42,6 +43,9 @@ const WrappedPlayerApp = () => {
   const lastBookRef = useRef<string | null>(null);
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
+
+  // Snapshot whether this transition should require a Start click (direct load)
+  const requiresStartRef = useRef(false);
 
   // Auth modal state and host
   const [showAuth, setShowAuth] = useState(false);
@@ -75,6 +79,7 @@ const WrappedPlayerApp = () => {
   // When user clicks "Start", remember the interaction and finish if app is already ready
   const handleStartClick = useCallback(() => {
     userInteractedRef.current = true;
+    setHasUserStarted(true);
     if (isPlayerReadyRef.current) safeFinish();
   }, [safeFinish]);
 
@@ -128,7 +133,8 @@ const WrappedPlayerApp = () => {
     const onReady = () => {
       setIsPlayerReady(true);
 
-      if (navigatedFromPlatform) {
+      if (!requiresStartRef.current) {
+        setHasUserStarted(true);
         safeFinish();
       } else {
         updateTransitionMeta({ showStartButton: true, onStartClick: handleStartClick });
@@ -137,7 +143,7 @@ const WrappedPlayerApp = () => {
 
     window.addEventListener("appReady", onReady);
     return () => window.removeEventListener("appReady", onReady);
-  }, [safeFinish, navigatedFromPlatform, updateTransitionMeta, handleStartClick]);
+  }, [safeFinish, updateTransitionMeta, handleStartClick]);
 
   // Handle book changes and setup/transition logic
   useEffect(() => {
@@ -146,6 +152,7 @@ const WrappedPlayerApp = () => {
       finishedRef.current = false;
       userInteractedRef.current = false;
       setIsPlayerReady(false);
+      setHasUserStarted(false);
 
       lastBookRef.current = book;
       unloadBookColorsCSS();
@@ -154,6 +161,15 @@ const WrappedPlayerApp = () => {
       // If overlay has ALREADY started on the platform, do NOT start it again here.
       // This avoids double startTransition when navigating from the grid.
       const shouldStartHere = !!book && !(navigatedFromPlatform && navigating);
+
+      // If we're starting the transition here, treat this as a direct load.
+      // This avoids stale "navigatedFromPlatform" state from prior sessions.
+      if (shouldStartHere) {
+        setNavigatedFromPlatform(false);
+        requiresStartRef.current = true;
+      } else if (navigatedFromPlatform) {
+        requiresStartRef.current = false;
+      }
 
       if (shouldStartHere && book) {
         const meta = books.find((b) => b.slug === book);
@@ -322,7 +338,9 @@ const WrappedPlayerApp = () => {
     const playerScopeElement = document.getElementById("player-scope");
     if (!playerScopeElement) return;
 
-    if (isPlayerReady) {
+    const shouldShow = isPlayerReady && (!requiresStartRef.current || hasUserStarted);
+
+    if (shouldShow) {
       playerScopeElement.classList.add("visible");
       playerScopeElement.removeAttribute("inert");
       playerScopeElement.setAttribute("aria-hidden", "false");
@@ -339,7 +357,7 @@ const WrappedPlayerApp = () => {
       playerScopeElement.setAttribute("inert", "");
       playerScopeElement.setAttribute("aria-hidden", "true");
     };
-  }, [isPlayerReady]);
+  }, [isPlayerReady, hasUserStarted]);
 
   return (
     <div
@@ -347,7 +365,7 @@ const WrappedPlayerApp = () => {
     >
       {assetBaseReady ? (
         <Suspense fallback={null}>
-          {createPortal(<PlayerApp />, document.getElementById("root-player")!)}
+          <PlayerApp />
         </Suspense>
       ) : null}
 

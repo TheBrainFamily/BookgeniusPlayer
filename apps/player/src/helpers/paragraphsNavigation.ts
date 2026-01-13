@@ -10,7 +10,7 @@ import {
   ensureChapterRangeWindow,
 } from "@player/logic/BookContentVirtualizer";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
-import { getBookData } from "@player/state/bookDataStore";
+import { getBookData, getBookSlug } from "@player/state/bookDataStore";
 import { activateMediaInRange } from "@player/ui/activateMediaInRange";
 
 /* ------------------------------------------------------------------ */
@@ -27,7 +27,6 @@ import {
   flushCommit,
   LAYOUT_UNSTABLE_RESIZE_MS,
 } from "./locationCommitter";
-import { getBookFromUrl } from "@player/getBookFromUrl";
 
 /* ------------------------------------------------------------------ */
 
@@ -145,7 +144,7 @@ export interface ExtendedLocation extends Location {
 /* ------------------------------------------------------------------ */
 /*  Furthest‑location helpers                                         */
 export const getFurthestLocationKey = (): string => {
-  return `furthestLocation_${getBookFromUrl()}`;
+  return `furthestLocation_${getBookSlug()}`;
 };
 
 export const getSavedLocation = (): ExtendedLocation => {

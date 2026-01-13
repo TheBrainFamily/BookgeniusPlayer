@@ -169,6 +169,12 @@ export declare const components: {
       >;
     };
     assetManager: {
+      cancelPendingConvexDeletion: FunctionReference<
+        "mutation",
+        "internal",
+        { storageId: string },
+        { cancelled: boolean }
+      >;
       cancelPendingR2Deletion: FunctionReference<
         "mutation",
         "internal",
@@ -487,6 +493,20 @@ export declare const components: {
           };
         }>
       >;
+      listPendingConvexDeletions: FunctionReference<
+        "query",
+        "internal",
+        { limit?: number; onlyExpired?: boolean },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          deleteAfter: number;
+          deletedAt: number;
+          deletedBy?: string;
+          originalPath: string;
+          storageId: string;
+        }>
+      >;
       listPendingR2Deletions: FunctionReference<
         "query",
         "internal",
@@ -538,6 +558,12 @@ export declare const components: {
         "internal",
         { basename: string; fromFolderPath: string; toFolderPath: string },
         { assetId: string; fromFolderPath: string; toFolderPath: string }
+      >;
+      processExpiredConvexDeletions: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; forceAll?: boolean },
+        { hasMore: boolean; processed: number }
       >;
       processExpiredR2Deletions: FunctionReference<
         "mutation",

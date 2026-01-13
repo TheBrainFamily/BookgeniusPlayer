@@ -121,7 +121,6 @@ function findTextNode(
   return walk(parent);
 }
 
- 
 async function uploadAndPublishContent(
   ctx: ActionCtx,
   args: {

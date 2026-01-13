@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
+import { extractBookPath } from "@/lib/pathUtils";
 import {
   Dialog,
   DialogContent,
@@ -128,9 +129,9 @@ export function UploadDialog({
       const chapterNum = parseInt(chapter);
       const paragraphNum = parseInt(paragraph);
       const hasCueTarget = !isNaN(chapterNum) && !isNaN(paragraphNum);
-      const bookPath = folderPath.split("/").slice(0, -1).join("/");
+      const bookPath = extractBookPath(folderPath);
 
-      if (hasCueTarget && assetType === "background") {
+      if (hasCueTarget && bookPath && assetType === "background") {
         await createBackgroundCue({
           bookPath,
           fileBasename: finalBasename,
@@ -141,7 +142,7 @@ export function UploadDialog({
         });
       }
 
-      if (hasCueTarget && assetType === "music") {
+      if (hasCueTarget && bookPath && assetType === "music") {
         await createMusicCue({
           bookPath,
           fileBasename: finalBasename,

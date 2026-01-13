@@ -1,5 +1,5 @@
 import { getPlatformId } from "@player/utils/getPlatformId";
-import { getBookFromUrl } from "@player/getBookFromUrl";
+import { getBookSlug } from "@player/state/bookDataStore";
 
 export interface SavePositionInput {
   platformId: string;
@@ -139,8 +139,7 @@ export const deletePosition = async (id: string): Promise<void> => {
  */
 export const getCurrentPlatformAndBook = (): { platformId: string; bookSlug: string } => {
   const platformId = getPlatformId();
-
-  const bookSlug = getBookFromUrl();
+  const bookSlug = getBookSlug();
 
   return { platformId, bookSlug };
 };

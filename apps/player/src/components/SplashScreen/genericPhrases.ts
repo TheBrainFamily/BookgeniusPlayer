@@ -1,3 +1,7 @@
+/**
+ * Generic loading phrases used when book-specific phrases are exhausted
+ * or not available.
+ */
 export const genericPhrases = [
   "Creating a virtual library...",
   "Invoking fictional characters...",

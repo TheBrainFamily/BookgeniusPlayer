@@ -19,12 +19,23 @@
     <meta name="theme-color" content="#2d2d2d" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" onload="this.rel = 'stylesheet'" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap"
+      onload="this.rel = 'stylesheet'"
+    />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
     </noscript>
 
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=Libre+Caslon+Text&display=swap"
+      rel="stylesheet"
+    />
     <style>
       html,
       body {
@@ -49,8 +60,8 @@
         visibility: hidden;
         pointer-events: none;
         transition:
-          opacity 0.3s ease-in-out,
-          visibility 0s linear 0.3s;
+          opacity 1000ms ease-in-out,
+          visibility 0s linear 1000ms;
       }
 
       #player-scope.visible {
@@ -59,7 +70,7 @@
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
-        transition: opacity 0.3s ease-in-out;
+        transition: opacity 1000ms ease-in-out;
       }
 
       body:has(#player-scope.visible) {
@@ -92,7 +103,8 @@
       }
 
       @media (max-width: 1280px) {
-        body:has(#bottom-input-container[data-optional-element-visible="true"]) #fc_frame:not(.fc-open) {
+        body:has(#bottom-input-container[data-optional-element-visible="true"])
+          #fc_frame:not(.fc-open) {
           opacity: 0;
           scale: 0.5;
           pointer-events: none;
@@ -249,28 +261,8 @@
       <div id="root"></div>
     </div>
 
-    <div id="player-scope">
-      <video id="cutscene-video" class="cutscene-video" playsinline></video>
-
-      <div id="legacy">
-        <video id="bg-video-a" class="bg-element" autoplay muted loop playsinline></video>
-        <video id="bg-video-b" class="bg-element faded" autoplay muted loop playsinline></video>
-
-        <div id="bg-image-a" class="bg-element faded"></div>
-        <div id="bg-image-b" class="bg-element faded"></div>
-
-        <p id="cutscene-text"></p>
-        <div id="book-container" class="flex flex-row justify-center mx-auto max-w-[120rem] w-full xl:px-2">
-          <div id="left-notes" class="hidden sm:block sm:flex-1 sm:w-auto max-w-[700px] content-center overflow-y-auto mr-2"></div>
-          <div id="content-container" class="max-w-[800px] sm:flex-3 xl:flex-none xl:w-[850px] xl:max-w-[850px] xxl:w-[900px] xxl:max-w-[900px]"></div>
-          <div id="right-notes" class="hidden xl:block xl:flex-1 max-w-[700px] pointer-events-none ml-2">
-            <div id="right-notes-scrollable-container"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="root-player"></div>
-    </div>
+    <!-- Player DOM elements are created dynamically by PlayerDOMProvider -->
+    <div id="player-scope"></div>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -114,7 +114,6 @@ function AssetSlot({ label, icon, asset, onUpload, isImage = false }: AssetSlotP
 // Main Component
 // =============================================================================
 
- 
 export function CharacterDetailView({
   characterPath,
   onBack,

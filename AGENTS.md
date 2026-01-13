@@ -101,7 +101,8 @@ bun run lint                    # All workspaces
 bun run prettier:check          # Check formatting
 
 # Testing
-cd convex && bun test           # Convex tests
+bunx vitest run convex/         # Convex tests (use vitest, not bun test)
+bunx vitest run convex/components/asset-manager  # Asset manager tests only
 
 # CLI operations (use wrapper script for admin identity)
 ./scripts/convex run cli:listPublishedFilesInFolder '{"folderPath": "books/BOOK/characters/SLUG"}'

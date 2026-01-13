@@ -49,7 +49,7 @@ export const generateCharacterPrompt = internalAction({
     paragraphIndex: v.number(),
   },
   returns: v.object({ success: v.boolean(), aiPrompt: v.optional(v.string()) }),
-   
+
   handler: async (
     ctx,
     { bookPath, characterSlug, characterName, chapterNumber, paragraphIndex },

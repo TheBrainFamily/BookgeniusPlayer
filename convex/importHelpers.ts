@@ -61,15 +61,6 @@ export const finishUpload = adminMutation({
       contentType: args.contentType,
     });
 
-    if (args.folderPath?.endsWith("/chapters") && args.basename) {
-      const bookPath = args.folderPath.replace(/\/chapters$/, "");
-      await ctx.scheduler.runAfter(0, internal.chapterCompiler.processPublishedChapter, {
-        bookPath,
-        chapterBasename: args.basename,
-        versionId: result.versionId,
-      });
-    }
-
     if (args.folderPath?.endsWith("/backgrounds") && args.basename) {
       const bookPath = args.folderPath.replace(/\/backgrounds$/, "");
       const isVideo = args.contentType?.startsWith("video/");

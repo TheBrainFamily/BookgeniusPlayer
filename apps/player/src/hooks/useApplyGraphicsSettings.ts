@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
 import { useGraphicsSettings } from "@player/stores/graphicsSettings.store";
+import { usePlayerDOM } from "@player/context/PlayerDOMContext";
 
 export function useApplyGraphicsSettings() {
+  const { legacy, bookContainer, bgVideoA, bgVideoB } = usePlayerDOM();
   const { qualityLevel, backgroundBlur, animationSpeed } = useGraphicsSettings();
   const initialBlurAnimationRef = useRef<number | null>(null);
   const hasAnimatedBlurRef = useRef(false);
 
   useEffect(() => {
-    const legacy = document.getElementById("legacy");
     if (!legacy) return;
 
     legacy.classList.remove(
@@ -17,13 +18,10 @@ export function useApplyGraphicsSettings() {
       "graphics-bright",
     );
     legacy.classList.add(`graphics-${qualityLevel}`);
-  }, [qualityLevel]);
+  }, [legacy, qualityLevel]);
 
   useEffect(() => {
-    const legacy = document.getElementById("legacy");
     if (!legacy) return;
-
-    const bookContainer = document.getElementById("book-container");
 
     const cancelAnimation = () => {
       if (initialBlurAnimationRef.current !== null) {
@@ -118,25 +116,21 @@ export function useApplyGraphicsSettings() {
     legacy.style.removeProperty("--bg-blur-base");
     legacy.style.removeProperty("--bg-blur-multiplier");
     legacy.style.removeProperty("--bg-blur-amount");
-  }, [backgroundBlur]);
+  }, [legacy, bookContainer, backgroundBlur]);
 
   useEffect(() => {
-    const legacy = document.getElementById("legacy");
     if (!legacy) return;
 
     legacy.setAttribute("data-animation-speed", String(animationSpeed));
 
-    const videoA = document.getElementById("bg-video-a") as HTMLVideoElement | null;
-    const videoB = document.getElementById("bg-video-b") as HTMLVideoElement | null;
-
     if (animationSpeed === 0) {
-      videoA?.pause();
-      videoB?.pause();
+      bgVideoA?.pause();
+      bgVideoB?.pause();
     } else {
-      const frontVideo = legacy.dataset.front === "a" ? videoA : videoB;
+      const frontVideo = legacy.dataset.front === "a" ? bgVideoA : bgVideoB;
       if (frontVideo && frontVideo.paused && frontVideo.src) {
         frontVideo.play().catch(() => {});
       }
     }
-  }, [animationSpeed]);
+  }, [legacy, bgVideoA, bgVideoB, animationSpeed]);
 }

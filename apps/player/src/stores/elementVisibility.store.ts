@@ -140,11 +140,13 @@ export const useElementVisibilityStore = create<ElementVisibilityState>()(
       setIsTimersPausedSticky: (sticky) => set({ isTimersPausedSticky: sticky }),
 
       // Complex actions
-      showAllElements: () =>
-        set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null }),
+      showAllElements: () => {
+        set({ areElementsVisible: true, isScrollMode: false, lastHideReason: null });
+      },
 
-      hideAllElements: (reason = null) =>
-        set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason }),
+      hideAllElements: (reason = null) => {
+        set({ areElementsVisible: false, isScrollMode: false, lastHideReason: reason });
+      },
 
       handleScreenTap: () => {
         const { areElementsVisible, isScrollMode, clearInactivityTimer } = get();

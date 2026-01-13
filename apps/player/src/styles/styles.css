@@ -1,4 +1,39 @@
 /* ============================================ */
+/* Player Scope - Root Container                */
+/* ============================================ */
+/* These styles enable the player to take over */
+/* the full screen when active. The #player-scope */
+/* element is created dynamically by PlayerDOMProvider */
+/* if it doesn't exist in the host app's HTML. */
+
+#player-scope {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 1000ms ease-in-out,
+    visibility 0s linear 1000ms;
+}
+
+#player-scope.visible {
+  position: fixed;
+  inset: 0;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 1000ms ease-in-out;
+  z-index: 9999; /* Ensure player is above host app content */
+}
+
+/* Lock body scroll when player is visible */
+body:has(#player-scope.visible) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ============================================ */
 /* Scoped Legacy CSS            */
 /* ============================================ */
 

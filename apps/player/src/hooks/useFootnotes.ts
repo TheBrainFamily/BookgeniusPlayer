@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { type Location } from "@player/state/LocationContext";
 import { useBookConvex } from "@player/context/BookConvexContext";
+import { usePlayerDOM } from "@player/context/PlayerDOMContext";
 
 export interface Footnote {
   id: string;
@@ -33,12 +34,12 @@ function isParagraphInRange(
 }
 
 export function useFootnotes(range: Location): Footnote[] {
+  const { rightNotesScrollable } = usePlayerDOM();
   const [notes, setNotes] = useState<Footnote[]>([]);
   const { notes: allNotes } = useBookConvex();
   /*  watch primitive fields → effect runs only when the *value* changes  */
   useEffect(() => {
-    const notesContainer = document.getElementById("right-notes-scrollable-container");
-    if (!notesContainer) {
+    if (!rightNotesScrollable) {
       console.warn("Footnotes container 'right-notes-scrollable-container' not found.");
 
       setNotes([]);
@@ -90,8 +91,8 @@ export function useFootnotes(range: Location): Footnote[] {
 
     // Sort notes based on their original order in the DOM, which usually corresponds to their appearance order.
     foundNotes.sort((a, b) => {
-      const elementA = notesContainer.querySelector<HTMLElement>(`#${a.id}`);
-      const elementB = notesContainer.querySelector<HTMLElement>(`#${b.id}`);
+      const elementA = rightNotesScrollable.querySelector<HTMLElement>(`#${a.id}`);
+      const elementB = rightNotesScrollable.querySelector<HTMLElement>(`#${b.id}`);
       // Basic check: If elements are missing during sort, keep original order (or handle error)
       if (!elementA || !elementB) return 0;
 
@@ -102,7 +103,14 @@ export function useFootnotes(range: Location): Footnote[] {
 
     setNotes(foundNotes);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: range object excluded, using destructured properties to avoid re-running on unrelated range changes.
-  }, [range.chapter, range.paragraph, range.endChapter, range.endParagraph, allNotes]);
+  }, [
+    rightNotesScrollable,
+    range.chapter,
+    range.paragraph,
+    range.endChapter,
+    range.endParagraph,
+    allNotes,
+  ]);
 
   return notes;
 }
