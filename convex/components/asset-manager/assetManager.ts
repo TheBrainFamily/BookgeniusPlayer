@@ -7,6 +7,7 @@ import { type Id } from "./_generated/dataModel";
 import { folderFields, assetFields, assetVersionFields } from "./validators";
 import { storageBackendValidator } from "./schema";
 import { createR2Client } from "./r2Client";
+import { logChange } from "./helpers/changelog";
 
 // Validator for R2 config passed from app layer
 const r2ConfigValidator = v.object({
@@ -458,6 +459,14 @@ export const finishUpload = mutation({
     // Mark intent as finalized
     await ctx.db.patch(args.intentId, { status: "finalized" });
 
+    // Log for real-time sync (only when publishing - that's when file appears in FileProvider)
+    if (publish) {
+      await logChange(ctx, "asset:publish", intent.folderPath, {
+        basename: intent.basename,
+        performedBy: actorFields.updatedBy,
+      });
+    }
+
     return { assetId, versionId, version: nextVersion };
   },
 });
@@ -485,14 +494,18 @@ export const createFolderByPath = mutation({
 
     const now = Date.now();
 
+    const actorFields = await getActorFields(ctx);
     const id = await ctx.db.insert("folders", {
       path: newFolderPath,
       name: args.name ?? newFolderPath.split("/").pop()!,
       extra: args.extra,
       createdAt: now,
       updatedAt: now,
-      ...(await getActorFields(ctx)),
+      ...actorFields,
     });
+
+    // Log for real-time sync
+    await logChange(ctx, "folder:create", newFolderPath, { performedBy: actorFields.createdBy });
 
     return id;
   },
@@ -525,14 +538,18 @@ export const createFolderByName = mutation({
     }
 
     const now = Date.now();
+    const actorFields = await getActorFields(ctx);
     const id = await ctx.db.insert("folders", {
       path: newFolderPath,
       name: args.name,
       extra: args.extra,
       createdAt: now,
       updatedAt: now,
-      ...(await getActorFields(ctx)),
+      ...actorFields,
     });
+
+    // Log for real-time sync
+    await logChange(ctx, "folder:create", newFolderPath, { performedBy: actorFields.createdBy });
 
     return id;
   },
@@ -571,6 +588,18 @@ export const listFolders = query({
       .order("asc")
       .collect();
     return candidates.filter((candidate) => depth(candidate.path) === depth(parentPrefix));
+  },
+});
+
+/**
+ * List ALL folders in the system (for bulk sync operations).
+ * Returns all folders sorted by path.
+ */
+export const listAllFolders = query({
+  args: {},
+  returns: v.array(v.object(folderFields)),
+  handler: async (ctx) => {
+    return await ctx.db.query("folders").withIndex("by_path").order("asc").collect();
   },
 });
 
@@ -724,13 +753,18 @@ export const updateFolder = mutation({
 
     const now = Date.now();
     const actorFields = await getActorFields(ctx);
+    const finalPath = args.newPath ?? existing.path;
     await ctx.db.patch(existing._id, {
       name: args.name ?? existing.name,
-      path: args.newPath ?? existing.path,
+      path: finalPath,
       extra: args.extra !== undefined ? args.extra : existing.extra,
       updatedAt: now,
       updatedBy: actorFields.updatedBy,
     });
+
+    // Log for real-time sync
+    await logChange(ctx, "folder:update", finalPath, { performedBy: actorFields.updatedBy });
+
     return existing._id;
   },
 });
@@ -1128,6 +1162,14 @@ export const createVersionFromStorageId = mutation({
       });
     }
 
+    // Log for real-time sync (only when publishing - that's when file appears in FileProvider)
+    if (publish) {
+      await logChange(ctx, "asset:publish", folderPath, {
+        basename: args.basename,
+        performedBy: actorFields.updatedBy,
+      });
+    }
+
     return { assetId, versionId, version: nextVersion };
   },
 });
@@ -1207,15 +1249,24 @@ export const publishDraft = mutation({
       publishedBy: actorFields.updatedBy,
     });
 
+    // Save versionId before clearing draft
+    const versionId = asset.draftVersionId!;
+
     // Update asset
     await ctx.db.patch(asset._id, {
-      publishedVersionId: asset.draftVersionId,
+      publishedVersionId: versionId,
       draftVersionId: undefined,
       updatedAt: now,
       updatedBy: actorFields.updatedBy,
     });
 
-    return { assetId: asset._id, versionId: asset.draftVersionId };
+    // Log for real-time sync
+    await logChange(ctx, "asset:publish", normalizedFolderPath, {
+      basename: args.basename,
+      performedBy: actorFields.updatedBy,
+    });
+
+    return { assetId: asset._id, versionId };
   },
 });
 
@@ -1610,6 +1661,13 @@ export const moveAsset = mutation({
       createdBy: actorFields.createdBy,
     });
 
+    // Log for real-time sync
+    await logChange(ctx, "asset:move", to, {
+      basename: args.basename,
+      oldFolderPath: from,
+      performedBy: actorFields.updatedBy,
+    });
+
     return { assetId: asset._id, fromFolderPath: from, toFolderPath: to };
   },
 });
@@ -1666,6 +1724,13 @@ export const renameAsset = mutation({
       toBasename: args.newBasename,
       createdAt: now,
       createdBy: actorFields.createdBy,
+    });
+
+    // Log for real-time sync
+    await logChange(ctx, "asset:rename", folderPath, {
+      basename: args.newBasename,
+      oldBasename: args.basename,
+      performedBy: actorFields.updatedBy,
     });
 
     return { assetId: asset._id, oldBasename: args.basename, newBasename: args.newBasename };

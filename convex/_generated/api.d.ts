@@ -397,6 +397,22 @@ export declare const components: {
         {},
         "convex" | "r2"
       >;
+      listAllFolders: FunctionReference<
+        "query",
+        "internal",
+        {},
+        Array<{
+          _creationTime: number;
+          _id: string;
+          createdAt: number;
+          createdBy?: string;
+          extra?: any;
+          name: string;
+          path: string;
+          updatedAt: number;
+          updatedBy?: string;
+        }>
+      >;
       listAssetEvents: FunctionReference<
         "query",
         "internal",
@@ -568,6 +584,20 @@ export declare const components: {
         "internal",
         { extra: any; versionId: string },
         { extra: any; versionId: string }
+      >;
+    };
+    changelog: {
+      listForFolder: FunctionReference<
+        "query",
+        "internal",
+        { cursor: number; folderPath: string; limit?: number },
+        any
+      >;
+      listSince: FunctionReference<
+        "query",
+        "internal",
+        { cursor: number; limit?: number },
+        any
       >;
     };
     signedUrl: {

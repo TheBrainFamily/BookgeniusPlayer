@@ -13,6 +13,13 @@ export const listFolders = adminQuery({
   },
 });
 
+export const listAllFolders = adminQuery({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.runQuery(components.assetManager.assetManager.listAllFolders, {});
+  },
+});
+
 export const getFolder = adminQuery({
   args: { path: v.string() },
   handler: async (ctx, args) => {
@@ -170,5 +177,21 @@ export const getTextContent = adminAction({
     return await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
       versionId: args.versionId,
     });
+  },
+});
+
+// --- Changelog Operations (for real-time sync) ---
+
+export const watchChangelog = adminQuery({
+  args: { cursor: v.number(), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    return await ctx.runQuery(components.assetManager.changelog.listSince, args);
+  },
+});
+
+export const watchFolderChanges = adminQuery({
+  args: { folderPath: v.string(), cursor: v.number(), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    return await ctx.runQuery(components.assetManager.changelog.listForFolder, args);
   },
 });

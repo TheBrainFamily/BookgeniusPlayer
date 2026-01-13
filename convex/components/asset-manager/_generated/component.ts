@@ -329,6 +329,23 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "convex" | "r2",
         Name
       >;
+      listAllFolders: FunctionReference<
+        "query",
+        "internal",
+        {},
+        Array<{
+          _creationTime: number;
+          _id: string;
+          createdAt: number;
+          createdBy?: string;
+          extra?: any;
+          name: string;
+          path: string;
+          updatedAt: number;
+          updatedBy?: string;
+        }>,
+        Name
+      >;
       listAssetEvents: FunctionReference<
         "query",
         "internal",
@@ -512,6 +529,22 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         { extra: any; versionId: string },
         { extra: any; versionId: string },
+        Name
+      >;
+    };
+    changelog: {
+      listForFolder: FunctionReference<
+        "query",
+        "internal",
+        { cursor: number; folderPath: string; limit?: number },
+        any,
+        Name
+      >;
+      listSince: FunctionReference<
+        "query",
+        "internal",
+        { cursor: number; limit?: number },
+        any,
         Name
       >;
     };

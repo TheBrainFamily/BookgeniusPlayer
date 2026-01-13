@@ -106,6 +106,37 @@ const schema = defineSchema({
     createdAt: v.number(),
     createdBy: v.optional(v.string()),
   }).index("by_asset", ["assetId"]),
+
+  /**
+   * Changelog for real-time sync.
+   * Records all changes to folders and assets for FileProvider subscriptions.
+   * Uses createdAt as the sync cursor (monotonically increasing).
+   */
+  changelog: defineTable({
+    changeType: v.union(
+      v.literal("folder:create"),
+      v.literal("folder:update"),
+      v.literal("folder:delete"),
+      v.literal("asset:create"),
+      v.literal("asset:publish"),
+      v.literal("asset:update"),
+      v.literal("asset:archive"),
+      v.literal("asset:move"),
+      v.literal("asset:rename"),
+    ),
+    // Where the change occurred (for signaling correct enumerator)
+    folderPath: v.string(),
+    basename: v.optional(v.string()),
+    // For moves: track old location too
+    oldFolderPath: v.optional(v.string()),
+    oldBasename: v.optional(v.string()),
+    // Who made the change (optional audit)
+    performedBy: v.optional(v.string()),
+    // Timestamp for sync cursor (can't index on _creationTime)
+    createdAt: v.number(),
+  })
+    .index("by_created_at", ["createdAt"])
+    .index("by_folder_path", ["folderPath", "createdAt"]),
 });
 
 export default schema;
