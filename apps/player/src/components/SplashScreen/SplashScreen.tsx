@@ -215,44 +215,48 @@ export function SplashScreen({
   return (
     <div id="splash-screen" className={`splash-screen ${isHiding ? "splash-screen--hide" : ""}`}>
       <div className="splash-container">
-        <div className="splash-title-container">
-          <h1 className="splash-title">{book.title || "Loading..."}</h1>
-          <h2 className="splash-subtitle">{book.author}</h2>
-        </div>
-
-        {book.loaderVideoSrc && (
-          <div className="splash-image-container">
-            <video
-              id="splash-video"
-              src={book.loaderVideoSrc}
-              poster="/clear-loader.png"
-              className="splash-loading-image"
-              muted
-              autoPlay
-              playsInline
-              preload="auto"
-            />
+        <div className="splash-inner">
+          <div className="splash-title-container">
+            <h1 className="splash-title">{book.title || "Loading..."}</h1>
+            <h2 className="splash-subtitle">{book.author}</h2>
           </div>
-        )}
 
-        <div className="splash-text-container">
-          <p className={`splash-loading-text ${isFading ? "fading-out" : "fading-in"}`}>
-            {currentPhrase}
-          </p>
-        </div>
-
-        {shouldShowStartButton && (
-          <button
-            className={`splash-start-button ${isButtonEnabled ? "visible" : "disabled"}`}
-            onClick={handleStartClick}
-            disabled={!isButtonEnabled}
-          >
-            <div className="play-icon">
-              <div className="play-triangle" />
+          {book.loaderVideoSrc && (
+            <div className="splash-image-container">
+              <video
+                id="splash-video"
+                src={book.loaderVideoSrc}
+                poster="/clear-loader.png"
+                className="splash-loading-image"
+                muted
+                autoPlay
+                playsInline
+                preload="auto"
+              />
             </div>
-            <span>Start</span>
-          </button>
-        )}
+          )}
+
+          <div className="splash-text-container">
+            <p className={`splash-loading-text ${isFading ? "fading-out" : "fading-in"}`}>
+              {currentPhrase}
+            </p>
+          </div>
+
+          <div className="splash-button-container">
+            <button
+              className={`splash-start-button ${shouldShowStartButton && isButtonEnabled ? "visible" : "disabled"}`}
+              onClick={handleStartClick}
+              disabled={!isButtonEnabled}
+              aria-hidden={!shouldShowStartButton}
+              tabIndex={shouldShowStartButton && isButtonEnabled ? 0 : -1}
+            >
+              <div className="play-icon">
+                <div className="play-triangle" />
+              </div>
+              <span>Start</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
