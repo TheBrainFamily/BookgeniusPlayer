@@ -11,7 +11,6 @@ import {
   Download,
   Upload,
   CheckCircle,
-  AlertCircle,
   Clock,
   Archive,
   Image,
@@ -81,18 +80,13 @@ export function AssetDetail({
   } = useQuery(queries.assetVersions(folderPath, basename));
   const { data: publishedFile } = useQuery(queries.publishedFile(folderPath, basename));
 
-  const publishDraft = useMutation(api.cli.publishDraft);
   const restoreVersion = useMutation(api.cli.restoreVersion);
 
-  // Check if this asset has editable metadata (music, background types)
-  // Also check folder path pattern for assets without extra.type set
+  // Check if this asset has editable metadata based on folder path
   const hasEditableMetadata =
-    folderPath.endsWith("/music") ||
-    folderPath.endsWith("/backgrounds") ||
-    versions?.some(
-      (v: { extra?: { type?: string } }) =>
-        v.extra?.type === "music" || v.extra?.type === "background",
-    );
+    folderPath.endsWith("/chapters") ||
+    folderPath.endsWith("/chapters-source") ||
+    folderPath.endsWith("/chapters-html");
 
   // Auto-select published version when no version is selected in URL
   // Must be called before any conditional returns (Rules of Hooks)
@@ -116,15 +110,6 @@ export function AssetDetail({
   if (isLoading || !asset || !versions) {
     return <AssetDetailSkeleton />;
   }
-
-  const handlePublishDraft = async () => {
-    try {
-      await publishDraft({ folderPath, basename });
-      toast.success("Draft published successfully");
-    } catch {
-      toast.error("Failed to publish draft");
-    }
-  };
 
   const handleRestoreVersion = async (versionId: string, versionNumber: number) => {
     try {
@@ -219,8 +204,6 @@ export function AssetDetail({
                   <span className="text-muted-foreground">Status</span>
                   {publishedFile ? (
                     <Badge variant="published">Published</Badge>
-                  ) : versions && versions.some((v: { state: string }) => v.state === "draft") ? (
-                    <Badge variant="draft">Has Draft</Badge>
                   ) : (
                     <Badge variant="muted">No versions</Badge>
                   )}
@@ -324,17 +307,13 @@ export function AssetDetail({
                             : "hover:border-primary/50",
                           version.state === "published"
                             ? "border-success/30 bg-success/5"
-                            : version.state === "draft"
-                              ? "border-warning/30 bg-warning/5"
-                              : "border-border bg-surface-1",
+                            : "border-border bg-surface-1",
                         )}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2">
                             {version.state === "published" ? (
                               <CheckCircle className="h-4 w-4 text-success" />
-                            ) : version.state === "draft" ? (
-                              <AlertCircle className="h-4 w-4 text-warning" />
                             ) : (
                               <Archive className="h-4 w-4 text-muted-foreground" />
                             )}
@@ -394,19 +373,6 @@ export function AssetDetail({
                             </span>
                           </div>
                         </div>
-                        {version.state === "draft" && (
-                          <Button
-                            variant="success"
-                            size="sm"
-                            className="mt-2 w-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePublishDraft();
-                            }}
-                          >
-                            Publish This Version
-                          </Button>
-                        )}
                         {version.state === "archived" && version.storageId && (
                           <Button
                             variant="outline"

@@ -12,7 +12,6 @@
  */
 
 import { useBook, useBookStats } from "@/lib/contexts";
-import { isBookFolder, type BookFolderExtra } from "@/lib/types/book";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -39,8 +38,7 @@ export function BookDashboard({ onNavigate }: BookDashboardProps) {
     );
   }
 
-  // Extract typed metadata
-  const extra = isBookFolder(metadata.extra) ? (metadata.extra as BookFolderExtra) : null;
+  const meta = metadata.metadata;
 
   const sections = [
     {
@@ -87,28 +85,28 @@ export function BookDashboard({ onNavigate }: BookDashboardProps) {
               <BookOpen className="h-8 w-8 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold">{extra?.title ?? metadata.name}</h1>
-              {extra?.author && <p className="text-muted-foreground">by {extra.author}</p>}
+              <h1 className="text-2xl font-bold">{meta?.title ?? metadata.name}</h1>
+              {meta?.author && <p className="text-muted-foreground">by {meta.author}</p>}
               <div className="flex flex-wrap gap-2 mt-2">
-                {extra?.language && (
+                {meta?.language && (
                   <Badge variant="secondary" className="gap-1">
                     <Globe className="h-3 w-3" />
-                    {extra.language}
+                    {meta.language}
                   </Badge>
                 )}
-                {extra?.form && <Badge variant="outline">{extra.form}</Badge>}
+                {meta?.form && <Badge variant="outline">{meta.form}</Badge>}
               </div>
             </div>
           </div>
 
           {/* Visual Style */}
-          {extra?.visualStyle && (
+          {meta?.visualStyle && (
             <div className="bg-muted/50 rounded-lg p-4">
               <div className="flex items-center gap-2 text-sm font-medium mb-2">
                 <Sparkles className="h-4 w-4 text-primary" />
                 Visual Style
               </div>
-              <p className="text-sm text-muted-foreground">{extra.visualStyle}</p>
+              <p className="text-sm text-muted-foreground">{meta.visualStyle}</p>
             </div>
           )}
         </div>

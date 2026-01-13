@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import type { ActionCtx } from "./_generated/server";
-import { components, internal } from "./_generated/api";
+import { api, components, internal } from "./_generated/api";
 import { bookAction } from "./functions";
 import {
   DOMParser,
@@ -44,7 +44,20 @@ function slugify(name: string): string {
   return slug || "character";
 }
 
-type ChapterExtra = { chapterNumber?: number; title?: string };
+type ChapterMetadata = {
+  chapterNumber?: number;
+  title?: string;
+  paragraphCount?: number;
+  sourceFormat?: string;
+};
+
+function extractChapterNumberFromBasename(basename: string): number {
+  const match = basename.match(/chapter[-_]?(\d+)/i);
+  if (match) return parseInt(match[1], 10);
+  const numMatch = basename.match(/^(\d+)/);
+  if (numMatch) return parseInt(numMatch[1], 10);
+  return 0;
+}
 
 function findParagraphByIndex(doc: XmlDocument, index: number): XmlElement | null {
   const sections = doc.getElementsByTagName("section");
@@ -108,33 +121,34 @@ function findTextNode(
   return walk(parent);
 }
 
-// eslint-disable-next-line max-params -- internal upload helper with contextual parameters
+ 
 async function uploadAndPublishContent(
   ctx: ActionCtx,
-  folderPath: string,
-  basename: string,
-  content: string,
-  contentType: string,
-  label: string,
-  extra: ChapterExtra,
+  args: {
+    bookPath: string;
+    folderPath: string;
+    basename: string;
+    content: string;
+    contentType: string;
+    label: string;
+    metadata?: ChapterMetadata;
+  },
 ): Promise<{ versionId: string }> {
-  console.log("[upload] to:", folderPath, basename, "length:", content.length);
+  console.log("[upload] to:", args.folderPath, args.basename, "length:", args.content.length);
 
   const uploadIntent = await ctx.runMutation(internal.generateUploadUrl.startUploadInternal, {
-    folderPath,
-    basename,
-    filename: basename,
-    publish: true,
-    label,
-    extra,
+    folderPath: args.folderPath,
+    basename: args.basename,
+    filename: args.basename,
+    label: args.label,
   });
 
   console.log("[upload] intent:", uploadIntent.intentId, "backend:", uploadIntent.backend);
 
-  const encoded = new TextEncoder().encode(content);
+  const encoded = new TextEncoder().encode(args.content);
   const response = await fetch(uploadIntent.uploadUrl, {
     method: uploadIntent.backend === "r2" ? "PUT" : "POST",
-    headers: { "Content-Type": contentType },
+    headers: { "Content-Type": args.contentType },
     body: encoded,
   });
 
@@ -150,7 +164,23 @@ async function uploadAndPublishContent(
     intentId: uploadIntent.intentId,
     uploadResponse,
     size: encoded.byteLength,
-    contentType,
+    contentType: args.contentType,
+  });
+
+  const chapterNumber =
+    args.metadata?.chapterNumber ?? extractChapterNumberFromBasename(args.basename);
+  const sourceFormat =
+    args.metadata?.sourceFormat ??
+    (args.folderPath.endsWith("/chapters-source") ? "html" : undefined);
+
+  await ctx.runMutation(internal.metadata.upsertChapterMetadataInternal, {
+    bookPath: args.bookPath,
+    folderPath: args.folderPath,
+    basename: args.basename,
+    chapterNumber,
+    title: args.metadata?.title,
+    paragraphCount: args.metadata?.paragraphCount,
+    sourceFormat,
   });
 
   console.log("[upload] done, versionId:", finishResult.versionId);
@@ -241,18 +271,21 @@ export const setParagraphSpeaker = bookAction({
 
     console.log("[setParagraphSpeaker] modified length:", modifiedHtml.length);
 
-    const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
+    const metadata = (await ctx.runQuery(api.metadata.getChapterMetadata, {
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+    })) || { chapterNumber };
     const label = characterSlug ? `Set speaker: ${characterSlug}` : "Removed speaker";
 
-    const uploadResult = await uploadAndPublishContent(
-      ctx,
-      chaptersPath,
-      chapterBasename,
-      modifiedHtml,
-      "text/html",
+    const uploadResult = await uploadAndPublishContent(ctx, {
+      bookPath,
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+      content: modifiedHtml,
+      contentType: "text/html",
       label,
-      versionExtra,
-    );
+      metadata,
+    });
 
     return {
       success: true,
@@ -338,20 +371,23 @@ export const modifyCharacterTag = bookAction({
     const serializer = new XMLSerializer();
     const modifiedHtml = serializer.serializeToString(doc);
 
-    const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
+    const metadata = (await ctx.runQuery(api.metadata.getChapterMetadata, {
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+    })) || { chapterNumber };
     const label = newCharacterSlug
       ? `Changed character: ${currentCharacterSlug} → ${newCharacterSlug}`
       : `Removed character tag: ${currentCharacterSlug}`;
 
-    const uploadResult = await uploadAndPublishContent(
-      ctx,
-      chaptersPath,
-      chapterBasename,
-      modifiedHtml,
-      "text/html",
+    const uploadResult = await uploadAndPublishContent(ctx, {
+      bookPath,
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+      content: modifiedHtml,
+      contentType: "text/html",
       label,
-      versionExtra,
-    );
+      metadata,
+    });
 
     return {
       success: true,
@@ -454,18 +490,21 @@ export const wrapTextWithCharacter = bookAction({
       modifiedHtml.includes(`data-c="${characterSlug}"`),
     );
 
-    const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
+    const metadata = (await ctx.runQuery(api.metadata.getChapterMetadata, {
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+    })) || { chapterNumber };
     const label = `Wrapped text with character: ${characterSlug}`;
 
-    const uploadResult = await uploadAndPublishContent(
-      ctx,
-      chaptersPath,
-      chapterBasename,
-      modifiedHtml,
-      "text/html",
+    const uploadResult = await uploadAndPublishContent(ctx, {
+      bookPath,
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+      content: modifiedHtml,
+      contentType: "text/html",
       label,
-      versionExtra,
-    );
+      metadata,
+    });
 
     return { success: true, versionId: uploadResult.versionId, characterSlug };
   },
@@ -551,18 +590,21 @@ export const removeNoteFromChapter = bookAction({
     const serializer = new XMLSerializer();
     const modifiedHtml = serializer.serializeToString(doc);
 
-    const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
+    const metadata = (await ctx.runQuery(api.metadata.getChapterMetadata, {
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+    })) || { chapterNumber };
     const label = `Removed note: ${noteNumber}`;
 
-    const uploadResult = await uploadAndPublishContent(
-      ctx,
-      chaptersPath,
-      chapterBasename,
-      modifiedHtml,
-      "text/html",
+    const uploadResult = await uploadAndPublishContent(ctx, {
+      bookPath,
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+      content: modifiedHtml,
+      contentType: "text/html",
       label,
-      versionExtra,
-    );
+      metadata,
+    });
 
     return { success: true, versionId: uploadResult.versionId };
   },
@@ -593,7 +635,6 @@ export const createCharacter = bookAction({
       await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
         path: characterPath,
         name: displayName,
-        extra: { type: "character", displayName, summary: "" },
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -602,6 +643,13 @@ export const createCharacter = bookAction({
       }
       throw error;
     }
+
+    await ctx.runMutation(internal.metadata.upsertCharacterMetadataInternal, {
+      bookPath,
+      characterSlug: slug,
+      displayName,
+      summary: "",
+    });
 
     if (chapterNumber !== undefined && paragraphIndex !== undefined) {
       await ctx.scheduler.runAfter(0, internal.characterPromptGeneration.generateCharacterPrompt, {

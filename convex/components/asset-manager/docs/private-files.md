@@ -5,6 +5,7 @@ This guide covers serving private files that require authentication. Users must 
 ## Overview
 
 The private files pattern uses:
+
 - **Signed URLs**: Time-limited URLs that expire (prevents unauthorized sharing)
 - **Convex reactivity**: When a file version changes, the UI updates automatically
 - **Browser caching**: Files are cached by version, so unchanged files aren't re-downloaded
@@ -92,19 +93,16 @@ http.route({
     // await checkPermission(ctx, identity, versionId);
 
     // 4. Generate signed URL
-    const signedUrl = await ctx.runAction(
-      components.assetManager.signedUrl.getSignedUrl,
-      {
-        versionId: versionId as any,
-        expiresIn: 3600, // 1 hour - good for audio/video seeking
-        r2Config: {
-          R2_BUCKET: process.env.R2_BUCKET!,
-          R2_ENDPOINT: process.env.R2_ENDPOINT!,
-          R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
-          R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
-        },
-      }
-    );
+    const signedUrl = await ctx.runAction(components.assetManager.signedUrl.getSignedUrl, {
+      versionId: versionId as any,
+      expiresIn: 3600, // 1 hour - good for audio/video seeking
+      r2Config: {
+        R2_BUCKET: process.env.R2_BUCKET!,
+        R2_ENDPOINT: process.env.R2_ENDPOINT!,
+        R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
+        R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
+      },
+    });
 
     if (!signedUrl) {
       return new Response("Not found", { status: 404 });
@@ -114,10 +112,7 @@ http.route({
     // (URL contains versionId, so content at this URL never changes)
     return new Response(null, {
       status: 302,
-      headers: {
-        Location: signedUrl,
-        "Cache-Control": "public, max-age=31536000, immutable",
-      },
+      headers: { Location: signedUrl, "Cache-Control": "public, max-age=31536000, immutable" },
     });
   }),
 });
@@ -136,16 +131,13 @@ import { components } from "./_generated/api";
 import { v } from "convex/values";
 
 export const getPrivateFile = query({
-  args: {
-    folderPath: v.string(),
-    basename: v.string(),
-  },
+  args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, { folderPath, basename }) => {
     // Get the published file info from the component
-    const file = await ctx.runQuery(
-      components.assetManager.assetManager.getPublishedFile,
-      { folderPath, basename }
-    );
+    const file = await ctx.runQuery(components.assetManager.assetManager.getPublishedFile, {
+      folderPath,
+      basename,
+    });
 
     if (!file) return null;
 
@@ -170,7 +162,7 @@ import { useAuth } from "./YourAuthProvider"; // Your auth solution
 
 export function PrivateAudioPlayer({
   folderPath,
-  basename
+  basename,
 }: {
   folderPath: string;
   basename: string;
@@ -209,9 +201,7 @@ function usePrivateFileUrl(versionId: string | undefined, path: string) {
 
     const url = `/private/v/${versionId}/${path}`;
 
-    fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.blob())
       .then((blob) => {
         const objectUrl = URL.createObjectURL(blob);
@@ -244,12 +234,7 @@ function PrivateImage({ folderPath, basename }) {
 
   if (!file) return null;
 
-  return (
-    <img
-      src={`/private/v/${file.versionId}/${folderPath}/${basename}`}
-      alt={basename}
-    />
-  );
+  return <img src={`/private/v/${file.versionId}/${folderPath}/${basename}`} alt={basename} />;
 }
 ```
 
@@ -257,23 +242,20 @@ function PrivateImage({ folderPath, basename }) {
 
 Choose expiration based on use case:
 
-| Use Case | Recommended Expiration | Reason |
-|----------|----------------------|--------|
-| Images | 300s (5 min) | Quick loads, limited sharing window |
-| Audio/Video | 3600s (1 hour) | Seeking creates new range requests |
-| Downloads | 300s (5 min) | Single download, limit sharing |
-| Long videos | 14400s (4 hours) | Extended viewing sessions |
+| Use Case    | Recommended Expiration | Reason                              |
+| ----------- | ---------------------- | ----------------------------------- |
+| Images      | 300s (5 min)           | Quick loads, limited sharing window |
+| Audio/Video | 3600s (1 hour)         | Seeking creates new range requests  |
+| Downloads   | 300s (5 min)           | Single download, limit sharing      |
+| Long videos | 14400s (4 hours)       | Extended viewing sessions           |
 
 ```typescript
 // In your HTTP endpoint
-const signedUrl = await ctx.runAction(
-  components.assetManager.signedUrl.getSignedUrl,
-  {
-    versionId,
-    expiresIn: 3600, // Adjust based on content type
-    r2Config: getR2Config(),
-  }
-);
+const signedUrl = await ctx.runAction(components.assetManager.signedUrl.getSignedUrl, {
+  versionId,
+  expiresIn: 3600, // Adjust based on content type
+  r2Config: getR2Config(),
+});
 ```
 
 ## Reactivity in Action
@@ -281,7 +263,7 @@ const signedUrl = await ctx.runAction(
 When a file is updated:
 
 1. Admin uploads new version in dashboard
-2. `publishDraft` mutation is called
+2. `finishUpload` mutation completes the upload
 3. Asset's `publishedVersionId` changes
 4. All clients with `useQuery(api.files.getPrivateFile, ...)` receive the update
 5. React re-renders with new `versionId`

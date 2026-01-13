@@ -114,7 +114,7 @@ function AssetSlot({ label, icon, asset, onUpload, isImage = false }: AssetSlotP
 // Main Component
 // =============================================================================
 
-// eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
+ 
 export function CharacterDetailView({
   characterPath,
   onBack,
@@ -165,12 +165,8 @@ export function CharacterDetailView({
     );
   }
 
-  // Get character metadata from extra
-  const extra = bundle.extra as
-    | { type?: string; displayName?: string; summary?: string }
-    | undefined;
-  const displayName = extra?.displayName || bundle.name;
-  const summary = extra?.summary;
+  const displayName = bundle.metadata.displayName || bundle.name;
+  const summary = bundle.metadata.summary;
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">

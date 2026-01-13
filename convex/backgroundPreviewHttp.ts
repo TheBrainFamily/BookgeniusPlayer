@@ -59,7 +59,7 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
 
       const { intentId, uploadUrl, backend } = await ctx.runMutation(
         components.assetManager.assetManager.startUpload,
-        { folderPath: thumbnailsPath, basename: previewMp4Basename, publish: true, r2Config },
+        { folderPath: thumbnailsPath, basename: previewMp4Basename, r2Config },
       );
 
       const uploadRes = await fetch(uploadUrl, {
@@ -89,7 +89,6 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
     } = await ctx.runMutation(components.assetManager.assetManager.startUpload, {
       folderPath: thumbnailsPath,
       basename: previewWebpBasename,
-      publish: true,
       r2Config,
     });
 

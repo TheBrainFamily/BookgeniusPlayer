@@ -71,21 +71,9 @@ export const ensureBookStructure = adminMutation({
       });
     }
 
-    const bookExtra = {
-      type: "book",
-      title: metadata?.title,
-      author: metadata?.author,
-      language: metadata?.language,
-      form: metadata?.form,
-      generation: { state: "generating", jobId, startedAt: now },
-    };
-
-    const createFolder = async (path: string, extra?: object) => {
+    const createFolder = async (path: string) => {
       try {
-        await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
-          path,
-          extra,
-        });
+        await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, { path });
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         if (!msg.includes("already exists")) throw e;
@@ -93,13 +81,40 @@ export const ensureBookStructure = adminMutation({
     };
 
     await createFolder("books");
-    await createFolder(bookPath, bookExtra);
+    await createFolder(bookPath);
     await createFolder(`${bookPath}/chapters`);
     await createFolder(`${bookPath}/chapters-source`);
     await createFolder(`${bookPath}/characters`);
     await createFolder(`${bookPath}/characters-data`);
     await createFolder(`${bookPath}/backgrounds`);
     await createFolder(`${bookPath}/music`);
+
+    const existingBook = await ctx.db
+      .query("books")
+      .withIndex("by_path", (q) => q.eq("path", bookPath))
+      .first();
+
+    if (existingBook) {
+      await ctx.db.patch(existingBook._id, {
+        title: metadata?.title ?? existingBook.title,
+        author: metadata?.author ?? existingBook.author,
+        language: metadata?.language ?? existingBook.language,
+        form: metadata?.form ?? existingBook.form,
+        updatedAt: now,
+      });
+    } else {
+      await ctx.db.insert("books", {
+        path: bookPath,
+        slug: bookSlug,
+        ownerId: ctx.principalId,
+        title: metadata?.title,
+        author: metadata?.author,
+        language: metadata?.language,
+        form: metadata?.form,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
 
     return { bookPath };
   },
@@ -178,20 +193,34 @@ export const updateBookMetadata = adminMutation({
     }),
   },
   handler: async (ctx, { bookPath, metadata }) => {
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: bookPath,
-    });
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("books")
+      .withIndex("by_path", (q) => q.eq("path", bookPath))
+      .first();
 
-    if (!folder) {
-      throw new Error(`Book folder not found: ${bookPath}`);
+    if (!existing) {
+      const slug = bookPath.split("/").pop() || bookPath;
+      await ctx.db.insert("books", {
+        path: bookPath,
+        slug,
+        ownerId: ctx.principalId,
+        title: metadata.title,
+        author: metadata.author,
+        language: metadata.language,
+        form: metadata.form,
+        createdAt: now,
+        updatedAt: now,
+      });
+      return;
     }
 
-    const currentExtra = (folder.extra as Record<string, unknown>) || {};
-    const updatedExtra = { ...currentExtra, ...metadata, type: "book" };
-
-    await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-      path: bookPath,
-      extra: updatedExtra,
+    await ctx.db.patch(existing._id, {
+      title: metadata.title ?? existing.title,
+      author: metadata.author ?? existing.author,
+      language: metadata.language ?? existing.language,
+      form: metadata.form ?? existing.form,
+      updatedAt: now,
     });
   },
 });
@@ -204,25 +233,32 @@ export const updateGraphicalStyle = adminMutation({
     avatarStyle: v.optional(v.string()),
   },
   handler: async (ctx, { bookPath, ...styles }) => {
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: bookPath,
-    });
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("books")
+      .withIndex("by_path", (q) => q.eq("path", bookPath))
+      .first();
 
-    if (!folder) {
-      throw new Error(`Book folder not found: ${bookPath}`);
+    if (!existing) {
+      const slug = bookPath.split("/").pop() || bookPath;
+      await ctx.db.insert("books", {
+        path: bookPath,
+        slug,
+        ownerId: ctx.principalId,
+        backgroundStyle: styles.backgroundStyle,
+        periodStyle: styles.periodStyle,
+        avatarStyle: styles.avatarStyle,
+        createdAt: now,
+        updatedAt: now,
+      });
+      return;
     }
 
-    const currentExtra = (folder.extra as Record<string, unknown>) || {};
-    const updatedExtra = {
-      ...currentExtra,
-      backgroundStyle: styles.backgroundStyle ?? currentExtra.backgroundStyle,
-      periodStyle: styles.periodStyle ?? currentExtra.periodStyle,
-      avatarStyle: styles.avatarStyle ?? currentExtra.avatarStyle,
-    };
-
-    await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-      path: bookPath,
-      extra: updatedExtra,
+    await ctx.db.patch(existing._id, {
+      backgroundStyle: styles.backgroundStyle ?? existing.backgroundStyle,
+      periodStyle: styles.periodStyle ?? existing.periodStyle,
+      avatarStyle: styles.avatarStyle ?? existing.avatarStyle,
+      updatedAt: now,
     });
   },
 });
@@ -238,26 +274,40 @@ export const ensureCharacterFolder = adminMutation({
   handler: async (ctx, { bookPath, characterSlug, displayName, summary, aiPrompt }) => {
     const characterPath = `${bookPath}/characters/${characterSlug}`;
 
-    const charExtra = {
-      type: "character",
-      displayName,
-      summary: summary || "",
-      aiPrompt,
-      avatarGenerationState: "none" as const,
-    };
-
     try {
       await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
         path: characterPath,
-        extra: charExtra,
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (!msg.includes("already exists")) throw e;
+    }
 
-      await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-        path: characterPath,
-        extra: charExtra,
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("characterMetadata")
+      .withIndex("by_book_slug", (q) => q.eq("bookPath", bookPath).eq("slug", characterSlug))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        displayName: displayName ?? existing.displayName,
+        summary: summary ?? existing.summary,
+        aiPrompt: aiPrompt ?? existing.aiPrompt,
+        avatarGenerationState: existing.avatarGenerationState ?? "none",
+        updatedAt: now,
+      });
+    } else {
+      await ctx.db.insert("characterMetadata", {
+        bookPath,
+        characterPath,
+        slug: characterSlug,
+        displayName,
+        summary: summary || "",
+        aiPrompt,
+        avatarGenerationState: "none",
+        createdAt: now,
+        updatedAt: now,
       });
     }
 
@@ -276,18 +326,29 @@ export const markCharacterAvatarState = adminMutation({
     ),
   },
   handler: async (ctx, { characterPath, state }) => {
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: characterPath,
-    });
+    const now = Date.now();
+    const slug = characterPath.split("/").pop() || characterPath;
+    const bookPath = characterPath.split("/").slice(0, 2).join("/");
 
-    if (!folder) {
-      throw new Error(`Character folder not found: ${characterPath}`);
+    const existing = await ctx.db
+      .query("characterMetadata")
+      .withIndex("by_path", (q) => q.eq("characterPath", characterPath))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { avatarGenerationState: state, updatedAt: now });
+      return;
     }
 
-    const currentExtra = (folder.extra as Record<string, unknown>) || {};
-    await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-      path: characterPath,
-      extra: { ...currentExtra, avatarGenerationState: state },
+    await ctx.db.insert("characterMetadata", {
+      bookPath,
+      characterPath,
+      slug,
+      displayName: slug,
+      summary: "",
+      avatarGenerationState: state,
+      createdAt: now,
+      updatedAt: now,
     });
   },
 });
@@ -378,18 +439,6 @@ export const markCompleted = adminMutation({
 
     if (!job) return;
 
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: bookPath,
-    });
-
-    if (folder) {
-      const currentExtra = (folder.extra as Record<string, unknown>) || {};
-      await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-        path: bookPath,
-        extra: { ...currentExtra, generation: { state: "completed", completedAt: Date.now() } },
-      });
-    }
-
     await ctx.db.patch(job._id, { status: "completed", updatedAt: Date.now() });
   },
 });
@@ -403,18 +452,6 @@ export const markFailed = adminMutation({
       .first();
 
     if (!job) return;
-
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-      path: bookPath,
-    });
-
-    if (folder) {
-      const currentExtra = (folder.extra as Record<string, unknown>) || {};
-      await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-        path: bookPath,
-        extra: { ...currentExtra, generation: { state: "failed", error, failedAt: Date.now() } },
-      });
-    }
 
     await ctx.db.patch(job._id, { status: "failed", error, updatedAt: Date.now() });
   },

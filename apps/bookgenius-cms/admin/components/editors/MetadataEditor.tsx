@@ -4,28 +4,20 @@
  * MetadataEditor - Generic form for editing folder/asset metadata
  *
  * This component renders appropriate form fields based on the
- * entity type (book, character, background, music, etc.)
+ * entity type (book, character, chapter)
  *
  * It handles:
- * - Folder extra fields (book, character)
- * - Asset version extra fields (chapter, background, music)
+ * - Book metadata (books table)
+ * - Character metadata (characterMetadata table)
+ * - Chapter metadata (chapterMetadata table)
  */
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { useQuery } from "@tanstack/react-query";
+import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import { queries } from "@/lib/queries";
-import {
-  type BookFolderExtra,
-  type CharacterFolderExtra,
-  type ChapterExtra,
-  type BackgroundExtra,
-  type MusicExtra,
-  isBookFolder,
-  isCharacterFolder,
-} from "@/lib/types/book";
-import { detectFolderType } from "@/lib/utils/folderPatterns";
+import { detectFolderType, parseBookPath, parseCharacterPath } from "@/lib/utils/folderPatterns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,6 +64,24 @@ const BOOK_FIELDS: FormField[] = [
     type: "text",
     placeholder: "Realistic, Cartoon, etc.",
   },
+  {
+    name: "backgroundStyle",
+    label: "Background Style",
+    type: "text",
+    placeholder: "Moody, Bright, etc.",
+  },
+  {
+    name: "periodStyle",
+    label: "Period Style",
+    type: "text",
+    placeholder: "Victorian, Modern, etc.",
+  },
+  {
+    name: "avatarStyle",
+    label: "Avatar Style",
+    type: "text",
+    placeholder: "Illustrated, 3D, etc.",
+  },
 ];
 
 const CHARACTER_FIELDS: FormField[] = [
@@ -90,21 +100,16 @@ const CHAPTER_FIELDS: FormField[] = [
   { name: "title", label: "Title", type: "text", required: true },
 ];
 
-const BACKGROUND_FIELDS: FormField[] = [
-  { name: "chapter", label: "Chapter", type: "number", required: true },
-  { name: "paragraph", label: "Paragraph", type: "number", required: true },
-  { name: "backgroundColor", label: "Background Color", type: "color", required: true },
-  { name: "textColor", label: "Text Color", type: "color", required: true },
-];
-
-const MUSIC_FIELDS: FormField[] = [
-  { name: "chapter", label: "Chapter", type: "number", required: true },
-  { name: "paragraph", label: "Paragraph", type: "number", required: true },
-];
-
 // =============================================================================
 // Field Renderer
 // =============================================================================
+
+const parseChapterNumberFromBasename = (basename: string): number | undefined => {
+  const match = basename.match(/chapter[-_ ]?(\\d+)/i) || basename.match(/^(\\d+)/);
+  if (!match) return undefined;
+  const value = Number.parseInt(match[1], 10);
+  return Number.isFinite(value) ? value : undefined;
+};
 
 interface FieldRendererProps {
   field: FormField;
@@ -177,23 +182,34 @@ function FieldRenderer({ field, value, onChange, disabled }: FieldRendererProps)
 // Main Component
 // =============================================================================
 
+// eslint-disable-next-line complexity
 export function MetadataEditor({ folderPath, basename, onSaveComplete }: MetadataEditorProps) {
-  // Get folder data
-  const { data: folder, isLoading: folderLoading } = useQuery({
-    ...queries.folders(folderPath.split("/").slice(0, -1).join("/") || ""),
-    select: (folders) => folders?.find((f) => f.path === folderPath),
+  const folderType = detectFolderType(folderPath);
+  const isChapter =
+    !!basename &&
+    (folderPath.endsWith("/chapters") ||
+      folderPath.endsWith("/chapters-source") ||
+      folderPath.endsWith("/chapters-html"));
+
+  const parsedBook = useMemo(() => parseBookPath(folderPath), [folderPath]);
+  const parsedCharacter = useMemo(() => parseCharacterPath(folderPath), [folderPath]);
+  const bookPath = parsedBook?.bookPath;
+  const characterSlug = parsedCharacter?.characterSlug ?? folderPath.split("/").pop() ?? "";
+  const chapterBasename = basename ?? "__none__";
+
+  const { data: bookMetadata, isLoading: bookLoading } = useQuery({
+    ...convexQuery(api.metadata.getBookMetadata, { bookPath: bookPath ?? "" }),
+    enabled: folderType === "book" && !!bookPath,
   });
 
-  // Get asset data if editing asset metadata
-  const { isLoading: assetLoading } = useQuery({
-    ...queries.asset(folderPath, basename || ""),
-    enabled: !!basename,
+  const { data: characterMetadata, isLoading: characterLoading } = useQuery({
+    ...convexQuery(api.metadata.getCharacterMetadata, { characterPath: folderPath }),
+    enabled: folderType === "character",
   });
 
-  // Get asset versions for version extra
-  const { data: versions, isLoading: versionsLoading } = useQuery({
-    ...queries.assetVersions(folderPath, basename || ""),
-    enabled: !!basename,
+  const { data: chapterMetadata, isLoading: chapterLoading } = useQuery({
+    ...convexQuery(api.metadata.getChapterMetadata, { folderPath, basename: chapterBasename }),
+    enabled: isChapter,
   });
 
   // Form state
@@ -202,104 +218,77 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
   const [isSaving, setIsSaving] = useState(false);
 
   // Mutations
-  const updateFolder = useMutation(api.cli.updateFolder);
-  const updateVersionExtra = useMutation(api.cli.updateVersionExtra);
+  const updateBookMetadata = useMutation(api.metadata.updateBookMetadata);
+  const updateCharacterMetadata = useMutation(api.metadata.updateCharacterMetadata);
+  const updateChapterMetadata = useMutation(api.metadata.updateChapterMetadata);
 
   // Detect entity type and get appropriate fields, including versionIds for asset types
   // eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
-  const { entityType, fields, currentExtra, publishedVersionId, draftVersionId } = useMemo(() => {
-    const folderType = detectFolderType(folderPath, folder?.extra);
-
-    // If editing an asset version, check its extra OR infer from folder path
-    if (basename && versions?.length) {
-      const publishedVersion = versions.find((v: { state: string }) => v.state === "published");
-      const draftVersion = versions.find((v: { state: string }) => v.state === "draft");
-
-      // IMPORTANT: Always show PUBLISHED version's extra to match what's displayed in lists
-      const sourceVersion = publishedVersion || draftVersion;
-      const extra = sourceVersion?.extra;
-
-      // Check extra.type first, then fall back to folder path pattern
-      const isChapter = extra?.type === "chapter" || folderPath.endsWith("/chapters");
-      const isBackground = extra?.type === "background" || folderPath.endsWith("/backgrounds");
-      const isMusic = extra?.type === "music" || folderPath.endsWith("/music");
-
-      if (isChapter) {
-        return {
-          entityType: "chapter" as const,
-          fields: CHAPTER_FIELDS,
-          currentExtra: (extra as ChapterExtra) || { type: "chapter", chapterNumber: 0, title: "" },
-          publishedVersionId: publishedVersion?._id,
-          draftVersionId: draftVersion?._id,
-        };
-      }
-      if (isBackground) {
-        return {
-          entityType: "background" as const,
-          fields: BACKGROUND_FIELDS,
-          currentExtra: (extra as BackgroundExtra) || {
-            type: "background",
-            chapter: 0,
-            paragraph: 0,
-            backgroundColor: "#000000",
-            textColor: "#ffffff",
-          },
-          publishedVersionId: publishedVersion?._id,
-          draftVersionId: draftVersion?._id,
-        };
-      }
-      if (isMusic) {
-        return {
-          entityType: "music" as const,
-          fields: MUSIC_FIELDS,
-          currentExtra: (extra as MusicExtra) || { type: "music", chapter: 0, paragraph: 0 },
-          publishedVersionId: publishedVersion?._id,
-          draftVersionId: draftVersion?._id,
-        };
-      }
+  const { entityType, fields, currentData } = useMemo(() => {
+    if (!bookPath) {
+      return { entityType: null, fields: [], currentData: undefined };
     }
 
-    // Check folder type
-    if (folderType === "book" || isBookFolder(folder?.extra)) {
+    if (isChapter) {
+      const fallbackChapterNumber = basename ? parseChapterNumberFromBasename(basename) : undefined;
+      return {
+        entityType: "chapter" as const,
+        fields: CHAPTER_FIELDS,
+        currentData: {
+          chapterNumber: chapterMetadata?.chapterNumber ?? fallbackChapterNumber ?? 0,
+          title: chapterMetadata?.title ?? "",
+        },
+      };
+    }
+
+    if (folderType === "book") {
       return {
         entityType: "book" as const,
         fields: BOOK_FIELDS,
-        currentExtra: folder?.extra as BookFolderExtra | undefined,
-        publishedVersionId: undefined,
-        draftVersionId: undefined,
+        currentData: {
+          title: bookMetadata?.title ?? "",
+          author: bookMetadata?.author ?? "",
+          language: bookMetadata?.language ?? "",
+          form: bookMetadata?.form ?? "",
+          visualStyle: bookMetadata?.visualStyle ?? "",
+          backgroundStyle: bookMetadata?.backgroundStyle ?? "",
+          periodStyle: bookMetadata?.periodStyle ?? "",
+          avatarStyle: bookMetadata?.avatarStyle ?? "",
+        },
       };
     }
-    if (folderType === "character" || isCharacterFolder(folder?.extra)) {
+
+    if (folderType === "character") {
       return {
         entityType: "character" as const,
         fields: CHARACTER_FIELDS,
-        currentExtra: folder?.extra as CharacterFolderExtra | undefined,
-        publishedVersionId: undefined,
-        draftVersionId: undefined,
+        currentData: {
+          displayName: characterMetadata?.displayName ?? "",
+          summary: characterMetadata?.summary ?? "",
+          aiPrompt: characterMetadata?.aiPrompt ?? "",
+        },
       };
     }
 
-    return {
-      entityType: null,
-      fields: [],
-      currentExtra: undefined,
-      publishedVersionId: undefined,
-      draftVersionId: undefined,
-    };
-  }, [folderPath, folder?.extra, basename, versions]);
+    return { entityType: null, fields: [], currentData: undefined };
+  }, [bookPath, isChapter, basename, chapterMetadata, folderType, bookMetadata, characterMetadata]);
 
-  // Initialize form data from current extra
-  useMemo(() => {
-    if (currentExtra && Object.keys(formData).length === 0) {
-      const initial: Record<string, string | number> = {};
-      const extraObj = currentExtra as unknown as Record<string, unknown>;
-      for (const field of fields) {
-        const value = extraObj[field.name];
-        initial[field.name] = (value as string | number) ?? (field.type === "number" ? 0 : "");
-      }
-      setFormData(initial);
+  useEffect(() => {
+    setFormData({});
+    setHasChanges(false);
+  }, [folderPath, basename]);
+
+  // Initialize form data from current metadata
+  useEffect(() => {
+    if (!currentData || Object.keys(formData).length > 0) return;
+    const initial: Record<string, string | number> = {};
+    const dataObj = currentData as Record<string, unknown>;
+    for (const field of fields) {
+      const value = dataObj[field.name];
+      initial[field.name] = (value as string | number) ?? (field.type === "number" ? 0 : "");
     }
-  }, [currentExtra, fields, formData]);
+    setFormData(initial);
+  }, [currentData, fields, formData]);
 
   // Handle field change
   const handleFieldChange = useCallback((name: string, value: string | number) => {
@@ -309,17 +298,17 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
 
   // Handle reset
   const handleReset = useCallback(() => {
-    if (currentExtra) {
+    if (currentData) {
       const initial: Record<string, string | number> = {};
-      const extraObj = currentExtra as unknown as Record<string, unknown>;
+      const dataObj = currentData as Record<string, unknown>;
       for (const field of fields) {
-        const value = extraObj[field.name];
+        const value = dataObj[field.name];
         initial[field.name] = (value as string | number) ?? (field.type === "number" ? 0 : "");
       }
       setFormData(initial);
       setHasChanges(false);
     }
-  }, [currentExtra, fields]);
+  }, [currentData, fields]);
 
   // Handle save
   const handleSave = useCallback(async () => {
@@ -328,7 +317,7 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
     setIsSaving(true);
 
     try {
-      // Build new extra object, converting number fields from strings
+      // Build metadata payload, converting number fields from strings
       const processedData: Record<string, string | number> = {};
       for (const field of fields) {
         const value = formData[field.name];
@@ -341,26 +330,39 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
         }
       }
 
-      const newExtra = { type: entityType, ...processedData };
-
-      // For folder types (book, character), update the folder
-      if (entityType === "book" || entityType === "character") {
-        await updateFolder({ path: folderPath, extra: newExtra });
-        toast.success("Metadata saved");
+      if (!bookPath) {
+        toast.error("Book path not found");
+        return;
       }
-      // For asset version types (chapter, background, music), update BOTH versions for consistency
-      else if (publishedVersionId || draftVersionId) {
-        // Update published version (so changes are immediately visible in lists)
-        if (publishedVersionId) {
-          await updateVersionExtra({ versionId: publishedVersionId, extra: newExtra });
+
+      if (entityType === "book") {
+        await updateBookMetadata({ bookPath, ...processedData });
+        toast.success("Metadata saved");
+      } else if (entityType === "character") {
+        await updateCharacterMetadata({
+          bookPath,
+          characterSlug,
+          displayName: processedData.displayName as string,
+          summary: processedData.summary as string,
+          aiPrompt: processedData.aiPrompt as string | undefined,
+        });
+        toast.success("Metadata saved");
+      } else if (entityType === "chapter" && basename) {
+        const chapterNumber = processedData.chapterNumber as number;
+        if (!chapterNumber) {
+          toast.error("Chapter number is required");
+          return;
         }
-        // Also update draft version (so changes are preserved when publishing)
-        if (draftVersionId) {
-          await updateVersionExtra({ versionId: draftVersionId, extra: newExtra });
-        }
+        await updateChapterMetadata({
+          bookPath,
+          folderPath,
+          basename,
+          chapterNumber,
+          title: processedData.title as string,
+        });
         toast.success("Metadata saved");
       } else {
-        toast.error("No version found to update");
+        toast.error("Unsupported metadata type");
         return;
       }
 
@@ -376,15 +378,18 @@ export function MetadataEditor({ folderPath, basename, onSaveComplete }: Metadat
     fields,
     formData,
     folderPath,
-    updateFolder,
-    updateVersionExtra,
-    publishedVersionId,
-    draftVersionId,
+    bookPath,
+    characterSlug,
+    updateBookMetadata,
+    updateCharacterMetadata,
+    updateChapterMetadata,
     onSaveComplete,
   ]);
-
   // Loading state
-  const isLoading = folderLoading || (basename && (assetLoading || versionsLoading));
+  const isLoading =
+    (entityType === "book" && bookLoading) ||
+    (entityType === "character" && characterLoading) ||
+    (entityType === "chapter" && chapterLoading);
 
   if (isLoading) {
     return (

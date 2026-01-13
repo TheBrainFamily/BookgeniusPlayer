@@ -4,13 +4,13 @@ Reusable Convex component for versioned file storage with dual-backend support.
 
 ## OVERVIEW
 
-Abstraction layer for managing media and documents with draft/published/archived states. Transparently switches between native Convex storage and Cloudflare R2 for CDN-optimized delivery.
+Abstraction layer for managing media and documents with published/archived versions. Transparently switches between native Convex storage and Cloudflare R2 for CDN-optimized delivery.
 
 ## ARCHITECTURE
 
 - **Dual Backend**: Configurable via `storageConfig` singleton. Convex (default) or R2 (high-scale).
 - **Versioning**: Assets (`folderPath` + `basename`) track multiple `assetVersions`.
-- **States**: Versions transition from `draft` → `published` (only one active) → `archived`.
+- **States**: Versions transition from `published` (only one active) → `archived`.
 - **Folder System**: Virtual hierarchy with path-based lookups and subfolder listing.
 
 ## KEY FILES
@@ -31,6 +31,6 @@ Abstraction layer for managing media and documents with draft/published/archived
 
 ## PUBLIC API
 
-- **Mutations**: `startUpload`, `finishUpload`, `publishDraft`, `moveAsset`, `renameAsset`, `configureStorageBackend`.
+- **Mutations**: `startUpload`, `finishUpload`, `moveAsset`, `renameAsset`, `configureStorageBackend`.
 - **Queries**: `getPublishedFile`, `listPublishedFilesInFolder`, `getAssetVersions`, `listFolders`, `getFolder`.
 - **Actions**: `getSignedUrl`, `getTextContent` (CORS-safe server-side fetch).

@@ -174,7 +174,7 @@ export function FileGallery({ folderPath }: { folderPath: string }) {
 When a file is updated, the CDN URL changes automatically:
 
 1. **Before update**: Query returns `https://cdn.example.com/app/abc123/song.mp3`
-2. **Admin publishes new version**
+2. **Admin uploads a new version**
 3. **After update**: Query returns `https://cdn.example.com/app/def456/song.mp3`
 4. **React re-renders** with new URL
 5. **Browser fetches** the new version
@@ -229,7 +229,6 @@ export const startUpload = mutation({
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
       ...args,
-      publish: true, // Immediately publish
       r2Config: getR2Config(),
     });
   },

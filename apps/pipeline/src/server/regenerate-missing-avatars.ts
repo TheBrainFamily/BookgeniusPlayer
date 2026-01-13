@@ -142,7 +142,6 @@ async function generateSingleAvatar(
       basename: "avatar-large.png",
       content: imageBuffer,
       contentType: "image/png",
-      publish: true,
     });
 
     await convex.markCharacterAvatarState({

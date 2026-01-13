@@ -9,7 +9,7 @@
 export interface AssetVersion {
   _id: string;
   versionNumber: number;
-  state: "draft" | "published" | "archived";
+  state: "published" | "archived";
   storageId?: string;
   r2Key?: string;
   contentType?: string;
@@ -22,7 +22,6 @@ export interface Asset {
   folderPath: string;
   basename: string;
   publishedVersionId?: string;
-  draftVersionId?: string;
 }
 
 // =============================================================================

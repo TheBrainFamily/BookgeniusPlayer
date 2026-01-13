@@ -6,8 +6,8 @@
  * This component:
  * 1. Fetches the XML content using a Convex action (bypasses CORS)
  * 2. Displays it in Monaco with character tag autocomplete
- * 3. Auto-saves drafts as you type (debounced)
- * 4. Cmd+S saves and publishes in one step
+ * 3. Auto-saves as you type (debounced)
+ * 4. Cmd+S saves immediately
  *
  * The character autocomplete suggests tags like:
  * - <WinstonSmith talking="true"/>
@@ -16,9 +16,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useMutation, useAction } from "convex/react";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@convex/_generated/api";
-import { queries } from "@/lib/queries";
 import { logError } from "@/lib/utils";
 import { XmlEditor } from "./XmlEditor";
 import { useCharacters } from "../../../lib/contexts/BookContext";
@@ -216,20 +214,9 @@ export function ChapterEditor({
   // Track the last auto-saved content to avoid redundant saves
   const lastAutoSavedContentRef = useRef<string | null>(null);
 
-  // Fetch versions to get the current version's extra metadata
-  const { data: versions } = useQuery(queries.assetVersions(folderPath, basename));
-
-  // Get the current version's extra metadata to preserve when saving
-  const currentVersionExtra = useMemo(() => {
-    if (!versions) return undefined;
-    const currentVersion = versions.find((v: { _id: string }) => v._id === versionId);
-    return currentVersion?.extra;
-  }, [versions, versionId]);
-
   // Convex mutations for saving
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
-  const publishDraft = useMutation(api.cli.publishDraft);
 
   // Transform characters for autocomplete
   const characters = useMemo<CharacterInfo[]>(() => {
@@ -243,15 +230,13 @@ export function ChapterEditor({
     return createCharacterCompletionProvider(characters);
   }, [characters]);
 
-  // Helper: Upload content and create a draft
-  const uploadDraft = useCallback(
+  // Helper: Upload content and publish immediately
+  const uploadVersion = useCallback(
     async (xmlContent: string) => {
       const { intentId, backend, uploadUrl } = await startUpload({
         folderPath,
         basename,
-        publish: false, // Save as draft
         label: `Edited chapter`,
-        extra: currentVersionExtra, // Preserve chapterNumber, title, etc.
       });
 
       const contentType = "application/xml";
@@ -270,7 +255,7 @@ export function ChapterEditor({
       const uploadResponse = backend === "convex" ? await response.json() : undefined;
       await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
     },
-    [folderPath, basename, startUpload, finishUpload, currentVersionExtra],
+    [folderPath, basename, startUpload, finishUpload],
   );
 
   // Auto-save handler (silent, no toast, debounced by XmlEditor)
@@ -289,18 +274,18 @@ export function ChapterEditor({
       }
 
       try {
-        console.log("[ChapterEditor] Uploading draft...");
-        await uploadDraft(xmlContent);
+        console.log("[ChapterEditor] Uploading update...");
+        await uploadVersion(xmlContent);
         lastAutoSavedContentRef.current = xmlContent;
-        console.log("[ChapterEditor] Draft uploaded, lastAutoSavedContentRef updated");
+        console.log("[ChapterEditor] Upload complete, lastAutoSavedContentRef updated");
       } catch (e) {
         logError("[ChapterEditor] Auto-save failed:", e);
       }
     },
-    [uploadDraft],
+    [uploadVersion],
   );
 
-  // Manual save handler (Cmd+S) - saves and publishes in one step
+  // Manual save handler (Cmd+S) - saves immediately
   const handleSave = useCallback(
     async (xmlContent: string) => {
       console.log("[ChapterEditor] handleSave called (Cmd+S)", {
@@ -315,27 +300,22 @@ export function ChapterEditor({
         // If content changed since last auto-save, save it first
         if (xmlContent !== lastAutoSavedContentRef.current) {
           console.log("[ChapterEditor] Content differs from last auto-save, uploading...");
-          await uploadDraft(xmlContent);
+          await uploadVersion(xmlContent);
           lastAutoSavedContentRef.current = xmlContent;
         } else {
           console.log("[ChapterEditor] Content same as last auto-save, skipping upload");
         }
 
-        // Publish the draft
-        console.log("[ChapterEditor] Publishing draft...", { folderPath, basename });
-        await publishDraft({ folderPath, basename });
-        console.log("[ChapterEditor] Draft published!");
-
-        toast.success("Chapter published");
+        toast.success("Chapter saved");
         onSaveComplete?.();
       } catch (e) {
         logError("[ChapterEditor] Save failed:", e);
-        toast.error(e instanceof Error ? e.message : "Failed to publish chapter");
+        toast.error(e instanceof Error ? e.message : "Failed to save chapter");
       } finally {
         setIsSaving(false);
       }
     },
-    [folderPath, basename, uploadDraft, publishDraft, onSaveComplete],
+    [folderPath, basename, uploadVersion, onSaveComplete],
   );
 
   // Loading state
@@ -407,28 +387,14 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const lastAutoSavedContentRef = useRef<string | null>(null);
 
-  // Fetch versions to get the current version's extra metadata
-  const { data: versions } = useQuery(queries.assetVersions(props.folderPath, props.basename));
-
-  // Get the current version's extra metadata to preserve when saving
-  const currentVersionExtra = useMemo(() => {
-    if (!versions) return undefined;
-    const currentVersion = versions.find((v: { _id: string }) => v._id === props.versionId);
-    return currentVersion?.extra;
-  }, [versions, props.versionId]);
-
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
-  const publishDraft = useMutation(api.cli.publishDraft);
-
-  const uploadDraft = useCallback(
+  const uploadVersion = useCallback(
     async (xmlContent: string) => {
       const { intentId, backend, uploadUrl } = await startUpload({
         folderPath: props.folderPath,
         basename: props.basename,
-        publish: false,
         label: `Edited chapter`,
-        extra: currentVersionExtra,
       });
 
       const contentType = "application/xml";
@@ -447,20 +413,20 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
       const uploadResponse = backend === "convex" ? await response.json() : undefined;
       await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
     },
-    [props.folderPath, props.basename, startUpload, finishUpload, currentVersionExtra],
+    [props.folderPath, props.basename, startUpload, finishUpload],
   );
 
   const handleAutoSave = useCallback(
     async (xmlContent: string) => {
       if (xmlContent === lastAutoSavedContentRef.current) return;
       try {
-        await uploadDraft(xmlContent);
+        await uploadVersion(xmlContent);
         lastAutoSavedContentRef.current = xmlContent;
       } catch (e) {
         logError("Auto-save failed:", e);
       }
     },
-    [uploadDraft],
+    [uploadVersion],
   );
 
   const handleSave = useCallback(
@@ -468,21 +434,20 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
       setIsSaving(true);
       try {
         if (xmlContent !== lastAutoSavedContentRef.current) {
-          await uploadDraft(xmlContent);
+          await uploadVersion(xmlContent);
           lastAutoSavedContentRef.current = xmlContent;
         }
-        await publishDraft({ folderPath: props.folderPath, basename: props.basename });
-        toast.success("Chapter published");
+        toast.success("Chapter saved");
         props.onSaveComplete?.();
       } catch (e) {
         logError("Save failed:", e);
-        toast.error(e instanceof Error ? e.message : "Failed to publish chapter");
+        toast.error(e instanceof Error ? e.message : "Failed to save chapter");
       } finally {
         setIsSaving(false);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps -- accessing props directly is intentional here
-    [props.folderPath, props.basename, uploadDraft, publishDraft, props.onSaveComplete],
+    [props.folderPath, props.basename, uploadVersion, props.onSaveComplete],
   );
 
   if (isLoading) {

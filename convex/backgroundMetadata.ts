@@ -236,7 +236,7 @@ export const generateImagePreview = internalAction({
       // Start upload
       const { intentId, uploadUrl, backend } = await ctx.runMutation(
         internal.generateUploadUrl.startUploadInternal,
-        { folderPath: thumbnailsPath, basename: previewBasename, publish: true },
+        { folderPath: thumbnailsPath, basename: previewBasename },
       );
 
       // Upload the blob

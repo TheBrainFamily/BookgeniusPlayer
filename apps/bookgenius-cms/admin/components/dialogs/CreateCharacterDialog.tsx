@@ -56,6 +56,7 @@ export function CreateCharacterDialog({
 
   // Mutations
   const createFolder = useMutation(api.cli.createFolderByPath);
+  const updateCharacterMetadata = useMutation(api.metadata.updateCharacterMetadata);
 
   // Generate slug from display name
   const generateSlug = useCallback((name: string) => {
@@ -95,10 +96,13 @@ export function CreateCharacterDialog({
     try {
       const characterPath = `${bookPath}/characters/${slug}`;
 
-      // Create character folder with metadata
-      await createFolder({
-        path: characterPath,
-        extra: { type: "character", displayName: displayName.trim(), summary: summary.trim() },
+      // Create character folder
+      await createFolder({ path: characterPath });
+      await updateCharacterMetadata({
+        bookPath,
+        characterSlug: slug,
+        displayName: displayName.trim(),
+        summary: summary.trim(),
       });
 
       toast.success(`Character "${displayName}" created`);
@@ -116,7 +120,16 @@ export function CreateCharacterDialog({
     } finally {
       setIsCreating(false);
     }
-  }, [bookPath, displayName, summary, slug, createFolder, onOpenChange, onCreated]);
+  }, [
+    bookPath,
+    displayName,
+    summary,
+    slug,
+    createFolder,
+    updateCharacterMetadata,
+    onOpenChange,
+    onCreated,
+  ]);
 
   // Handle close
   const handleClose = useCallback(() => {

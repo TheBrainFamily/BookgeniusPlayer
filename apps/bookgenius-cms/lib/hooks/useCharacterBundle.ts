@@ -16,7 +16,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import type { CharacterFolderExtra } from "../types/book";
+import type { CharacterMetadata } from "../types/book";
 
 // =============================================================================
 // Types
@@ -32,7 +32,7 @@ export interface CharacterBundle {
   path: string;
   slug: string;
   name: string;
-  extra: CharacterFolderExtra | unknown;
+  metadata: CharacterMetadata;
   avatar?: AssetInfo;
   speaks?: AssetInfo;
   listens?: AssetInfo;

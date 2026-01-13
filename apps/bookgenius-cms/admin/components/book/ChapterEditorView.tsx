@@ -8,7 +8,7 @@
  * - Full-width Monaco editor with character autocomplete
  * - Collapsible and resizable version history sidebar
  * - Chapter metadata display
- * - Auto-save drafts + Cmd+S to publish workflow
+ * - Auto-save + Cmd+S to save workflow
  */
 
 import { useState, useMemo, useCallback } from "react";
@@ -22,7 +22,6 @@ import { formatDistanceToNow } from "date-fns";
 import {
   ArrowLeft,
   CheckCircle,
-  AlertCircle,
   Clock,
   Archive,
   PanelRightClose,
@@ -58,7 +57,7 @@ interface ChapterEditorViewProps {
 type VersionBadgeVariant = NonNullable<BadgeProps["variant"]>;
 
 function getVersionBadgeVariant(state: string): VersionBadgeVariant {
-  if (state === "draft" || state === "published" || state === "archived") return state;
+  if (state === "published" || state === "archived") return state;
   return "default";
 }
 
@@ -281,16 +280,12 @@ function ChapterEditorContent({
                           : "hover:border-primary/50",
                         version.state === "published"
                           ? "border-success/30 bg-success/5"
-                          : version.state === "draft"
-                            ? "border-warning/30 bg-warning/5"
-                            : "border-border bg-surface-1",
+                          : "border-border bg-surface-1",
                       )}
                     >
                       <div className="flex items-center gap-2">
                         {version.state === "published" ? (
                           <CheckCircle className="h-3 w-3 text-success" />
-                        ) : version.state === "draft" ? (
-                          <AlertCircle className="h-3 w-3 text-warning" />
                         ) : (
                           <Archive className="h-3 w-3 text-muted-foreground" />
                         )}

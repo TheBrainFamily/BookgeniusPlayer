@@ -72,6 +72,7 @@ export function CreateChapterDialog({
   // Mutations
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
+  const updateChapterMetadata = useMutation(api.metadata.updateChapterMetadata);
 
   // Generate filename from chapter number
   const filename = useMemo(() => {
@@ -108,8 +109,6 @@ export function CreateChapterDialog({
       const { intentId, backend, uploadUrl } = await startUpload({
         folderPath: chaptersPath,
         basename: filename,
-        publish: true, // Publish immediately
-        extra: { type: "chapter", chapterNumber: num, title: title.trim() },
       });
 
       // Upload content
@@ -126,6 +125,14 @@ export function CreateChapterDialog({
       // Finish upload
       const uploadResponse = backend === "convex" ? await response.json() : undefined;
       await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
+      await updateChapterMetadata({
+        bookPath,
+        folderPath: chaptersPath,
+        basename: filename,
+        chapterNumber: num,
+        title: title.trim(),
+        sourceFormat: "xml",
+      });
 
       toast.success(`Chapter ${num} created`);
       onOpenChange(false);
@@ -148,6 +155,7 @@ export function CreateChapterDialog({
     filename,
     startUpload,
     finishUpload,
+    updateChapterMetadata,
     onOpenChange,
     onCreated,
   ]);

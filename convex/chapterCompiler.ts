@@ -2,15 +2,10 @@ import { v } from "convex/values";
 import { type ActionCtx, internalAction } from "./_generated/server";
 import { api, components, internal } from "./_generated/api";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
-import {
-  renderChapterFromXmlDocument,
-  type CharacterBundleInfo,
-} from "../apps/player/src/services/live/xmlRendererCore";
+import { renderChapterFromXmlDocument } from "../apps/player/src/services/live/xmlRendererCore";
 import { extractCharacterMetadata } from "../apps/player/src/services/live/characterExtractor";
 import { extractOccurrences, type CompiledChapter } from "./lib/characterDataV2";
 import { adminAction } from "@convex/functions";
-
-type ChapterExtra = { chapterNumber?: number; title?: string };
 
 const CHAPTERS_FOLDER_SUFFIX = "/chapters";
 
@@ -45,24 +40,21 @@ const ensureFolder = async (ctx: ActionCtx, path: string): Promise<void> => {
 const uploadGeneratedAsset = async (
   ctx: ActionCtx,
   args: {
+    bookPath: string;
     folderPath: string;
     basename: string;
     content: string;
     contentType: string;
-    extra?: Record<string, unknown>;
+    chapterNumber?: number;
+    title?: string;
+    paragraphCount?: number;
+    sourceFormat?: string;
   },
 ) => {
-  const { folderPath, basename, content, contentType, extra } = args;
+  const { folderPath, basename, content, contentType } = args;
   const { intentId, backend, uploadUrl } = await ctx.runMutation(
     internal.generateUploadUrl.startUploadInternal,
-    {
-      folderPath,
-      basename,
-      filename: basename,
-      publish: true,
-      label: "Generated chapter artifact",
-      extra,
-    },
+    { folderPath, basename, filename: basename, label: "Generated chapter artifact" },
   );
 
   const encoded = new TextEncoder().encode(content);
@@ -84,11 +76,24 @@ const uploadGeneratedAsset = async (
     size: encoded.byteLength,
     contentType,
   });
+
+  const chapterNumber = args.chapterNumber ?? extractChapterNumber(basename);
+  if (chapterNumber) {
+    await ctx.runMutation(internal.metadata.upsertChapterMetadataInternal, {
+      bookPath: args.bookPath,
+      folderPath,
+      basename,
+      chapterNumber,
+      title: args.title,
+      paragraphCount: args.paragraphCount,
+      sourceFormat: args.sourceFormat,
+    });
+  }
 };
 
 /**
  * Compile a single published chapter into HTML + per-chapter character fragments.
- * Intended to be triggered by scheduler after publishDraft.
+ * Intended to be triggered by scheduler after a chapter is saved.
  */
 export const processPublishedChapter = internalAction({
   args: { bookPath: v.string(), chapterBasename: v.string(), versionId: v.string() },
@@ -99,18 +104,15 @@ export const processPublishedChapter = internalAction({
       throw new Error(`Invalid chapter path: ${chaptersPath}`);
     }
 
-    const book = await ctx.runQuery(api.bookQueries.getBookMetadata, { bookPath });
+    const book = await ctx.runQuery(api.metadata.getBookMetadata, { bookPath });
     if (!book) {
       throw new Error(`Book not found: ${bookPath}`);
     }
 
-    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+    const chapterMetadata = await ctx.runQuery(api.metadata.getChapterMetadata, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
-
-    const publishedVersion = versions.find((v) => v._id === versionId);
-    const versionExtra = (publishedVersion?.extra ?? {}) as ChapterExtra;
 
     const xmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
       versionId,
@@ -119,7 +121,7 @@ export const processPublishedChapter = internalAction({
       throw new Error(`No XML content found for ${chapterBasename}`);
     }
 
-    const normalizedXml = normalizeChapterXml(xmlResult.content, versionExtra.chapterNumber);
+    const normalizedXml = normalizeChapterXml(xmlResult.content, chapterMetadata?.chapterNumber);
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(normalizedXml, "text/xml") as unknown as Document;
     const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
@@ -135,7 +137,7 @@ export const processPublishedChapter = internalAction({
     const chapterNumber =
       Number.isFinite(chapterNumberFromXml) && chapterNumberFromXml > 0
         ? chapterNumberFromXml
-        : (versionExtra.chapterNumber ?? extractChapterNumber(chapterBasename));
+        : (chapterMetadata?.chapterNumber ?? extractChapterNumber(chapterBasename));
 
     if (!chapterElement) {
       throw new Error(`Chapter element missing in ${chapterBasename}`);
@@ -147,19 +149,17 @@ export const processPublishedChapter = internalAction({
       chapterElement.setAttribute("id", String(chapterNumber));
     }
 
-    const bookForm = book.extra?.form?.toLowerCase() || "book";
-    const bookLang = book.extra?.language?.toLowerCase() || "english";
+    const bookForm = book.form?.toLowerCase() || "book";
+    const bookLang = book.language?.toLowerCase() || "english";
     const bookSlug = book.slug;
 
-    const characters = (await ctx.runQuery(api.bookQueries.listCharacters, { bookPath })) as Array<{
-      slug: string;
-      name: string;
-      extra: CharacterBundleInfo["extra"];
-    }>;
+    const characters = (await ctx.runQuery(api.metadata.listCharacterMetadata, {
+      bookPath,
+    })) as Array<{ slug: string; displayName: string; summary: string }>;
     const characterBundles = characters.map((c) => ({
       slug: c.slug,
-      name: c.name,
-      extra: c.extra,
+      name: c.displayName,
+      metadata: { displayName: c.displayName, summary: c.summary },
     }));
 
     const serializer = new XMLSerializer();
@@ -170,8 +170,16 @@ export const processPublishedChapter = internalAction({
       characterBundles,
       serializer,
     });
-    const resolvedTitle = title || versionExtra.title;
+    const resolvedTitle = title || chapterMetadata?.title;
     const paragraphCount = (html.match(/data-index="/g) ?? []).length;
+
+    await ctx.runMutation(internal.metadata.upsertChapterMetadataInternal, {
+      bookPath,
+      folderPath: chaptersPath,
+      basename: chapterBasename,
+      chapterNumber,
+      title: resolvedTitle,
+    });
 
     const knownCharacterSlugs = new Set<string>(characterBundles.map((c) => c.slug.toLowerCase()));
     const actualCharacterTags = new Set<string>();
@@ -205,19 +213,24 @@ export const processPublishedChapter = internalAction({
     await ensureFolder(ctx, compiledFolder);
 
     await uploadGeneratedAsset(ctx, {
+      bookPath,
       folderPath: htmlFolder,
       basename: `chapter-${chapterNumber}.html`,
       content: html,
       contentType: "text/html",
-      extra: { chapterNumber, title: resolvedTitle, sourceVersionId: versionId, paragraphCount },
+      chapterNumber,
+      title: resolvedTitle,
+      paragraphCount,
+      sourceFormat: "html",
     });
 
     await uploadGeneratedAsset(ctx, {
+      bookPath,
       folderPath: characterFolder,
       basename: `chapter-${chapterNumber}.json`,
       content: characterPayload,
       contentType: "application/json",
-      extra: { chapterNumber, sourceVersionId: versionId },
+      chapterNumber,
     });
 
     const occurrences = extractOccurrences(
@@ -232,11 +245,14 @@ export const processPublishedChapter = internalAction({
     };
 
     await uploadGeneratedAsset(ctx, {
+      bookPath,
       folderPath: compiledFolder,
       basename: `chapter-${chapterNumber}.json`,
       content: JSON.stringify(compiledChapter),
       contentType: "application/json",
-      extra: { chapterNumber, title: resolvedTitle, sourceVersionId: versionId, paragraphCount },
+      chapterNumber,
+      title: resolvedTitle,
+      paragraphCount,
     });
 
     const backendUrl = process.env.BACKEND_SERVER_URL;
@@ -292,11 +308,15 @@ export const uploadHtmlSourceChapter = adminAction({
     await ensureFolder(ctx, sourceFolder);
 
     await uploadGeneratedAsset(ctx, {
+      bookPath,
       folderPath: sourceFolder,
       basename: `chapter-${chapterNumber}.html`,
       content: htmlContent,
       contentType: "text/html",
-      extra: { chapterNumber, title, paragraphCount, sourceFormat: "html" },
+      chapterNumber,
+      title,
+      paragraphCount,
+      sourceFormat: "html",
     });
 
     const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {

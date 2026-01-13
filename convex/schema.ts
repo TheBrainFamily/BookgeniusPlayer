@@ -14,12 +14,55 @@ export default defineSchema({
     slug: v.string(), // For quick lookups
     ownerId: v.string(), // tokenIdentifier of owner
     title: v.optional(v.string()),
+    author: v.optional(v.string()),
+    language: v.optional(v.string()),
+    form: v.optional(v.string()),
+    visualStyle: v.optional(v.string()),
+    backgroundStyle: v.optional(v.string()),
+    periodStyle: v.optional(v.string()),
+    avatarStyle: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_path", ["path"])
     .index("by_slug", ["slug"])
     .index("by_owner", ["ownerId"]),
+
+  // Character metadata (display name, summary, AI prompt, avatar generation state)
+  characterMetadata: defineTable({
+    bookPath: v.string(),
+    characterPath: v.string(),
+    slug: v.string(),
+    displayName: v.string(),
+    summary: v.string(),
+    aiPrompt: v.optional(v.string()),
+    avatarGenerationState: v.optional(
+      v.union(v.literal("generating"), v.literal("ready"), v.literal("error"), v.literal("none")),
+    ),
+    avatarProposalUrls: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_book_slug", ["bookPath", "slug"])
+    .index("by_path", ["characterPath"]),
+
+  // Chapter metadata (per asset basename)
+  chapterMetadata: defineTable({
+    bookPath: v.string(),
+    folderPath: v.string(),
+    basename: v.string(),
+    chapterNumber: v.number(),
+    title: v.optional(v.string()),
+    paragraphCount: v.optional(v.number()),
+    sourceFormat: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_book_chapter", ["bookPath", "chapterNumber"])
+    .index("by_folder", ["folderPath"])
+    .index("by_folder_basename", ["folderPath", "basename"]),
 
   // Book members - collaborators (future: invitations/teams)
   bookMembers: defineTable({

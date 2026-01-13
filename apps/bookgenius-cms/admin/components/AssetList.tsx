@@ -214,7 +214,6 @@ export function AssetList({
         const { intentId, uploadUrl, backend } = await startUpload({
           folderPath: item.targetFolder,
           basename: item.file.name,
-          publish: true,
         });
 
         // 2. Upload file - R2 uses PUT, Convex uses POST

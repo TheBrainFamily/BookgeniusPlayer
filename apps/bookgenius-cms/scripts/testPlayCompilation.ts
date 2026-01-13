@@ -114,7 +114,7 @@ console.log(`Characters: ${characters.length}`);
 const characterBundles: CharacterBundleInfo[] = characters.map((c) => ({
   slug: c.slug,
   name: c.displayName,
-  extra: { displayName: c.displayName, summary: c.summary },
+  metadata: { displayName: c.displayName, summary: c.summary },
 }));
 
 // Create output directory

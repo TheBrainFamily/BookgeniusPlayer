@@ -2,17 +2,13 @@
  * LiveModeApp - Unified Convex-based Player Entry Point
  *
  * All player modes now use Convex for data loading.
- * Draft mode is controlled by ?draft=true or ?editor=true URL params.
- *
  * Features:
  * - Reactive updates from CMS
- * - Draft-aware queries for editors
  * - Scroll position preservation on content changes
  */
 
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { BookConvexProvider, useBookConvex } from "@player/context/BookConvexContext";
-import { DraftModeProvider } from "@player/context/DraftModeContext";
 import { EditModeProvider } from "@player/context/EditModeContext";
 import React, { useEffect, useState } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
@@ -30,7 +26,6 @@ import { BookContentWrapper } from "./components/BookContentWrapper";
 import { ContentShiftWrapper } from "./components/ContentShiftWrapper";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { EditorMode } from "@player/components/EditorMode";
 import { useAppReady } from "./hooks/useAppReady";
 import useSplashHidden from "./hooks/useSplashHidden";
 import { initAudioContext } from "./audio-crossfader";
@@ -51,7 +46,6 @@ import { DebugLocationOverlay } from "./components/DebugLocationOverlay";
 import { AvatarGenerationBadge } from "./components/AvatarGenerationBadge";
 import { BackgroundGenerationBadge } from "./components/BackgroundGenerationBadge";
 import { EditorToolbar } from "./components/EditorToolbar";
-import { useDraftMode } from "@player/context/DraftModeContext";
 import { useInlineAvatarSync } from "@player/hooks/useInlineAvatarSync";
 import { useEmbeddingsHeartbeat } from "@player/hooks/useEmbeddingsHeartbeat";
 import { useApplyGraphicsSettings } from "@player/hooks/useApplyGraphicsSettings";
@@ -87,7 +81,6 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
 
   const { i18n: i18nInstance } = useTranslation();
   const { bookData } = useBookConvex();
-  const draftMode = useDraftMode();
 
   useEffect(() => {
     onShellMounted();
@@ -105,8 +98,6 @@ function LiveShell({ onShellMounted }: { onShellMounted: () => void }) {
       <RightNotesPanel />
       <ScrollIndicator />
       <Footer />
-      {/* Show editor controls in draft mode */}
-      {draftMode && <EditorMode />}
     </>
   );
 }
@@ -290,33 +281,31 @@ export function LiveModeAppCore({ bookPath }: LiveModeAppProps) {
 
   return (
     <NativeShellProvider>
-      <DraftModeProvider>
-        <EditModeProvider>
-          <BookConvexProvider bookPath={bookPath}>
-            <CriticalAssetPreloader />
-            <ParagraphEditConnector />
-            <I18nextProvider i18n={i18n}>
-              <ConvexAppInitializer>
-                <LocationProvider>
-                  <RealtimeProvider>
-                    <NativeShellBridge />
-                    <WebOnlyHooks />
-                    <BookContentWrapper>
-                      <LiveShell onShellMounted={() => setReactDomReady(true)} />
-                      <ModalRenderers />
-                      <EditorToolbar />
-                      <AvatarGenerationBadge />
-                      <BackgroundGenerationBadge />
-                      <ContentShiftWrapper />
-                    </BookContentWrapper>
-                    <DebugLocationOverlay />
-                  </RealtimeProvider>
-                </LocationProvider>
-              </ConvexAppInitializer>
-            </I18nextProvider>
-          </BookConvexProvider>
-        </EditModeProvider>
-      </DraftModeProvider>
+      <EditModeProvider>
+        <BookConvexProvider bookPath={bookPath}>
+          <CriticalAssetPreloader />
+          <ParagraphEditConnector />
+          <I18nextProvider i18n={i18n}>
+            <ConvexAppInitializer>
+              <LocationProvider>
+                <RealtimeProvider>
+                  <NativeShellBridge />
+                  <WebOnlyHooks />
+                  <BookContentWrapper>
+                    <LiveShell onShellMounted={() => setReactDomReady(true)} />
+                    <ModalRenderers />
+                    <EditorToolbar />
+                    <AvatarGenerationBadge />
+                    <BackgroundGenerationBadge />
+                    <ContentShiftWrapper />
+                  </BookContentWrapper>
+                  <DebugLocationOverlay />
+                </RealtimeProvider>
+              </LocationProvider>
+            </ConvexAppInitializer>
+          </I18nextProvider>
+        </BookConvexProvider>
+      </EditModeProvider>
     </NativeShellProvider>
   );
 }

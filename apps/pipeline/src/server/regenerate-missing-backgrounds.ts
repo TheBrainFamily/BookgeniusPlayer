@@ -37,7 +37,6 @@ async function uploadBackgroundsToConvex(bookSlug: string, outputDir: string) {
         basename: file,
         content,
         contentType: getContentType(file),
-        publish: true,
       });
 
       const match = file.match(/(\d+)-(\d+)/);

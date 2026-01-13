@@ -159,7 +159,7 @@ describe("changelog: real-time sync", () => {
       expect(renameChange?.oldBasename).toBe("old-name.txt");
     });
 
-    it("createVersionFromStorageId with publish=true logs asset:publish", async () => {
+    it("createVersionFromStorageId logs asset:publish", async () => {
       const t = convexTest(schema, modules);
 
       // Insert fake file metadata into _storage for testing
@@ -172,7 +172,6 @@ describe("changelog: real-time sync", () => {
         folderPath: "images",
         basename: "photo.png",
         storageId,
-        publish: true,
       });
 
       const changes = await t.query(api.changelog.listSince, { cursor: 0 });
@@ -180,55 +179,6 @@ describe("changelog: real-time sync", () => {
       expect(publishChange).toBeDefined();
       expect(publishChange?.folderPath).toBe("images");
       expect(publishChange?.basename).toBe("photo.png");
-    });
-
-    it("createVersionFromStorageId with publish=false does NOT log to changelog", async () => {
-      const t = convexTest(schema, modules);
-
-      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-        size: 100,
-        contentType: "text/plain",
-      });
-
-      await t.mutation(api.assetManager.createVersionFromStorageId, {
-        folderPath: "drafts",
-        basename: "note.txt",
-        storageId,
-        publish: false,
-      });
-
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
-      // Draft uploads should NOT log to changelog (FileProvider only shows published files)
-      expect(changes.changes).toHaveLength(0);
-    });
-
-    it("publishDraft logs asset:publish to changelog", async () => {
-      const t = convexTest(schema, modules);
-
-      // Create a draft first
-      const storageId = await t.action(internal._testInsertFakeFile._testStoreFakeFile, {
-        size: 500,
-        contentType: "application/pdf",
-      });
-
-      await t.mutation(api.assetManager.createVersionFromStorageId, {
-        folderPath: "documents",
-        basename: "report.pdf",
-        storageId,
-        publish: false,
-      });
-
-      // Now publish the draft
-      await t.mutation(api.assetManager.publishDraft, {
-        folderPath: "documents",
-        basename: "report.pdf",
-      });
-
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
-      const publishChange = changes.changes.find((c) => c.changeType === "asset:publish");
-      expect(publishChange).toBeDefined();
-      expect(publishChange?.folderPath).toBe("documents");
-      expect(publishChange?.basename).toBe("report.pdf");
     });
   });
 });

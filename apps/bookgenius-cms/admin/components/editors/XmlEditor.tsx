@@ -22,9 +22,9 @@ type AutoSaveStatus = "idle" | "pending" | "saving" | "saved" | "error";
 export interface XmlEditorProps {
   /** XML content to display */
   value: string;
-  /** Called for auto-saving drafts (debounced, fires automatically on changes) */
+  /** Called for auto-saving (debounced, fires automatically on changes) */
   onAutoSave?: (value: string) => Promise<void>;
-  /** Called when manual save is triggered (Ctrl+S) - typically saves + publishes */
+  /** Called when manual save is triggered (Ctrl+S) */
   onSave?: (value: string) => Promise<void>;
   /** Custom completion items provider */
   completionProvider?: (
@@ -64,10 +64,9 @@ export function XmlEditor({
   const disposablesRef = useRef<IDisposable[]>([]);
 
   const [currentValue, setCurrentValue] = useState(value);
-  const [lastPublishedValue, setLastPublishedValue] = useState(value); // What was last published (for Cmd+S check)
+  const [lastPublishedValue, setLastPublishedValue] = useState(value); // Last persisted value (for Cmd+S check)
   const [parseError, setParseError] = useState<string | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<AutoSaveStatus>("idle");
-  const [hasDraftChanges, setHasDraftChanges] = useState(false); // True if there are changes not yet published
 
   // Refs for auto-save
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,7 +75,6 @@ export function XmlEditor({
   // Refs for values needed in keyboard shortcut callback (avoids stale closure)
   const currentValueRef = useRef(currentValue);
   const lastPublishedValueRef = useRef(lastPublishedValue);
-  const hasDraftChangesRef = useRef(hasDraftChanges);
   const onSaveRef = useRef(onSave);
   const parseErrorRef = useRef(parseError);
 
@@ -91,10 +89,6 @@ export function XmlEditor({
   useEffect(() => {
     lastPublishedValueRef.current = lastPublishedValue;
   }, [lastPublishedValue]);
-
-  useEffect(() => {
-    hasDraftChangesRef.current = hasDraftChanges;
-  }, [hasDraftChanges]);
 
   useEffect(() => {
     onSaveRef.current = onSave;
@@ -119,7 +113,6 @@ export function XmlEditor({
     if (value === currentValue) {
       console.log("[XmlEditor] value matches currentValue, updating lastPublishedValue");
       setLastPublishedValue(value);
-      setHasDraftChanges(false);
       return;
     }
 
@@ -127,7 +120,6 @@ export function XmlEditor({
     console.log("[XmlEditor] RESETTING editor to new value");
     setCurrentValue(value);
     setLastPublishedValue(value);
-    setHasDraftChanges(false);
     setAutoSaveStatus("idle");
     setParseError(null);
 
@@ -185,9 +177,7 @@ export function XmlEditor({
           "[XmlEditor] onAutoSave completed, pendingAutoSaveRef:",
           pendingAutoSaveRef.current,
         );
-        // Mark that we have draft changes that need publishing
-        // NOTE: We do NOT update lastPublishedValue here - only after publish
-        setHasDraftChanges(true);
+        setLastPublishedValue(content);
         setAutoSaveStatus("saved");
         setTimeout(() => setAutoSaveStatus("idle"), 2000);
       } catch (e) {
@@ -238,11 +228,9 @@ export function XmlEditor({
       // Cmd+S shortcut
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
         const contentChanged = currentValueRef.current !== lastPublishedValueRef.current;
-        const hasDraft = hasDraftChangesRef.current;
-        const shouldSave = contentChanged || hasDraft;
+        const shouldSave = contentChanged;
         console.log("[XmlEditor] Cmd+S pressed", {
           contentChanged,
-          hasDraft,
           shouldSave,
           hasOnSave: !!onSaveRef.current,
           hasParseError: !!parseErrorRef.current,
@@ -251,10 +239,8 @@ export function XmlEditor({
         });
         if (onSaveRef.current && shouldSave && !parseErrorRef.current) {
           console.log("[XmlEditor] Calling onSave...");
-          // Update lastPublishedValue AFTER save completes (in the callback)
-          // For now, just mark that we're publishing
+          // Update lastPublishedValue optimistically; onSave persists immediately
           setLastPublishedValue(currentValueRef.current);
-          setHasDraftChanges(false);
           onSaveRef.current(currentValueRef.current);
         } else {
           console.log("[XmlEditor] NOT calling onSave - conditions not met");
@@ -283,9 +269,8 @@ export function XmlEditor({
         setCurrentValue(newValue);
         setParseError(validateXml(newValue));
 
-        // If content differs from last published, schedule auto-save
+        // If content differs from last persisted, schedule auto-save
         if (newValue !== lastPublishedValueRef.current) {
-          setHasDraftChanges(true); // Mark that we have unpublished changes
           scheduleAutoSave(newValue);
         }
       }
@@ -324,7 +309,7 @@ export function XmlEditor({
       return (
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          <span>Publishing...</span>
+          <span>Saving...</span>
         </div>
       );
     }
@@ -333,7 +318,7 @@ export function XmlEditor({
       return (
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          <span>Saving draft...</span>
+          <span>Saving...</span>
         </div>
       );
     }
@@ -372,7 +357,7 @@ export function XmlEditor({
         {!readOnly && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono">⌘S</kbd>
-            <span>to publish</span>
+            <span>to save</span>
           </div>
         )}
       </div>

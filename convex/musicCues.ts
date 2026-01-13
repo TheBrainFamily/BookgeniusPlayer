@@ -104,62 +104,6 @@ export const listForPlayer = publicQuery({
 });
 
 /**
- * List cues in player format, preferring draft files over published.
- * For live edit mode.
- */
-export const listForPlayerWithDrafts = publicQuery({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const cues = await ctx.db
-      .query("musicCues")
-      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
-      .collect();
-
-    const musicPath = `${bookPath}/music`;
-
-    // Get all assets (not just published)
-    const assets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
-      folderPath: musicPath,
-    });
-
-    // Build fileBasename -> url map, preferring drafts
-    const fileMap = new Map<string, string>();
-
-    for (const asset of assets) {
-      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-        folderPath: musicPath,
-        basename: asset.basename,
-      });
-
-      const draftVersion = versions.find((v) => v.state === "draft");
-      const publishedVersion = versions.find((v) => v.state === "published");
-      const bestVersion = draftVersion || publishedVersion || versions[0];
-
-      if (bestVersion) {
-        const urlInfo = await ctx.runQuery(
-          components.assetManager.assetFsHttp.getVersionPreviewUrl,
-          { versionId: bestVersion._id },
-        );
-        if (urlInfo?.url) {
-          fileMap.set(asset.basename, urlInfo.url);
-        }
-      }
-    }
-
-    return cues
-      .filter((cue) => fileMap.has(cue.fileBasename))
-      .map((cue) => ({
-        chapter: cue.chapter,
-        paragraph: cue.paragraph,
-        files: [fileMap.get(cue.fileBasename)!],
-      }))
-      .sort((a, b) =>
-        a.chapter !== b.chapter ? a.chapter - b.chapter : a.paragraph - b.paragraph,
-      );
-  },
-});
-
-/**
  * Get available music files (for picker UI).
  * Includes cover art URLs from extracted metadata.
  */

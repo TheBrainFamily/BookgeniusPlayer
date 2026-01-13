@@ -45,7 +45,7 @@ const SMALL_FILE_LIMIT = 20 * 1024 * 1024; // 20MB
 /**
  * Get a direct storage URL for any version (regardless of state).
  * This is for admin preview only - it doesn't enforce published-only access.
- * Returns the storage URL which can be used to preview draft/archived versions.
+ * Returns the storage URL which can be used to preview archived versions.
  */
 export const getVersionPreviewUrl = query({
   args: { versionId: v.id("assetVersions") },
@@ -79,7 +79,7 @@ export const getVersionPreviewUrl = query({
 /**
  * Get version data for HTTP serving.
  *
- * Serves ANY version that has storage, regardless of state (draft/published/archived).
+ * Serves ANY version that has storage, regardless of state (published/archived).
  * Version IDs are opaque UUIDs - knowing an ID is sufficient authorization.
  * The "published" concept is about which version is "current" at a path, not access control.
  *

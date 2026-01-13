@@ -75,16 +75,17 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       >;
     };
     assetManager: {
+      cancelPendingR2Deletion: FunctionReference<
+        "mutation",
+        "internal",
+        { r2Key: string },
+        { cancelled: boolean },
+        Name
+      >;
       commitVersion: FunctionReference<
         "mutation",
         "internal",
-        {
-          basename: string;
-          extra?: any;
-          folderPath: string;
-          label?: string;
-          publish?: boolean;
-        },
+        { basename: string; folderPath: string; label?: string },
         { assetId: string; version: number; versionId: string },
         Name
       >;
@@ -102,21 +103,21 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       createAsset: FunctionReference<
         "mutation",
         "internal",
-        { basename: string; extra?: any; folderPath: string },
+        { basename: string; folderPath: string },
         string,
         Name
       >;
       createFolderByName: FunctionReference<
         "mutation",
         "internal",
-        { extra?: any; name: string; parentPath: string },
+        { name: string; parentPath: string },
         string,
         Name
       >;
       createFolderByPath: FunctionReference<
         "mutation",
         "internal",
-        { extra?: any; name?: string; path: string },
+        { name?: string; path: string },
         string,
         Name
       >;
@@ -125,10 +126,8 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         {
           basename: string;
-          extra?: any;
           folderPath: string;
           label?: string;
-          publish?: boolean;
           storageId: string;
         },
         { assetId: string; version: number; versionId: string },
@@ -160,6 +159,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           deletedVersions: number;
           hasMore: boolean;
         },
+        Name
+      >;
+      deleteFile: FunctionReference<
+        "mutation",
+        "internal",
+        { basename: string; folderPath: string },
+        { deleted: boolean; deletedVersions: number },
         Name
       >;
       deleteFilesInFolder: FunctionReference<
@@ -197,8 +203,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           basename: string;
           createdAt: number;
           createdBy?: string;
-          draftVersionId?: string;
-          extra?: any;
           folderPath: string;
           publishedVersionId?: string;
           updatedAt: number;
@@ -220,7 +224,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           contentType?: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           label?: string;
           originalFilename?: string;
           publishedAt?: number;
@@ -228,7 +231,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           r2Key?: string;
           sha256?: string;
           size?: number;
-          state: "draft" | "published" | "archived";
+          state: "published" | "archived";
           storageId?: string;
           updatedBy?: string;
           uploadStatus?: "pending" | "ready";
@@ -245,7 +248,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           _id: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           name: string;
           path: string;
           updatedAt: number;
@@ -264,8 +266,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             basename: string;
             createdAt: number;
             createdBy?: string;
-            draftVersionId?: string;
-            extra?: any;
             folderPath: string;
             publishedVersionId?: string;
             updatedAt: number;
@@ -277,7 +277,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             _id: string;
             createdAt: number;
             createdBy?: string;
-            extra?: any;
             name: string;
             path: string;
             updatedAt: number;
@@ -338,7 +337,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           _id: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           name: string;
           path: string;
           updatedAt: number;
@@ -371,8 +369,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           basename: string;
           createdAt: number;
           createdBy?: string;
-          draftVersionId?: string;
-          extra?: any;
           folderPath: string;
           publishedVersionId?: string;
           updatedAt: number;
@@ -390,7 +386,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           _id: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           name: string;
           path: string;
           updatedAt: number;
@@ -401,7 +396,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       listFoldersWithAssets: FunctionReference<
         "query",
         "internal",
-        { parentPath: string; preferDraft?: boolean },
+        { parentPath: string },
         Array<{
           assets: Array<{
             basename: string;
@@ -415,12 +410,26 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             _id: string;
             createdAt: number;
             createdBy?: string;
-            extra?: any;
             name: string;
             path: string;
             updatedAt: number;
             updatedBy?: string;
           };
+        }>,
+        Name
+      >;
+      listPendingR2Deletions: FunctionReference<
+        "query",
+        "internal",
+        { limit?: number; onlyExpired?: boolean },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          deleteAfter: number;
+          deletedAt: number;
+          deletedBy?: string;
+          originalPath: string;
+          r2Key: string;
         }>,
         Name
       >;
@@ -432,7 +441,6 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           basename: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           folderPath: string;
           label?: string;
           publishedAt?: number;
@@ -466,11 +474,11 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         { assetId: string; fromFolderPath: string; toFolderPath: string },
         Name
       >;
-      publishDraft: FunctionReference<
+      processExpiredR2Deletions: FunctionReference<
         "mutation",
         "internal",
-        { basename: string; folderPath: string },
-        any,
+        { batchSize?: number; forceAll?: boolean },
+        { hasMore: boolean; processed: number; r2KeysToDelete: Array<string> },
         Name
       >;
       renameAsset: FunctionReference<
@@ -497,11 +505,9 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         {
           basename: string;
-          extra?: any;
           filename?: string;
           folderPath: string;
           label?: string;
-          publish?: boolean;
           r2Config?: {
             R2_ACCESS_KEY_ID: string;
             R2_BUCKET: string;
@@ -520,15 +526,8 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       updateFolder: FunctionReference<
         "mutation",
         "internal",
-        { extra?: any; name?: string; newPath?: string; path: string },
+        { name?: string; newPath?: string; path: string },
         any,
-        Name
-      >;
-      updateVersionExtra: FunctionReference<
-        "mutation",
-        "internal",
-        { extra: any; versionId: string },
-        { extra: any; versionId: string },
         Name
       >;
     };

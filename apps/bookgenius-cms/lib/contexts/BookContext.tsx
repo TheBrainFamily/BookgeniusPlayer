@@ -18,17 +18,17 @@ import { createContext, useContext, type ReactNode, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import type { BookFolderExtra, CharacterFolderExtra } from "../types/book";
+import type { BookMetadata as BookMeta, CharacterMetadata, ChapterMetadata } from "../types/book";
 
 // =============================================================================
 // Types
 // =============================================================================
 
-interface BookMetadata {
+interface BookSummary {
   path: string;
   slug: string;
   name: string;
-  extra: BookFolderExtra | unknown;
+  metadata: BookMeta;
   createdAt: number;
   updatedAt: number;
 }
@@ -37,7 +37,7 @@ interface CharacterSummary {
   path: string;
   slug: string;
   name: string;
-  extra: CharacterFolderExtra | unknown;
+  metadata: CharacterMetadata;
   createdAt: number;
   updatedAt: number;
 }
@@ -52,7 +52,7 @@ interface ChapterSummary {
   publishedAt?: number;
   chapterNumber: number;
   title?: string;
-  extra: unknown;
+  metadata?: ChapterMetadata;
 }
 
 interface BookStats {
@@ -64,7 +64,7 @@ interface BookStats {
 
 interface BookContextValue {
   bookPath: string;
-  metadata: BookMetadata | null | undefined;
+  metadata: BookSummary | null | undefined;
   characters: CharacterSummary[] | undefined;
   chapters: ChapterSummary[] | undefined;
   stats: BookStats | undefined;
@@ -109,7 +109,7 @@ export function BookProvider({ bookPath, children }: BookProviderProps) {
   const value = useMemo<BookContextValue>(
     () => ({
       bookPath,
-      metadata: metadata as BookMetadata | null | undefined,
+      metadata: metadata as BookSummary | null | undefined,
       characters: characters as CharacterSummary[] | undefined,
       chapters: chapters as ChapterSummary[] | undefined,
       stats: stats as BookStats | undefined,
