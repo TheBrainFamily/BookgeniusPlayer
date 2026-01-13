@@ -28,7 +28,6 @@ export interface AssetData {
   versionCounter: number;
   publishedVersionId?: string;
   updatedAt: number;
-  extra?: unknown;
 }
 
 interface AssetCardProps {

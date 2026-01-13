@@ -8,7 +8,9 @@
  * @module
  */
 
+import type * as admin_deleteFile from "../admin/deleteFile.js";
 import type * as admin_deleteFilesInFolder from "../admin/deleteFilesInFolder.js";
+import type * as admin_r2Deletions from "../admin/r2Deletions.js";
 import type * as authHelpers from "../authHelpers.js";
 import type * as authz from "../authz.js";
 import type * as authzQueries from "../authzQueries.js";
@@ -34,6 +36,8 @@ import type * as importHelpers from "../importHelpers.js";
 import type * as lib_characterDataV2 from "../lib/characterDataV2.js";
 import type * as lib_extractDominantColor from "../lib/extractDominantColor.js";
 import type * as lib_parseFormData from "../lib/parseFormData.js";
+import type * as metadata from "../metadata.js";
+import type * as metadataMigrations from "../metadataMigrations.js";
 import type * as musicCues from "../musicCues.js";
 import type * as musicMetadata from "../musicMetadata.js";
 import type * as notes from "../notes.js";
@@ -50,7 +54,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "admin/deleteFile": typeof admin_deleteFile;
   "admin/deleteFilesInFolder": typeof admin_deleteFilesInFolder;
+  "admin/r2Deletions": typeof admin_r2Deletions;
   authHelpers: typeof authHelpers;
   authz: typeof authz;
   authzQueries: typeof authzQueries;
@@ -76,6 +82,8 @@ declare const fullApi: ApiFromModules<{
   "lib/characterDataV2": typeof lib_characterDataV2;
   "lib/extractDominantColor": typeof lib_extractDominantColor;
   "lib/parseFormData": typeof lib_parseFormData;
+  metadata: typeof metadata;
+  metadataMigrations: typeof metadataMigrations;
   musicCues: typeof musicCues;
   musicMetadata: typeof musicMetadata;
   notes: typeof notes;
@@ -161,10 +169,16 @@ export declare const components: {
       >;
     };
     assetManager: {
+      cancelPendingR2Deletion: FunctionReference<
+        "mutation",
+        "internal",
+        { r2Key: string },
+        { cancelled: boolean }
+      >;
       commitVersion: FunctionReference<
         "mutation",
         "internal",
-        { basename: string; extra?: any; folderPath: string; label?: string },
+        { basename: string; folderPath: string; label?: string },
         { assetId: string; version: number; versionId: string }
       >;
       configureStorageBackend: FunctionReference<
@@ -180,19 +194,19 @@ export declare const components: {
       createAsset: FunctionReference<
         "mutation",
         "internal",
-        { basename: string; extra?: any; folderPath: string },
+        { basename: string; folderPath: string },
         string
       >;
       createFolderByName: FunctionReference<
         "mutation",
         "internal",
-        { extra?: any; name: string; parentPath: string },
+        { name: string; parentPath: string },
         string
       >;
       createFolderByPath: FunctionReference<
         "mutation",
         "internal",
-        { extra?: any; name?: string; path: string },
+        { name?: string; path: string },
         string
       >;
       createVersionFromStorageId: FunctionReference<
@@ -200,7 +214,6 @@ export declare const components: {
         "internal",
         {
           basename: string;
-          extra?: any;
           folderPath: string;
           label?: string;
           storageId: string;
@@ -232,6 +245,12 @@ export declare const components: {
           deletedVersions: number;
           hasMore: boolean;
         }
+      >;
+      deleteFile: FunctionReference<
+        "mutation",
+        "internal",
+        { basename: string; folderPath: string },
+        { deleted: boolean; deletedVersions: number }
       >;
       deleteFilesInFolder: FunctionReference<
         "mutation",
@@ -266,7 +285,6 @@ export declare const components: {
           basename: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           folderPath: string;
           publishedVersionId?: string;
           updatedAt: number;
@@ -287,7 +305,6 @@ export declare const components: {
           contentType?: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           label?: string;
           originalFilename?: string;
           publishedAt?: number;
@@ -311,7 +328,6 @@ export declare const components: {
           _id: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           name: string;
           path: string;
           updatedAt: number;
@@ -329,7 +345,6 @@ export declare const components: {
             basename: string;
             createdAt: number;
             createdBy?: string;
-            extra?: any;
             folderPath: string;
             publishedVersionId?: string;
             updatedAt: number;
@@ -341,7 +356,6 @@ export declare const components: {
             _id: string;
             createdAt: number;
             createdBy?: string;
-            extra?: any;
             name: string;
             path: string;
             updatedAt: number;
@@ -397,7 +411,6 @@ export declare const components: {
           _id: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           name: string;
           path: string;
           updatedAt: number;
@@ -428,7 +441,6 @@ export declare const components: {
           basename: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           folderPath: string;
           publishedVersionId?: string;
           updatedAt: number;
@@ -445,7 +457,6 @@ export declare const components: {
           _id: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           name: string;
           path: string;
           updatedAt: number;
@@ -469,12 +480,25 @@ export declare const components: {
             _id: string;
             createdAt: number;
             createdBy?: string;
-            extra?: any;
             name: string;
             path: string;
             updatedAt: number;
             updatedBy?: string;
           };
+        }>
+      >;
+      listPendingR2Deletions: FunctionReference<
+        "query",
+        "internal",
+        { limit?: number; onlyExpired?: boolean },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          deleteAfter: number;
+          deletedAt: number;
+          deletedBy?: string;
+          originalPath: string;
+          r2Key: string;
         }>
       >;
       listPublishedAssetsInFolder: FunctionReference<
@@ -485,7 +509,6 @@ export declare const components: {
           basename: string;
           createdAt: number;
           createdBy?: string;
-          extra?: any;
           folderPath: string;
           label?: string;
           publishedAt?: number;
@@ -516,6 +539,12 @@ export declare const components: {
         { basename: string; fromFolderPath: string; toFolderPath: string },
         { assetId: string; fromFolderPath: string; toFolderPath: string }
       >;
+      processExpiredR2Deletions: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; forceAll?: boolean },
+        { hasMore: boolean; processed: number; r2KeysToDelete: Array<string> }
+      >;
       renameAsset: FunctionReference<
         "mutation",
         "internal",
@@ -538,7 +567,6 @@ export declare const components: {
         "internal",
         {
           basename: string;
-          extra?: any;
           filename?: string;
           folderPath: string;
           label?: string;
@@ -559,14 +587,8 @@ export declare const components: {
       updateFolder: FunctionReference<
         "mutation",
         "internal",
-        { extra?: any; name?: string; newPath?: string; path: string },
+        { name?: string; newPath?: string; path: string },
         any
-      >;
-      updateVersionExtra: FunctionReference<
-        "mutation",
-        "internal",
-        { extra: any; versionId: string },
-        { extra: any; versionId: string }
       >;
     };
     changelog: {

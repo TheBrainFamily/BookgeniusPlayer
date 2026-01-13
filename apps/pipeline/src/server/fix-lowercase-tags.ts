@@ -157,12 +157,14 @@ export async function fixLowercaseTags(
       basename: `chapter-${chapterNumber}.xml`,
       content: Buffer.from(fixedXml),
       contentType: "application/xml",
-      extra: {
-        type: "chapter",
-        chapterNumber,
-        title: `Chapter ${chapterNumber}`,
-        lowercaseTagsFixedAt: new Date().toISOString(),
-      },
+    });
+    await convex.updateChapterMetadata({
+      bookPath,
+      folderPath: `${bookPath}/chapters`,
+      basename: `chapter-${chapterNumber}.xml`,
+      chapterNumber,
+      title: `Chapter ${chapterNumber}`,
+      sourceFormat: "xml",
     });
     console.log(`[fixLowercaseTags] ✅ Upload complete`);
   } catch (e) {

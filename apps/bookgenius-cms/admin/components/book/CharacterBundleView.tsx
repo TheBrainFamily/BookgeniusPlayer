@@ -13,7 +13,6 @@
  */
 
 import { useCharacterBundle, getMissingAssets } from "@/lib/hooks";
-import { isCharacterFolder, type CharacterFolderExtra } from "@/lib/types/book";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { User, Image as ImageIcon, AlertCircle, CheckCircle2, Play, Volume2 } from "lucide-react";
@@ -39,11 +38,8 @@ export function CharacterBundleView({ characterPath, onClick }: CharacterBundleV
     );
   }
 
-  // Extract typed metadata
-  const extra = isCharacterFolder(bundle.extra) ? (bundle.extra as CharacterFolderExtra) : null;
-
-  const displayName = extra?.displayName ?? bundle.name;
-  const summary = extra?.summary;
+  const displayName = bundle.metadata.displayName ?? bundle.name;
+  const summary = bundle.metadata.summary;
 
   // Check bundle completeness
   const missing = getMissingAssets(bundle);

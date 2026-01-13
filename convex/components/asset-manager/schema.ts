@@ -38,8 +38,6 @@ const schema = defineSchema({
 
     // Options for version creation
     label: v.optional(v.string()),
-    extra: v.optional(v.any()),
-
     createdAt: v.number(),
     expiresAt: v.number(),
     createdBy: v.optional(v.string()),
@@ -50,7 +48,6 @@ const schema = defineSchema({
   folders: defineTable({
     path: v.string(),
     name: v.string(),
-    extra: v.optional(v.any()),
     createdAt: v.number(),
     updatedAt: v.number(),
     createdBy: v.optional(v.string()),
@@ -59,7 +56,6 @@ const schema = defineSchema({
   assets: defineTable({
     folderPath: v.string(),
     basename: v.string(),
-    extra: v.optional(v.any()),
     versionCounter: v.number(),
     publishedVersionId: v.optional(v.id("assetVersions")),
     createdAt: v.number(),
@@ -73,7 +69,6 @@ const schema = defineSchema({
     state: v.union(v.literal("published"), v.literal("archived")),
 
     label: v.optional(v.string()),
-    extra: v.optional(v.any()),
 
     // File storage metadata - one of storageId (Convex) or r2Key (R2) will be set
     storageId: v.optional(v.id("_storage")),
@@ -106,6 +101,20 @@ const schema = defineSchema({
   }).index("by_asset", ["assetId"]),
 
   /**
+   * Pending R2 deletions for soft-delete with grace period.
+   * R2 keys are queued here when assets are deleted, then hard-deleted after retention period.
+   */
+  pendingR2Deletions: defineTable({
+    r2Key: v.string(),
+    originalPath: v.string(), // "folderPath/basename" for audit trail
+    deletedAt: v.number(), // Timestamp when soft-deleted
+    deleteAfter: v.number(), // Timestamp when eligible for hard-delete
+    deletedBy: v.optional(v.string()),
+  })
+    .index("by_delete_after", ["deleteAfter"])
+    .index("by_r2_key", ["r2Key"]),
+
+  /**
    * Changelog for real-time sync.
    * Records all changes to folders and assets for FileProvider subscriptions.
    * Uses createdAt as the sync cursor (monotonically increasing).
@@ -119,6 +128,7 @@ const schema = defineSchema({
       v.literal("asset:publish"),
       v.literal("asset:update"),
       v.literal("asset:archive"),
+      v.literal("asset:delete"),
       v.literal("asset:move"),
       v.literal("asset:rename"),
     ),

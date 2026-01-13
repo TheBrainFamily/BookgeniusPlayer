@@ -12,6 +12,7 @@ export type ChangeType =
   | "asset:publish"
   | "asset:update"
   | "asset:archive"
+  | "asset:delete"
   | "asset:move"
   | "asset:rename";
 

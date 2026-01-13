@@ -88,24 +88,8 @@ type LegacyBackground = {
 };
 type LegacyMusic = { chapter: number; paragraph: number; files: string[] };
 
-// CMS Extra types
-interface BookFolderExtra {
-  type: "book";
-  title: string;
-  author: string;
-  language: string;
-  form?: string;
-}
-
-interface CharacterFolderExtra {
-  type: "character";
-  displayName: string;
-  summary: string;
-  aiPrompt?: string;
-}
-
-// Note: Background and music cue points are now stored in separate tables
-// (backgroundCues, musicCues) rather than as file extra metadata.
+// Note: Background and music cue points are stored in separate tables
+// (backgroundCues, musicCues) rather than as file metadata.
 
 const CONCURRENCY = 10;
 
@@ -236,7 +220,7 @@ function findNoteReferencesInChapter(xmlContent: string): string[] {
 // Convex Operations
 // =============================================================================
 
-async function createFolderIfNeeded(folderPath: string, extra?: object): Promise<void> {
+async function createFolderIfNeeded(folderPath: string): Promise<void> {
   try {
     const existing = await client.query(api.cli.getFolder, { path: folderPath });
     if (existing) {
@@ -248,19 +232,14 @@ async function createFolderIfNeeded(folderPath: string, extra?: object): Promise
   }
 
   try {
-    await client.mutation(api.cli.createFolderByPath, { path: folderPath, extra });
+    await client.mutation(api.cli.createFolderByPath, { path: folderPath });
     console.log(`  Created folder: ${folderPath}`);
   } catch (error) {
     logError(`  Failed to create folder ${folderPath}:`, error);
   }
 }
 
-async function uploadFile(
-  folderPath: string,
-  basename: string,
-  filePath: string,
-  extra?: object,
-): Promise<void> {
+async function uploadFile(folderPath: string, basename: string, filePath: string): Promise<void> {
   if (!fs.existsSync(filePath)) {
     console.log(`  Skipping (not found): ${filePath}`);
     return;
@@ -272,7 +251,7 @@ async function uploadFile(
   try {
     const { intentId, uploadUrl, backend } = await client.mutation(
       api.generateUploadUrl.startUpload,
-      { folderPath, basename, extra },
+      { folderPath, basename },
     );
 
     const response = await fetch(uploadUrl, {
@@ -329,15 +308,14 @@ async function step1_CreateFolderStructure(book: {
   console.log("\n=== Step 1: Create Folder Structure ===");
 
   await createFolderIfNeeded("books");
-
-  const bookExtra: BookFolderExtra = {
-    type: "book",
+  await createFolderIfNeeded(BOOK_PATH);
+  await client.mutation(api.metadata.updateBookMetadata, {
+    bookPath: BOOK_PATH,
     title: book.title,
     author: book.author,
     language: book.language,
     form: book.form,
-  };
-  await createFolderIfNeeded(BOOK_PATH, bookExtra);
+  });
 
   await createFolderIfNeeded(`${BOOK_PATH}/characters`);
   await createFolderIfNeeded(`${BOOK_PATH}/chapters`);
@@ -354,13 +332,14 @@ async function step2_ImportCharacters(
     console.log(`  Processing: ${char.displayName}`);
 
     const charPath = `${BOOK_PATH}/characters/${char.slug}`;
-    const charExtra: CharacterFolderExtra = {
-      type: "character",
+    await createFolderIfNeeded(charPath);
+    await client.mutation(api.metadata.updateCharacterMetadata, {
+      bookPath: BOOK_PATH,
+      characterSlug: char.slug,
       displayName: char.displayName,
       summary: char.summary,
       aiPrompt: char.aiPrompt,
-    };
-    await createFolderIfNeeded(charPath, charExtra);
+    });
 
     const avatarExtensions = [".png", ".jpg", ".jpeg", ".webp"];
     let avatarUploaded = false;
@@ -733,7 +712,7 @@ async function main() {
   globalCharacterBundles = characters.map((c) => ({
     slug: c.slug,
     name: c.displayName,
-    extra: { displayName: c.displayName, summary: c.summary },
+    metadata: { displayName: c.displayName, summary: c.summary },
   }));
 
   // Run import steps

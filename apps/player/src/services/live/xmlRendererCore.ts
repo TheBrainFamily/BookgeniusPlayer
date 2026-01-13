@@ -22,7 +22,7 @@ import { getFigureUrl } from "@player/utils/assetUrls";
 export type CharacterBundleInfo = {
   slug: string;
   name: string;
-  extra: { displayName?: string; summary?: string };
+  metadata: { displayName?: string; summary?: string };
   avatar?: { url: string };
   listens?: { url: string };
   speaks?: { url: string };
@@ -629,7 +629,7 @@ const buildCharacterMapFromBundles = (
     const tagName = allEls[i].tagName;
     if (isLikelyCharacterTag(tagName) && !characterMap.has(tagName)) {
       const bundle = bundleBySlug.get(tagName.toLowerCase());
-      const display = bundle?.extra.displayName ?? bundle?.name ?? tagName.replace(/-/g, " ");
+      const display = bundle?.metadata.displayName ?? bundle?.name ?? tagName.replace(/-/g, " ");
       characterMap.set(tagName, { display });
     }
   }

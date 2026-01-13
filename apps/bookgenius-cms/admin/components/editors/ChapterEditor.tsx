@@ -16,9 +16,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useMutation, useAction } from "convex/react";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@convex/_generated/api";
-import { queries } from "@/lib/queries";
 import { logError } from "@/lib/utils";
 import { XmlEditor } from "./XmlEditor";
 import { useCharacters } from "../../../lib/contexts/BookContext";
@@ -216,16 +214,6 @@ export function ChapterEditor({
   // Track the last auto-saved content to avoid redundant saves
   const lastAutoSavedContentRef = useRef<string | null>(null);
 
-  // Fetch versions to get the current version's extra metadata
-  const { data: versions } = useQuery(queries.assetVersions(folderPath, basename));
-
-  // Get the current version's extra metadata to preserve when saving
-  const currentVersionExtra = useMemo(() => {
-    if (!versions) return undefined;
-    const currentVersion = versions.find((v: { _id: string }) => v._id === versionId);
-    return currentVersion?.extra;
-  }, [versions, versionId]);
-
   // Convex mutations for saving
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
@@ -249,7 +237,6 @@ export function ChapterEditor({
         folderPath,
         basename,
         label: `Edited chapter`,
-        extra: currentVersionExtra, // Preserve chapterNumber, title, etc.
       });
 
       const contentType = "application/xml";
@@ -268,7 +255,7 @@ export function ChapterEditor({
       const uploadResponse = backend === "convex" ? await response.json() : undefined;
       await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
     },
-    [folderPath, basename, startUpload, finishUpload, currentVersionExtra],
+    [folderPath, basename, startUpload, finishUpload],
   );
 
   // Auto-save handler (silent, no toast, debounced by XmlEditor)
@@ -400,16 +387,6 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const lastAutoSavedContentRef = useRef<string | null>(null);
 
-  // Fetch versions to get the current version's extra metadata
-  const { data: versions } = useQuery(queries.assetVersions(props.folderPath, props.basename));
-
-  // Get the current version's extra metadata to preserve when saving
-  const currentVersionExtra = useMemo(() => {
-    if (!versions) return undefined;
-    const currentVersion = versions.find((v: { _id: string }) => v._id === props.versionId);
-    return currentVersion?.extra;
-  }, [versions, props.versionId]);
-
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
   const uploadVersion = useCallback(
@@ -418,7 +395,6 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
         folderPath: props.folderPath,
         basename: props.basename,
         label: `Edited chapter`,
-        extra: currentVersionExtra,
       });
 
       const contentType = "application/xml";
@@ -437,7 +413,7 @@ export function StandaloneChapterEditor(props: ChapterEditorProps) {
       const uploadResponse = backend === "convex" ? await response.json() : undefined;
       await finishUpload({ intentId, uploadResponse, size: blob.size, contentType });
     },
-    [props.folderPath, props.basename, startUpload, finishUpload, currentVersionExtra],
+    [props.folderPath, props.basename, startUpload, finishUpload],
   );
 
   const handleAutoSave = useCallback(

@@ -82,15 +82,11 @@ export function AssetDetail({
 
   const restoreVersion = useMutation(api.cli.restoreVersion);
 
-  // Check if this asset has editable metadata (music, background types)
-  // Also check folder path pattern for assets without extra.type set
+  // Check if this asset has editable metadata based on folder path
   const hasEditableMetadata =
-    folderPath.endsWith("/music") ||
-    folderPath.endsWith("/backgrounds") ||
-    versions?.some(
-      (v: { extra?: { type?: string } }) =>
-        v.extra?.type === "music" || v.extra?.type === "background",
-    );
+    folderPath.endsWith("/chapters") ||
+    folderPath.endsWith("/chapters-source") ||
+    folderPath.endsWith("/chapters-html");
 
   // Auto-select published version when no version is selected in URL
   // Must be called before any conditional returns (Rules of Hooks)

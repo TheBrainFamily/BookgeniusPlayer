@@ -11,7 +11,6 @@ describe("assets (logical layer)", () => {
     const assetId = await t.mutation(api.assetManager.createAsset, {
       folderPath: "", // root
       basename: "cover.jpg",
-      extra: { kind: "image" },
     });
 
     const asset = await t.query(api.assetManager.getAsset, {
@@ -22,7 +21,6 @@ describe("assets (logical layer)", () => {
     expect(asset?._id).toEqual(assetId);
     expect(asset?.folderPath).toBe(""); // normalized root
     expect(asset?.basename).toBe("cover.jpg");
-    expect(asset?.extra).toEqual({ kind: "image" });
     expect(asset?.versionCounter).toBe(0);
 
     expect(asset?.createdAt).toBeGreaterThan(0);
@@ -224,13 +222,11 @@ describe("getFolderWithAssets", () => {
     await t.mutation(api.assetManager.createAsset, {
       folderPath: "project/docs",
       basename: "readme.md",
-      extra: { type: "markdown" },
     });
 
     await t.mutation(api.assetManager.createAsset, {
       folderPath: "project/docs",
       basename: "api.md",
-      extra: { type: "api-docs" },
     });
 
     const result = await t.query(api.assetManager.getFolderWithAssets, { path: "project/docs" });
@@ -247,7 +243,6 @@ describe("getFolderWithAssets", () => {
     const readmeAsset = result!.assets.find((a) => a.basename === "readme.md");
     expect(readmeAsset).toBeDefined();
     expect(readmeAsset!.folderPath).toBe("project/docs");
-    expect(readmeAsset!.extra).toEqual({ type: "markdown" });
     expect(readmeAsset!.versionCounter).toBe(0);
   });
 
@@ -287,15 +282,11 @@ describe("getFolderWithAssets", () => {
     const t = convexTest(schema, modules);
     const asUser = t.withIdentity({ tokenIdentifier: "user-1" });
 
-    await asUser.mutation(api.assetManager.createFolderByPath, {
-      path: "test-folder",
-      extra: { description: "Test folder" },
-    });
+    await asUser.mutation(api.assetManager.createFolderByPath, { path: "test-folder" });
 
     await asUser.mutation(api.assetManager.createAsset, {
       folderPath: "test-folder",
       basename: "test-asset.txt",
-      extra: { size: 1024 },
     });
 
     const result = await asUser.query(api.assetManager.getFolderWithAssets, {
@@ -309,7 +300,6 @@ describe("getFolderWithAssets", () => {
     expect(folder._id).toBeDefined();
     expect(folder.path).toBe("test-folder");
     expect(folder.name).toBe("test-folder");
-    expect(folder.extra).toEqual({ description: "Test folder" });
     expect(folder.createdAt).toBeGreaterThan(0);
     expect(folder.updatedAt).toBeGreaterThan(0);
     expect(folder.createdBy).toBe("user-1");
@@ -321,7 +311,6 @@ describe("getFolderWithAssets", () => {
     expect(asset._id).toBeDefined();
     expect(asset.folderPath).toBe("test-folder");
     expect(asset.basename).toBe("test-asset.txt");
-    expect(asset.extra).toEqual({ size: 1024 });
     expect(asset.versionCounter).toBe(0);
     expect(asset.createdAt).toBeGreaterThan(0);
     expect(asset.updatedAt).toBeGreaterThan(0);

@@ -58,6 +58,8 @@ export function UploadDialog({
 
   const startUpload = useMutation(api.generateUploadUrl.startUpload);
   const finishUpload = useMutation(api.generateUploadUrl.finishUpload);
+  const createBackgroundCue = useMutation(api.backgroundCues.create);
+  const createMusicCue = useMutation(api.musicCues.create);
 
   const handleFileSelect = (selectedFile: File) => {
     setFile(selectedFile);
@@ -80,34 +82,11 @@ export function UploadDialog({
 
     setIsUploading(true);
     try {
-      // Build extra metadata based on asset type
-      let extra: Record<string, unknown> | undefined;
-      if (assetType === "background") {
-        const chapterNum = parseInt(chapter);
-        const paragraphNum = parseInt(paragraph);
-        if (!isNaN(chapterNum) && !isNaN(paragraphNum)) {
-          extra = {
-            type: "background",
-            chapter: chapterNum,
-            paragraph: paragraphNum,
-            backgroundColor,
-            textColor,
-          };
-        }
-      } else if (assetType === "music") {
-        const chapterNum = parseInt(chapter);
-        const paragraphNum = parseInt(paragraph);
-        if (!isNaN(chapterNum) && !isNaN(paragraphNum)) {
-          extra = { type: "music", chapter: chapterNum, paragraph: paragraphNum };
-        }
-      }
-
       // 1. Start upload to get intentId, uploadUrl, and backend type
       const { intentId, uploadUrl, backend } = await startUpload({
         folderPath,
         basename: finalBasename,
         label: label.trim() || undefined,
-        extra,
       });
 
       // 2. Upload file - method differs by backend (R2 uses PUT, Convex uses POST)
@@ -145,6 +124,31 @@ export function UploadDialog({
         folderPath,
         basename: finalBasename,
       });
+
+      const chapterNum = parseInt(chapter);
+      const paragraphNum = parseInt(paragraph);
+      const hasCueTarget = !isNaN(chapterNum) && !isNaN(paragraphNum);
+      const bookPath = folderPath.split("/").slice(0, -1).join("/");
+
+      if (hasCueTarget && assetType === "background") {
+        await createBackgroundCue({
+          bookPath,
+          fileBasename: finalBasename,
+          chapter: chapterNum,
+          paragraph: paragraphNum,
+          backgroundColor,
+          textColor,
+        });
+      }
+
+      if (hasCueTarget && assetType === "music") {
+        await createMusicCue({
+          bookPath,
+          fileBasename: finalBasename,
+          chapter: chapterNum,
+          paragraph: paragraphNum,
+        });
+      }
 
       toast.success("File uploaded");
 

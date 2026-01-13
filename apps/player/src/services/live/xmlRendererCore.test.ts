@@ -12,10 +12,10 @@ const renderOptions = {
   bookLang: "english",
   bookForm: "play",
   characterBundles: [
-    { slug: "theseus", name: "Theseus", extra: { displayName: "Theseus" } },
-    { slug: "hippolyta", name: "Hippolyta", extra: { displayName: "Hippolyta" } },
-    { slug: "wukong", name: "Wukong", extra: { displayName: "Wukong" } },
-    { slug: "master-bodhi", name: "Master Bodhi", extra: { displayName: "Master Bodhi" } },
+    { slug: "theseus", name: "Theseus", metadata: { displayName: "Theseus" } },
+    { slug: "hippolyta", name: "Hippolyta", metadata: { displayName: "Hippolyta" } },
+    { slug: "wukong", name: "Wukong", metadata: { displayName: "Wukong" } },
+    { slug: "master-bodhi", name: "Master Bodhi", metadata: { displayName: "Master Bodhi" } },
   ],
   serializer: new XMLSerializer(),
 };

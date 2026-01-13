@@ -18,11 +18,11 @@ const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ character, onClos
     useAvatarGenerationStore();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showPromptEditor, setShowPromptEditor] = useState(false);
-  const [editablePrompt, setEditablePrompt] = useState(character.extra?.aiPrompt || "");
+  const [editablePrompt, setEditablePrompt] = useState(character.metadata?.aiPrompt || "");
   const [isRegenerating, setIsRegenerating] = useState(false);
 
-  const proposalUrls = character.extra?.avatarProposalUrls || [];
-  const displayName = character.extra?.displayName || character.name;
+  const proposalUrls = character.metadata?.avatarProposalUrls || [];
+  const displayName = character.metadata?.displayName || character.name;
 
   const handleConfirm = () => {
     if (selectedIndex === null || !book?.path) return;
@@ -207,7 +207,7 @@ const GeneratingBanner: React.FC<{ character: CharacterBundle }> = ({ character 
   >
     <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
     <span className="text-sm text-zinc-300">
-      Generating avatar for {character.extra?.displayName || character.name}...
+      Generating avatar for {character.metadata?.displayName || character.name}...
     </span>
   </motion.div>
 );
@@ -217,7 +217,7 @@ const ReadyBannerWithPreload: React.FC<{ character: CharacterBundle; onClick: ()
   onClick,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const proposalUrls = character.extra?.avatarProposalUrls || [];
+  const proposalUrls = character.metadata?.avatarProposalUrls || [];
   const previewUrls = proposalUrls.slice(0, 2);
   const imagesLoaded = usePreloadedImages(previewUrls);
 
@@ -288,7 +288,7 @@ const ReadyBannerWithPreload: React.FC<{ character: CharacterBundle; onClick: ()
 
       <span className="relative text-sm font-medium text-emerald-50">
         Avatar ready for{" "}
-        <span className="font-semibold">{character.extra?.displayName || character.name}</span>
+        <span className="font-semibold">{character.metadata?.displayName || character.name}</span>
       </span>
 
       <motion.div
@@ -322,11 +322,12 @@ export const AvatarGenerationBadge: React.FC = () => {
   } = useAvatarGenerationStore();
 
   const serverGenerating = characters.filter(
-    (c) => c.extra?.avatarGenerationState === "generating",
+    (c) => c.metadata?.avatarGenerationState === "generating",
   );
   const readyCharacters = characters.filter(
     (c) =>
-      c.extra?.avatarGenerationState === "ready" && (c.extra?.avatarProposalUrls?.length ?? 0) > 0,
+      c.metadata?.avatarGenerationState === "ready" &&
+      (c.metadata?.avatarProposalUrls?.length ?? 0) > 0,
   );
 
   const serverGeneratingSlugs = useMemo(
@@ -349,7 +350,7 @@ export const AvatarGenerationBadge: React.FC = () => {
   useEffect(() => {
     for (const slug of Object.keys(optimisticAvatars)) {
       const character = characters.find((c) => c.slug.toLowerCase() === slug);
-      const stateIsComplete = character?.extra?.avatarGenerationState !== "ready";
+      const stateIsComplete = character?.metadata?.avatarGenerationState !== "ready";
       if (character?.avatar?.url && stateIsComplete) {
         clearOptimisticAvatar(slug);
       }
@@ -367,7 +368,7 @@ export const AvatarGenerationBadge: React.FC = () => {
         ({
           slug: o.slug,
           name: o.displayName,
-          extra: { displayName: o.displayName },
+          metadata: { displayName: o.displayName },
         }) as CharacterBundle,
     ),
   ];

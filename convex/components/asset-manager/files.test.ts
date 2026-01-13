@@ -18,13 +18,7 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
 
     const { assetId, versionId, version } = await t.mutation(
       api.assetManager.createVersionFromStorageId,
-      {
-        folderPath: "odyssey/ch1",
-        basename: "01-intro.mp3",
-        storageId,
-        label: "Intro",
-        extra: { chapter: 1 },
-      },
+      { folderPath: "odyssey/ch1", basename: "01-intro.mp3", storageId, label: "Intro" },
     );
 
     expect(version).toBe(1);
@@ -49,7 +43,6 @@ describe("file-backed asset versions (createVersionFromStorageId + published URL
     expect(v1.version).toBe(1);
     expect(v1.state).toBe("published");
     expect(v1.label).toBe("Intro");
-    expect(v1.extra).toEqual({ chapter: 1 });
 
     // from _storage
     expect(v1.storageId).toEqual(storageId);

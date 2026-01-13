@@ -90,7 +90,6 @@ export const startUpload = authedMutation({
     basename: v.string(),
     filename: v.optional(v.string()),
     label: v.optional(v.string()),
-    extra: v.optional(v.any()),
   },
   returns: v.object({
     intentId: v.string(),
@@ -133,7 +132,6 @@ export const startUploadInternal = internalMutation({
     basename: v.string(),
     filename: v.optional(v.string()), // Original filename with extension for URLs
     label: v.optional(v.string()),
-    extra: v.optional(v.any()),
   },
   returns: v.object({
     intentId: v.string(),

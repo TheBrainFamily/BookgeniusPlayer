@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internal, components } from "./_generated/api";
+import { api, internal, components } from "./_generated/api";
 import { internalAction, bookAction } from "./functions";
 import OpenAI, { toFile } from "openai";
 
@@ -78,11 +78,8 @@ export const editAvatarWithInstructions = internalAction({
 
       const openai = new OpenAI({ apiKey });
 
-      const bookFolder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-        path: bookPath,
-      });
-      const bookExtra = (bookFolder?.extra as Record<string, unknown>) || {};
-      const avatarStyle = (bookExtra.avatarStyle as string) || "";
+      const book = await ctx.runQuery(api.metadata.getBookMetadata, { bookPath });
+      const avatarStyle = book?.avatarStyle || "";
 
       const editPrompt = avatarStyle
         ? `${avatarStyle}\n${characterDisplayName}\n${instructions}`

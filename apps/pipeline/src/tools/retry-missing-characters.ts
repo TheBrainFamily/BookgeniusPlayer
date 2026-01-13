@@ -112,17 +112,6 @@ async function main() {
         basename: fileName,
         content: buffer,
         contentType: "image/png",
-        extra: {
-          type: "avatar",
-          characterName: character.name,
-          regeneratedAt: new Date().toISOString(),
-          // Verification tracking
-          sanitizationLevel,
-          attemptNumber: attempt,
-          originalPrompt: character.referenceCard,
-          needsVerification,
-          verifiedAt: needsVerification ? null : new Date().toISOString(),
-        },
       });
       console.log(`  ✅ Uploaded to Convex${needsVerification ? " (needs verification)" : ""}`);
 

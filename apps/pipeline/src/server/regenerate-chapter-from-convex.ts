@@ -140,12 +140,14 @@ export async function regenerateChapterFromConvex(
       basename: `chapter-${chapterNumber}.xml`,
       content: Buffer.from(newXml),
       contentType: "application/xml",
-      extra: {
-        type: "chapter",
-        chapterNumber,
-        title: `Chapter ${chapterNumber}`,
-        regeneratedAt: new Date().toISOString(),
-      },
+    });
+    await convex.updateChapterMetadata({
+      bookPath,
+      folderPath: `${bookPath}/chapters`,
+      basename: `chapter-${chapterNumber}.xml`,
+      chapterNumber,
+      title: `Chapter ${chapterNumber}`,
+      sourceFormat: "xml",
     });
     console.log(`[regenerateChapterFromConvex] ✅ Upload complete`);
   } catch (e) {

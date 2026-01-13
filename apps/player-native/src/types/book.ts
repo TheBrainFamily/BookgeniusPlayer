@@ -48,7 +48,7 @@ export interface CharacterBundle {
   path: string;
   slug: string;
   name: string;
-  extra: { displayName?: string; summary?: string };
+  metadata: { displayName?: string; summary?: string };
   avatar?: { url: string; versionId: string };
   speaks?: { url: string; versionId: string };
   listens?: { url: string; versionId: string };

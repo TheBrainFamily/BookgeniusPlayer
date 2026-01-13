@@ -5,13 +5,7 @@
  * Used by UI components to render appropriate views (book dashboard, character grid, etc.)
  */
 
-import {
-  type FolderExtra,
-  type CharacterAssetType,
-  isBookFolder,
-  isCharacterFolder,
-  getCharacterAssetType,
-} from "../types/book";
+import { type CharacterAssetType, getCharacterAssetType } from "../types/book";
 
 // =============================================================================
 // Folder Type Detection
@@ -28,18 +22,10 @@ export type DetectedFolderType =
   | "unknown";
 
 /**
- * Detect the type of folder based on its path and extra field.
- *
- * Priority:
- * 1. Check extra field (explicit type)
- * 2. Infer from path structure
+ * Detect the type of folder based on its path.
  */
-export function detectFolderType(path: string, extra: FolderExtra): DetectedFolderType {
-  // 1. Check explicit type in extra
-  if (isBookFolder(extra)) return "book";
-  if (isCharacterFolder(extra)) return "character";
-
-  // 2. Infer from path structure
+export function detectFolderType(path: string): DetectedFolderType {
+  // Infer from path structure
   const segments = path.split("/").filter(Boolean);
 
   // Root "books" folder
@@ -63,7 +49,7 @@ export function detectFolderType(path: string, extra: FolderExtra): DetectedFold
     }
   }
 
-  // A folder directly under "books" (without extra) is likely a book
+  // A folder directly under "books" is likely a book
   if (segments.length === 2 && segments[0] === "books") {
     return "book";
   }

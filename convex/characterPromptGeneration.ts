@@ -49,7 +49,7 @@ export const generateCharacterPrompt = internalAction({
     paragraphIndex: v.number(),
   },
   returns: v.object({ success: v.boolean(), aiPrompt: v.optional(v.string()) }),
-  // eslint-disable-next-line complexity -- AI prompt generation with context building
+   
   handler: async (
     ctx,
     { bookPath, characterSlug, characterName, chapterNumber, paragraphIndex },
@@ -59,18 +59,11 @@ export const generateCharacterPrompt = internalAction({
         await new Promise((resolve) => setTimeout(resolve, 500));
         const aiPrompt = `A mysterious figure known as ${characterName}. Medium build, weathered features, wearing period-appropriate attire.`;
 
-        const characterPath = `${bookPath}/characters/${characterSlug}`;
-        const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-          path: characterPath,
+        await ctx.runMutation(internal.metadata.upsertCharacterMetadataInternal, {
+          bookPath,
+          characterSlug,
+          aiPrompt,
         });
-
-        if (folder) {
-          const existingExtra = (folder.extra as Record<string, unknown>) || {};
-          await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-            path: characterPath,
-            extra: { ...existingExtra, aiPrompt },
-          });
-        }
 
         console.log(`[generateCharacterPrompt] DISABLE_AI: Using mock prompt for ${characterName}`);
         return { success: true, aiPrompt };
@@ -170,21 +163,10 @@ export const generateCharacterPrompt = internalAction({
         return { success: false };
       }
 
-      const characterPath = `${bookPath}/characters/${characterSlug}`;
-
-      const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
-        path: characterPath,
-      });
-
-      if (!folder) {
-        console.error(`[generateCharacterPrompt] Character folder not found: ${characterPath}`);
-        return { success: false };
-      }
-
-      const existingExtra = (folder.extra as Record<string, unknown>) || {};
-      await ctx.runMutation(components.assetManager.assetManager.updateFolder, {
-        path: characterPath,
-        extra: { ...existingExtra, aiPrompt },
+      await ctx.runMutation(internal.metadata.upsertCharacterMetadataInternal, {
+        bookPath,
+        characterSlug,
+        aiPrompt,
       });
 
       console.log(

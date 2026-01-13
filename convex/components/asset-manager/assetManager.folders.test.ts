@@ -327,61 +327,6 @@ test("fails if trying to update a folder to a path that already exists", async (
   ).rejects.toThrow(/already exists/i);
 });
 
-test("updateFolder updates the folder extra field", async () => {
-  const t = convexTest(schema, modules);
-
-  await t.mutation(api.assetManager.createFolderByPath, {
-    path: "books/my-book",
-    extra: { type: "book", title: "Original Title" },
-  });
-
-  // Update the extra field
-  await t.mutation(api.assetManager.updateFolder, {
-    path: "books/my-book",
-    extra: { type: "book", title: "Updated Title", author: "Jane Doe" },
-  });
-
-  const folder = await t.query(api.assetManager.getFolder, { path: "books/my-book" });
-
-  expect(folder?.extra).toEqual({ type: "book", title: "Updated Title", author: "Jane Doe" });
-});
-
-test("updateFolder preserves extra when not provided", async () => {
-  const t = convexTest(schema, modules);
-
-  await t.mutation(api.assetManager.createFolderByPath, {
-    path: "books/another-book",
-    extra: { type: "book", title: "My Book" },
-  });
-
-  // Update only the name, not extra
-  await t.mutation(api.assetManager.updateFolder, {
-    path: "books/another-book",
-    name: "Renamed Book",
-  });
-
-  const folder = await t.query(api.assetManager.getFolder, { path: "books/another-book" });
-
-  expect(folder?.name).toBe("Renamed Book");
-  expect(folder?.extra).toEqual({ type: "book", title: "My Book" });
-});
-
-test("updateFolder can set extra to null", async () => {
-  const t = convexTest(schema, modules);
-
-  await t.mutation(api.assetManager.createFolderByPath, {
-    path: "books/temp-book",
-    extra: { type: "book", title: "Temp" },
-  });
-
-  // Set extra to null
-  await t.mutation(api.assetManager.updateFolder, { path: "books/temp-book", extra: null });
-
-  const folder = await t.query(api.assetManager.getFolder, { path: "books/temp-book" });
-
-  expect(folder?.extra).toBeNull();
-});
-
 describe("folders: path-first + label-first APIs v2", () => {
   it("createFolderByName handles slug collisions at root without leading slash", async () => {
     const t = convexTest(schema, modules);
@@ -451,13 +396,8 @@ describe("listFoldersWithAssets", () => {
     await t.mutation(api.assetManager.createFolderByPath, {
       path: "characters/alice",
       name: "Alice",
-      extra: { displayName: "Alice" },
     });
-    await t.mutation(api.assetManager.createFolderByPath, {
-      path: "characters/bob",
-      name: "Bob",
-      extra: { displayName: "Bob" },
-    });
+    await t.mutation(api.assetManager.createFolderByPath, { path: "characters/bob", name: "Bob" });
 
     await t.mutation(api.assetManager.commitVersion, {
       folderPath: "characters/alice",
@@ -515,13 +455,12 @@ describe("listFoldersWithAssets", () => {
     expect(result[0].assets).toHaveLength(0);
   });
 
-  it("returns folder extra metadata", async () => {
+  it("returns folders with assets in nested paths", async () => {
     const t = convexTest(schema, modules);
 
     await t.mutation(api.assetManager.createFolderByPath, {
       path: "books/mybook/characters/hero",
       name: "Hero Character",
-      extra: { displayName: "The Hero", summary: "A brave warrior" },
     });
 
     await t.mutation(api.assetManager.commitVersion, {
@@ -534,6 +473,6 @@ describe("listFoldersWithAssets", () => {
     });
 
     expect(result).toHaveLength(1);
-    expect(result[0].folder.extra).toEqual({ displayName: "The Hero", summary: "A brave warrior" });
+    expect(result[0].folder.name).toBe("Hero Character");
   });
 });

@@ -213,7 +213,14 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
         basename,
         content,
         contentType: "application/html",
-        extra: { type: "chapter", chapterNumber, title: `Chapter ${chapterNumber}` },
+      });
+      await convex.updateChapterMetadata({
+        bookPath: job.bookPath,
+        folderPath: `${job.bookPath}/chapters-source`,
+        basename,
+        chapterNumber,
+        title: `Chapter ${chapterNumber}`,
+        sourceFormat: "html",
       });
       addLog(job, `✔ Chapter ${chapterNumber} uploaded`);
     } catch (e) {

@@ -82,7 +82,7 @@ export interface CharacterBundle {
   path: string;
   slug: string;
   name: string;
-  extra: {
+  metadata: {
     displayName?: string;
     summary?: string;
     aiPrompt?: string;
@@ -117,7 +117,7 @@ export interface BookMetadata {
   path: string;
   slug: string;
   name: string;
-  extra: { title: string; author: string; language?: string; form?: string };
+  metadata: { title: string; author: string; language?: string; form?: string };
 }
 
 type ChapterHtmlEntry = { chapterNumber: number; html?: string };
@@ -288,7 +288,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       path: bookMetadata.path,
       slug: bookMetadata.slug,
       name: bookMetadata.name,
-      extra: bookMetadata.extra as BookMetadata["extra"],
+      metadata: bookMetadata.metadata as BookMetadata["metadata"],
     };
   }, [bookMetadata]);
 
@@ -340,7 +340,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       path: c.path,
       slug: c.slug,
       name: c.name,
-      extra: c.extra as CharacterBundle["extra"],
+      metadata: c.metadata as CharacterBundle["metadata"],
       avatar: c.avatar,
       avatarLarge: c.avatarLarge,
       speaks: c.speaks,
@@ -406,8 +406,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const renderMode = useMemo(() => getRenderModeFromUrl(), []);
   const bookFormValue = useMemo(
-    () => book?.extra?.form?.toLowerCase() || "book",
-    [book?.extra?.form],
+    () => book?.metadata?.form?.toLowerCase() || "book",
+    [book?.metadata?.form],
   );
   const isPlayLayout = useMemo(
     () =>
@@ -424,9 +424,9 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       slug: bookSlug,
       metadata: {
         title: book.name,
-        author: book.extra.author,
-        language: book.extra.language,
-        bookForm: book.extra.form?.toLowerCase(),
+        author: book.metadata.author,
+        language: book.metadata.language,
+        bookForm: book.metadata.form?.toLowerCase(),
       },
       chapters: chaptersData,
       hasAudiobook: false,
@@ -512,7 +512,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
     const speakerDisplayNames = new Map<string, string>();
     for (const char of characters) {
-      speakerDisplayNames.set(char.slug.toLowerCase(), char.extra.displayName ?? char.name);
+      speakerDisplayNames.set(char.slug.toLowerCase(), char.metadata.displayName ?? char.name);
     }
     const htmlResult = buildBookHtmlFromChapters(
       buildHtmlSourceChapterEntries(),
@@ -550,8 +550,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     const characterIndex: CharacterIndex = { form, characters: {} };
     for (const char of characters) {
       characterIndex.characters[char.slug] = {
-        name: char.extra.displayName ?? char.name,
-        summary: char.extra.summary ?? "",
+        name: char.metadata.displayName ?? char.name,
+        summary: char.metadata.summary ?? "",
       };
     }
 
@@ -756,10 +756,10 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
         return {
           ...char,
-          characterName: bundle.extra.displayName ?? bundle.name,
+          characterName: bundle.metadata.displayName ?? bundle.name,
           infoPerChapter: char.infoPerChapter.map((chapterInfo) => ({
             ...chapterInfo,
-            summary: bundle.extra.summary ?? "",
+            summary: bundle.metadata.summary ?? "",
           })),
           media: {
             avatarUrl: bundle.avatar?.url,

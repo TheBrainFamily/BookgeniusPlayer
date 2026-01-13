@@ -28,21 +28,21 @@ export const getFolder = adminQuery({
 });
 
 export const createFolderByName = adminMutation({
-  args: { parentPath: v.string(), name: v.string(), extra: v.optional(v.any()) },
+  args: { parentPath: v.string(), name: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.createFolderByName, args);
   },
 });
 
 export const createFolderByPath = adminMutation({
-  args: { path: v.string(), name: v.optional(v.string()), extra: v.optional(v.any()) },
+  args: { path: v.string(), name: v.optional(v.string()) },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, args);
   },
 });
 
 export const updateFolder = adminMutation({
-  args: { path: v.string(), name: v.optional(v.string()), extra: v.optional(v.any()) },
+  args: { path: v.string(), name: v.optional(v.string()) },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.updateFolder, args);
   },
@@ -65,7 +65,7 @@ export const getAsset = adminQuery({
 });
 
 export const createAsset = adminMutation({
-  args: { folderPath: v.string(), basename: v.string(), extra: v.optional(v.any()) },
+  args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.createAsset, args);
   },
@@ -131,16 +131,6 @@ export const restoreVersion = adminMutation({
   args: { versionId: v.string(), label: v.optional(v.string()) },
   handler: async (ctx, args) => {
     return await ctx.runMutation(components.assetManager.assetManager.restoreVersion, args);
-  },
-});
-
-export const updateVersionExtra = adminMutation({
-  args: { versionId: v.string(), extra: v.any() },
-  handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.updateVersionExtra, {
-      versionId: args.versionId,
-      extra: args.extra,
-    });
   },
 });
 
