@@ -29,11 +29,13 @@ export function SplashScreenController({
   const [isReady, setIsReady] = useState(false);
   const [isHiding, setIsHiding] = useState(false);
 
-  // Refs for phrase rotation
+  // Refs for phrase rotation and cleanup
   const previousPhrasesRef = useRef(new Set<string>());
   const usingGenericRef = useRef(false);
   const phraseIntervalRef = useRef<number | null>(null);
   const fadeTimeoutRef = useRef<number | null>(null);
+  const blurTimeoutRef = useRef<number | null>(null);
+  const hideTimeoutRef = useRef<number | null>(null);
 
   const bookPhrases = useMemo(() => book?.loadingPhrases ?? [], [book?.loadingPhrases]);
 
@@ -78,7 +80,8 @@ export function SplashScreenController({
       phraseElement.textContent = getRandomPhrase();
       phraseElement.style.animation = "textFadeIn 0.5s ease-out forwards";
       // Force remove blur after animation completes
-      setTimeout(() => {
+      if (blurTimeoutRef.current) window.clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = window.setTimeout(() => {
         phraseElement.style.filter = "blur(0)";
       }, 600);
     }, 300);
@@ -101,7 +104,8 @@ export function SplashScreenController({
       phraseIntervalRef.current = null;
     }
 
-    setTimeout(() => {
+    if (hideTimeoutRef.current) window.clearTimeout(hideTimeoutRef.current);
+    hideTimeoutRef.current = window.setTimeout(() => {
       window.dispatchEvent(new CustomEvent("splashHidden"));
       onHidden?.();
     }, SPLASH_FADE_DURATION_MS);
@@ -132,19 +136,21 @@ export function SplashScreenController({
       previousPhrasesRef.current.add(firstPhrase);
       phraseElement.textContent = firstPhrase;
       // Force remove blur after animation would complete
-      setTimeout(() => {
+      blurTimeoutRef.current = window.setTimeout(() => {
         phraseElement.style.filter = "blur(0)";
       }, 600);
     }
 
-    // Start phrase rotation
-    const intervalId = window.setInterval(() => {
+    // Start phrase rotation and store ref so hideSplash can clear it
+    phraseIntervalRef.current = window.setInterval(() => {
       updatePhrase();
     }, 1700);
 
     return () => {
-      window.clearInterval(intervalId);
+      if (phraseIntervalRef.current) window.clearInterval(phraseIntervalRef.current);
       if (fadeTimeoutRef.current) window.clearTimeout(fadeTimeoutRef.current);
+      if (blurTimeoutRef.current) window.clearTimeout(blurTimeoutRef.current);
+      if (hideTimeoutRef.current) window.clearTimeout(hideTimeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Run once on mount
   }, []);
