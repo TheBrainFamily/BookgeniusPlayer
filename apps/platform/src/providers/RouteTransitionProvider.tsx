@@ -138,7 +138,13 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
 
   return (
     <RouteTransitionContext.Provider value={value}>
-      {children}
+      {/* Platform content - blurs when transitioning */}
+      <div
+        className={`platform-content ${navigating ? "platform-content--blurring" : ""}`}
+        style={{ transition: "filter 1s ease-out", filter: navigating ? "blur(8px)" : "blur(0px)" }}
+      >
+        {children}
+      </div>
 
       {/* SplashScreen with fadeIn for smooth appearance */}
       {meta && (
