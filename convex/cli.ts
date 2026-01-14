@@ -9,42 +9,42 @@ import { adminQuery, adminMutation, adminAction } from "./functions";
 export const listFolders = adminQuery({
   args: { parentPath: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetManager.listFolders, args);
+    return await ctx.runQuery(components.versionedAssets.assetManager.listFolders, args);
   },
 });
 
 export const listAllFolders = adminQuery({
   args: {},
   handler: async (ctx) => {
-    return await ctx.runQuery(components.assetManager.assetManager.listAllFolders, {});
+    return await ctx.runQuery(components.versionedAssets.assetManager.listAllFolders, {});
   },
 });
 
 export const getFolder = adminQuery({
   args: { path: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetManager.getFolder, args);
+    return await ctx.runQuery(components.versionedAssets.assetManager.getFolder, args);
   },
 });
 
 export const createFolderByName = adminMutation({
   args: { parentPath: v.string(), name: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.createFolderByName, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.createFolderByName, args);
   },
 });
 
 export const createFolderByPath = adminMutation({
   args: { path: v.string(), name: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.createFolderByPath, args);
   },
 });
 
 export const updateFolder = adminMutation({
   args: { path: v.string(), name: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.updateFolder, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.updateFolder, args);
   },
 });
 
@@ -53,28 +53,28 @@ export const updateFolder = adminMutation({
 export const listAssets = adminQuery({
   args: { folderPath: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetManager.listAssets, args);
+    return await ctx.runQuery(components.versionedAssets.assetManager.listAssets, args);
   },
 });
 
 export const getAsset = adminQuery({
   args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetManager.getAsset, args);
+    return await ctx.runQuery(components.versionedAssets.assetManager.getAsset, args);
   },
 });
 
 export const createAsset = adminMutation({
   args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.createAsset, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.createAsset, args);
   },
 });
 
 export const renameAsset = adminMutation({
   args: { folderPath: v.string(), basename: v.string(), newBasename: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.renameAsset, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.renameAsset, args);
   },
 });
 
@@ -83,14 +83,14 @@ export const renameAsset = adminMutation({
 export const getAssetVersions = adminQuery({
   args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, args);
+    return await ctx.runQuery(components.versionedAssets.assetManager.getAssetVersions, args);
   },
 });
 
 export const getPublishedFile = adminQuery({
   args: { folderPath: v.string(), basename: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetManager.getPublishedFile, args);
+    return await ctx.runQuery(components.versionedAssets.assetManager.getPublishedFile, args);
   },
 });
 
@@ -98,7 +98,7 @@ export const listPublishedFilesInFolder = adminQuery({
   args: { folderPath: v.string() },
   handler: async (ctx, args) => {
     return await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       args,
     );
   },
@@ -107,7 +107,7 @@ export const listPublishedFilesInFolder = adminQuery({
 export const restoreVersion = adminMutation({
   args: { versionId: v.string(), label: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.restoreVersion, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.restoreVersion, args);
   },
 });
 
@@ -116,7 +116,7 @@ export const restoreVersion = adminMutation({
 export const getVersionPreviewUrl = adminQuery({
   args: { versionId: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, args);
+    return await ctx.runQuery(components.versionedAssets.assetFsHttp.getVersionPreviewUrl, args);
   },
 });
 
@@ -125,7 +125,7 @@ export const getVersionPreviewUrl = adminQuery({
 export const getTextContent = adminAction({
   args: { versionId: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    return await ctx.runAction(components.versionedAssets.assetFsHttp.getTextContent, {
       versionId: args.versionId,
     });
   },
@@ -142,7 +142,7 @@ export const watchChangelog = adminQuery({
   args: { cursorCreatedAt: v.number(), cursorId: v.string(), limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
     const cursor = { createdAt: args.cursorCreatedAt, id: args.cursorId };
-    return await ctx.runQuery(components.assetManager.changelog.listSince, {
+    return await ctx.runQuery(components.versionedAssets.changelog.listSince, {
       cursor,
       limit: args.limit,
     });
@@ -158,7 +158,7 @@ export const watchFolderChanges = adminQuery({
   },
   handler: async (ctx, args) => {
     const cursor = { createdAt: args.cursorCreatedAt, id: args.cursorId };
-    return await ctx.runQuery(components.assetManager.changelog.listForFolder, {
+    return await ctx.runQuery(components.versionedAssets.changelog.listForFolder, {
       folderPath: args.folderPath,
       cursor,
       limit: args.limit,

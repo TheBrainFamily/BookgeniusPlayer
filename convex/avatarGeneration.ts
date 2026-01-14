@@ -102,7 +102,7 @@ export const generateAvatarOptions = internalAction({
           );
 
           const urlInfo = await ctx.runQuery(
-            components.assetManager.assetFsHttp.getVersionPreviewUrl,
+            components.versionedAssets.assetFsHttp.getVersionPreviewUrl,
             { versionId },
           );
 
@@ -216,7 +216,7 @@ export const selectAvatar = internalAction({
       const proposalPath = `${bookPath}/${PROPOSALS_FOLDER}/${characterSlug}`;
       const proposalBasename = `option-${optionIndex + 1}.png`;
       const proposalVersions = await ctx.runQuery(
-        components.assetManager.assetManager.getAssetVersions,
+        components.versionedAssets.assetManager.getAssetVersions,
         { folderPath: proposalPath, basename: proposalBasename },
       );
 
@@ -226,7 +226,7 @@ export const selectAvatar = internalAction({
 
       const latestProposal = proposalVersions.at(-1);
       const proposalUrlInfo = latestProposal
-        ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
+        ? await ctx.runQuery(components.versionedAssets.assetFsHttp.getVersionPreviewUrl, {
             versionId: latestProposal._id,
           })
         : null;
@@ -280,12 +280,12 @@ export const selectAvatar = internalAction({
       log("finished avatar-large upload");
 
       const largeVersions = await ctx.runQuery(
-        components.assetManager.assetManager.getAssetVersions,
+        components.versionedAssets.assetManager.getAssetVersions,
         { folderPath: characterPath, basename: "avatar-large.png" },
       );
       const latestLargeVersion = largeVersions.at(-1);
       const largeUrlInfo = latestLargeVersion
-        ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
+        ? await ctx.runQuery(components.versionedAssets.assetFsHttp.getVersionPreviewUrl, {
             versionId: latestLargeVersion._id,
           })
         : null;
@@ -391,10 +391,10 @@ export const processUploadedAvatarLarge = internalAction({
   returns: v.object({ success: v.boolean(), error: v.optional(v.string()) }),
   handler: async (ctx, { characterPath, retryCount = 0 }) => {
     try {
-      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-        folderPath: characterPath,
-        basename: "avatar-large.png",
-      });
+      const versions = await ctx.runQuery(
+        components.versionedAssets.assetManager.getAssetVersions,
+        { folderPath: characterPath, basename: "avatar-large.png" },
+      );
 
       if (!versions.length) {
         if (retryCount < MAX_AVATAR_RETRIES) {
@@ -420,7 +420,7 @@ export const processUploadedAvatarLarge = internalAction({
 
       const latestVersion = versions.at(-1);
       const largeUrlInfo = latestVersion
-        ? await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
+        ? await ctx.runQuery(components.versionedAssets.assetFsHttp.getVersionPreviewUrl, {
             versionId: latestVersion._id,
           })
         : null;
@@ -483,7 +483,7 @@ export const repairMissingAvatarWebp = internalAction({
   }),
   handler: async (ctx, { bookPath }) => {
     const charactersPath = `${bookPath}/characters`;
-    const folder = await ctx.runQuery(components.assetManager.assetManager.getFolder, {
+    const folder = await ctx.runQuery(components.versionedAssets.assetManager.getFolder, {
       path: charactersPath,
     });
 
@@ -492,9 +492,10 @@ export const repairMissingAvatarWebp = internalAction({
       return { repaired: [], skipped: [], failed: [] };
     }
 
-    const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
-      parentPath: charactersPath,
-    });
+    const characterFolders = await ctx.runQuery(
+      components.versionedAssets.assetManager.listFolders,
+      { parentPath: charactersPath },
+    );
 
     const skipped: string[] = [];
     const toProcess: { characterPath: string; characterSlug: string }[] = [];
@@ -505,7 +506,7 @@ export const repairMissingAvatarWebp = internalAction({
       const characterSlug = characterPath.split("/").pop() || "";
 
       const avatarLargeVersions = await ctx.runQuery(
-        components.assetManager.assetManager.getAssetVersions,
+        components.versionedAssets.assetManager.getAssetVersions,
         { folderPath: characterPath, basename: "avatar-large.png" },
       );
 
@@ -515,7 +516,7 @@ export const repairMissingAvatarWebp = internalAction({
       }
 
       const avatarWebpVersions = await ctx.runQuery(
-        components.assetManager.assetManager.getAssetVersions,
+        components.versionedAssets.assetManager.getAssetVersions,
         { folderPath: characterPath, basename: "avatar.webp" },
       );
 

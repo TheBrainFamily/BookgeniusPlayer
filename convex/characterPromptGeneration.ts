@@ -72,10 +72,10 @@ export const generateCharacterPrompt = internalAction({
       const chaptersPath = `${bookPath}/chapters-source`;
       const chapterBasename = `chapter-${chapterNumber}.html`;
 
-      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-        folderPath: chaptersPath,
-        basename: chapterBasename,
-      });
+      const versions = await ctx.runQuery(
+        components.versionedAssets.assetManager.getAssetVersions,
+        { folderPath: chaptersPath, basename: chapterBasename },
+      );
 
       const publishedVersion = versions.find((v) => v.state === "published");
       if (!publishedVersion) {
@@ -85,7 +85,7 @@ export const generateCharacterPrompt = internalAction({
         return { success: false };
       }
 
-      const xmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+      const xmlResult = await ctx.runAction(components.versionedAssets.assetFsHttp.getTextContent, {
         versionId: publishedVersion._id,
       });
 

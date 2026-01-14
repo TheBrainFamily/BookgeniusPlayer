@@ -73,7 +73,7 @@ export const ensureBookStructure = adminMutation({
 
     const createFolder = async (path: string) => {
       try {
-        await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, { path });
+        await ctx.runMutation(components.versionedAssets.assetManager.createFolderByPath, { path });
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         if (!msg.includes("already exists")) throw e;
@@ -275,7 +275,7 @@ export const ensureCharacterFolder = adminMutation({
     const characterPath = `${bookPath}/characters/${characterSlug}`;
 
     try {
-      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      await ctx.runMutation(components.versionedAssets.assetManager.createFolderByPath, {
         path: characterPath,
       });
     } catch (e) {

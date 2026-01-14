@@ -27,7 +27,7 @@ export const listByBook = publicQuery({
 
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music` },
     );
     const fileMap = new Map(files.map((f) => [f.basename, f.url]));
@@ -41,7 +41,7 @@ export const listByBook = publicQuery({
 
     // Get cover URLs
     const coverFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music-covers` },
     );
     const coverMap = new Map(coverFiles.map((f) => [f.basename, f.url]));
@@ -84,7 +84,7 @@ export const listForPlayer = publicQuery({
 
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music` },
     );
 
@@ -111,7 +111,7 @@ export const listFiles = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music` },
     );
 
@@ -124,7 +124,7 @@ export const listFiles = publicQuery({
 
     // Get cover URLs
     const coverFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music-covers` },
     );
     const coverMap = new Map(coverFiles.map((f) => [f.basename, f.url]));

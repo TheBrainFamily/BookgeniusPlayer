@@ -1,6 +1,5 @@
 import { defineApp } from "convex/server";
-import assetManager from "./components/asset-manager/convex.config.js";
-
+import versionedAssets from "convex-versioned-assets/convex.config.js";
 const app = defineApp();
-app.use(assetManager);
+app.use(versionedAssets);
 export default app;

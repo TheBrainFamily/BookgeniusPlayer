@@ -27,7 +27,7 @@ export const listByBook = publicQuery({
 
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/backgrounds` },
     );
 
@@ -42,7 +42,7 @@ export const listByBook = publicQuery({
 
     // Get preview file URLs
     const previewFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/background-thumbnails` },
     );
     const previewMap = new Map(previewFiles.map((f) => [f.basename, f.url]));
@@ -87,7 +87,7 @@ export const listForPlayer = publicQuery({
 
     // Get file URLs from asset-manager
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/backgrounds` },
     );
 
@@ -118,7 +118,7 @@ export const listFiles = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/backgrounds` },
     );
 
@@ -131,7 +131,7 @@ export const listFiles = publicQuery({
 
     // Get preview file URLs
     const previewFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/background-thumbnails` },
     );
     const previewMap = new Map(previewFiles.map((f) => [f.basename, f.url]));

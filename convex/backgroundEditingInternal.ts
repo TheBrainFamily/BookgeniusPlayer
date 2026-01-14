@@ -49,19 +49,20 @@ export const editBackgroundWithInstructions = internalAction({
     try {
       const backgroundsPath = `${bookPath}/backgrounds`;
 
-      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-        folderPath: backgroundsPath,
-        basename: fileBasename,
-      });
+      const versions = await ctx.runQuery(
+        components.versionedAssets.assetManager.getAssetVersions,
+        { folderPath: backgroundsPath, basename: fileBasename },
+      );
 
       const publishedVersion = versions.find((ver) => ver.state === "published");
       if (!publishedVersion) {
         return { success: false, error: `No published version found for ${fileBasename}` };
       }
 
-      const urlInfo = await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
-        versionId: publishedVersion._id,
-      });
+      const urlInfo = await ctx.runQuery(
+        components.versionedAssets.assetFsHttp.getVersionPreviewUrl,
+        { versionId: publishedVersion._id },
+      );
 
       if (!urlInfo?.url) {
         return { success: false, error: "Failed to get background URL" };
@@ -169,7 +170,7 @@ export const generateNewBackground = internalAction({
 
     try {
       const chaptersSource = await ctx.runQuery(
-        components.assetManager.assetManager.listPublishedFilesInFolder,
+        components.versionedAssets.assetManager.listPublishedFilesInFolder,
         { folderPath: `${bookPath}/chapters-source` },
       );
 

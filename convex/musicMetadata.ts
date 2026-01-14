@@ -32,7 +32,7 @@ export const getByFile = publicQuery({
 
     // Get cover URL
     const coverFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music-covers` },
     );
     const coverFile = coverFiles.find((f) => f.basename === metadata.coverBasename);
@@ -58,7 +58,7 @@ export const listByBook = publicQuery({
 
     // Get all cover URLs in one query
     const coverFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music-covers` },
     );
     const coverMap = new Map(coverFiles.map((f) => [f.basename, f.url]));
@@ -133,7 +133,7 @@ export const extractFromFile = internalAction({
     try {
       // Get the file URL from asset-manager
       const files = await ctx.runQuery(
-        components.assetManager.assetManager.listPublishedFilesInFolder,
+        components.versionedAssets.assetManager.listPublishedFilesInFolder,
         { folderPath: `${bookPath}/music` },
       );
       const file = files.find((f) => f.basename === fileBasename);
@@ -254,7 +254,7 @@ export const triggerExtractionForBook = bookMutation({
   handler: async (ctx) => {
     const bookPath = ctx.bookPath;
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/music` },
     );
 

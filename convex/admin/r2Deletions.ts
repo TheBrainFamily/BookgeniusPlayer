@@ -12,7 +12,7 @@ import { components } from "../_generated/api";
 export const listPendingR2Deletions = adminQuery({
   args: { limit: v.optional(v.number()), onlyExpired: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.assetManager.listPendingR2Deletions, args);
+    return await ctx.runQuery(components.versionedAssets.assetManager.listPendingR2Deletions, args);
   },
 });
 
@@ -33,7 +33,7 @@ export const processExpiredR2Deletions = adminMutation({
   }),
   handler: async (ctx, args) => {
     return await ctx.runMutation(
-      components.assetManager.assetManager.processExpiredR2Deletions,
+      components.versionedAssets.assetManager.processExpiredR2Deletions,
       args,
     );
   },
@@ -50,7 +50,7 @@ export const cancelPendingR2Deletion = adminMutation({
   returns: v.object({ cancelled: v.boolean() }),
   handler: async (ctx, args) => {
     return await ctx.runMutation(
-      components.assetManager.assetManager.cancelPendingR2Deletion,
+      components.versionedAssets.assetManager.cancelPendingR2Deletion,
       args,
     );
   },
