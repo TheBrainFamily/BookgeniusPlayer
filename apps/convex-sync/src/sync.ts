@@ -2,8 +2,8 @@
  * Main sync logic - initial sync, real-time updates, file management
  */
 
-import { existsSync, mkdirSync, unlinkSync, rmdirSync } from "fs";
-import { join, dirname } from "path";
+import { existsSync, mkdirSync, unlinkSync, rmSync } from "fs";
+import { join, dirname, resolve } from "path";
 import { ConvexClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
 import { ConvexHttpClient } from "./client";
@@ -64,6 +64,69 @@ export class SyncDaemon {
     if (this.config.verbose) {
       this.log(`[DEBUG] ${msg}`);
     }
+  }
+
+  /**
+   * Validate that a path stays within syncDir to prevent path traversal attacks.
+   * Returns the resolved safe path, or null if the path escapes syncDir.
+   */
+  private getSafePath(folderPath: string, basename: string): string | null {
+    // Reject paths containing null bytes (common attack vector)
+    if (folderPath.includes("\0") || basename.includes("\0")) {
+      this.log(`❌ Path traversal blocked (null byte): ${folderPath}/${basename}`);
+      return null;
+    }
+
+    // Reject absolute paths in components
+    if (basename.startsWith("/") || (folderPath && folderPath.startsWith("/"))) {
+      this.log(`❌ Path traversal blocked (absolute path): ${folderPath}/${basename}`);
+      return null;
+    }
+
+    const localPath = folderPath
+      ? join(this.config.syncDir, folderPath, basename)
+      : join(this.config.syncDir, basename);
+
+    const resolvedPath = resolve(localPath);
+    const resolvedSyncDir = resolve(this.config.syncDir);
+
+    // Ensure resolved path is within syncDir
+    if (!resolvedPath.startsWith(resolvedSyncDir + "/") && resolvedPath !== resolvedSyncDir) {
+      this.log(`❌ Path traversal blocked: ${folderPath}/${basename}`);
+      return null;
+    }
+
+    return resolvedPath;
+  }
+
+  /**
+   * Validate that a folder path stays within syncDir to prevent path traversal attacks.
+   * Returns the resolved safe path, or null if the path escapes syncDir.
+   */
+  private getSafeFolderPath(folderPath: string): string | null {
+    // Reject paths containing null bytes
+    if (folderPath.includes("\0")) {
+      this.log(`❌ Path traversal blocked (null byte): ${folderPath}`);
+      return null;
+    }
+
+    // Reject absolute paths
+    if (folderPath.startsWith("/")) {
+      this.log(`❌ Path traversal blocked (absolute path): ${folderPath}`);
+      return null;
+    }
+
+    const localPath = join(this.config.syncDir, folderPath);
+    const resolvedPath = resolve(localPath);
+    const resolvedSyncDir = resolve(this.config.syncDir);
+
+    // Ensure resolved path is within syncDir
+    if (!resolvedPath.startsWith(resolvedSyncDir + "/") && resolvedPath !== resolvedSyncDir) {
+      this.log(`❌ Path traversal blocked: ${folderPath}`);
+      return null;
+    }
+
+    return resolvedPath;
   }
 
   /** Start the sync daemon */
@@ -177,15 +240,16 @@ export class SyncDaemon {
 
   /** Download a single file */
   private async downloadFile(file: ConvexPublishedFile): Promise<boolean> {
-    const localPath = file.folderPath
-      ? join(this.config.syncDir, file.folderPath, file.basename)
-      : join(this.config.syncDir, file.basename);
+    const safePath = this.getSafePath(file.folderPath ?? "", file.basename);
+    if (!safePath) {
+      return false; // Path validation failed, already logged
+    }
 
     // Create parent directory
-    mkdirSync(dirname(localPath), { recursive: true });
+    mkdirSync(dirname(safePath), { recursive: true });
 
     // Check if we already have this version
-    const existingVersion = await getVersionAttr(localPath);
+    const existingVersion = await getVersionAttr(safePath);
     if (existingVersion === file.versionId) {
       return false; // Already have this version
     }
@@ -194,10 +258,10 @@ export class SyncDaemon {
 
     // Download
     const data = await this.httpClient.downloadFile(file.url);
-    await Bun.write(localPath, data);
+    await Bun.write(safePath, data);
 
     // Store version in xattr
-    await setVersionAttr(localPath, file.versionId);
+    await setVersionAttr(safePath, file.versionId);
 
     this.syncedFiles++;
     return true;
@@ -205,16 +269,41 @@ export class SyncDaemon {
 
   /** Catch up on changes since last sync */
   private async catchUpOnChanges(): Promise<void> {
-    const response = await this.httpClient.getChangelog(this.state.cursor, 1000);
+    let totalProcessed = 0;
+    let cursor = this.state.cursor;
 
-    if (response.changes.length === 0) {
-      this.log("No changes since last run");
-    } else {
-      this.log(`📥 Catching up on ${response.changes.length} changes`);
+    while (true) {
+      const response = await this.httpClient.getChangelog(cursor, 1000);
+
+      if (response.changes.length === 0) {
+        break;
+      }
+
+      this.log(
+        `📥 Processing ${response.changes.length} changes (total: ${totalProcessed + response.changes.length})`,
+      );
       await this.processChanges(response.changes);
+      totalProcessed += response.changes.length;
+
+      // Check for cursor advancement to prevent infinite loops
+      if (
+        response.nextCursor.createdAt === cursor.createdAt &&
+        response.nextCursor.id === cursor.id
+      ) {
+        break;
+      }
+
+      cursor = response.nextCursor;
+      this.state.cursor = cursor;
+      saveState(this.config.syncDir, this.state);
     }
 
-    this.state.cursor = response.nextCursor;
+    if (totalProcessed === 0) {
+      this.log("No changes since last run");
+    } else {
+      this.log(`✅ Caught up on ${totalProcessed} changes`);
+    }
+
     this.state.lastSync = new Date().toISOString();
     saveState(this.config.syncDir, this.state);
   }
@@ -280,88 +369,113 @@ export class SyncDaemon {
     switch (change.changeType) {
       case "asset:publish":
       case "asset:create":
-      case "asset:update": {
-        if (change.basename) {
-          const file = await this.httpClient.getPublishedFile(change.folderPath, change.basename);
-          if (file) {
-            await this.downloadFile(file);
-            this.log(`✅ Downloaded: ${change.folderPath}/${change.basename}`);
-          }
-        }
+      case "asset:update":
+        await this.handleAssetDownload(change);
         break;
-      }
 
-      case "asset:archive": {
+      case "asset:archive":
         if (change.basename) {
           this.deleteLocalFile(change.folderPath, change.basename);
         }
         break;
-      }
 
-      case "asset:move": {
-        // Delete from old location
-        if (change.oldFolderPath && change.basename) {
-          this.deleteLocalFile(change.oldFolderPath, change.basename);
-        }
-        // Download at new location
-        if (change.basename) {
-          const file = await this.httpClient.getPublishedFile(change.folderPath, change.basename);
-          if (file) {
-            await this.downloadFile(file);
-          }
-        }
+      case "asset:move":
+        await this.handleAssetMove(change);
         break;
-      }
 
-      case "asset:rename": {
-        // Delete old name
-        if (change.oldBasename) {
-          this.deleteLocalFile(change.folderPath, change.oldBasename);
-        }
-        // Download with new name
-        if (change.basename) {
-          const file = await this.httpClient.getPublishedFile(change.folderPath, change.basename);
-          if (file) {
-            await this.downloadFile(file);
-          }
-        }
+      case "asset:rename":
+        await this.handleAssetRename(change);
         break;
-      }
 
-      case "folder:create": {
-        const localPath = join(this.config.syncDir, change.folderPath);
-        mkdirSync(localPath, { recursive: true });
+      case "folder:create":
+        this.handleFolderCreate(change.folderPath);
         break;
-      }
 
-      case "folder:delete": {
-        const localPath = join(this.config.syncDir, change.folderPath);
-        try {
-          rmdirSync(localPath, { recursive: true });
-        } catch {
-          // Ignore if doesn't exist
-        }
+      case "folder:delete":
+        this.handleFolderDelete(change.folderPath);
         break;
-      }
 
       default:
         this.debug(`Unknown change type: ${change.changeType}`);
     }
   }
 
-  /** Delete a local file */
-  private deleteLocalFile(folderPath: string, basename: string): void {
-    const localPath = folderPath
-      ? join(this.config.syncDir, folderPath, basename)
-      : join(this.config.syncDir, basename);
+  /** Handle asset download (publish/create/update) */
+  private async handleAssetDownload(change: ChangelogEntry): Promise<void> {
+    if (!change.basename) return;
+    const file = await this.httpClient.getPublishedFile(change.folderPath, change.basename);
+    if (file) {
+      await this.downloadFile(file);
+      this.log(`✅ Downloaded: ${change.folderPath}/${change.basename}`);
+    }
+  }
+
+  /** Handle asset move between folders */
+  private async handleAssetMove(change: ChangelogEntry): Promise<void> {
+    // Delete from old location
+    if (change.oldFolderPath && change.basename) {
+      this.deleteLocalFile(change.oldFolderPath, change.basename);
+    }
+    // Download at new location
+    if (change.basename) {
+      const file = await this.httpClient.getPublishedFile(change.folderPath, change.basename);
+      if (file) {
+        await this.downloadFile(file);
+      }
+    }
+  }
+
+  /** Handle asset rename */
+  private async handleAssetRename(change: ChangelogEntry): Promise<void> {
+    // Delete old name
+    if (change.oldBasename) {
+      this.deleteLocalFile(change.folderPath, change.oldBasename);
+    }
+    // Download with new name
+    if (change.basename) {
+      const file = await this.httpClient.getPublishedFile(change.folderPath, change.basename);
+      if (file) {
+        await this.downloadFile(file);
+      }
+    }
+  }
+
+  /** Handle folder creation with path validation */
+  private handleFolderCreate(folderPath: string): void {
+    const safePath = this.getSafeFolderPath(folderPath);
+    if (safePath) {
+      mkdirSync(safePath, { recursive: true });
+    }
+  }
+
+  /** Handle folder deletion with path validation */
+  private handleFolderDelete(folderPath: string): void {
+    const safePath = this.getSafeFolderPath(folderPath);
+    if (!safePath) return;
 
     try {
-      if (existsSync(localPath)) {
-        unlinkSync(localPath);
+      rmSync(safePath, { recursive: true, force: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.log(`❌ Failed to delete folder ${folderPath}: ${message}`);
+    }
+  }
+
+  /** Delete a local file */
+  private deleteLocalFile(folderPath: string, basename: string): void {
+    const safePath = this.getSafePath(folderPath, basename);
+    if (!safePath) {
+      return; // Path validation failed, already logged
+    }
+
+    try {
+      if (existsSync(safePath)) {
+        unlinkSync(safePath);
         this.log(`🗑️ Deleted: ${folderPath}/${basename}`);
       }
-    } catch {
-      // Ignore
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.log(`❌ Failed to delete ${folderPath}/${basename}: ${message}`);
     }
   }
 }
