@@ -236,17 +236,6 @@ const WrappedPlayerApp = () => {
         }
       }
 
-      // const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", credentials, headers });
-
-      // if (!res.ok) {
-      //   const error = new Error(`[RESOLVE] resolve failed with status ${res.status}`);
-      //   (error as ResolveError).status = res.status;
-      //   throw error;
-      // }
-
-      // const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
-      // bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
-      // bookDataLoader.setBookVisibility(visibility);
       setAssetBaseReady(true);
     };
 

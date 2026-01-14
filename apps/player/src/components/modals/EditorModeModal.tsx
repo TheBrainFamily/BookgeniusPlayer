@@ -459,7 +459,7 @@ const EditorModeModal: React.FC<EditorModeModalProps> = ({ onClose }) => {
                 value={selectedCharacter || ""}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Wybierz postać" />
+                  <SelectValue placeholder="Select character" />
                 </SelectTrigger>
                 <SelectContent className="max-h-60 bg-zinc-900 border-zinc-700">
                   {sortedCharacters.map((character) => (
