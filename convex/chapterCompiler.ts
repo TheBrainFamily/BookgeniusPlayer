@@ -13,7 +13,7 @@ const extractChapterNumber = (basename: string): number => {
 
 const ensureFolder = async (ctx: ActionCtx, path: string): Promise<void> => {
   try {
-    await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, { path });
+    await ctx.runMutation(components.versionedAssets.assetManager.createFolderByPath, { path });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (!message.includes("Folder already exists")) {
@@ -101,7 +101,7 @@ export const uploadHtmlSourceChapter = adminAction({
       sourceFormat: "html",
     });
 
-    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+    const versions = await ctx.runQuery(components.versionedAssets.assetManager.getAssetVersions, {
       folderPath: sourceFolder,
       basename: `chapter-${chapterNumber}.html`,
     });

@@ -58,7 +58,7 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
       previewMp4Basename = `${baseName}_preview.mp4`;
 
       const { intentId, uploadUrl, backend } = await ctx.runMutation(
-        components.assetManager.assetManager.startUpload,
+        components.versionedAssets.assetManager.startUpload,
         { folderPath: thumbnailsPath, basename: previewMp4Basename, r2Config },
       );
 
@@ -71,7 +71,7 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
       if (!uploadRes.ok) throw new Error(`MP4 upload failed: ${uploadRes.status}`);
 
       const uploadResponse = backend === "convex" ? await uploadRes.json() : undefined;
-      await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+      await ctx.runMutation(components.versionedAssets.assetManager.finishUpload, {
         intentId,
         uploadResponse,
         r2Config,
@@ -86,7 +86,7 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
       intentId: webpIntentId,
       uploadUrl: webpUploadUrl,
       backend: webpBackend,
-    } = await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+    } = await ctx.runMutation(components.versionedAssets.assetManager.startUpload, {
       folderPath: thumbnailsPath,
       basename: previewWebpBasename,
       r2Config,
@@ -101,7 +101,7 @@ export const uploadBackgroundPreview = httpAction(async (ctx, request) => {
     if (!webpUploadRes.ok) throw new Error(`WebP upload failed: ${webpUploadRes.status}`);
 
     const webpUploadResponse = webpBackend === "convex" ? await webpUploadRes.json() : undefined;
-    await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+    await ctx.runMutation(components.versionedAssets.assetManager.finishUpload, {
       intentId: webpIntentId,
       uploadResponse: webpUploadResponse,
       r2Config,

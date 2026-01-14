@@ -31,7 +31,7 @@ export const getByFile = publicQuery({
 
     // Get preview URLs if available
     const previewFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/background-thumbnails` },
     );
     const previewMap = new Map(previewFiles.map((f) => [f.basename, f.url]));
@@ -63,7 +63,7 @@ export const listByBook = publicQuery({
 
     // Get all preview URLs in one query
     const previewFiles = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/background-thumbnails` },
     );
     const previewMap = new Map(previewFiles.map((f) => [f.basename, f.url]));
@@ -200,7 +200,7 @@ export const generateImagePreview = internalAction({
     try {
       // 2. Get the source image URL
       const files = await ctx.runQuery(
-        components.assetManager.assetManager.listPublishedFilesInFolder,
+        components.versionedAssets.assetManager.listPublishedFilesInFolder,
         { folderPath: `${bookPath}/backgrounds` },
       );
       const file = files.find((f) => f.basename === fileBasename);
@@ -318,7 +318,7 @@ export const generateVideoPreview = internalAction({
     try {
       // 2. Get the source video URL (signed for external access)
       const files = await ctx.runQuery(
-        components.assetManager.assetManager.listPublishedFilesInFolder,
+        components.versionedAssets.assetManager.listPublishedFilesInFolder,
         { folderPath: `${bookPath}/backgrounds` },
       );
       const file = files.find((f) => f.basename === fileBasename);
@@ -422,7 +422,7 @@ export const triggerForBook = bookMutation({
   handler: async (ctx) => {
     const bookPath = ctx.bookPath;
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: `${bookPath}/backgrounds` },
     );
 

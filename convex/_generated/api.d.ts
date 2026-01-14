@@ -123,7 +123,7 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  assetManager: {
+  versionedAssets: {
     assetFsHttp: {
       getBlobForServing: FunctionReference<
         "action",
@@ -390,6 +390,7 @@ export declare const components: {
           storageId?: string;
           url: string;
           version: number;
+          versionId: string;
         }
       >;
       getPublishedVersion: FunctionReference<

@@ -52,7 +52,7 @@ export const deleteAssetsBatch = adminMutation({
     hasMore: v.boolean(),
   }),
   handler: async (ctx) => {
-    return await ctx.runMutation(components.assetManager.assetManager.deleteDataBatch, {
+    return await ctx.runMutation(components.versionedAssets.assetManager.deleteDataBatch, {
       batchSize: BATCH_SIZE,
     });
   },
@@ -66,7 +66,7 @@ export const getBookR2Keys = adminQuery({
   returns: v.array(v.string()),
   handler: async (ctx, { bookSlug }) => {
     const bookPath = `books/${bookSlug}`;
-    return await ctx.runQuery(components.assetManager.assetManager.getR2KeysByPathPrefix, {
+    return await ctx.runQuery(components.versionedAssets.assetManager.getR2KeysByPathPrefix, {
       pathPrefix: bookPath,
     });
   },
@@ -329,7 +329,7 @@ export const deleteBookAssetsBatch = adminMutation({
   }),
   handler: async (ctx, { bookSlug, subfolder }) => {
     const bookPath = subfolder ? `books/${bookSlug}/${subfolder}` : `books/${bookSlug}`;
-    return await ctx.runMutation(components.assetManager.assetManager.deleteByPathPrefixBatch, {
+    return await ctx.runMutation(components.versionedAssets.assetManager.deleteByPathPrefixBatch, {
       pathPrefix: bookPath,
       batchSize: BATCH_SIZE,
     });

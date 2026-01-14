@@ -31,7 +31,7 @@ export const startUpload = adminMutation({
     r2Key: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+    return await ctx.runMutation(components.versionedAssets.assetManager.startUpload, {
       ...args,
       r2Config: getR2Config(),
     });
@@ -53,7 +53,7 @@ export const finishUpload = adminMutation({
   },
   returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
-    const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+    const result = await ctx.runMutation(components.versionedAssets.assetManager.finishUpload, {
       intentId: args.intentId,
       uploadResponse: args.uploadResponse,
       r2Config: getR2Config(),
@@ -103,7 +103,7 @@ export const createVersionFromStorageId = adminMutation({
   returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
     return await ctx.runMutation(
-      components.assetManager.assetManager.createVersionFromStorageId,
+      components.versionedAssets.assetManager.createVersionFromStorageId,
       args,
     );
   },
@@ -115,6 +115,6 @@ export const createVersionFromStorageId = adminMutation({
 export const createFolderByPath = adminMutation({
   args: { path: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.createFolderByPath, args);
   },
 });

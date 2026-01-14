@@ -20,6 +20,6 @@ export const deleteFilesInFolder = adminMutation({
   },
   returns: v.object({ deletedAssets: v.number(), deletedVersions: v.number() }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.deleteFilesInFolder, args);
+    return await ctx.runMutation(components.versionedAssets.assetManager.deleteFilesInFolder, args);
   },
 });

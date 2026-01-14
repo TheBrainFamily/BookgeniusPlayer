@@ -139,7 +139,7 @@ export const getCharacterBundle = publicQuery({
 
     // Get published files in the character folder
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: characterPath },
     );
 
@@ -217,7 +217,7 @@ export const listChapters = publicQuery({
     const chaptersPath = `${bookPath}/chapters`;
 
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: chaptersPath },
     );
 
@@ -266,7 +266,7 @@ export const listHtmlSourceChapters = publicQuery({
     const sourcePath = `${bookPath}/chapters-source`;
 
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: sourcePath },
     );
 
@@ -302,7 +302,7 @@ export const getCharacterIndexV2 = publicQuery({
     const indexPath = `${bookPath}/characters-v2`;
 
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: indexPath },
     );
 
@@ -327,7 +327,7 @@ export const listBackgrounds = publicQuery({
     const backgroundsPath = `${bookPath}/backgrounds`;
 
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: backgroundsPath },
     );
 
@@ -397,7 +397,7 @@ export const listFigures = publicQuery({
     const figuresPath = `${bookPath}/figures`;
 
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: figuresPath },
     );
 
@@ -423,7 +423,7 @@ export const listMusic = publicQuery({
     const musicPath = `${bookPath}/music`;
 
     const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
+      components.versionedAssets.assetManager.listPublishedFilesInFolder,
       { folderPath: musicPath },
     );
 
@@ -479,7 +479,7 @@ export const listCharacterBundles = publicQuery({
     const charactersPath = `${bookPath}/characters`;
 
     const foldersWithAssets = await ctx.runQuery(
-      components.assetManager.assetManager.listFoldersWithAssets,
+      components.versionedAssets.assetManager.listFoldersWithAssets,
       { parentPath: charactersPath },
     );
 
@@ -577,22 +577,24 @@ export const getBookStats = publicQuery({
   args: { bookPath: v.string() },
   handler: async (ctx, { bookPath }) => {
     // Count characters
-    const characterFolders = await ctx.runQuery(components.assetManager.assetManager.listFolders, {
-      parentPath: `${bookPath}/characters`,
-    });
+    const characterFolders = await ctx.runQuery(
+      components.versionedAssets.assetManager.listFolders,
+      { parentPath: `${bookPath}/characters` },
+    );
 
     // Count chapters
-    const chapterAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+    const chapterAssets = await ctx.runQuery(components.versionedAssets.assetManager.listAssets, {
       folderPath: `${bookPath}/chapters`,
     });
 
     // Count backgrounds
-    const backgroundAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
-      folderPath: `${bookPath}/backgrounds`,
-    });
+    const backgroundAssets = await ctx.runQuery(
+      components.versionedAssets.assetManager.listAssets,
+      { folderPath: `${bookPath}/backgrounds` },
+    );
 
     // Count music
-    const musicAssets = await ctx.runQuery(components.assetManager.assetManager.listAssets, {
+    const musicAssets = await ctx.runQuery(components.versionedAssets.assetManager.listAssets, {
       folderPath: `${bookPath}/music`,
     });
 

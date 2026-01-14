@@ -211,7 +211,7 @@ export const setParagraphSpeaker = bookAction({
       paragraphIndex,
     );
 
-    const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+    const asset = await ctx.runQuery(components.versionedAssets.assetManager.getAsset, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -220,7 +220,7 @@ export const setParagraphSpeaker = bookAction({
       throw new Error(`Chapter not found: ${chapterBasename}`);
     }
 
-    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+    const versions = await ctx.runQuery(components.versionedAssets.assetManager.getAssetVersions, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -230,7 +230,7 @@ export const setParagraphSpeaker = bookAction({
       throw new Error(`No published version for chapter: ${chapterBasename}`);
     }
 
-    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    const htmlResult = await ctx.runAction(components.versionedAssets.assetFsHttp.getTextContent, {
       versionId: publishedVersion._id,
     });
 
@@ -317,7 +317,7 @@ export const modifyCharacterTag = bookAction({
     const chaptersPath = `${bookPath}/chapters-source`;
     const chapterBasename = `chapter-${chapterNumber}.html`;
 
-    const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+    const asset = await ctx.runQuery(components.versionedAssets.assetManager.getAsset, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -326,7 +326,7 @@ export const modifyCharacterTag = bookAction({
       throw new Error(`Chapter not found: ${chapterBasename}`);
     }
 
-    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+    const versions = await ctx.runQuery(components.versionedAssets.assetManager.getAssetVersions, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -336,7 +336,7 @@ export const modifyCharacterTag = bookAction({
       throw new Error(`No published version for chapter: ${chapterBasename}`);
     }
 
-    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    const htmlResult = await ctx.runAction(components.versionedAssets.assetFsHttp.getTextContent, {
       versionId: publishedVersion._id,
     });
 
@@ -423,7 +423,7 @@ export const wrapTextWithCharacter = bookAction({
       paragraphIndex,
     );
 
-    const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+    const asset = await ctx.runQuery(components.versionedAssets.assetManager.getAsset, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -432,7 +432,7 @@ export const wrapTextWithCharacter = bookAction({
       throw new Error(`Chapter not found: ${chapterBasename}`);
     }
 
-    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+    const versions = await ctx.runQuery(components.versionedAssets.assetManager.getAssetVersions, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -442,7 +442,7 @@ export const wrapTextWithCharacter = bookAction({
       throw new Error(`No published version for chapter: ${chapterBasename}`);
     }
 
-    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    const htmlResult = await ctx.runAction(components.versionedAssets.assetFsHttp.getTextContent, {
       versionId: publishedVersion._id,
     });
 
@@ -519,7 +519,7 @@ export const removeNoteFromChapter = bookAction({
 
     console.log("[removeNote] chapter:", chapterBasename, "noteNumber:", noteNumber);
 
-    const asset = await ctx.runQuery(components.assetManager.assetManager.getAsset, {
+    const asset = await ctx.runQuery(components.versionedAssets.assetManager.getAsset, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -528,7 +528,7 @@ export const removeNoteFromChapter = bookAction({
       throw new Error(`Chapter not found: ${chapterBasename}`);
     }
 
-    const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
+    const versions = await ctx.runQuery(components.versionedAssets.assetManager.getAssetVersions, {
       folderPath: chaptersPath,
       basename: chapterBasename,
     });
@@ -538,7 +538,7 @@ export const removeNoteFromChapter = bookAction({
       throw new Error(`No published version for chapter: ${chapterBasename}`);
     }
 
-    const htmlResult = await ctx.runAction(components.assetManager.assetFsHttp.getTextContent, {
+    const htmlResult = await ctx.runAction(components.versionedAssets.assetFsHttp.getTextContent, {
       versionId: publishedVersion._id,
     });
 
@@ -631,7 +631,7 @@ export const createCharacter = bookAction({
     const characterPath = `${bookPath}/characters/${slug}`;
 
     try {
-      await ctx.runMutation(components.assetManager.assetManager.createFolderByPath, {
+      await ctx.runMutation(components.versionedAssets.assetManager.createFolderByPath, {
         path: characterPath,
         name: displayName,
       });

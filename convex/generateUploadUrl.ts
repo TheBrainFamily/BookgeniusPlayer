@@ -54,7 +54,7 @@ export const configureStorageBackend = adminMutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     return await ctx.runMutation(
-      components.assetManager.assetManager.configureStorageBackend,
+      components.versionedAssets.assetManager.configureStorageBackend,
       args,
     );
   },
@@ -67,7 +67,7 @@ export const getStorageBackendConfig = publicQuery({
   args: {},
   returns: storageBackendValidator,
   handler: async (ctx) => {
-    return await ctx.runQuery(components.assetManager.assetManager.getStorageBackendConfig, {});
+    return await ctx.runQuery(components.versionedAssets.assetManager.getStorageBackendConfig, {});
   },
 });
 
@@ -112,7 +112,7 @@ export const startUpload = authedMutation({
       throw new Error("Forbidden: Only admins can upload to non-book folders");
     }
 
-    const result = await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+    const result = await ctx.runMutation(components.versionedAssets.assetManager.startUpload, {
       ...args,
       r2Config: getR2Config(),
     });
@@ -140,7 +140,7 @@ export const startUploadInternal = internalMutation({
     r2Key: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    return await ctx.runMutation(components.assetManager.assetManager.startUpload, {
+    return await ctx.runMutation(components.versionedAssets.assetManager.startUpload, {
       ...args,
       r2Config: getR2Config(),
     });
@@ -182,7 +182,7 @@ export const finishUpload = authedMutation({
         throw new Error("Forbidden: Only admins can upload to non-book folders");
       }
     }
-    const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+    const result = await ctx.runMutation(components.versionedAssets.assetManager.finishUpload, {
       intentId: args.intentId,
       uploadResponse: args.uploadResponse,
       r2Config: getR2Config(),
@@ -246,7 +246,7 @@ export const finishUploadInternal = internalMutation({
   },
   returns: v.object({ assetId: v.string(), versionId: v.string(), version: v.number() }),
   handler: async (ctx, args) => {
-    const result = await ctx.runMutation(components.assetManager.assetManager.finishUpload, {
+    const result = await ctx.runMutation(components.versionedAssets.assetManager.finishUpload, {
       intentId: args.intentId,
       uploadResponse: args.uploadResponse,
       r2Config: getR2Config(),
@@ -297,7 +297,7 @@ export const getSignedUrl = publicAction({
   },
   returns: v.union(v.null(), v.string()),
   handler: async (ctx, { versionId, expiresIn }) => {
-    return await ctx.runAction(components.assetManager.signedUrl.getSignedUrl, {
+    return await ctx.runAction(components.versionedAssets.signedUrl.getSignedUrl, {
       versionId,
       expiresIn,
       r2Config: getR2Config(),

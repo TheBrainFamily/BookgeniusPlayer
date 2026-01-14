@@ -23,10 +23,10 @@ export const editAvatarWithInstructions = internalAction({
         proposalUrls: undefined,
       });
 
-      const versions = await ctx.runQuery(components.assetManager.assetManager.getAssetVersions, {
-        folderPath: characterPath,
-        basename: "avatar-large.png",
-      });
+      const versions = await ctx.runQuery(
+        components.versionedAssets.assetManager.getAssetVersions,
+        { folderPath: characterPath, basename: "avatar-large.png" },
+      );
 
       const publishedVersion = versions.find((v) => v.state === "published");
       if (!publishedVersion) {
@@ -38,9 +38,10 @@ export const editAvatarWithInstructions = internalAction({
         return { success: false, error: "No existing avatar found (avatar-large.png)" };
       }
 
-      const urlInfo = await ctx.runQuery(components.assetManager.assetFsHttp.getVersionPreviewUrl, {
-        versionId: publishedVersion._id,
-      });
+      const urlInfo = await ctx.runQuery(
+        components.versionedAssets.assetFsHttp.getVersionPreviewUrl,
+        { versionId: publishedVersion._id },
+      );
 
       if (!urlInfo?.url) {
         await ctx.runMutation(internal.avatarGeneration.updateCharacterAvatarState, {
@@ -134,7 +135,7 @@ export const editAvatarWithInstructions = internalAction({
           );
 
           const newUrlInfo = await ctx.runQuery(
-            components.assetManager.assetFsHttp.getVersionPreviewUrl,
+            components.versionedAssets.assetFsHttp.getVersionPreviewUrl,
             { versionId },
           );
 
