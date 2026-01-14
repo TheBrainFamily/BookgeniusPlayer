@@ -1,0 +1,15 @@
+# Generated files - don't reformat
+convex/_generated/
+convex/components/*/_generated/
+
+# Build outputs
+dist/
+build/
+.next/
+node_modules/
+
+# Lock files
+bun.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

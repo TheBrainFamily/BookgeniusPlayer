@@ -8,7 +8,11 @@ interface MicrophoneVisualizerProps {
   onMicReady?: (ready: boolean) => void;
 }
 
-export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isActive, audioAnalyser, onMicReady }) => {
+export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({
+  isActive,
+  audioAnalyser,
+  onMicReady,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const [volume, setVolume] = useState(0);
@@ -24,6 +28,7 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isAc
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Cleanup when deactivating
       setVolume(0);
       framesWithDataRef.current = 0;
       if (micReadyRef.current) {
@@ -118,7 +123,12 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isAc
 
           {/* Canvas for waveform */}
           <div className="relative">
-            <canvas ref={canvasRef} width={248} height={60} className="w-full rounded bg-black/50" />
+            <canvas
+              ref={canvasRef}
+              width={248}
+              height={60}
+              className="w-full rounded bg-black/50"
+            />
           </div>
 
           {/* Volume meter */}
@@ -133,7 +143,15 @@ export const MicrophoneVisualizer: React.FC<MicrophoneVisualizerProps> = ({ isAc
               />
             </div>
             <div className="text-xs text-white/60 mt-1">
-              {volume === 0 ? "No audio detected" : volume < 0.1 ? "Very quiet" : volume < 0.3 ? "Quiet" : volume < 0.6 ? "Normal" : "Loud"}
+              {volume === 0
+                ? "No audio detected"
+                : volume < 0.1
+                  ? "Very quiet"
+                  : volume < 0.3
+                    ? "Quiet"
+                    : volume < 0.6
+                      ? "Normal"
+                      : "Loud"}
             </div>
           </div>
         </motion.div>

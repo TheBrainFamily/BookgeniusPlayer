@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { useModalCoordinator } from "../modalCoordinator.store";
-import { SearchResultsData } from "@player/searchModal";
+import { type SearchResultsData } from "@player/searchModal";
 
 const MODAL_ID = "search-modal";
 
@@ -38,15 +38,23 @@ export const useSearchModal = create<SearchModalState>()(
 
       openModal: (layoutView = false, hideOverlay = false, query = "") => {
         const state = get();
-        const coordinator = useModalCoordinator.getState();
 
+        if (state.isOpen) {
+          set({ query: query.trim() });
+          return;
+        }
+
+        const coordinator = useModalCoordinator.getState();
         if (!coordinator.requestModalOpen(MODAL_ID)) return;
 
-        // Content shift is now handled by SearchModalRenderer
-        const trimmedQuery = query.trim();
-        const hasResults = state.results.items.length;
-
-        set({ isOpen: true, layoutView, hideOverlay, query: trimmedQuery, results: hasResults ? state.results : EMPTY_RESULTS, isLoading: false });
+        set({
+          isOpen: true,
+          layoutView,
+          hideOverlay,
+          query: query.trim(),
+          results: EMPTY_RESULTS,
+          isLoading: false,
+        });
       },
 
       closeModal: () => {
@@ -57,7 +65,12 @@ export const useSearchModal = create<SearchModalState>()(
       },
 
       clearModal: () => {
-        set({ query: "", results: EMPTY_RESULTS, isLoading: false, lastClickedAppearanceId: undefined });
+        set({
+          query: "",
+          results: EMPTY_RESULTS,
+          isLoading: false,
+          lastClickedAppearanceId: undefined,
+        });
       },
 
       setQuery: (query) => set({ query }),

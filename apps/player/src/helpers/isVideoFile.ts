@@ -1,6 +1,9 @@
 export function urlExt(u: string): string {
   try {
-    const { pathname } = new URL(u, typeof window !== "undefined" ? window.location.origin : "http://x");
+    const { pathname } = new URL(
+      u,
+      typeof window !== "undefined" ? window.location.origin : "http://x",
+    );
     const name = pathname.substring(pathname.lastIndexOf("/") + 1);
     const dot = name.lastIndexOf(".");
     return dot >= 0 ? name.slice(dot).toLowerCase() : "";

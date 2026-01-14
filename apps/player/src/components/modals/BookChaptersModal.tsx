@@ -5,9 +5,8 @@ import ModalUI from "@player/components/modals/ModalUI";
 import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
 import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { Button } from "../ui/button";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useLocationRange } from "@player/hooks/useLocationRange";
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { Lock, LockOpen } from "lucide-react";
 
 interface BookChaptersModalProps {
@@ -22,11 +21,15 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
   const {
     locationRange: { currentChapter },
   } = useLocationRange();
-  const hasDemoAccess = bookDataLoader.getBookVisibility() === "demo";
+  const { bookData } = useBookConvex();
+
+  // TODO: Implement proper visibility check from URL or Convex
+  const hasDemoAccess = new URLSearchParams(window.location.search).get("visibility") === "demo";
 
   const chapters = useMemo(() => {
-    const bookData = getBookData();
-    const maxDemoChapter = bookData.metadata.bookForm === "play" ? MAX_DEMO_CHAPTER_PLAY : MAX_DEMO_CHAPTER_DEFAULT;
+    if (!bookData) return [];
+    const maxDemoChapter =
+      bookData.metadata.bookForm === "play" ? MAX_DEMO_CHAPTER_PLAY : MAX_DEMO_CHAPTER_DEFAULT;
 
     return bookData.chapters.map((chapter, index) => {
       return {
@@ -36,7 +39,7 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
         isLocked: hasDemoAccess && parseInt(chapter.id, 10) > maxDemoChapter,
       };
     });
-  }, [t, hasDemoAccess]);
+  }, [t, hasDemoAccess, bookData]);
 
   const navigateToChapter = (chapterId: number) => {
     systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });
@@ -75,7 +78,8 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
             >
               <div className="grid w-full min-w-0 grid-cols-[1fr_auto] items-start gap-3">
                 <div className="flex items-center gap-2">
-                  {hasDemoAccess && (isLocked ? <Lock className="w-3 h-3" /> : <LockOpen className="w-3 h-3" />)}
+                  {hasDemoAccess &&
+                    (isLocked ? <Lock className="w-3 h-3" /> : <LockOpen className="w-3 h-3" />)}
                   <span
                     className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap sm:whitespace-normal sm:line-clamp-2 leading-snug"
                     title={chapter.title}
@@ -84,7 +88,9 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
                     {chapter.title}
                   </span>
                 </div>
-                <span className="shrink-0 text-sm text-muted-foreground tabular-nums">{chapter.page}</span>
+                <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
+                  {chapter.page}
+                </span>
               </div>
             </Button>
           );

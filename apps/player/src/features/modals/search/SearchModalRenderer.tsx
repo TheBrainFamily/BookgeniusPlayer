@@ -11,7 +11,12 @@ import { useIsMobileOrTablet } from "@player/hooks/useIsMobileOrTablet";
 import { useContentShift } from "@player/stores/contentShift.store";
 import { useBookForm } from "@player/hooks/useBookForm";
 
-const getModalContainer = (isMobile: boolean, isPlayFormat: boolean, isLargeScreen: boolean, isMediumScreen: boolean): HTMLElement => {
+const getModalContainer = (
+  isMobile: boolean,
+  isPlayFormat: boolean,
+  isLargeScreen: boolean,
+  isMediumScreen: boolean,
+): HTMLElement => {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return null as unknown as HTMLElement;
   }
@@ -66,7 +71,10 @@ export const SearchModalRenderer: React.FC = () => {
     }
   }, [shouldUseContentShift, disableContentShift]);
 
-  const container = useMemo(() => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen), [isMobile, isPlayFormat, isLargeScreen, isMediumScreen]);
+  const container = useMemo(
+    () => getModalContainer(isMobile, isPlayFormat, isLargeScreen, isMediumScreen),
+    [isMobile, isPlayFormat, isLargeScreen, isMediumScreen],
+  );
 
   return createPortal(
     <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>
@@ -74,7 +82,6 @@ export const SearchModalRenderer: React.FC = () => {
         <SearchModal
           key="search-modal"
           onClose={closeModal}
-          layoutView={isSidePanel}
           searchResults={results}
           clickedAppearanceId={lastClickedAppearanceId}
           searchQuery={query}

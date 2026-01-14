@@ -40,7 +40,13 @@ interface CommitterState {
   timer: number | null;
 }
 
-const state: CommitterState = { unstableUntil: 0, candidate: null, candidateSince: 0, lastCommitted: null, timer: null };
+const state: CommitterState = {
+  unstableUntil: 0,
+  candidate: null,
+  candidateSince: 0,
+  lastCommitted: null,
+  timer: null,
+};
 
 // Track whether initCommitter has been called - use slow dwell until initialized
 // to prevent noisy iOS first-paint data from committing too quickly
@@ -129,7 +135,8 @@ function commitFurthest(loc: Location): void {
   if (state.lastCommitted) {
     const isAhead =
       loc.currentChapter > state.lastCommitted.currentChapter ||
-      (loc.currentChapter === state.lastCommitted.currentChapter && loc.currentParagraph > state.lastCommitted.currentParagraph);
+      (loc.currentChapter === state.lastCommitted.currentChapter &&
+        loc.currentParagraph > state.lastCommitted.currentParagraph);
     if (!isAhead) {
       debugLog("commitFurthest: skipped (not ahead)", loc.currentChapter, loc.currentParagraph);
       return;
@@ -169,11 +176,17 @@ function scheduleCommitCheck(): void {
  * Offer a candidate location. Will be committed after stability criteria are met.
  * Call this from setCurrentLocation instead of directly calling setSavedLocation.
  */
-export function offerCandidateLocation(loc: Location, meta?: { source?: "observer" | "system" | "user" }): void {
+export function offerCandidateLocation(
+  loc: Location,
+  meta?: { source?: "observer" | "system" | "user" },
+): void {
   const now = Date.now();
 
   // Check if candidate changed
-  const changed = !state.candidate || loc.currentChapter !== state.candidate.currentChapter || loc.currentParagraph !== state.candidate.currentParagraph;
+  const changed =
+    !state.candidate ||
+    loc.currentChapter !== state.candidate.currentChapter ||
+    loc.currentParagraph !== state.candidate.currentParagraph;
 
   if (changed) {
     state.candidate = loc;

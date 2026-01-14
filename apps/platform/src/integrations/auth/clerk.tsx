@@ -1,6 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import type { ClerkProviderProps } from "@clerk/react-router";
 import type { LoadedClerk, UseUserReturn, UseAuthReturn } from "@clerk/types";
+import type { useAuth as ClerkUseAuthType } from "@clerk/react-router";
 import type { AuthCtx, AuthModule } from "./types";
 import { Button } from "@platform/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -11,29 +13,49 @@ const Ctx = createContext<AuthCtx>({ ready: false, isSignedIn: false, openSignIn
 
 const WidgetCtx = createContext<React.ComponentType | undefined>(undefined);
 
+// Context to expose Clerk's native useAuth hook for ConvexProviderWithClerk
+const ClerkUseAuthCtx = createContext<typeof ClerkUseAuthType | null>(null);
+
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<ClerkProviderProps> | null>(null);
-  const [SignInComponent, setSignInComponent] = useState<React.ComponentType | undefined>(undefined);
-  const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | undefined>(undefined);
-  const [hooks, setHooks] = useState<{ useUser: () => UseUserReturn; useClerk: () => LoadedClerk; UserButton?: React.ComponentType; useClerkAuth: () => UseAuthReturn } | null>(
-    null,
+  const [ClerkProvider, setClerkProvider] =
+    useState<React.ComponentType<ClerkProviderProps> | null>(null);
+  const [SignInComponent, setSignInComponent] = useState<React.ComponentType | undefined>(
+    undefined,
   );
+  const [SignUpComponent, setSignUpComponent] = useState<React.ComponentType | undefined>(
+    undefined,
+  );
+  const [hooks, setHooks] = useState<{
+    useUser: () => UseUserReturn;
+    useClerk: () => LoadedClerk;
+    UserButton?: React.ComponentType;
+    useClerkAuth: () => UseAuthReturn;
+  } | null>(null);
   const [loadingState, setLoadingState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([import("@clerk/react-router"), import("@clerk/clerk-react")])
-      .then(([router, react]) => {
+    // Import everything from @clerk/react-router to ensure version consistency.
+    // react-router re-exports all hooks from @clerk/clerk-react, so importing
+    // from both packages separately can cause version mismatches with different
+    // React contexts, leading to "useUser can only be used within ClerkProvider" errors.
+    import("@clerk/react-router")
+      .then((clerkModule) => {
         if (!mounted) {
           console.log("[CLERK] ClerkProvider not mounted");
           return;
         }
         console.log("[CLERK] ClerkProvider loaded, setting hooks");
-        setClerkProvider(() => router.ClerkProvider);
-        setSignInComponent(() => router.SignIn);
-        setSignUpComponent(() => router.SignUp);
+        setClerkProvider(() => clerkModule.ClerkProvider);
+        setSignInComponent(() => clerkModule.SignIn);
+        setSignUpComponent(() => clerkModule.SignUp);
 
-        setHooks({ useUser: react.useUser, useClerk: react.useClerk, UserButton: react.UserButton, useClerkAuth: react.useAuth });
+        setHooks({
+          useUser: clerkModule.useUser,
+          useClerk: clerkModule.useClerk,
+          UserButton: clerkModule.UserButton,
+          useClerkAuth: clerkModule.useAuth,
+        });
         setLoadingState("ready");
       })
       .catch((e) => {
@@ -166,17 +188,19 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   return (
     <WidgetCtx.Provider value={hooks.UserButton}>
-      <ClerkProvider
-        localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
-        publishableKey={publishableKey}
-        domain={shouldUseRedirect ? clerkDomain : undefined}
-        signInUrl={signInUrl}
-        signUpUrl={signUpUrl}
-        isSatellite={isSatellite}
-        allowedRedirectOrigins={allowedRedirectOrigins}
-      >
-        <Inner>{children}</Inner>
-      </ClerkProvider>
+      <ClerkUseAuthCtx.Provider value={hooks.useClerkAuth}>
+        <ClerkProvider
+          localization={detectLanguageFromDomain() === "pl" ? plPL : enUS}
+          publishableKey={publishableKey}
+          domain={shouldUseRedirect ? clerkDomain : undefined}
+          signInUrl={signInUrl}
+          signUpUrl={signUpUrl}
+          isSatellite={isSatellite}
+          allowedRedirectOrigins={allowedRedirectOrigins}
+        >
+          <Inner>{children}</Inner>
+        </ClerkProvider>
+      </ClerkUseAuthCtx.Provider>
     </WidgetCtx.Provider>
   );
 };
@@ -203,6 +227,9 @@ const AuthProviderSafe: React.FC<{ children: React.ReactNode }> = ({ children })
 const useAuth = () => useContext(Ctx);
 
 const useUserWidget = () => useContext(WidgetCtx);
+
+// Hook to get Clerk's native useAuth for ConvexProviderWithClerk
+const useClerkAuthHook = () => useContext(ClerkUseAuthCtx);
 const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   const { t } = useTranslation();
 
@@ -212,6 +239,12 @@ const SignInWidget: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     </Button>
   );
 };
-const mod: AuthModule = { AuthProvider: AuthProviderSafe, useAuth, useUserWidget, useSignInWidget: () => SignInWidget };
+const mod: AuthModule = {
+  AuthProvider: AuthProviderSafe,
+  useAuth,
+  useUserWidget,
+  useSignInWidget: () => SignInWidget,
+  clerkUseAuth: useClerkAuthHook,
+};
 
 export default mod;

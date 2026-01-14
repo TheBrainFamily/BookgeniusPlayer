@@ -1,8 +1,0 @@
-{
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "default",
-  "rsc": false,
-  "tsx": true,
-  "tailwind": { "config": "tailwind.config.ts", "css": "src/index.css", "baseColor": "slate", "cssVariables": true, "prefix": "" },
-  "aliases": { "components": "@wukong/components", "utils": "@wukong/lib/utils", "ui": "@wukong/components/ui", "lib": "@wukong/lib", "hooks": "@wukong/hooks" }
-}

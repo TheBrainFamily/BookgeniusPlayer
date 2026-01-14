@@ -1,13 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { useOptionalElementVisibility, useLastHideReason, useElementVisibilityStore } from "@player/stores/elementVisibility.store";
+import {
+  useOptionalElementVisibility,
+  useLastHideReason,
+  useElementVisibilityStore,
+} from "@player/stores/elementVisibility.store";
 
 interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
 }
 
-export const OptionalElement: React.FC<OptionalElementProps> = ({ children, className, ...props }) => {
+export const OptionalElement: React.FC<OptionalElementProps> = ({
+  children,
+  className,
+  ...props
+}) => {
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
   const startAllTimers = useElementVisibilityStore((state) => state.startAllTimers);
 
@@ -37,6 +45,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
   // Reset hover state when window becomes too narrow
   useEffect(() => {
     if (!isDesktop && isHovered) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Clearing hover on resize
       setIsHovered(false);
       startAllTimers(); // Resume timers when forcibly clearing hover
     }
@@ -70,6 +79,7 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
     }
 
     element.style.opacity = currentlyVisible ? "1" : "0";
+
     previousVisibilityRef.current = currentlyVisible;
   }, [shouldBeVisible, lastHideReason, isHovered]);
 
@@ -102,6 +112,8 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({ children, clas
       aria-hidden={!isElementVisible}
       data-optional-element-visible={isElementVisible}
       style={{
+        // Set initial opacity - useEffect may not run if ref is null on mount
+        opacity: isElementVisible ? 1 : 0,
         // Always allow pointer events on desktop, and on mobile only disable when truly hidden
         pointerEvents: isDesktop ? "auto" : shouldBeVisible || isHovered ? "auto" : "none",
       }}

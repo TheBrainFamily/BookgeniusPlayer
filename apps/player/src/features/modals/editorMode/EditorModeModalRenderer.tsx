@@ -10,5 +10,8 @@ export const EditorModeModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <EditorModeModal onClose={closeModal} />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>{isOpen && <EditorModeModal onClose={closeModal} />}</AnimatePresence>,
+    document.body,
+  );
 };

@@ -50,7 +50,12 @@ export const isMobile = (considerViewportWidth = false, mobileMaxWidth = 768): b
  * @param {number} tabletMaxWidth - Maximum width to consider as tablet (default: 1024px)
  * @returns {boolean} `true` if the device is identified as a tablet, otherwise `false`.
  */
-export const isTablet = (considerViewportWidth = false, tabletMinWidth = 768, tabletMaxWidth = 1024): boolean => {
+export const isTablet = (
+  considerViewportWidth = false,
+  tabletMinWidth = 768,
+  tabletMaxWidth = 1024,
+  // eslint-disable-next-line complexity -- device detection with multiple UA patterns
+): boolean => {
   if (typeof window === "undefined") return false;
 
   const userAgent = navigator.userAgent || navigator.vendor || "";
@@ -62,7 +67,12 @@ export const isTablet = (considerViewportWidth = false, tabletMinWidth = 768, ta
   const silkRegex = /Silk/i;
 
   // Check for known tablet patterns
-  if (androidTabletRegex.test(userAgent) || iPadRegex.test(userAgent) || playBookRegex.test(userAgent) || silkRegex.test(userAgent)) {
+  if (
+    androidTabletRegex.test(userAgent) ||
+    iPadRegex.test(userAgent) ||
+    playBookRegex.test(userAgent) ||
+    silkRegex.test(userAgent)
+  ) {
     return true;
   }
 
@@ -114,6 +124,14 @@ export const isTablet = (considerViewportWidth = false, tabletMinWidth = 768, ta
  * @param {number} tabletMaxWidth - Maximum width to consider as tablet (default: 1024px)
  * @returns {boolean} `true` if the device is identified as a mobile or tablet, otherwise `false`.
  */
-export const isMobileOrTablet = (considerViewportWidth = true, mobileMaxWidth = 768, tabletMinWidth = 768, tabletMaxWidth = 1024): boolean => {
-  return isMobile(considerViewportWidth, mobileMaxWidth) || isTablet(considerViewportWidth, tabletMinWidth, tabletMaxWidth);
+export const isMobileOrTablet = (
+  considerViewportWidth = true,
+  mobileMaxWidth = 768,
+  tabletMinWidth = 768,
+  tabletMaxWidth = 1024,
+): boolean => {
+  return (
+    isMobile(considerViewportWidth, mobileMaxWidth) ||
+    isTablet(considerViewportWidth, tabletMinWidth, tabletMaxWidth)
+  );
 };

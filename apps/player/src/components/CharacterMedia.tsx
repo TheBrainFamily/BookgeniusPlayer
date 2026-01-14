@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
 
 import { cn } from "@player/lib/utils";
-import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
+import { getSpeaksUrlForListens } from "@player/utils/assetUrls";
 
 type VideoState = "listens" | "speaks";
 
 interface CharacterMediaProps {
   mediaSrc: string;
-  commonAttrs: { "data-original-src": string; "data-character-name": string; "data-summary": string; className: string };
+  commonAttrs: {
+    "data-original-src": string;
+    "data-character-name": string;
+    "data-summary": string;
+    className: string;
+  };
   isVideo: boolean;
   canonicalName: string;
   isTalking?: boolean;
@@ -22,35 +27,44 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
   const [isListeningMode, setIsListeningMode] = useState<boolean>(true);
 
   useEffect(() => {
-    if (isVideo && videoListensSrc === null && videoSpeaksSrc === null && mediaSrc !== "") {
-      // Set up idle state video (listening mode)
-      setVideoListensLoaded(false);
-      setVideoListensSrc(mediaSrc);
+    if (!mediaSrc) return;
 
-      // Create talking state video path if possible
-      if (isVideoFile(mediaSrc)) {
-        const talkingSrc = mediaSrc.replace("listens.mp4", "speaks.mp4");
-        setVideoSpeaksSrc(talkingSrc);
+    if (isVideo) {
+      // Detect when mediaSrc changed to a new URL (initial load or reactive update)
+      if (mediaSrc !== videoListensSrc) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing video state with prop changes
+        setVideoListensLoaded(false);
+
+        setVideoListensSrc(mediaSrc);
+
+        // Look up the speaks URL from the registry
+        const talkingSrc = getSpeaksUrlForListens(mediaSrc);
+        setVideoSpeaksSrc(talkingSrc ?? mediaSrc);
         setVideoSpeaksLoaded(false);
+        setIsListeningMode(true);
       }
-
-      setIsListeningMode(true);
-    } else if (!isVideo && mediaSrc) {
-      // Reset to image state
-      setVideoListensSrc(mediaSrc);
-      setVideoListensLoaded(true);
-      setVideoSpeaksSrc(null);
-      setVideoSpeaksLoaded(false);
-      setIsListeningMode(true);
+    } else {
+      // Image mode
+      if (mediaSrc !== videoListensSrc) {
+        setVideoListensSrc(mediaSrc);
+        setVideoListensLoaded(true);
+        setVideoSpeaksSrc(null);
+        setVideoSpeaksLoaded(false);
+        setIsListeningMode(true);
+      }
     }
-  }, [mediaSrc, isVideo]);
+  }, [mediaSrc, isVideo, videoListensSrc]);
 
   // Handle video source and talking state changes
   useEffect(() => {
     if (!isVideo) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing video state for image mode
       if (videoListensSrc !== mediaSrc) setVideoListensSrc(mediaSrc);
+
       if (!isListeningMode) setIsListeningMode(true);
+
       setVideoListensLoaded(true);
+
       if (videoSpeaksSrc !== null) setVideoSpeaksSrc(null);
       setVideoSpeaksLoaded(false);
       return;
@@ -89,7 +103,16 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
         setVideoListensSrc(mediaSrc);
       }
     }
-  }, [mediaSrc, isVideo, isListeningMode, videoListensSrc, videoSpeaksSrc, videoListensLoaded, videoSpeaksLoaded, isTalking]);
+  }, [
+    mediaSrc,
+    isVideo,
+    isListeningMode,
+    videoListensSrc,
+    videoSpeaksSrc,
+    videoListensLoaded,
+    videoSpeaksLoaded,
+    isTalking,
+  ]);
 
   const handleLoadedData = (videoState: VideoState) => {
     if (videoState === "listens") {
@@ -115,7 +138,15 @@ const useVideoState = (mediaSrc: string, isVideo: boolean, isTalking?: boolean) 
     }
   };
 
-  return { videoListensSrc, videoSpeaksSrc, videoListensLoaded, videoSpeaksLoaded, isListeningMode, handleLoadedData, handleVideoError };
+  return {
+    videoListensSrc,
+    videoSpeaksSrc,
+    videoListensLoaded,
+    videoSpeaksLoaded,
+    isListeningMode,
+    handleLoadedData,
+    handleVideoError,
+  };
 };
 
 interface VideoPlayerProps {
@@ -128,15 +159,35 @@ interface VideoPlayerProps {
   isTalking?: boolean;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonAttrs, onLoaded, onError, isTalking }) => {
-  const stateValue = isTalking !== undefined ? (state === "listens" ? (isTalking ? "idle" : "talking") : isTalking ? "talking" : "idle") : "default";
+const VideoPlayer: React.FC<VideoPlayerProps> = ({
+  state,
+  src,
+  isActive,
+  commonAttrs,
+  onLoaded,
+  onError,
+  isTalking,
+}) => {
+  const stateValue =
+    isTalking !== undefined
+      ? state === "listens"
+        ? isTalking
+          ? "idle"
+          : "talking"
+        : isTalking
+          ? "talking"
+          : "idle"
+      : "default";
 
   return (
     <video
       key={`video-${state}`}
       {...commonAttrs}
-      src={src || null}
-      className={cn("absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out rounded-full", isActive ? "opacity-100" : "opacity-0")}
+      src={src || undefined} //TODO: why would this ever be undefined?
+      className={cn(
+        "absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out rounded-full",
+        isActive ? "opacity-100" : "opacity-0",
+      )}
       autoPlay
       loop
       muted
@@ -148,22 +199,41 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ state, src, isActive, commonA
   );
 };
 
-const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, isVideo, canonicalName, isTalking }) => {
-  const { videoListensSrc, videoSpeaksSrc, isListeningMode, handleLoadedData, handleVideoError, videoListensLoaded, videoSpeaksLoaded } = useVideoState(
-    mediaSrc,
-    isVideo,
-    isTalking,
-  );
+const CharacterMedia: React.FC<CharacterMediaProps> = ({
+  mediaSrc,
+  commonAttrs,
+  isVideo,
+  canonicalName,
+  isTalking,
+}) => {
+  const {
+    videoListensSrc,
+    videoSpeaksSrc,
+    isListeningMode,
+    handleLoadedData,
+    handleVideoError,
+    videoListensLoaded,
+    videoSpeaksLoaded,
+  } = useVideoState(mediaSrc, isVideo, isTalking);
 
   if (!isVideo) {
-    return <img {...commonAttrs} src={mediaSrc || ""} alt={canonicalName} className="rounded-full w-full" />;
+    return (
+      <img
+        {...commonAttrs}
+        src={mediaSrc || ""}
+        alt={canonicalName}
+        className="rounded-full w-full"
+      />
+    );
   }
 
   const placeholderSrc = getPlaceholderFromVideoUrl(videoListensSrc || mediaSrc);
 
   // Determine video display logic based on new layering requirements
-  const hasBothVideos = videoListensSrc && videoSpeaksSrc && videoListensLoaded && videoSpeaksLoaded;
-  const hasOnlySpeakingVideo = videoSpeaksSrc && videoSpeaksLoaded && (!videoListensSrc || !videoListensLoaded);
+  const hasBothVideos =
+    videoListensSrc && videoSpeaksSrc && videoListensLoaded && videoSpeaksLoaded;
+  const hasOnlySpeakingVideo =
+    videoSpeaksSrc && videoSpeaksLoaded && (!videoListensSrc || !videoListensLoaded);
   const currentlyTalking = isTalking !== undefined ? isTalking : !isListeningMode;
 
   let showListensVideo = false;
@@ -187,7 +257,13 @@ const CharacterMedia: React.FC<CharacterMediaProps> = ({ mediaSrc, commonAttrs, 
   return (
     <div className="relative w-full h-full">
       {placeholderSrc && (
-        <img src={placeholderSrc} alt={canonicalName} loading="eager" decoding="async" className="absolute top-0 left-0 w-full h-full object-cover rounded-full" />
+        <img
+          src={placeholderSrc}
+          alt={canonicalName}
+          loading="eager"
+          decoding="async"
+          className="absolute top-0 left-0 w-full h-full object-cover rounded-full"
+        />
       )}
       <VideoPlayer
         state="listens"

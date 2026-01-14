@@ -1,9 +1,106 @@
-import { bookDataLoader } from "@player/services/bookDataLoader";
 import { activateCharacters } from "./characterHelpers";
+import { getGlobalEditModeActive } from "@player/context/EditModeContext";
 
-// Variables to track scrolling state
 let isScrolling = false;
 let scrollDebounce: NodeJS.Timeout;
+let currentEditHoverElement: HTMLElement | null = null;
+let currentHoveredParagraph: HTMLElement | null = null;
+
+export type OpenTalkingCharacterModalFn = (
+  chapterNumber: number,
+  paragraphIndex: number,
+  currentSpeaker: string | null,
+) => void;
+let openTalkingCharacterModalFn: OpenTalkingCharacterModalFn | null = null;
+
+export function setOpenTalkingCharacterModal(fn: OpenTalkingCharacterModalFn): void {
+  openTalkingCharacterModalFn = fn;
+}
+
+export type OpenEditCharacterTagModalFn = (
+  chapterNumber: number,
+  paragraphIndex: number,
+  characterSlug: string,
+  textContent: string,
+) => void;
+let openEditCharacterTagModalFn: OpenEditCharacterTagModalFn | null = null;
+
+export function setOpenEditCharacterTagModal(fn: OpenEditCharacterTagModalFn): void {
+  openEditCharacterTagModalFn = fn;
+}
+
+export type OpenWrapWithCharacterModalFn = (
+  chapterNumber: number,
+  paragraphIndex: number,
+  selectedText: string,
+  occurrenceIndex: number,
+) => void;
+let openWrapWithCharacterModalFn: OpenWrapWithCharacterModalFn | null = null;
+
+export function setOpenWrapWithCharacterModal(fn: OpenWrapWithCharacterModalFn): void {
+  openWrapWithCharacterModalFn = fn;
+}
+
+function getSelectionInfo(): {
+  chapterNumber: number;
+  paragraphIndex: number;
+  selectedText: string;
+  occurrenceIndex: number;
+} | null {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || !selection.toString().trim()) {
+    return null;
+  }
+
+  const selectedText = selection.toString().trim();
+  const range = selection.getRangeAt(0);
+  const container = range.commonAncestorContainer;
+
+  const element =
+    container.nodeType === Node.TEXT_NODE ? container.parentElement : (container as HTMLElement);
+  if (!element) return null;
+
+  const paragraph = element.closest<HTMLElement>("section[data-chapter] [data-index]");
+  const section = paragraph?.closest<HTMLElement>("section[data-chapter]");
+
+  if (!paragraph || !section) return null;
+
+  const chapterNumber = parseInt(section.dataset.chapter || "0");
+  const paragraphIndex = parseInt(paragraph.dataset.index || "0");
+
+  // Calculate which occurrence of the selected text this is
+  const paragraphText = paragraph.textContent || "";
+  let occurrenceIndex = 0;
+
+  // Get the text offset of the selection start within the paragraph
+  const preSelectionRange = document.createRange();
+  preSelectionRange.selectNodeContents(paragraph);
+  preSelectionRange.setEnd(range.startContainer, range.startOffset);
+  const selectionStartOffset = preSelectionRange.toString().length;
+
+  // Count how many times the selected text appears before this position
+  let searchPos = 0;
+  while (searchPos < selectionStartOffset) {
+    const foundPos = paragraphText.indexOf(selectedText, searchPos);
+    if (foundPos === -1 || foundPos >= selectionStartOffset) break;
+    occurrenceIndex++;
+    searchPos = foundPos + 1;
+  }
+
+  return { chapterNumber, paragraphIndex, selectedText, occurrenceIndex };
+}
+
+function clearEditHover(): void {
+  if (currentEditHoverElement) {
+    currentEditHoverElement.classList.remove("edit-hover");
+    currentEditHoverElement = null;
+  }
+}
+
+function extractCurrentSpeaker(paragraph: HTMLElement): string | null {
+  const talkingSpan = paragraph.querySelector<HTMLElement>('[data-is-talking="true"]');
+  return talkingSpan?.dataset.character || null;
+}
 
 export function setupParagraphHighlighting() {
   const contentContainer = document.getElementById("content-container");
@@ -14,6 +111,8 @@ export function setupParagraphHighlighting() {
     const target = event.target as HTMLElement;
     const paragraph = target.closest<HTMLElement>("section[data-chapter] [data-index]");
     if (paragraph) {
+      currentHoveredParagraph = paragraph;
+
       const section = paragraph.closest<HTMLElement>("section[data-chapter]");
       if (!section) return;
 
@@ -23,7 +122,13 @@ export function setupParagraphHighlighting() {
       if (chapterNumber && paragraphNumber) {
         const chapterNum = parseInt(chapterNumber);
         const paragraphNum = parseInt(paragraphNumber);
-        activateCharacters(chapterNum, paragraphNum, bookDataLoader.getCurrentBook());
+        activateCharacters(chapterNum, paragraphNum);
+      }
+
+      if (getGlobalEditModeActive() && paragraph !== currentEditHoverElement) {
+        clearEditHover();
+        paragraph.classList.add("edit-hover");
+        currentEditHoverElement = paragraph;
       }
     }
   });
@@ -38,10 +143,8 @@ export function setupParagraphHighlighting() {
       entityNotes.forEach((note) => {
         note.classList.remove("highlighted-entity", "highlighted-talking-entity");
 
-        // Revert image to original PNG
         const imageElement = note.querySelector<HTMLImageElement>(".entity-image");
         if (imageElement && imageElement.dataset.originalSrc) {
-          // Extract just the filenames for comparison
           const currentSrcFilename = imageElement.src.split("/").pop();
           const originalSrcFilename = imageElement.dataset.originalSrc.split("/").pop();
 
@@ -51,12 +154,79 @@ export function setupParagraphHighlighting() {
         }
       });
     }
+
+    const relatedTarget = event.relatedTarget as HTMLElement | null;
+    const stillInParagraph = relatedTarget?.closest<HTMLElement>(
+      "section[data-chapter] [data-index]",
+    );
+    if (!stillInParagraph) {
+      currentHoveredParagraph = null;
+    }
+    if (!stillInParagraph || stillInParagraph !== currentEditHoverElement) {
+      clearEditHover();
+    }
   });
 
-  // --- Add Click Listener for Mobile Note Modals ---
+  // eslint-disable-next-line complexity -- click handler with edit mode, character clicks, footnotes
   contentContainer.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
-    const linkNote = target.classList.contains("link-note") ? target : (target.closest(".link-note") as HTMLElement | null);
+
+    if (getGlobalEditModeActive()) {
+      const selection = window.getSelection();
+      const hasTextSelection =
+        selection && !selection.isCollapsed && selection.toString().trim().length > 0;
+      if (hasTextSelection) {
+        return;
+      }
+
+      // Skip inline avatars - they should trigger set-talking-character, not edit-character-tag
+      const isInlineAvatarClick = target.closest(".inline-avatar");
+      if (!isInlineAvatarClick) {
+        const characterSpan = target.closest<HTMLElement>(
+          "[data-character]:not([data-is-talking])",
+        );
+        if (characterSpan && openEditCharacterTagModalFn) {
+          const paragraph = characterSpan.closest<HTMLElement>(
+            "section[data-chapter] [data-index]",
+          );
+          const section = paragraph?.closest<HTMLElement>("section[data-chapter]");
+          if (paragraph && section) {
+            const chapterNumber = parseInt(section.dataset.chapter || "0");
+            const paragraphIndex = parseInt(paragraph.dataset.index || "0");
+            const characterSlug = characterSpan.dataset.character || "";
+            const textContent = characterSpan.textContent || "";
+
+            event.preventDefault();
+            event.stopPropagation();
+            clearEditHover();
+            openEditCharacterTagModalFn(chapterNumber, paragraphIndex, characterSlug, textContent);
+            return;
+          }
+        }
+      }
+
+      const paragraph = target.closest<HTMLElement>("section[data-chapter] [data-index]");
+      if (paragraph) {
+        const section = paragraph.closest<HTMLElement>("section[data-chapter]");
+        if (section) {
+          const chapterNumber = parseInt(section.dataset.chapter || "0");
+          const paragraphIndex = parseInt(paragraph.dataset.index || "0");
+          const currentSpeaker = extractCurrentSpeaker(paragraph);
+
+          if (openTalkingCharacterModalFn) {
+            event.preventDefault();
+            event.stopPropagation();
+            clearEditHover();
+            openTalkingCharacterModalFn(chapterNumber, paragraphIndex, currentSpeaker);
+            return;
+          }
+        }
+      }
+    }
+
+    const linkNote = target.classList.contains("link-note")
+      ? target
+      : (target.closest(".link-note") as HTMLElement | null);
 
     if (linkNote) {
       console.log("1148 linkNote", linkNote);
@@ -77,8 +247,8 @@ export function setupParagraphHighlighting() {
           const closeModal = () => {
             if (modal) modal.classList.remove("visible");
             if (modalOverlay) modalOverlay.classList.remove("visible");
-            // Remove body class to allow scrolling again
-            document.body.classList.remove("modal-open");
+            // Remove player-scope class to allow scrolling again
+            document.getElementById("player-scope")?.classList.remove("modal-open");
           };
 
           if (!modal) {
@@ -115,13 +285,19 @@ export function setupParagraphHighlighting() {
             // and wrap the note itself to prevent internal breaks.
             const originalHTML = noteElement.innerHTML;
             const modifiedHTML = originalHTML
-              .replace(/\s*(\[przypis edytorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>')
-              .replace(/\s*(\[przypis autorski\])/g, ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>');
+              .replace(
+                /\s*(\[przypis edytorski\])/g,
+                ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>',
+              )
+              .replace(
+                /\s*(\[przypis autorski\])/g,
+                ' <br/><p class="przypis"><span style="white-space: nowrap;">$1</span></p>',
+              );
             modalContent.innerHTML = modifiedHTML; // Use innerHTML to preserve formatting
             modal.classList.add("visible"); // Use class
             modalOverlay.classList.add("visible"); // Use class
-            // Add body class to prevent background scrolling
-            document.body.classList.add("modal-open");
+            // Add player-scope class to prevent background scrolling
+            document.getElementById("player-scope")?.classList.add("modal-open");
           }
         }
       }
@@ -129,7 +305,6 @@ export function setupParagraphHighlighting() {
   });
   // --- End Click Listener ---
 
-  // Set up scroll event listener
   contentContainer.addEventListener("scroll", () => {
     if (scrollDebounce) clearTimeout(scrollDebounce);
     isScrolling = true;
@@ -138,5 +313,34 @@ export function setupParagraphHighlighting() {
       isScrolling = false;
       (window as unknown as { __sidebarScrollingLock: boolean }).__sidebarScrollingLock = false;
     }, 400);
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Meta" || event.key === "Control") {
+      if (currentHoveredParagraph && currentHoveredParagraph !== currentEditHoverElement) {
+        clearEditHover();
+        currentHoveredParagraph.classList.add("edit-hover");
+        currentEditHoverElement = currentHoveredParagraph;
+      }
+    }
+  });
+
+  window.addEventListener("keyup", (event) => {
+    if (event.key === "Meta" || event.key === "Control") {
+      clearEditHover();
+
+      if (openWrapWithCharacterModalFn) {
+        const selectionInfo = getSelectionInfo();
+        if (selectionInfo) {
+          openWrapWithCharacterModalFn(
+            selectionInfo.chapterNumber,
+            selectionInfo.paragraphIndex,
+            selectionInfo.selectedText,
+            selectionInfo.occurrenceIndex,
+          );
+          window.getSelection()?.removeAllRanges();
+        }
+      }
+    }
   });
 }

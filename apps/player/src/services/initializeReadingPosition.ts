@@ -1,5 +1,10 @@
 import { getLatestPosition, getCurrentPlatformAndBook } from "./readingPositionApi";
-import { getSavedLocation, setSavedLocation, type ExtendedLocation } from "@player/helpers/paragraphsNavigation";
+import {
+  getSavedLocation,
+  setCurrentLocation,
+  setSavedLocation,
+  type ExtendedLocation,
+} from "@player/helpers/paragraphsNavigation";
 import { initCommitter } from "@player/helpers/locationCommitter";
 
 const normalizeTimestamp = (ts: unknown): number => {
@@ -59,6 +64,7 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
 
       // Initialize committer with the remote location (now saved locally)
       initCommitter(extended);
+      setCurrentLocation(extended);
 
       return extended;
     } else {
@@ -66,6 +72,8 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
       const savedLoc = getSavedLocation();
       // Initialize committer with the local saved location
       initCommitter(savedLoc);
+      setCurrentLocation(savedLoc);
+
       return savedLoc;
     }
   } catch (error) {
@@ -74,6 +82,7 @@ export const initializeReadingPosition = async (): Promise<ExtendedLocation | nu
     const savedLoc = getSavedLocation();
     // Initialize committer with the local saved location
     initCommitter(savedLoc);
+    setCurrentLocation(savedLoc);
     return savedLoc;
   }
 };

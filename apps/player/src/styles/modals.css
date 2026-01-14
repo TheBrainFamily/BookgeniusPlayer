@@ -91,7 +91,7 @@
   display: block;
 }
 
-/* Modal open body state */
-body.modal-open {
+/* Modal open state - scoped to player */
+#player-scope.modal-open {
   overflow: hidden;
 }

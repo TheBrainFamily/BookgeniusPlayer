@@ -1,4 +1,4 @@
-import { getAllVariants } from "@player/genericBookDataGetters/getAllVariants";
+import { getAllVariants } from "@player/state/bookDataStore";
 
 export function findSimplifiedSentence(id: string, currentScore: number) {
   const allVariants = getAllVariants();
@@ -7,7 +7,9 @@ export function findSimplifiedSentence(id: string, currentScore: number) {
     return;
   }
 
-  const allVersions = [...foundSentence.simplifications.map((s) => ({ score: s.score, text: s.sentences.join(" ") }))];
+  const allVersions = [
+    ...foundSentence.simplifications.map((s) => ({ score: s.score, text: s.sentences.join(" ") })),
+  ];
 
   if (!currentScore) {
     currentScore = Math.max(...allVersions.map((v) => v.score));
@@ -21,5 +23,9 @@ export function findSimplifiedSentence(id: string, currentScore: number) {
   }
 
   lowerVersions.sort((a, b) => b.score - a.score);
-  return { text: lowerVersions[0].text, score: lowerVersions[0].score, hasLower: lowerVersions.length > 1 };
+  return {
+    text: lowerVersions[0].text,
+    score: lowerVersions[0].score,
+    hasLower: lowerVersions.length > 1,
+  };
 }

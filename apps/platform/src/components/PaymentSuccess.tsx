@@ -55,9 +55,14 @@ const PaymentSuccess: React.FC = () => {
               <div className="space-y-2">
                 <BookOpen className="h-8 w-8 text-library-gold mx-auto" />
                 <h3 className="text-lg font-semibold">Book Purchased</h3>
-                <p className="text-muted-foreground">You now have lifetime access to this visual novel. Enjoy your reading!</p>
+                <p className="text-muted-foreground">
+                  You now have lifetime access to this visual novel. Enjoy your reading!
+                </p>
               </div>
-              <Button onClick={handleContinue} className="w-full bg-library-gold hover:bg-library-gold/90 text-library-mahogany">
+              <Button
+                onClick={handleContinue}
+                className="w-full bg-library-gold hover:bg-library-gold/90 text-library-mahogany"
+              >
                 <BookOpen className="h-4 w-4 mr-2" />
                 Continue Reading
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -68,9 +73,14 @@ const PaymentSuccess: React.FC = () => {
               <div className="space-y-2">
                 <Crown className="h-8 w-8 text-library-gold mx-auto" />
                 <h3 className="text-lg font-semibold">Welcome to Premium!</h3>
-                <p className="text-muted-foreground">You now have access to our entire library of visual novels. Explore and enjoy!</p>
+                <p className="text-muted-foreground">
+                  You now have access to our entire library of visual novels. Explore and enjoy!
+                </p>
               </div>
-              <Button onClick={handleContinue} className="w-full bg-library-gold hover:bg-library-gold/90 text-library-mahogany">
+              <Button
+                onClick={handleContinue}
+                className="w-full bg-library-gold hover:bg-library-gold/90 text-library-mahogany"
+              >
                 <Crown className="h-4 w-4 mr-2" />
                 Explore Library
                 <ArrowRight className="h-4 w-4 ml-2" />

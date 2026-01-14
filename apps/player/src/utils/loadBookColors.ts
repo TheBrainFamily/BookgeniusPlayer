@@ -2,14 +2,16 @@
  * Utility to dynamically load optional book-specific color CSS files
  */
 
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "@player/state/bookDataStore";
 import { getBookAssetUrl } from "./assetUrls";
 
 const verifiedBookColorPaths = new Map<string, string>();
 const LINK_ID_PREFIX = "book-colors-";
 
 function removeExistingBookColorLinks(): void {
-  const links = Array.from(document.querySelectorAll<HTMLLinkElement>(`link[id^="${LINK_ID_PREFIX}"]`));
+  const links = Array.from(
+    document.querySelectorAll<HTMLLinkElement>(`link[id^="${LINK_ID_PREFIX}"]`),
+  );
 
   for (const link of links) {
     const slug = link.dataset.bookSlug ?? link.id.replace(LINK_ID_PREFIX, "");
@@ -30,15 +32,17 @@ function attachBookColorLink(bookSlug: string, cssPath: string): void {
 }
 
 export const loadBookColorsCSS = async (): Promise<void> => {
-  const bookSlug = bookDataLoader.getCurrentBook();
+  const bookSlug = getBookSlug();
   if (!bookSlug) {
     return;
   }
 
-  const cssPath = getBookAssetUrl("book-colors.css");
-
   // Always clear previously injected book colors so they do not bleed into the new book.
   removeExistingBookColorLinks();
+  const cssPath = getBookAssetUrl("book-colors.css");
+  if (!cssPath) {
+    return;
+  }
 
   try {
     const verifiedPath = verifiedBookColorPaths.get(bookSlug);

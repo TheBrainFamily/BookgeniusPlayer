@@ -8,5 +8,13 @@ interface PaywallProps {
 }
 
 export const PaywallGeneric: React.FC<PaywallProps> = (props) => {
-  return <PaywallInner {...props} handlePayment={() => {}} openSignIn={() => {}} isUserLoggedIn={false} loading={null} />;
+  return (
+    <PaywallInner
+      {...props}
+      handlePayment={() => {}}
+      openSignIn={() => {}}
+      isUserLoggedIn={false}
+      loading={null}
+    />
+  );
 };

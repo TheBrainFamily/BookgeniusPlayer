@@ -1,6 +1,11 @@
 import { highlightSearchQuery, removeHighlights } from "@player/utils/highlightSearchQuery";
 
-export const highlightSearchInParagraph = (chapter: number, paragraphNumber: number, searchQuery: string, delay: number = 200): void => {
+export const highlightSearchInParagraph = (
+  chapter: number,
+  paragraphNumber: number,
+  searchQuery: string,
+  delay: number = 200,
+): void => {
   setTimeout(() => {
     try {
       const paragraphSelector = `section[data-chapter="${chapter}"] [data-index="${paragraphNumber}"]`;

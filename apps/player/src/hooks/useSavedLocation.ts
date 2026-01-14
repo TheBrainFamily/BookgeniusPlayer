@@ -12,7 +12,10 @@ export const useSavedLocation = () => {
       const next = ce.detail ?? getSavedLocation();
       setSavedLocation((prev) => {
         if (!prev || !next) return next;
-        if (prev.currentChapter === next.currentChapter && prev.currentParagraph === next.currentParagraph) {
+        if (
+          prev.currentChapter === next.currentChapter &&
+          prev.currentParagraph === next.currentParagraph
+        ) {
           return prev; // nothing relevant changed
         }
         return next;

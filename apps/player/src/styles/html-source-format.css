@@ -1,0 +1,42 @@
+/* ============================================ */
+/* HTML Source Format Data Attribute Selectors */
+/* ============================================ */
+
+/* 
+ * These selectors support the new HTML source format where:
+ * - data-speaker="slug" on paragraphs indicates who is speaking
+ * - data-c="slug" on spans indicates character mentions
+ * 
+ * The normalizer injects legacy classes, but these selectors
+ * provide semantic fallbacks and can be used directly.
+ */
+
+/* Speaker paragraphs */
+[data-speaker] {
+  position: relative;
+}
+
+/* Character mentions - base styles */
+span[data-c] {
+  border: 1px dashed transparent;
+  border-radius: 0.375rem;
+  padding: 0 0.375em;
+  text-indent: 0;
+  display: inline-block;
+  line-height: 1.5em;
+  box-decoration-break: clone;
+  vertical-align: baseline;
+}
+
+/* Character mentions - activated state */
+span[data-c].character-highlighted-activated {
+  border-color: color-mix(in srgb, var(--text-light, gray) 60%, transparent);
+  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 40%, transparent);
+  cursor: pointer;
+}
+
+span[data-c].character-highlighted-activated:hover {
+  color: var(--text-light, #5e5e5e);
+  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 80%, transparent);
+  border-color: color-mix(in srgb, var(--text-light, gray) 80%, transparent);
+}

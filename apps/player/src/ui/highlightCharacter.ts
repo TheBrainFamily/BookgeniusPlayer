@@ -1,8 +1,11 @@
 import { isVideoFile } from "@player/helpers/isVideoFile";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
-import { resolveCharacterSnapshot, parseChapterParagraphId } from "@player/utils/characterOverrides";
+import { getCharactersData } from "@player/state/bookDataStore";
+import {
+  resolveCharacterSnapshot,
+  parseChapterParagraphId,
+} from "@player/utils/characterOverrides";
 import type { CharacterData, ChapterParagraphRef } from "@player/types/book";
-import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
+import { getAvatarUrlForVideo } from "@player/utils/assetUrls";
 
 let avatarContainerEl: HTMLDivElement | null = null;
 let globalGuardsAttached = false;
@@ -20,15 +23,11 @@ const HIDE_TRANSITION_MS = 250;
 /** Keep track of elements already wired to avoid duplicate listeners */
 const initializedCharacters = new WeakSet<HTMLElement>();
 
-const charactersBySlug = new Map<string, CharacterData>();
-
+// Get character data by slug - always fresh from store (no stale cache)
 function getCharacterDataBySlug(slug: string): CharacterData | undefined {
-  if (!charactersBySlug.has(slug)) {
-    charactersBySlug.clear();
-    getCharactersData().forEach((character) => charactersBySlug.set(character.slug, character));
-  }
-
-  return charactersBySlug.get(slug);
+  const characters = getCharactersData();
+  // Case-insensitive matching (XML tags may differ in case from Convex slugs)
+  return characters.find((c) => c.slug.toLowerCase() === slug.toLowerCase());
 }
 
 function extractLocationFromCharacterEl(el: HTMLElement): ChapterParagraphRef | null {
@@ -140,7 +139,9 @@ function attachGlobalGuardsOnce() {
 
   window.addEventListener("scroll", dismissNow, { passive: true, capture: true });
   window.addEventListener("resize", dismissNow, { passive: true, capture: true });
-  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), { capture: true });
+  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), {
+    capture: true,
+  });
 }
 
 function showFloatingAvatar(anchorEl: HTMLElement, avatarSrc: string) {
@@ -184,36 +185,57 @@ function hideFloatingAvatar(requester?: HTMLElement) {
   removalDelayTimeout = window.setTimeout(removeNow, HIDE_TRANSITION_MS);
 }
 
+/**
+ * Dynamically resolve the avatar URL for a character element.
+ * Called at event time (not initialization) to pick up reactive updates.
+ */
+function getAvatarSrcForElement(characterEl: HTMLSpanElement): string {
+  const characterSlug = characterEl.dataset.character;
+  if (!characterSlug) return "";
+
+  const characterData = getCharacterDataBySlug(characterSlug);
+  if (!characterData) return "";
+
+  const location = extractLocationFromCharacterEl(characterEl);
+  const snapshot = resolveCharacterSnapshot(characterData, {
+    location,
+    fallbackDisplayName: characterData.characterName,
+  });
+
+  const listeningSrc = snapshot.media.listening;
+  return listeningSrc ? normalizeSrcForInlineAvatar(listeningSrc) : "";
+}
+
 export function highlightCharacter(characterEl: HTMLSpanElement) {
   if (initializedCharacters.has(characterEl)) return;
 
   const characterSlug = characterEl.dataset.character;
   if (!characterSlug) return;
 
+  // Verify character exists at initialization time
   const characterData = getCharacterDataBySlug(characterSlug);
   if (!characterData) return;
 
-  const location = extractLocationFromCharacterEl(characterEl);
-
-  const snapshot = resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
-
-  const listeningSrc = snapshot.media.listening;
-  const avatarSrc = listeningSrc ? normalizeSrcForInlineAvatar(listeningSrc) : "";
-  const hasListeningMedia = Boolean(avatarSrc);
-
   initializedCharacters.add(characterEl);
-
   characterEl.classList.add("character-highlighted-activated");
 
-  if (!hasListeningMedia) return;
-
   // Only attach hover behavior on devices that actually support hover
-  const supportsHover = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(hover: hover)").matches;
+  const supportsHover =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(hover: hover)").matches;
   if (supportsHover) {
     characterEl.addEventListener("pointerenter", () => {
+      // Look up URL dynamically to pick up reactive updates
+      const avatarSrc = getAvatarSrcForElement(characterEl);
+      if (!avatarSrc) return;
+
       if (hoverDebounceTimeout) clearTimeout(hoverDebounceTimeout);
       if (HOVER_DEBOUNCE_MS > 0) {
-        hoverDebounceTimeout = window.setTimeout(() => showFloatingAvatar(characterEl, avatarSrc), HOVER_DEBOUNCE_MS);
+        hoverDebounceTimeout = window.setTimeout(
+          () => showFloatingAvatar(characterEl, avatarSrc),
+          HOVER_DEBOUNCE_MS,
+        );
       } else {
         showFloatingAvatar(characterEl, avatarSrc);
       }
@@ -229,48 +251,23 @@ export function highlightCharacter(characterEl: HTMLSpanElement) {
     };
 
     characterEl.addEventListener("pointerleave", handlePointerOut);
-
     characterEl.addEventListener("pointercancel", handlePointerOut);
   }
 }
 
 /**
- * Normalizes the src to always be PNG and removes "speaks" or "listens" suffixes
+ * Normalizes the src to get an avatar image URL.
+ * For image URLs, returns as-is. For video URLs, looks up avatar from registry.
  */
 export function normalizeSrcForInlineAvatar(src: string): string {
   if (!src) return src;
 
-  // Preserve query/hash separately so we don't mangle them
-  let pathPart = src;
-  let query = "";
-  let hash = "";
-
-  const hashIdx = src.indexOf("#");
-  if (hashIdx !== -1) {
-    hash = src.slice(hashIdx);
-    pathPart = src.slice(0, hashIdx);
+  // If it's already an image URL, return as-is
+  if (/\.(png|jpg|jpeg|gif|webp)(\?|$)/i.test(src)) {
+    return src;
   }
 
-  const qIdx = pathPart.indexOf("?");
-  if (qIdx !== -1) {
-    query = pathPart.slice(qIdx);
-    pathPart = pathPart.slice(0, qIdx);
-  }
-
-  // Split directory + filename
-  const lastSlash = pathPart.lastIndexOf("/");
-  const dir = lastSlash >= 0 ? pathPart.slice(0, lastSlash + 1) : "";
-  let file = lastSlash >= 0 ? pathPart.slice(lastSlash + 1) : pathPart;
-
-  // Remove "-speaks" or "-listens" only when they appear immediately before the final extension or at end
-  file = file.replace(/-(speaks|listens)(?=(\.[^.\/]+$|$))/i, "");
-
-  // Replace final extension with .png, or add .png if none
-  if (/\.[^.\/]+$/.test(file)) {
-    file = file.replace(/\.[^.\/]+$/, ".png");
-  } else {
-    file = `${file}.png`;
-  }
-
-  return `${dir}${file}${query}${hash}`;
+  // For video URLs, look up the avatar from registry
+  const avatarUrl = getAvatarUrlForVideo(src);
+  return avatarUrl ?? src;
 }

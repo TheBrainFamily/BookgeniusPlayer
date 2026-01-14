@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.turbo/
 .idea/
 .DS_Store
 .eslintcache
@@ -7,10 +8,18 @@ tsconfig.tsbuildinfo
 src/data/tools/Text-Editor/.cursor/
 .claude
 src/books/*
+# Environment files (except .example and .default templates)
 .env
+.env.*
+!.env.example
+!.env.default
+!.env.snapplify
+*.env.server
+*.env.local
+*.env.prod
+
 build/
 gateway.zip
-.env.prod
 Support/
 apps/platform/public/books/
 cdk.out
@@ -21,3 +30,21 @@ apps/wukong/public/books
 apps/player/src/components/ContentShiftWrapperOld.tsx
 .repoprompt/
 compiled-books/*/
+.repo_ignore
+.env.local
+
+# Local book development directories
+backend/wolnelektury-data/generated-descriptions/
+backend/wolnelektury-data/fb2/
+backend/wolnelektury-data/
+backend/standardebooks-data/
+.serena/
+tools/convex-fuse/.gocache/
+apps/player/dist-lib/
+
+# Synced Convex assets (local only)
+ConvexAssets/
+convex-test
+books/
+.env.test
+ConvexReactiveAssets/

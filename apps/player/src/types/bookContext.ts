@@ -1,7 +1,7 @@
-export interface BookContextLocation {
-  chapter: number;
-  paragraph: number;
-}
+import type { ChapterParagraphRef } from "./book";
+
+/** @deprecated Use ChapterParagraphRef instead */
+export type BookContextLocation = ChapterParagraphRef;
 
 export interface BookContextChunk {
   chapter: number;

@@ -186,6 +186,11 @@ export const formatTimestamp = (timestamp: number): string => {
   } else if (dateOnly.getTime() === yesterday.getTime()) {
     return `Yesterday ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   } else {
-    return date.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleString([], {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 };

@@ -1,5 +1,5 @@
 import { getPlatformId } from "@player/utils/getPlatformId";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getBookSlug } from "@player/state/bookDataStore";
 
 export interface SavePositionInput {
   platformId: string;
@@ -26,7 +26,11 @@ export interface ReadingPosition {
  * Build fetch options with credentials (cookie-based auth)
  */
 const buildFetchOptions = (method: string, body?: object): RequestInit => {
-  const options: RequestInit = { method, credentials: "include", headers: { "Content-Type": "application/json" } };
+  const options: RequestInit = {
+    method,
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  };
 
   if (body) {
     options.body = JSON.stringify(body);
@@ -55,10 +59,16 @@ export const savePosition = async (input: SavePositionInput): Promise<ReadingPos
 /**
  * Get the latest reading position for a book
  */
-export const getLatestPosition = async (platformId: string, bookSlug: string): Promise<ReadingPosition | null> => {
+export const getLatestPosition = async (
+  platformId: string,
+  bookSlug: string,
+): Promise<ReadingPosition | null> => {
   const params = new URLSearchParams({ platformId, bookSlug });
 
-  const response = await fetch(`/api/reading-position?${params.toString()}`, buildFetchOptions("GET"));
+  const response = await fetch(
+    `/api/reading-position?${params.toString()}`,
+    buildFetchOptions("GET"),
+  );
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
@@ -77,10 +87,17 @@ export const getLatestPosition = async (platformId: string, bookSlug: string): P
 /**
  * Get reading position history for a book
  */
-export const getPositionHistory = async (platformId: string, bookSlug: string, limit: number = 20): Promise<ReadingPosition[]> => {
+export const getPositionHistory = async (
+  platformId: string,
+  bookSlug: string,
+  limit: number = 20,
+): Promise<ReadingPosition[]> => {
   const params = new URLSearchParams({ platformId, bookSlug, limit: limit.toString() });
 
-  const response = await fetch(`/api/reading-position/history?${params.toString()}`, buildFetchOptions("GET"));
+  const response = await fetch(
+    `/api/reading-position/history?${params.toString()}`,
+    buildFetchOptions("GET"),
+  );
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
@@ -122,8 +139,7 @@ export const deletePosition = async (id: string): Promise<void> => {
  */
 export const getCurrentPlatformAndBook = (): { platformId: string; bookSlug: string } => {
   const platformId = getPlatformId();
-  const bookData = getBookData();
-  const bookSlug = bookData.slug;
+  const bookSlug = getBookSlug();
 
   return { platformId, bookSlug };
 };

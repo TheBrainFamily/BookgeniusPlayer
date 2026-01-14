@@ -1,0 +1,443 @@
+/* ============================================ */
+/* Standard Ebooks Semantic Type Styles        */
+/* ============================================ */
+
+/*
+ * These selectors style SE content based on data-epub-type attributes.
+ * SE uses epub|type~="..." namespace selectors; we use [data-epub-type~="..."]
+ * The ~= selector matches words in a space-separated list.
+ *
+ * All styles are scoped to #content-container to avoid leaking into the UI.
+ */
+
+#content-container {
+  /* === POETRY / VERSE / SONG / HYMN === */
+  /* Affects ~847 books */
+
+  [data-epub-type~="z3998:poem"],
+  [data-epub-type~="z3998:verse"],
+  [data-epub-type~="z3998:song"],
+  [data-epub-type~="z3998:hymn"] {
+    margin: 1.5em 0;
+  }
+
+  [data-epub-type~="z3998:poem"] p,
+  [data-epub-type~="z3998:verse"] p,
+  [data-epub-type~="z3998:song"] p,
+  [data-epub-type~="z3998:hymn"] p {
+    text-align: initial;
+    text-indent: 0;
+  }
+
+  [data-epub-type~="z3998:poem"] p > span,
+  [data-epub-type~="z3998:verse"] p > span,
+  [data-epub-type~="z3998:song"] p > span,
+  [data-epub-type~="z3998:hymn"] p > span {
+    display: block;
+    padding-left: 1em;
+    text-indent: -1em;
+  }
+
+  [data-epub-type~="z3998:poem"] p > span + br,
+  [data-epub-type~="z3998:verse"] p > span + br,
+  [data-epub-type~="z3998:song"] p > span + br,
+  [data-epub-type~="z3998:hymn"] p > span + br {
+    display: none;
+  }
+
+  [data-epub-type~="z3998:song"] p + p {
+    margin-top: 1em;
+  }
+
+  [data-epub-type~="z3998:song"] header,
+  [data-epub-type~="z3998:hymn"] header {
+    margin-bottom: 1em;
+  }
+
+  [data-epub-type~="z3998:verse"] footer {
+    text-align: center;
+  }
+
+  /* Verse indentation classes (from SE local.css) */
+  p span.i1 {
+    padding-left: 2em;
+    text-indent: -1em;
+  }
+  p span.i2 {
+    padding-left: 3em;
+    text-indent: -1em;
+  }
+  p span.i3 {
+    padding-left: 4em;
+    text-indent: -1em;
+  }
+  p span.i4 {
+    padding-left: 5em;
+    text-indent: -1em;
+  }
+  p span.i5 {
+    padding-left: 6em;
+    text-indent: -1em;
+  }
+  p span.i6 {
+    padding-left: 7em;
+    text-indent: -1em;
+  }
+  p span.i7 {
+    padding-left: 8em;
+    text-indent: -1em;
+  }
+  p span.i8 {
+    padding-left: 9em;
+    text-indent: -1em;
+  }
+
+  /* === DEDICATION === */
+
+  section[data-epub-type~="dedication"] {
+    text-align: center;
+    padding: 3em 2em;
+  }
+
+  section[data-epub-type~="dedication"] > * {
+    display: inline-block;
+    margin: auto;
+    margin-top: 3em;
+    max-width: 80%;
+  }
+
+  section[data-epub-type~="dedication"] p {
+    text-indent: 0;
+    text-align: center;
+  }
+
+  /* === EPIGRAPH === */
+
+  [data-epub-type~="epigraph"] {
+    font-style: italic;
+    hyphens: none;
+  }
+
+  [data-epub-type~="epigraph"] p {
+    text-indent: 0;
+    text-align: left;
+  }
+
+  [data-epub-type~="epigraph"] cite {
+    font-style: normal;
+    font-variant: small-caps;
+    margin-top: 1em;
+    display: block;
+    text-align: right;
+  }
+
+  [data-epub-type~="epigraph"] cite i {
+    font-style: italic;
+  }
+
+  /* Full-page epigraphs */
+  section[data-epub-type~="epigraph"] {
+    text-align: center;
+  }
+
+  section[data-epub-type~="epigraph"] > * {
+    display: inline-block;
+    margin: auto;
+    margin-top: 3em;
+    max-width: 80%;
+    text-align: initial;
+  }
+
+  /* === LETTERS === */
+  /* Affects ~690 books */
+
+  [data-epub-type~="z3998:letter"] {
+    margin: 1.5em 0;
+  }
+
+  [data-epub-type~="z3998:letter"] header {
+    text-align: right;
+    margin-bottom: 1em;
+  }
+
+  [data-epub-type~="z3998:salutation"] {
+    font-variant: small-caps;
+    text-indent: 0;
+    margin-bottom: 1em;
+  }
+
+  [data-epub-type~="z3998:salutation"] + p {
+    text-indent: 0;
+  }
+
+  [data-epub-type~="z3998:valediction"] {
+    text-align: right;
+    text-indent: 0;
+    margin-top: 1em;
+  }
+
+  [data-epub-type~="z3998:signature"] {
+    font-variant: small-caps;
+    text-align: right;
+    text-indent: 0;
+  }
+
+  [data-epub-type~="z3998:postscript"] {
+    margin-top: 1em;
+    text-indent: 0;
+  }
+
+  [data-epub-type~="z3998:sender"] {
+    text-indent: 0;
+  }
+
+  [data-epub-type~="z3998:recipient"] {
+    font-style: italic;
+    text-indent: 0;
+  }
+
+  /* === STAGE DIRECTIONS (outside drama tables) === */
+  /* Affects ~66 books in non-play context */
+
+  [data-epub-type~="z3998:stage-direction"] {
+    font-style: italic;
+  }
+
+  [data-epub-type~="z3998:stage-direction"]::before {
+    content: "(";
+    font-style: normal;
+  }
+
+  [data-epub-type~="z3998:stage-direction"]::after {
+    content: ")";
+    font-style: normal;
+  }
+
+  /* Don't add parentheses to standalone stage direction paragraphs (already handled by play format) */
+  p[data-stage-direction] [data-epub-type~="z3998:stage-direction"]::before,
+  p[data-stage-direction] [data-epub-type~="z3998:stage-direction"]::after,
+  .inline-stage-direction::before,
+  .inline-stage-direction::after {
+    content: none;
+  }
+
+  /* === PERSONA (character names in drama) === */
+
+  [data-epub-type~="z3998:persona"] {
+    font-variant: all-small-caps;
+  }
+
+  /* Persona in bold (inline dramatic dialogue) */
+  b[data-epub-type~="z3998:persona"] {
+    font-variant: small-caps;
+    font-weight: normal;
+  }
+
+  /* === BRIDGEHEAD === */
+
+  [data-epub-type~="bridgehead"] {
+    text-align: center;
+    font-weight: bold;
+    margin: 1em 0;
+    text-indent: 0;
+  }
+
+  /* === PART MARKERS === */
+
+  section[data-epub-type~="part"] {
+    text-align: center;
+    margin-top: 3em;
+  }
+
+  section[data-epub-type~="part"] hgroup {
+    margin-bottom: 2em;
+  }
+
+  /* === SUBCHAPTER === */
+
+  [data-epub-type~="z3998:subchapter"] {
+    margin-top: 2em;
+  }
+
+  [data-epub-type~="z3998:subchapter"] > h3,
+  [data-epub-type~="z3998:subchapter"] > h4 {
+    text-align: center;
+    font-variant: small-caps;
+    margin-bottom: 1em;
+  }
+
+  /* === DIARY ENTRIES === */
+
+  [data-epub-type~="z3998:diary-entry"] {
+    margin: 1.5em 0;
+  }
+
+  [data-epub-type~="z3998:diary-entry"] header {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+  }
+
+  /* === FIGURES AND IMAGES === */
+
+  figure {
+    break-inside: avoid;
+    margin: 1em 2.5em;
+    text-align: center;
+  }
+
+  figure img {
+    display: block;
+    margin: auto;
+    max-height: 100vh;
+    max-width: 100%;
+  }
+
+  figure.full-page {
+    break-after: page;
+    break-before: page;
+  }
+
+  figcaption {
+    font-size: smaller;
+    font-style: italic;
+    margin: 1em;
+    text-align: center;
+  }
+
+  /* === AUTHOR ATTRIBUTION === */
+
+  [data-epub-type~="z3998:attribution"] {
+    font-style: normal;
+    text-align: right;
+    margin-top: 0.5em;
+  }
+
+  /* === ABSTRACT === */
+
+  [data-epub-type~="z3998:abstract"] {
+    font-style: italic;
+    margin: 1em 2em;
+  }
+
+  /* === SE SPECIFIC STYLES === */
+
+  /* Short story markers */
+  article[data-epub-type~="se:short-story"] > h2:first-child {
+    text-align: center;
+    margin-bottom: 2em;
+  }
+
+  /* Era abbreviations (BC, AD, etc.) */
+  abbr[data-epub-type~="se:era"] {
+    font-variant: all-small-caps;
+  }
+
+  /* === BLOCK QUOTES WITH VERSE === */
+
+  blockquote[data-epub-type~="z3998:verse"] {
+    font-style: normal;
+  }
+
+  /* === FOOTER (for signatures, etc.) === */
+
+  footer {
+    margin-top: 1em;
+    text-align: right;
+  }
+
+  /* === ASIDE STYLING === */
+
+  .aside {
+    font-style: italic;
+  }
+
+  /* === QUOTED TEXT === */
+
+  q {
+    font-style: italic;
+  }
+
+  /* === BLOCKQUOTE HEADERS === */
+
+  blockquote header {
+    font-variant: small-caps;
+    margin-bottom: 1em;
+    text-align: center;
+  }
+
+  /* === COMMON INDENT CLASSES === */
+
+  .indent {
+    margin-left: 6.5em;
+    text-indent: 0;
+  }
+
+  .indent + p {
+    text-indent: 0;
+  }
+
+  .short-indent {
+    text-indent: 3em;
+  }
+
+  /* === TABLES (generic) === */
+
+  table {
+    border-collapse: collapse;
+    margin: 1em auto;
+  }
+
+  td {
+    padding: 0 0.5em 0 0;
+    vertical-align: top;
+  }
+
+  /* === ITALIC BOLD HANDLING === */
+  /* When bold is inside italic, make it normal style */
+
+  i b {
+    font-style: normal;
+  }
+
+  /* === RUBY TEXT (for annotations) === */
+
+  rt {
+    font-size: 1em;
+    ruby-align: center;
+  }
+}
+
+/* @supports blocks need to be outside the nesting */
+@supports (display: flex) {
+  #content-container section[data-epub-type~="dedication"] {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(98vh - 3em);
+    padding-top: 3em;
+  }
+
+  #content-container section[data-epub-type~="dedication"] > * {
+    margin: 0;
+  }
+
+  #content-container section[data-epub-type~="epigraph"] {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(98vh - 3em);
+    padding-top: 3em;
+  }
+
+  #content-container section[data-epub-type~="epigraph"] > * {
+    margin: 0;
+  }
+
+  #content-container section[data-epub-type~="epigraph"] > * + * {
+    margin-top: 3em;
+  }
+}

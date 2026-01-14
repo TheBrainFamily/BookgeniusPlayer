@@ -1,12 +1,15 @@
 import { addPaddingBottomLastChapter } from "@player/helpers/addPaddingBottomLastChapter";
 import { addSpaceBetweenChapters } from "@player/helpers/addSpaceBetweenChapters";
-import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
-import { getBookStringified } from "@player/genericBookDataGetters/getBookStringified";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import {
+  getBackgroundsForBook,
+  getBookStringified,
+  getCharactersData,
+} from "@player/state/bookDataStore";
 
 /**
- * Pre-render inline avatar shell divs inside character placeholders.
+ * Pre-render inline avatar shell spans inside character placeholders.
  * This prevents layout shift when media is injected later.
+ * Note: Must use span (not div) because these are inside <p> elements.
  */
 const addInlineAvatarShells = (doc: Document) => {
   const charactersData = getCharactersData();
@@ -28,8 +31,9 @@ const addInlineAvatarShells = (doc: Document) => {
     const characterData = charactersBySlug.get(characterSlug);
     const displayName = characterData?.characterName ?? characterSlug;
 
-    // Create the shell div that will hold the media later
-    const shell = doc.createElement("div");
+    // Create the shell span that will hold the media later
+    // Must be span (not div) because it's nested inside <p> - div would break out of <p>
+    const shell = doc.createElement("span");
     shell.className = "inline-avatar relative w-full h-full";
     shell.dataset.character = characterSlug;
     shell.title = displayName;
@@ -51,11 +55,11 @@ class BookIndex {
   private static instance: BookIndex;
 
   private initialized = false;
-  private doc: Document | null = null;
   private rootTemplates: HTMLElement[] = [];
   private chapters = new Map<number, ChapterRecord>();
   private chapterOrder: number[] = [];
   private chaptersContainerSelector = "[data-chapters-container='true']";
+  private paragraphCountOverrides = new Map<number, number>();
 
   static getInstance(): BookIndex {
     if (!BookIndex.instance) {
@@ -66,18 +70,75 @@ class BookIndex {
 
   invalidate(): void {
     this.initialized = false;
-    this.doc = null;
     this.rootTemplates = [];
     this.chapters.clear();
     this.chapterOrder = [];
   }
 
+  setParagraphCountOverrides(structure: ChaptersStructureEntry[]): void {
+    this.paragraphCountOverrides = new Map(
+      structure.map((entry) => [entry.chapterNumber, entry.paragraphCount]),
+    );
+    const missing = structure
+      .filter((entry) => entry.paragraphCount <= 0)
+      .map((entry) => entry.chapterNumber);
+
+    if (!this.initialized) {
+      console.log("[BookIndex] paragraph overrides set (deferred)", {
+        chapters: structure.length,
+        missingCount: missing.length,
+        missingSample: missing.slice(0, 5),
+      });
+      return;
+    }
+
+    let updated = 0;
+    for (const [chapterNumber, paragraphCount] of this.paragraphCountOverrides) {
+      const record = this.chapters.get(chapterNumber);
+      if (record) {
+        record.paragraphCount = paragraphCount;
+        updated += 1;
+      }
+    }
+
+    console.log("[BookIndex] paragraph overrides applied", {
+      chapters: structure.length,
+      updated,
+      missingCount: missing.length,
+      missingSample: missing.slice(0, 5),
+    });
+  }
+
+  /**
+   * Initialize with explicit bookStringified content.
+   * Use this when you have fresh content and want to avoid the store race condition.
+   */
+  initializeWith(bookStringified: string): void {
+    // Always re-initialize when called with explicit content
+    this.invalidate();
+    this._parseAndInitialize(bookStringified);
+  }
+
+  /**
+   * Ensure initialized using content from store (legacy behavior).
+   * Prefer initializeWith() when you have the content available.
+   */
   ensureInitialized(): void {
     if (this.initialized) {
       return;
     }
 
     const bookStringified = getBookStringified();
+    if (!bookStringified) {
+      throw new Error(
+        "[BookIndex] bookStringified is null - store not initialized. This usually means ensureInitialized was called before BookConvexProvider set the store.",
+      );
+    }
+
+    this._parseAndInitialize(bookStringified);
+  }
+
+  private _parseAndInitialize(bookStringified: string): void {
     const parser = new DOMParser();
     const doc = parser.parseFromString(bookStringified, "text/html");
 
@@ -113,7 +174,8 @@ class BookIndex {
 
       wrapper.setAttribute("data-chapter-wrapper", String(chapterId));
 
-      const paragraphCount = section.querySelectorAll("[data-index]").length;
+      const derivedCount = section.querySelectorAll("[data-index]").length;
+      const paragraphCount = this.paragraphCountOverrides.get(chapterId) ?? derivedCount;
 
       this.chapters.set(chapterId, { chapterId, wrapper, section, paragraphCount });
       this.chapterOrder.push(chapterId);
@@ -126,7 +188,7 @@ class BookIndex {
     this.chapterOrder.sort((a, b) => a - b);
 
     if (chaptersContainer) {
-      chaptersContainer.setAttribute("data-chapters-container", "true");
+      (chaptersContainer as HTMLElement).setAttribute("data-chapters-container", "true");
     }
 
     // Store static root templates (body children without chapter wrappers)
@@ -136,7 +198,6 @@ class BookIndex {
       return clone;
     });
 
-    this.doc = doc;
     this.initialized = true;
   }
 
@@ -185,7 +246,11 @@ class BookIndex {
 
   getChaptersStructure(): ChaptersStructureEntry[] {
     this.ensureInitialized();
-    return this.chapterOrder.map((chapterNumber) => ({ chapterNumber, paragraphCount: this.chapters.get(chapterNumber)!.paragraphCount }));
+    return this.chapterOrder.map((chapterNumber) => {
+      const record = this.chapters.get(chapterNumber);
+      const override = this.paragraphCountOverrides.get(chapterNumber);
+      return { chapterNumber, paragraphCount: override ?? record?.paragraphCount ?? 0 };
+    });
   }
 
   getParagraphCount(chapterId: number): number {
@@ -194,7 +259,7 @@ class BookIndex {
     if (!record) {
       return 0;
     }
-    return record.paragraphCount;
+    return this.paragraphCountOverrides.get(chapterId) ?? record.paragraphCount;
   }
 
   getParagraphElements(chapterId: number): HTMLElement[] {

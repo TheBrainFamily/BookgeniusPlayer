@@ -1,0 +1,17 @@
+app = 'ffmpeg-worker-slug'
+primary_region = 'fra'
+
+[build]
+
+# No [http_service] - this is a run-to-completion job, not a server
+# Machines are spawned via Fly Machines API with job params as env vars
+
+[[restart]]
+  policy = "never"
+  processes = ["app"]
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 2
+  memory_mb = 1024

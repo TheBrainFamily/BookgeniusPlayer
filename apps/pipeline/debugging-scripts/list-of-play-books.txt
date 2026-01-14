@@ -1,0 +1,195 @@
+# Drama/Play Books in Standard Ebooks Collection
+# Generated: 2026-01-02T13:19:43.726Z
+#
+# Categories:
+#   FULL_PLAY - Entire book is a play (use play UI throughout)
+#   EMBEDDED_DRAMA - Prose with embedded drama sections (switch UI for those sections)
+#   HAS_CHARACTER_LIST - Novel with character list (render normally)
+
+================================================================================
+FULL_PLAY (99 books) - Render entirely in play format
+================================================================================
+aeschylus_agamemnon_gilbert-murray  # 246 dialogue rows
+aeschylus_the-eumenides_gilbert-murray  # Scene-based play (no acts)
+aeschylus_the-libation-bearers_gilbert-murray  # Scene-based play (no acts)
+anton-chekhov_the-cherry-orchard_constance-garnett  # 4 acts
+anton-chekhov_the-seagull_constance-garnett  # 4 acts
+anton-chekhov_three-sisters_julius-west  # 4 acts
+anton-chekhov_uncle-vanya_constance-garnett  # 4 acts
+arthur-w-pinero_the-second-mrs-tanqueray  # 4 acts
+ben-jonson_the-alchemist  # 5 acts with scenes
+christopher-marlowe_edward-ii  # 5 acts with scenes
+christopher-marlowe_the-jew-of-malta  # 5 acts with scenes
+christopher-marlowe_the-tragical-history-of-doctor-faustus  # Scene-based play (no acts)
+eugene-oneill_the-hairy-ape  # Scene-based play (no acts)
+george-bernard-shaw_arms-and-the-man  # 3 acts
+george-bernard-shaw_candida  # 3 acts
+george-bernard-shaw_fannys-first-play  # 3 acts
+george-bernard-shaw_getting-married  # 1204 dialogue rows
+george-bernard-shaw_heartbreak-house  # 3 acts
+george-bernard-shaw_major-barbara  # 3 acts with scenes
+george-bernard-shaw_man-and-superman  # 4 acts
+george-bernard-shaw_misalliance  # 1086 dialogue rows
+george-bernard-shaw_mrs-warrens-profession  # 4 acts
+george-bernard-shaw_pygmalion  # 5 acts
+george-bernard-shaw_saint-joan  # Scene-based play (no acts)
+george-bernard-shaw_the-doctors-dilemma  # 5 acts
+george-bernard-shaw_the-man-of-destiny  # 474 dialogue rows
+george-bernard-shaw_you-never-can-tell  # 4 acts
+henrik-ibsen_a-dolls-house_r-farquharson-sharp  # 3 acts
+henrik-ibsen_ghosts_william-archer  # 3 acts
+henrik-ibsen_hedda-gabler_edmund-gosse_william-archer  # 4 acts
+j-m-synge_short-plays  # Drama table format (553 dialogue rows)
+j-m-synge_the-playboy-of-the-western-world  # 3 acts
+j-m-synge_the-well-of-the-saints  # 3 acts
+james-joyce_exiles  # 3 acts
+john-webster_the-duchess-of-malfi  # 5 acts with scenes
+karel-capek_r-u-r_paul-selver_nigel-playfair  # 3 acts
+lady-gregory_w-b-yeats_the-unicorn-from-the-stars  # 3 acts
+langston-hughes_zora-neale-hurston_the-mule-bone  # 3 acts
+leo-tolstoy_the-power-of-darkness_louise-maude_aylmer-maude  # 5 acts with scenes
+leonid-andreyev_he-who-gets-slapped_gregory-zilboorg  # 4 acts
+luigi-pirandello_six-characters-in-search-of-an-author_edward-storer  # 3 acts
+moliere_tartuffe_curtis-hidden-page  # 5 acts with scenes
+noel-coward_the-vortex  # 3 acts
+oliver-goldsmith_she-stoops-to-conquer  # 5 acts with scenes
+oscar-wilde_a-woman-of-no-importance  # 4 acts
+oscar-wilde_an-ideal-husband  # 4 acts
+oscar-wilde_lady-windermeres-fan  # 4 acts
+oscar-wilde_the-importance-of-being-earnest  # 3 acts
+richard-brinsley-sheridan_the-school-for-scandal  # 5 acts with scenes
+richard-steele_the-conscious-lovers  # 5 acts with scenes
+sophocles_ajax_francis-storr  # 316 dialogue rows
+sophocles_antigone_francis-storr  # 288 dialogue rows
+sophocles_electra_francis-storr  # 422 dialogue rows
+sophocles_oedipus-at-colonus_francis-storr  # 547 dialogue rows
+sophocles_oedipus-rex_francis-storr  # 456 dialogue rows
+sophocles_philoctetes_francis-storr  # 419 dialogue rows
+sophocles_the-trachiniae_francis-storr  # 265 dialogue rows
+tom-taylor_our-american-cousin  # 3 acts with scenes
+william-congreve_the-way-of-the-world  # 5 acts with scenes
+william-shakespeare_a-midsummer-nights-dream  # 5 acts with scenes
+william-shakespeare_alls-well-that-ends-well  # 5 acts with scenes
+william-shakespeare_antony-and-cleopatra  # 5 acts with scenes
+william-shakespeare_as-you-like-it  # 5 acts with scenes
+william-shakespeare_coriolanus  # 5 acts with scenes
+william-shakespeare_cymbeline  # 5 acts with scenes
+william-shakespeare_edward-iii  # 5 acts with scenes
+william-shakespeare_hamlet  # 5 acts with scenes
+william-shakespeare_henry-iv-part-i  # 5 acts with scenes
+william-shakespeare_henry-iv-part-ii  # 5 acts with scenes
+william-shakespeare_henry-v  # 5 acts with scenes
+william-shakespeare_henry-vi-part-i  # 5 acts with scenes
+william-shakespeare_henry-vi-part-ii  # 5 acts with scenes
+william-shakespeare_henry-vi-part-iii  # 5 acts with scenes
+william-shakespeare_henry-viii  # 5 acts with scenes
+william-shakespeare_john-fletcher_the-two-noble-kinsmen  # 5 acts with scenes
+william-shakespeare_julius-caesar  # 5 acts with scenes
+william-shakespeare_king-john  # 5 acts with scenes
+william-shakespeare_king-lear  # 5 acts with scenes
+william-shakespeare_loves-labours-lost  # 5 acts with scenes
+william-shakespeare_macbeth  # 5 acts with scenes
+william-shakespeare_measure-for-measure  # 5 acts with scenes
+william-shakespeare_much-ado-about-nothing  # 5 acts with scenes
+william-shakespeare_othello  # 5 acts with scenes
+william-shakespeare_pericles  # 5 acts with scenes
+william-shakespeare_richard-ii  # 5 acts with scenes
+william-shakespeare_richard-iii  # 5 acts with scenes
+william-shakespeare_romeo-and-juliet  # 5 acts with scenes
+william-shakespeare_the-comedy-of-errors  # 5 acts with scenes
+william-shakespeare_the-merchant-of-venice  # 5 acts with scenes
+william-shakespeare_the-merry-wives-of-windsor  # 5 acts with scenes
+william-shakespeare_the-taming-of-the-shrew  # 5 acts with scenes
+william-shakespeare_the-tempest  # 5 acts with scenes
+william-shakespeare_the-two-gentlemen-of-verona  # 5 acts with scenes
+william-shakespeare_the-winters-tale  # 5 acts with scenes
+william-shakespeare_timon-of-athens  # 5 acts with scenes
+william-shakespeare_titus-andronicus  # 5 acts with scenes
+william-shakespeare_troilus-and-cressida  # 5 acts with scenes
+william-shakespeare_twelfth-night  # 5 acts with scenes
+william-wycherley_the-country-wife  # 5 acts with scenes
+
+================================================================================
+EMBEDDED_DRAMA (68 books) - Has drama sections within prose
+================================================================================
+a-a-milne_the-house-at-pooh-corner  # Novel with 10 chapters, 1 drama sections
+aldous-huxley_antic-hay  # Novel with 22 chapters, 0 drama sections
+ambrose-bierce_poetry  # Some dramatic elements
+ann-radcliffe_the-mysteries-of-udolpho  # Novel with 57 chapters, 1 drama sections
+anna-katharine-green_the-leavenworth-case  # Novel with 39 chapters, 1 drama sections
+anton-chekhov_short-fiction_constance-garnett  # 1 drama tables
+apsley-cherry-garrard_the-worst-journey-in-the-world  # Novel with 19 chapters, 2 drama sections
+arthur-quiller-couch_on-the-art-of-reading  # Novel with 12 chapters, 1 drama sections
+arthur-quiller-couch_on-the-art-of-writing  # Novel with 12 chapters, 2 drama sections
+banjo-paterson_an-outback-marriage  # Novel with 29 chapters, 0 drama sections
+captain-charles-johnson_a-general-history-of-the-pirates  # Novel with 19 chapters, 5 drama sections
+charles-babbage_passages-from-the-life-of-a-philosopher  # Novel with 36 chapters, 0 drama sections
+christopher-morley_the-haunted-bookshop  # Novel with 15 chapters, 1 drama sections
+cicero_tusculan-disputations_c-d-yonge  # Novel with 5 chapters, 6 drama sections
+daniel-defoe_a-journal-of-the-plague-year  # 3 drama tables
+dante-alighieri_the-divine-comedy_henry-wadsworth-longfellow  # 2 drama tables
+david-park-barnitz_the-book-of-jade  # Some dramatic elements
+dorothy-day_the-eleventh-virgin  # Novel with 12 chapters, 1 drama sections
+dorothy-l-sayers_clouds-of-witness  # Novel with 19 chapters, 1 drama sections
+dorothy-l-sayers_unnatural-death  # Novel with 23 chapters, 2 drama sections
+edgar-allan-poe_short-fiction  # 5 drama tables
+edgar-lee-masters_spoon-river-anthology  # Some dramatic elements
+epictetus_discourses_george-long  # 1 drama tables
+ernest-hemingway_short-fiction  # Novel with 15 chapters, 0 drama sections
+f-scott-fitzgerald_short-fiction  # Some dramatic elements
+f-scott-fitzgerald_the-beautiful-and-damned  # Novel with 9 chapters, 1 drama sections
+f-scott-fitzgerald_this-side-of-paradise  # Novel with 9 chapters, 0 drama sections
+frank-norris_the-pit  # Novel with 10 chapters, 0 drama sections
+george-bernard-shaw_short-plays  # Some dramatic elements
+george-eliot_daniel-deronda  # Novel with 70 chapters, 4 drama sections
+gustave-flaubert_short-fiction_m-walter-dunne  # Some dramatic elements
+guy-de-maupassant_short-fiction_various-translators  # 1 drama tables
+helen-keller_the-story-of-my-life  # Novel with 28 chapters, 1 drama sections
+henry-david-thoreau_a-week-on-the-concord-and-merrimack-rivers  # Novel with 8 chapters, 2 drama sections
+herman-melville_moby-dick  # Novel with 135 chapters, 0 drama sections
+hilaire-belloc_the-path-to-rome  # 2 drama tables
+james-joyce_ulysses  # Novel with 18 chapters, 1 drama sections
+jerome-k-jerome_three-men-in-a-boat  # Novel with 19 chapters, 2 drama sections
+john-keats_poetry  # Some dramatic elements
+leo-tolstoy_short-fiction_various-translators  # Some dramatic elements
+leonid-andreyev_short-fiction_various-translators  # Some dramatic elements
+lew-wallace_ben-hur  # Novel with 81 chapters, 0 drama sections
+lord-byron_don-juan  # 2 drama tables
+m-r-james_short-fiction  # Some dramatic elements
+matthew-arnold_poetry  # Some dramatic elements
+o-henry_short-fiction  # Some dramatic elements
+p-g-wodehouse_school-stories  # Some dramatic elements
+philip-james-bailey_festus  # Some dramatic elements
+plato_dialogues_benjamin-jowett  # Some dramatic elements
+richard-hughes_a-high-wind-in-jamaica  # Novel with 10 chapters, 1 drama sections
+robert-e-howard_short-fiction  # Some dramatic elements
+robert-louis-stevenson_travel-essays  # Some dramatic elements
+robert-w-chambers_the-king-in-yellow  # Some dramatic elements
+roswitha-of-gandersheim_plays_christopher-st-john  # Some dramatic elements
+saki_short-fiction  # Some dramatic elements
+samuel-pepys_the-diary  # Novel with 113 chapters, 5 drama sections
+samuel-richardson_clarissa  # Some dramatic elements
+sinclair-lewis_main-street  # Novel with 39 chapters, 0 drama sections
+tanizaki-junichiro_short-fiction_various-translators  # Some dramatic elements
+theodore-roosevelt_an-autobiography  # Novel with 15 chapters, 0 drama sections
+thomas-gray_poetry  # Some dramatic elements
+thomas-hardy_the-mayor-of-casterbridge  # Novel with 45 chapters, 0 drama sections
+thomas-love-peacock_nightmare-abbey  # Novel with 15 chapters, 10 drama sections
+w-b-yeats_poetry  # 14 drama tables
+washington-irving_the-sketchbook-of-geoffrey-crayon-gent  # 2 drama tables
+william-faulkner_soldiers-pay  # Novel with 9 chapters, 2 drama sections
+william-hazlitt_table-talk  # 2 drama tables
+william-wells-brown_clotel  # Novel with 29 chapters, 1 drama sections
+
+================================================================================
+HAS_CHARACTER_LIST (9 books) - Novels with character lists
+================================================================================
+alexandre-dumas_the-vicomte-de-bragelonne_george-routledge-and-co  # Novel with 267 chapters
+ellery-queen_the-roman-hat-mystery  # Novel with 22 chapters
+frances-noyes-hart_the-bellamy-trial  # Novel with 8 chapters
+frank-norris_the-octopus  # Novel with 16 chapters
+leo-tolstoy_war-and-peace_louise-maude_aylmer-maude  # Novel with 336 chapters
+s-s-van-dine_the-benson-murder-case  # Novel with 25 chapters
+s-s-van-dine_the-canary-murder-case  # Novel with 30 chapters
+s-s-van-dine_the-greene-murder-case  # Novel with 26 chapters
+thomas-hardy_a-pair-of-blue-eyes  # Novel with 40 chapters

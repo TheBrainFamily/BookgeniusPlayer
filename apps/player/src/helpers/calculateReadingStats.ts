@@ -11,9 +11,18 @@ export interface ReadingStats {
 /**
  * Calculate reading statistics based on position history
  */
-export const calculateReadingStats = (history: ReadingPosition[], currentProgress: number | null): ReadingStats => {
+export const calculateReadingStats = (
+  history: ReadingPosition[],
+  currentProgress: number | null,
+  // eslint-disable-next-line complexity -- reading stats calculation with multiple conditions
+): ReadingStats => {
   if (history.length < 2) {
-    return { averageParagraphsPerMinute: 0, estimatedMinutesRemaining: null, totalReadingTimeMinutes: 0, readingSpeed: "unknown" };
+    return {
+      averageParagraphsPerMinute: 0,
+      estimatedMinutesRemaining: null,
+      totalReadingTimeMinutes: 0,
+      readingSpeed: "unknown",
+    };
   }
 
   // Sort by timestamp ascending (oldest first)
@@ -66,7 +75,12 @@ export const calculateReadingStats = (history: ReadingPosition[], currentProgres
   }
 
   if (progressDeltas.length === 0) {
-    return { averageParagraphsPerMinute: 0, estimatedMinutesRemaining: null, totalReadingTimeMinutes: 0, readingSpeed: "unknown" };
+    return {
+      averageParagraphsPerMinute: 0,
+      estimatedMinutesRemaining: null,
+      totalReadingTimeMinutes: 0,
+      readingSpeed: "unknown",
+    };
   }
 
   // Calculate average paragraphs per minute
@@ -80,14 +94,20 @@ export const calculateReadingStats = (history: ReadingPosition[], currentProgres
     totalWeightedMinutes += delta.minutes * weight;
   });
 
-  const averageParagraphsPerMinute = totalWeightedMinutes > 0 ? totalWeightedParagraphs / totalWeightedMinutes : 0;
+  const averageParagraphsPerMinute =
+    totalWeightedMinutes > 0 ? totalWeightedParagraphs / totalWeightedMinutes : 0;
 
   // Total reading time is the sum of active intervals (not wall-clock span)
   const totalReadingTimeMinutes = activeTimeMinutes;
 
   // Estimate remaining time
   let estimatedMinutesRemaining: number | null = null;
-  if (currentProgress !== null && currentProgress > 0 && currentProgress < 1 && averageParagraphsPerMinute > 0) {
+  if (
+    currentProgress !== null &&
+    currentProgress > 0 &&
+    currentProgress < 1 &&
+    averageParagraphsPerMinute > 0
+  ) {
     const remainingProgress = 1 - currentProgress;
     const effectiveTotal = totalParagraphs > 0 ? totalParagraphs : 10000;
     const remainingParagraphs = remainingProgress * effectiveTotal;
@@ -106,7 +126,12 @@ export const calculateReadingStats = (history: ReadingPosition[], currentProgres
     }
   }
 
-  return { averageParagraphsPerMinute, estimatedMinutesRemaining, totalReadingTimeMinutes, readingSpeed };
+  return {
+    averageParagraphsPerMinute,
+    estimatedMinutesRemaining,
+    totalReadingTimeMinutes,
+    readingSpeed,
+  };
 };
 
 /**

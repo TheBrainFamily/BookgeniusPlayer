@@ -5,10 +5,12 @@
  * as in the original vanilla code.
  */
 import { pageWasJustReloaded } from "@player/utils/pageWasJustReloaded";
-import { bookDataLoader } from "@player/services/bookDataLoader";
-import { ensureChapterWindow, ensureChapterRangeWindow } from "@player/logic/BookContentVirtualizer";
+import {
+  ensureChapterWindow,
+  ensureChapterRangeWindow,
+} from "@player/logic/BookContentVirtualizer";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { getBookData, getBookSlug } from "@player/state/bookDataStore";
 import { activateMediaInRange } from "@player/ui/activateMediaInRange";
 
 /* ------------------------------------------------------------------ */
@@ -16,16 +18,25 @@ import { activateMediaInRange } from "@player/ui/activateMediaInRange";
 export const isSystemNavigationInProgress = (): boolean => scrollCoordinator.isNavigating;
 
 /* ------------------------------------------------------------------ */
-import { DEFAULT_LOCATION, Location } from "@player/state/LocationContext";
+import { DEFAULT_LOCATION, type Location } from "@player/state/LocationContext";
 import debounce from "lodash.debounce";
 import { setUrlHash } from "./setUrlHash";
-import { offerCandidateLocation, markLayoutUnstable, flushCommit, LAYOUT_UNSTABLE_RESIZE_MS } from "./locationCommitter";
+import {
+  offerCandidateLocation,
+  markLayoutUnstable,
+  flushCommit,
+  LAYOUT_UNSTABLE_RESIZE_MS,
+} from "./locationCommitter";
 
 /* ------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------ */
 /*  Scroll completion detection helpers                              */
-const detectScrollEnd = (element: HTMLElement, callback: () => void, timeout: number = 1000): (() => void) => {
+const detectScrollEnd = (
+  element: HTMLElement,
+  callback: () => void,
+  timeout: number = 1000,
+): (() => void) => {
   let scrollTimer: number | null = null;
   let timeoutTimer: number | null = null;
   let isScrolling = false;
@@ -74,7 +85,9 @@ const calculateFocusZone = (containerRect: DOMRect) => {
   const viewportWidth = window.innerWidth;
 
   // Check media query for landscape mode on smaller wide screens
-  const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
+  const landscapeMediaQuery = window.matchMedia(
+    "screen and (orientation: landscape) and (max-width: 1400px)",
+  );
   if (landscapeMediaQuery.matches) {
     bottomMultiplier = 0.75; // Use larger focus zone in landscape mode
   }
@@ -98,7 +111,12 @@ const calculateFocusZone = (containerRect: DOMRect) => {
   const focusZoneBottom = containerRect.top + containerRect.height * bottomMultiplier;
   const focusZoneHeight = Math.max(0, focusZoneBottom - focusZoneTop);
 
-  return { top: focusZoneTop, bottom: focusZoneBottom, height: focusZoneHeight, center: focusZoneTop + focusZoneHeight / 2 } as const;
+  return {
+    top: focusZoneTop,
+    bottom: focusZoneBottom,
+    height: focusZoneHeight,
+    center: focusZoneTop + focusZoneHeight / 2,
+  } as const;
 };
 
 /* ------------------------------------------------------------------ */
@@ -126,8 +144,7 @@ export interface ExtendedLocation extends Location {
 /* ------------------------------------------------------------------ */
 /*  Furthest‑location helpers                                         */
 export const getFurthestLocationKey = (): string => {
-  const currentBook = bookDataLoader.getCurrentBook();
-  return `furthestLocation_${currentBook}`;
+  return `furthestLocation_${getBookSlug()}`;
 };
 
 export const getSavedLocation = (): ExtendedLocation => {
@@ -139,7 +156,8 @@ export const getSavedLocation = (): ExtendedLocation => {
     const parsed = JSON.parse(raw);
     // Handle both old format (plain Location) and new format (ExtendedLocation)
     return parsed as ExtendedLocation;
-  } catch {
+  } catch (e) {
+    console.warn("[paragraphsNavigation] getSavedLocation error", e);
     return DEFAULT_LOCATION;
   }
 };
@@ -147,7 +165,11 @@ export const getSavedLocation = (): ExtendedLocation => {
 export const setSavedLocation = (loc: Location | ExtendedLocation, progress?: number | null) => {
   try {
     const key = getFurthestLocationKey();
-    const extended: ExtendedLocation = { ...loc, timestamp: Date.now(), progress: progress ?? (loc as ExtendedLocation).progress ?? null };
+    const extended: ExtendedLocation = {
+      ...loc,
+      timestamp: Date.now(),
+      progress: progress ?? (loc as ExtendedLocation).progress ?? null,
+    };
     localStorage.setItem(key, JSON.stringify(extended));
     // Notify listeners that the furthest saved location advanced
     try {
@@ -200,7 +222,10 @@ export const setCurrentLocation = (loc: Location) => {
  * @param options Configuration for timeout, polling interval, and stability threshold.
  * @returns A promise that resolves when the element is stable or when the timeout is reached.
  */
-const waitForElementStablePosition = (element: HTMLElement, options: { timeout?: number; interval?: number; stableThreshold?: number } = {}): Promise<void> => {
+const waitForElementStablePosition = (
+  element: HTMLElement,
+  options: { timeout?: number; interval?: number; stableThreshold?: number } = {},
+): Promise<void> => {
   const { timeout = 3000, interval = 50, stableThreshold = 200 } = options;
   const container = document.getElementById("content-container");
 
@@ -282,13 +307,19 @@ export const systemNavigateTo = async (
      */
     expandChapterRange?: boolean;
   } = {},
+  // eslint-disable-next-line complexity
 ) => {
   if (!loc || typeof loc.currentChapter !== "number" || typeof loc.currentParagraph !== "number") {
     console.error("Invalid location provided to systemNavigateTo:", loc);
     return;
   }
 
-  const { wait = false, history = "replace", behavior = "instant", expandChapterRange = false } = options;
+  const {
+    wait = false,
+    history = "replace",
+    behavior = "instant",
+    expandChapterRange = false,
+  } = options;
 
   // Capture where we are *before* updating the bridge so we can compute the range.
   const startingLocation = getCurrentLocation();
@@ -317,7 +348,10 @@ export const systemNavigateTo = async (
   if (!saved) {
     setSavedLocation(fullLocation);
   } else {
-    const ahead = loc.currentChapter > saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph > saved.currentParagraph);
+    const ahead =
+      loc.currentChapter > saved.currentChapter ||
+      (loc.currentChapter === saved.currentChapter &&
+        loc.currentParagraph > saved.currentParagraph);
     if (ahead) {
       setSavedLocation(fullLocation);
     }
@@ -329,7 +363,10 @@ export const systemNavigateTo = async (
 
   try {
     if (expandChapterRange) {
-      const fromChapter = typeof startingLocation.currentChapter === "number" ? startingLocation.currentChapter : loc.currentChapter;
+      const fromChapter =
+        typeof startingLocation.currentChapter === "number"
+          ? startingLocation.currentChapter
+          : loc.currentChapter;
       await ensureChapterRangeWindow(fromChapter, loc.currentChapter);
     } else {
       await ensureChapterWindow(loc.currentChapter);
@@ -340,13 +377,22 @@ export const systemNavigateTo = async (
 
     // Pre-populate avatars around the target location so they're visible when scroll completes
     const bookData = getBookData();
-    const isPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
+    const isPlayFormat =
+      bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
     const targetParagraph = loc.currentParagraph;
     const bufferSize = 5;
-    activateMediaInRange(loc.currentChapter, Math.max(0, targetParagraph - bufferSize), loc.currentChapter, targetParagraph + bufferSize, isPlayFormat);
+    activateMediaInRange(
+      loc.currentChapter,
+      Math.max(0, targetParagraph - bufferSize),
+      loc.currentChapter,
+      targetParagraph + bufferSize,
+      isPlayFormat,
+    );
 
     const selector =
-      loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
+      loc.currentParagraph === 0
+        ? `section[data-chapter="${loc.currentChapter}"]`
+        : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
     const element = document.querySelector(selector) as HTMLElement | null;
 
     if ((pageWasJustReloaded() || wait) && element) {
@@ -354,7 +400,10 @@ export const systemNavigateTo = async (
     }
 
     // Smooth or instant scroll based on caller's request.
-    await goToParagraph({ currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph }, { behavior });
+    await goToParagraph(
+      { currentChapter: loc.currentChapter, currentParagraph: loc.currentParagraph },
+      { behavior },
+    );
 
     // Force location to the target immediately after scroll completes
     // This ensures the location state is correct before any chapter window changes
@@ -391,11 +440,16 @@ export const systemNavigateTo = async (
 
 /* ------------------------------------------------------------------ */
 /*  Scroll helper                                                     */
-export const goToParagraph = (loc: { currentChapter: number; currentParagraph: number }, options: ScrollToOptions = { behavior: "smooth" }): Promise<void> => {
+export const goToParagraph = (
+  loc: { currentChapter: number; currentParagraph: number },
+  options: ScrollToOptions = { behavior: "smooth" },
+): Promise<void> => {
   console.log("CurrentLocation", getCurrentLocation());
   return new Promise((resolve, reject) => {
     const selector =
-      loc.currentParagraph === 0 ? `section[data-chapter="${loc.currentChapter}"]` : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
+      loc.currentParagraph === 0
+        ? `section[data-chapter="${loc.currentChapter}"]`
+        : `section[data-chapter="${loc.currentChapter}"] [data-index="${loc.currentParagraph}"]`;
     const element = document.querySelector(selector) as HTMLElement;
 
     if (!element) {
@@ -404,19 +458,7 @@ export const goToParagraph = (loc: { currentChapter: number; currentParagraph: n
       return;
     }
 
-    const contentContainer = document.getElementById("content-container");
-    // if (!contentContainer) {
-    //   // Fallback for safety, though the container should always exist.
-    //   element.scrollIntoView({ behavior: options.behavior, block: "start" });
-
-    //   if (options.behavior === "instant") {
-    //     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-    //   } else {
-    //     // For smooth scroll without a container, we can't detect the end, so we use a timeout.
-    //     setTimeout(resolve, 1000);
-    //   }
-    //   return;
-    // }
+    const contentContainer = document.getElementById("content-container")!;
 
     const containerRect = contentContainer.getBoundingClientRect();
     const elementRect = element.getBoundingClientRect();
@@ -482,7 +524,11 @@ export const shouldShowReturnButton = (): boolean => {
   const current = getCurrentLocation();
   const saved = getSavedLocation();
 
-  return saved.currentChapter > current.currentChapter || (saved.currentChapter === current.currentChapter && saved.currentParagraph - 5 > current.currentParagraph);
+  return (
+    saved.currentChapter > current.currentChapter ||
+    (saved.currentChapter === current.currentChapter &&
+      saved.currentParagraph - 5 > current.currentParagraph)
+  );
 };
 
 /* ------------------------------------------------------------------ */
@@ -510,7 +556,9 @@ function captureResizeAnchor(): void {
   if (!container) return;
 
   // Prefer .active-paragraph (canonical "what user is reading")
-  const anchor = document.querySelector<HTMLElement>(".active-paragraph") ?? container.querySelector<HTMLElement>("[data-index]");
+  const anchor =
+    document.querySelector<HTMLElement>(".active-paragraph") ??
+    container.querySelector<HTMLElement>("[data-index]");
 
   const containerRect = container.getBoundingClientRect();
   const beforeOffset = anchor ? anchor.getBoundingClientRect().top - containerRect.top : 0;
@@ -553,7 +601,10 @@ async function applyResizeCompensation(): Promise<void> {
       // Fallback: anchor disconnected (chapter unloaded), scroll by location
       debugLog("applyResizeCompensation fallback to location", txn.loc);
       await ensureChapterWindow(txn.loc.currentChapter);
-      await goToParagraph({ currentChapter: txn.loc.currentChapter, currentParagraph: txn.loc.currentParagraph }, { behavior: "instant" });
+      await goToParagraph(
+        { currentChapter: txn.loc.currentChapter, currentParagraph: txn.loc.currentParagraph },
+        { behavior: "instant" },
+      );
     }
   } catch (error) {
     console.warn("Failed to apply resize compensation:", error);
@@ -569,7 +620,10 @@ async function applyResizeCompensation(): Promise<void> {
   }
 }
 
-const applyResizeCompensationDebounced = debounce(() => void applyResizeCompensation(), 150, { leading: false, trailing: true });
+const applyResizeCompensationDebounced = debounce(() => void applyResizeCompensation(), 150, {
+  leading: false,
+  trailing: true,
+});
 
 // Event handlers - capture SYNCHRONOUSLY, apply debounced
 window.addEventListener("resize", () => {

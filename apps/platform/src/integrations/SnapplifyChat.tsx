@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@platform/hooks/useAuth";
 import { snapplifyChatInitializer, FC_READY_EVENT } from "./SnapplifyChatFreshChatInitializer";
 
@@ -17,7 +17,16 @@ declare global {
   }
 }
 
-type SnapplifyJwtData = { sub: string; user_id: number; given_name: string; family_name: string; name: string; email: string; iat: number; exp: number };
+type SnapplifyJwtData = {
+  sub: string;
+  user_id: number;
+  given_name: string;
+  family_name: string;
+  name: string;
+  email: string;
+  iat: number;
+  exp: number;
+};
 function getSnapplifyDataFromJwt(): SnapplifyJwtData | null {
   console.log("[SnapplifyChat] Getting Snapplify data from JWT...");
 
@@ -73,7 +82,7 @@ function SnapplifyChatSafe() {
   console.log("[SnapplifyChat] Initial state:", {
     authReady: auth.ready,
     isSignedIn: auth.isSignedIn,
-    fcReady: fcReady,
+    fcReady,
     fcWidgetExists: typeof window !== "undefined" && !!window.fcWidget,
   });
 
@@ -87,6 +96,7 @@ function SnapplifyChatSafe() {
 
     if (window.fcWidget) {
       console.log("[SnapplifyChat] FreshChat widget already exists, setting ready");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing with external widget state on mount
       setFcReady(true);
     } else {
       console.log("[SnapplifyChat] FreshChat widget not found, initiating...");
@@ -100,10 +110,17 @@ function SnapplifyChatSafe() {
   }, []);
 
   useEffect(() => {
-    console.log("[SnapplifyChat] Auth/FC state change effect triggered:", { authReady: auth.ready, isSignedIn: auth.isSignedIn, fcReady: fcReady });
+    console.log("[SnapplifyChat] Auth/FC state change effect triggered:", {
+      authReady: auth.ready,
+      isSignedIn: auth.isSignedIn,
+      fcReady,
+    });
 
     if (!auth.ready || !fcReady) {
-      console.log("[SnapplifyChat] Skipping user properties - not ready:", { authReady: auth.ready, fcReady: fcReady });
+      console.log("[SnapplifyChat] Skipping user properties - not ready:", {
+        authReady: auth.ready,
+        fcReady,
+      });
       return;
     }
 
@@ -152,7 +169,10 @@ function SnapplifyChatSafe() {
 
 export function SnapplifyChat() {
   console.log("[SnapplifyChat] SnapplifyChat component rendering...");
-  console.log("[SnapplifyChat] Environment checks:", { isSSR: import.meta.env.SSR, authProvider: import.meta.env.VITE_AUTH_PROVIDER });
+  console.log("[SnapplifyChat] Environment checks:", {
+    isSSR: import.meta.env.SSR,
+    authProvider: import.meta.env.VITE_AUTH_PROVIDER,
+  });
 
   if (!import.meta.env.SSR && import.meta.env.VITE_AUTH_PROVIDER === "snapplify") {
     console.log("[SnapplifyChat] Conditions met, rendering SnapplifyChatSafe");

@@ -3,7 +3,7 @@ import { Play, Volume2, Star, Clock, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@platform/components/ui/card";
 import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
-import { books } from "@platform/books";
+import { type books } from "@platform/books";
 import { humanizeBookCardButtonText } from "@platform/utils/humanizeBookCardButtonText";
 import { detectLanguageFromDomain } from "@platform/utils/languageDetection.ts";
 import { LanguageFlagEN } from "@platform/components/LanguageFlagEN.tsx";
@@ -11,11 +11,17 @@ import { LanguageFlagPL } from "@platform/components/LanguageFlagPL.tsx";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { minutesToHours } from "@platform/utils/minutesToHours.ts";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 
 type Book = (typeof books)[number];
 
-type BookCardProps = { book: Book; onClick: (book: Book) => void; variant?: "default" | "featured"; showLanguageFlag?: boolean; className?: string };
+type BookCardProps = {
+  book: Book;
+  onClick: (book: Book) => void;
+  variant?: "default" | "featured";
+  showLanguageFlag?: boolean;
+  className?: string;
+};
 
 const displayReadTime = (t: TFunction, readTime: { h: number; m: number }) => {
   if (readTime.h > 0) {
@@ -24,7 +30,13 @@ const displayReadTime = (t: TFunction, readTime: { h: number; m: number }) => {
   return `${readTime.m} ${t("common.minutes")}`;
 };
 
-export default function BookCard({ book, onClick, variant = "default", showLanguageFlag = false, className = "" }: BookCardProps) {
+export default function BookCard({
+  book,
+  onClick,
+  variant = "default",
+  showLanguageFlag = false,
+  className = "",
+}: BookCardProps) {
   const { t } = useTranslation();
   const language = useMemo(() => detectLanguageFromDomain(), []);
 
@@ -59,7 +71,10 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
             <div className="absolute top-4 right-4 animate-pulse">
               <Sparkles className="h-4 w-4 text-library-gold/60" />
             </div>
-            <div className="absolute bottom-6 left-6 animate-pulse" style={{ animationDelay: "1s" }}>
+            <div
+              className="absolute bottom-6 left-6 animate-pulse"
+              style={{ animationDelay: "1s" }}
+            >
               <Sparkles className="h-3 w-3 text-library-gold/40" />
             </div>
           </div>
@@ -67,8 +82,18 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
       )}
 
       <CardHeader className="pb-3 sm:pb-4 p-2 sm:p-4 md:p-6">
-        <div className={`w-full ${mediaHeights} rounded-lg mb-3 sm:mb-4 relative overflow-hidden group-hover:animate-bookglow`}>
-          <video className="w-full h-full object-cover" autoPlay loop muted playsInline poster={book.poster} aria-hidden="true">
+        <div
+          className={`w-full ${mediaHeights} rounded-lg mb-3 sm:mb-4 relative overflow-hidden group-hover:animate-bookglow`}
+        >
+          <video
+            className="w-full h-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={book.poster}
+            aria-hidden="true"
+          >
             <source src={book.video} type="video/mp4" />
           </video>
 
@@ -79,7 +104,7 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
           <Badge className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-library-gold/90 text-library-mahogany text-xs sm:text-sm py-0.5 sm:py-1">
-            {book.metadata[language].genre}
+            {book.metadata[language]?.genre}
           </Badge>
 
           <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 flex items-center space-x-1">
@@ -95,17 +120,25 @@ export default function BookCard({ book, onClick, variant = "default", showLangu
           )}
         </div>
 
-        <CardTitle className="text-lg sm:text-xl md:text-lg font-bold text-foreground group-hover:text-library-gold transition-colors line-clamp-2">{book.title}</CardTitle>
+        <CardTitle className="text-lg sm:text-xl md:text-lg font-bold text-foreground group-hover:text-library-gold transition-colors line-clamp-2">
+          {book.title}
+        </CardTitle>
         <p className="text-library-gold font-medium text-sm">{book.author}</p>
       </CardHeader>
 
       <CardContent className="flex flex-col flex-1 p-2 sm:p-3 md:p-6 !pt-2">
-        <p className={`text-muted-foreground text-sm leading-relaxed ${descriptionClamp} mb-4`}>{book.metadata[language].description}</p>
+        <p className={`text-muted-foreground text-sm leading-relaxed ${descriptionClamp} mb-4`}>
+          {book.metadata[language]?.description}
+        </p>
 
         <div className="mt-auto space-y-6 md:space-y-4">
           <div className="flex flex-wrap gap-1">
-            {book.metadata[language].features.slice(0, 2).map((feature, index) => (
-              <Badge key={index} variant="outline" className="text-xs sm:text-sm md:text-xs border-library-walnut text-muted-foreground py-0.5 sm:py-1">
+            {book.metadata[language]?.features.slice(0, 2).map((feature, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="text-xs sm:text-sm md:text-xs border-library-walnut text-muted-foreground py-0.5 sm:py-1"
+              >
                 {feature}
               </Badge>
             ))}

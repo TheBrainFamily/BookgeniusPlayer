@@ -1,0 +1,155 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment: production
+    steps:
+      - name: Set-up s5cmd
+        uses: peak/action-setup-s5cmd@main
+        with:
+          version: v2.3.0
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+          fetch-depth: 1
+
+      - name: Compute base/head SHAs
+        id: sha
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            git fetch --no-tags --depth=1 origin "$BASE"
+          else
+            BASE="${{ github.event.before }}"
+            if [[ -n "$BASE" ]]; then
+              git fetch --no-tags --depth=1 origin "$BASE"
+            else
+              git fetch --no-tags --depth=1 origin main
+              BASE=$(git merge-base HEAD origin/main)
+            fi
+          fi
+          echo "base=$BASE" >> $GITHUB_OUTPUT
+          echo "head=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Set dynamic environment variables
+        id: set_vars
+        run: |
+          REPOSITORY=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "REPOSITORY=${REPOSITORY}" >> $GITHUB_ENV
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For Pull Requests
+            BRANCH_NAME=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+            echo "ASSET_CONTEXT=branches/${BRANCH_NAME}" >> $GITHUB_ENV
+            echo "IS_PRODUCTION=false" >> $GITHUB_ENV
+            echo "DOMAIN=${BRANCH_NAME}.branches.bookgenius.net" >> $GITHUB_ENV
+          else
+            BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+            echo "ASSET_CONTEXT=prod" >> $GITHUB_ENV
+            echo "IS_PRODUCTION=true" >> $GITHUB_ENV
+            echo "DOMAIN=bookgenius.net" >> $GITHUB_ENV
+          fi
+
+      - name: Install git-lfs (skip auto smudge)
+        run: |
+          git lfs install --local
+          git config --local filter.lfs.smudge "git-lfs smudge --skip -- %f"
+          git config --local filter.lfs.process "git-lfs filter-process --skip"
+
+      - name: Initial git lfs pull for platform files
+        run: git lfs pull -I "apps/platform/**"
+
+      - name: Export change set
+        run: |
+          echo "VITE_BUILD_TIME=${{ env.ASSET_CONTEXT }}-$(date +%s)" >> $GITHUB_ENV
+
+      # - uses: pnpm/action-setup@v4
+
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "20"
+      #     cache: "pnpm"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      #      - name: Build local artifacts (for S3 upload)
+      #        run: pnpm build:docker
+
+      - name: Build Platform
+        run: bun build:platform
+        env:
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_AUTH_PROVIDER: ${{ secrets.VITE_AUTH_PROVIDER }}
+          VITE_PAYMENTS_PROVIDER: ${{ secrets.VITE_PAYMENTS_PROVIDER }}
+          VITE_SUPPORT_EMAIL: support@bookgenius.net
+          CI: true
+
+      - name: move bookgenius.net platform to dist-intl
+        run: mv apps/platform/dist apps/platform/dist-intl
+
+      - name: Build snapplify platform
+        run: bun build:platform
+        env:
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
+          VITE_AUTH_PROVIDER: "snapplify"
+          VITE_PAYMENTS_PROVIDER: "default"
+          VITE_SUPPORT_EMAIL: "support@snapplify.com"
+          VITE_SNAPPLIFY_CLIENT_ID: "bookgenius.net"
+          VITE_SNAPPLIFY_ISSUER: "https://auth.snapplify.com"
+          VITE_SNAPPLIFY_REDIRECT_URI: "https://bookgenius.snapplify.com/auth/callback"
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
+          CI: "true"
+
+      - name: move snapplify platform to dist
+        run: mv apps/platform/dist apps/platform/dist-snapplify
+
+      - name: build bookgeniusz.pl
+        run: bun build:platform
+        env:
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_BOOKGENIUSZ_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_BOOKGENIUSZ_SECRET_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_AUTH_PROVIDER: ${{ secrets.VITE_AUTH_PROVIDER }}
+          VITE_PAYMENTS_PROVIDER: ${{ secrets.VITE_PAYMENTS_PROVIDER }}
+          VITE_SUPPORT_EMAIL: support@bookgeniusz.pl
+          VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
+          CI: true
+
+      - name: Prepare s3 folder
+        run: bun prepare:docker
+
+      - name: Deploy assets to S3
+        env:
+          ASSET_CONTEXT: ${{ env.ASSET_CONTEXT }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
+          PREVIEW_KEY: ${{ secrets.PREVIEW_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          DOMAIN: ${{ env.DOMAIN }}
+        run: bash ./update-cloudflare.sh

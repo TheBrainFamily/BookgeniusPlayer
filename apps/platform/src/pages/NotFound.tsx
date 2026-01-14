@@ -16,19 +16,31 @@ const NotFound = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center overflow-hidden">
       {/* Background image with overlay */}
-      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${library404Image})` }}></div>
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${library404Image})` }}
+       />
 
       {/* Floating sparkles animation */}
       <div className="absolute top-20 left-1/4 animate-float opacity-30">
         <Sparkles className="h-8 w-8 text-library-gold" />
       </div>
-      <div className="absolute top-32 right-1/3 animate-float opacity-20" style={{ animationDelay: "2s" }}>
+      <div
+        className="absolute top-32 right-1/3 animate-float opacity-20"
+        style={{ animationDelay: "2s" }}
+      >
         <Sparkles className="h-6 w-6 text-library-gold" />
       </div>
-      <div className="absolute bottom-32 left-3/4 animate-float opacity-25" style={{ animationDelay: "4s" }}>
+      <div
+        className="absolute bottom-32 left-3/4 animate-float opacity-25"
+        style={{ animationDelay: "4s" }}
+      >
         <Sparkles className="h-7 w-7 text-library-gold" />
       </div>
-      <div className="absolute top-1/2 left-12 animate-float opacity-15" style={{ animationDelay: "1s" }}>
+      <div
+        className="absolute top-1/2 left-12 animate-float opacity-15"
+        style={{ animationDelay: "1s" }}
+      >
         <Sparkles className="h-5 w-5 text-library-gold" />
       </div>
 
@@ -44,14 +56,20 @@ const NotFound = () => {
 
           {/* Error code with literary flair */}
           <div className="mb-6">
-            <h1 className="text-8xl md:text-9xl font-bold text-library-gold leading-none animate-candleflicker">404</h1>
+            <h1 className="text-8xl md:text-9xl font-bold text-library-gold leading-none animate-candleflicker">
+              404
+            </h1>
             <div className="h-1 w-32 bg-library-gold mx-auto mt-4 rounded-full opacity-80" />
           </div>
 
           {/* Literary-themed error message */}
           <div className="mb-8 space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">{t("notFound.title")}</h2>
-            <p className="text-xl text-muted-foreground font-light leading-relaxed">{t("notFound.description")}</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
+              {t("notFound.title")}
+            </h2>
+            <p className="text-xl text-muted-foreground font-light leading-relaxed">
+              {t("notFound.description")}
+            </p>
           </div>
 
           {/* Action buttons */}

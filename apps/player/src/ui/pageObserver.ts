@@ -1,20 +1,48 @@
-import { isSystemNavigationInProgress, setCurrentLocation } from "@player/helpers/paragraphsNavigation";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { drawActiveElement, drawFocusZone, hideVisualizer, initializeDevZoneVisualizers, drawElementsUnion } from "./devVisualizers";
+import {
+  isSystemNavigationInProgress,
+  setCurrentLocation,
+} from "@player/helpers/paragraphsNavigation";
+import { getIsPlayLayout } from "@player/state/bookDataStore";
+import {
+  drawActiveElement,
+  drawFocusZone,
+  hideVisualizer,
+  initializeDevZoneVisualizers,
+  drawElementsUnion,
+} from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
-// Cache isPlayFormat at module level to avoid repeated getBookData() calls
-let cachedIsPlayFormat: boolean | null = null;
+type ParagraphInfo = { chapter: number | null; paragraph: number | null };
+type ParagraphKey = { chapter: number; paragraph: number };
+
+const isParagraphKey = (info: ParagraphInfo | null): info is ParagraphKey => {
+  if (!info) return false;
+  const { chapter, paragraph } = info;
+
+  return (
+    typeof chapter === "number" &&
+    Number.isFinite(chapter) &&
+    typeof paragraph === "number" &&
+    Number.isFinite(paragraph)
+  );
+};
+
+const compareParagraphKey = (a: ParagraphKey, b: ParagraphKey): number => {
+  if (a.chapter !== b.chapter) return a.chapter - b.chapter;
+  return a.paragraph - b.paragraph;
+};
+
+const areSameParagraphKey = (a: ParagraphKey | null, b: ParagraphKey | null): boolean => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.chapter === b.chapter && a.paragraph === b.paragraph;
+};
 
 function getIsPlayFormat(): boolean {
-  if (cachedIsPlayFormat === null) {
-    const bookData = getBookData();
-    cachedIsPlayFormat = bookData.metadata.bookForm === "play" || bookData.metadata.bookForm === "mixed";
-  }
-  return cachedIsPlayFormat;
+  return getIsPlayLayout();
 }
 
 let isSplashAnimationComplete = false;
@@ -28,7 +56,7 @@ window.addEventListener(
 );
 
 /** Extract Chapter and Paragraph Info **/
-const getParagraphInfo = (element: Element): { chapter: number | null; paragraph: number | null } => {
+const getParagraphInfo = (element: Element): ParagraphInfo => {
   const el = element as HTMLElement;
 
   const chapterElement = el.closest("section[data-chapter]") as HTMLElement | null;
@@ -91,16 +119,22 @@ export function setupPageObserver(): {
     return null;
   }
 
-  const observerOptions = { root: rootEl, rootMargin: "0px", threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95] };
+  const observerOptions = {
+    root: rootEl,
+    rootMargin: "0px",
+    threshold: [0.1, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95],
+  };
 
   // Initialize development zone visualizers
-  const { activeElementVisualizer, rangeVisualizer } = DEV_ZONE_VISUALIZERS_ENABLED ? initializeDevZoneVisualizers() : { activeElementVisualizer: null, rangeVisualizer: null };
+  const { activeElementVisualizer, rangeVisualizer } = DEV_ZONE_VISUALIZERS_ENABLED
+    ? initializeDevZoneVisualizers()
+    : { activeElementVisualizer: null, rangeVisualizer: null };
 
   // --- State for tracking all currently intersecting pages ---
   const intersectingPages = new Set<Element>();
   let currentlyActivePageElement: Element | null = null;
   let currentlyLastActivePageElement: Element | null = null;
-  let currentlyActiveParagraph: { chapter: number; paragraph: number } | null = null;
+  let currentlyActiveParagraph: ParagraphKey | null = null;
 
   // Keep track of observed paragraphs to avoid re-observing
   const observedParagraphs = new Set<Element>();
@@ -152,19 +186,30 @@ export function setupPageObserver(): {
     scrollIndicatorTargetChapter = nextChapter;
 
     if (isScrollIndicatorVisible) {
-      window.dispatchEvent(new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }));
+      window.dispatchEvent(
+        new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }),
+      );
       return;
     }
 
     scrollIndicatorTimeoutId = window.setTimeout(() => {
       scrollIndicatorTimeoutId = null;
       isScrollIndicatorVisible = true;
-      window.dispatchEvent(new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }));
+      window.dispatchEvent(
+        new CustomEvent("showScrollIndicator", { detail: { targetChapter: nextChapter } }),
+      );
     }, 2000);
   };
 
   // Prevent redundant location updates when values are equivalent
-  type MinimalLoc = { chapter: number; paragraph: number; endChapter: number; endParagraph: number; currentChapter: number; currentParagraph: number };
+  type MinimalLoc = {
+    chapter: number;
+    paragraph: number;
+    endChapter: number;
+    endParagraph: number;
+    currentChapter: number;
+    currentParagraph: number;
+  };
   let lastSentLocation: MinimalLoc | null = null;
   const isSameLoc = (a: MinimalLoc | null, b: MinimalLoc): boolean => {
     return (
@@ -178,6 +223,7 @@ export function setupPageObserver(): {
     );
   };
 
+  // eslint-disable-next-line complexity -- intersection processing with many visibility calculations
   const processIntersections = () => {
     // Skip heavy processing during system navigation or viewport stabilization
     // This covers: systemNavigateTo, resize/orientation transaction, any programmatic scroll
@@ -193,7 +239,9 @@ export function setupPageObserver(): {
     const viewportWidth = window.innerWidth;
 
     // Check media query for landscape mode on smaller wide screens
-    const landscapeMediaQuery = window.matchMedia("screen and (orientation: landscape) and (max-width: 1400px)");
+    const landscapeMediaQuery = window.matchMedia(
+      "screen and (orientation: landscape) and (max-width: 1400px)",
+    );
     if (landscapeMediaQuery.matches) {
       bottomMultiplier = 0.75; // Use larger focus zone in landscape mode
     }
@@ -222,7 +270,7 @@ export function setupPageObserver(): {
       drawFocusZone(rangeVisualizer, rootEl, focusZoneTop, focusZoneBottom);
     }
 
-    let activeParagraph: { chapter: number | null; paragraph: number | null } | null = null;
+    let activeParagraph: ParagraphInfo | null = null;
     let maxPercentageOverlapRatio = -1;
     let chosenElement: Element | null = null;
     let foundFullyVisible = false;
@@ -244,7 +292,11 @@ export function setupPageObserver(): {
       const visualBottom = rect.bottom + marginBottom;
 
       // Check if element is fully contained within the zone and has content
-      if (visualTop >= focusZoneTop && visualBottom <= focusZoneBottom && element.textContent?.trim() !== "") {
+      if (
+        visualTop >= focusZoneTop &&
+        visualBottom <= focusZoneBottom &&
+        element.textContent?.trim() !== ""
+      ) {
         // Element is fully visible in the zone; prefer the one whose center is closest to the focus-zone center
         const elementCenter = (visualTop + visualBottom) / 2;
         const centerDistance = Math.abs(elementCenter - focusZoneCenter);
@@ -299,10 +351,14 @@ export function setupPageObserver(): {
 
         const zoneHeight = focusZoneBottom - focusZoneTop;
         const normalizedAbsoluteOverlap = overlap / zoneHeight; // Normalize to 0-1 range
-        const weightedScore = normalizedAbsoluteOverlap * ABSOLUTE_WEIGHT + currentOverlapRatio * PERCENTAGE_WEIGHT;
+        const weightedScore =
+          normalizedAbsoluteOverlap * ABSOLUTE_WEIGHT + currentOverlapRatio * PERCENTAGE_WEIGHT;
 
         const elementCenter = (visualTop + visualBottom) / 2;
-        const normalizedCenterDistance = Math.min(1, Math.abs(elementCenter - focusZoneCenter) / (zoneHeight / 2));
+        const normalizedCenterDistance = Math.min(
+          1,
+          Math.abs(elementCenter - focusZoneCenter) / (zoneHeight / 2),
+        );
         const centerProximity = 1 - normalizedCenterDistance; // 1 at center, 0 near edges
 
         const finalScore = weightedScore + centerProximity * CENTER_WEIGHT;
@@ -318,7 +374,9 @@ export function setupPageObserver(): {
     rootEl.querySelectorAll(".active-paragraph").forEach((element) => {
       element.classList.remove("active-paragraph");
     });
-    chosenElement?.classList.add("active-paragraph");
+    if (chosenElement) {
+      (chosenElement as HTMLElement).classList.add("active-paragraph");
+    }
 
     if (DEV_ZONE_VISUALIZERS_ENABLED) {
       if (chosenElement) {
@@ -348,74 +406,80 @@ export function setupPageObserver(): {
         const topFocusedPageElement = focusedPages[0];
         const bottomFocusedPageElement = focusedPages[focusedPages.length - 1];
 
-        let activeParagraphChanged = false;
-        if (!currentlyActiveParagraph && activeParagraph) {
-          activeParagraphChanged = true;
-        } else if (currentlyActiveParagraph && !activeParagraph) {
-          activeParagraphChanged = true;
-        } else if (currentlyActiveParagraph && activeParagraph) {
-          if (currentlyActiveParagraph.chapter !== activeParagraph.chapter || currentlyActiveParagraph.paragraph !== activeParagraph.paragraph) {
-            activeParagraphChanged = true;
-          }
-        }
+        const activeParagraphKey = isParagraphKey(activeParagraph) ? activeParagraph : null;
+        const activeParagraphChanged = !areSameParagraphKey(
+          currentlyActiveParagraph,
+          activeParagraphKey,
+        );
 
         // --- Determine if topFocusedPageElement has changed (value-based) ---
         let topElementChanged = false;
         const newTopInfo = topFocusedPageElement ? getParagraphInfo(topFocusedPageElement) : null;
         // Get info for currentlyActivePageElement (which was the top element from the PREVIOUS run)
-        const currentTopInfoFromState = currentlyActivePageElement ? getParagraphInfo(currentlyActivePageElement) : null;
+        const currentTopInfoFromState = currentlyActivePageElement
+          ? getParagraphInfo(currentlyActivePageElement)
+          : null;
 
         if ((!newTopInfo && currentTopInfoFromState) || (newTopInfo && !currentTopInfoFromState)) {
           topElementChanged = true;
         } else if (newTopInfo && currentTopInfoFromState) {
-          if (newTopInfo.chapter !== currentTopInfoFromState.chapter || newTopInfo.paragraph !== currentTopInfoFromState.paragraph) {
+          if (
+            newTopInfo.chapter !== currentTopInfoFromState.chapter ||
+            newTopInfo.paragraph !== currentTopInfoFromState.paragraph
+          ) {
             topElementChanged = true;
           }
         }
 
         // --- Determine if bottomFocusedPageElement has changed (value-based) ---
         let bottomElementChanged = false;
-        const newBottomInfo = bottomFocusedPageElement ? getParagraphInfo(bottomFocusedPageElement) : null;
+        const newBottomInfo = bottomFocusedPageElement
+          ? getParagraphInfo(bottomFocusedPageElement)
+          : null;
         // Get info for currentlyLastActivePageElement (which was the bottom element from the PREVIOUS run)
-        const currentBottomInfoFromState = currentlyLastActivePageElement ? getParagraphInfo(currentlyLastActivePageElement) : null;
+        const currentBottomInfoFromState = currentlyLastActivePageElement
+          ? getParagraphInfo(currentlyLastActivePageElement)
+          : null;
 
-        if ((!newBottomInfo && currentBottomInfoFromState) || (newBottomInfo && !currentBottomInfoFromState)) {
+        if (
+          (!newBottomInfo && currentBottomInfoFromState) ||
+          (newBottomInfo && !currentBottomInfoFromState)
+        ) {
           bottomElementChanged = true;
         } else if (newBottomInfo && currentBottomInfoFromState) {
-          if (newBottomInfo.chapter !== currentBottomInfoFromState.chapter || newBottomInfo.paragraph !== currentBottomInfoFromState.paragraph) {
+          if (
+            newBottomInfo.chapter !== currentBottomInfoFromState.chapter ||
+            newBottomInfo.paragraph !== currentBottomInfoFromState.paragraph
+          ) {
             bottomElementChanged = true;
           }
         }
 
         // Always calculate the intersecting paragraphs and visible range for media
         // This ensures media is activated even on initial load without scroll
-        const allIntersectingParagraphs = Array.from(intersectingPages)
+        const allIntersectingParagraphs: ParagraphKey[] = Array.from(intersectingPages)
           .map((element) => getParagraphInfo(element))
-          .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
-          .sort((a, b) => {
-            if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-            return a.paragraph - b.paragraph;
-          });
+          .filter(isParagraphKey)
+          .sort(compareParagraphKey);
 
         const isMobile = viewportHeight < 700 || viewportWidth < 768;
 
         // On mobile, capture full viewport; on desktop, use 10% to 70% from top
         const visibilityZoneTop = isMobile ? rootRect.top : rootRect.top + rootRect.height * 0.1;
-        const visibilityZoneBottom = isMobile ? rootRect.bottom : rootRect.top + rootRect.height * 0.7;
+        const visibilityZoneBottom = isMobile
+          ? rootRect.bottom
+          : rootRect.top + rootRect.height * 0.7;
 
         // Filter intersecting paragraphs to only include those within the visibility zone
-        const focusZoneIntersectingParagraphs = Array.from(intersectingPages)
+        const focusZoneIntersectingParagraphs: ParagraphKey[] = Array.from(intersectingPages)
           .filter((element) => {
             const elementRect = element.getBoundingClientRect();
             // Check if element's vertical range overlaps with the visibility zone
             return elementRect.top < visibilityZoneBottom && elementRect.bottom > visibilityZoneTop;
           })
           .map((element) => getParagraphInfo(element))
-          .filter((info) => info.chapter !== null && !isNaN(info.chapter) && info.paragraph !== null && !isNaN(info.paragraph))
-          .sort((a, b) => {
-            if (a.chapter !== b.chapter) return a.chapter - b.chapter;
-            return a.paragraph - b.paragraph;
-          });
+          .filter(isParagraphKey)
+          .sort(compareParagraphKey);
 
         const RANGE_PADDING = 1;
         const isPlayFormat = getIsPlayFormat();
@@ -424,26 +488,19 @@ export function setupPageObserver(): {
           // Update persisted state with the NEW DOM element references for the next comparison cycle
           currentlyActivePageElement = topFocusedPageElement;
           currentlyLastActivePageElement = bottomFocusedPageElement;
-          currentlyActiveParagraph = activeParagraph ? { chapter: activeParagraph.chapter, paragraph: activeParagraph.paragraph } : null;
+          currentlyActiveParagraph = activeParagraphKey;
 
           // Use startInfo and endInfo derived from the NEW topFocusedPageElement and bottomFocusedPageElement
-          const startInfo = newTopInfo; // Already derived
-          const endInfo = newBottomInfo; // Already derived
+          const startInfo = newTopInfo;
+          const endInfo = newBottomInfo;
 
-          if (
-            activeParagraph &&
-            activeParagraph.chapter !== null &&
-            activeParagraph.paragraph !== null &&
-            startInfo &&
-            startInfo.chapter !== null &&
-            startInfo.paragraph !== null &&
-            endInfo &&
-            endInfo.chapter !== null &&
-            endInfo.paragraph !== null
-          ) {
-            const rangeStartInfo = startInfo;
-            const rangeEndInfo = endInfo;
+          const rangeStartInfo = isParagraphKey(startInfo) ? startInfo : null;
+          const rangeEndInfo = isParagraphKey(endInfo) ? endInfo : null;
 
+          // Fall back to start paragraph if active paragraph is unknown (e.g. image/figure)
+          const effectiveActive = activeParagraphKey ?? rangeStartInfo;
+
+          if (rangeStartInfo && rangeEndInfo && effectiveActive) {
             let expandedStartParagraph = Math.max(1, rangeStartInfo.paragraph - RANGE_PADDING);
             const expandedEndParagraph = rangeEndInfo.paragraph + RANGE_PADDING;
 
@@ -456,35 +513,40 @@ export function setupPageObserver(): {
               paragraph: expandedStartParagraph,
               endChapter: rangeEndInfo.chapter,
               endParagraph: expandedEndParagraph,
-              currentChapter: activeParagraph.chapter,
-              currentParagraph: activeParagraph.paragraph,
+              currentChapter: effectiveActive.chapter,
+              currentParagraph: effectiveActive.paragraph,
             };
 
             if (!isSameLoc(lastSentLocation, nextLoc)) {
-              // Avoid overriding programmatic navigation mid-scroll
-              if (isSystemNavigationInProgress()) {
-                // Defer location update until system navigation finishes
-              } else {
+              if (!isSystemNavigationInProgress()) {
+                // Defensive defaults to satisfy Location's non-nullable number fields
+                const firstVisible = focusZoneIntersectingParagraphs[0] ?? rangeStartInfo;
+                const lastVisible =
+                  focusZoneIntersectingParagraphs.length > 0
+                    ? focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]
+                    : rangeEndInfo;
+
                 setCurrentLocation({
                   chapter: rangeStartInfo.chapter,
                   paragraph: expandedStartParagraph,
                   endChapter: rangeEndInfo.chapter,
                   endParagraph: expandedEndParagraph,
-                  currentChapter: activeParagraph.chapter,
-                  currentParagraph: activeParagraph.paragraph,
-                  earliestVisibleParagraph: focusZoneIntersectingParagraphs[0]?.paragraph ?? null,
-                  latestVisibleParagraph: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.paragraph ?? null,
-                  earliestVisibleChapter: focusZoneIntersectingParagraphs[0]?.chapter ?? null,
-                  latestVisibleChapter: focusZoneIntersectingParagraphs[focusZoneIntersectingParagraphs.length - 1]?.chapter ?? null,
+                  currentChapter: effectiveActive.chapter,
+                  currentParagraph: effectiveActive.paragraph,
+                  earliestVisibleParagraph: firstVisible.paragraph,
+                  latestVisibleParagraph: lastVisible.paragraph,
+                  earliestVisibleChapter: firstVisible.chapter,
+                  latestVisibleChapter: lastVisible.chapter,
                 });
+
                 lastSentLocation = nextLoc;
               }
             }
           } else {
-            console.warn("[Observer] Could not update location: activeParagraph or start/end info is invalid.", {
+            console.warn("[Observer] Could not update location: start/end info is invalid.", {
               activePgh: activeParagraph,
-              startInfo: startInfo,
-              endInfo: endInfo,
+              startInfo,
+              endInfo,
             });
           }
         }
@@ -494,17 +556,26 @@ export function setupPageObserver(): {
         if (allIntersectingParagraphs.length > 0) {
           const mediaStartInfo = allIntersectingParagraphs[0];
           const mediaEndInfo = allIntersectingParagraphs[allIntersectingParagraphs.length - 1];
-          activateMediaInRange(mediaStartInfo.chapter, mediaStartInfo.paragraph, mediaEndInfo.chapter, mediaEndInfo.paragraph, isPlayFormat);
-        } else if (
-          newTopInfo &&
-          newBottomInfo &&
-          newTopInfo.chapter !== null &&
-          newTopInfo.paragraph !== null &&
-          newBottomInfo.chapter !== null &&
-          newBottomInfo.paragraph !== null
-        ) {
-          // Fallback to focus zone range if no intersecting paragraphs found
-          activateMediaInRange(newTopInfo.chapter, newTopInfo.paragraph, newBottomInfo.chapter, newBottomInfo.paragraph, isPlayFormat);
+          activateMediaInRange(
+            mediaStartInfo.chapter,
+            mediaStartInfo.paragraph,
+            mediaEndInfo.chapter,
+            mediaEndInfo.paragraph,
+            isPlayFormat,
+          );
+        } else {
+          const fallbackStart = isParagraphKey(newTopInfo) ? newTopInfo : null;
+          const fallbackEnd = isParagraphKey(newBottomInfo) ? newBottomInfo : null;
+
+          if (fallbackStart && fallbackEnd) {
+            activateMediaInRange(
+              fallbackStart.chapter,
+              fallbackStart.paragraph,
+              fallbackEnd.chapter,
+              fallbackEnd.paragraph,
+              isPlayFormat,
+            );
+          }
         }
       } else {
         // Handle case where intersecting pages exist, but none are in the focus zone
@@ -585,7 +656,9 @@ export function setupPageObserver(): {
     });
 
     if (newParagraphsCount > 0) {
-      console.log(`[PageObserver] Observed ${newParagraphsCount} new paragraphs. Total observed: ${observedParagraphs.size}`);
+      console.log(
+        `[PageObserver] Observed ${newParagraphsCount} new paragraphs. Total observed: ${observedParagraphs.size}`,
+      );
     }
 
     return newParagraphsCount;
@@ -620,7 +693,9 @@ export function setupPageObserver(): {
     }
 
     if (removedCount > 0) {
-      console.log(`[PageObserver] Cleaned up ${removedCount} removed paragraphs. Total observed: ${observedParagraphs.size}`);
+      console.log(
+        `[PageObserver] Cleaned up ${removedCount} removed paragraphs. Total observed: ${observedParagraphs.size}`,
+      );
     }
 
     return removedCount;
@@ -631,6 +706,22 @@ export function setupPageObserver(): {
 
   const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
 
+  const visibleSpacers = new Map<Element, number>();
+
+  const applySpacerBlur = (visibilityPercent: number) => {
+    const legacy = document.getElementById("legacy");
+    if (!legacy || !legacy.hasAttribute("data-bg-blur")) return;
+
+    const clampedVisibility = Math.max(0, Math.min(1, visibilityPercent));
+    const blurMultiplier = Math.max(0, 1 - clampedVisibility);
+    const baseBlurValue = Number.parseFloat(legacy.style.getPropertyValue("--bg-blur-base"));
+
+    if (!Number.isFinite(baseBlurValue)) return;
+
+    legacy.style.setProperty("--bg-blur-multiplier", blurMultiplier.toString());
+    legacy.style.setProperty("--bg-blur-amount", `${baseBlurValue * blurMultiplier}px`);
+  };
+
   const spacerObserver = new IntersectionObserver(
     (entries) => {
       // Skip processing during system navigation or viewport stabilization
@@ -639,6 +730,9 @@ export function setupPageObserver(): {
         return;
       }
 
+      let shouldApplyBlur = false;
+
+      // eslint-disable-next-line complexity -- spacer visibility calculation with blur effects
       entries.forEach((entry) => {
         if (!isSplashAnimationComplete) return;
 
@@ -649,7 +743,21 @@ export function setupPageObserver(): {
         const visibleTop = Math.max(rootBounds.top, rect.top);
         const visibleBottom = Math.min(rootBounds.bottom, rect.bottom);
         const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-        const visibilityPercent = entry.intersectionRatio > 0 ? entry.intersectionRatio : rect.height > 0 ? visibleHeight / rect.height : 0;
+        const visibilityPercent =
+          entry.intersectionRatio > 0
+            ? entry.intersectionRatio
+            : rect.height > 0
+              ? visibleHeight / rect.height
+              : 0;
+        const clampedVisibility = Math.max(0, Math.min(1, visibilityPercent));
+        const isVisible = visibleHeight > 0;
+
+        shouldApplyBlur = true;
+        if (isVisible) {
+          visibleSpacers.set(entry.target, clampedVisibility);
+        } else {
+          visibleSpacers.delete(entry.target);
+        }
 
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
@@ -669,13 +777,23 @@ export function setupPageObserver(): {
                 scheduleScrollIndicator(nextChapter);
               }
 
-              if (visibilityPercent > 0.8 && visibilityPercent < 1 && Number.isFinite(nextChapter)) {
+              if (
+                visibilityPercent > 0.8 &&
+                visibilityPercent < 1 &&
+                Number.isFinite(nextChapter)
+              ) {
                 // Only trigger chapter transition when scrolling DOWN, not navigating, and cooldown passed
                 const direction = scrollCoordinator.scrollDirection;
                 const canTransition = scrollCoordinator.canTriggerChapterTransition();
                 const isNavigating = scrollCoordinator.isNavigating;
 
-                debugLog("spacer threshold", { visibilityPercent, nextChapter, direction, canTransition, isNavigating });
+                debugLog("spacer threshold", {
+                  visibilityPercent,
+                  nextChapter,
+                  direction,
+                  canTransition,
+                  isNavigating,
+                });
 
                 if (direction === "down" && canTransition && !isNavigating) {
                   scrollCoordinator.recordChapterTransition();
@@ -696,7 +814,10 @@ export function setupPageObserver(): {
 
               // Map 0.4 -> 1.0 visibility to 1.0 -> 0.0 opacity
               const fadePercent = (visibilityPercent - 0.4) / 0.6;
-              rootEl.style.setProperty("--gradient-opacity", Math.max(0, 1 - fadePercent).toString());
+              rootEl.style.setProperty(
+                "--gradient-opacity",
+                Math.max(0, 1 - fadePercent).toString(),
+              );
             } else {
               // 100% visible: full transparency
               rootEl.style.setProperty("--gradient-opacity", "0");
@@ -715,7 +836,6 @@ export function setupPageObserver(): {
               rootEl.style.setProperty("--gradient-opacity", (1 - fadePercent).toString());
             } else {
               hideScrollIndicator();
-              // Less than 30% visible: full opacity
               rootEl.style.setProperty("--gradient-opacity", "1");
             }
           }
@@ -734,7 +854,8 @@ export function setupPageObserver(): {
             } else {
               // Leaving from top
               const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
-              const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
+              const nextChapter =
+                nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
               scheduleScrollIndicator(nextChapter);
               rootEl.style.setProperty("--gradient-opacity", "0");
             }
@@ -744,6 +865,16 @@ export function setupPageObserver(): {
           hideScrollIndicator();
         }
       });
+
+      if (shouldApplyBlur) {
+        let maxVisibility = 0;
+        visibleSpacers.forEach((visibility) => {
+          if (visibility > maxVisibility) {
+            maxVisibility = visibility;
+          }
+        });
+        applySpacerBlur(maxVisibility);
+      }
     },
     { threshold: Array.from(Array(51).keys()).map((i) => i / 50) },
   );
@@ -782,7 +913,9 @@ export function setupPageObserver(): {
     });
     toDelete.forEach((s) => observedSpacers.delete(s));
     if (removed > 0) {
-      console.log(`[PageObserver] Cleaned up ${removed} removed spacers. Total observed: ${observedSpacers.size}`);
+      console.log(
+        `[PageObserver] Cleaned up ${removed} removed spacers. Total observed: ${observedSpacers.size}`,
+      );
     }
     return removed;
   };
@@ -804,7 +937,9 @@ export function setupPageObserver(): {
   };
 
   if (paragraphsToObserve.length === 0) {
-    console.warn("No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').");
+    console.warn(
+      "No paragraphs found to observe (selector: 'section[data-chapter] [data-index]').",
+    );
     window.removeEventListener("scrollIndicatorClicked", handleScrollIndicatorClicked);
     return null;
   } else {
@@ -813,6 +948,13 @@ export function setupPageObserver(): {
       observedParagraphs.add(paragraph);
     });
 
-    return { observer, observeNewParagraphs, cleanupRemovedParagraphs, observeNewSpacers, cleanupRemovedSpacers, cleanup };
+    return {
+      observer,
+      observeNewParagraphs,
+      cleanupRemovedParagraphs,
+      observeNewSpacers,
+      cleanupRemovedSpacers,
+      cleanup,
+    };
   }
 }

@@ -8,8 +8,13 @@ interface IntegrationsContextType {
   ready: boolean;
 }
 
-const IntegrationsContext = createContext<IntegrationsContextType>({ authMod: null, paymentsMod: null, ready: false });
+const IntegrationsContext = createContext<IntegrationsContextType>({
+  authMod: null,
+  paymentsMod: null,
+  ready: false,
+});
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useIntegrations = () => useContext(IntegrationsContext);
 
 export const IntegrationsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -24,7 +29,11 @@ export const IntegrationsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       try {
         const [authModule, paymentsModule] = await Promise.all([
-          AUTH === "clerk" ? import("./auth/clerk") : AUTH === "snapplify" ? import("./auth/snapplify") : import("./auth/default"),
+          AUTH === "clerk"
+            ? import("./auth/clerk")
+            : AUTH === "snapplify"
+              ? import("./auth/snapplify")
+              : import("./auth/default"),
           PAY === "supabase" ? import("./payments/supabase") : import("./payments/default"),
         ]);
 
@@ -34,7 +43,10 @@ export const IntegrationsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch (error) {
         console.error("Failed to load integrations:", error);
         // Load defaults as fallback
-        const [defaultAuth, defaultPayments] = await Promise.all([import("./auth/default"), import("./payments/default")]);
+        const [defaultAuth, defaultPayments] = await Promise.all([
+          import("./auth/default"),
+          import("./payments/default"),
+        ]);
         setAuthMod(defaultAuth.default);
         setPaymentsMod(defaultPayments.default);
         setReady(true);
@@ -56,5 +68,9 @@ export const IntegrationsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, []);
 
-  return <IntegrationsContext.Provider value={{ authMod, paymentsMod, ready }}>{children}</IntegrationsContext.Provider>;
+  return (
+    <IntegrationsContext.Provider value={{ authMod, paymentsMod, ready }}>
+      {children}
+    </IntegrationsContext.Provider>
+  );
 };

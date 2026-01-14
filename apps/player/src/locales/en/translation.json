@@ -56,7 +56,15 @@
     "Awakening dormant heroes..."
   ],
   "books": {
-    "Wukong": { "loading_phrases": ["Training the monkeys...", "Traveling through the sky...", "Encountering demons...", "Discovering treasures...", "Learning new skills..."] },
+    "Wukong": {
+      "loading_phrases": [
+        "Training the monkeys...",
+        "Traveling through the sky...",
+        "Encountering demons...",
+        "Discovering treasures...",
+        "Learning new skills..."
+      ]
+    },
     "Alice-Wonderland": {
       "loading_phrases": [
         "Stretching reality...",
@@ -79,7 +87,14 @@
         "Fighting thoughtcrime..."
       ]
     },
-    "1984-English": { "loading_phrases": ["Installing telescreens...", "Configuring thoughtcrime detection...", "Erasing the past...", "Activating thought police..."] },
+    "1984-English": {
+      "loading_phrases": [
+        "Installing telescreens...",
+        "Configuring thoughtcrime detection...",
+        "Erasing the past...",
+        "Activating thought police..."
+      ]
+    },
     "Pharaon": {
       "loading_phrases": [
         "Building the pyramids...",
@@ -97,10 +112,32 @@
       ]
     },
     "Conrad-Tajny-Agent": {
-      "loading_phrases": ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."]
+      "loading_phrases": [
+        "Encrypting secret messages...",
+        "Plotting espionage...",
+        "Shadowing informants...",
+        "Meeting in dark alleys...",
+        "Planting evidence..."
+      ]
     },
-    "Krolowa-Sniegu": { "loading_phrases": ["Freezing hearts...", "Shattering mirrors...", "Chilling the air...", "Preparing ice castles...", "Summoning snowflakes..."] },
-    "Snow-Queen": { "loading_phrases": ["Building snow palaces...", "Freezing summer dreams...", "Icing friendships...", "Crafting snowflakes...", "Conjuring frostbite..."] },
+    "Krolowa-Sniegu": {
+      "loading_phrases": [
+        "Freezing hearts...",
+        "Shattering mirrors...",
+        "Chilling the air...",
+        "Preparing ice castles...",
+        "Summoning snowflakes..."
+      ]
+    },
+    "Snow-Queen": {
+      "loading_phrases": [
+        "Building snow palaces...",
+        "Freezing summer dreams...",
+        "Icing friendships...",
+        "Crafting snowflakes...",
+        "Conjuring frostbite..."
+      ]
+    },
     "Lalka": {
       "loading_phrases": [
         "Polishing shop windows...",
@@ -111,7 +148,13 @@
       ]
     },
     "Romeo-And-Juliet": {
-      "loading_phrases": ["Mixing love potions...", "Arranging secret meetings...", "Avoiding family feuds...", "Balcony climbing practice...", "Sending cryptic love letters..."]
+      "loading_phrases": [
+        "Mixing love potions...",
+        "Arranging secret meetings...",
+        "Avoiding family feuds...",
+        "Balcony climbing practice...",
+        "Sending cryptic love letters..."
+      ]
     },
     "Fatherland": {
       "loading_phrases": [
@@ -122,9 +165,23 @@
         "Questioning the official story..."
       ]
     },
-    "Macbeth": { "loading_phrases": ["Brewing witchcraft...", "Counting prophecies...", "Polishing daggers...", "Removing bloodstains...", "Summoning ghosts..."] },
+    "Macbeth": {
+      "loading_phrases": [
+        "Brewing witchcraft...",
+        "Counting prophecies...",
+        "Polishing daggers...",
+        "Removing bloodstains...",
+        "Summoning ghosts..."
+      ]
+    },
     "Midsummer-Nights-Dream": {
-      "loading_phrases": ["Casting love spells...", "Chasing fairies...", "Taming mischievous spirits...", "Confusing lovers...", "Weaving magical forests..."]
+      "loading_phrases": [
+        "Casting love spells...",
+        "Chasing fairies...",
+        "Taming mischievous spirits...",
+        "Confusing lovers...",
+        "Weaving magical forests..."
+      ]
     },
     "Othello": {
       "loading_phrases": [
@@ -165,6 +222,7 @@
   "enter_deep_research": "Enter Deep Research...",
   "search_or_ask": "Search or Ask",
   "no_results_to_display": "No results to display.",
+  "updating_results": "Updating results...",
   "searching": "Searching...",
   "search_results": "Search Results",
   "discover_book_content": "Discover book content and insights",

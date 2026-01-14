@@ -1,0 +1,658 @@
+/* eslint-disable */
+/**
+ * Generated `api` utility.
+ *
+ * THIS CODE IS AUTOMATICALLY GENERATED.
+ *
+ * To regenerate, run `npx convex dev`.
+ * @module
+ */
+
+import type * as admin_deleteFile from "../admin/deleteFile.js";
+import type * as admin_deleteFilesInFolder from "../admin/deleteFilesInFolder.js";
+import type * as admin_r2Deletions from "../admin/r2Deletions.js";
+import type * as authHelpers from "../authHelpers.js";
+import type * as authz from "../authz.js";
+import type * as authzQueries from "../authzQueries.js";
+import type * as avatarEditing from "../avatarEditing.js";
+import type * as avatarGeneration from "../avatarGeneration.js";
+import type * as backgroundCues from "../backgroundCues.js";
+import type * as backgroundEditing from "../backgroundEditing.js";
+import type * as backgroundEditingInternal from "../backgroundEditingInternal.js";
+import type * as backgroundMetadata from "../backgroundMetadata.js";
+import type * as backgroundPreviewHttp from "../backgroundPreviewHttp.js";
+import type * as bookAuthz from "../bookAuthz.js";
+import type * as bookQueries from "../bookQueries.js";
+import type * as chapterCompiler from "../chapterCompiler.js";
+import type * as characterPromptGeneration from "../characterPromptGeneration.js";
+import type * as cli from "../cli.js";
+import type * as colorExtraction from "../colorExtraction.js";
+import type * as functions from "../functions.js";
+import type * as generateUploadUrl from "../generateUploadUrl.js";
+import type * as generator from "../generator.js";
+import type * as http from "../http.js";
+import type * as imageProcessing from "../imageProcessing.js";
+import type * as importHelpers from "../importHelpers.js";
+import type * as lib_characterDataV2 from "../lib/characterDataV2.js";
+import type * as lib_extractDominantColor from "../lib/extractDominantColor.js";
+import type * as lib_parseFormData from "../lib/parseFormData.js";
+import type * as lib_sharedTypes from "../lib/sharedTypes.js";
+import type * as metadata from "../metadata.js";
+import type * as metadataMigrations from "../metadataMigrations.js";
+import type * as musicCues from "../musicCues.js";
+import type * as musicMetadata from "../musicMetadata.js";
+import type * as notes from "../notes.js";
+import type * as paragraphEditor from "../paragraphEditor.js";
+import type * as prompts_promptForSingleUserDescription from "../prompts/promptForSingleUserDescription.js";
+import type * as prompts_storyContext from "../prompts/storyContext.js";
+import type * as reset from "../reset.js";
+import type * as variants from "../variants.js";
+
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
+
+declare const fullApi: ApiFromModules<{
+  "admin/deleteFile": typeof admin_deleteFile;
+  "admin/deleteFilesInFolder": typeof admin_deleteFilesInFolder;
+  "admin/r2Deletions": typeof admin_r2Deletions;
+  authHelpers: typeof authHelpers;
+  authz: typeof authz;
+  authzQueries: typeof authzQueries;
+  avatarEditing: typeof avatarEditing;
+  avatarGeneration: typeof avatarGeneration;
+  backgroundCues: typeof backgroundCues;
+  backgroundEditing: typeof backgroundEditing;
+  backgroundEditingInternal: typeof backgroundEditingInternal;
+  backgroundMetadata: typeof backgroundMetadata;
+  backgroundPreviewHttp: typeof backgroundPreviewHttp;
+  bookAuthz: typeof bookAuthz;
+  bookQueries: typeof bookQueries;
+  chapterCompiler: typeof chapterCompiler;
+  characterPromptGeneration: typeof characterPromptGeneration;
+  cli: typeof cli;
+  colorExtraction: typeof colorExtraction;
+  functions: typeof functions;
+  generateUploadUrl: typeof generateUploadUrl;
+  generator: typeof generator;
+  http: typeof http;
+  imageProcessing: typeof imageProcessing;
+  importHelpers: typeof importHelpers;
+  "lib/characterDataV2": typeof lib_characterDataV2;
+  "lib/extractDominantColor": typeof lib_extractDominantColor;
+  "lib/parseFormData": typeof lib_parseFormData;
+  "lib/sharedTypes": typeof lib_sharedTypes;
+  metadata: typeof metadata;
+  metadataMigrations: typeof metadataMigrations;
+  musicCues: typeof musicCues;
+  musicMetadata: typeof musicMetadata;
+  notes: typeof notes;
+  paragraphEditor: typeof paragraphEditor;
+  "prompts/promptForSingleUserDescription": typeof prompts_promptForSingleUserDescription;
+  "prompts/storyContext": typeof prompts_storyContext;
+  reset: typeof reset;
+  variants: typeof variants;
+}>;
+
+/**
+ * A utility for referencing Convex functions in your app's public API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
+export declare const api: FilterApi<
+  typeof fullApi,
+  FunctionReference<any, "public">
+>;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
+export declare const internal: FilterApi<
+  typeof fullApi,
+  FunctionReference<any, "internal">
+>;
+
+export declare const components: {
+  assetManager: {
+    assetFsHttp: {
+      getBlobForServing: FunctionReference<
+        "action",
+        "internal",
+        { storageId: string },
+        null | ArrayBuffer
+      >;
+      getPublishedFileForServing: FunctionReference<
+        "query",
+        "internal",
+        { basename: string; folderPath: string },
+        | null
+        | {
+            cacheControl?: string;
+            contentType?: string;
+            kind: "blob";
+            storageId: string;
+          }
+        | { cacheControl?: string; kind: "redirect"; location: string }
+      >;
+      getTextContent: FunctionReference<
+        "action",
+        "internal",
+        { versionId: string },
+        null | { content: string; contentType?: string }
+      >;
+      getVersionForServing: FunctionReference<
+        "query",
+        "internal",
+        { versionId: string },
+        | null
+        | {
+            cacheControl?: string;
+            contentType?: string;
+            kind: "blob";
+            storageId: string;
+          }
+        | { cacheControl?: string; kind: "redirect"; location: string }
+      >;
+      getVersionPreviewUrl: FunctionReference<
+        "query",
+        "internal",
+        { versionId: string },
+        null | { contentType?: string; size?: number; url: string }
+      >;
+    };
+    assetManager: {
+      cancelPendingConvexDeletion: FunctionReference<
+        "mutation",
+        "internal",
+        { storageId: string },
+        { cancelled: boolean }
+      >;
+      cancelPendingR2Deletion: FunctionReference<
+        "mutation",
+        "internal",
+        { r2Key: string },
+        { cancelled: boolean }
+      >;
+      commitVersion: FunctionReference<
+        "mutation",
+        "internal",
+        { basename: string; folderPath: string; label?: string },
+        { assetId: string; version: number; versionId: string }
+      >;
+      configureStorageBackend: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          backend: "convex" | "r2";
+          r2KeyPrefix?: string;
+          r2PublicUrl?: string;
+        },
+        null
+      >;
+      createAsset: FunctionReference<
+        "mutation",
+        "internal",
+        { basename: string; folderPath: string },
+        string
+      >;
+      createFolderByName: FunctionReference<
+        "mutation",
+        "internal",
+        { name: string; parentPath: string },
+        string
+      >;
+      createFolderByPath: FunctionReference<
+        "mutation",
+        "internal",
+        { name?: string; path: string },
+        string
+      >;
+      createVersionFromStorageId: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          basename: string;
+          folderPath: string;
+          label?: string;
+          storageId: string;
+        },
+        { assetId: string; version: number; versionId: string }
+      >;
+      deleteByPathPrefixBatch: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; pathPrefix: string },
+        {
+          deletedAssets: number;
+          deletedEvents: number;
+          deletedFolders: number;
+          deletedVersions: number;
+          hasMore: boolean;
+          r2KeysToDelete: Array<string>;
+        }
+      >;
+      deleteDataBatch: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number },
+        {
+          deletedAssets: number;
+          deletedEvents: number;
+          deletedFolders: number;
+          deletedIntents: number;
+          deletedVersions: number;
+          hasMore: boolean;
+        }
+      >;
+      deleteFile: FunctionReference<
+        "mutation",
+        "internal",
+        { basename: string; folderPath: string },
+        { deleted: boolean; deletedVersions: number }
+      >;
+      deleteFilesInFolder: FunctionReference<
+        "mutation",
+        "internal",
+        { basenames?: Array<string>; folderPath: string },
+        { deletedAssets: number; deletedVersions: number }
+      >;
+      finishUpload: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          contentType?: string;
+          intentId: string;
+          r2Config?: {
+            R2_ACCESS_KEY_ID: string;
+            R2_BUCKET: string;
+            R2_ENDPOINT: string;
+            R2_SECRET_ACCESS_KEY: string;
+          };
+          size?: number;
+          uploadResponse?: any;
+        },
+        { assetId: string; version: number; versionId: string }
+      >;
+      getAsset: FunctionReference<
+        "query",
+        "internal",
+        { basename: string; folderPath: string },
+        null | {
+          _creationTime: number;
+          _id: string;
+          basename: string;
+          createdAt: number;
+          createdBy?: string;
+          folderPath: string;
+          publishedVersionId?: string;
+          updatedAt: number;
+          updatedBy?: string;
+          versionCounter: number;
+        }
+      >;
+      getAssetVersions: FunctionReference<
+        "query",
+        "internal",
+        { basename: string; folderPath: string },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          archivedAt?: number;
+          archivedBy?: string;
+          assetId: string;
+          contentType?: string;
+          createdAt: number;
+          createdBy?: string;
+          label?: string;
+          originalFilename?: string;
+          publishedAt?: number;
+          publishedBy?: string;
+          r2Key?: string;
+          sha256?: string;
+          size?: number;
+          state: "published" | "archived";
+          storageId?: string;
+          updatedBy?: string;
+          uploadStatus?: "pending" | "ready";
+          version: number;
+        }>
+      >;
+      getFolder: FunctionReference<
+        "query",
+        "internal",
+        { path: string },
+        null | {
+          _creationTime: number;
+          _id: string;
+          createdAt: number;
+          createdBy?: string;
+          name: string;
+          path: string;
+          updatedAt: number;
+          updatedBy?: string;
+        }
+      >;
+      getFolderWithAssets: FunctionReference<
+        "query",
+        "internal",
+        { path: string },
+        null | {
+          assets: Array<{
+            _creationTime: number;
+            _id: string;
+            basename: string;
+            createdAt: number;
+            createdBy?: string;
+            folderPath: string;
+            publishedVersionId?: string;
+            updatedAt: number;
+            updatedBy?: string;
+            versionCounter: number;
+          }>;
+          folder: {
+            _creationTime: number;
+            _id: string;
+            createdAt: number;
+            createdBy?: string;
+            name: string;
+            path: string;
+            updatedAt: number;
+            updatedBy?: string;
+          };
+        }
+      >;
+      getPublishedFile: FunctionReference<
+        "query",
+        "internal",
+        { basename: string; folderPath: string },
+        null | {
+          basename: string;
+          contentType?: string;
+          createdAt: number;
+          createdBy?: string;
+          folderPath: string;
+          publishedAt: number;
+          publishedBy?: string;
+          r2Key?: string;
+          sha256?: string;
+          size?: number;
+          state: "published";
+          storageId?: string;
+          url: string;
+          version: number;
+        }
+      >;
+      getPublishedVersion: FunctionReference<
+        "query",
+        "internal",
+        { basename: string; folderPath: string },
+        any
+      >;
+      getR2KeysByPathPrefix: FunctionReference<
+        "query",
+        "internal",
+        { pathPrefix: string },
+        Array<string>
+      >;
+      getStorageBackendConfig: FunctionReference<
+        "query",
+        "internal",
+        {},
+        "convex" | "r2"
+      >;
+      listAllFolders: FunctionReference<
+        "query",
+        "internal",
+        {},
+        Array<{
+          _creationTime: number;
+          _id: string;
+          createdAt: number;
+          createdBy?: string;
+          name: string;
+          path: string;
+          updatedAt: number;
+          updatedBy?: string;
+        }>
+      >;
+      listAssetEvents: FunctionReference<
+        "query",
+        "internal",
+        { basename: string; folderPath: string },
+        Array<{
+          createdAt: number;
+          createdBy?: string;
+          fromBasename?: string;
+          fromFolderPath?: string;
+          toBasename?: string;
+          toFolderPath?: string;
+          type: string;
+        }>
+      >;
+      listAssets: FunctionReference<
+        "query",
+        "internal",
+        { folderPath: string },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          basename: string;
+          createdAt: number;
+          createdBy?: string;
+          folderPath: string;
+          publishedVersionId?: string;
+          updatedAt: number;
+          updatedBy?: string;
+          versionCounter: number;
+        }>
+      >;
+      listFolders: FunctionReference<
+        "query",
+        "internal",
+        { parentPath?: string },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          createdAt: number;
+          createdBy?: string;
+          name: string;
+          path: string;
+          updatedAt: number;
+          updatedBy?: string;
+        }>
+      >;
+      listFoldersWithAssets: FunctionReference<
+        "query",
+        "internal",
+        { parentPath: string },
+        Array<{
+          assets: Array<{
+            basename: string;
+            contentType?: string;
+            size?: number;
+            url: string;
+            versionId: string;
+          }>;
+          folder: {
+            _creationTime: number;
+            _id: string;
+            createdAt: number;
+            createdBy?: string;
+            name: string;
+            path: string;
+            updatedAt: number;
+            updatedBy?: string;
+          };
+        }>
+      >;
+      listPendingConvexDeletions: FunctionReference<
+        "query",
+        "internal",
+        { limit?: number; onlyExpired?: boolean },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          deleteAfter: number;
+          deletedAt: number;
+          deletedBy?: string;
+          originalPath: string;
+          storageId: string;
+        }>
+      >;
+      listPendingR2Deletions: FunctionReference<
+        "query",
+        "internal",
+        { limit?: number; onlyExpired?: boolean },
+        Array<{
+          _creationTime: number;
+          _id: string;
+          deleteAfter: number;
+          deletedAt: number;
+          deletedBy?: string;
+          originalPath: string;
+          r2Key: string;
+        }>
+      >;
+      listPublishedAssetsInFolder: FunctionReference<
+        "query",
+        "internal",
+        { folderPath: string },
+        Array<{
+          basename: string;
+          createdAt: number;
+          createdBy?: string;
+          folderPath: string;
+          label?: string;
+          publishedAt?: number;
+          publishedBy?: string;
+          version: number;
+        }>
+      >;
+      listPublishedFilesInFolder: FunctionReference<
+        "query",
+        "internal",
+        { folderPath: string },
+        Array<{
+          basename: string;
+          contentType?: string;
+          folderPath: string;
+          publishedAt?: number;
+          r2Key?: string;
+          size?: number;
+          storageId?: string;
+          url: string;
+          version: number;
+          versionId: string;
+        }>
+      >;
+      moveAsset: FunctionReference<
+        "mutation",
+        "internal",
+        { basename: string; fromFolderPath: string; toFolderPath: string },
+        { assetId: string; fromFolderPath: string; toFolderPath: string }
+      >;
+      processExpiredConvexDeletions: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; forceAll?: boolean },
+        { hasMore: boolean; processed: number }
+      >;
+      processExpiredR2Deletions: FunctionReference<
+        "mutation",
+        "internal",
+        { batchSize?: number; forceAll?: boolean },
+        { hasMore: boolean; processed: number; r2KeysToDelete: Array<string> }
+      >;
+      renameAsset: FunctionReference<
+        "mutation",
+        "internal",
+        { basename: string; folderPath: string; newBasename: string },
+        { assetId: string; newBasename: string; oldBasename: string }
+      >;
+      restoreVersion: FunctionReference<
+        "mutation",
+        "internal",
+        { label?: string; versionId: string },
+        {
+          assetId: string;
+          restoredFromVersion: number;
+          version: number;
+          versionId: string;
+        }
+      >;
+      startUpload: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          basename: string;
+          filename?: string;
+          folderPath: string;
+          label?: string;
+          r2Config?: {
+            R2_ACCESS_KEY_ID: string;
+            R2_BUCKET: string;
+            R2_ENDPOINT: string;
+            R2_SECRET_ACCESS_KEY: string;
+          };
+        },
+        {
+          backend: "convex" | "r2";
+          intentId: string;
+          r2Key?: string;
+          uploadUrl: string;
+        }
+      >;
+      updateFolder: FunctionReference<
+        "mutation",
+        "internal",
+        { name?: string; newPath?: string; path: string },
+        any
+      >;
+    };
+    changelog: {
+      listForFolder: FunctionReference<
+        "query",
+        "internal",
+        {
+          cursor: { createdAt: number; id: string };
+          folderPath: string;
+          limit?: number;
+        },
+        any
+      >;
+      listSince: FunctionReference<
+        "query",
+        "internal",
+        { cursor: { createdAt: number; id: string }; limit?: number },
+        any
+      >;
+    };
+    signedUrl: {
+      getSignedUrl: FunctionReference<
+        "action",
+        "internal",
+        {
+          expiresIn?: number;
+          r2Config?: {
+            R2_ACCESS_KEY_ID: string;
+            R2_BUCKET: string;
+            R2_ENDPOINT: string;
+            R2_SECRET_ACCESS_KEY: string;
+          };
+          versionId: string;
+        },
+        null | string
+      >;
+    };
+  };
+};

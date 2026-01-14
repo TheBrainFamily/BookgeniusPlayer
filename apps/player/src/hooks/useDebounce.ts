@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
-import { DebouncedFunc } from "lodash";
+import { type DebouncedFunc } from "lodash";
 
 /**
  * React hook that returns a debounced version of `value`.
@@ -14,7 +14,10 @@ export function useDebounce<T>(value: T, delayMs = 200): T {
   const debouncedSetter = useRef<DebouncedFunc<(v: T) => void> | null>(null);
 
   useEffect(() => {
-    debouncedSetter.current = debounce((v: T) => setDebounced(v), delayMs, { leading: false, trailing: true });
+    debouncedSetter.current = debounce((v: T) => setDebounced(v), delayMs, {
+      leading: false,
+      trailing: true,
+    });
     return () => {
       debouncedSetter.current?.cancel();
     };

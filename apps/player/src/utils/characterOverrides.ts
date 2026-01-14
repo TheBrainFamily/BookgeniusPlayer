@@ -1,5 +1,8 @@
-import { CharacterData, CharacterOverride, ChapterParagraphRef } from "@player/types/book";
-import { getListeningMediaFilePathForName, getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
+import {
+  type CharacterData,
+  type CharacterOverride,
+  type ChapterParagraphRef,
+} from "@player/types/book";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
 
 const LOCATION_REGEX = /^ch(\d+)-p(\d+)$/i;
@@ -13,8 +16,10 @@ export const compareLocations = (a: ChapterParagraphRef, b: ChapterParagraphRef)
   return a.paragraph - b.paragraph;
 };
 
-const isOnOrAfter = (location: ChapterParagraphRef, start: ChapterParagraphRef) => compareLocations(location, start) >= 0;
-const isOnOrBefore = (location: ChapterParagraphRef, end: ChapterParagraphRef) => compareLocations(location, end) <= 0;
+const isOnOrAfter = (location: ChapterParagraphRef, start: ChapterParagraphRef) =>
+  compareLocations(location, start) >= 0;
+const isOnOrBefore = (location: ChapterParagraphRef, end: ChapterParagraphRef) =>
+  compareLocations(location, end) <= 0;
 
 export const parseChapterParagraphId = (id?: string | null): ChapterParagraphRef | null => {
   if (!id) return null;
@@ -29,7 +34,10 @@ export const parseChapterParagraphId = (id?: string | null): ChapterParagraphRef
   return { chapter, paragraph };
 };
 
-export const findActiveOverride = (character: CharacterData, location?: ChapterParagraphRef | null): CharacterOverride | null => {
+export const findActiveOverride = (
+  character: CharacterData,
+  location?: ChapterParagraphRef | null,
+): CharacterOverride | null => {
   if (!location || !character.overrides?.length) {
     return null;
   }
@@ -65,14 +73,25 @@ export interface CharacterSnapshot {
   displayName: string;
   summary?: string;
   override: CharacterOverride | null;
-  media: { listening: string; talking: string; usesExplicitAsset: boolean; baseNameUsed: string; explicitAssetUrl?: string };
+  media: {
+    listening: string;
+    talking: string;
+    usesExplicitAsset: boolean;
+    baseNameUsed: string;
+    explicitAssetUrl?: string;
+  };
 }
 
-export const resolveCharacterSnapshot = (character: CharacterData, { location = null, baseSummary, fallbackDisplayName }: CharacterSnapshotOptions = {}): CharacterSnapshot => {
+export const resolveCharacterSnapshot = (
+  character: CharacterData,
+  { location = null, baseSummary, fallbackDisplayName }: CharacterSnapshotOptions = {},
+  // eslint-disable-next-line complexity -- character snapshot resolution with override cascading
+): CharacterSnapshot => {
   const override = findActiveOverride(character, location);
 
   const displayName = override?.display ?? fallbackDisplayName ?? character.characterName;
-  const normalizedBaseSummary = baseSummary && baseSummary.trim().length > 0 ? baseSummary : undefined;
+  const normalizedBaseSummary =
+    baseSummary && baseSummary.trim().length > 0 ? baseSummary : undefined;
   const derivedBaseSummary = normalizedBaseSummary ?? character.infoPerChapter[0]?.summary;
   const summary = override?.summary ?? derivedBaseSummary;
 
@@ -85,15 +104,33 @@ export const resolveCharacterSnapshot = (character: CharacterData, { location = 
   let explicitAssetUrl: string | undefined;
 
   if (usesExplicitAsset && avatarValue) {
+    // Override with explicit asset file
     explicitAssetUrl = getBookAssetUrl(avatarValue);
+    if (!explicitAssetUrl) {
+      console.error("Failed to get asset URL for:", avatarValue);
+      throw new Error(`Failed to get asset URL for: ${avatarValue}`);
+    }
     listening = explicitAssetUrl;
     talking = explicitAssetUrl;
     baseNameUsed = avatarValue;
   } else {
-    baseNameUsed = avatarValue && avatarValue.length > 0 ? avatarValue : character.slug;
-    listening = getListeningMediaFilePathForName(baseNameUsed, character.bookSlug);
-    talking = getTalkingMediaFilePathForName(baseNameUsed, character.bookSlug);
+    // Use Convex URLs directly
+    listening = character.media?.listensUrl ?? character.media?.avatarUrl ?? "";
+    talking =
+      character.media?.speaksUrl ?? character.media?.listensUrl ?? character.media?.avatarUrl ?? "";
+    baseNameUsed = character.slug;
   }
 
-  return { displayName, summary, override, media: { listening, talking, usesExplicitAsset: usesExplicitAsset && Boolean(explicitAssetUrl), baseNameUsed, explicitAssetUrl } };
+  return {
+    displayName,
+    summary,
+    override,
+    media: {
+      listening,
+      talking,
+      usesExplicitAsset: usesExplicitAsset && Boolean(explicitAssetUrl),
+      baseNameUsed,
+      explicitAssetUrl,
+    },
+  };
 };

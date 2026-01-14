@@ -1,5 +1,5 @@
-import React, { useEffect, useState, ReactNode, useMemo } from "react";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import React, { useEffect, useState, type ReactNode, useMemo } from "react";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { HighlightContext } from "@player/hooks/useHighlight";
 
 declare global {
@@ -23,14 +23,20 @@ interface HighlightProviderProps {
 export const HighlightProvider: React.FC<HighlightProviderProps> = ({ children }) => {
   const [isScrollingLocked, setScrollingLocked] = useState(false);
 
-  const isPlayFormat = useMemo(() => getBookData().metadata.bookForm === "play" || getBookData().metadata.bookForm === "mixed", []);
+  const { bookData } = useBookConvex();
+  const isPlayFormat = useMemo(
+    () => bookData?.metadata?.bookForm === "play" || bookData?.metadata?.bookForm === "mixed",
+    [bookData],
+  );
 
   const highlightParagraphs = (appearances: Appearance[], enable: boolean): void => {
     // Don't highlight paragraphs for play format books
     if (isPlayFormat) return;
 
     appearances.forEach(({ chapterNumber, paragraphNumber, isTalkingInParagraph }) => {
-      const p = document.querySelector<HTMLElement>(`section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`);
+      const p = document.querySelector<HTMLElement>(
+        `section[data-chapter="${chapterNumber}"] [data-index="${paragraphNumber}"]`,
+      );
       if (!p) return;
       p.classList.toggle("highlighted-paragraph", enable);
       p.classList.toggle("talking-paragraph", enable && isTalkingInParagraph);
@@ -45,5 +51,11 @@ export const HighlightProvider: React.FC<HighlightProviderProps> = ({ children }
     };
   }, [isScrollingLocked]);
 
-  return <HighlightContext.Provider value={{ highlightParagraphs, isScrollingLocked, setScrollingLocked }}>{children}</HighlightContext.Provider>;
+  return (
+    <HighlightContext.Provider
+      value={{ highlightParagraphs, isScrollingLocked, setScrollingLocked }}
+    >
+      {children}
+    </HighlightContext.Provider>
+  );
 };

@@ -1,5 +1,7 @@
 import { bookIndex } from "@player/logic/BookIndex";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
+import { hydrateInlineAvatarsInSection } from "@player/ui/activateMediaInRange";
+import { highlightCharacter } from "@player/ui/highlightCharacter";
 
 console.log("[BookContentVirtualizer] BookContentVirtualizer version NOV28-v3 (refactored)");
 
@@ -38,6 +40,14 @@ class TopSpacer {
 
   set height(value: number) {
     const normalized = Math.max(0, Math.round(value));
+    const oldHeight = parseFloat(this.element.style.height || "0");
+    if (Math.abs(normalized - oldHeight) > 1) {
+      console.log("[Spacer] height changed", {
+        from: oldHeight,
+        to: normalized,
+        stack: new Error().stack?.split("\n").slice(2, 5).join(" <- "),
+      });
+    }
     this.element.style.height = `${normalized}px`;
   }
 
@@ -83,7 +93,12 @@ interface CompensationContext {
   topSpacer: TopSpacer;
 }
 
-function compensateForPrepend(ctx: CompensationContext, anchorElement: HTMLElement, beforeTop: number, chapterId: number): void {
+function compensateForPrepend(
+  ctx: CompensationContext,
+  anchorElement: HTMLElement,
+  beforeTop: number,
+  chapterId: number,
+): void {
   const { contentContainer, containerRect, topSpacer } = ctx;
   if (!containerRect) return;
 
@@ -109,11 +124,21 @@ function compensateForPrepend(ctx: CompensationContext, anchorElement: HTMLEleme
     const currentScrollTop = contentContainer.scrollTop;
     const newScrollTop = currentScrollTop + remainingDelta;
     contentContainer.scrollTop = newScrollTop;
-    debugLog("compensateForPrepend via scroll", { chapterId, delta, currentSpacerHeight, remainingDelta, scrollAdjust: `${currentScrollTop} -> ${newScrollTop}` });
+    debugLog("compensateForPrepend via scroll", {
+      chapterId,
+      delta,
+      currentSpacerHeight,
+      remainingDelta,
+      scrollAdjust: `${currentScrollTop} -> ${newScrollTop}`,
+    });
   }
 }
 
-function compensateForRemoval(ctx: CompensationContext, anchorElement: HTMLElement | null, anchorTopBefore: number | null): void {
+function compensateForRemoval(
+  ctx: CompensationContext,
+  anchorElement: HTMLElement | null,
+  anchorTopBefore: number | null,
+): void {
   const { containerRect, topSpacer } = ctx;
   if (!anchorElement || !containerRect || anchorTopBefore === null) return;
 
@@ -122,7 +147,10 @@ function compensateForRemoval(ctx: CompensationContext, anchorElement: HTMLEleme
 
   if (delta !== 0) {
     topSpacer.adjustBy(-delta);
-    debugLog("compensateForRemoval anchor correction", { delta, newSpacerHeight: topSpacer.height });
+    debugLog("compensateForRemoval anchor correction", {
+      delta,
+      newSpacerHeight: topSpacer.height,
+    });
   }
 }
 
@@ -142,7 +170,11 @@ class ChapterVirtualizer {
   }
 
   ensureWindow(targetChapter: number, forceRemount = false): void {
-    debugLog("ensureWindow called", { targetChapter, forceRemount, currentMounted: this.mountedChapters });
+    debugLog("ensureWindow called", {
+      targetChapter,
+      forceRemount,
+      currentMounted: this.mountedChapters,
+    });
 
     const normalizedTarget = this.normalizeTargetChapter(targetChapter);
     if (normalizedTarget === null) return;
@@ -158,7 +190,12 @@ class ChapterVirtualizer {
    * sees continuous content between source and target.
    */
   ensureRange(startChapter: number, endChapter: number, forceRemount = false): void {
-    debugLog("ensureRange called", { startChapter, endChapter, forceRemount, currentMounted: this.mountedChapters });
+    debugLog("ensureRange called", {
+      startChapter,
+      endChapter,
+      forceRemount,
+      currentMounted: this.mountedChapters,
+    });
 
     if (!Number.isFinite(startChapter) || !Number.isFinite(endChapter)) return;
 
@@ -187,7 +224,11 @@ class ChapterVirtualizer {
    * Core driver for applying a specific set of chapters to the DOM,
    * with spacer/scroll compensation. Used by both ensureWindow and ensureRange.
    */
-  private ensureChapters(desiredChapters: number[], forceRemount: boolean, options: { stripSpacers: boolean } = { stripSpacers: false }): void {
+  private ensureChapters(
+    desiredChapters: number[],
+    forceRemount: boolean,
+    options: { stripSpacers: boolean } = { stripSpacers: false },
+  ): void {
     const contentContainer = this.host.closest<HTMLElement>("#content-container");
     const containerRect = contentContainer?.getBoundingClientRect() ?? null;
 
@@ -246,9 +287,19 @@ class ChapterVirtualizer {
     return existing;
   }
 
-  private removeStaleChapters(ctx: CompensationContext, existingWrappers: Map<number, HTMLElement>, desiredChapters: number[], forceRemount: boolean): void {
+  private removeStaleChapters(
+    ctx: CompensationContext,
+    existingWrappers: Map<number, HTMLElement>,
+    desiredChapters: number[],
+    forceRemount: boolean,
+  ): void {
     const desiredSet = new Set(desiredChapters);
-    const { toRemoveAbove, toRemoveBelow } = this.categorizeWrappersToRemove(ctx, existingWrappers, desiredSet, forceRemount);
+    const { toRemoveAbove, toRemoveBelow } = this.categorizeWrappersToRemove(
+      ctx,
+      existingWrappers,
+      desiredSet,
+      forceRemount,
+    );
 
     if (toRemoveAbove.length === 0 && toRemoveBelow.length === 0) return;
 
@@ -268,15 +319,24 @@ class ChapterVirtualizer {
 
       scrollCoordinator.forceReflow(this.host);
 
-      const anchorTopBefore = anchor && ctx.containerRect ? getRelativeTop(anchor, ctx.containerRect) : null;
+      const anchorTopBefore =
+        anchor && ctx.containerRect ? getRelativeTop(anchor, ctx.containerRect) : null;
 
-      debugLog("removeStaleChapters", { toRemoveAbove: toRemoveAbove.length, toRemoveBelow: toRemoveBelow.length, anchorTopBefore, preferredAnchorId });
+      debugLog("removeStaleChapters", {
+        toRemoveAbove: toRemoveAbove.length,
+        toRemoveBelow: toRemoveBelow.length,
+        anchorTopBefore,
+        preferredAnchorId,
+      });
 
       // Adjust spacer before removing chapters above
       if (toRemoveAbove.length > 0) {
         const removedHeight = toRemoveAbove.reduce((sum, w) => sum + getOuterHeight(w), 0);
         this.topSpacer.adjustBy(removedHeight);
-        debugLog("removeStaleChapters spacer adjusted", { removedHeight, newSpacerHeight: this.topSpacer.height });
+        debugLog("removeStaleChapters spacer adjusted", {
+          removedHeight,
+          newSpacerHeight: this.topSpacer.height,
+        });
       }
 
       // Remove elements
@@ -372,7 +432,12 @@ class ChapterVirtualizer {
     return null;
   }
 
-  private mountMissingChapters(ctx: CompensationContext, existingWrappers: Map<number, HTMLElement>, desiredChapters: number[], stripSpacers: boolean = false): void {
+  private mountMissingChapters(
+    ctx: CompensationContext,
+    existingWrappers: Map<number, HTMLElement>,
+    desiredChapters: number[],
+    stripSpacers: boolean = false,
+  ): void {
     const currentlyInDom = new Set<number>(existingWrappers.keys());
 
     for (const chapterId of desiredChapters) {
@@ -401,7 +466,11 @@ class ChapterVirtualizer {
     }
   }
 
-  private findInsertionPoint(currentlyInDom: Set<number>, existingWrappers: Map<number, HTMLElement>, chapterId: number): HTMLElement | null {
+  private findInsertionPoint(
+    currentlyInDom: Set<number>,
+    existingWrappers: Map<number, HTMLElement>,
+    chapterId: number,
+  ): HTMLElement | null {
     const sortedInDom = Array.from(currentlyInDom).sort((a, b) => a - b);
     const nextHigherChapter = sortedInDom.find((ch) => ch > chapterId);
 
@@ -410,7 +479,12 @@ class ChapterVirtualizer {
     return existingWrappers.get(nextHigherChapter) ?? null;
   }
 
-  private insertWithCompensation(ctx: CompensationContext, element: HTMLElement, insertBefore: HTMLElement, chapterId: number): void {
+  private insertWithCompensation(
+    ctx: CompensationContext,
+    element: HTMLElement,
+    insertBefore: HTMLElement,
+    chapterId: number,
+  ): void {
     const { containerRect } = ctx;
 
     scrollCoordinator.forceReflow(this.host);
@@ -432,13 +506,18 @@ class ChapterVirtualizer {
       return;
     }
 
-    const nowWrappers = Array.from(this.host.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
+    const nowWrappers = Array.from(
+      this.host.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"),
+    );
     this.mountedChapters = nowWrappers
       .map((w) => parseChapterId(w))
       .filter((n): n is number => n !== null)
       .sort((a, b) => a - b);
 
-    debugLog("ensureWindow complete", { mountedChapters: this.mountedChapters, spacerHeight: this.topSpacer.height });
+    debugLog("ensureWindow complete", {
+      mountedChapters: this.mountedChapters,
+      spacerHeight: this.topSpacer.height,
+    });
 
     this.onContentChanged?.([...this.mountedChapters]);
   }
@@ -486,7 +565,9 @@ const ensureInitializationPromise = (): Promise<void> => {
   return pendingInitialization;
 };
 
-export const initializeBookContentVirtualizer = async (options: InitializeOptions): Promise<void> => {
+export const initializeBookContentVirtualizer = async (
+  options: InitializeOptions,
+): Promise<void> => {
   cachedOptions = options;
   ensureInitializationPromise();
 
@@ -504,7 +585,9 @@ export const initializeBookContentVirtualizer = async (options: InitializeOption
 
     const host = container.querySelector<HTMLElement>(bookIndex.getChaptersContainerSelector());
     if (!host) {
-      throw new Error("[BookContentVirtualizer] Chapters container not found in rendered template.");
+      throw new Error(
+        "[BookContentVirtualizer] Chapters container not found in rendered template.",
+      );
     }
 
     chaptersHost = host;
@@ -516,7 +599,16 @@ export const initializeBookContentVirtualizer = async (options: InitializeOption
   }
 };
 
-export const ensureChapterWindow = async (chapterId: number, options: { force?: boolean } = {}): Promise<void> => {
+export const ensureChapterWindow = async (
+  chapterId: number,
+  options: { force?: boolean } = {},
+): Promise<void> => {
+  console.log("[Virtualizer] ensureChapterWindow called", {
+    chapterId,
+    force: options.force,
+    stack: new Error().stack?.split("\n").slice(1, 4).join(" <- "),
+  });
+
   if (!virtualizer || !chaptersHost) {
     await ensureInitializationPromise();
   }
@@ -528,13 +620,19 @@ export const ensureChapterWindow = async (chapterId: number, options: { force?: 
   virtualizer.ensureWindow(chapterId, options.force ?? false);
 };
 
-export const ensureChapterRangeWindow = async (startChapter: number, endChapter: number, options: { force?: boolean } = {}): Promise<void> => {
+export const ensureChapterRangeWindow = async (
+  startChapter: number,
+  endChapter: number,
+  options: { force?: boolean } = {},
+): Promise<void> => {
   if (!virtualizer || !chaptersHost) {
     await ensureInitializationPromise();
   }
 
   if (!virtualizer) {
-    throw new Error("[BookContentVirtualizer] ensureChapterRangeWindow called before initialization.");
+    throw new Error(
+      "[BookContentVirtualizer] ensureChapterRangeWindow called before initialization.",
+    );
   }
 
   virtualizer.ensureRange(startChapter, endChapter, options.force ?? false);
@@ -564,4 +662,131 @@ export const reloadVirtualizer = async (): Promise<void> => {
       cachedOptions.onContentChanged(mounted);
     }
   }
+};
+
+/**
+ * Update mounted chapters in-place without removing/re-adding DOM nodes.
+ * This preserves scroll position naturally since the wrapper elements stay in place.
+ * Only the inner section content is replaced.
+ */
+export const updateMountedChaptersInPlace = (): void => {
+  console.log("[Convex:Flow] updateMountedChaptersInPlace called", {
+    chaptersHost: !!chaptersHost,
+    virtualizer: !!virtualizer,
+    currentContainer: !!currentContainer,
+  });
+
+  if (!chaptersHost) {
+    console.warn(
+      "[BookContentVirtualizer] updateMountedChaptersInPlace called before initialization",
+    );
+    return;
+  }
+
+  console.log(
+    "[Convex:Flow] chaptersHost element:",
+    chaptersHost.tagName,
+    chaptersHost.id,
+    chaptersHost.className,
+  );
+  console.log("[Convex:Flow] chaptersHost children count:", chaptersHost.children.length);
+
+  // Query DOM directly for mounted chapter wrappers (don't rely on virtualizer state)
+  const wrappers = Array.from(chaptersHost.querySelectorAll<HTMLElement>("[data-chapter-wrapper]"));
+  console.log("[Convex:Flow] Found wrappers with [data-chapter-wrapper]:", wrappers.length);
+
+  const mountedChapterIds = wrappers
+    .map((w) => {
+      const attr = w.getAttribute("data-chapter-wrapper");
+      return attr ? parseInt(attr, 10) : null;
+    })
+    .filter((id): id is number => id !== null && Number.isFinite(id));
+
+  if (mountedChapterIds.length === 0) {
+    console.log("[Convex:Flow] No mounted chapters found in DOM");
+    return;
+  }
+
+  console.log("[Convex:Flow] Updating chapters in-place:", mountedChapterIds);
+
+  for (const chapterId of mountedChapterIds) {
+    const existingWrapper = chaptersHost.querySelector<HTMLElement>(
+      `[data-chapter-wrapper="${chapterId}"]`,
+    );
+    if (!existingWrapper) continue;
+
+    try {
+      // Get fresh content from bookIndex
+      const freshWrapper = bookIndex.cloneChapterWrapper(chapterId);
+      const freshSection = freshWrapper.querySelector<HTMLElement>("section[data-chapter]");
+      const existingSection = existingWrapper.querySelector<HTMLElement>("section[data-chapter]");
+
+      if (freshSection && existingSection) {
+        // Log first 200 chars of old vs new to detect if content actually changed
+        const oldHtml = existingSection.innerHTML;
+        const newHtml = freshSection.innerHTML;
+        const contentChanged = oldHtml !== newHtml;
+        console.log("[Convex:Flow] Chapter", chapterId, "update:", {
+          contentChanged,
+          oldLength: oldHtml.length,
+          newLength: newHtml.length,
+          oldPreview: oldHtml.slice(0, 150) + "...",
+          newPreview: newHtml.slice(0, 150) + "...",
+        });
+
+        // Save existing avatar state before replacing content
+        const savedAvatars = new Map<string, { src: string; alt: string; title: string }>();
+        existingSection.querySelectorAll<HTMLElement>(".inline-avatar").forEach((shell) => {
+          const slug = shell.dataset.character;
+          const img = shell.querySelector<HTMLImageElement>("img");
+          if (slug && img?.src) {
+            savedAvatars.set(slug, {
+              src: img.src,
+              alt: img.alt || slug,
+              title: shell.title || slug,
+            });
+          }
+        });
+
+        // Replace inner HTML only - wrapper stays in place
+        existingSection.innerHTML = freshSection.innerHTML;
+
+        // Restore saved avatars to shells that exist in new content
+        if (savedAvatars.size > 0) {
+          existingSection.querySelectorAll<HTMLElement>(".inline-avatar").forEach((shell) => {
+            const slug = shell.dataset.character;
+            if (slug && savedAvatars.has(slug) && !shell.querySelector("img")) {
+              const saved = savedAvatars.get(slug)!;
+              const img = document.createElement("img");
+              img.src = saved.src;
+              img.alt = saved.alt;
+              img.classList.add(
+                "absolute",
+                "top-0",
+                "left-0",
+                "w-full",
+                "h-full",
+                "object-cover",
+                "rounded-full",
+              );
+              shell.title = saved.title;
+              shell.appendChild(img);
+            }
+          });
+        }
+
+        // Hydrate any remaining shells that weren't restored
+        hydrateInlineAvatarsInSection(existingSection);
+        existingSection
+          .querySelectorAll<HTMLSpanElement>(".character-highlighted")
+          .forEach(highlightCharacter);
+
+        console.log("[Convex:Flow] Updated chapter", chapterId, "in-place");
+      }
+    } catch (e) {
+      console.error("[Convex:Flow] Failed to update chapter", chapterId, e);
+    }
+  }
+
+  console.log("[Convex:Flow] In-place update complete");
 };

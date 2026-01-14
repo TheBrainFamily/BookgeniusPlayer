@@ -1,4 +1,8 @@
-export function highlightSearchQuery(paragraphElement: HTMLElement, query: string, highlightClass: string = "search-highlight"): void {
+export function highlightSearchQuery(
+  paragraphElement: HTMLElement,
+  query: string,
+  highlightClass: string = "search-highlight",
+): void {
   if (!paragraphElement || !query) {
     return;
   }
@@ -12,7 +16,11 @@ export function highlightSearchQuery(paragraphElement: HTMLElement, query: strin
 
   function collectTextNodes(node: Node) {
     if (node.nodeType === Node.TEXT_NODE && node.textContent !== null) {
-      textNodes.push({ node: node as Text, startOffset: currentOffset, endOffset: currentOffset + node.textContent.length });
+      textNodes.push({
+        node: node as Text,
+        startOffset: currentOffset,
+        endOffset: currentOffset + node.textContent.length,
+      });
       currentOffset += node.textContent.length;
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       // Recursively traverse child nodes, but skip script and style tags
@@ -116,7 +124,10 @@ function applyHighlightToTextNode(node: Text, start: number, end: number, highli
 }
 
 // Function to remove all highlights
-export function removeHighlights(paragraphElement: HTMLElement, highlightClass: string = "search-highlight"): void {
+export function removeHighlights(
+  paragraphElement: HTMLElement,
+  highlightClass: string = "search-highlight",
+): void {
   if (!paragraphElement) {
     return;
   }

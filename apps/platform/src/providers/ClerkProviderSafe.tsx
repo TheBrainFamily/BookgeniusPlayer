@@ -2,10 +2,15 @@ import React, { useEffect, useState, createContext, useContext } from "react";
 import type { ClerkProviderProps } from "@clerk/react-router";
 
 const ClerkReadyContext = createContext(false);
+// eslint-disable-next-line react-refresh/only-export-components
 export const useClerkReady = () => useContext(ClerkReadyContext);
 
-const ClerkProviderSafeClient: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({ publishableKey, children }) => {
-  const [ClerkProvider, setClerkProvider] = useState<React.ComponentType<ClerkProviderProps> | null>(null);
+const ClerkProviderSafeClient: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({
+  publishableKey,
+  children,
+}) => {
+  const [ClerkProvider, setClerkProvider] =
+    useState<React.ComponentType<ClerkProviderProps> | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -37,7 +42,9 @@ const ClerkProviderSafeClient: React.FC<{ publishableKey: string; children: Reac
         signInUrl={import.meta.env.VITE_CLERK_SIGN_IN_URL}
         signUpUrl={import.meta.env.VITE_CLERK_SIGN_UP_URL}
         isSatellite={import.meta.env.VITE_CLERK_IS_SATELLITE}
-        allowedRedirectOrigins={!import.meta.env.VITE_CLERK_IS_SATELLITE ? ["https://bookgeniusz.pl"] : undefined}
+        allowedRedirectOrigins={
+          !import.meta.env.VITE_CLERK_IS_SATELLITE ? ["https://bookgeniusz.pl"] : undefined
+        }
       >
         {children}
       </ClerkProvider>
@@ -50,7 +57,10 @@ const ClerkProviderSafeServer: React.FC<{ children: React.ReactNode }> = ({ chil
   return <ClerkReadyContext.Provider value={false}>{children}</ClerkReadyContext.Provider>;
 };
 
-export const ClerkProviderSafe: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({ publishableKey, children }) => {
+export const ClerkProviderSafe: React.FC<{ publishableKey: string; children: React.ReactNode }> = ({
+  publishableKey,
+  children,
+}) => {
   return import.meta.env.SSR ? (
     <ClerkProviderSafeServer>{children}</ClerkProviderSafeServer>
   ) : (

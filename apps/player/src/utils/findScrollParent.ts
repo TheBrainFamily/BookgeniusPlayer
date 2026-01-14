@@ -9,7 +9,10 @@ export const findScrollParent = (el: HTMLElement | null): HTMLElement | null => 
 
   while (current) {
     const style = window.getComputedStyle(current);
-    if (scrollableOverflowValues.has(style.overflowY) && current.scrollHeight > current.clientHeight + 1) {
+    if (
+      scrollableOverflowValues.has(style.overflowY) &&
+      current.scrollHeight > current.clientHeight + 1
+    ) {
       return current;
     }
     current = current.parentElement;

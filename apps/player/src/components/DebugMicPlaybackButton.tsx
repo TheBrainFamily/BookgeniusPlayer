@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Play, Pause, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRealtime } from "@player/context/RealtimeContext";
@@ -8,7 +8,7 @@ const DebugMicPlaybackButton: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
-  const visible = useMemo(() => !!debugClipUrl, [debugClipUrl]);
+  const visible = !!debugClipUrl;
 
   const handleToggle = async () => {
     if (!audioRef.current || !debugClipUrl) return;
@@ -22,7 +22,7 @@ const DebugMicPlaybackButton: React.FC = () => {
         el.pause();
         setPlaying(false);
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   };
@@ -54,7 +54,11 @@ const DebugMicPlaybackButton: React.FC = () => {
             {playing ? <Pause size={16} /> : <Play size={16} />}
           </button>
           <span className="text-xs text-white/80 select-none">Last mic clip</span>
-          <button onClick={handleClose} className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center text-white" title="Close">
+          <button
+            onClick={handleClose}
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center text-white"
+            title="Close"
+          >
             <X size={14} />
           </button>
           {/* Hidden audio element for playback */}

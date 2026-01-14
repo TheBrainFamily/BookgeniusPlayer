@@ -3,15 +3,29 @@ import { getBackgrounds } from "./getBackgrounds";
 import debounce from "lodash.debounce";
 import { getPreloadedElement } from "@player/preloadBackgrounds";
 import { getFileType, loadVideoAsHTMLElement } from "./backgroundUtils";
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getBookSlug } from "@player/state/bookDataStore";
 
-export type Background = { startChapter: number; startParagraph: number; file: string; endChapter: number; endParagraph: number; backgroundColor?: string; textColor?: string };
+export type Background = {
+  startChapter: number;
+  startParagraph: number;
+  file: string;
+  endChapter: number;
+  endParagraph: number;
+  backgroundColor?: string;
+  textColor?: string;
+};
 
 // ---- globals ----------------------------------------------------------------
 
-type DebouncedLike<F extends (...args: unknown[]) => unknown> = F & { cancel: () => void; flush?: () => void; pending?: () => boolean };
+type DebouncedLike<F extends (...args: never[]) => unknown> = F & {
+  cancel: () => void;
+  flush?: () => void;
+  pending?: () => boolean;
+};
 
-let debouncedHandler: DebouncedLike<(currentLocation: { currentChapter: number; currentParagraph: number }) => void> | null = null;
+let debouncedHandler: DebouncedLike<
+  (currentLocation: { currentChapter: number; currentParagraph: number }) => void
+> | null = null;
 
 enum TransitionState {
   Idle = "idle", // nothing in progress
@@ -28,6 +42,56 @@ let bgAbort = new AbortController(); // aborts the current "prepare" phase (logi
 let sessionToken = 0; // increments to invalidate stale closures
 
 // ---- color helpers ---------------------------------------------------------
+
+/**
+ * Detects if an image is predominantly dark by sampling pixels.
+ * Returns "#000000" for dark images, "#ffffff" for light images.
+ * Samples corners + center for a quick luminance estimate.
+ */
+function detectImageBrightness(imgSrc: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        const size = 100; // downsample for speed
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) {
+          resolve("#ffffff");
+          return;
+        }
+        ctx.drawImage(img, 0, 0, size, size);
+
+        // Sample 5 points: corners + center
+        const samplePoints = [
+          [10, 10],
+          [size - 10, 10],
+          [10, size - 10],
+          [size - 10, size - 10],
+          [size / 2, size / 2],
+        ];
+
+        let totalLuminance = 0;
+        for (const [x, y] of samplePoints) {
+          const pixel = ctx.getImageData(x, y, 1, 1).data;
+          // Simple perceived luminance: 0.299*R + 0.587*G + 0.114*B
+          const luminance = (0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2]) / 255;
+          totalLuminance += luminance;
+        }
+
+        const avgLuminance = totalLuminance / samplePoints.length;
+        resolve(avgLuminance < 0.5 ? "#000000" : "#ffffff");
+      } catch {
+        resolve("#ffffff"); // fallback to light on any error
+      }
+    };
+    img.onerror = () => resolve("#ffffff");
+    img.src = imgSrc;
+  });
+}
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const cleaned = hex.replace(/^#/, "");
@@ -75,25 +139,96 @@ function isDarkColor(hex: string, threshold: number = 0.5): boolean {
   return getColorLuminance(hex) < threshold;
 }
 
-function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: string; textColor?: string }) {
+function rgbToHex(r: number, g: number, b: number): string {
+  const toHex = (n: number) =>
+    Math.round(Math.max(0, Math.min(255, n)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function lerpColor(from: string, to: string, t: number): string {
+  const fromRgb = hexToRgb(from);
+  const toRgb = hexToRgb(to);
+  if (!fromRgb || !toRgb) return to;
+
+  const r = fromRgb.r + (toRgb.r - fromRgb.r) * t;
+  const g = fromRgb.g + (toRgb.g - fromRgb.g) * t;
+  const b = fromRgb.b + (toRgb.b - fromRgb.b) * t;
+  return rgbToHex(r, g, b);
+}
+
+// Animation state for color transitions
+let colorAnimationId: number | null = null;
+const COLOR_TRANSITION_DURATION = 800; // ms, matches the original CSS transition
+
+function animateColor(
+  element: HTMLElement,
+  property: string,
+  fromColor: string,
+  toColor: string,
+  duration: number = COLOR_TRANSITION_DURATION,
+): void {
+  // Cancel any existing animation
+  if (colorAnimationId !== null) {
+    cancelAnimationFrame(colorAnimationId);
+    colorAnimationId = null;
+  }
+
+  const startTime = performance.now();
+
+  function tick(currentTime: number) {
+    const elapsed = currentTime - startTime;
+    const t = Math.min(elapsed / duration, 1);
+
+    // Ease-in-out cubic
+    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const currentColor = lerpColor(fromColor, toColor, eased);
+    element.style.setProperty(property, currentColor);
+
+    if (t < 1) {
+      colorAnimationId = requestAnimationFrame(tick);
+    } else {
+      colorAnimationId = null;
+    }
+  }
+
+  colorAnimationId = requestAnimationFrame(tick);
+}
+
+// Default fallback color for --bg-content-light
+const DEFAULT_BG_COLOR = "#fdfaf4";
+
+export function applyScopedColors({
+  backgroundColor,
+  textColor,
+}: {
+  backgroundColor?: string;
+  textColor?: string;
+}) {
   const scope = document.getElementById("player-scope") as HTMLElement | null;
   if (!scope) return;
 
   if (backgroundColor && backgroundColor.trim().length > 0) {
     const isDark = isDarkColor(backgroundColor.trim());
-    if (bookDataLoader.getCurrentBook() === "Midsummer-Nights-Dream") {
-      scope.style.setProperty("--bg-content-light", backgroundColor.trim());
+    console.log("[applyScopedColors]", { backgroundColor, isDark, textColor });
+
+    // Get the current color for animation
+    const currentColor =
+      scope.style.getPropertyValue("--bg-content-light").trim() || DEFAULT_BG_COLOR;
+
+    let targetColor: string;
+
+    if (getBookSlug() === "Midsummer-Nights-Dream") {
+      targetColor = backgroundColor.trim();
       if (textColor && textColor.trim().length > 0) {
         scope.style.setProperty("--text-light", textColor.trim());
       } else {
         scope.style.removeProperty("--text-light");
       }
     } else {
-      if (isDark) {
-        scope.style.setProperty("--bg-content-light", "#000000");
-      } else {
-        scope.style.setProperty("--bg-content-light", "#ffffff");
-      }
+      targetColor = isDark ? "#000000" : "#ffffff";
       if (isDark) {
         scope.style.setProperty("--text-light", "#f2e4c9");
         scope.style.setProperty("--bg-notes-rgb", "0, 0, 0");
@@ -102,6 +237,12 @@ function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: s
         scope.style.setProperty("--bg-notes-rgb", "249, 249, 249");
       }
     }
+
+    // Animate the background color transition via JS to avoid Safari layout bug
+    if (currentColor !== targetColor) {
+      animateColor(scope, "--bg-content-light", currentColor, targetColor);
+    }
+
     if (isDark) {
       scope.style.setProperty("--bg-dark-gradient-opacity", "0.8");
     } else {
@@ -110,6 +251,40 @@ function applyScopedColors({ backgroundColor, textColor }: { backgroundColor?: s
   } else {
     scope.style.removeProperty("--bg-content-light");
   }
+}
+
+export { detectImageBrightness };
+
+export async function updateBackgroundColors({
+  currentChapter,
+  currentParagraph,
+}: {
+  currentChapter: number;
+  currentParagraph: number;
+}): Promise<void> {
+  const backgrounds = getBackgrounds() as Background[];
+
+  const foundAll = backgrounds.filter((bg) => {
+    return (
+      (currentChapter == bg.startChapter && currentParagraph >= bg.startParagraph) ||
+      currentChapter > bg.startChapter
+    );
+  });
+
+  const found = foundAll[foundAll.length - 1];
+  if (!found) return;
+
+  const newSrc = getBookAssetUrl(found.file);
+  if (!newSrc) return;
+
+  const newType = getFileType(found.file);
+  let bgColor = found.backgroundColor;
+
+  if (!bgColor || bgColor.trim().length === 0) {
+    bgColor = newType === "video" ? "#ffffff" : await detectImageBrightness(newSrc);
+  }
+
+  applyScopedColors({ backgroundColor: bgColor, textColor: found.textColor });
 }
 
 // ---- helpers ----------------------------------------------------------------
@@ -154,7 +329,13 @@ const FADE_DURATION_MS = 800; // fallback
 const COLOR_DELAY_MS = 120; // slight delay to let background start appearing first
 
 // ---- Main Function ----------------------------------------------------------
-export const dealWithBackground = ({ currentChapter, currentParagraph }: { currentChapter: number; currentParagraph: number }) => {
+export const dealWithBackground = ({
+  currentChapter,
+  currentParagraph,
+}: {
+  currentChapter: number;
+  currentParagraph: number;
+}) => {
   const legacy = document.getElementById("legacy")!;
   const videoA = document.getElementById("bg-video-a") as HTMLVideoElement;
   const videoB = document.getElementById("bg-video-b") as HTMLVideoElement;
@@ -189,7 +370,11 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
     const initialFrontEl = elements[initialType][initialFrontId];
     initialFrontEl.style.zIndex = Z_INDEX_FRONT;
     initialFrontEl.classList.remove("faded");
-    if (initialType === "image" && legacy.dataset.currentFile && getFileType(legacy.dataset.currentFile) === "image") {
+    if (
+      initialType === "image" &&
+      legacy.dataset.currentFile &&
+      getFileType(legacy.dataset.currentFile) === "image"
+    ) {
       initialFrontEl.classList.add("zooming");
     }
 
@@ -201,6 +386,7 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
 
     /* ---------- main debounced handler ----------------------------------- */
     debouncedHandler = debounce(
+      // eslint-disable-next-line complexity
       async (currentLocation: { currentChapter: number; currentParagraph: number }) => {
         // Guards for lifecycle invalidation across teardown/re-entry
         const myToken = sessionToken; // snapshot current session
@@ -209,7 +395,11 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         const backgrounds = getBackgrounds() as Background[];
 
         const foundAll = backgrounds.filter((bg) => {
-          return (currentLocation.currentChapter == bg.startChapter && currentLocation.currentParagraph >= bg.startParagraph) || currentLocation.currentChapter > bg.startChapter;
+          return (
+            (currentLocation.currentChapter == bg.startChapter &&
+              currentLocation.currentParagraph >= bg.startParagraph) ||
+            currentLocation.currentChapter > bg.startChapter
+          );
         });
 
         const found = foundAll[foundAll.length - 1];
@@ -237,6 +427,11 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           return;
         }
         const newSrc = getBookAssetUrl(newFile); // expected to resolve to the current book's absolute URL (or equivalent)
+        if (!newSrc) {
+          console.error("Failed to get asset URL for:", newFile);
+          transitionState = TransitionState.Idle;
+          return;
+        }
 
         const curType = legacy.dataset.type as "video" | "image";
         const curFrontId = legacy.dataset.front as "a" | "b";
@@ -262,7 +457,10 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
           const canReusePreload =
             pre instanceof HTMLVideoElement &&
             pre.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA &&
-            sameUrl(new URL(pre.src, window.location.href).href, new URL(newSrc, window.location.href).href);
+            sameUrl(
+              new URL(pre.src, window.location.href).href,
+              new URL(newSrc, window.location.href).href,
+            );
 
           if (canReusePreload) {
             vid.src = pre.src;
@@ -308,7 +506,6 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
         }
 
         // Force reflow to apply "transition: none" reset cleanly, then restore transition
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         nextBack.offsetHeight;
         nextBack.style.transition = "";
 
@@ -337,9 +534,17 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
             clearTimeout(colorTimeoutId);
             colorTimeoutId = null;
           }
-          colorTimeoutId = window.setTimeout(() => {
+          colorTimeoutId = window.setTimeout(async () => {
             if (signal.aborted || myToken !== sessionToken) return;
-            applyScopedColors({ backgroundColor: found.backgroundColor, textColor: found.textColor });
+
+            let bgColor = found.backgroundColor;
+            if (!bgColor || bgColor.trim().length === 0) {
+              console.time("time to calculate background color");
+              bgColor = newType === "video" ? "#ffffff" : await detectImageBrightness(newSrc);
+              console.timeEnd("time to calculate background color");
+            }
+
+            applyScopedColors({ backgroundColor: bgColor, textColor: found.textColor });
           }, COLOR_DELAY_MS);
 
           fadeTimeoutId = window.setTimeout(() => {
@@ -384,7 +589,9 @@ export const dealWithBackground = ({ currentChapter, currentParagraph }: { curre
       },
       150,
       { leading: true, trailing: true, maxWait: 150 },
-    ) as DebouncedLike<(currentLocation: { currentChapter: number; currentParagraph: number }) => void>; // cast to our local DebouncedLike
+    ) as DebouncedLike<
+      (currentLocation: { currentChapter: number; currentParagraph: number }) => void
+    >; // cast to our local DebouncedLike
   }
 
   /* ---------- invoke the handler ----------------------------------------- */

@@ -1,0 +1,1 @@
+{ "name": "bookgenius-answer-server", "dependencies": { "express": "5.1.0" } }

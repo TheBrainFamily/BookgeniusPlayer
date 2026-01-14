@@ -1,5 +1,7 @@
-import { getNotes } from "@player/genericBookDataGetters/getNotes";
+import { getNotes, getFullStore } from "@player/state/bookDataStore";
 import { useFootnoteModal } from "@player/stores/modals/footnoteModal.store";
+import { useNoteEditModal } from "@player/stores/modals/noteEditModal.store";
+import { getGlobalEditModeActive } from "@player/context/EditModeContext";
 
 let footnoteContainerEl: HTMLDivElement | null = null;
 let globalGuardsAttached = false;
@@ -16,8 +18,19 @@ const HIDE_TRANSITION_MS = 250;
 /** Keep track of elements already wired to avoid duplicate listeners */
 const initializedFootnotes = new WeakSet<HTMLElement>();
 
-/** Cache for footnote content */
 const footnoteContentCache = new Map<string, string>();
+
+export function invalidateFootnoteCache(noteId?: string): void {
+  if (noteId) {
+    footnoteContentCache.delete(noteId);
+  } else {
+    footnoteContentCache.clear();
+  }
+}
+
+export function updateFootnoteCache(noteId: string, newContent: string): void {
+  footnoteContentCache.set(noteId, newContent);
+}
 
 function getFootnoteContent(footnoteId: string): string | null {
   if (footnoteContentCache.has(footnoteId)) {
@@ -91,7 +104,9 @@ function attachGlobalGuardsOnce() {
 
   window.addEventListener("scroll", dismissNow, { passive: true, capture: true });
   window.addEventListener("resize", dismissNow, { passive: true, capture: true });
-  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), { capture: true });
+  document.addEventListener("visibilitychange", () => document.hidden && dismissNow(), {
+    capture: true,
+  });
 }
 
 function showFloatingFootnote(anchorEl: HTMLElement, html: string) {
@@ -131,21 +146,28 @@ function hideFloatingFootnote(requester?: HTMLElement) {
   removalDelayTimeout = window.setTimeout(removeNow, HIDE_TRANSITION_MS);
 }
 
-/** Open the FootnoteModal for click interactions */
 function openFootnoteModal(html: string) {
   useFootnoteModal.getState().openModal(html);
+}
+
+function openNoteEditModal(noteId: string, content: string) {
+  const bookPath = getFullStore().book?.path;
+  if (!bookPath) {
+    console.warn("[highlightFootnote] Cannot open edit modal: book path not available");
+    return;
+  }
+  useNoteEditModal.getState().openModal({ noteId, content, bookPath });
 }
 
 export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
   if (initializedFootnotes.has(linkNoteEl)) return;
 
-  const href = linkNoteEl.getAttribute("href");
-  if (!href || !href.startsWith("#")) return;
+  const noteNumber = linkNoteEl.getAttribute("data-note");
+  if (!noteNumber) return;
 
-  const footnoteId = href.substring(1); // Remove the '#'
-  const content = getFootnoteContent(footnoteId);
+  const footnoteId = `fn${noteNumber}`;
 
-  if (!content) {
+  if (!getFootnoteContent(footnoteId)) {
     console.warn(`Footnote content not found for ID: ${footnoteId}`);
     return;
   }
@@ -153,14 +175,21 @@ export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
   initializedFootnotes.add(linkNoteEl);
   linkNoteEl.classList.add("footnote-activated");
 
-  // Only attach hover behavior on devices that actually support hover
-  const supportsHover = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(hover: hover)").matches;
+  const supportsHover =
+    typeof window !== "undefined" &&
+    window.matchMedia &&
+    window.matchMedia("(hover: hover)").matches;
 
   if (supportsHover) {
     linkNoteEl.addEventListener("pointerenter", () => {
+      const content = getFootnoteContent(footnoteId);
+      if (!content) return;
       if (hoverDebounceTimeout) clearTimeout(hoverDebounceTimeout);
       if (HOVER_DEBOUNCE_MS > 0) {
-        hoverDebounceTimeout = window.setTimeout(() => showFloatingFootnote(linkNoteEl, content), HOVER_DEBOUNCE_MS);
+        hoverDebounceTimeout = window.setTimeout(
+          () => showFloatingFootnote(linkNoteEl, content),
+          HOVER_DEBOUNCE_MS,
+        );
       } else {
         showFloatingFootnote(linkNoteEl, content);
       }
@@ -171,7 +200,6 @@ export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
         clearTimeout(hoverDebounceTimeout);
         hoverDebounceTimeout = null;
       }
-
       hideFloatingFootnote(linkNoteEl);
     };
 
@@ -179,9 +207,15 @@ export function highlightFootnote(linkNoteEl: HTMLAnchorElement) {
     linkNoteEl.addEventListener("pointercancel", handlePointerOut);
   }
 
-  // Attach click handler for mobile/all devices
   linkNoteEl.addEventListener("click", (e) => {
     e.preventDefault();
-    openFootnoteModal(content);
+    e.stopPropagation();
+    const content = getFootnoteContent(footnoteId);
+    if (!content) return;
+    if (getGlobalEditModeActive()) {
+      openNoteEditModal(footnoteId, content);
+    } else {
+      openFootnoteModal(content);
+    }
   });
 }

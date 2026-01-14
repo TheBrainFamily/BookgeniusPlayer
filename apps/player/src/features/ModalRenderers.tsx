@@ -5,10 +5,16 @@ import { BookChapterModalRenderer } from "./modals/bookChapter/BookChapterModalR
 import { BookMenuModalRenderer } from "./modals/bookMenu/BookMenuModalRenderer";
 import { EditorModeModalRenderer } from "./modals/editorMode/EditorModeModalRenderer";
 import { ApiKeyModalRenderer } from "./modals/apiKey/ApiKeyModalRenderer";
-import { SentenceModalRenderer } from "./modals/sentence/SentenceModalRenderer";
 import { DeepResearchModalRenderer } from "@player/features/modals/deepResearch/DeepResearchModalRenderer";
 import { PositionHistoryModalRenderer } from "./modals/positionHistory/PositionHistoryModalRenderer";
 import { FootnoteModalRenderer } from "./modals/footnote/FootnoteModalRenderer";
+import { AvatarEditModalRenderer } from "./modals/avatarEdit/AvatarEditModalRenderer";
+import { BackgroundEditModalRenderer } from "./modals/backgroundEdit/BackgroundEditModalRenderer";
+import { BackgroundAddModalRenderer } from "./modals/backgroundAdd/BackgroundAddModalRenderer";
+import { MusicEditModalRenderer } from "./modals/musicEdit/MusicEditModalRenderer";
+import { MusicAddModalRenderer } from "./modals/musicAdd/MusicAddModalRenderer";
+import { NoteEditModalRenderer } from "./modals/noteEdit/NoteEditModalRenderer";
+import { GraphicsSettingsModalRenderer } from "./modals/graphicsSettings/GraphicsSettingsModalRenderer";
 
 export const ModalRenderers: React.FC = () => {
   return (
@@ -21,8 +27,14 @@ export const ModalRenderers: React.FC = () => {
       <PositionHistoryModalRenderer />
       <EditorModeModalRenderer />
       <ApiKeyModalRenderer />
-      <SentenceModalRenderer />
       <FootnoteModalRenderer />
+      <AvatarEditModalRenderer />
+      <BackgroundEditModalRenderer />
+      <BackgroundAddModalRenderer />
+      <MusicEditModalRenderer />
+      <MusicAddModalRenderer />
+      <NoteEditModalRenderer />
+      <GraphicsSettingsModalRenderer />
     </>
   );
 };

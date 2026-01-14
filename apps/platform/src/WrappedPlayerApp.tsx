@@ -4,12 +4,12 @@ import { createPortal } from "react-dom";
 
 import { useRouteTransition } from "./providers/RouteTransitionProvider";
 import { books } from "@platform/books";
-import { bookDataLoader } from "../../player/src/services/bookDataLoader";
 import { unloadBookColorsCSS } from "../../player/src/utils/loadBookColors";
 import Paywall from "./components/Paywall";
 import AuthRequiredModal from "./components/AuthRequiredModal";
 import { teardownPlayer } from "../../player/src/teardown";
 import { useAuth } from "./hooks/useAuth";
+import { detectLanguageFromDomain } from "@platform/utils/languageDetection";
 
 const PlayerApp = React.lazy(() => import("./player/PlayerRoot"));
 const PAYWALL_FADE_MS = 300;
@@ -19,12 +19,21 @@ type ResolveError = Error & { status?: number };
 
 const WrappedPlayerApp = () => {
   const [searchParams] = useSearchParams();
-  const { startTransition, finishTransition, cancelTransition, navigatedFromPlatform, setNavigatedFromPlatform, updateTransitionMeta, navigating } = useRouteTransition();
+  const {
+    startTransition,
+    finishTransition,
+    cancelTransition,
+    navigatedFromPlatform,
+    setNavigatedFromPlatform,
+    updateTransitionMeta,
+    navigating,
+  } = useRouteTransition();
   const auth = useAuth();
 
   const book = searchParams.get("book");
 
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  const [hasUserStarted, setHasUserStarted] = useState(false);
   const [assetBaseReady, setAssetBaseReady] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallVisible, setPaywallVisible] = useState(false);
@@ -34,6 +43,9 @@ const WrappedPlayerApp = () => {
   const lastBookRef = useRef<string | null>(null);
   const [paywallMounted, setPaywallMounted] = useState(false);
   const paywallHostRef = useRef<HTMLDivElement | null>(null);
+
+  // Snapshot whether this transition should require a Start click (direct load)
+  const requiresStartRef = useRef(false);
 
   // Auth modal state and host
   const [showAuth, setShowAuth] = useState(false);
@@ -67,6 +79,7 @@ const WrappedPlayerApp = () => {
   // When user clicks "Start", remember the interaction and finish if app is already ready
   const handleStartClick = useCallback(() => {
     userInteractedRef.current = true;
+    setHasUserStarted(true);
     if (isPlayerReadyRef.current) safeFinish();
   }, [safeFinish]);
 
@@ -77,13 +90,13 @@ const WrappedPlayerApp = () => {
       setBookTitle(event.detail.bookTitle);
     };
 
-    window.addEventListener("ShowPaywall", handleShowPaywall);
-    return () => window.removeEventListener("ShowPaywall", handleShowPaywall);
+    window.addEventListener("ShowPaywall", handleShowPaywall as EventListener);
+    return () => window.removeEventListener("ShowPaywall", handleShowPaywall as EventListener);
   }, []);
 
   // Listen for auth modal trigger from player
   useEffect(() => {
-    const handleShowAuth = (event: Event) => {
+    const handleShowAuth = (_event: Event) => {
       // Optionally inspect (event as CustomEvent).detail?.reason
       setShowAuth(true);
     };
@@ -120,7 +133,8 @@ const WrappedPlayerApp = () => {
     const onReady = () => {
       setIsPlayerReady(true);
 
-      if (navigatedFromPlatform) {
+      if (!requiresStartRef.current) {
+        setHasUserStarted(true);
         safeFinish();
       } else {
         updateTransitionMeta({ showStartButton: true, onStartClick: handleStartClick });
@@ -129,7 +143,7 @@ const WrappedPlayerApp = () => {
 
     window.addEventListener("appReady", onReady);
     return () => window.removeEventListener("appReady", onReady);
-  }, [safeFinish, navigatedFromPlatform, updateTransitionMeta, handleStartClick]);
+  }, [safeFinish, updateTransitionMeta, handleStartClick]);
 
   // Handle book changes and setup/transition logic
   useEffect(() => {
@@ -138,23 +152,39 @@ const WrappedPlayerApp = () => {
       finishedRef.current = false;
       userInteractedRef.current = false;
       setIsPlayerReady(false);
+      setHasUserStarted(false);
 
       lastBookRef.current = book;
       unloadBookColorsCSS();
-      bookDataLoader.resetCurrentBook();
+      // bookDataLoader.resetCurrentBook();
 
       // If overlay has ALREADY started on the platform, do NOT start it again here.
       // This avoids double startTransition when navigating from the grid.
       const shouldStartHere = !!book && !(navigatedFromPlatform && navigating);
 
+      // If we're starting the transition here, treat this as a direct load.
+      // This avoids stale "navigatedFromPlatform" state from prior sessions.
+      if (shouldStartHere) {
+        setNavigatedFromPlatform(false);
+        requiresStartRef.current = true;
+      } else if (navigatedFromPlatform) {
+        requiresStartRef.current = false;
+      }
+
       if (shouldStartHere && book) {
         const meta = books.find((b) => b.slug === book);
         const title = meta?.title ?? "BookGenius";
-        const phrases = meta?.phrases ?? [];
+        const phrases = meta?.metadata?.[detectLanguageFromDomain()]?.phrases ?? [];
         const author = meta?.author ?? "";
 
         // For direct loads we DO NOT show Start yet; it appears only after appReady.
-        startTransition({ title, phrases, author, showStartButton: false, onStartClick: handleStartClick });
+        startTransition({
+          title,
+          phrases,
+          author,
+          showStartButton: false,
+          onStartClick: handleStartClick,
+        });
       }
 
       if (!book) {
@@ -162,18 +192,19 @@ const WrappedPlayerApp = () => {
         return;
       }
 
-      bookDataLoader.setCurrentBook(book);
+      // bookDataLoader.setCurrentBook(book);
     }
   }, [book, navigatedFromPlatform, navigating, startTransition, handleStartClick]);
 
   // Handle asset base resolution - waits for both book and auth to be ready
+
   useEffect(() => {
     if (!book) {
       return;
     }
 
     if (import.meta.env.DEV) {
-      bookDataLoader.setAssetBase(`/books/${book}/`);
+      // bookDataLoader.setAssetBase(`/books/${book}/`);
       setAssetBaseReady(true);
       return;
     }
@@ -183,9 +214,11 @@ const WrappedPlayerApp = () => {
       return;
     }
 
-    const resolveBookContent = async (mode: "signed-in" | "anon", { forceFreshToken = false }: { forceFreshToken?: boolean } = {}) => {
+    const resolveBookContent = async (
+      mode: "signed-in" | "anon",
+      { forceFreshToken = false }: { forceFreshToken?: boolean } = {},
+    ) => {
       const headers: Record<string, string> = {};
-      let credentials: RequestCredentials = "omit";
 
       if (mode === "signed-in") {
         let token: string | null | undefined = null;
@@ -200,26 +233,9 @@ const WrappedPlayerApp = () => {
 
         if (token) {
           headers.Authorization = `Bearer ${token}`;
-        } else {
-          credentials = "same-origin";
         }
       }
 
-      if (mode === "anon") {
-        credentials = "omit";
-      }
-
-      const res = await fetch(`/api/content/resolve/${encodeURIComponent(book)}`, { cache: "no-store", credentials, headers });
-
-      if (!res.ok) {
-        const error = new Error(`[RESOLVE] resolve failed with status ${res.status}`);
-        (error as ResolveError).status = res.status;
-        throw error;
-      }
-
-      const { signedAssetBase, assetPrefix, assetQuery, visibility } = await res.json();
-      bookDataLoader.setAssetBase(signedAssetBase ?? (assetPrefix && assetQuery ? `${assetPrefix}?${assetQuery}` : null));
-      bookDataLoader.setBookVisibility(visibility);
       setAssetBaseReady(true);
     };
 
@@ -260,7 +276,10 @@ const WrappedPlayerApp = () => {
             await resolveBookContent("anon");
           }
         } catch (err: unknown) {
-          console.error("[RESOLVE] error final attempt failed. Keeping splash visible for manual retry.", err);
+          console.error(
+            "[RESOLVE] error final attempt failed. Keeping splash visible for manual retry.",
+            err,
+          );
           if (auth.isSignedIn) {
             console.warn("[RESOLVE] prompting auth modal after repeated failures.");
             setShowAuth(true);
@@ -268,6 +287,7 @@ const WrappedPlayerApp = () => {
         }
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- FALSE POSITIVE: We intentionally depend on auth.ready and auth.isSignedIn, not the full auth object which changes on every render
   }, [book, auth.ready, auth.isSignedIn]);
 
   // On unmount (leaving /reader), fully tear down the player environment
@@ -289,7 +309,7 @@ const WrappedPlayerApp = () => {
       const cleanup = async () => {
         try {
           // 1. First reset the book data loader to stop any ongoing requests
-          bookDataLoader.resetCurrentBook();
+          // bookDataLoader.resetCurrentBook();
 
           // 2. Then tear down the player runtime
           await teardownPlayer();
@@ -307,7 +327,9 @@ const WrappedPlayerApp = () => {
     const playerScopeElement = document.getElementById("player-scope");
     if (!playerScopeElement) return;
 
-    if (isPlayerReady) {
+    const shouldShow = isPlayerReady && (!requiresStartRef.current || hasUserStarted);
+
+    if (shouldShow) {
       playerScopeElement.classList.add("visible");
       playerScopeElement.removeAttribute("inert");
       playerScopeElement.setAttribute("aria-hidden", "false");
@@ -324,25 +346,48 @@ const WrappedPlayerApp = () => {
       playerScopeElement.setAttribute("inert", "");
       playerScopeElement.setAttribute("aria-hidden", "true");
     };
-  }, [isPlayerReady]);
+  }, [isPlayerReady, hasUserStarted]);
 
   return (
-    <div className={`w-full h-full border-0 transition-opacity duration-100 ${isPlayerReady ? "opacity-100" : "opacity-0"}`}>
-      {assetBaseReady ? <Suspense fallback={null}>{createPortal(<PlayerApp />, document.getElementById("root-player")!)}</Suspense> : null}
+    <div
+      className={`w-full h-full border-0 transition-opacity duration-100 ${isPlayerReady ? "opacity-100" : "opacity-0"}`}
+    >
+      {assetBaseReady ? (
+        <Suspense fallback={null}>
+          <PlayerApp />
+        </Suspense>
+      ) : null}
 
       {paywallMounted && (
-        <div ref={paywallHostRef} className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${paywallVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
+        <div
+          ref={paywallHostRef}
+          className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${paywallVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        />
       )}
 
       {authMounted && (
-        <div ref={authHostRef} className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${authVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
+        <div
+          ref={authHostRef}
+          className={`fixed inset-0 z-[1000] transition-opacity duration-1000 ${authVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        />
       )}
 
       {/* render Paywall INTO the fading host */}
-      {showPaywall && paywallHostRef.current && createPortal(<Paywall bookSlug={bookSlug} bookTitle={bookTitle} onClose={() => setShowPaywall(false)} />, paywallHostRef.current)}
+      {showPaywall &&
+        paywallHostRef.current &&
+        createPortal(
+          <Paywall
+            bookSlug={bookSlug}
+            bookTitle={bookTitle}
+            onClose={() => setShowPaywall(false)}
+          />,
+          paywallHostRef.current,
+        )}
 
       {/* render Auth modal INTO its fading host */}
-      {showAuth && authHostRef.current && createPortal(<AuthRequiredModal onClose={() => setShowAuth(false)} />, authHostRef.current)}
+      {showAuth &&
+        authHostRef.current &&
+        createPortal(<AuthRequiredModal onClose={() => setShowAuth(false)} />, authHostRef.current)}
     </div>
   );
 };

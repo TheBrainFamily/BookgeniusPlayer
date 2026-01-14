@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocationRange } from "@player/hooks/useLocationRange";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { getBookAssetUrl } from "@player/utils/assetUrls";
-import { getBackgroundsForBook } from "@player/genericBookDataGetters/getBackgroundsForBook";
+import { useNativeShell } from "@player/context/NativeShellContext";
+import { usePlayerDOM } from "@player/context/PlayerDOMContext";
 
 type TimeoutId = number | null;
 
@@ -30,7 +31,12 @@ interface UseImageReadinessOpts {
  *
  * We only start the splash timer after a configurable post-ready delay.
  */
-const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postReadyDelayMs = 100 }: UseVideoReadinessOpts = {}) => {
+const useVideoReadiness = ({
+  videoTimeoutMs = 30000,
+  minSplashMs = 1500,
+  postReadyDelayMs = 100,
+}: UseVideoReadinessOpts = {}) => {
+  const { bgVideoA, bgVideoB } = usePlayerDOM();
   const [videoAReady, setVideoAReady] = useState(false);
   const [videoBReady, setVideoBReady] = useState(false);
   const [postReadyDelayElapsed, setPostReadyDelayElapsed] = useState(false);
@@ -42,25 +48,17 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
   const splashTimeoutIdRef = useRef<TimeoutId>(null);
 
   useEffect(() => {
-    const bgVideoA = document.getElementById("bg-video-a") as HTMLVideoElement | null;
-    const bgVideoB = document.getElementById("bg-video-b") as HTMLVideoElement | null;
-
     const onAPlaying = () => setVideoAReady(true);
-    const onACanPlay = () => {
-      // Only set if not already ready; prefer playing but accept canplay
-      setVideoAReady((prev) => prev || true);
-    };
-
+    const onACanPlay = () => setVideoAReady(true);
     const onBPlaying = () => setVideoBReady(true);
-    const onBCanPlay = () => {
-      setVideoBReady((prev) => prev || true);
-    };
+    const onBCanPlay = () => setVideoBReady(true);
 
     // Attach listeners only if element exists
     if (bgVideoA) {
       // If already in a state that implies playable soon, attach events and
       // also check current readyState/paused to possibly mark ready early.
       if (bgVideoA.readyState >= READY_STATE_CAN_PLAY && !bgVideoA.paused) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Checking video state on mount
         setVideoAReady(true);
       } else {
         bgVideoA.addEventListener("playing", onAPlaying);
@@ -102,7 +100,7 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
         bgVideoB.removeEventListener("canplay", onBCanPlay);
       }
     };
-  }, [videoTimeoutMs]);
+  }, [bgVideoA, bgVideoB, videoTimeoutMs]);
 
   // When any one video becomes ready, start the post-ready delay once.
   useEffect(() => {
@@ -131,30 +129,37 @@ const useVideoReadiness = ({ videoTimeoutMs = 30000, minSplashMs = 1500, postRea
   useEffect(() => {
     const videosReady = videoAReady || videoBReady;
     if (videosReady && postReadyDelayElapsed && minSplashElapsed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Deriving final ready state
       setVideoBackgroundReady(true);
     }
   }, [videoAReady, videoBReady, postReadyDelayElapsed, minSplashElapsed]);
 
-  useEffect(() => {
-    if (getBackgroundsForBook().length === 0) {
-      setVideoBackgroundReady(true);
-    }
-  }, []);
-  return { videoBackgroundReady };
+  return { videoBackgroundReady, setVideoBackgroundReady };
 };
 
-const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {}) => {
+const useImageReadiness = ({
+  imageTimeoutMs = 30000,
+  charactersData,
+}: UseImageReadinessOpts & {
+  charactersData: ReturnType<typeof useBookConvex>["charactersData"];
+}) => {
+  const { bgImageA, bgImageB } = usePlayerDOM();
   const [imageBackgroundReady, setImageBackgroundReady] = useState(false);
-  const allCharacters = useMemo(() => getCharactersData(), []);
+  const allCharacters = charactersData;
   const timeoutIdsRef = useRef<Set<TimeoutId>>(new Set());
 
   const { locationRange } = useLocationRange();
 
   const { chapter } = locationRange;
   const loadImages = useCallback(async (): Promise<void> => {
-    const chapterCharacters = allCharacters.filter((character) => character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter));
+    const chapterCharacters = allCharacters.filter((character) =>
+      character.infoPerChapter.find((chapterInfo) => chapterInfo.chapter === chapter),
+    );
 
-    const imageUrls = chapterCharacters.map((character) => getBookAssetUrl(`${character.slug.toLowerCase()}.png`));
+    const imageUrls = chapterCharacters
+      .filter((character) => character.media?.avatarUrl)
+      .map((character) => getBookAssetUrl(character.media!.avatarUrl!))
+      .filter((url): url is string => !!url);
 
     let failedCount = 0;
 
@@ -184,7 +189,6 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
               resolve();
             };
 
-            // Set timeout for this image
             timeoutId = window.setTimeout(() => {
               cleanup();
               console.warn(`Timeout loading: ${url}`);
@@ -203,23 +207,21 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
     }
 
     console.log("All images processing completed!");
-  }, [chapter, imageTimeoutMs]);
+  }, [allCharacters, chapter, imageTimeoutMs]);
 
   // Cleanup function to clear all pending timeouts
   useEffect(() => {
+    const timeoutIds = timeoutIdsRef.current;
     return () => {
-      timeoutIdsRef.current.forEach((id) => {
+      timeoutIds.forEach((id) => {
         if (id) clearTimeout(id);
       });
-      timeoutIdsRef.current.clear();
+      timeoutIds.clear();
     };
   }, []);
 
   useEffect(() => {
-    const bgImageA = document.getElementById("bg-image-a") as HTMLImageElement | null;
-    const bgImageB = document.getElementById("bg-image-b") as HTMLImageElement | null;
-
-    const isBackgroundImageLoaded = (bgImage: HTMLImageElement | null): Promise<boolean> => {
+    const isBackgroundImageLoaded = (bgImage: HTMLElement | null): Promise<boolean> => {
       if (!bgImage || !bgImage.style.backgroundImage) return Promise.resolve(false);
 
       // Extract URL from backgroundImage style (remove url() wrapper and quotes)
@@ -251,7 +253,10 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
     };
 
     const checkImages = async () => {
-      const [isALoaded, isBLoaded] = await Promise.all([isBackgroundImageLoaded(bgImageA), isBackgroundImageLoaded(bgImageB)]);
+      const [isALoaded, isBLoaded] = await Promise.all([
+        isBackgroundImageLoaded(bgImageA),
+        isBackgroundImageLoaded(bgImageB),
+      ]);
 
       if (isALoaded || isBLoaded) {
         setImageBackgroundReady(true);
@@ -259,14 +264,29 @@ const useImageReadiness = ({ imageTimeoutMs = 30000 }: UseImageReadinessOpts = {
     };
 
     void checkImages();
-  }, [imageTimeoutMs]);
+  }, [bgImageA, bgImageB, imageTimeoutMs]);
 
   return { loadImages, imageBackgroundReady };
 };
 
 export const useAppReady = () => {
-  const { videoBackgroundReady } = useVideoReadiness({ videoTimeoutMs: 30000, minSplashMs: 100, postReadyDelayMs: 100 });
-  const { loadImages, imageBackgroundReady } = useImageReadiness({ imageTimeoutMs: 30000 });
+  const { charactersData, backgroundsForBook } = useBookConvex();
+  const isNativeShell = useNativeShell();
+  const { videoBackgroundReady, setVideoBackgroundReady } = useVideoReadiness({
+    videoTimeoutMs: 30000,
+    minSplashMs: 100,
+    postReadyDelayMs: 100,
+  });
+  const { loadImages, imageBackgroundReady } = useImageReadiness({
+    imageTimeoutMs: 30000,
+    charactersData,
+  });
+
+  useEffect(() => {
+    if (backgroundsForBook.length === 0 || isNativeShell) {
+      setVideoBackgroundReady(true);
+    }
+  }, [backgroundsForBook, isNativeShell, setVideoBackgroundReady]);
 
   useEffect(() => {
     if (!videoBackgroundReady && !imageBackgroundReady) return;

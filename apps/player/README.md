@@ -30,51 +30,51 @@ BookGenius is an innovative multi-book interactive reading platform that transfo
 
 ```bash
 # Install dependencies
-pnpm install
+bun install
 
 # Start development server with a specific book
 # The book directory should contain a book.xml file
 
 # Using relative paths:
-pnpm start public_books/Krolowa-Sniegu
+bun start public_books/Krolowa-Sniegu
 
 # Using absolute paths (any directory on your system):
 # Windows:
-pnpm start "C:\Users\username\Desktop\BookGenius\1984"
-pnpm start "D:\MyBooks\Snow-Queen"
+bun start "C:\Users\username\Desktop\BookGenius\1984"
+bun start "D:\MyBooks\Snow-Queen"
 
 # WSL2 (Windows Subsystem for Linux):
 # You can use Windows paths directly - they'll be automatically translated
-pnpm start "C:\Users\username\Desktop\BookGenius\1984"
-pnpm start "D:\MyBooks\Snow-Queen"
+bun start "C:\Users\username\Desktop\BookGenius\1984"
+bun start "D:\MyBooks\Snow-Queen"
 # Or use the WSL2 mount paths directly:
-pnpm start "/mnt/c/Users/username/Desktop/BookGenius/1984"
+bun start "/mnt/c/Users/username/Desktop/BookGenius/1984"
 
 # macOS/Linux:
-pnpm start "/Users/username/Documents/BookGenius/1984"
-pnpm start "/home/username/books/Snow-Queen"
-pnpm start ~/Desktop/my-book-project
+bun start "/Users/username/Documents/BookGenius/1984"
+bun start "/home/username/books/Snow-Queen"
+bun start ~/Desktop/my-book-project
 
 # Current working directory:
-pnpm start "../my-books/Krolowa-Sniegu"
+bun start "../my-books/Krolowa-Sniegu"
 ```
 
 ### Building for Production
 
 ```bash
 # Build the application for a specific book (supports same path formats as start)
-pnpm build public_books/Krolowa-Sniegu
+bun build public_books/Krolowa-Sniegu
 
 # Examples with absolute paths:
-pnpm build "C:\Users\username\Desktop\BookGenius\1984"
-pnpm build "/Users/username/Documents/BookGenius/1984"
+bun build "C:\Users\username\Desktop\BookGenius\1984"
+bun build "/Users/username/Documents/BookGenius/1984"
 
 # WSL2 examples:
-pnpm build "C:\Users\username\Desktop\BookGenius\1984"  # Auto-translated
-pnpm build "/mnt/c/Users/username/Desktop/BookGenius/1984"  # Direct mount path
+bun build "C:\Users\username\Desktop\BookGenius\1984"  # Auto-translated
+bun build "/mnt/c/Users/username/Desktop/BookGenius/1984"  # Direct mount path
 
 # Alternative: use the existing build script (same functionality)
-pnpm build public_books/Krolowa-Sniegu
+bun build public_books/Krolowa-Sniegu
 ```
 
 ### Path Requirements
@@ -91,7 +91,7 @@ For content editing and development:
 
 ```bash
 # Run frontend with editor mode
-VITE_BOOK=Krolowa-Sniegu VITE_EDITOR=true pnpm dev
+VITE_BOOK=Krolowa-Sniegu VITE_EDITOR=true bun dev
 
 # Run text editor service (separate terminal)
 tsx src/text-editor-service/server.ts
@@ -367,9 +367,9 @@ public_books/{BOOK_NAME}/
 ### Code Quality
 
 ```bash
-pnpm run lint          # ESLint with Prettier
-pnpm run typecheck     # TypeScript checking
-pnpm test             # Jest unit tests
+bun run lint          # ESLint with Prettier
+bun run typecheck     # TypeScript checking
+bun test             # Jest unit tests
 ```
 
 ### Asset Management

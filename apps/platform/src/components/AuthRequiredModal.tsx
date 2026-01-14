@@ -2,11 +2,14 @@ import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Lock, X } from "lucide-react";
-import { AuthModule, useIntegrations } from "@platform/integrations";
+import { type AuthModule, useIntegrations } from "@platform/integrations";
 
 type Props = { onClose: () => void };
 
-const AuthRequiredModalInner: React.FC<{ onClose: () => void; authMod: AuthModule }> = ({ onClose, authMod }) => {
+const AuthRequiredModalInner: React.FC<{ onClose: () => void; authMod: AuthModule }> = ({
+  onClose,
+  authMod,
+}) => {
   const { ready, isSignedIn, openSignIn } = authMod.useAuth();
   useEffect(() => {
     if (ready && isSignedIn) onClose();
@@ -14,7 +17,13 @@ const AuthRequiredModalInner: React.FC<{ onClose: () => void; authMod: AuthModul
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="relative max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white" onClick={onClose} aria-label="Close">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white"
+          onClick={onClose}
+          aria-label="Close"
+        >
           <X className="h-5 w-5" aria-hidden="true" />
         </Button>
 
@@ -34,7 +43,12 @@ const AuthRequiredModalInner: React.FC<{ onClose: () => void; authMod: AuthModul
           <CardContent className="space-y-6">
             <div className="text-center space-y-3 p-6 bg-library-gold/10 rounded-lg border border-library-gold/20">
               <p className="text-muted-foreground">Create an account or sign in to continue.</p>
-              <Button onClick={openSignIn} className="bg-library-gold hover:bg-library-gold/90 text-library-mahogany" disabled={!ready} autoFocus>
+              <Button
+                onClick={openSignIn}
+                className="bg-library-gold hover:bg-library-gold/90 text-library-mahogany"
+                disabled={!ready}
+                autoFocus
+              >
                 Sign In / Sign Up
               </Button>
             </div>

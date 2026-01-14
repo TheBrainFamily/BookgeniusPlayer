@@ -1,13 +1,12 @@
-import { useMemo } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence, Variants } from "motion/react";
+import { motion, AnimatePresence, type Variants } from "motion/react";
 
 import { useCharacterNotes } from "@player/hooks/useCharacterNotes";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
 import useSplashHidden from "@player/hooks/useSplashHidden";
 import { useLocationRange } from "@player/hooks/useLocationRange";
 import { useLocation } from "@player/state/LocationContext";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useBookForm } from "@player/hooks/useBookForm";
 import CharacterCard from "./CharacterCard";
 
@@ -19,7 +18,8 @@ const CharacterNotesPanel = () => {
   const { location } = useLocation();
   const { isPlayFormat } = useBookForm();
 
-  const allCharacters = useMemo(() => getCharactersData(), []);
+  const { charactersData } = useBookConvex();
+  const allCharacters = charactersData;
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, isPlayFormat);
 
   if (isPlayFormat || !target) return null;
@@ -57,8 +57,14 @@ const CharacterNotesPanel = () => {
 };
 
 const variants: { container: Variants; character: Variants } = {
-  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 3, delay: 1.5, staggerChildren: 0.05 } } },
-  character: { hidden: { opacity: 0, x: -100 }, visible: (i: number) => ({ opacity: 1, x: 0, transition: { delay: i * 0.05 } }) },
+  container: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 3, delay: 1.5, staggerChildren: 0.05 } },
+  },
+  character: {
+    hidden: { opacity: 0, x: -100 },
+    visible: (i: number) => ({ opacity: 1, x: 0, transition: { delay: i * 0.05 } }),
+  },
 };
 
 export default CharacterNotesPanel;

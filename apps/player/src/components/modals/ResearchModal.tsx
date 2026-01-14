@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, Variants, AnimatePresence } from "motion/react";
+import { motion, type Variants, AnimatePresence } from "motion/react";
 import { Brain, FileSearch, Telescope, Loader2, X } from "lucide-react";
 
 import ModalUI from "./ModalUI";
@@ -39,7 +39,13 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
   );
 
   const mainContent = (
-    <motion.div className="flex flex-col h-full relative overflow-hidden" variants={variants.container} initial="hidden" animate="visible" exit="exit">
+    <motion.div
+      className="flex flex-col h-full relative overflow-hidden"
+      variants={variants.container}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
       <AnimatePresence mode="wait">
         {isLoading ? (
           <motion.div
@@ -64,15 +70,31 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
                 animate="animate"
               />
             </div>
-            <motion.div className="mt-4 text-white/90 font-medium" variants={variants.loadingText} initial="hidden" animate="visible">
+            <motion.div
+              className="mt-4 text-white/90 font-medium"
+              variants={variants.loadingText}
+              initial="hidden"
+              animate="visible"
+            >
               {type === "ask" ? "Thinking..." : "Researching..."}
             </motion.div>
-            <motion.div className="mt-2 text-white/60 text-sm" variants={variants.loadingSubtext} initial="hidden" animate="visible">
+            <motion.div
+              className="mt-2 text-white/60 text-sm"
+              variants={variants.loadingSubtext}
+              initial="hidden"
+              animate="visible"
+            >
               {type === "ask" ? "Analyzing your question..." : "Exploring the book..."}
             </motion.div>
           </motion.div>
         ) : content ? (
-          <motion.div className="flex-grow flex flex-col pt-4 min-h-0" variants={variants.contentContainer} initial="initial" animate="animate" key="content">
+          <motion.div
+            className="flex-grow flex flex-col pt-4 min-h-0"
+            variants={variants.contentContainer}
+            initial="initial"
+            animate="animate"
+            key="content"
+          >
             <div className="flex-grow overflow-y-auto px-1 no-scrollbar">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -104,12 +126,26 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
                   >
                     <AnimatePresence mode="wait">
                       {isDiveDeeperLoading ? (
-                        <motion.div key="loading" className="flex items-center gap-2" variants={variants.buttonContent} initial="hidden" animate="visible" exit="exit">
+                        <motion.div
+                          key="loading"
+                          className="flex items-center gap-2"
+                          variants={variants.buttonContent}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                        >
                           <Loader2 size={14} className="animate-spin" />
                           <span>Diving Deeper...</span>
                         </motion.div>
                       ) : (
-                        <motion.div key="idle" className="flex items-center gap-2" variants={variants.buttonContent} initial="hidden" animate="visible" exit="exit">
+                        <motion.div
+                          key="idle"
+                          className="flex items-center gap-2"
+                          variants={variants.buttonContent}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                        >
                           <Telescope size={14} />
                           <span>Dive deeper</span>
                         </motion.div>
@@ -119,7 +155,13 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
 
                   <AnimatePresence>
                     {isDiveDeeperLoading && (
-                      <motion.div className="mt-4 text-white/70 text-sm" variants={variants.gatheringText} initial="hidden" animate="visible" exit="exit">
+                      <motion.div
+                        className="mt-4 text-white/70 text-sm"
+                        variants={variants.gatheringText}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                      >
                         Gathering detailed quotes...
                       </motion.div>
                     )}
@@ -129,7 +171,13 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
             </AnimatePresence>
           </motion.div>
         ) : (
-          <motion.div className="flex flex-col items-center justify-center py-12 text-center" variants={variants.noResults} initial="initial" animate="animate" key="no-results">
+          <motion.div
+            className="flex flex-col items-center justify-center py-12 text-center"
+            variants={variants.noResults}
+            initial="initial"
+            animate="animate"
+            key="no-results"
+          >
             <div className="p-4 rounded-full mb-4 backdrop-blur-sm border bg-book-secondary-20 border-book-secondary-30">
               <FileSearch size={24} />
             </div>
@@ -153,7 +201,12 @@ const DeepResearchModal: React.FC<DeepResearchModalProps> = ({
           <header className="flex justify-between items-center p-4 pb-0">
             <div className="text-lg font-semibold text-white">{modalTitle}</div>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={onClose} className="p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white" aria-label="Close modal">
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 rounded-md transition-colors cursor-pointer text-white/70 hover:text-white"
+                aria-label="Close modal"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -178,15 +231,30 @@ const variants: Record<string, Variants> = {
     visible: { opacity: 1, scale: 1, transition: { duration: 0.25, ease: "easeOut" } },
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
   },
-  loading: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } } },
-  loadingDelayed: { initial: { rotate: 0 }, animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity, delay: 0.1 } } },
+  loading: {
+    initial: { rotate: 0 },
+    animate: { rotate: 360, transition: { duration: 1, ease: "linear", repeat: Infinity } },
+  },
+  loadingDelayed: {
+    initial: { rotate: 0 },
+    animate: {
+      rotate: 360,
+      transition: { duration: 1, ease: "linear", repeat: Infinity, delay: 0.1 },
+    },
+  },
   loadingContainer: {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.25, ease: "easeIn" } },
   },
-  loadingText: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.2 } } },
-  loadingSubtext: { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: 0.4 } } },
+  loadingText: {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { delay: 0.2 } },
+  },
+  loadingSubtext: {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { delay: 0.4 } },
+  },
   contentContainer: {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut", delay: 0.05 } },

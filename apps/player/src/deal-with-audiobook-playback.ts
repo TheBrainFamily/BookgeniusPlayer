@@ -1,8 +1,7 @@
-import { loadTrack, playTrack, stopAllTracks, AudiobookTrackEvent } from "./audiobook-player";
+import { loadTrack, playTrack, stopAllTracks, type AudiobookTrackEvent } from "./audiobook-player";
 import { highlightNthOccurrence } from "./highlightWord";
-import { getAudiobookTracksForBook } from "./genericBookDataGetters/getAudiobookTracksForBook";
-import { AudiobookTracksSection } from "./types/book";
-import { bookDataLoader } from "@player/services/bookDataLoader";
+import { getAudiobookTracksForBook, getBookSlug } from "./state/bookDataStore";
+import { type AudiobookTracksSection } from "./types/book";
 
 const AUDIO_SYNC_SHIFT = -0.1;
 
@@ -54,7 +53,10 @@ interface DealWithAudiobookTracksParams {
   currentParagraph: number;
 }
 
-export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph }: DealWithAudiobookTracksParams): Promise<void> => {
+export const dealWithAudiobookTracks = async ({
+  currentChapter,
+  currentParagraph,
+}: DealWithAudiobookTracksParams): Promise<void> => {
   if (isProcessingAudiobookTracks) {
     console.log("dealWithAudiobookTracks: Already processing, skipping this call.");
     return;
@@ -64,18 +66,25 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
   console.log("dealWithAudiobookTracks invoked with:", { currentChapter, currentParagraph });
 
   try {
-    console.log(`Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`);
+    console.log(
+      `Calculated consideration point: Chapter ${currentChapter}, Paragraph ${currentParagraph}`,
+    );
 
-    const bookTracks = await getAudiobookTracksForBook();
-    if (!bookTracks) {
-      console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
+    const bookTracks = getAudiobookTracksForBook() as AudiobookTracksSection[];
+    if (!bookTracks || bookTracks.length === 0) {
+      console.log(
+        `No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`,
+      );
       isProcessingAudiobookTracks = false;
       return;
     }
 
     const foundAudiobookSections = bookTracks
       .filter((section: AudiobookTracksSection) => {
-        return section.chapter === currentChapter - 1 || (section.chapter === currentChapter && section.paragraph <= currentParagraph);
+        return (
+          section.chapter === currentChapter - 1 ||
+          (section.chapter === currentChapter && section.paragraph <= currentParagraph)
+        );
       })
       .sort((a: AudiobookTracksSection, b: AudiobookTracksSection) => {
         if (b.chapter !== a.chapter) return b.chapter - a.chapter;
@@ -97,10 +106,14 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
 
         const createEventsForAudiobook = () => {
           const sectionsToApply = bookTracks.filter(
-            (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
+            (section: AudiobookTracksSection) =>
+              section.chapter === currentChapter ||
+              (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
-          if (!sectionsToApply) {
-            console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
+          if (!sectionsToApply || sectionsToApply.length === 0) {
+            console.log(
+              `No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`,
+            );
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }
@@ -144,14 +157,23 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
             });
           return events;
         };
-        const events: AudiobookTrackEvent[] = createEventsForAudiobook();
+        const events = createEventsForAudiobook();
+        if (!events) {
+          console.warn("no events for audiobook");
+          isProcessingAudiobookTracks = false;
+          return;
+        }
 
         const createWordLevelEvents = () => {
           const sectionsToApply = bookTracks.filter(
-            (section: AudiobookTracksSection) => section.chapter === currentChapter || (section.chapter === currentChapter + 1 && section.paragraph <= 1),
+            (section: AudiobookTracksSection) =>
+              section.chapter === currentChapter ||
+              (section.chapter === currentChapter + 1 && section.paragraph <= 1),
           );
-          if (!sectionsToApply) {
-            console.log(`No song definitions found for book ${bookDataLoader.getCurrentBook()}. Cannot determine Audiobook song.`);
+          if (!sectionsToApply || sectionsToApply.length === 0) {
+            console.log(
+              `No song definitions found for book ${getBookSlug()}. Cannot determine Audiobook song.`,
+            );
             isProcessingAudiobookTracks = false; // Reset flag before early exit
             return;
           }
@@ -209,7 +231,13 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
                     const paragraphElement = document.querySelector(paragraphSelector);
 
                     if (paragraphElement) {
-                      paragraphElement.innerHTML = highlightNthOccurrence(paragraphElement.innerHTML, wordStr, occurrenceIndex, "current-word", isLastWord);
+                      paragraphElement.innerHTML = highlightNthOccurrence(
+                        paragraphElement.innerHTML,
+                        wordStr,
+                        occurrenceIndex,
+                        "current-word",
+                        isLastWord,
+                      );
                     }
                   },
                   triggered: false,
@@ -217,13 +245,20 @@ export const dealWithAudiobookTracks = async ({ currentChapter, currentParagraph
               });
             });
         };
-        const wordLevelEvents: AudiobookTrackEvent[] = createWordLevelEvents();
-        // console.log(`wordLevelEvents: ${wordLevelEvents.splice(0, 3)}`);
+        const wordLevelEvents = createWordLevelEvents();
+        if (!wordLevelEvents) {
+          console.warn("no word level events for audiobook");
+          isProcessingAudiobookTracks = false;
+          return;
+        }
 
         const clipBeginCalculated = sectionToApply["clip-begin"] + AUDIO_SYNC_SHIFT;
         const clipBeginToUse = clipBeginCalculated > 0 ? clipBeginCalculated : 0; // THIS PREVENTS A LOUD AUDIBLE CLICK / AUDIO ARTIFACT
 
-        playTrack(sectionToApply.file, 0, clipBeginToUse, [...events, ...wordLevelEvents]);
+        playTrack(sectionToApply.file, 0, clipBeginToUse, [
+          ...events,
+          ...(wordLevelEvents as AudiobookTrackEvent[]),
+        ]);
       });
     }
   } catch (error) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AnimatePresence, motion, Variants } from "motion/react";
+import { AnimatePresence, motion, type Variants } from "motion/react";
 import { ListMusic } from "lucide-react";
 
 const Fallback = () => (
@@ -24,6 +24,7 @@ export const CoverArt = ({ src }: CoverArtProps) => {
     // If no new src is provided, show the fallback icon.
     if (!src) {
       setDisplayedSrc(null);
+
       setHasError(true);
       return;
     }
@@ -53,6 +54,7 @@ export const CoverArt = ({ src }: CoverArtProps) => {
       img.onload = null;
       img.onerror = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: hasError is read inside but excluded because we only want to trigger on src/displayedSrc changes. hasError is reset within the effect.
   }, [src, displayedSrc]);
 
   if (!displayedSrc || hasError) {
@@ -65,7 +67,8 @@ export const CoverArt = ({ src }: CoverArtProps) => {
 
   return (
     <div className="relative w-full h-full group">
-      <AnimatePresence /* default mode="sync" gives us overlapping enter/exit for a smooth cross-fade */>
+      <AnimatePresence /* default mode="sync" gives us overlapping enter/exit for a smooth cross-fade */
+      >
         <motion.img
           key={displayedSrc}
           src={displayedSrc}

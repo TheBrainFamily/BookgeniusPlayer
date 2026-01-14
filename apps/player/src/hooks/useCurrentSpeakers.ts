@@ -10,7 +10,11 @@ import type { CharacterData } from "@player/types/book";
  * @param isPlayFormat - Whether the book is in play format or not
  * @returns Array of character slugs who are currently speaking
  */
-export function useCurrentSpeakers(location: Location, allCharacters: CharacterData[], isPlayFormat: boolean): string[] {
+export function useCurrentSpeakers(
+  location: Location,
+  allCharacters: CharacterData[],
+  isPlayFormat: boolean,
+): string[] {
   // Add debouncing to prevent rapid changes during scrolling
   const debouncedLocation = useDebounce(location, 50);
 
@@ -30,12 +34,16 @@ export function useCurrentSpeakers(location: Location, allCharacters: CharacterD
 
     if (!isPlayFormat) {
       // For book format, the speakers are ONLY those talking in the current paragraph.
-      const whoIsTalkingNow = characterChapterData.filter((char) => char.paragraphsWhereTalking.includes(currentParagraph));
+      const whoIsTalkingNow = characterChapterData.filter((char) =>
+        char.paragraphsWhereTalking.includes(currentParagraph),
+      );
       return whoIsTalkingNow.map((char) => char.slug);
     }
 
     // For play format, apply sticky logic.
-    const whoStartsTalkingNow = characterChapterData.filter((char) => char.paragraphsWhereTalking.includes(currentParagraph));
+    const whoStartsTalkingNow = characterChapterData.filter((char) =>
+      char.paragraphsWhereTalking.includes(currentParagraph),
+    );
 
     if (whoStartsTalkingNow.length > 0) {
       return whoStartsTalkingNow.map((char) => char.slug);
@@ -45,7 +53,10 @@ export function useCurrentSpeakers(location: Location, allCharacters: CharacterD
     let mostRecentParagraph = -1;
 
     characterChapterData.forEach((char) => {
-      const mostRecentForThisChar = char.paragraphsWhereTalking.reduce((max, p) => (p <= currentParagraph ? Math.max(max, p) : max), -1);
+      const mostRecentForThisChar = char.paragraphsWhereTalking.reduce(
+        (max, p) => (p <= currentParagraph ? Math.max(max, p) : max),
+        -1,
+      );
 
       if (mostRecentForThisChar !== -1) {
         if (mostRecentForThisChar > mostRecentParagraph) {
@@ -57,5 +68,10 @@ export function useCurrentSpeakers(location: Location, allCharacters: CharacterD
       }
     });
     return mostRecentSpeakers;
-  }, [debouncedLocation.currentChapter, debouncedLocation.currentParagraph, allCharacters, isPlayFormat]);
+  }, [
+    debouncedLocation.currentChapter,
+    debouncedLocation.currentParagraph,
+    allCharacters,
+    isPlayFormat,
+  ]);
 }

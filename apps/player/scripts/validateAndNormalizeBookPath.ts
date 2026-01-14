@@ -19,7 +19,10 @@ export function validateAndNormalizeBookPath(args: string[]): BookDirectoryInfo 
 
   let bookDirectoryPath = args[0];
 
-  const isWSL = process.platform === "linux" && fs.existsSync("/proc/version") && fs.readFileSync("/proc/version", "utf8").toLowerCase().includes("microsoft");
+  const isWSL =
+    process.platform === "linux" &&
+    fs.existsSync("/proc/version") &&
+    fs.readFileSync("/proc/version", "utf8").toLowerCase().includes("microsoft");
   if (isWSL && bookDirectoryPath.match(/^[A-Za-z]:\\/)) {
     const driveLetter = bookDirectoryPath[0].toLowerCase();
     const pathWithoutDrive = bookDirectoryPath.slice(3); // Remove "C:\"

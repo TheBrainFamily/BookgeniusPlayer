@@ -6,6 +6,20 @@ import { useTranslation } from "react-i18next";
 const FADE_DURATION_MS = 300;
 const SCROLL_INDICATOR_SCROLL_MARGIN_PX = 320;
 
+const MobileScrollIndicator = ({ label }: { label: string }) => (
+  <>
+    <ChevronsUp className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
+    <span className="uppercase">{label}</span>
+  </>
+);
+
+const DesktopScrollIndicator = ({ label }: { label: string }) => (
+  <>
+    <ChevronsDown className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
+    <span className="uppercase">{label}</span>
+  </>
+);
+
 export const ScrollIndicator = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [targetChapter, setTargetChapter] = useState<number | null>(null);
@@ -21,7 +35,9 @@ export const ScrollIndicator = () => {
       }
       const detail = event.detail as { targetChapter?: number | null } | undefined;
       const nextTarget = detail?.targetChapter;
-      setTargetChapter(typeof nextTarget === "number" && Number.isFinite(nextTarget) ? nextTarget : null);
+      setTargetChapter(
+        typeof nextTarget === "number" && Number.isFinite(nextTarget) ? nextTarget : null,
+      );
 
       if (hideTimeoutRef.current !== null) {
         window.clearTimeout(hideTimeoutRef.current);
@@ -64,7 +80,9 @@ export const ScrollIndicator = () => {
       return;
     }
 
-    const chapterElement = contentContainer.querySelector(`section[data-chapter="${targetChapter}"]`);
+    const chapterElement = contentContainer.querySelector(
+      `section[data-chapter="${targetChapter}"]`,
+    );
     if (!(chapterElement instanceof HTMLElement)) {
       return;
     }
@@ -77,28 +95,20 @@ export const ScrollIndicator = () => {
     window.dispatchEvent(new Event("scrollIndicatorClicked"));
   };
 
-  const MobileScrollIndicator = () => (
-    <>
-      <ChevronsUp className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
-      <span className="uppercase">{t("scroll_indicator-swipe-up")}</span>
-    </>
-  );
-
-  const DesktopScrollIndicator = () => (
-    <>
-      <ChevronsDown className="w-[2.7rem] h-[2.7rem] pointer-events-none" />
-      <span className="uppercase">{t("scroll_indicator-keep-scrolling")}</span>
-    </>
-  );
-
   return (
     <button
       type="button"
       className={`flex flex-col items-center fixed bottom-40 left-1/2 -translate-x-1/2 text-white cursor-pointer ${isMobileOrTablet ? "scroll-indicator-swipe-up" : "scroll-indicator-keep-scrolling"}`}
-      aria-label={isMobileOrTablet ? t("scroll_indicator-swipe-up") : t("scroll_indicator-keep-scrolling")}
+      aria-label={
+        isMobileOrTablet ? t("scroll_indicator-swipe-up") : t("scroll_indicator-keep-scrolling")
+      }
       onClick={handleClick}
     >
-      {isMobileOrTablet ? <MobileScrollIndicator /> : <DesktopScrollIndicator />}
+      {isMobileOrTablet ? (
+        <MobileScrollIndicator label={t("scroll_indicator-swipe-up")} />
+      ) : (
+        <DesktopScrollIndicator label={t("scroll_indicator-keep-scrolling")} />
+      )}
     </button>
   );
 };

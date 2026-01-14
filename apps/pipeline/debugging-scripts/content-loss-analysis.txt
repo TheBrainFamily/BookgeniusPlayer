@@ -1,0 +1,1945 @@
+# Content Loss Risk Analysis for SE Books
+# Generated: 2026-01-02T16:36:07.738Z
+#
+# Target format: <section data-chapter> with <p data-speaker> for dialogue
+
+================================================================================
+SUMMARY
+================================================================================
+CRITICAL: 156 books (content WILL be lost without handling)
+HIGH:     94 books (significant structure/formatting loss)
+MEDIUM:   942 books (some information loss)
+LOW:      51 books (minor formatting differences)
+
+Risk type distribution:
+  POETRY_VERSE: 847 books
+  LETTER_FORMAT: 690 books
+  NESTED_CHAPTERS: 606 books
+  FOOTNOTE_REFS: 554 books
+  PART_WITH_PROSE: 479 books
+  EPIGRAPHS: 301 books
+  BRIDGEHEADS: 290 books
+  DATA_TABLES: 275 books
+  FIGURES_IMAGES: 156 books
+  STAGE_DIRECTIONS: 66 books
+  EMBEDDED_DRAMA_TABLE: 37 books
+  INTERLUDE_CONTENT: 9 books
+
+================================================================================
+CRITICAL - Content will be lost (156 books)
+================================================================================
+
+a-a-milne_the-house-at-pooh-corner
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-3.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Heffalump<...
+
+adam-mickiewicz_pan-tadeusz_maude-ashurst-biggs
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="bridgehead">Return of a young gentleman⁠—A first meeting in a chamber, a second at tab...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="bridgehead">The Count’s expedition into the orchard⁠—The mysterious nymph feeds the ge...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="bridgehead">The sound and salutary counsels of Bartek, called the Prussian⁠—The soldie...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">Diplomacy and the Chase...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">A hunt with greyhounds of a singled-out hare⁠—The guest in the castle⁠—The...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">Diplomacy and the Chase...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="bridgehead">The first warlike movements of the foray⁠—Protasy’s expedition⁠—Robak take...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p epub:type="title">Let Us Love One Another...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="bridgehead">Council concerning the safety of the victors⁠—Conventions with ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="bridgehead">Of the danger resulting from disorderly camping out⁠—Unexpected succour⁠—S...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p epub:type="bridgehead">Spring omens⁠—Entrance of armies⁠—Divine service⁠—Official rehabilitation ...
+
+adam-smith_the-theory-of-moral-sentiments
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-7.xhtml
+    Example: <p epub:type="title">Of Systems of Moral Philosophy...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">Of the Influence of Custom and Fashion Upon the Sentiments of Moral Approbation...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Of the Propriety of Action...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Of the Foundation of Our Judgments Concerning Our Own Sentiments and Conduct, a...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">Of the Effect of Utility Upon the Sentiment of Approbation...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-6.xhtml
+    Example: <p epub:type="title">Of the Character of Virtue...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Of Merit and Demerit; or, of the Objects of Reward and Punishment...
+
+adam-smith_the-wealth-of-nations
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="bridgehead">Of the causes of improvement in the productive powers of labour, and of th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="bridgehead">Of the different progress of opulence in different nations....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="bridgehead">Of the revenue of the sovereign or commonwealth....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">Of the nature, accumulation, and employment of stock....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="bridgehead">Of systems of political œconomy....
+
+aeschylus_the-eumenides_gilbert-murray
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: endnotes.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Pros...
+
+aldous-huxley_those-barren-leaves
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Loves of the Parallels...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Fragments from the Autobiography of Francis Chelifer...
+
+alexandre-dumas_the-vicomte-de-bragelonne_george-routledge-and-co
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Vicomte de Bragelonne...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Man in the Iron Mask...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Louise de La Vallière...
+
+anatole-france_penguin-island_a-w-evans
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Middle Ages and the Renaissance...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p>“Only extreme things are tolerable.”...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="subtitle">The Affair of the Eighty Thousand Trusses of Hay...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p>Alca is becoming Americanised....
+
+ann-radcliffe_the-mysteries-of-udolpho
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-15.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Tita...
+
+anna-julia-cooper_a-voice-from-the-south
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>The greatest question in the world is how to give every man a man’s share in what goes on in life...
+
+anna-katharine-green_that-affair-next-door
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">Miss Butterworth’s Window...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Windings of a Labyrinth...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The End of a Great Mystery...
+
+anna-katharine-green_the-leavenworth-case
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-33.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona"> 			...
+
+anton-chekhov_short-fiction_constance-garnett
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: a-play.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Valentin</...
+
+apsley-cherry-garrard_the-worst-journey-in-the-world
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-17.xhtml, chapter-12.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Don ...
+
+aristotle_nicomachean-ethics_f-h-peters
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>Every art and every kind of inquiry, and likewise every act and purpose, seems to aim at some goo...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>Virtue, as we have seen, has to do with feelings and actions. Now, praise...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p>At this point we will make a fresh start and say that the undesirable forms of moral character ar...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p>We now have to inquire about justice and injustice, and to ask what sorts of acts they are concer...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p>Excellence, then, being of these two kinds, intellectual and moral, intellectual excellence owes ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>Liberality, of which we will next speak, seems to be moderation in the matter of wealth. What we ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p>We said above that what we should choose is neither too much nor too little, but “the mean,” and ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p>Our next business, I think, should be to treat of pleasure. For pleasure seems, more than anythin...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p>After the foregoing a discussion of friendship will naturally follow, as it is a sort of virtue, ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p>In all dissimilar friendships...
+
+arthur-conan-doyle_a-study-in-scarlet
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Being a Reprint from the Reminiscences of John ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Country of the Saints...
+
+arthur-conan-doyle_the-valley-of-fear
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Tragedy of Birlstone...
+
+arthur-quiller-couch_on-the-art-of-reading
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-5.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td epub:type="z3998:persona">Oenone....
+
+arthur-quiller-couch_on-the-art-of-writing
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-5.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Ferdinand<...
+
+baroness-orczy_lord-tonys-wife
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Nantes, December, 1793...
+
+bertrand-russell_roads-to-freedom
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Problems of the Future...
+
+bertrand-russell_the-practice-and-theory-of-bolshevism
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Present Condition of Russia...
+
+black-hawk_the-autobiography-of-ma-ka-tai-me-she-kia-kiak-or-black-hawk
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>I was born at the Sac village, on Rock river, in the year 1767, and am now in my 67th year. My gr...
+
+boethius_the-consolation-of-philosophy_h-r-james
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Sorrows of Boethius...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">True Happiness and False...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">Free Will and God’s Foreknowledge...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Vanity of Fortune’s Gifts...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">Good and Ill Fortune...
+
+captain-charles-johnson_a-general-history-of-the-pirates
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-11.xhtml, chapter-17.xhtml, chapter-12.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Pres...
+
+charles-dickens_a-tale-of-two-cities
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Track of a Storm...
+
+christopher-morley_the-haunted-bookshop
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-2.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Mifflin</t...
+
+cicero_tusculan-disputations_c-d-yonge
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-5.xhtml, chapter-1.xhtml, chapter-3.xhtml, chapter-4.xhtml, chapter-2.xhtml, endnotes.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">A.</td> 		...
+
+compton-mackenzie_sinister-street
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p xml:lang="la">Sancta ad vos anima atque istius inscia culpae descendam, magnorum haud umquam indi...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p xml:lang="la">“Sic cum his, inter quos eram, voluntatum enuntianaarum signa conmunicavi; et vitae...
+
+daniel-defoe_a-journal-of-the-plague-year
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: a-journal-of-the-plague-year.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">John</td> ...
+
+dante-alighieri_the-divine-comedy_henry-wadsworth-longfellow
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: endnotes.xhtml
+    Example: <table epub:type="z3998:drama"> 							<tbody> 								<tr> 									<td epub:type="z3998:persona">T...
+
+david-park-barnitz_the-book-of-jade
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="subtitle">On His Twenty-First Year...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="subtitle">At the End of the Century...
+
+diogenes-laertius_the-lives-and-opinions-of-eminent-philosophers_c-d-yonge
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>Some say that the study of philosophy originated with the barbarians. In that among the Persians ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>Plato was the son of Ariston and Perictione or Potone, and a citizen of Athens; and his mother tr...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p>Zeno was the son of Mnaseas, or Demeas, and a native of Citium, in Cyprus, which is a Grecian cit...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p>Aristotle was the son of Nicomachus and Phaestias, a citizen of Stagira; and Nicomachus was desce...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p>Anaximander, the son of Praxiadas, was a citizen of Miletus....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>The long account which I have given of Plato was compiled to the best of my power, and in it I co...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p>Antisthenes was an Athenian, the son of Antisthenes. And he was said not to be a legitimate Athen...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p>Epicurus was an Athenian, and the son of Neocles and Chaerestrate, of the burgh of Gargettus, and...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p>Since we have now gone through the Ionian philosophy, which was derived from Thales, and the live...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p>Heraclitus was the son of Blyson, or as some say, of Heracion, and a citizen of Ephesus. He flour...
+
+dorothy-day_the-eleventh-virgin
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-2-1.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Billy</td>...
+
+dorothy-l-sayers_clouds-of-witness
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-14.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Boli...
+
+dorothy-l-sayers_unnatural-death
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-20.xhtml, chapter-15.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Sieg...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Medico-Legal Problem...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“The gladsome light of jurisprudence.”...
+
+edgar-allan-poe_short-fiction
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: the-conversation-of-eiros-and-charmion.xhtml, mesmeric-revelation.xhtml, the-power-of-words.xhtml, the-colloquy-of-monos-and-una.xhtml, three-sundays-in-a-week.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Eiros</td>...
+
+edgar-rice-burroughs_the-land-that-time-forgot
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Land That Time Forgot...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The People That Time Forgot...
+
+edgar-rice-burroughs_the-moon-maid
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="subtitle">Being the Story of Julian 20th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="subtitle">Being the Story of Julian 9th...
+
+edmund-spenser_the-faerie-queene
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Legend of the Knight of the Red Cross, or of Holiness...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Legend of Britomartis, or of Chastity...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">The Legend of Artegall, or of Justice...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Legend of Sir Guyon, or of Temperance...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Legend of Cambel and Triamond, or of Friendship...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="title">The Legend of Calidore, or of Courtesy...
+
+edwin-a-abbott_flatland
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>“Be patient, for the world is broad and wide.”...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“O brave new worlds, that have such people in them!”...
+
+ellery-queen_the-roman-hat-mystery
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>“The policeman must oft follow the precept of the ‘...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>“A good detective is born, not made. Like all genius, he springs not from a carefully nurtured ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>“The perfect criminal is a superman. He must be meticulous in his technique: unseen, unseeable, a...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“.⁠ ⁠… To illustrate: Once young Jean C⁠⸺ came to me after a month of diligent investigation on a...
+
+emile-gaboriau_monsieur-lecoq_laura-e-kendall
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Honor of the Name...
+
+emile-gaboriau_the-slaves-of-paris_charles-scribners-sons
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Champdoce Mystery...
+
+epictetus_discourses_george-long
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">Of the Things Which Are in Our Power, and Not in Our Power...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>A certain young man, a rhetorician, came to see Epictetus, with his hair dressed more carefully t...
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: book-2.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Poly...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">That Confidence (Courage) Is Not Inconsistent with Caution...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>He is free who lives as he wishes to live;...
+
+ethel-voynich_the-gadfly
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>Thirteen years later....
+
+f-scott-fitzgerald_the-beautiful-and-damned
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-1-3.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td epub:type="z3998:persona">Muriel<...
+
+f-scott-fitzgerald_this-side-of-paradise
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Romantic Egotist...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Education of a Personage...
+
+friedrich-nietzsche_beyond-good-and-evil_helen-zimmern
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-8.xhtml
+    Example: <p epub:type="title">Peoples and Countries...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-9.xhtml
+    Example: <p>Every elevation of the type “man,” has hitherto been the work of an aristocratic society and so i...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-7.xhtml
+    Example: <p>As in the stellar firmament there are sometimes two suns which determine the path of one planet, ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">The Natural History of Morals...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Prejudices of Philosophers...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>The human soul and its limits, the range of man’s inner experiences hitherto attained, the height...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">Apophthegms and Interludes...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-6.xhtml
+    Example: <p>At the risk that moralizing may also reveal itself here as that which it has always been⁠—namely,...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>After such a cheerful commencement, a serious word would fain be heard; it appeals to the most se...
+
+friedrich-nietzsche_thus-spake-zarathustra_thomas-common
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Zarathustra’s Discourses...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>“Ye look aloft when ye long for exaltation, and I look downward because I am exalted....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>Ah, where in the world have there been greater follies than with the pitiful? And what in the wor...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“⁠—and only when ye have all denied me, will I return unto you....
+
+fyodor-dostoevsky_the-brothers-karamazov_constance-garnett
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The History of a Family...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">An Unfortunate Gathering...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="title">The Preliminary Investigation...
+
+g-k-chesterton_manalive
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Enigmas of Innocent Smith...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Explanations of Innocent Smith...
+
+g-k-chesterton_the-everlasting-man
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">On the Creature Called Man...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">On the Man Called Christ...
+
+g-k-chesterton_the-napoleon-of-notting-hill
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">Introductory Remarks on the Art of Prophecy...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Mental Condition of Adam Wayne...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">The Empire of Notting Hill...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Charter of the Cities...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Battle of the Lamps...
+
+g-k-chesterton_whats-wrong-with-the-world
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Homelessness of Man...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Feminism: Or the Mistake About Woman...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">Education: Or the Mistake About the Child...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Imperialism: Or the Mistake About Man...
+
+george-borrow_lavengro
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Lavengro; The Scholar, the Gypsy, the Priest...
+
+george-du-maurier_trilby
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-8.xhtml
+    Example: <p>Svengali had died from heart-disease. The cut he had received from Gecko had not apparently (as f...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-7.xhtml
+    Example: <p>Next morning our three friends lay late abed, and breakfasted in their rooms....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p>When Taffy and the Laird went back to the studio in the Place ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>It was a fine, sunny, showery day in April....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>One lovely Monday morning in late September, at about eleven or so, Taffy and the Laird sat in th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>Midday had struck. The expected hamper had not turned up in the Place ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-6.xhtml
+    Example: <p>Behold our three musketeers of the brush once more reunited in Paris, famous, after long years....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>Nobody knew exactly how Svengali lived, and very few knew where (or why). He occupied a roomy dil...
+
+george-eliot_daniel-deronda
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-7.xhtml, chapter-4.xhtml, chapter-37.xhtml, chapter-10.xhtml
+    Example: <table epub:type="z3998:drama"> 						<tbody> 							<tr> 								<td epub:type="z3998:persona">Peri...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="title">The Mother and the Son...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">Gwendolen Gets Her Choice...
+
+george-eliot_middlemarch
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="title">The Widow and the Wife...
+
+george-eliot_the-mill-on-the-floss
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Valley of Humiliation...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="title">The Great Temptation...
+
+georgette-heyer_the-great-roxhythe
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Ways Run Parallel...
+
+gustave-le-bon_the-crowd_t-fisher-unwin-ltd
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Classification and Description of the Different Kinds of Crowds...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Opinions and Beliefs of Crowds...
+
+guy-de-maupassant_short-fiction_various-translators
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: the-revenge.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td/> 							<td> 								<i epub:typ...
+
+h-g-wells_mr-britling-sees-it-through
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">Matching’s Easy at Ease...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Testament of Matching’s Easy...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Matching’s Easy at War...
+
+h-g-wells_the-food-of-the-gods
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Dawn of the Food...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Harvest of the Food...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Food in the Village...
+
+h-g-wells_the-war-of-the-worlds
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Coming of the Martians...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Earth Under the Martians...
+
+h-g-wells_tono-bungay
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Days Before Tono-Bungay Was Invented...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Great Days of Tono-Bungay...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Rise of Tono-Bungay...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Aftermath of Tono-Bungay...
+
+h-rider-haggard_cleopatra
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Preparation of Harmachis...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Vengeance of Harmachis...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Fall of Harmachis...
+
+helen-keller_the-story-of-my-life
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-3-3.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td epub:type="z3998:persona">Helen</...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Story of My Life...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">A Supplementary Account of Helen Keller’s Life and Education...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Letters (1887⁠–⁠1901)...
+
+henry-david-thoreau_a-week-on-the-concord-and-merrimack-rivers
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-4.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td epub:type="z3998:persona">Ismene<...
+
+henry-fielding_the-history-of-tom-jones-a-foundling
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="bridgehead">Containing as much of the birth of the foundling as is necessary or proper...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="bridgehead">Containing the most memorable transactions which passed in the family of ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="bridgehead">Containing three days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="bridgehead">Containing a portion of time somewhat longer than half a year....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">Containing scenes of matrimonial felicity in different degrees of life; an...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-18.xhtml
+    Example: <p epub:type="bridgehead">Containing about six days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="bridgehead">Containing the time of a year....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="bridgehead">Containing about three weeks....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p epub:type="bridgehead">Containing the same individual time with the former....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="bridgehead">In which the history goes forward about twelve hours....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="bridgehead">Containing about two days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-14.xhtml
+    Example: <p epub:type="bridgehead">Containing two days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-16.xhtml
+    Example: <p epub:type="bridgehead">Containing the space of five days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="bridgehead">Containing twelve hours....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p epub:type="bridgehead">Containing about three days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-13.xhtml
+    Example: <p epub:type="bridgehead">Containing the space of twelve days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-17.xhtml
+    Example: <p epub:type="bridgehead">Containing three days....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-15.xhtml
+    Example: <p epub:type="bridgehead">In which the history advances about two days....
+
+henry-george_progress-and-poverty
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Laws of Distribution...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="title">Justice of the Remedy...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Population and Subsistence...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">Effect of Material Progress Upon the Distribution of Wealth...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="title">The Law of Human Progress...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="title">Application of the Remedy...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="title">Effects of the Remedy...
+
+herodotus_histories_g-c-macaulay
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>This is the Showing forth of the Inquiry of Herodotus of Halicarnassos, to the end that...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p class="continued">Now just at that time the marketplace and city hall of the Siphnians had been d...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p class="continued">In reference to these verses the opinions of those who said that the ships were...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p class="continued">These verses, as soon as it was day, he publicly communicated to the interprete...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p>With regard then to the rearing of the children they related so much as I have said: and I heard ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p class="continued">for it is rightly said that in hot regions the horns come quickly, whereas in e...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p class="continued">At the time of which I speak these things came upon the Milesians, since most o...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p class="continued">In the evils which at this time were either upon them or soon to be expected th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p class="continued">these sayings, and others like them composed by Musaios, I know had reference t...
+
+hilaire-belloc_the-path-to-rome
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: the-path-to-rome.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">The Duches...
+
+homer_the-iliad_william-cullen-bryant
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-24.xhtml
+    Example: <p epub:type="title">The Body of Hector Recovered...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-19.xhtml
+    Example: <p epub:type="title">The Reconciliation of Achilles and Agamemnon...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Contention of Achilles and Agamemnon...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">Single Combat of Menelaus and Paris...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="title">The Combat of Hector and Ajax...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-22.xhtml
+    Example: <p epub:type="bridgehead">Refusal of Hector to enter the city, though entreated by Priam and Hecuba⁠...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-20.xhtml
+    Example: <p epub:type="title">The Battle of the Gods...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">The Exploits of Diomed...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Trial of the Army, and Catalogue of the Forces...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-18.xhtml
+    Example: <p epub:type="title">The Grief of Achilles for the Death of Patroclus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Breaking of the Truce, and the First Battle...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-21.xhtml
+    Example: <p epub:type="title">The Battle in the River Scamander...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-23.xhtml
+    Example: <p epub:type="title">The Funeral of Patroclus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="title">Interviews Between Glaucus and Diomed, and Hector and Andromache...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p epub:type="title">The Battle at the Grecian Wall...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="title">The Night-Adventure of Diomed and Ulysses...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="bridgehead">A council of the gods⁠—Jupiter forbids them to take part with either side⁠...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-14.xhtml
+    Example: <p epub:type="title">The Fraud Practised on Jupiter by Juno...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-16.xhtml
+    Example: <p epub:type="title">The Sixth Battle⁠—Death of Patroclus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="title">The Embassy to Achilles...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p epub:type="title">The Third Battle, and Exploits of Agamemnon...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-13.xhtml
+    Example: <p epub:type="title">The Continuation of the Fourth Battle...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-17.xhtml
+    Example: <p epub:type="bridgehead">Contest for the body of Patroclus, which is guarded by Menelaus⁠—Death of ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-15.xhtml
+    Example: <p epub:type="title">The Fifth Battle at the Ships...
+
+homer_the-odyssey_william-cullen-bryant
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-24.xhtml
+    Example: <p epub:type="bridgehead">The souls of the suitors conducted to Hades by Mercury⁠—Agamemnon and Achi...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-19.xhtml
+    Example: <p epub:type="title">Ulysses Recognized by Eurycleia...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">Visit of Pallas to Telemachus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">Interview of Telemachus with Nestor...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="title">Reception of Ulysses by Alcinoüs...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-22.xhtml
+    Example: <p epub:type="title">Death of the Suitors...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-20.xhtml
+    Example: <p epub:type="title">The Last Banquet of the Suitors...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">Departure of Ulysses from Calypso...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Departure of Telemachus from Ithaca...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-18.xhtml
+    Example: <p epub:type="title">Combat of Ulysses and Irus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">Conference of Telemachus and Menelaus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-21.xhtml
+    Example: <p epub:type="title">The Bending of the Bow of Ulysses...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-23.xhtml
+    Example: <p epub:type="title">Ulysses and Penelope After the Slaughter...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="title">Ulysses Discovered by Nausicaä...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p epub:type="title">The Sirens, Scylla, and Charybdis...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="title">Aeolus, the Lestrigonians, and Circè...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="title">Festivals in Honor of Ulysses...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-14.xhtml
+    Example: <p epub:type="title">Meeting of Ulysses and Eumaeus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-16.xhtml
+    Example: <p epub:type="title">Ulysses Discovering Himself to Telemachus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="title">The Ciconians, Lotus-Eaters, and Cyclops...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p epub:type="title">Visit of Ulysses to the Land of the Dead...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-13.xhtml
+    Example: <p epub:type="title">Arrival of Ulysses at Ithaca...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-17.xhtml
+    Example: <p epub:type="title">Return of Ulysses to His Palace...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-15.xhtml
+    Example: <p epub:type="title">Return of Telemachus...
+
+honore-de-balzac_beatrix_james-waring
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>France, and more especially Brittany, still has some few towns that stand entirely outside the so...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Retrospective Adultery...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“What is the matter with you, my boy?” said Claude Vignon, stealing quietly in after him and taki...
+
+honore-de-balzac_lost-illusions_ellen-marriage
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>At the time when this story opens, the Stanhope press and the ink-distributing roller were not as...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>Lucien had gone to Paris; and David Séchard, with the courage and intelligence of the ox which pa...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">A Distinguished Provincial at Paris...
+
+honore-de-balzac_ursule-mirouet_clara-bell
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>As you enter Nemours coming from Paris, you cross the canal of the Loing, whose banks form a rura...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Minoret Property...
+
+hugh-walpole_the-secret-city
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Markovitch and Semyonov...
+
+j-m-synge_short-plays
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: in-the-shadow-of-the-glen.xhtml, the-tinkers-wedding.xhtml, riders-to-the-sea.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td epub:type="z3998:persona">Tramp</...
+
+j-storer-clouston_the-spy-in-black
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">A Few Concluding Chapters by the Editor...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Narrative of Lieutenant von Belke (Of the German Navy)...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Lieutenant von Belke’s Narrative Resumed...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">Lieutenant von Belke’s Narrative Concluded...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">A Few Chapters by the Editor...
+
+j-w-von-goethe_the-sorrows-of-young-werther_r-d-boylan
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>How happy I am that I am gone! My dear friend, what a thing is the heart of man! To leave you, fr...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p>We arrived here yesterday. The ambassador is indisposed, and will not go out for some days. If he...
+
+james-branch-cabell_figures-of-earth
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">The Book of Settlement...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>“Then answered the Magician dredefully: Manuel, Manuel, now I shall shewe unto thee many bokes of...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Book of Cast Accounts...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">The Book of Surcharge...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Book of Spending...
+
+james-joyce_ulysses
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-9.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Stephen</t...
+
+james-stephens_the-crock-of-gold
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Philosopher’s Journey...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Philosopher’s Return...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="title">The Thin Woman’s Journey and the Happy March...
+
+jean-jacques-rousseau_the-social-contract_g-d-h-cole
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>I mean to inquire if, in the civil order, there can be any sure and legitimate rule of administra...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>Before speaking of the different forms of government, let us try to fix the exact sense of the wo...
+
+jerome-k-jerome_three-men-in-a-boat
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-13.xhtml, chapter-8.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">The Cat</t...
+
+joel-barlow_the-columbiad
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="bridgehead">Subject of the Poem, and invocation to Freedom⁠—Condition of Columbus in a...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="bridgehead">Actions of the Inca Capac⁠—A general invasion of his dominions threatened ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="bridgehead">Coast of France rises in vision⁠—Louis, to humble the British power, forms...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="bridgehead">Vision confined to North America⁠—Progress of the colonies⁠—Troubles with ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">Natives of America appear in vision⁠—Their manners and characters⁠—Columbu...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="bridgehead">Destruction of Peru foretold⁠—Grief of Columbus⁠—He is comforted by the pr...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="bridgehead">British cruelty to American prisoners⁠—Prison Ship⁠—Retreat of Washington ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="bridgehead">The vision resumed and extended over the whole earth⁠—Present character of...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="bridgehead">Hymn to Peace⁠—Eulogy on the heroes slain in the war, in which the Author ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="bridgehead">Vision suspended⁠—Night scene, as contemplated from the mount of vision⁠—C...
+
+johanna-spyri_heidi_elisabeth-p-stork
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Heidi’s Years of Learning and Travel...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Heidi Makes Use of Her Experience...
+
+john-a-lomax_songs-of-the-cattle-trail-and-cow-camp
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Cowboy Off Guard...
+
+john-buchan_the-courts-of-the-morning
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Courts of the Morning...
+
+john-bunyan_the-pilgrims-progress
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>As I walked through the wilderness of this world, I lighted on a certain place, where was a den;...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“I have used similitudes.”...
+
+john-dewey_human-nature-and-conduct
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Place of Habit in Conduct...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Place of Intelligence in Conduct...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>Conduct when distributed under heads like habit, impulse and intelligence gets artificially shred...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Place of Impulse in Conduct...
+
+john-milton_paradise-lost
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>This First Book proposes, first in brief, the whole subject, Man’s disobedience, and the loss the...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>God, sitting on his throne, sees Satan flying towards this World, then newly created; shows him t...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p>Raphael, at the request of Adam, relates how and wherefore this World was first created: that God...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p>Morning approached, Eve relates to Adam her troublesome dream; he likes it not, yet comforts her:...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p>The consultation begun, Satan debates whether another battle be to be hazarded for the recovery o...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>Satan, now in prospect of Eden, and nigh the place where he must now attempt the bold enterprise ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p>Raphael continues to relate how Michael and Gabriel were sent forth to battle against Satan and h...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p>The Angel Michael continues, from the Flood, to relate what shall succeed; then, in the mention o...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p>Man’s transgression known, the guardian Angels forsake Paradise, and return up to Heaven to appro...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p>Adam inquires concerning celestial motions; is doubtfully answered, and exhorted to search rather...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p>Satan, having compassed the Earth, with meditated guile returns as a mist by night into Paradise;...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p>The Son of God presents to his Father the prayers of our first parents now repenting, and interce...
+
+john-w-campbell_the-black-star-passes
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Black Star Passes...
+
+jonathan-swift_gullivers-travels
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">A Voyage to Lilliput...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">A Voyage to Laputa, Balnibarbi, Luggnagg, Glubbdubdrib, and Japan...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">A Voyage to the Country of the Houyhnhnms...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">A Voyage to Brobdingnag...
+
+joseph-conrad_heart-of-darkness
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>The sea-reach of the Thames stretched before us like the beginning of an interminable waterway. I...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>“I looked at him, lost in astonishment. There he was before me, in motley, as though he had absco...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“One evening as I was lying flat on the deck of my steamboat, I heard voices approaching⁠—and the...
+
+joseph-conrad_nostromo
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Silver of the Mine...
+
+joseph-conrad_under-western-eyes
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>To begin with I wish to disclaim the possession of those high gifts of imagination and expression...
+
+jules-verne_the-adventures-of-captain-hatteras_james-r-osgood-and-company
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The English at the North Pole...
+
+jules-verne_the-giant-raft_w-j-gordon
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Eight Hundred Leagues on the Amazon...
+
+jules-verne_the-mysterious-island_stephen-w-white
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Shipwrecked in the Air...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Secret of the Island...
+
+laurence-sterne_the-life-and-opinions-of-tristram-shandy-gentleman
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-9.xhtml
+    Example: <p xml:lang="la">Non enim excursus hic ejus, sed opus ipsum est....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p xml:lang="la">Dixero si quid fortè jocosius, hoc mihi juris...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p xml:lang="la">Multitudinis imperitæ non formido judicia; meis tamen, rogo, parcant opusculis⁠⸻in ...
+
+lew-wallace_ben-hur
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p>“I am the resurrection and the life.”...
+
+lord-byron_don-juan
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: endnotes.xhtml
+    Example: <table epub:type="z3998:drama"> 							<tbody> 								<tr> 									<td epub:type="z3998:persona">R...
+
+lytton-strachey_eminent-victorians
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>Henry Edward Manning was born in 1807 and died in 1892. His life was extraordinary in many ways, ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>In 1827 the headmastership of Rugby School fell vacant, and it became necessary for the twelve tr...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>During the year 1883 a solitary English gentleman was to be seen, wandering, with a thick book un...
+
+marcel-proust_in-search-of-lost-time_c-k-scott-moncrieff
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Within a Budding Grove...
+
+marcus-aurelius_meditations_george-long
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>From my grandfather Verus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>We ought to consider not only that our life is daily wasting away and a smaller part of it is lef...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p>What is badness? It is that which thou hast often seen. And on the occasion of everything which h...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p id="book-5-p-1">In the morning when thou risest unwillingly, let this thought be present⁠—I am ri...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p id="book-2-p-1">Begin the morning by saying to thyself, I shall meet with the busybody, the ungra...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>That which rules within, when it is according to nature, is so affected with respect to the event...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p>The substance of the universe is obedient and compliant; and the reason which governs it has in i...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p>All those things at which thou wishest to arrive by a circuitous road, thou canst have now, if th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p>Wilt thou, then, my soul, never be good and simple and one and naked, more manifest than the body...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p>This reflection also tends to the removal of the desire of empty fame, that it is no longer in th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p>He who acts unjustly acts impiously. For since the universal nature has made rational animals for...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p id="book-11-p-1">These are the properties of the rational soul: it sees itself, analyses itself, ...
+
+mary-parker-follett_the-new-state
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Group Organization Democracy’s Method...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">The Dual Aspect of the Group...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Traditional Democracy...
+
+nikolay-chernyshevsky_what-is-to-be-done_nathan-haskell-dole_simon-s-skidelsky
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">New People, and the Finale...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Life of Viéra Pavlovna in Her Parents’ Family...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Marriage and Second Love...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-6.xhtml
+    Example: <p>“Let us start,” said the lady in mourning; but now she was no longer in mourning; a bright pink d...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">First Love, and Legal Marriage...
+
+ovid_metamorphoses_various-translators
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="bridgehead">The formation of the world from the confusion of Chaos by the wisdom and p...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="bridgehead">The sons of Agenor are despatched by their father in quest of their sister...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="bridgehead">Jason, at the command of the usurper Pelias, who compasses his destruction...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="bridgehead">Phineus, the brother of Cepheus, had been betrothed to his niece Andromeda...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">Phaeton, the son of Apollo and Clymene, obtains from his fond father an oa...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="bridgehead">Undeterred by the punishment of Pentheus, Alcithoe and her sisters dare to...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="bridgehead">Arachne presumes to challenge Minerva to a trial of skill in needlework⁠—B...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p epub:type="bridgehead">Preparations are making by the Greeks for the hostile invasion of Troy⁠—Ip...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="bridgehead">Orpheus, by his skill in music, obtains from Pluto the restoration of his ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="bridgehead">Scylla, the daughter of Nisus, king of Megara, becomes enamoured of King M...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-14.xhtml
+    Example: <p epub:type="bridgehead">The goddess Circe, becoming enamoured of Glaucus, and finding his preferen...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="bridgehead">Achelous relates to Theseus the contest between himself and Hercules for t...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p epub:type="bridgehead">The Thracian women, offended at the coldness of Orpheus, tear him to piece...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-13.xhtml
+    Example: <p epub:type="bridgehead">Ajax and Ulysses lay claim to the armour of Achilles, which is assigned to...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-15.xhtml
+    Example: <p epub:type="bridgehead">The Pythagorean system of philosophy, which is here minutely described, is...
+
+p-g-wodehouse_the-little-nugget
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="bridgehead">In which the Little Nugget is introduced to the reader, and plans are made...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="bridgehead">In which other interested parties, notably one Buck MacGinnis and a trade ...
+
+p-t-barnum_the-humbugs-of-the-world
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-7.xhtml
+    Example: <p epub:type="title">Ghosts and Witchcrafts...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Personal Reminiscences...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Trade and Business Impositions...
+
+peter-kropotkin_memoirs-of-a-revolutionist
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">The Fortress; The Escape...
+
+philip-gibbs_now-it-can-be-told
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-8.xhtml
+    Example: <p>In this book I have written in a blunt way some episodes of the war as I observed them, and gaine...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-7.xhtml
+    Example: <p epub:type="title">The Fields of Armageddon...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="subtitle">Amiens in Time of War...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Observers and Commanders...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Nature of a Battle...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">A Winter of Discontent...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-6.xhtml
+    Example: <p epub:type="title">Psychology on the Somme...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The School of Courage...
+
+rafael-sabatini_the-sea-hawk
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Sir Oliver Tressilian...
+
+richard-brinsley-sheridan_the-school-for-scandal
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: introduction.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Jenny</td>...
+
+richard-hughes_a-high-wind-in-jamaica
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-3.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td epub:type="z3998:persona">Laura</...
+
+richard-jefferies_after-london
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">The Relapse Into Barbarism...
+
+richard-marsh_the-beetle
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The House with the Open Window...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Terror by Night and the Terror by Day...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">The story according to Sydney Atherton, Esquire....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="bridgehead">The conclusion of the matter is extracted from the casebook of the ...
+
+robert-louis-stevenson_prince-otto
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">Fortunate Misfortune...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Of Love and Politics...
+
+romain-rolland_clerambault_katherine-miller
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p>Once more Clerambault found himself wrapt in solitude; but this time she appeared to him as never...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>Agénor Clerambault sat under an arbour in his garden at ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>Clerambault came back from the hospital, shut himself into his room, and began to write. His wife...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>Clerambault was passing through a new danger-zone. His solitary journey was like a mountain ascen...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>It was a week before Clerambault could go out again. The terrible crisis through which he had pas...
+
+samuel-pepys_the-diary
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: endnotes.xhtml
+    Example: <table epub:type="z3998:drama"> 							<tbody> 								<tr> 									<td epub:type="z3998:persona">A...
+
+stephen-vincent-benet_john-browns-body
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>I have, may it please the Court, a few words to say....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p>A smoke-stained Stars-and-Stripes droops from a broken toothpick and ninety tired men march out o...
+
+suetonius_the-lives-of-the-caesars_j-c-rolfe
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p>He served his first campaign in Asia on the personal staff of Marcus Thermus, governor of the pro...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>The patrician branch of the Claudian family (for there was, besides, a plebeian branch of no less...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="title">Galba⁠—Otho⁠—Vitellius...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">The Deified Claudius...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Deified Augustus...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>Germanicus, father of Gaius Caesar, son of Drusus and the younger Antonia, after being adopted by...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p>Of the Domitian family two branches have acquired distinction, the Calvini and the Ahenobarbi. Th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="title">The Deified Vespasian⁠—The Deified Titus⁠—Domitian...
+
+t-e-lawrence_seven-pillars-of-wisdom
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Discovery of Feisal...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p>Our taking Wejh had the wished effect upon the Turks, who abandoned their advance towards Mecca f...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="title">The Dead Sea Campaign...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p>Our capture of Akaba closed the Hejaz war, and gave us the task of helping the British invade Syr...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Opening the Arab Offensive...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>The port of Akaba was naturally so strong that it could be taken only by surprise from inland: bu...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="title">The Raid Upon the Bridges...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="title">The House Is Perfected...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="title">The Ruin of High Hope...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="title">Balancing for a Last Effort...
+
+thomas-a-kempis_the-imitation-of-christ_william-benham
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">Admonitions Profitable for the Spiritual Life...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">On Inward Consolation...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">Admonitions Concerning the Inner Life...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">Of the Sacrament of the Altar...
+
+thomas-bulfinch_bulfinchs-mythology
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>It has been well known to the literati and antiquarians of Europe that there exist in the great p...
+
+thomas-de-quincey_confessions-of-an-english-opium-eater
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>These preliminary confessions, or introductory narrative of the youthful adventures which laid th...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>So then, Oxford Street, stony-hearted stepmother! thou that listenest to the sighs of orphans and...
+
+thomas-hardy_jude-the-obscure
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">At Aldbrickham and Elsewhere...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>“Yea, many there be that have run out of their wits for women, and become servants for their sake...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>“For there was no other girl, O bridegroom, like her!”...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>“Whoso prefers either Matrimony or other Ordinance before the Good of Man and the plain Exigence ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-6.xhtml
+    Example: <p epub:type="title">At Christminster Again...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>“Save his own soul he hath no star.”...
+
+thomas-hobbes_leviathan
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Of a Christian Commonwealth...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">Of the Kingdom of Darkness...
+
+thomas-love-peacock_nightmare-abbey
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-7.xhtml, chapter-5.xhtml, chapter-6.xhtml, chapter-11.xhtml, chapter-8.xhtml, chapter-12.xhtml, epigraph.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona"><abbr epub...
+
+thomas-paine_the-rights-of-man
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Combining Principle and Practice...
+
+upton-sinclair_king-coal
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Domain of King Coal...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Henchmen of King Coal...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Serfs of King Coal...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Will of King Coal...
+
+victor-hugo_les-miserables_isabel-f-hapgood
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: volume-4.xhtml
+    Example: <p epub:type="title">The Idyl in the Rue Plumet and the Epic in the Rue Saint-Denis...
+
+virgil_the-aeneid_john-dryden
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="bridgehead">The Trojans, after a seven years’ voyage, set sail for Italy, but are over...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="bridgehead">Aeneas proceeds in his relation: he gives an account of the fleet with whi...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-7.xhtml
+    Example: <p epub:type="bridgehead">King Latinus entertains Aeneas, and promises him his only daughter, Lavini...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="bridgehead">Aeneas, setting sail from Afric, is driven by a storm on the coast of Sici...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">Aeneas relates how the city of Troy was taken, after a ten years’ siege, b...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="bridgehead">Dido discovers to her sister her passion for Aeneas, and her thoughts of m...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-6.xhtml
+    Example: <p epub:type="bridgehead">The Sibyl foretells Aeneas the adventures he should meet with in Italy. Sh...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-12.xhtml
+    Example: <p epub:type="bridgehead">Turnus challenges Aeneas to a single combat: articles are agreed on, but b...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-10.xhtml
+    Example: <p epub:type="bridgehead">Jupiter, calling a council of the gods, forbids them to engage in either p...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-8.xhtml
+    Example: <p epub:type="bridgehead">The war being now begun, both the generals make all possible preparations....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-9.xhtml
+    Example: <p epub:type="bridgehead">Turnus takes advantage of Aeneas’s absence, fires some of his ships (which...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-11.xhtml
+    Example: <p epub:type="bridgehead">Aeneas erects a trophy of the spoils of Mezentius, grants a truce for bury...
+
+virgil_the-georgics_john-dryden
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="bridgehead">The poet, in the beginning of this book, propounds the general design of e...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="bridgehead">This book begins with an invocation of some rural deities, and a complimen...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="bridgehead">The subject of the following book is planting: in handling of which argume...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p>Virgil has taken care to raise the subject of each Georgic. In the first, he has only dead matter...
+
+w-b-yeats_poetry
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: poetry.xhtml
+    Example: <table epub:type="z3998:drama"> 					<tbody> 						<tr> 							<td epub:type="z3998:persona">S. Patr...
+
+w-e-b-du-bois_dark-princess
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>Summer is come with bursting flower and promise of perfect fruit. Rain is rolling down Nile and N...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">The Chicago Politician...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">The Maharajah of Bwodpur...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>September to December, 1923...
+
+w-n-p-barbellion_the-journal-of-a-disappointed-man
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>The journal begins when its author is a little over thirteen years old. The following are selecte...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>This evening we walked through the Churchyard reading tombstone inscriptions. What a lot of men h...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>Am at last beginning to get more content with the work at the Museum, so that I muse on Bernard S...
+
+wallace-thurman_the-blacker-the-berry
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p>It was two years later. ...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>More acutely than ever before Emma Lou began to feel that her luscious black complexion was somew...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p>It was nine o’clock. The alarm rang. Alva’s roommate awoke cursing....
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p>Saturday evening. Alva had urged her to hurry uptown from work. He was going to take her on a par...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>Emma Lou turned her face away from the wall, and quizzically squinted her dark, pea-like eyes at ...
+
+washington-irving_the-sketchbook-of-geoffrey-crayon-gent
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: stratford-on-avon.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona">Falstaff</...
+
+willa-cather_my-antonia
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-4.xhtml
+    Example: <p epub:type="title">The Pioneer Woman’s Story...
+
+willa-cather_o-pioneers
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">The White Mulberry Tree...
+
+willa-cather_one-of-ours
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">Sunrise on the Prairie...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-5.xhtml
+    Example: <p epub:type="title">“Bidding the Eagles of the West Fly On”...
+
+willa-cather_the-song-of-the-lark
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">Doctor Archie’s Venture...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Friends of Childhood...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">The Song of the Lark...
+
+william-craft_ellen-craft_running-a-thousand-miles-for-freedom
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p>My wife and myself were born in different towns in the State of Georgia, which is one of the prin...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p>After my wife had a little recovered herself, she threw off the disguise and assumed her own appa...
+
+william-faulkner_soldiers-pay
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-1.xhtml
+    Example: <table epub:type="z3998:drama"> 							<tbody> 								<tr> 									<td epub:type="z3998:persona">A...
+
+william-gerhardie_futility
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Intervening in Siberia...
+
+william-hazlitt_table-talk
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: endnotes.xhtml
+    Example: <table epub:type="z3998:drama"> 							<tbody> 								<tr> 									<td epub:type="z3998:persona">G...
+
+william-makepeace-thackeray_the-history-of-henry-esmond
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-1.xhtml
+    Example: <p epub:type="title">The Early Youth of Henry Esmond, Up to the Time of His Leaving Trinity College,...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">Containing the End of ...
+
+william-morris_the-water-of-the-wondrous-isles
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-7.xhtml
+    Example: <p epub:type="title">The Days of Returning...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-5.xhtml
+    Example: <p epub:type="title">The Tale of the Quest’s Ending...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-1.xhtml
+    Example: <p epub:type="title">Of the House of Captivity...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-3.xhtml
+    Example: <p epub:type="title">Of the Castle of the Quest...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-4.xhtml
+    Example: <p epub:type="title">Of the Days of Abiding...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: part-2.xhtml
+    Example: <p epub:type="title">Of the Wondrous Isles...
+
+william-morris_the-well-at-the-worlds-end
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-3.xhtml
+    Example: <p epub:type="title">The Road to the Well at the World’s End...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: book-2.xhtml
+    Example: <p epub:type="title">The Road Unto Trouble...
+
+william-wells-brown_clotel
+  [EMBEDDED_DRAMA_TABLE] Drama dialogue in <table> format needs conversion to data-speaker paragraphs
+    Files: chapter-6.xhtml
+    Example: <table epub:type="z3998:drama"> 				<tbody> 					<tr> 						<td epub:type="z3998:persona"> 							<a...
+
+william-wordsworth_samuel-taylor-coleridge_lyrical-ballads
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: volume-1.xhtml
+    Example: <p epub:type="subtitle">An Evening Scene on the Same Subject...
+  [PART_WITH_PROSE] Part/book divider contains prose paragraphs that may be lost
+    Files: volume-2.xhtml
+    Example: <p epub:type="bridgehead">Hart-Leap Well is a small spring of water, about five miles from Richmond ...
+
+================================================================================
+HIGH - Significant structure loss (94 books)
+================================================================================
+aleksandr-kuprin_short-fiction_various-translators: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+algernon-blackwood_john-silence-stories: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+algis-budrys_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+ambrose-bierce_can-such-things-be: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+ambrose-bierce_in-the-midst-of-life: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+ambrose-bierce_poetry: NESTED_CHAPTERS
+andre-norton_short-fiction: NESTED_CHAPTERS
+anthony-trollope_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+arthur-conan-doyle_his-last-bow: NESTED_CHAPTERS, NESTED_CHAPTERS
+arthur-conan-doyle_the-adventures-of-sherlock-holmes: NESTED_CHAPTERS
+arthur-machen_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+baroness-orczy_the-league-of-the-scarlet-pimpernel: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+clifford-d-simak_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+cordwainer-smith_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS
+e-m-forster_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+edward-lear_nonsense-books: NESTED_CHAPTERS
+epictetus_short-works_george-long: NESTED_CHAPTERS, NESTED_CHAPTERS
+ernest-hemingway_short-fiction: NESTED_CHAPTERS
+ernest-thompson-seton_wild-animals-i-have-known: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+errico-malatesta_essays_various-translators: NESTED_CHAPTERS
+f-scott-fitzgerald_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+frances-ellen-watkins-harper_poetry: NESTED_CHAPTERS
+frank-belknap-long_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+frank-hamilton-cushing_zuni-folktales: NESTED_CHAPTERS
+frederik-pohl_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+fritz-leiber_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+fyodor-sologub_short-fiction_various-translators: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+george-bernard-shaw_short-plays: INTERLUDE_CONTENT
+gustave-flaubert_short-fiction_m-walter-dunne: NESTED_CHAPTERS, NESTED_CHAPTERS
+h-c-bailey_call-mr-fortune: NESTED_CHAPTERS
+h-p-lovecraft_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+h-rider-haggard_allan-quatermain-stories: NESTED_CHAPTERS
+henry-david-thoreau_essays: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+henry-kuttner_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+herman-melville_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+herminie-templeton-kavanagh_darby-ogill-and-the-good-people: NESTED_CHAPTERS, NESTED_CHAPTERS
+hjalmar-soderberg_short-fiction_various-translators: NESTED_CHAPTERS, NESTED_CHAPTERS
+isaac-asimov_short-science-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS
+ivan-bunin_short-fiction_various-translators: NESTED_CHAPTERS, NESTED_CHAPTERS
+j-sheridan-le-fanu_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+jack-london_the-son-of-the-wolf: NESTED_CHAPTERS, NESTED_CHAPTERS
+jacob-grimm_wilhelm-grimm_household-tales_margaret-hunt: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+james-stephens_irish-fairy-tales: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+james-weldon-johnson_poetry: NESTED_CHAPTERS
+john-g-neihardt_a-cycle-of-the-west: NESTED_CHAPTERS, NESTED_CHAPTERS
+john-galsworthy_the-forsyte-saga: INTERLUDE_CONTENT, INTERLUDE_CONTENT, INTERLUDE_CONTENT, INTERLUDE_CONTENT, INTERLUDE_CONTENT, INTERLUDE_CONTENT
+john-henry-newman_verses-on-various-occasions: NESTED_CHAPTERS
+john-keats_poetry: NESTED_CHAPTERS
+kate-chopin_short-fiction: NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS, NESTED_CHAPTERS
+laozi_tao-te-ching_james-legge: NESTED_CHAPTERS
+  ... and 44 more

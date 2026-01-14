@@ -64,8 +64,14 @@ export const similarityPingwing = (a: string, b: string): number => {
   return result;
 };
 
-export const locateQuotes = (quotes: string[], paragraphs: ParagraphInfo[], upTo: { chapter: number; paragraph: number }): QuoteHit[] => {
-  const limited = paragraphs.filter((p) => p.chapter < upTo.chapter || (p.chapter === upTo.chapter && p.index <= upTo.paragraph));
+export const locateQuotes = (
+  quotes: string[],
+  paragraphs: ParagraphInfo[],
+  upTo: { chapter: number; paragraph: number },
+): QuoteHit[] => {
+  const limited = paragraphs.filter(
+    (p) => p.chapter < upTo.chapter || (p.chapter === upTo.chapter && p.index <= upTo.paragraph),
+  );
 
   const hits: QuoteHit[] = [];
 

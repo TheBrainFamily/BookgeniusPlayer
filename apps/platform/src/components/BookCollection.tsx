@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
+import { SPLASH_FADE_DURATION_MS } from "../../../player/src/components/SplashScreen";
 import { getBooksByCurrentLanguage } from "@platform/utils/bookLanguageFilter";
 import { books } from "@platform/books";
 import BookCard from "./BookCard";
@@ -27,8 +28,8 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
       (book) =>
         book.title.toLowerCase().includes(query) ||
         book.author.toLowerCase().includes(query) ||
-        book.metadata[language].genre.toLowerCase().includes(query) ||
-        book.metadata[language].description.toLowerCase().includes(query),
+        book.metadata[language]?.genre.toLowerCase().includes(query) ||
+        book.metadata[language]?.description.toLowerCase().includes(query),
     );
   }, [searchQuery, language]);
 
@@ -37,37 +38,50 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   }, [filteredBooks]);
 
   const handleBookClick = (book: (typeof books)[0]) => {
-    const title = book?.title ?? "BookGenius";
-    const phrases = book?.metadata[language].phrases;
-    const author = book?.author;
+    const title = book.title ?? "BookGenius";
+    const phrases = book.metadata[language]?.phrases ?? [];
+    const author = book.author;
 
     // Indicate user came from platform for proper loader behavior
     setNavigatedFromPlatform(true);
     // Start the transition overlay with book-specific meta
     startTransition({ title, phrases, author, showStartButton: false, onStartClick: undefined });
 
-    // Let the overlay paint before route switch for a smooth fade
-    requestAnimationFrame(() => {
+    // Wait for overlay to fade in before navigating (prevents flash of gray body background)
+    setTimeout(() => {
       navigate(`/reader?book=${book.slug}`, { state: { meta: { title, phrases, author } } });
-    });
+    }, SPLASH_FADE_DURATION_MS);
   };
 
   return (
-    <section id="book-collection" className="py-16 px-0 md:px-8 m-auto max-w-[400px] sm:max-w-[1400px] min-h-[80vh] flex items-center justify-center">
+    <section
+      id="book-collection"
+      className="py-16 px-0 md:px-8 m-auto max-w-[400px] sm:max-w-[1400px] min-h-[80vh] flex items-center justify-center"
+    >
       <div className="container mx-auto px-0">
         <div className="text-center mb-12 px-4 md:px-0">
           <h2 className="text-4xl font-bold text-foreground mb-4">
             {searchQuery ? (
               <>
-                {t("collection.searchResults").split(" ")[0]} <span className="text-library-gold">{t("collection.searchResults").split(" ")[1]}</span>
+                {t("collection.searchResults").split(" ")[0]}{" "}
+                <span className="text-library-gold">
+                  {t("collection.searchResults").split(" ")[1]}
+                </span>
               </>
             ) : (
               <>
-                {t("collection.ourCollection").split(" ")[0]} <span className="text-library-gold">{t("collection.ourCollection").split(" ")[1]}</span>
+                {t("collection.ourCollection").split(" ")[0]}{" "}
+                <span className="text-library-gold">
+                  {t("collection.ourCollection").split(" ")[1]}
+                </span>
               </>
             )}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{searchQuery ? `${t("collection.searchResultsFor")} "${searchQuery}"` : t("collection.description")}</p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            {searchQuery
+              ? `${t("collection.searchResultsFor")} "${searchQuery}"`
+              : t("collection.description")}
+          </p>
         </div>
 
         {filteredBooks.length === 0 ? (
@@ -80,7 +94,15 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
             {filteredBooks
-              .map((book) => <BookCard key={book.id} book={book} variant="default" showLanguageFlag onClick={handleBookClick} />)
+              .map((book) => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  variant="default"
+                  showLanguageFlag
+                  onClick={handleBookClick}
+                />
+              ))
               .sort((a, b) => {
                 const aPref = a.props.book.language === language ? 0 : 1;
                 const bPref = b.props.book.language === language ? 0 : 1;

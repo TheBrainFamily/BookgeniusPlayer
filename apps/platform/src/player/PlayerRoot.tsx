@@ -1,5 +1,3 @@
 // Loads ONLY when the player route is actually used (or when we prefetch it)
-import "../../../player/src/styles/imports.css";
-
-import App from "../../../player/src/App";
-export default App;
+// PlayerWithConvex handles styles import and Convex provider setup
+export { default } from "./PlayerWithConvex";

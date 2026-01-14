@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import React, { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { X } from "lucide-react";
 
@@ -50,13 +50,19 @@ const MODAL_SIZES: Record<NonNullable<ModalUIProps["size"]>, ModalSize> = {
   full: { content: "w-full max-w-none", container: "w-full max-w-none" },
 };
 
-const LAYOUT_VIEW_SIZE: ModalSize = { content: "w-full h-full max-w-none pointer-events-none z-40", container: "w-full max-w-none pointer-events-none" };
+const LAYOUT_VIEW_SIZE: ModalSize = {
+  content: "w-full h-full max-w-none pointer-events-none z-40",
+  container: "w-full max-w-none pointer-events-none",
+};
 
 const isTransparentModal = (transparent: boolean, className: string): boolean => {
   return transparent || className.includes("bg-transparent");
 };
 
-const getModalSizeConfig = (layoutView: boolean, size: NonNullable<ModalUIProps["size"]>): ModalSize => {
+const getModalSizeConfig = (
+  layoutView: boolean,
+  size: NonNullable<ModalUIProps["size"]>,
+): ModalSize => {
   return layoutView ? LAYOUT_VIEW_SIZE : MODAL_SIZES[size];
 };
 
@@ -81,12 +87,24 @@ const getModalContentClasses = (
   );
 };
 
-const getContainerClasses = (shouldShiftContent: boolean, layoutView: boolean, isPlayFormat: boolean, sizeConfig: ModalSize, isLargeScreen: boolean): string => {
+const getContainerClasses = (
+  shouldShiftContent: boolean,
+  layoutView: boolean,
+  isPlayFormat: boolean,
+  sizeConfig: ModalSize,
+  _isLargeScreen: boolean,
+): string => {
   return cn(
     "flex flex-row justify-center h-full",
     sizeConfig.container,
-    shouldShiftContent && layoutView && !isPlayFormat && "flex flex-row justify-center mx-auto max-w-[120rem] w-full xl:px-2",
-    shouldShiftContent && layoutView && isPlayFormat && "flex flex-row mx-auto max-w-[120rem] w-full",
+    shouldShiftContent &&
+      layoutView &&
+      !isPlayFormat &&
+      "flex flex-row justify-center mx-auto max-w-[120rem] w-full xl:px-2",
+    shouldShiftContent &&
+      layoutView &&
+      isPlayFormat &&
+      "flex flex-row mx-auto max-w-[120rem] w-full",
   );
 };
 
@@ -96,7 +114,7 @@ const getModalWrapperClasses = (
   isMediumScreen: boolean,
   isLargeScreen: boolean,
   shouldShiftContent: boolean,
-  isWideScreen: boolean,
+  _isWideScreen: boolean,
 ): string => {
   if (!layoutView) return "";
 
@@ -111,17 +129,26 @@ const getModalWrapperClasses = (
     }
     // Default (no shift)
     return cn(
-      !isMediumScreen && !isLargeScreen && "xl:flex-1 pointer-events-none max-w-[600px] flex items-center",
-      (isMediumScreen || isLargeScreen) && "lg:flex-1 pointer-events-none max-w-[600px] flex items-center ml-2",
+      !isMediumScreen &&
+        !isLargeScreen &&
+        "xl:flex-1 pointer-events-none max-w-[600px] flex items-center",
+      (isMediumScreen || isLargeScreen) &&
+        "lg:flex-1 pointer-events-none max-w-[600px] flex items-center ml-2",
       isMediumScreen && "mr-2",
     );
   }
 
   // Play format positioning
   return cn(
-    !isMediumScreen && !isLargeScreen && "pointer-events-none max-w-[800px] mx-auto flex items-center",
-    isLargeScreen && shouldShiftContent && "xl:flex-1 max-w-[500px] pointer-events-none flex items-center mr-3",
-    isMediumScreen && shouldShiftContent && "lg:flex-1 pointer-events-none max-w-[500px] flex items-center mr-2",
+    !isMediumScreen &&
+      !isLargeScreen &&
+      "pointer-events-none max-w-[800px] mx-auto flex items-center",
+    isLargeScreen &&
+      shouldShiftContent &&
+      "xl:flex-1 max-w-[500px] pointer-events-none flex items-center mr-3",
+    isMediumScreen &&
+      shouldShiftContent &&
+      "lg:flex-1 pointer-events-none max-w-[500px] flex items-center mr-2",
   );
 };
 
@@ -136,7 +163,16 @@ interface SpacerProps {
   columnWidths: { leftNotes: number; content: number; rightNotes: number };
 }
 
-const LeftSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isLargeScreen, isMediumScreen, shouldShiftContent, isMobileOrTablet, columnWidths }) => {
+const LeftSpacer: React.FC<SpacerProps> = ({
+  layoutView,
+  isPlayFormat,
+  isLargeScreen,
+  isMediumScreen,
+  shouldShiftContent,
+  isMobileOrTablet,
+  columnWidths,
+  isWideScreen: _isWideScreen,
+}) => {
   if (!layoutView || isPlayFormat || isMobileOrTablet) return null;
 
   // 3-COLUMN (large) with shift: spacer matches actual left-notes column width
@@ -153,7 +189,16 @@ const LeftSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isLargeSc
   );
 };
 
-const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMediumScreen, isLargeScreen, shouldShiftContent, isMobileOrTablet, columnWidths }) => {
+const ContentSpacer: React.FC<SpacerProps> = ({
+  layoutView,
+  isPlayFormat,
+  isMediumScreen,
+  isLargeScreen,
+  shouldShiftContent,
+  isMobileOrTablet,
+  columnWidths,
+  isWideScreen: _isWideScreen,
+}) => {
   if (!layoutView) return null;
 
   // 3-COLUMN (large) with shift: spacer matches actual content column width
@@ -162,16 +207,39 @@ const ContentSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, isMedi
   }
 
   if (!isPlayFormat) {
-    return <div className={cn("modal-content max-w-[800px]", (isMediumScreen || isLargeScreen) && "sm:flex-3", !isMobileOrTablet && "xl:max-w-[850px] xxl:max-w-[900px]")} />;
+    return (
+      <div
+        className={cn(
+          "modal-content max-w-[800px]",
+          (isMediumScreen || isLargeScreen) && "sm:flex-3",
+          !isMobileOrTablet && "xl:max-w-[850px] xxl:max-w-[900px]",
+        )}
+      />
+    );
   }
 
   return null;
 };
 
-const PlayFormatSpacer: React.FC<SpacerProps> = ({ layoutView, isPlayFormat, shouldShiftContent }) => {
+const PlayFormatSpacer: React.FC<SpacerProps> = ({
+  layoutView,
+  isPlayFormat,
+  shouldShiftContent,
+  isLargeScreen: _isLargeScreen,
+  isMediumScreen: _isMediumScreen,
+  isMobileOrTablet: _isMobileOrTablet,
+  isWideScreen: _isWideScreen,
+  columnWidths: _columnWidths,
+}) => {
   if (!layoutView || !isPlayFormat || !shouldShiftContent) return null;
 
-  return <div className={cn("sm:flex-3 max-w-[800px] xl:max-w-[850px] xxl:max-w-[900px] xxl:w-[900px] xxl:flex-auto mx-2")} />;
+  return (
+    <div
+      className={cn(
+        "sm:flex-3 max-w-[800px] xl:max-w-[850px] xxl:max-w-[900px] xxl:w-[900px] xxl:flex-auto mx-2",
+      )}
+    />
+  );
 };
 
 interface ModalHeaderProps {
@@ -183,11 +251,21 @@ interface ModalHeaderProps {
   onClose: () => void;
 }
 
-const ModalHeader: React.FC<ModalHeaderProps> = ({ title, isTransparent, layoutView, showCloseButton, headerActions, onClose }) => {
+const ModalHeader: React.FC<ModalHeaderProps> = ({
+  title,
+  isTransparent,
+  layoutView,
+  showCloseButton,
+  headerActions,
+  onClose,
+}) => {
   if (!title) return null;
 
   const titleClasses = cn("text-lg font-semibold", isTransparent ? "text-black" : "text-white");
-  const closeButtonClasses = cn("p-1 rounded-md transition-colors cursor-pointer", isTransparent ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white");
+  const closeButtonClasses = cn(
+    "p-1 rounded-md transition-colors cursor-pointer",
+    isTransparent ? "text-gray-600 hover:text-black" : "text-white/70 hover:text-white",
+  );
 
   return (
     <header className={cn("flex justify-between items-center p-4 w-full", layoutView && "pb-0")}>
@@ -230,6 +308,7 @@ const ModalUI: React.FC<ModalUIProps> = ({
   headerActions,
   searchActions,
   disableHeightConstraint = false,
+  // eslint-disable-next-line complexity
 }) => {
   const { isContentShiftedLeft } = useContentShift();
   const { isLargeScreen, isMediumScreen } = useScreenSize();
@@ -237,7 +316,9 @@ const ModalUI: React.FC<ModalUIProps> = ({
   const isMobileOrTablet = useIsMobileOrTablet();
 
   // Track if screen is wide enough that modal fits in right column without squeezing
-  const [isWideScreen, setIsWideScreen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1500);
+  const [isWideScreen, setIsWideScreen] = useState(
+    () => typeof window !== "undefined" && window.innerWidth >= 1500,
+  );
   useEffect(() => {
     const checkWideScreen = () => setIsWideScreen(window.innerWidth >= 1500);
     window.addEventListener("resize", checkWideScreen);
@@ -280,12 +361,33 @@ const ModalUI: React.FC<ModalUIProps> = ({
 
   const isTransparent = isTransparentModal(transparent, className);
   // Only apply content shift for side-panel modals (layoutView=true), not centered modals
-  const shouldShiftContent = layoutView && isContentShiftedLeft && (isLargeScreen || isMediumScreen);
+  const shouldShiftContent =
+    layoutView && isContentShiftedLeft && (isLargeScreen || isMediumScreen);
   const sizeConfig = getModalSizeConfig(layoutView, size);
 
-  const modalContentClasses = getModalContentClasses(isTransparent, layoutView, className, isContentShiftedLeft, isLargeScreen, isPlayFormat);
-  const containerClasses = getContainerClasses(shouldShiftContent, layoutView, isPlayFormat, sizeConfig, isLargeScreen);
-  const modalWrapperClasses = getModalWrapperClasses(layoutView, isPlayFormat, isMediumScreen, isLargeScreen, shouldShiftContent, isWideScreen);
+  const modalContentClasses = getModalContentClasses(
+    isTransparent,
+    layoutView,
+    className,
+    isContentShiftedLeft,
+    isLargeScreen,
+    isPlayFormat,
+  );
+  const containerClasses = getContainerClasses(
+    shouldShiftContent,
+    layoutView,
+    isPlayFormat,
+    sizeConfig,
+    isLargeScreen,
+  );
+  const modalWrapperClasses = getModalWrapperClasses(
+    layoutView,
+    isPlayFormat,
+    isMediumScreen,
+    isLargeScreen,
+    shouldShiftContent,
+    isWideScreen,
+  );
 
   const activeTextInputRef = useRef<HTMLElement | null>(null);
   const shouldTrapNextOutsideTapRef = useRef(false);
@@ -329,7 +431,9 @@ const ModalUI: React.FC<ModalUIProps> = ({
       }
 
       const activeElement = document.activeElement as HTMLElement | null;
-      const focusedInput = isTextInputElement(activeElement) ? activeElement : activeTextInputRef.current;
+      const focusedInput = isTextInputElement(activeElement)
+        ? activeElement
+        : activeTextInputRef.current;
 
       if (shouldTrapNextOutsideTapRef.current && isTextInputElement(focusedInput)) {
         shouldTrapNextOutsideTapRef.current = false;
@@ -443,7 +547,14 @@ const ModalUI: React.FC<ModalUIProps> = ({
             columnWidths={columnWidths}
           />
 
-          <div className={modalWrapperClasses} style={isLargeScreen && shouldShiftContent && columnWidths.rightNotes > 0 ? { width: columnWidths.rightNotes } : undefined}>
+          <div
+            className={modalWrapperClasses}
+            style={
+              isLargeScreen && shouldShiftContent && columnWidths.rightNotes > 0
+                ? { width: columnWidths.rightNotes }
+                : undefined
+            }
+          >
             <motion.div
               className={modalContentClasses}
               style={disableHeightConstraint ? undefined : { maxHeight }}
@@ -452,9 +563,20 @@ const ModalUI: React.FC<ModalUIProps> = ({
               exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.25, ease: "easeIn" } }}
               layout={animateHeight}
             >
-              <ModalHeader title={title} isTransparent={isTransparent} layoutView={layoutView} showCloseButton={showCloseButton} headerActions={headerActions} onClose={onClose} />
+              <ModalHeader
+                title={title}
+                isTransparent={isTransparent}
+                layoutView={layoutView}
+                showCloseButton={showCloseButton}
+                headerActions={headerActions}
+                onClose={onClose}
+              />
 
-              {searchActions && <div className="w-full flex justify-between items-center px-4 pt-4">{searchActions}</div>}
+              {searchActions && (
+                <div className="w-full flex justify-between items-center px-4 pt-4">
+                  {searchActions}
+                </div>
+              )}
 
               <motion.div
                 className="py-3 px-2 overflow-y-auto opened-modal w-full"

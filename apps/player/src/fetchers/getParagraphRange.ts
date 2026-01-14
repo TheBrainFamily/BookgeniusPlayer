@@ -7,8 +7,8 @@
  * compile without any additional tweaks.
  */
 
-import { BOOK_SLUGS } from "@player/consts";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
+import { type BOOK_SLUGS } from "@player/consts";
+import { getBookData } from "@player/state/bookDataStore";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 
 /* -------------------------------------------------------------------------- */
@@ -33,15 +33,24 @@ export interface SelfSufficientCharacterMetadata {
   infoPerChapter: InfoPerChapter[];
 }
 
-type PureRange = { startChapter: number; endChapter: number; bookSlug: BOOK_SLUGS; startParagraph: number; endParagraph: number };
+type PureRange = {
+  startChapter: number;
+  endChapter: number;
+  bookSlug: BOOK_SLUGS;
+  startParagraph: number;
+  endParagraph: number;
+};
 
 export const paragraphMetadataServicePure = {
   /**
    * Returns the slice of `data` that matches the given range, replicating the
    * MongoDB aggregation you run on the server.
    */
-  getCharactersMetadataForParagraphRange(range: PureRange, data: SelfSufficientCharacterMetadata[]): SelfSufficientCharacterMetadata[] {
-    const { startChapter, endChapter, bookSlug, startParagraph, endParagraph } = range;
+  getCharactersMetadataForParagraphRange(
+    range: PureRange,
+    data: SelfSufficientCharacterMetadata[],
+  ): SelfSufficientCharacterMetadata[] {
+    const { startChapter, endChapter, bookSlug: _bookSlug, startParagraph, endParagraph } = range;
     const {
       metadata: { bookForm },
     } = getBookData();
@@ -59,7 +68,10 @@ export const paragraphMetadataServicePure = {
         : [];
 
     // Use reduce instead of Math.min(...array) to avoid stack overflow with large arrays
-    const closestEntryInChapter = chapterEntryParagraphs.length > 0 ? chapterEntryParagraphs.reduce((min, current) => (current < min ? current : min), Infinity) : -1;
+    const closestEntryInChapter =
+      chapterEntryParagraphs.length > 0
+        ? chapterEntryParagraphs.reduce((min, current) => (current < min ? current : min), Infinity)
+        : -1;
 
     return (
       bookCharacters
@@ -99,7 +111,9 @@ export const paragraphMetadataServicePure = {
               return { ...c, paragraphsWhereSpotted, paragraphsWhereTalking };
             })
             // drop chapters whose spotted OR talking list is now empty
-            .filter((c) => c.paragraphsWhereSpotted.length > 0 || c.paragraphsWhereTalking.length > 0);
+            .filter(
+              (c) => c.paragraphsWhereSpotted.length > 0 || c.paragraphsWhereTalking.length > 0,
+            );
 
           // drop characters that vanished entirely
           if (infoPerChapter.length === 0) return null;
@@ -115,7 +129,11 @@ export const paragraphMetadataServicePure = {
 /*  3. UI‑oriented post‑processing                                            */
 /* -------------------------------------------------------------------------- */
 
-export type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
+export type Appearance = {
+  chapterNumber: number;
+  paragraphNumber: number;
+  isTalkingInParagraph: boolean;
+};
 
 export interface ParsedParagraphRange {
   slug: string;
@@ -135,7 +153,9 @@ export interface ParsedParagraphRange {
  * appearance inside the requested range plus an array of their other
  * appearances within the same range.
  */
-export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): ParsedParagraphRange[] {
+export function parseParagraphRange(
+  data: SelfSufficientCharacterMetadata[],
+): ParsedParagraphRange[] {
   return data
     .map((character) => {
       let first: {
@@ -150,7 +170,9 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
       const sortedChapters = [...character.infoPerChapter].sort((a, b) => a.chapter - b.chapter);
 
       for (const info of sortedChapters) {
-        const sortedParagraphs = [...new Set([...info.paragraphsWhereSpotted, ...info.paragraphsWhereTalking])].sort((a, b) => a - b);
+        const sortedParagraphs = [
+          ...new Set([...info.paragraphsWhereSpotted, ...info.paragraphsWhereTalking]),
+        ].sort((a, b) => a - b);
 
         if (sortedParagraphs.length === 0) continue;
 
@@ -163,10 +185,20 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
           summary: info.summary,
           label: info.slug,
           others: [
-            ...rest.map((p) => ({ chapterNumber: info.chapter, paragraphNumber: p, isTalkingInParagraph: info.paragraphsWhereTalking.includes(p) })),
+            ...rest.map((p) => ({
+              chapterNumber: info.chapter,
+              paragraphNumber: p,
+              isTalkingInParagraph: info.paragraphsWhereTalking.includes(p),
+            })),
             ...sortedChapters
               .filter((c) => c.chapter !== info.chapter)
-              .flatMap((c) => c.paragraphsWhereSpotted.map((p) => ({ chapterNumber: c.chapter, paragraphNumber: p, isTalkingInParagraph: c.paragraphsWhereTalking.includes(p) }))),
+              .flatMap((c) =>
+                c.paragraphsWhereSpotted.map((p) => ({
+                  chapterNumber: c.chapter,
+                  paragraphNumber: p,
+                  isTalkingInParagraph: c.paragraphsWhereTalking.includes(p),
+                })),
+              ),
           ],
         };
 
@@ -174,7 +206,9 @@ export function parseParagraphRange(data: SelfSufficientCharacterMetadata[]): Pa
       }
 
       if (!first) {
-        console.warn(`Character ${character.characterName} has no paragraphs listed in the provided data.`);
+        console.warn(
+          `Character ${character.characterName} has no paragraphs listed in the provided data.`,
+        );
         return null;
       }
 

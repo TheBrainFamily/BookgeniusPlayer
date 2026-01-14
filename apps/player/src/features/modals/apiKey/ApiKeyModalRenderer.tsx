@@ -10,5 +10,10 @@ export const ApiKeyModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
-  return createPortal(<AnimatePresence>{isOpen && <ApiKeyModal onClose={closeModal} onSuccess={onSuccess} />}</AnimatePresence>, document.body);
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && <ApiKeyModal onClose={closeModal} onSuccess={onSuccess} />}
+    </AnimatePresence>,
+    document.body,
+  );
 };

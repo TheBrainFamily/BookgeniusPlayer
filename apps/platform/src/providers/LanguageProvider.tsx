@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { detectLanguageFromDomain, type SupportedLanguage } from "@platform/utils/languageDetection";
+import {
+  detectLanguageFromDomain,
+  type SupportedLanguage,
+} from "@platform/utils/languageDetection";
 
 interface LanguageContextType {
   language: SupportedLanguage;
@@ -10,6 +13,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {
@@ -24,7 +28,9 @@ interface LanguageProviderProps {
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
   const { i18n, ready } = useTranslation();
-  const [language, setLanguageState] = useState<SupportedLanguage>(() => detectLanguageFromDomain());
+  const [language, setLanguageState] = useState<SupportedLanguage>(() =>
+    detectLanguageFromDomain(),
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   const setLanguage = (newLanguage: SupportedLanguage) => {
@@ -40,8 +46,10 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       if (detectedLanguage !== language) {
         setLanguage(detectedLanguage);
       }
+
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: i18n and language excluded. We only want to run initialization once when ready becomes true. Language changes are handled by the separate effect below.
   }, [ready]);
 
   useEffect(() => {

@@ -72,5 +72,7 @@ export const dealWithSW = () => {
     setServiceWorkerAsHandled();
   }
 
-  logWithTime(`Service worker initialization completed: serviceWorkerHandled=${serviceWorkerHandled}`);
+  logWithTime(
+    `Service worker initialization completed: serviceWorkerHandled=${serviceWorkerHandled}`,
+  );
 };

@@ -1,6 +1,10 @@
-import { Location } from "@player/state/LocationContext";
-import { savePosition, getCurrentPlatformAndBook, type SavePositionInput } from "./readingPositionApi";
-import { getSavedLocation, setSavedLocation, type ExtendedLocation } from "@player/helpers/paragraphsNavigation";
+import { type Location } from "@player/state/LocationContext";
+import {
+  savePosition,
+  getCurrentPlatformAndBook,
+  type SavePositionInput,
+} from "./readingPositionApi";
+import { getSavedLocation, setSavedLocation } from "@player/helpers/paragraphsNavigation";
 import { calculateReadProgress } from "@player/helpers/readProgress";
 import { bookIndex } from "@player/logic/BookIndex";
 
@@ -22,21 +26,28 @@ class ReadingPositionTracker {
     if (!this.remoteSyncEnabled) return;
 
     // Skip if paragraph hasn't changed
-    if (this.lastSentPosition?.chapter === loc.currentChapter && this.lastSentPosition?.paragraph === loc.currentParagraph) {
+    if (
+      this.lastSentPosition?.chapter === loc.currentChapter &&
+      this.lastSentPosition?.paragraph === loc.currentParagraph
+    ) {
       return;
     }
 
     // Only send if moving forward relative to furthest saved
     const saved = getSavedLocation();
     if (saved) {
-      const isBackward = loc.currentChapter < saved.currentChapter || (loc.currentChapter === saved.currentChapter && loc.currentParagraph < saved.currentParagraph);
+      const isBackward =
+        loc.currentChapter < saved.currentChapter ||
+        (loc.currentChapter === saved.currentChapter &&
+          loc.currentParagraph < saved.currentParagraph);
       if (isBackward) {
         return;
       }
     }
 
     // Check if this is a chapter change (significant movement)
-    const isChapterChange = this.lastSentPosition && this.lastSentPosition.chapter !== loc.currentChapter;
+    const isChapterChange =
+      this.lastSentPosition && this.lastSentPosition.chapter !== loc.currentChapter;
 
     if (isChapterChange) {
       // Send immediately on chapter change
@@ -69,12 +80,19 @@ class ReadingPositionTracker {
   /**
    * Send position to backend
    */
-  private async sendPosition(loc: Location, immediate: boolean): Promise<void> {
+  private async sendPosition(loc: Location, _immediate: boolean): Promise<void> {
     try {
       const { platformId, bookSlug } = getCurrentPlatformAndBook();
       const progress = this.calculateProgress(loc.currentChapter, loc.currentParagraph);
 
-      const input: SavePositionInput = { platformId, bookSlug, chapter: loc.currentChapter, paragraph: loc.currentParagraph, progress, source: SOURCE };
+      const input: SavePositionInput = {
+        platformId,
+        bookSlug,
+        chapter: loc.currentChapter,
+        paragraph: loc.currentParagraph,
+        progress,
+        source: SOURCE,
+      };
 
       // Send to backend
       await savePosition(input);
@@ -140,7 +158,14 @@ class ReadingPositionTracker {
       const { platformId, bookSlug } = getCurrentPlatformAndBook();
       const progress = this.calculateProgress(loc.currentChapter, loc.currentParagraph);
 
-      const input: SavePositionInput = { platformId, bookSlug, chapter: loc.currentChapter, paragraph: loc.currentParagraph, progress, source: SOURCE };
+      const input: SavePositionInput = {
+        platformId,
+        bookSlug,
+        chapter: loc.currentChapter,
+        paragraph: loc.currentParagraph,
+        progress,
+        source: SOURCE,
+      };
 
       const payload = JSON.stringify(input);
 
@@ -155,7 +180,13 @@ class ReadingPositionTracker {
       }
 
       // Fallback to keepalive fetch
-      fetch("/api/reading-position", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true, credentials: "include" }).catch(() => {
+      fetch("/api/reading-position", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+        keepalive: true,
+        credentials: "include",
+      }).catch(() => {
         // Ignore errors during unload
       });
 

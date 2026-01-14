@@ -1,6 +1,3 @@
-import { BOOK_SLUGS } from "@player/consts";
-import { getTalkingMediaFilePathForName } from "@player/utils/getFilePathsForName";
-
 export function isAppearanceWithinRange(
   appearance: { chapterNumber: number; paragraphNumber: number },
   startChapter: number,
@@ -16,7 +13,11 @@ export function isAppearanceWithinRange(
 
   // Single chapter range
   if (startChapter === effectiveEndChapter) {
-    return chapterNumber === startChapter && paragraphNumber >= startParagraph && paragraphNumber <= effectiveEndParagraph;
+    return (
+      chapterNumber === startChapter &&
+      paragraphNumber >= startParagraph &&
+      paragraphNumber <= effectiveEndParagraph
+    );
   }
 
   // Multi-chapter range cases:
@@ -36,7 +37,14 @@ export function isAppearanceWithinRange(
   return false; // Not in range
 }
 
-export function activateCharacters(chapterNum: number, paragraphNum: number, bookSlug: string, endChapter?: number, endParagraph?: number, onlyTalking = false) {
+//TODO the endChapter and endParagraph are never set, same for onlyTalking
+export function activateCharacters(
+  chapterNum: number,
+  paragraphNum: number,
+  endChapter?: number,
+  endParagraph?: number,
+  onlyTalking = false,
+) {
   const entityNotes = document.querySelectorAll<HTMLElement>("#left-notes .entity-note");
   entityNotes.forEach((note) => {
     const appearancesStr = note.dataset.appearances;
@@ -44,7 +52,11 @@ export function activateCharacters(chapterNum: number, paragraphNum: number, boo
     if (!appearancesStr || !canonicalName) return;
 
     try {
-      const appearances: { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean }[] = JSON.parse(appearancesStr);
+      const appearances: {
+        chapterNumber: number;
+        paragraphNumber: number;
+        isTalkingInParagraph: boolean;
+      }[] = JSON.parse(appearancesStr);
       let isInRange = false;
       let isTalkingInRange = false;
 
@@ -65,12 +77,7 @@ export function activateCharacters(chapterNum: number, paragraphNum: number, boo
         note.classList.add("highlighted-talking-entity");
         // Swap image to GIF if talking
         if (imageElement && imageElement.dataset.originalSrc) {
-          const gifSrc = getTalkingMediaFilePathForName(canonicalName, bookSlug as BOOK_SLUGS);
-          const currentSrcFilename = imageElement.src.split("/").pop();
-          const gifSrcFilename = gifSrc.split("/").pop();
-          if (currentSrcFilename !== gifSrcFilename) {
-            imageElement.src = gifSrc;
-          }
+          throw new Error("using old getTalkingMediaFilePathForName");
         }
       } else if (isInRange && !onlyTalking) {
         console.log("are we in this weird !onlyTalking case?", canonicalName);

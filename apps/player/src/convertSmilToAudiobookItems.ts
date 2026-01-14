@@ -1,4 +1,4 @@
-import { DOMParser, Element } from "@xmldom/xmldom"; // Using @xmldom/xmldom
+import { DOMParser, type Element } from "@xmldom/xmldom"; // Using @xmldom/xmldom
 import fs from "fs";
 
 // Interface for the desired output object
@@ -94,7 +94,9 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
     const clipEndStr = audioElement.getAttribute("clip-end");
 
     if (!parId) {
-      console.warn(`Skipping <par> element with missing 'id' attribute. Cannot determine paragraph number.`);
+      console.warn(
+        `Skipping <par> element with missing 'id' attribute. Cannot determine paragraph number.`,
+      );
       return;
     }
     if (!textSrc) {
@@ -102,7 +104,9 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
       return;
     }
     if (!audioSrcAttr || !clipBeginStr || !clipEndStr) {
-      console.warn(`Skipping <par> (ID: ${parId}) due to missing attributes on <audio> (expected src, clip-begin, clip-end).`);
+      console.warn(
+        `Skipping <par> (ID: ${parId}) due to missing attributes on <audio> (expected src, clip-begin, clip-end).`,
+      );
       return;
     }
 
@@ -117,7 +121,9 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
         chapter = parseInt(dolMatch[1], 10) - 1;
       } else {
         // If both bookMatch and dolMatch fail, then warn and skip.
-        console.warn(`Could not determine chapter number from text src: "${textSrc}" for <par> (ID: ${parId}). Tried bookN.html and #dol_1_N_ patterns. Skipping.`);
+        console.warn(
+          `Could not determine chapter number from text src: "${textSrc}" for <par> (ID: ${parId}). Tried bookN.html and #dol_1_N_ patterns. Skipping.`,
+        );
         return;
       }
     }
@@ -138,7 +144,9 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
     if (smileIdMatch && smileIdMatch[1]) {
       smile_id = smileIdMatch[1];
     } else {
-      console.warn(`Could not determine smile_id from text src: "${textSrc}" for <par> (ID: ${parId}). Skipping.`);
+      console.warn(
+        `Could not determine smile_id from text src: "${textSrc}" for <par> (ID: ${parId}). Skipping.`,
+      );
       return;
     }
 
@@ -150,11 +158,20 @@ export function convertSmilToAudiobookItems(xmlString: string): OutputItem[] {
     const clipEndTime = parseNptTime(clipEndStr);
 
     if (isNaN(clipBeginTime) || isNaN(clipEndTime)) {
-      console.warn(`Invalid NPT time(s) for <par> with smile_id "${smile_id}" (ID: ${parId}, clip-begin: "${clipBeginStr}", clip-end: "${clipEndStr}"). Skipping.`);
+      console.warn(
+        `Invalid NPT time(s) for <par> with smile_id "${smile_id}" (ID: ${parId}, clip-begin: "${clipBeginStr}", clip-end: "${clipEndStr}"). Skipping.`,
+      );
       return;
     }
 
-    const item: OutputItem = { chapter, paragraph: paragraph - 1, smile_id, file, "clip-begin": clipBeginTime, "clip-end": clipEndTime };
+    const item: OutputItem = {
+      chapter,
+      paragraph: paragraph - 1,
+      smile_id,
+      file,
+      "clip-begin": clipBeginTime,
+      "clip-end": clipEndTime,
+    };
     outputItems.push(item);
   });
 

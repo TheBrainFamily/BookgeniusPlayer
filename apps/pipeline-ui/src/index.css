@@ -1,0 +1,330 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 20% 8%;
+    --foreground: 210 20% 95%;
+
+    --card: 222 18% 11%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 222 18% 11%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 174 72% 50%;
+    --primary-foreground: 222 20% 8%;
+
+    --secondary: 220 16% 18%;
+    --secondary-foreground: 210 20% 85%;
+
+    --muted: 220 14% 15%;
+    --muted-foreground: 215 14% 55%;
+
+    --accent: 220 16% 20%;
+    --accent-foreground: 210 20% 95%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 20% 95%;
+
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 174 72% 50%;
+
+    --radius: 0.625rem;
+
+    /* Custom tokens */
+    --success: 152 72% 45%;
+    --success-foreground: 210 20% 95%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 20% 8%;
+    --info: 210 72% 55%;
+    --info-foreground: 210 20% 95%;
+
+    --surface-1: 222 18% 11%;
+    --surface-2: 220 16% 14%;
+    --surface-3: 220 14% 18%;
+
+    --glass: 222 18% 12% / 0.8;
+    --glass-border: 220 14% 25% / 0.3;
+
+    --gradient-primary: linear-gradient(135deg, hsl(174 72% 50%), hsl(185 72% 40%));
+    --gradient-warm: linear-gradient(135deg, hsl(38 92% 55%), hsl(25 92% 50%));
+    --gradient-surface: linear-gradient(180deg, hsl(222 18% 13%), hsl(222 18% 10%));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-[hsl(var(--glass))] backdrop-blur-xl border border-[hsl(var(--glass-border))];
+  }
+
+  .surface-1 {
+    @apply bg-[hsl(var(--surface-1))];
+  }
+
+  .surface-2 {
+    @apply bg-[hsl(var(--surface-2))];
+  }
+
+  .surface-3 {
+    @apply bg-[hsl(var(--surface-3))];
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-warm {
+    background: var(--gradient-warm);
+  }
+
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px hsl(var(--primary) / 0.2);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-fade-out {
+  animation: fade-out 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--surface-3)) 50%, hsl(var(--muted)) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Staggered animations */
+.stagger-1 {
+  animation-delay: 0.02s;
+}
+.stagger-2 {
+  animation-delay: 0.04s;
+}
+.stagger-3 {
+  animation-delay: 0.06s;
+}
+.stagger-4 {
+  animation-delay: 0.08s;
+}
+.stagger-5 {
+  animation-delay: 0.1s;
+}
+.stagger-6 {
+  animation-delay: 0.12s;
+}
+.stagger-7 {
+  animation-delay: 0.14s;
+}
+.stagger-8 {
+  animation-delay: 0.16s;
+}
+.stagger-9 {
+  animation-delay: 0.18s;
+}
+.stagger-10 {
+  animation-delay: 0.2s;
+}
+.stagger-11 {
+  animation-delay: 0.22s;
+}
+.stagger-12 {
+  animation-delay: 0.24s;
+}
+
+/* Page transition */
+.page-enter {
+  animation: page-fade-in 0.3s ease-out forwards;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Book card stagger animation */
+.book-card-enter {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: book-card-fade-in 0.4s ease-out forwards;
+}
+
+@keyframes book-card-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hide scrollbar utility */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

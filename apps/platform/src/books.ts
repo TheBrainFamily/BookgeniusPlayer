@@ -9,15 +9,27 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Dystopian",
-        description: "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
+        description:
+          "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
         features: ["English Audio", "Sound Effects", "Animation"],
-        phrases: ["Installing telescreens...", "Configuring thoughtcrime detection...", "Erasing the past...", "Activating thought police..."],
+        phrases: [
+          "Installing telescreens...",
+          "Configuring thoughtcrime detection...",
+          "Erasing the past...",
+          "Activating thought police...",
+        ],
       },
       pl: {
         genre: "Dystopia",
-        description: "Wejdź w totalitarny świat Wielkiego Brata dzięki sugestywnym wizualizacjom i niepokojącej oprawie dźwiękowej.",
+        description:
+          "Wejdź w totalitarny świat Wielkiego Brata dzięki sugestywnym wizualizacjom i niepokojącej oprawie dźwiękowej.",
         features: ["Polski lektor", "Efekty dźwiękowe", "Animacja"],
-        phrases: ["Instalowanie teleekranów...", "Konfigurowanie systemu wykrywania myślozbrodni...", "Wymazywanie przeszłości...", "Aktywacja policji myśli..."],
+        phrases: [
+          "Instalowanie teleekranów...",
+          "Konfigurowanie systemu wykrywania myślozbrodni...",
+          "Wymazywanie przeszłości...",
+          "Aktywacja policji myśli...",
+        ],
       },
     },
     year: "1949",
@@ -36,7 +48,8 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Fantasy",
-        description: "Fall down the rabbit hole into a whimsical world of talking animals and magical adventures.",
+        description:
+          "Fall down the rabbit hole into a whimsical world of talking animals and magical adventures.",
         features: ["Fantasy Animation", "Whimsical Music", "Character Voices"],
         phrases: [
           "Stretching reality...",
@@ -50,7 +63,8 @@ export const books: Book[] = [
       },
       pl: {
         genre: "Fantasy",
-        description: "Wpadnij do króliczej nory i odkryj baśniowy świat mówiących zwierząt i magicznych przygód.",
+        description:
+          "Wpadnij do króliczej nory i odkryj baśniowy świat mówiących zwierząt i magicznych przygód.",
         features: ["Animacja fantastyczna", "Muzyka baśniowa", "Głosy bohaterów"],
         phrases: [
           "Rozciąganie rzeczywistości...",
@@ -79,15 +93,29 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Fairy Tale",
-        description: "Another enchanting version of the beloved winter fairy tale with different artistic vision.",
+        description:
+          "Another enchanting version of the beloved winter fairy tale with different artistic vision.",
         features: ["Ice Magic", "Nordic Music", "Winter Animation"],
-        phrases: ["Building snow palaces...", "Freezing summer dreams...", "Icing friendships...", "Crafting snowflakes...", "Conjuring frostbite..."],
+        phrases: [
+          "Building snow palaces...",
+          "Freezing summer dreams...",
+          "Icing friendships...",
+          "Crafting snowflakes...",
+          "Conjuring frostbite...",
+        ],
       },
       pl: {
         genre: "Baśń",
-        description: "Kolejna urzekająca wersja ukochanej zimowej baśni w innej wizji artystycznej.",
+        description:
+          "Kolejna urzekająca wersja ukochanej zimowej baśni w innej wizji artystycznej.",
         features: ["Magia lodu", "Nordycka muzyka", "Zimowa animacja"],
-        phrases: ["Budowanie pałaców ze śniegu...", "Zamrażanie letnich marzeń...", "Oziębianie przyjaźni...", "Tworzenie płatków śniegu...", "Wywoływanie odmrożeń..."],
+        phrases: [
+          "Budowanie pałaców ze śniegu...",
+          "Zamrażanie letnich marzeń...",
+          "Oziębianie przyjaźni...",
+          "Tworzenie płatków śniegu...",
+          "Wywoływanie odmrożeń...",
+        ],
       },
     },
     year: "1844",
@@ -106,13 +134,21 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Realist novel",
-        description: "A masterpiece of Polish literature exploring love, ambition, and social change.",
+        description:
+          "A masterpiece of Polish literature exploring love, ambition, and social change.",
         features: ["Costume drama", "Classical music", "Historical animation"],
-        phrases: ["Polishing shop windows...", "Shaping social opinions...", "Balancing trade ledgers...", "Weaving romantic intrigues...", "Negotiating marital prospects..."],
+        phrases: [
+          "Polishing shop windows...",
+          "Shaping social opinions...",
+          "Balancing trade ledgers...",
+          "Weaving romantic intrigues...",
+          "Negotiating marital prospects...",
+        ],
       },
       pl: {
         genre: "Powieść realistyczna",
-        description: "Arcydzieło polskiej literatury zgłębiające miłość, ambicję i zmiany społeczne.",
+        description:
+          "Arcydzieło polskiej literatury zgłębiające miłość, ambicję i zmiany społeczne.",
         features: ["Dramat kostiumowy", "Muzyka klasyczna", "Animacja historyczna"],
         phrases: [
           "Polerowanie sklepowych witryn...",
@@ -139,7 +175,8 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Tragedy",
-        description: "The Scottish play brought to life with dark visuals and dramatic performances.",
+        description:
+          "The Scottish play brought to life with dark visuals and dramatic performances.",
         features: ["Shakespearean Audio", "Gothic Animation", "Dramatic Score"],
         phrases: [
           "Sharpening quills...",
@@ -154,7 +191,8 @@ export const books: Book[] = [
       },
       pl: {
         genre: "Tragedia",
-        description: "Szkocka tragedia ożywiona mrocznymi wizualizacjami i dramatycznymi występami.",
+        description:
+          "Szkocka tragedia ożywiona mrocznymi wizualizacjami i dramatycznymi występami.",
         features: ["Audio szekspirowskie", "Animacja gotycka", "Dramatyczna muzyka"],
         phrases: [
           "Ostrzenie piór...",
@@ -184,7 +222,8 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Fantasy",
-        description: "Sail into Prospero's enchanted island where storms, spirits, and reconciliation unfold.",
+        description:
+          "Sail into Prospero's enchanted island where storms, spirits, and reconciliation unfold.",
         features: ["Magical Atmosphere", "Cinematic Audio", "Oceanic Animation"],
         phrases: [
           "Convincing the storm to take five...",
@@ -196,7 +235,8 @@ export const books: Book[] = [
       },
       pl: {
         genre: "Fantazja",
-        description: "Wejdź na zaczarowaną wyspę Prospera, gdzie burze, duchy i pojednanie splatają się w jedną opowieść.",
+        description:
+          "Wejdź na zaczarowaną wyspę Prospera, gdzie burze, duchy i pojednanie splatają się w jedną opowieść.",
         features: ["Magiczny klimat", "Filmowe audio", "Oceaniczna animacja"],
         phrases: [
           "Przekonywanie burzy, by przestała się burzyć...",
@@ -222,15 +262,29 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Comedy",
-        description: "Enter the enchanted forest where fairies, lovers, and magic collide in delightful chaos.",
+        description:
+          "Enter the enchanted forest where fairies, lovers, and magic collide in delightful chaos.",
         features: ["Fairy Magic", "Comedic Voice", "Forest Animation"],
-        phrases: ["Casting love spells...", "Chasing fairies...", "Taming mischievous spirits...", "Confusing lovers...", "Weaving magical forests..."],
+        phrases: [
+          "Casting love spells...",
+          "Chasing fairies...",
+          "Taming mischievous spirits...",
+          "Confusing lovers...",
+          "Weaving magical forests...",
+        ],
       },
       pl: {
         genre: "Komedia",
-        description: "Wejdź do zaczarowanego lasu, gdzie wróżki, zakochani i magia splatają się w uroczy chaos.",
+        description:
+          "Wejdź do zaczarowanego lasu, gdzie wróżki, zakochani i magia splatają się w uroczy chaos.",
         features: ["Magia wróżek", "Komediowe głosy", "Leśna animacja"],
-        phrases: ["Rzucanie zaklęć miłosnych...", "Gonitwa za wróżkami...", "Poskramianie psotnych duchów...", "Mylne historie kochanków...", "Tkanie magicznych lasów..."],
+        phrases: [
+          "Rzucanie zaklęć miłosnych...",
+          "Gonitwa za wróżkami...",
+          "Poskramianie psotnych duchów...",
+          "Mylne historie kochanków...",
+          "Tkanie magicznych lasów...",
+        ],
       },
     },
     year: "1595",
@@ -261,7 +315,8 @@ export const books: Book[] = [
       },
       pl: {
         genre: "Tragedia",
-        description: "Opowieść o zazdrości, manipulacji i tragicznej miłości w renesansowej Wenecji.",
+        description:
+          "Opowieść o zazdrości, manipulacji i tragicznej miłości w renesansowej Wenecji.",
         features: ["Wenecka sceneria", "Dramatyczne audio", "Sztuka renesansowa"],
         phrases: [
           "Sianie ziaren zazdrości...",
@@ -307,7 +362,8 @@ export const books: Book[] = [
       },
       pl: {
         genre: "Historyczna",
-        description: "Podróż do starożytnego Egiptu w tej epickiej opowieści o władzy, polityce i przeznaczeniu.",
+        description:
+          "Podróż do starożytnego Egiptu w tej epickiej opowieści o władzy, polityce i przeznaczeniu.",
         features: ["Starożytny Egipt", "Epicka muzyka", "Animacja historyczna"],
         phrases: [
           "Budowanie piramid...",
@@ -341,13 +397,21 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Romance",
-        description: "The ultimate tale of star-crossed lovers brought to life with passion and beauty.",
+        description:
+          "The ultimate tale of star-crossed lovers brought to life with passion and beauty.",
         features: ["Romantic Music", "Renaissance Art", "Passionate Audio"],
-        phrases: ["Mixing love potions...", "Arranging secret meetings...", "Avoiding family feuds...", "Balcony climbing practice...", "Sending cryptic love letters..."],
+        phrases: [
+          "Mixing love potions...",
+          "Arranging secret meetings...",
+          "Avoiding family feuds...",
+          "Balcony climbing practice...",
+          "Sending cryptic love letters...",
+        ],
       },
       pl: {
         genre: "Romans",
-        description: "Najwspanialsza opowieść o kochankach z przeciwnych światów, przedstawiona z pasją i pięknem.",
+        description:
+          "Najwspanialsza opowieść o kochankach z przeciwnych światów, przedstawiona z pasją i pięknem.",
         features: ["Romantyczna muzyka", "Sztuka renesansowa", "Namiętne audio"],
         phrases: [
           "Mieszanie eliksirów miłosnych...",
@@ -374,7 +438,8 @@ export const books: Book[] = [
     metadata: {
       en: {
         genre: "Dystopian",
-        description: "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
+        description:
+          "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
         features: ["Voice Acting", "Ambient Sound", "Animation"],
         phrases: [
           "Big Brother is watching...",
@@ -388,7 +453,8 @@ export const books: Book[] = [
       },
       pl: {
         genre: "Dystopia",
-        description: "Wejdź w totalitarny świat Wielkiego Brata z sugestywnymi wizualizacjami i niepokojącą oprawą dźwiękową.",
+        description:
+          "Wejdź w totalitarny świat Wielkiego Brata z sugestywnymi wizualizacjami i niepokojącą oprawą dźwiękową.",
         features: ["Aktorstwo głosowe", "Dźwięki otoczenia", "Animacja"],
         phrases: [
           "Wielki Brat patrzy...",
@@ -423,13 +489,25 @@ export const books: Book[] = [
         genre: "Fairy Tale",
         description: "A magical winter tale of friendship, love, and the power of a pure heart.",
         features: ["Winter Magic", "Orchestral Music", "Animated Snow"],
-        phrases: ["Freezing hearts...", "Shattering mirrors...", "Chilling the air...", "Preparing ice castles...", "Summoning snowflakes..."],
+        phrases: [
+          "Freezing hearts...",
+          "Shattering mirrors...",
+          "Chilling the air...",
+          "Preparing ice castles...",
+          "Summoning snowflakes...",
+        ],
       },
       pl: {
         genre: "Baśń",
         description: "Magiczna zimowa opowieść o przyjaźni, miłości i sile czystego serca.",
         features: ["Zimowa magia", "Muzyka orkiestrowa", "Animowany śnieg"],
-        phrases: ["Zamrażanie serc...", "Rozbijanie luster...", "Oziębianie powietrza...", "Przygotowywanie lodowych zamków...", "Przywoływanie płatków śniegu..."],
+        phrases: [
+          "Zamrażanie serc...",
+          "Rozbijanie luster...",
+          "Oziębianie powietrza...",
+          "Przygotowywanie lodowych zamków...",
+          "Przywoływanie płatków śniegu...",
+        ],
       },
     },
     year: "1844",
@@ -450,11 +528,18 @@ export const books: Book[] = [
         genre: "Thriller",
         description: "A gripping tale of espionage and political intrigue in Victorian London.",
         features: ["Suspenseful Score", "Period Animation", "Voice Acting"],
-        phrases: ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."],
+        phrases: [
+          "Encrypting secret messages...",
+          "Plotting espionage...",
+          "Shadowing informants...",
+          "Meeting in dark alleys...",
+          "Planting evidence...",
+        ],
       },
       pl: {
         genre: "Thriller",
-        description: "Wciągająca opowieść o szpiegostwie i politycznych intrygach w wiktoriańskim Londynie.",
+        description:
+          "Wciągająca opowieść o szpiegostwie i politycznych intrygach w wiktoriańskim Londynie.",
         features: ["Muzyka pełna napięcia", "Animacja epoki", "Aktorstwo głosowe"],
         phrases: [
           "Szyfrowanie tajnych wiadomości...",
@@ -483,11 +568,18 @@ export const books: Book[] = [
         genre: "Thriller",
         description: "A gripping tale of espionage and political intrigue in Victorian London.",
         features: ["Suspenseful Score", "Period Animation", "Voice Acting"],
-        phrases: ["Encrypting secret messages...", "Plotting espionage...", "Shadowing informants...", "Meeting in dark alleys...", "Planting evidence..."],
+        phrases: [
+          "Encrypting secret messages...",
+          "Plotting espionage...",
+          "Shadowing informants...",
+          "Meeting in dark alleys...",
+          "Planting evidence...",
+        ],
       },
       pl: {
         genre: "Thriller",
-        description: "Wciągająca opowieść o szpiegostwie i politycznych intrygach w wiktoriańskim Londynie.",
+        description:
+          "Wciągająca opowieść o szpiegostwie i politycznych intrygach w wiktoriańskim Londynie.",
         features: ["Muzyka pełna napięcia", "Animacja epoki", "Aktorstwo głosowe"],
         phrases: [
           "Szyfrowanie tajnych wiadomości...",

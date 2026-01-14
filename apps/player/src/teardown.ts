@@ -1,14 +1,4 @@
 import { stopAllPlayback, getAudioContext } from "./audio-crossfader";
-import { clearBookDataCache } from "@player/genericBookDataGetters/getBookData";
-import { clearAllVariantsCache } from "@player/genericBookDataGetters/getAllVariants";
-import { clearNotesCache } from "@player/genericBookDataGetters/getNotes";
-import { clearAudiobookTracksCache } from "@player/genericBookDataGetters/getAudiobookTracksForBook";
-import { clearBackgroundSongsCache } from "@player/genericBookDataGetters/getBackgroundSongsForBook";
-import { clearBackgroundsCache } from "@player/genericBookDataGetters/getBackgroundsForBook";
-import { clearBookStringifiedCache } from "@player/genericBookDataGetters/getBookStringified";
-import { clearCharactersDataCache } from "@player/genericBookDataGetters/getCharactersData";
-import { clearCutScenesCache } from "@player/genericBookDataGetters/getCutScenesForBook";
-import { clearKnownVideoFilesCache } from "@player/genericBookDataGetters/getKnownVideoFiles";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { resetBackgroundDebouncer } from "./ui/background";
 import { unloadBookColorsCSS } from "./utils/loadBookColors";
@@ -171,16 +161,6 @@ export async function teardownPlayer(): Promise<void> {
 
   // Clear in-memory caches for current book so next entry reloads fresh
   try {
-    clearBookDataCache();
-    clearAllVariantsCache();
-    clearNotesCache();
-    clearAudiobookTracksCache();
-    clearBackgroundSongsCache();
-    clearBackgroundsCache();
-    clearBookStringifiedCache();
-    clearCharactersDataCache();
-    clearCutScenesCache();
-    clearKnownVideoFilesCache();
     unloadBookColorsCSS();
   } catch (e) {
     console.warn("teardownPlayer: clearing caches failed", e);

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/library-hero.jpg";
+import { Button } from "@platform/components/ui/button";
+import heroImage from "@platform/assets/library-hero.jpg";
 import { Play, BookOpen } from "lucide-react";
 
 interface SelectedBook {
@@ -65,22 +65,39 @@ const StartHereShowcase = ({ onBookSelect }: StartHereShowcaseProps) => {
   return (
     <section aria-labelledby="start-here-heading" className="relative" ref={containerRef}>
       {/* Sticky shrinking header */}
-      <div className="sticky top-0 z-30 w-full overflow-hidden shadow-md pointer-events-none" style={{ height: `${headerHeightVh}vh`, willChange: "height" }}>
+      <div
+        className="sticky top-0 z-30 w-full overflow-hidden shadow-md pointer-events-none"
+        style={{ height: `${headerHeightVh}vh`, willChange: "height" }}
+      >
         <div className="relative h-full">
           {/* Background with elegant overlays to match theme */}
-          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImage})` }} aria-hidden />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/95" aria-hidden />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" aria-hidden />
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${heroImage})` }}
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/95"
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60"
+            aria-hidden
+          />
 
           <div className="relative h-full container mx-auto px-4 flex flex-col items-center justify-center text-center">
-            <h2 id="start-here-heading" className="text-3xl md:text-5xl font-bold text-foreground leading-tight">
+            <h2
+              id="start-here-heading"
+              className="text-3xl md:text-5xl font-bold text-foreground leading-tight"
+            >
               Experience Literature
               <span className="block text-transparent bg-gradient-to-r from-library-gold via-library-gold-glow to-library-gold bg-clip-text animate-candleflicker">
                 Like Never Before
               </span>
             </h2>
             <p className="mt-4 max-w-3xl text-base md:text-lg text-muted-foreground">
-              Start your journey with two hand-picked masterpieces. Choose the theatrical experience or dive into the classic novel.
+              Start your journey with two hand-picked masterpieces. Choose the theatrical experience
+              or dive into the classic novel.
             </p>
           </div>
         </div>
@@ -106,18 +123,24 @@ const StartHereShowcase = ({ onBookSelect }: StartHereShowcaseProps) => {
             </div>
             <div className="p-5 md:p-6">
               <h4 className="text-xl font-bold text-foreground">1984</h4>
-              <p className="text-sm text-muted-foreground mb-4">George Orwell • Dystopian classic</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                George Orwell • Dystopian classic
+              </p>
               <div className="flex flex-wrap gap-3">
                 <Button
                   className="bg-library-gold text-library-mahogany hover:bg-library-gold-glow"
-                  onClick={() => selectBook({ title: "1984", author: "George Orwell", slug: "1984-English" })}
+                  onClick={() =>
+                    selectBook({ title: "1984", author: "George Orwell", slug: "1984-English" })
+                  }
                 >
                   <Play className="mr-2 h-4 w-4" /> Theater experience
                 </Button>
                 <Button
                   variant="outline"
                   className="border-library-gold text-library-gold hover:bg-library-gold/10"
-                  onClick={() => document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })}
+                  onClick={() =>
+                    document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })
+                  }
                 >
                   <BookOpen className="mr-2 h-4 w-4" /> Read the novel
                 </Button>
@@ -141,14 +164,18 @@ const StartHereShowcase = ({ onBookSelect }: StartHereShowcaseProps) => {
               <div className="flex flex-wrap gap-3">
                 <Button
                   className="bg-library-gold text-library-mahogany hover:bg-library-gold-glow"
-                  onClick={() => selectBook({ title: "Othello", author: "William Shakespeare", slug: "Othello" })}
+                  onClick={() =>
+                    selectBook({ title: "Othello", author: "William Shakespeare", slug: "Othello" })
+                  }
                 >
                   <Play className="mr-2 h-4 w-4" /> Theater experience
                 </Button>
                 <Button
                   variant="outline"
                   className="border-library-gold text-library-gold hover:bg-library-gold/10"
-                  onClick={() => document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })}
+                  onClick={() =>
+                    document.getElementById("collection")?.scrollIntoView({ behavior: "smooth" })
+                  }
                 >
                   <BookOpen className="mr-2 h-4 w-4" /> Read the novel
                 </Button>

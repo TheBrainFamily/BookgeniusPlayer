@@ -31,8 +31,12 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
             <BookOpen className="h-8 w-8 text-library-gold animate-candleflicker" />
             <h1 className="text-2xl font-bold text-foreground relative">
               {t("hero.bookGenius").split(/(?=[A-Z])/)[0]}
-              <span className="text-library-gold">{t("hero.bookGenius").split(/(?=[A-Z])/)[1]}</span>
-              <span className="absolute -right-6 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">Beta</span>
+              <span className="text-library-gold">
+                {t("hero.bookGenius").split(/(?=[A-Z])/)[1]}
+              </span>
+              <span className="absolute -right-6 -bottom-2 bg-[#1E2A44] px-2 py-1 text-xs text-library-goldA uppercase rounded-md -skew-4 -rotate-4">
+                Beta
+              </span>
             </h1>
           </a>
 
@@ -46,7 +50,11 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
               onChange={(e) => onSearchChange(e.target.value)}
             />
             {searchQuery && (
-              <Button variant="ghost" onClick={() => onSearchChange("")} className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <Button
+                variant="ghost"
+                onClick={() => onSearchChange("")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
                 <X className="h-4 w-4" />
               </Button>
             )}
@@ -95,7 +103,11 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
               onChange={(e) => onSearchChange(e.target.value)}
             />
             {searchQuery && (
-              <Button variant="ghost" onClick={() => onSearchChange("")} className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <Button
+                variant="ghost"
+                onClick={() => onSearchChange("")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
                 <X className="h-4 w-4" />
               </Button>
             )}

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "wallaby": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "-c", "node ~/.wallaby/mcp"],
+      "env": {}
+    },
+    "spawner": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.vibeship.co"],
+      "description": "Spawner V2 - Project memory, validation, skills, sharp edges"
+    }
+  }
+}

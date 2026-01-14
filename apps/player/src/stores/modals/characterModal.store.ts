@@ -16,7 +16,7 @@ const MODAL_ID = "character-modal";
 
 interface CharacterModalState {
   isOpen: boolean;
-  slug?: string | null;
+  slug?: string;
   isVideo: boolean;
   mediaSrc?: string;
   chapter?: number;
@@ -31,24 +31,47 @@ export const useCharacterModal = create<CharacterModalState>()(
   devtools(
     (set) => ({
       isOpen: false,
-      slug: null,
+      slug: undefined,
       isVideo: false,
-      mediaSrc: null,
-      chapter: null,
-      paragraph: null,
+      mediaSrc: undefined,
+      chapter: undefined,
+      paragraph: undefined,
       isTalking: false,
 
-      openModal: ({ characterSlug, isVideo, mediaSrc, chapter, paragraph, isTalking = false }: CharacterModalParams) => {
+      openModal: ({
+        characterSlug,
+        isVideo,
+        mediaSrc,
+        chapter,
+        paragraph,
+        isTalking = false,
+      }: CharacterModalParams) => {
         const coordinator = useModalCoordinator.getState();
         if (coordinator.requestModalOpen(MODAL_ID)) {
-          set({ isOpen: true, slug: characterSlug, isVideo, mediaSrc, chapter: chapter ?? null, paragraph: paragraph ?? null, isTalking });
+          set({
+            isOpen: true,
+            slug: characterSlug,
+            isVideo,
+            mediaSrc,
+            chapter,
+            paragraph,
+            isTalking,
+          });
         }
       },
 
       closeModal: () => {
         const coordinator = useModalCoordinator.getState();
         coordinator.releaseModal(MODAL_ID);
-        set({ isOpen: false, slug: null, isVideo: false, mediaSrc: null, chapter: null, paragraph: null, isTalking: false });
+        set({
+          isOpen: false,
+          slug: undefined,
+          isVideo: false,
+          mediaSrc: undefined,
+          chapter: undefined,
+          paragraph: undefined,
+          isTalking: false,
+        });
       },
     }),
     { name: "character-modal" },

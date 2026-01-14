@@ -6,17 +6,23 @@ import { ClientOnly } from "vite-react-ssg";
 interface PaywallTriggerProps {
   bookSlug: string;
   bookTitle: string;
-  children: (props: { hasAccess: boolean; checkAccess: () => void; showPaywall: () => void }) => React.ReactNode;
+  children: (props: {
+    hasAccess: boolean;
+    checkAccess: () => void;
+    showPaywall: () => void;
+  }) => React.ReactNode;
 }
 
 const PaywallTriggerInner: React.FC<PaywallTriggerProps> = ({ bookSlug, bookTitle, children }) => {
   const { authMod, paymentsMod } = useIntegrations();
   const [hasAccess, setHasAccess] = useState(false);
   const [showingPaywall, setShowingPaywall] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
 
   if (!authMod || !paymentsMod) {
-    return <>{children({ hasAccess: false, checkAccess: async () => false, showPaywall: () => {} })}</>;
+    return (
+      <>{children({ hasAccess: false, checkAccess: async () => false, showPaywall: () => {} })}</>
+    );
   }
 
   const { userId } = authMod.useAuth();
@@ -46,7 +52,13 @@ const PaywallTriggerInner: React.FC<PaywallTriggerProps> = ({ bookSlug, bookTitl
     <>
       {children({ hasAccess, checkAccess: checkAccessHandler, showPaywall })}
 
-      {showingPaywall && <Paywall bookSlug={bookSlug} bookTitle={bookTitle} onClose={() => setShowingPaywall(false)} />}
+      {showingPaywall && (
+        <Paywall
+          bookSlug={bookSlug}
+          bookTitle={bookTitle}
+          onClose={() => setShowingPaywall(false)}
+        />
+      )}
     </>
   );
 };
@@ -65,7 +77,9 @@ const PaywallTrigger: React.FC<PaywallTriggerProps> = ({ bookSlug, bookTitle, ch
           </PaywallTriggerInner>
         ) : (
           // Provide safe no-op callbacks until auth is ready
-          <>{children({ hasAccess: false, checkAccess: async () => false, showPaywall: () => {} })}</>
+          <>
+            {children({ hasAccess: false, checkAccess: async () => false, showPaywall: () => {} })}
+          </>
         )
       }
     </ClientOnly>

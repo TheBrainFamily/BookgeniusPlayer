@@ -4,7 +4,9 @@ import { clientsClaim } from "workbox-core";
 import { registerRoute } from "workbox-routing";
 import { NetworkOnly } from "workbox-strategies";
 
-declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: Array<{ url: string; revision: string | null }> };
+declare const self: ServiceWorkerGlobalScope & {
+  __WB_MANIFEST: Array<{ url: string; revision: string | null }>;
+};
 
 // ①  Workbox rewrites __WB_MANIFEST at build time
 // Provide a fallback for __WB_MANIFEST in development

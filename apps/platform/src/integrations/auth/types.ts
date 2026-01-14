@@ -1,3 +1,5 @@
+import type { useAuth as ClerkUseAuth } from "@clerk/react-router";
+
 type AuthCtxComponents = { SignIn?: React.ComponentType; SignUp?: React.ComponentType };
 
 export type AuthCtx = {
@@ -5,7 +7,7 @@ export type AuthCtx = {
   isSignedIn: boolean;
   openSignIn: () => void;
   signOut?: () => void;
-  refreshToken?: () => Promise<string>;
+  refreshToken?: () => Promise<string | null | undefined>;
   getToken?: (options?: { skipCache?: boolean }) => Promise<string | null | undefined>;
   userId?: string;
   email?: string | null;
@@ -17,4 +19,10 @@ export interface AuthModule {
   useAuth: () => AuthCtx;
   useUserWidget?: () => React.ComponentType | undefined;
   useSignInWidget?: () => React.ComponentType<{ onClick: () => void }> | undefined;
+  /**
+   * Clerk's native useAuth hook - only available when using Clerk provider.
+   * Returns null if Clerk isn't ready. The returned hook can be passed directly
+   * to ConvexProviderWithClerk's useAuth prop.
+   */
+  clerkUseAuth?: () => typeof ClerkUseAuth | null;
 }

@@ -1,8 +1,8 @@
 import debounce from "lodash.debounce";
 import { isVideoFile } from "@player/helpers/isVideoFile";
-import { CharacterModalParams } from "@player/stores/modals/characterModal.store";
+import { type CharacterModalParams } from "@player/stores/modals/characterModal.store";
 import { getPlaceholderFromVideoUrl } from "@player/utils/getPlaceholderFromVideoUrl";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { getCharactersData } from "@player/state/bookDataStore";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isMobile } from "@player/utils/isMobileOrTablet";
 import type { CharacterData } from "@player/types/book";
@@ -10,9 +10,12 @@ import type { CharacterSnapshot } from "@player/utils/characterOverrides";
 import { normalizeSrcForInlineAvatar } from "./highlightCharacter";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
+import { getAvatarSource } from "@player/helpers/svgAvatars";
 
-function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
-  const result = [];
+function getActiveWithSiblingsSkippingDidaskalia(
+  element: Element,
+): { row: Element; state: "listens" | "speaks" }[] {
+  const result: { row: Element; state: "listens" | "speaks" }[] = [];
 
   // Get previous sibling
   let prev = element.previousElementSibling;
@@ -46,7 +49,18 @@ function getActiveWithSiblingsSkippingDidaskalia(element: Element) {
 function createVideoElement(src: string, state: "listens" | "speaks"): HTMLVideoElement {
   const video = document.createElement("video");
   video.src = src;
-  video.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full", "transition-all", "duration-500", "ease-in-out");
+  video.classList.add(
+    "absolute",
+    "top-0",
+    "left-0",
+    "w-full",
+    "h-full",
+    "object-cover",
+    "rounded-full",
+    "transition-all",
+    "duration-500",
+    "ease-in-out",
+  );
   video.autoplay = true;
   video.loop = true;
   video.muted = true;
@@ -66,10 +80,21 @@ function createVideoElement(src: string, state: "listens" | "speaks"): HTMLVideo
 }
 
 /** Checks if a given chapter and paragraph index falls within the specified range **/
-function isInRange(currentChapter: number, currentParagraph: number, startChapter: number, startParagraph: number, endChapter: number, endParagraph: number): boolean {
+function isInRange(
+  currentChapter: number,
+  currentParagraph: number,
+  startChapter: number,
+  startParagraph: number,
+  endChapter: number,
+  endParagraph: number,
+): boolean {
   // Single chapter range
   if (startChapter === endChapter) {
-    return currentChapter === startChapter && currentParagraph >= startParagraph && currentParagraph <= endParagraph;
+    return (
+      currentChapter === startChapter &&
+      currentParagraph >= startParagraph &&
+      currentParagraph <= endParagraph
+    );
   }
 
   // Multi-chapter range
@@ -87,7 +112,12 @@ function isInRange(currentChapter: number, currentParagraph: number, startChapte
 }
 
 /** Derives chapter and paragraph range for both play and non-play paragraphs */
-function getRowContext(el: HTMLElement): { chapter: number | null; firstParagraphIndex: number | null; lastParagraphIndex: number | null } {
+// eslint-disable-next-line complexity -- DOM traversal with multiple fallback paths
+function getRowContext(el: HTMLElement): {
+  chapter: number | null;
+  firstParagraphIndex: number | null;
+  lastParagraphIndex: number | null;
+} {
   const section = el.closest<HTMLElement>("[data-chapter]");
   const chapter = section ? parseInt(section.dataset.chapter || "", 10) : null;
 
@@ -122,26 +152,50 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
   const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
   const activePlayRow = activeParagraph?.closest(".play-row");
 
-  if (!activePlayRow) return;
+  if (!activePlayRow) {
+    console.error("no active play row");
+    return;
+  }
 
   const chapterElement = activePlayRow?.closest<HTMLElement>("[data-chapter]");
-  const chapterIndex = chapterElement?.dataset.chapter;
+  if (!chapterElement) {
+    console.error("no chapter element");
+    return;
+  }
+  const chapterIndex = chapterElement.dataset.chapter!;
 
   const rows = getActiveWithSiblingsSkippingDidaskalia(activePlayRow);
 
-  rows.forEach(({ row: playRow, state }: { row: Element; state: "speaks" | "listens" }) => {
-    const characterPlaceholders = playRow?.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+  rows.forEach(({ row: playRow, state }) => {
+    const characterPlaceholders =
+      playRow.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
+    // eslint-disable-next-line complexity -- character placeholder hydration with video state management
     characterPlaceholders.forEach((activeCharacterPlaceholder) => {
       const characterSlug = activeCharacterPlaceholder?.dataset.character;
       const characterData = characterSlug ? charactersBySlug.get(characterSlug) : undefined;
       const inlineAvatar = activeCharacterPlaceholder?.querySelector(".inline-avatar");
       const existingVideo = inlineAvatar?.querySelector("video");
-      const paragraphIndex = playRow?.querySelector<HTMLElement>("[data-index]")?.getAttribute("data-index");
+      const paragraphIndex = playRow
+        .querySelector<HTMLElement>("[data-index]")
+        ?.getAttribute("data-index");
 
-      const locationForPlaceholder = { chapter: parseInt(chapterIndex, 10), paragraph: parseInt(paragraphIndex, 10) };
+      if (!paragraphIndex) {
+        console.error("no paragraph index for play row", playRow);
+        return;
+      }
 
-      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const locationForPlaceholder = {
+        chapter: parseInt(chapterIndex, 10),
+        paragraph: parseInt(paragraphIndex, 10),
+      };
+
+      const snapshot = characterData
+        ? resolveCharacterSnapshot(characterData, {
+            location: locationForPlaceholder,
+            fallbackDisplayName: characterData.characterName,
+          })
+        : null;
       const videoSrc = state === "speaks" ? snapshot?.media.talking : snapshot?.media.listening;
 
       // Case 1: Existing video needs update or removal
@@ -244,78 +298,139 @@ const runPlayFormatMediaActivation = ({ charactersBySlug }: PlayFormatMediaActiv
   });
 };
 
-/**
- * Populates an existing inline-avatar shell with the placeholder image.
- * Returns true if the shell was populated, false if it already had content.
- */
+function generateFallbackAvatarUrl(characterSlug: string, displayName?: string): string {
+  const name =
+    displayName || characterSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return getAvatarSource({
+    slug: characterSlug,
+    characterName: name,
+    bookSlug: "",
+    infoPerChapter: [],
+  });
+}
+
 function populateInlineAvatarShell(
   shell: HTMLElement,
   characterData: CharacterData | undefined,
   location: { chapter: number; paragraph: number } | null,
   snapshotOverride?: CharacterSnapshot | null,
 ): boolean {
-  // Skip if already has an image
   if (shell.querySelector("img")) {
     return false;
   }
 
   const characterSlug = shell.dataset.character;
-  if (!characterSlug || !characterData) return false;
+  if (!characterSlug) {
+    console.warn(`[populateInlineAvatarShell] shell has no data-character attribute`);
+    return false;
+  }
 
-  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  if (!characterData) {
+    console.warn(`[populateInlineAvatarShell] ${characterSlug}: no characterData provided`);
+    return false;
+  }
 
+  const snapshot =
+    snapshotOverride ??
+    resolveCharacterSnapshot(characterData, {
+      location,
+      fallbackDisplayName: characterData.characterName,
+    });
+  const displayName = snapshot.displayName;
   const listeningSrc = snapshot.media.listening;
   const talkingSrc = snapshot.media.talking;
+  let placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
 
-  // Update title in case it wasn't set properly
-  shell.title = snapshot.displayName;
+  if (!placeholderSrc) {
+    placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);
+  }
 
-  // Create placeholder image (always shown as fallback)
+  shell.title = displayName;
+
   const placeholderImg = document.createElement("img");
-  const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
-  placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-  placeholderImg.alt = snapshot.displayName;
+  placeholderImg.classList.add(
+    "absolute",
+    "top-0",
+    "left-0",
+    "w-full",
+    "h-full",
+    "object-cover",
+    "rounded-full",
+  );
+  placeholderImg.alt = displayName;
   shell.appendChild(placeholderImg);
 
   return true;
 }
 
-/** Creates a media container element with CharacterMedia-like structure for inline avatars */
 function createMediaElement(
   placeholder: HTMLSpanElement,
   characterData: CharacterData | undefined,
   location: { chapter: number; paragraph: number } | null,
   snapshotOverride?: CharacterSnapshot | null,
-): HTMLDivElement | null {
+): HTMLSpanElement | null {
   const characterSlug = placeholder.dataset.character;
-  if (!characterSlug || !characterData) return null;
+  if (!characterSlug) {
+    console.warn(`[createMediaElement] placeholder has no data-character`);
+    return null;
+  }
 
-  const snapshot = snapshotOverride ?? resolveCharacterSnapshot(characterData, { location, fallbackDisplayName: characterData.characterName });
+  if (!characterData) {
+    console.warn(`[createMediaElement] ${characterSlug}: no characterData found`);
+    return null;
+  }
 
+  const snapshot =
+    snapshotOverride ??
+    resolveCharacterSnapshot(characterData, {
+      location,
+      fallbackDisplayName: characterData.characterName,
+    });
+  const displayName = snapshot.displayName;
   const listeningSrc = snapshot.media.listening;
   const talkingSrc = snapshot.media.talking;
+  let placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
 
-  // Create container element similar to CharacterMedia structure
-  const container = document.createElement("div");
+  if (!placeholderSrc) {
+    placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);
+  }
+
+  const container = document.createElement("span");
   container.classList.add("inline-avatar", "relative", "w-full", "h-full");
   container.dataset.character = characterSlug;
-  container.title = snapshot.displayName;
+  container.title = displayName;
 
-  // Create placeholder image (always shown as fallback)
   const placeholderImg = document.createElement("img");
-  const placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
   placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
-  placeholderImg.classList.add("absolute", "top-0", "left-0", "w-full", "h-full", "object-cover", "rounded-full");
-  placeholderImg.alt = snapshot.displayName;
+  placeholderImg.classList.add(
+    "absolute",
+    "top-0",
+    "left-0",
+    "w-full",
+    "h-full",
+    "object-cover",
+    "rounded-full",
+  );
+  placeholderImg.alt = displayName;
   container.appendChild(placeholderImg);
 
   return container;
 }
 
 function createDummyElement(characterPlaceholder: HTMLSpanElement) {
+  const existingInlineAvatar =
+    characterPlaceholder.querySelector<HTMLSpanElement>(".inline-avatar");
   const dummyElement = document.createElement("span");
   dummyElement.classList.add("dummy-avatar-placeholder", "inline-avatar");
+
+  if (existingInlineAvatar?.dataset.character) {
+    dummyElement.dataset.character = existingInlineAvatar.dataset.character;
+  }
+  if (existingInlineAvatar?.title) {
+    dummyElement.title = existingInlineAvatar.title;
+  }
+
   const img = characterPlaceholder.querySelector<HTMLImageElement>("img");
   if (img) {
     dummyElement.appendChild(img.cloneNode(true));
@@ -331,11 +446,22 @@ function getVideoPathname(src: string): string {
   }
 }
 
-const activatePlayFormatMediaDebounced = debounce(runPlayFormatMediaActivation, INLINE_MEDIA_DEBOUNCE_MS, { leading: true, trailing: true, maxWait: 500 });
+const activatePlayFormatMediaDebounced = debounce(
+  runPlayFormatMediaActivation,
+  INLINE_MEDIA_DEBOUNCE_MS,
+  { leading: true, trailing: true, maxWait: 500 },
+);
 
 /** Manages media loading and playback for paragraphs within the visible range **/
-export function activateMediaInRange(startChapter: number, startParagraph: number, endChapter: number, endParagraph: number, isPlayFormat: boolean) {
-  const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
+export function activateMediaInRange(
+  startChapter: number,
+  startParagraph: number,
+  endChapter: number,
+  endParagraph: number,
+  isPlayFormat: boolean,
+) {
+  const charactersData = getCharactersData();
+  const charactersBySlug = new Map(charactersData.map((c) => [c.slug, c]));
 
   if (isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
@@ -368,7 +494,14 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
     if (chapterStr && paragraphStr) {
       const currentChapter = parseInt(chapterStr, 10);
       const currentParagraph = parseInt(paragraphStr, 10);
-      return isInRange(currentChapter, currentParagraph, startChapter, startParagraph - bufferSize, endChapter, endParagraph + bufferSize);
+      return isInRange(
+        currentChapter,
+        currentParagraph,
+        startChapter,
+        startParagraph - bufferSize,
+        endChapter,
+        endParagraph + bufferSize,
+      );
     }
   });
 
@@ -384,6 +517,16 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
   const uniqueRows = [...new Set(playRowsOrParagraphs)];
   const activatedMedia = document.querySelectorAll<HTMLElement>("[data-activated-media='true']");
 
+  // Hydrate drama table persona cells for sections in range
+  const sectionsInRange = new Set<HTMLElement>();
+  paragraphsInRange.forEach((p) => {
+    const section = p.closest<HTMLElement>("section[data-chapter]");
+    if (section) sectionsInRange.add(section);
+  });
+  sectionsInRange.forEach((section) => {
+    hydrateInlineAvatarsInSection(section);
+  });
+
   uniqueRows.forEach((rowEl: HTMLElement) => {
     const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
     if (!characterPlaceholders.length) return;
@@ -396,23 +539,46 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
       const characterSlug = characterPlaceholder.dataset.character;
       if (!characterSlug?.trim()) return;
 
-      const locationForPlaceholder = { chapter: rowChapter ?? startChapter, paragraph: firstParagraphIndex ?? startParagraph };
+      const locationForPlaceholder = {
+        chapter: rowChapter ?? startChapter,
+        paragraph: firstParagraphIndex ?? startParagraph,
+      };
 
       const characterData = charactersBySlug.get(characterSlug);
-      const snapshot = characterData ? resolveCharacterSnapshot(characterData, { location: locationForPlaceholder, fallbackDisplayName: characterData.characterName }) : null;
+      const snapshot = characterData
+        ? resolveCharacterSnapshot(characterData, {
+            location: locationForPlaceholder,
+            fallbackDisplayName: characterData.characterName,
+          })
+        : null;
 
-      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(".dummy-avatar-placeholder");
+      const dummyPlaceholder = characterPlaceholder.querySelector<HTMLSpanElement>(
+        ".dummy-avatar-placeholder",
+      );
 
-      if (Array.from(activatedMedia).find((_rowEl) => _rowEl === rowEl)) return;
-
-      const existingInlineAvatar = characterPlaceholder.querySelector<HTMLElement>(".inline-avatar");
+      const existingInlineAvatar =
+        characterPlaceholder.querySelector<HTMLElement>(".inline-avatar");
+      let success = false;
 
       if (existingInlineAvatar) {
-        // Pre-rendered shell exists, populate it with the image
-        populateInlineAvatarShell(existingInlineAvatar, characterData, locationForPlaceholder, snapshot);
+        const hasImg = existingInlineAvatar.querySelector("img");
+        if (hasImg) {
+          success = true;
+        } else {
+          success = populateInlineAvatarShell(
+            existingInlineAvatar,
+            characterData,
+            locationForPlaceholder,
+            snapshot,
+          );
+        }
       } else {
-        // No shell exists, create full media element
-        const newMediaElement = createMediaElement(characterPlaceholder, characterData, locationForPlaceholder, snapshot);
+        const newMediaElement = createMediaElement(
+          characterPlaceholder,
+          characterData,
+          locationForPlaceholder,
+          snapshot,
+        );
 
         if (newMediaElement) {
           if (dummyPlaceholder) {
@@ -420,17 +586,20 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
           } else {
             characterPlaceholder.appendChild(newMediaElement);
           }
+          success = true;
         }
       }
 
-      rowEl.dataset.activatedMedia = "true";
+      if (success) {
+        rowEl.dataset.activatedMedia = "true";
+      }
     });
   });
 
-  // Here we clean up the activated media
   activatedMedia.forEach((rowEl) => {
     if (!uniqueRows.includes(rowEl)) {
-      const characterPlaceholders = rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
+      const characterPlaceholders =
+        rowEl.querySelectorAll<HTMLSpanElement>(".character-placeholder");
 
       characterPlaceholders.forEach((characterPlaceholder) => {
         const dummyElement = createDummyElement(characterPlaceholder);
@@ -444,14 +613,18 @@ export function activateMediaInRange(startChapter: number, startParagraph: numbe
   });
 }
 
-export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDetailsModal: (params: CharacterModalParams) => void) => {
+export const openPlayRowCharacterModal = (
+  target: HTMLElement,
+  openCharacterDetailsModal: (params: CharacterModalParams) => void,
+) => {
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
 
   const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
   const isCharacterPlaceholder = target.closest(".character-placeholder");
 
   // Support both play and non-play: prefer .play-row, else fall back to the nearest [data-index] paragraph
-  const rowOrParagraph = target.closest<HTMLElement>(".play-row") ?? target.closest<HTMLElement>("[data-index]");
+  const rowOrParagraph =
+    target.closest<HTMLElement>(".play-row") ?? target.closest<HTMLElement>("[data-index]");
   if (!rowOrParagraph) return;
 
   // Determine chapter/paragraph from the element we found
@@ -469,7 +642,8 @@ export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDeta
     if (isCharacterPlaceholder) {
       characterPlaceholder = target.closest<HTMLSpanElement>(".character-placeholder");
     } else {
-      characterPlaceholder = rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
+      characterPlaceholder =
+        rowOrParagraph.querySelector<HTMLSpanElement>(".character-placeholder");
     }
 
     characterSlug = characterPlaceholder?.dataset.character || "";
@@ -483,10 +657,17 @@ export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDeta
 
   const characterData = charactersBySlug.get(characterSlug);
   const snapshot = characterData
-    ? resolveCharacterSnapshot(characterData, { location: { chapter, paragraph: firstParagraphIndex }, fallbackDisplayName: characterData.characterName })
+    ? resolveCharacterSnapshot(characterData, {
+        location: { chapter, paragraph: firstParagraphIndex },
+        fallbackDisplayName: characterData.characterName,
+      })
     : null;
 
-  const mediaSrc = snapshot ? (isTalkingNow ? snapshot.media.talking : snapshot.media.listening) : "";
+  const mediaSrc = snapshot
+    ? isTalkingNow
+      ? snapshot.media.talking
+      : snapshot.media.listening
+    : "";
 
   openCharacterDetailsModal({
     characterSlug,
@@ -497,3 +678,61 @@ export const openPlayRowCharacterModal = (target: HTMLElement, openCharacterDeta
     isTalking: isTalkingNow,
   });
 };
+
+export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
+  const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
+  const chapterAttr = section.dataset.chapter;
+  const chapterNumber = chapterAttr ? parseInt(chapterAttr, 10) : 0;
+
+  const shells = section.querySelectorAll<HTMLElement>(".inline-avatar:not(:has(img))");
+  shells.forEach((shell) => {
+    const characterSlug = shell.dataset.character;
+    if (!characterSlug) return;
+
+    const characterData = charactersBySlug.get(characterSlug);
+    const paragraphEl = shell.closest<HTMLElement>("[data-index]");
+    const paragraphIndex = paragraphEl?.dataset.index ? parseInt(paragraphEl.dataset.index, 10) : 0;
+    const location = { chapter: chapterNumber, paragraph: paragraphIndex };
+
+    populateInlineAvatarShell(shell, characterData, location);
+  });
+
+  const personaCells = section.querySelectorAll<HTMLElement>(
+    "table[data-drama] td[data-persona]:not(:has(.inline-avatar))",
+  );
+  personaCells.forEach((cell) => {
+    const row = cell.closest<HTMLElement>("tr[data-speaker]");
+    const characterSlug = row?.dataset.speaker;
+    if (!characterSlug) return;
+
+    const characterData = charactersBySlug.get(characterSlug);
+    if (!characterData) return;
+
+    const location = { chapter: chapterNumber, paragraph: 0 };
+    const snapshot = resolveCharacterSnapshot(characterData, {
+      location,
+      fallbackDisplayName: characterData.characterName,
+    });
+    const displayName = snapshot.displayName;
+    const listeningSrc = snapshot.media.listening;
+    const talkingSrc = snapshot.media.talking;
+    let placeholderSrc = getPlaceholderFromVideoUrl(listeningSrc || talkingSrc || "");
+
+    if (!placeholderSrc) {
+      placeholderSrc = generateFallbackAvatarUrl(characterSlug, displayName);
+    }
+
+    const container = document.createElement("span");
+    container.classList.add("inline-avatar");
+    container.dataset.character = characterSlug;
+    container.title = displayName;
+
+    const placeholderImg = document.createElement("img");
+    placeholderImg.src = normalizeSrcForInlineAvatar(placeholderSrc);
+    placeholderImg.classList.add("rounded-full");
+    placeholderImg.alt = displayName;
+    container.appendChild(placeholderImg);
+
+    cell.insertBefore(container, cell.firstChild);
+  });
+}

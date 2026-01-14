@@ -1,20 +1,24 @@
-import { CSSProperties, useMemo, useState, useEffect, memo } from "react";
-import { motion, Variants, AnimatePresence } from "motion/react";
+import { type CSSProperties, useMemo, useState, useEffect, memo } from "react";
+import { motion, type Variants, AnimatePresence } from "motion/react";
 
 import { useCharactersOnStage } from "@player/hooks/useCharactersOnStage";
 import { useCurrentSpeakers } from "@player/hooks/useCurrentSpeakers";
 import { useLocation } from "@player/state/LocationContext";
-import { getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import CharacterCard from "./CharacterCard";
 import { cn } from "@player/lib/utils";
-import { useOptionalElementVisibility, useLastHideReason } from "@player/stores/elementVisibility.store";
-import { Appearance } from "@player/fetchers/getParagraphRange";
+import {
+  useOptionalElementVisibility,
+  useLastHideReason,
+} from "@player/stores/elementVisibility.store";
+import { type Appearance } from "@player/fetchers/getParagraphRange";
 
 const AVATAR_SIZE = "clamp(55px, 6.5vw, 90px)";
 const FADE_OUT_DURATION_MS = 3000;
 
 const CharactersOnStagePanel = () => {
-  const allCharacters = useMemo(() => getCharactersData(), []);
+  const { charactersData } = useBookConvex();
+  const allCharacters = charactersData;
   const charactersOnStage = useCharactersOnStage(allCharacters);
   const { location } = useLocation();
   const currentSpeakers = useCurrentSpeakers(location, allCharacters, true);
@@ -28,6 +32,7 @@ const CharactersOnStagePanel = () => {
 
   useEffect(() => {
     if (isOverlayVisible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing derived visibility state
       setIsOverlayEffectivelyVisible(true);
       return;
     }
@@ -75,10 +80,19 @@ const CharactersOnStagePanel = () => {
       )}
     >
       <div className="relative w-full h-full overflow-x-auto no-scrollbar">
-        <div className="min-w-max flex flex-nowrap justify-center gap-2 py-3 px-3 md:px-4 select-none" style={{ "--avatar-size": AVATAR_SIZE } as CSSProperties} role="list">
+        <div
+          className="min-w-max flex flex-nowrap justify-center gap-2 py-3 px-3 md:px-4 select-none"
+          style={{ "--avatar-size": AVATAR_SIZE } as CSSProperties}
+          role="list"
+        >
           <AnimatePresence>
             {characterEntities.map((characterEntity, index) => (
-              <CharacterAvatar key={characterEntity.slug} characterEntity={characterEntity} isSpeaking={currentSpeakers.includes(characterEntity.slug)} index={index} />
+              <CharacterAvatar
+                key={characterEntity.slug}
+                characterEntity={characterEntity}
+                isSpeaking={currentSpeakers.includes(characterEntity.slug)}
+                index={index}
+              />
             ))}
           </AnimatePresence>
         </div>
@@ -103,7 +117,11 @@ interface CharacterAvatarProps {
 }
 
 const arePropsEqual = (prev: CharacterAvatarProps, next: CharacterAvatarProps) => {
-  return prev.characterEntity.slug === next.characterEntity.slug && prev.isSpeaking === next.isSpeaking && prev.index === next.index;
+  return (
+    prev.characterEntity.slug === next.characterEntity.slug &&
+    prev.isSpeaking === next.isSpeaking &&
+    prev.index === next.index
+  );
 };
 
 const CharacterAvatar = memo<CharacterAvatarProps>(({ characterEntity, isSpeaking, index }) => {
@@ -118,18 +136,38 @@ const CharacterAvatar = memo<CharacterAvatarProps>(({ characterEntity, isSpeakin
       role="listitem"
       layoutId={`character-${characterEntity.slug}`}
     >
-      <div className={cn("w-[var(--avatar-size)] h-[var(--avatar-size)] rounded-full border-2 pointer-events-auto", isSpeaking ? "speaking" : "not-speaking")}>
-        <CharacterCard entity={characterEntity} currentSpeakers={isSpeaking ? [characterEntity.slug] : []} disableHighlight imageOnly captionMode="hover-title" />
+      <div
+        className={cn(
+          "w-[var(--avatar-size)] h-[var(--avatar-size)] rounded-full border-2 pointer-events-auto",
+          isSpeaking ? "speaking" : "not-speaking",
+        )}
+      >
+        <CharacterCard
+          entity={characterEntity}
+          currentSpeakers={isSpeaking ? [characterEntity.slug] : []}
+          disableHighlight
+          imageOnly
+          captionMode="hover-title"
+        />
       </div>
     </motion.div>
   );
 }, arePropsEqual);
 
 const variants: { container: Variants; character: Variants } = {
-  container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.1 } }, exit: { opacity: 0, transition: { duration: 0.3 } } },
+  container: {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
+    exit: { opacity: 0, transition: { duration: 0.3 } },
+  },
   character: {
     hidden: { opacity: 0, scale: 0.8, y: 20 },
-    visible: (i: number) => ({ opacity: 1, scale: 1, y: 0, transition: { delay: i * 0.03, duration: 0.25, ease: "easeOut" } }),
+    visible: (i: number) => ({
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { delay: i * 0.03, duration: 0.25, ease: "easeOut" },
+    }),
     exit: { opacity: 0, scale: 0.7, y: -10, transition: { duration: 0.2 } },
   },
 } as const;

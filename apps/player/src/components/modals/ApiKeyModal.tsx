@@ -66,7 +66,12 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ onClose, onSuccess }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-center gap-2 mb-4">
           <BrainCircuit className="h-5 w-5 text-blue-400" />
-          <p className="text-sm text-gray-300">{t("api_key_required_message", "Please enter your OpenAI API key to use voice features.")}</p>
+          <p className="text-sm text-gray-300">
+            {t(
+              "api_key_required_message",
+              "Please enter your OpenAI API key to use voice features.",
+            )}
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -95,14 +100,29 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ onClose, onSuccess }) => {
               {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <p className="text-xs text-gray-500">{t("api_key_storage_note", "Your API key is stored locally in your browser and never sent to our servers.")}</p>
+          <p className="text-xs text-gray-500">
+            {t(
+              "api_key_storage_note",
+              "Your API key is stored locally in your browser and never sent to our servers.",
+            )}
+          </p>
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button type="button" variant="ghost" onClick={onClose} className="flex-1 text-white hover:bg-white/10 border-white/20" disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="flex-1 text-white hover:bg-white/10 border-white/20"
+            disabled={isSubmitting}
+          >
             {t("cancel")}
           </Button>
-          <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white" disabled={!apiKey.trim() || isSubmitting}>
+          <Button
+            type="submit"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={!apiKey.trim() || isSubmitting}
+          >
             {isSubmitting ? t("saving", "Saving...") : t("save")}
           </Button>
         </div>

@@ -1,14 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { instructions } from "@player/utils/conversation_config.js";
 import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents-realtime";
-import { loadCharactersData, getCharactersData } from "@player/genericBookDataGetters/getCharactersData";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useLocation } from "@player/state/LocationContext";
 import { z } from "zod";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { useLocationRange } from "@player/hooks/useLocationRange";
-import { extractBookTextFromLocation, extractBookTextUpToLocation } from "@player/utils/extractBookText";
-import type { BookContextLocation, BookContextChunk } from "@player/types/bookContext";
-import { getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import type { BookContextLocation } from "@player/types/bookContext";
 import { getSurroundingText } from "@player/utils/getSurroundingText";
 
 interface RealtimeContextType {
@@ -50,13 +46,17 @@ type TransportEvent =
 
 function setMicActiveSafe(active: boolean) {
   try {
-    // @ts-expect-error experimental API for iOS
-    navigator.mediaSession?.setMicrophoneActive?.(active);
+    // setMicrophoneActive is an experimental API not in TS types
+    const session = navigator.mediaSession as MediaSession & {
+      setMicrophoneActive?: (active: boolean) => void;
+    };
+    session?.setMicrophoneActive?.(active);
   } catch (e) {
     console.debug("[mic] setMicrophoneActive suppressed:", (e as Error)?.name);
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useRealtime = () => {
   const context = useContext(RealtimeContext);
   if (!context) throw new Error("useRealtime must be used within a RealtimeProvider");
@@ -65,7 +65,7 @@ export const useRealtime = () => {
 
 export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { location } = useLocation();
-  const { debouncedLocation } = useLocationRange(300);
+  const { charactersData, bookData } = useBookConvex();
   const audioResponses = (() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -87,7 +87,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Persistent book context tracking (Option B)
   const bookContextLastSentRef = useRef<BookContextLocation | null>(null);
-  const isUpdatingBookContextRef = useRef<boolean>(false);
 
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -140,10 +139,12 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.log("mod audio context finished", ctx);
         if (ctx) return ctx;
       }
-    } catch (e) {
+    } catch {
       // Fallback: create a local context if crossfader isn't initialized yet
     }
-    const Ctx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    const Ctx =
+      window.AudioContext ||
+      (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     return audioContextRef.current ?? new Ctx();
   }, []);
 
@@ -193,7 +194,12 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       toolsArr = [getBookInformation];
     }
 
-    agentRef.current = new RealtimeAgent({ name: "Reader Assistant", instructions, tools: toolsArr });
+    agentRef.current = new RealtimeAgent({
+      name: "Reader Assistant",
+      instructions,
+      tools: toolsArr,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: Session configuration should only run once on mount. instructions and toolsArr are stable module-level constants.
   }, []);
 
   // Attach streaming handlers on the active session
@@ -203,7 +209,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const onTransport = (event: TransportEvent) => {
       // Detect speech activity hints from server
-      if (event.type === "input_audio_buffer.speech_started" || event.type === "server.input_audio_buffer.speech_started") {
+      if (
+        event.type === "input_audio_buffer.speech_started" ||
+        event.type === "server.input_audio_buffer.speech_started"
+      ) {
         audioHeardThisRecordingRef.current = true;
       }
 
@@ -272,16 +281,27 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.log("[connect] fetching realtime token at", tFetch0.toFixed(1));
         const resp = await fetch(`/api/generate-realtime-token`, { credentials: "include" });
         const tFetch1 = performance.now();
-        console.log("[connect] token fetch completed in", (tFetch1 - tFetch0).toFixed(1), "ms; status", resp.status);
+        console.log(
+          "[connect] token fetch completed in",
+          (tFetch1 - tFetch0).toFixed(1),
+          "ms; status",
+          resp.status,
+        );
         if (resp.status === 401) {
           if (nextConnectInteractiveRef.current) {
             try {
-              window.dispatchEvent(new CustomEvent("ShowAuthModal", { detail: { reason: "realtimeTokenUnauthorized" } }));
-            } catch (_) {
+              window.dispatchEvent(
+                new CustomEvent("ShowAuthModal", {
+                  detail: { reason: "realtimeTokenUnauthorized" },
+                }),
+              );
+            } catch {
               // ignore dispatch failures
             }
           } else {
-            console.warn("Realtime preconnect unauthorized; deferring auth prompt until interaction");
+            console.warn(
+              "Realtime preconnect unauthorized; deferring auth prompt until interaction",
+            );
           }
           throw new Error("Unauthorized: sign in required");
         }
@@ -307,7 +327,12 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         session.transport.sendEvent({
           type: "session.update",
-          session: { model: "gpt-realtime-mini", type: "realtime", output_modalities: audioResponses ? ["text", "audio"] : ["text"], audio: { input: { turn_detection: null } } },
+          session: {
+            model: "gpt-realtime-mini",
+            type: "realtime",
+            output_modalities: audioResponses ? ["text", "audio"] : ["text"],
+            audio: { input: { turn_detection: null } },
+          },
         });
       } catch (e) {
         console.warn("[connect] session.update failed", e);
@@ -360,6 +385,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
+  // eslint-disable-next-line complexity
   const sendPerHoldPriming = useCallback(async () => {
     if (primingSentThisHoldRef.current) return;
     const session = sessionRef.current;
@@ -368,8 +394,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // Do not clear conversation items between requests — keep continuity
     // Send a guidance message every hold with dynamic character list scoped to current chapter
     try {
-      await loadCharactersData().catch(() => {});
-      const chars = getCharactersData();
+      const chars = charactersData;
       const currentChapter = location?.chapter ?? location?.currentChapter ?? 1;
       const inCurrent = new Set<string>();
       const inPrevious = new Set<string>();
@@ -380,7 +405,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         for (const info of infos) {
           const ch = info.chapter;
           if (!ch || ch > currentChapter) continue;
-          const encountered = [...(info.paragraphsWhereSpotted || []), ...(info.paragraphsWhereTalking || []), ...(info.paragraphsWhereEnters || [])];
+          const encountered = [
+            ...(info.paragraphsWhereSpotted || []),
+            ...(info.paragraphsWhereTalking || []),
+            ...(info.paragraphsWhereEnters || []),
+          ];
           if (encountered.length === 0) continue;
           if (ch === currentChapter) inCurrent.add(name);
           else if (ch < currentChapter) inPrevious.add(name);
@@ -390,9 +419,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       for (const n of Array.from(inCurrent)) inPrevious.delete(n);
       const format = (s: Set<string>) => (s.size ? Array.from(s).slice(0, 50).join(", ") : "none");
 
-      const book = getBookData();
-      const title = book?.metadata?.title ?? "the book";
-      const author = book?.metadata?.author ?? "the author";
+      const title = bookData?.metadata?.title ?? "the book";
+      const author = bookData?.metadata?.author ?? "the author";
       const segments = [
         `Help the user with "${title}" by ${author}.`,
         ...(audioResponses ? [] : ["Use the get_book_information tool for every answer."]),
@@ -411,7 +439,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
 
       const text = segments.join(" ");
-      session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text }] } });
+      session.transport.sendEvent({
+        type: "conversation.item.create",
+        item: { type: "message", role: "system", content: [{ type: "input_text", text }] },
+      });
     } catch (e) {
       console.warn("Failed to send per-hold priming message", e);
     }
@@ -420,11 +451,15 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         const visibleText = getSurroundingText(location, true);
         const msg = `For context, the user is currently looking at:\n<VisibleText>${visibleText}</VisibleText> Once again. No spoilers, dont mention what happens, dont ask questions, do not say what book this is or by whom - the user already knows!`;
-        session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text: msg }] } });
+        session.transport.sendEvent({
+          type: "conversation.item.create",
+          item: { type: "message", role: "system", content: [{ type: "input_text", text: msg }] },
+        });
       } catch (e) {
         console.error("Failed to send visible text context", e);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: Only want to trigger on audioResponses and location changes. Other refs (sessionRef, textCacheRef) are stable and read fresh values when needed.
   }, [audioResponses, location]);
 
   // Optional preconnect: disabled until mic is primed to ensure we attach our MediaStream
@@ -437,9 +472,11 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (typeof navigator !== "undefined" && navigator.permissions?.query) {
         try {
           console.log("querying microphone permission");
-          const result = await navigator.permissions.query({ name: "microphone" as PermissionName });
+          const result = await navigator.permissions.query({
+            name: "microphone" as PermissionName,
+          });
           hasPermission = result.state === "granted";
-        } catch (error) {
+        } catch {
           // permissions.query not supported or failed, skip preconnect
           return;
         }
@@ -458,94 +495,6 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // ------------------------------
   // Persistent Book Context (Option B)
   // ------------------------------
-  const hasAdvancedBeyond = (a: BookContextLocation | null, b: BookContextLocation): boolean => {
-    if (!a) return true;
-    return b.chapter > a.chapter || (b.chapter === a.chapter && b.paragraph > a.paragraph);
-  };
-
-  const sendBookContext = useCallback(
-    async (chunks: BookContextChunk[], isInitial: boolean) => {
-      if (!isConnected || !sessionRef.current || !chunks.length) return;
-      const session = sessionRef.current;
-      const contextText = chunks.map((c) => c.text).join("\n\n");
-      const header = isInitial ? "Book context so far:" : "Additional book context:";
-      const text = `${header}\n\n${contextText}`;
-      session.transport.sendEvent({ type: "conversation.item.create", item: { type: "message", role: "system", content: [{ type: "input_text", text }] } });
-      const last = chunks[chunks.length - 1];
-      bookContextLastSentRef.current = { chapter: last.chapter, paragraph: last.paragraph };
-    },
-    [isConnected],
-  );
-
-  const sendInitialBookContext = useCallback(async () => {
-    if (!audioResponses) return;
-    console.log("sendInitialBookContext");
-    if (!isConnected || !sessionRef.current || isUpdatingBookContextRef.current) return;
-    console.log("sendInitialBookContext 2");
-    isUpdatingBookContextRef.current = true;
-    try {
-      const current: BookContextLocation = {
-        chapter: debouncedLocation.currentChapter ?? debouncedLocation.chapter,
-        paragraph: debouncedLocation.currentParagraph ?? debouncedLocation.paragraph,
-      };
-      const { chunks } = await extractBookTextUpToLocation(current);
-      if (chunks.length) await sendBookContext(chunks, true);
-    } catch (e) {
-      console.warn("Failed to send initial book context", e);
-    } finally {
-      isUpdatingBookContextRef.current = false;
-    }
-  }, [isConnected, debouncedLocation.currentChapter, debouncedLocation.currentParagraph, debouncedLocation.chapter, debouncedLocation.paragraph, sendBookContext]);
-
-  const sendIncrementalBookContext = useCallback(async () => {
-    if (!audioResponses) return;
-    console.log("sendIncrementalBookContext");
-    if (!isConnected || !sessionRef.current || isUpdatingBookContextRef.current) return;
-    console.log("sendIncrementalBookContext 2");
-    const last = bookContextLastSentRef.current;
-    if (!last) return;
-    console.log("sendIncrementalBookContext 3");
-    const current: BookContextLocation = {
-      chapter: debouncedLocation.currentChapter ?? debouncedLocation.chapter,
-      paragraph: debouncedLocation.currentParagraph ?? debouncedLocation.paragraph,
-    };
-    if (!hasAdvancedBeyond(last, current)) return;
-
-    isUpdatingBookContextRef.current = true;
-    try {
-      const from: BookContextLocation = { chapter: last.chapter, paragraph: last.paragraph + 1 };
-      if (current.chapter > last.chapter) {
-        from.chapter = last.chapter + 1;
-        from.paragraph = 1;
-      }
-      const { chunks } = await extractBookTextFromLocation(from, current);
-      if (chunks.length) await sendBookContext(chunks, false);
-    } catch (e) {
-      console.warn("Failed to send incremental book context", e);
-    } finally {
-      isUpdatingBookContextRef.current = false;
-    }
-  }, [isConnected, debouncedLocation.currentChapter, debouncedLocation.currentParagraph, debouncedLocation.chapter, debouncedLocation.paragraph, sendBookContext]);
-
-  // Kick off initial context once connected
-  useEffect(() => {
-    if (audioResponses && isConnected && !bookContextLastSentRef.current) {
-      const t = setTimeout(() => {
-        // void sendInitialBookContext();
-      }, 50);
-      return () => clearTimeout(t);
-    }
-  }, [audioResponses, isConnected, sendInitialBookContext]);
-
-  // Send incremental context as the reader advances
-  useEffect(() => {
-    if (audioResponses && isConnected && bookContextLastSentRef.current) {
-      const t = setTimeout(() => {
-        // void sendIncrementalBookContext();
-      }, 350);
-      return () => clearTimeout(t);
-    }
-  }, [audioResponses, isConnected, debouncedLocation.currentChapter, debouncedLocation.currentParagraph, sendIncrementalBookContext]);
 
   const disconnectConversation = useCallback(async () => {
     setIsConnected(false);
@@ -561,7 +510,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   // Prime microphone once: request permission, set up analyser, keep stream alive (tracks disabled)
-  const primeMicrophone = useCallback(async (): Promise<"already_primed" | "just_primed" | "failed"> => {
+  const primeMicrophone = useCallback(async (): Promise<
+    "already_primed" | "just_primed" | "failed"
+    // eslint-disable-next-line complexity -- microphone setup with cross-browser compatibility
+  > => {
     const t0 = performance.now();
     console.log("[mic] prime start at", t0.toFixed(1));
     if (micPrimedRef.current && micStreamRef.current) {
@@ -569,12 +521,21 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return "already_primed";
     }
     try {
-      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) return "failed";
+      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia)
+        return "failed";
 
       // Request mic. Keep it alive to avoid repeated hardware acquisition/permission prompts.
-      const isSafari = typeof navigator !== "undefined" && /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|Chromium/.test(navigator.userAgent);
+      const isSafari =
+        typeof navigator !== "undefined" &&
+        /Safari/.test(navigator.userAgent) &&
+        !/Chrome|CriOS|Chromium/.test(navigator.userAgent);
 
-      const audioConstraints: MediaTrackConstraints = { echoCancellation: !isSafari, noiseSuppression: !isSafari, autoGainControl: !isSafari, ...(isSafari ? { latency: 0 } : {}) };
+      const audioConstraints: MediaTrackConstraints = {
+        echoCancellation: !isSafari,
+        noiseSuppression: !isSafari,
+        autoGainControl: !isSafari,
+        ...(isSafari ? { latency: 0 } : {}),
+      };
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
       try {
@@ -587,8 +548,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         for (const t of stream.getAudioTracks()) {
           t.onmute = () => console.log("[mic] prime: track muted at", performance.now().toFixed(1));
-          t.onunmute = () => console.log("[mic] prime: track unmuted at", performance.now().toFixed(1));
-          t.onended = () => console.log("[mic] prime: track ended at", performance.now().toFixed(1));
+          t.onunmute = () =>
+            console.log("[mic] prime: track unmuted at", performance.now().toFixed(1));
+          t.onended = () =>
+            console.log("[mic] prime: track ended at", performance.now().toFixed(1));
         }
       } catch {}
 
@@ -646,6 +609,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [getSharedAudioContext]);
 
+  // eslint-disable-next-line complexity
   const startRecording = useCallback(async (): Promise<"local_first" | "streaming_now"> => {
     const tPress = performance.now();
     console.log("[ptt] startRecording invoked at", tPress.toFixed(1));
@@ -792,10 +756,15 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (workletReady && window.AudioWorkletNode) {
           let node = audioWorkletNodeRef.current;
           if (!node) {
-            node = new window.AudioWorkletNode(ctx, "pcm-worklet", { numberOfInputs: 1, numberOfOutputs: 0, channelCount: 1 });
+            node = new window.AudioWorkletNode(ctx, "pcm-worklet", {
+              numberOfInputs: 1,
+              numberOfOutputs: 0,
+              channelCount: 1,
+            });
             audioWorkletNodeRef.current = node;
           }
           let voicedLogged = false;
+          // eslint-disable-next-line complexity -- audio resampling with multiple branch conditions
           node.port.onmessage = (e: MessageEvent) => {
             if (!isStreamingAudioRef.current) return;
             try {
@@ -863,7 +832,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                   if (slice.length) {
                     const b64 = int16ToBase64(slice);
                     try {
-                      session.transport.sendEvent({ type: "input_audio_buffer.append", audio: b64 });
+                      session.transport.sendEvent({
+                        type: "input_audio_buffer.append",
+                        audio: b64,
+                      });
                     } catch {}
                   }
                 }
@@ -890,6 +862,7 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             scriptProcessorRef.current = sp;
           }
           let voicedLogged = false;
+          // eslint-disable-next-line complexity -- ScriptProcessor fallback with resampling logic
           sp.onaudioprocess = (ev) => {
             if (!isStreamingAudioRef.current) return;
             try {
@@ -953,7 +926,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                   if (slice.length) {
                     const b64 = int16ToBase64(slice);
                     try {
-                      session.transport.sendEvent({ type: "input_audio_buffer.append", audio: b64 });
+                      session.transport.sendEvent({
+                        type: "input_audio_buffer.append",
+                        audio: b64,
+                      });
                     } catch {}
                   }
                 }
@@ -977,10 +953,13 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               gain.gain.value = 0;
               scriptProcessorGainRef.current = gain;
             }
+
             if (gain) {
+              // eslint-disable-next-line max-depth -- audio node connection with error recovery
               try {
                 sp.disconnect();
               } catch {}
+              // eslint-disable-next-line max-depth -- audio node connection with error recovery
               try {
                 gain.disconnect();
               } catch {}
@@ -1006,8 +985,18 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       .catch(() => {});
     // Prime mic permission on first use to avoid missing initial speech
     return "streaming_now";
-  }, [isConnected, connectConversation, location, flushPrebufferIfNeeded, sendPerHoldPriming, primeMicrophone, debugClipUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: getSharedAudioContext is stable, refs are excluded as they read fresh values. Including all would cause unnecessary re-creation of callback.
+  }, [
+    isConnected,
+    connectConversation,
+    location,
+    flushPrebufferIfNeeded,
+    sendPerHoldPriming,
+    primeMicrophone,
+    debugClipUrl,
+  ]);
 
+  // eslint-disable-next-line complexity
   const stopRecording = useCallback(async () => {
     setIsRecording(false);
 
@@ -1082,7 +1071,8 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.warn("[ptt] failed to process local recording for upload", e);
       }
 
-      const heardAudio = debugInt16CaptureRef.current.length > 0 && debugInt16CaptureRef.current[0].length > 0;
+      const heardAudio =
+        debugInt16CaptureRef.current.length > 0 && debugInt16CaptureRef.current[0].length > 0;
       audioHeardThisRecordingRef.current = heardAudio;
       awaitingSpeechResponseRef.current = heardAudio;
       recordStartTimeRef.current = null;
@@ -1096,7 +1086,10 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         sessionRef.current?.transport.sendEvent({
           type: "response.create",
-          response: { output_modalities: audioResponses ? ["text", "audio"] : ["text"], tool_choice: audioResponses ? "auto" : "required" },
+          response: {
+            output_modalities: audioResponses ? ["text", "audio"] : ["text"],
+            tool_choice: audioResponses ? "auto" : "required",
+          },
         });
       } catch (e) {
         console.warn("[ptt] failed to request response after local upload", e);
@@ -1198,15 +1191,29 @@ export const RealtimeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     inputClearedThisHoldRef.current = false;
     primingSentThisHoldRef.current = false;
     try {
+      if (!session) {
+        console.error("[ptt] no session");
+        return;
+      }
       session.transport.sendEvent({
         type: "response.create",
-        response: { output_modalities: audioResponses ? ["text", "audio"] : ["text"], tool_choice: audioResponses ? "auto" : "required" },
+        response: {
+          output_modalities: audioResponses ? ["text", "audio"] : ["text"],
+          tool_choice: audioResponses ? "auto" : "required",
+        },
       });
       console.log("[ptt] response.create sent at", performance.now().toFixed(1));
     } catch (e) {
       console.warn("[ptt] failed to send response.create", e);
     }
-  }, [audioResponses, isConnected, flushPrebufferIfNeeded, sendPerHoldPriming, getSharedAudioContext, connectConversation]);
+  }, [
+    audioResponses,
+    isConnected,
+    flushPrebufferIfNeeded,
+    sendPerHoldPriming,
+    getSharedAudioContext,
+    connectConversation,
+  ]);
 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
@@ -1275,7 +1282,11 @@ function int16ToBase64(int16: Int16Array): string {
   return btoa(binary);
 }
 
-async function decodeBlobToInt16(blob: Blob, targetSampleRate: number, ctx: AudioContext): Promise<Int16Array> {
+async function decodeBlobToInt16(
+  blob: Blob,
+  targetSampleRate: number,
+  ctx: AudioContext,
+): Promise<Int16Array> {
   if (!blob || blob.size === 0) return new Int16Array(0);
   try {
     if (ctx.state === "suspended") await ctx.resume();

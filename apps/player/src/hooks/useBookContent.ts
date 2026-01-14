@@ -1,46 +1,59 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import { usePlayerDOM } from "@player/context/PlayerDOMContext";
 import { useCharacterModal } from "@player/stores/modals/characterModal.store";
 import { setupPageObserver } from "@player/ui/pageObserver";
 import { findSimplifiedSentence } from "@player/helpers/findSimplifiedSentence";
 import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHtmlTags";
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
-import { useEditorMode } from "@player/hooks/useEditorMode";
-import { useBookData } from "@player/context/BookDataContext";
-import { getBookData } from "@player/genericBookDataGetters/getBookData";
-import { goToParagraph } from "@player/helpers/paragraphsNavigation";
-import { markLayoutUnstable, LAYOUT_UNSTABLE_VIRTUALIZER_MS } from "@player/helpers/locationCommitter";
+import { useBookConvex } from "@player/context/BookConvexContext";
+import {
+  markLayoutUnstable,
+  LAYOUT_UNSTABLE_VIRTUALIZER_MS,
+} from "@player/helpers/locationCommitter";
 import { useLocation } from "@player/state/LocationContext";
-import { disposeVirtualizer, ensureChapterWindow, initializeBookContentVirtualizer } from "@player/logic/BookContentVirtualizer";
+import {
+  disposeVirtualizer,
+  ensureChapterWindow,
+  initializeBookContentVirtualizer,
+  updateMountedChaptersInPlace,
+} from "@player/logic/BookContentVirtualizer";
 import { bookIndex } from "@player/logic/BookIndex";
 import { openPlayRowCharacterModal } from "@player/ui/activateMediaInRange";
 import { scrollCoordinator } from "@player/services/ScrollCoordinator";
+import { useBookForm } from "@player/hooks/useBookForm";
 
 const findSimplifiedSentenceRef = { current: findSimplifiedSentence };
 
 if (import.meta.hot) {
   import.meta.hot.accept("@player/helpers/findSimplifiedSentence", (mod) => {
-    findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
+    if (mod) findSimplifiedSentenceRef.current = mod.findSimplifiedSentence;
     console.info("[HMR] findSimplifiedSentence updated");
   });
 }
 
-const isEditorMode = import.meta.env.VITE_EDITOR === "true";
 const containerId = "content-container";
 
 export function useBookContent() {
-  const { textVersion } = useBookData();
-  const { location } = useLocation();
-  const { currentChapter, currentParagraph } = location;
+  const { contentContainer, bookContainer } = usePlayerDOM();
   const {
-    metadata: { bookForm },
-  } = getBookData();
+    textVersion,
+    bookData: _bookData,
+    isReady,
+    bookStringified,
+    ensureCompiledChaptersLoaded,
+  } = useBookConvex();
+  const { location } = useLocation();
+  const { currentChapter } = location;
+  const { isPlayFormat } = useBookForm();
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
 
-  const previousTextVersionRef = useRef(textVersion);
-  const lastInitializedVersionRef = useRef<number | null>(null);
+  // Initialize to -1 so the first real version (0 or 1) is always detected as a change
+  // Using textVersion as initial value would miss the first update if component mounts after version change
+  const previousTextVersionRef = useRef(-1);
   const containerRef = useRef<HTMLElement | null>(null);
+  const virtualizerInitializedRef = useRef(false);
   const observerSetupRef = useRef<{
     observer: IntersectionObserver;
     observeNewParagraphs: () => number;
@@ -51,11 +64,14 @@ export function useBookContent() {
   } | null>(null);
   const currentChapterRef = useRef<number | undefined>(currentChapter);
 
-  useEditorMode(isEditorMode ? containerRef.current : null);
-
-  const isPlayFormat = bookForm === "play" || bookForm === "mixed";
+  useEffect(() => {
+    if (typeof currentChapter !== "number") return;
+    const requested = [currentChapter - 1, currentChapter, currentChapter + 1];
+    void ensureCompiledChaptersLoaded(requested);
+  }, [currentChapter, ensureCompiledChaptersLoaded]);
 
   const handlePointerUp = useCallback(
+    // eslint-disable-next-line complexity
     (event: PointerEvent) => {
       if (event.metaKey || event.ctrlKey) return;
 
@@ -68,7 +84,14 @@ export function useBookContent() {
 
       const complexitySpan = target.closest("span[id^='ch']") as HTMLElement;
 
-      if (!complexitySpan && !isCharacterText && !isInlineAvatar && !isCharacterHighlighted && !isCharacterPlaceholder) return;
+      if (
+        !complexitySpan &&
+        !isCharacterText &&
+        !isInlineAvatar &&
+        !isCharacterHighlighted &&
+        !isCharacterPlaceholder
+      )
+        return;
 
       event.preventDefault();
       event.stopPropagation();
@@ -87,9 +110,17 @@ export function useBookContent() {
       }
 
       const currentSentenceScore = complexitySpan.getAttribute("data-current-score") || "100";
-      const { text: simplifiedSentence, score: simplifiedSentenceScore } = findSimplifiedSentenceRef.current(currentSentenceId, parseInt(currentSentenceScore));
+      const simplificationResult = findSimplifiedSentenceRef.current(
+        currentSentenceId,
+        parseInt(currentSentenceScore),
+      );
+      const simplifiedSentence = simplificationResult?.text;
+      const simplifiedSentenceScore = simplificationResult?.score;
 
-      const sentenceNumber = parseInt(complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1", 10);
+      const sentenceNumber = parseInt(
+        complexitySpan.getAttribute("id")?.split("-s")?.[1] ?? "1",
+        10,
+      );
       const isFirstSentence = sentenceNumber === 1;
 
       // Handle case when no further simplification is available
@@ -98,7 +129,11 @@ export function useBookContent() {
 
         // Reset to original sentence
         const originalSentence = complexitySpan.getAttribute("data-original-sentence") || "";
-        complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(originalSentence, isPlayFormat, isFirstSentence);
+        complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(
+          originalSentence,
+          isPlayFormat,
+          isFirstSentence,
+        );
         complexitySpan.removeAttribute("data-current-score");
         complexitySpan.setAttribute("data-simplified", "false");
 
@@ -113,8 +148,12 @@ export function useBookContent() {
       }
 
       // Update content
-      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(simplifiedSentence, isPlayFormat, isFirstSentence);
-      complexitySpan.setAttribute("data-current-score", simplifiedSentenceScore.toString());
+      complexitySpan.innerHTML = replaceXmlTagsIntoHtmlTags(
+        simplifiedSentence,
+        isPlayFormat,
+        isFirstSentence,
+      );
+      complexitySpan.setAttribute("data-current-score", String(simplifiedSentenceScore ?? 0));
       complexitySpan.setAttribute("data-simplified", "true");
 
       wrapSimplifiedSentenceTail(complexitySpan);
@@ -128,31 +167,29 @@ export function useBookContent() {
   );
 
   useEffect(() => {
-    containerRef.current = document.getElementById(containerId);
-  }, []);
+    containerRef.current = contentContainer;
+  }, [contentContainer]);
 
   // Initialize ScrollCoordinator when container is available
   useEffect(() => {
-    const container = document.getElementById(containerId);
-    if (container) {
-      scrollCoordinator.initialize(container);
+    if (contentContainer) {
+      scrollCoordinator.initialize(contentContainer);
     }
 
     return () => {
       scrollCoordinator.destroy();
     };
-  }, []);
+  }, [contentContainer]);
 
   useEffect(() => {
-    const bookContainer = document.getElementById("book-container");
     if (bookContainer) {
-      if (bookForm === "play" || bookForm === "mixed") {
+      if (isPlayFormat) {
         bookContainer.classList.add("play-mode");
       } else {
         bookContainer.classList.remove("play-mode");
       }
     }
-  }, [bookForm]);
+  }, [bookContainer, isPlayFormat]);
 
   useEffect(() => {
     currentChapterRef.current = currentChapter;
@@ -174,7 +211,20 @@ export function useBookContent() {
     }
   }, []);
 
+  // Initialize virtualizer ONCE when container AND bookStringified are available
+  // This must NOT re-run when bookStringified changes - only when initially ready
+  // Content updates are handled by the separate textVersion effect below using updateMountedChaptersInPlace
   useEffect(() => {
+    // Skip if already initialized - prevents re-init on content changes
+    if (virtualizerInitializedRef.current) {
+      return () => {};
+    }
+
+    // Wait until we have book content - prevents initialization before store is ready
+    if (!isReady || !bookStringified) {
+      return () => {};
+    }
+
     const container = containerRef.current;
 
     if (!container) {
@@ -182,19 +232,21 @@ export function useBookContent() {
       return () => {};
     }
 
-    if (lastInitializedVersionRef.current !== textVersion) {
-      bookIndex.invalidate();
-      lastInitializedVersionRef.current = textVersion;
-    }
-
     let cancelled = false;
 
     const initializeVirtualizer = async () => {
       try {
-        await initializeBookContentVirtualizer({ container, onContentChanged: handleContentChanged });
-        const initialChapter = typeof currentChapterRef.current === "number" ? currentChapterRef.current : (bookIndex.getFirstChapter() ?? 1);
+        await initializeBookContentVirtualizer({
+          container,
+          onContentChanged: handleContentChanged,
+        });
+        const initialChapter =
+          typeof currentChapterRef.current === "number"
+            ? currentChapterRef.current
+            : (bookIndex.getFirstChapter() ?? 1);
         await ensureChapterWindow(initialChapter, { force: true });
         if (!cancelled) {
+          virtualizerInitializedRef.current = true;
           handleContentChanged();
         }
       } catch (error) {
@@ -211,8 +263,14 @@ export function useBookContent() {
         observerSetupRef.current = null;
       }
       disposeVirtualizer();
+      virtualizerInitializedRef.current = false;
     };
-  }, [textVersion, handleContentChanged]);
+    // We only want to initialize ONCE when first ready. Content updates are handled
+    // by the textVersion effect using updateMountedChaptersInPlace().
+    // Including bookStringified would cause cleanup to run (disposing virtualizer)
+    // before the next effect run, triggering full re-initialization and scroll loss.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- INTENTIONAL: bookStringified excluded to prevent re-initialization on content updates. See comment above.
+  }, [handleContentChanged, isReady]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -229,6 +287,11 @@ export function useBookContent() {
   }, [handlePointerUp]);
 
   useEffect(() => {
+    // Wait until we have book content
+    if (!isReady || !bookStringified) {
+      return;
+    }
+
     if (typeof currentChapter !== "number") {
       return;
     }
@@ -248,40 +311,54 @@ export function useBookContent() {
         handleContentChanged();
       }
     })();
-  }, [currentChapter, handleContentChanged]);
+  }, [currentChapter, handleContentChanged, isReady, bookStringified]);
 
   useEffect(() => {
-    const textVersionChanged = previousTextVersionRef.current !== textVersion;
+    const prevVersion = previousTextVersionRef.current;
+    const textVersionChanged = prevVersion !== textVersion;
+
+    console.log("[Convex:Flow] useBookContent textVersion effect", {
+      textVersionChanged,
+      prevVersion,
+      newVersion: textVersion,
+    });
+
+    // Only update ref AFTER we've checked for change (fixes React strict mode double-invoke)
+    if (!textVersionChanged) {
+      console.log("[Convex:Flow] No version change, skipping update");
+      return;
+    }
+
+    // Need bookStringified to update content
+    if (!bookStringified) {
+      console.log("[Convex:Flow] No bookStringified available, skipping update");
+      return;
+    }
+
+    // Update ref now that we know there's a real change
     previousTextVersionRef.current = textVersion;
 
-    if (!textVersionChanged) {
+    // Skip the initial mount (ref starts at -1, first real version is 1)
+    // Initial load is handled by the virtualizer initialization effect
+    if (prevVersion === -1) {
+      console.log("[Convex:Flow] Initial mount, skipping in-place update");
       return;
     }
 
-    if (typeof currentChapter !== "number" || typeof currentParagraph !== "number") {
-      return;
-    }
+    console.log("[Convex:Flow] Version changed! Doing in-place content update");
 
-    if (observerSetupRef.current) {
-      observerSetupRef.current.cleanup();
-      observerSetupRef.current = null;
-    }
+    // Initialize bookIndex with the FRESH bookStringified from context (not stale store)
+    // This avoids the race condition where the store hasn't been updated yet
+    bookIndex.initializeWith(bookStringified);
 
-    void (async () => {
-      try {
-        await ensureChapterWindow(currentChapter, { force: true });
-        requestAnimationFrame(() => {
-          void goToParagraph({ currentChapter, currentParagraph }, { behavior: "instant" }).catch((error) => {
-            console.error("useBookContent: Failed to restore scroll position after reload", error);
-          });
-        });
-      } catch (error) {
-        console.error("useBookContent: Failed to remount chapters after reload", error);
-      } finally {
-        handleContentChanged();
-      }
-    })();
-  }, [currentChapter, currentParagraph, textVersion, handleContentChanged]);
+    // Update mounted chapters in-place (no remount, preserves scroll)
+    updateMountedChaptersInPlace();
+
+    // Refresh observers for the new content
+    handleContentChanged();
+
+    console.log("[Convex:Flow] In-place update complete, scroll preserved");
+  }, [textVersion, bookStringified, handleContentChanged]);
 }
 
 // Ensure last word (incl. trailing punctuation) and icon stay on same line

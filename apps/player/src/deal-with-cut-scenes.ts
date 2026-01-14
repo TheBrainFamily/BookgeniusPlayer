@@ -1,9 +1,15 @@
-import { bookDataLoader } from "@player/services/bookDataLoader";
-import { getCutScenesForBook } from "./genericBookDataGetters/getCutScenesForBook";
+import { getCutScenesForBook, getBookSlug } from "./state/bookDataStore";
+import { type CutSceneForBook } from "./types/book";
 import "./styles/cutscene-video.css";
 
-export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
-  const cutScenesDefined = getCutScenesForBook();
+export const dealWithCutScenes = ({
+  currentChapter,
+  currentParagraph,
+}: {
+  currentChapter: number;
+  currentParagraph: number;
+}) => {
+  const cutScenesDefined = getCutScenesForBook() as CutSceneForBook[];
 
   const cutSceneToApply = cutScenesDefined.find((cutscene) => {
     return cutscene.chapter === currentChapter && cutscene.paragraph === currentParagraph;
@@ -56,7 +62,8 @@ export const dealWithCutScenes = ({ currentChapter, currentParagraph }) => {
 
     // --- Setup and Play ---
     cutsceneText.textContent = cutSceneToApply.text || ""; // Set the text content
-    const currentBook = bookDataLoader.getCurrentBook();
+    const currentBook = getBookSlug();
+    if (!currentBook) throw new Error("[deal-with-cut-scenes] Book slug not available");
     cutsceneVideo.src = `/books/${currentBook}/assets/${cutSceneToApply.file}`;
     cutsceneVideo.load();
 

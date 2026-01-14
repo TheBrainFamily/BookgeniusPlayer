@@ -39,7 +39,8 @@ export const useElementVisibility = () => {
   const isSplashHidden = useSplashHidden();
 
   // Store actions (these don't change, so they won't cause re-renders)
-  const { showAllElements, clearInactivityTimer, resetInactivityTimer } = useElementVisibilityStore();
+  const { showAllElements, clearInactivityTimer, resetInactivityTimer } =
+    useElementVisibilityStore();
 
   const rafIdRef = useRef<number | null>(null);
   const lastTapTimeRef = useRef(0);
@@ -156,12 +157,18 @@ export const useElementVisibility = () => {
   useEffect(() => {
     if (!isSplashHidden) return;
 
-    document.addEventListener("click", stableHandleTap, true);
-    document.addEventListener("touchstart", stableHandleTouchStart, { passive: true });
-    document.addEventListener("touchmove", stableHandleTouchMove, { passive: true });
-    document.addEventListener("touchend", stableHandleTouchEnd, true);
+    // Defer listener attachment to avoid catching the click that triggered mount
+    // (e.g., clicking a book in the library triggers the player mount, and that
+    // same click would immediately hide elements if we attach synchronously)
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("click", stableHandleTap, true);
+      document.addEventListener("touchstart", stableHandleTouchStart, { passive: true });
+      document.addEventListener("touchmove", stableHandleTouchMove, { passive: true });
+      document.addEventListener("touchend", stableHandleTouchEnd, true);
+    }, 0);
 
     return () => {
+      clearTimeout(timeoutId);
       document.removeEventListener("click", stableHandleTap, true);
       document.removeEventListener("touchstart", stableHandleTouchStart);
       document.removeEventListener("touchmove", stableHandleTouchMove);
@@ -174,7 +181,14 @@ export const useElementVisibility = () => {
 
       clearInactivityTimer();
     };
-  }, [isSplashHidden, stableHandleTap, stableHandleTouchStart, stableHandleTouchMove, stableHandleTouchEnd, clearInactivityTimer]);
+  }, [
+    isSplashHidden,
+    stableHandleTap,
+    stableHandleTouchStart,
+    stableHandleTouchMove,
+    stableHandleTouchEnd,
+    clearInactivityTimer,
+  ]);
 
   return { areElementsVisible, isScrollMode };
 };

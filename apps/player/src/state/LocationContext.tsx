@@ -1,5 +1,9 @@
 import React, { createContext, useCallback, useMemo, useState, useEffect } from "react";
-import { __setLocationBridge, parseLocationFromHash, getSavedLocation } from "@player/helpers/paragraphsNavigation";
+import {
+  __setLocationBridge,
+  parseLocationFromHash,
+  getSavedLocation,
+} from "@player/helpers/paragraphsNavigation";
 
 /* ------------------------------------------------------------------ */
 export interface Location {
@@ -10,10 +14,10 @@ export interface Location {
   currentChapter: number;
   currentParagraph: number;
   lastScrollTimestamp?: number;
-  earliestVisibleParagraph: number | null;
-  latestVisibleParagraph: number | null;
-  earliestVisibleChapter: number | null;
-  latestVisibleChapter: number | null;
+  earliestVisibleParagraph: number;
+  latestVisibleParagraph: number;
+  earliestVisibleChapter: number;
+  latestVisibleChapter: number;
 }
 
 export interface LocationWithMetadata {
@@ -22,6 +26,7 @@ export interface LocationWithMetadata {
   source: "user" | "system";
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const DEFAULT_LOCATION: Location = {
   chapter: 1,
   paragraph: 1,
@@ -29,10 +34,10 @@ export const DEFAULT_LOCATION: Location = {
   endParagraph: 1,
   currentChapter: 1,
   currentParagraph: 1,
-  earliestVisibleParagraph: null,
-  latestVisibleParagraph: null,
-  earliestVisibleChapter: null,
-  latestVisibleChapter: null,
+  earliestVisibleParagraph: 1,
+  latestVisibleParagraph: 1,
+  earliestVisibleChapter: 1,
+  latestVisibleChapter: 1,
 };
 
 /* ------------------------------------------------------------------ */
@@ -52,7 +57,12 @@ interface LocationCtx {
   setLocation: (loc: Location, source?: "user" | "system") => void;
 }
 
-export const LocationContext = createContext<LocationCtx>({ location: DEFAULT_LOCATION, lastSystemLocation: null, setLocation: () => {} });
+// eslint-disable-next-line react-refresh/only-export-components
+export const LocationContext = createContext<LocationCtx>({
+  location: DEFAULT_LOCATION,
+  lastSystemLocation: null,
+  setLocation: () => {},
+});
 
 /* ------------------------------------------------------------------ */
 export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -96,16 +106,23 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   /* ------------------------------------------------------------------ */
   /*  Sync internal bridge                                              */
   useEffect(() => {
-    __setLocationBridge({ get: () => location, set: (loc, source = "user") => setLocation(loc, source) });
+    __setLocationBridge({
+      get: () => location,
+      set: (loc, source = "user") => setLocation(loc, source),
+    });
   }, [location, setLocation]);
 
   /* ------------------------------------------------------------------ */
-  const value = useMemo(() => ({ location, lastSystemLocation, setLocation }), [location, lastSystemLocation, setLocation]);
+  const value = useMemo(
+    () => ({ location, lastSystemLocation, setLocation }),
+    [location, lastSystemLocation, setLocation],
+  );
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
 };
 
 /* ------------------------------------------------------------------ */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLocation = () => {
   const ctx = React.useContext(LocationContext);
   if (!ctx) throw new Error("useLocation must be used within LocationProvider");
