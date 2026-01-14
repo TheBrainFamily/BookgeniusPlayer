@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { motion, AnimatePresence } from "motion/react";
+import DOMPurify from "dompurify";
 
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useNoteEditModal } from "@player/stores/modals/noteEditModal.store";
@@ -47,7 +48,11 @@ const NoteEditModal: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const htmlContent = `<p>${editedContent}</p>`;
+      const sanitizedContent = DOMPurify.sanitize(editedContent, {
+        ALLOWED_TAGS: ["b", "i", "ul", "li"],
+        ALLOWED_ATTR: [],
+      });
+      const htmlContent = `<p>${sanitizedContent}</p>`;
       await updateNote({ bookPath: effectiveBookPath!, id: noteData._id, content: htmlContent });
       updateFootnoteCache(noteId, htmlContent);
       closeModal();

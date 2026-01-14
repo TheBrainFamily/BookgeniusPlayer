@@ -24,6 +24,7 @@ export const RightNotesPanel: React.FC = () => {
     >
       {notes.map((n) => (
         <section
+          id={n.id}
           key={n.id}
           className="right-note"
           onClick={() => openModal(n.html)}
