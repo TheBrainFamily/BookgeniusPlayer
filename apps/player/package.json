@@ -37,7 +37,7 @@
     "zustand": "^4.0.0 || ^5.0.0",
     "i18next": "^23.0.0 || ^24.0.0 || ^25.0.0",
     "react-i18next": "^13.0.0 || ^14.0.0 || ^15.0.0",
-    "lucide-react": "^0.400.0"
+    "lucide-react": "^0.4.0"
   },
   "scripts": {
     "analyze-characters": "tsx ./scripts/analyze-character-mentions.ts",
