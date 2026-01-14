@@ -4,8 +4,8 @@ import "./globals.css";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
-  title: "Convex Kanban - Next.js",
-  description: "Next.js experiment with Convex",
+  title: "BookGenius CMS",
+  description: "Content management system for BookGenius",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
