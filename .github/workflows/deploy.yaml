@@ -14,7 +14,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    environment: production
+    environment: cloudflare
     steps:
       - name: Set-up s5cmd
         uses: peak/action-setup-s5cmd@main
