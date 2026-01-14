@@ -318,7 +318,7 @@ export const deleteBookDataBatch = adminMutation({
  * This deletes all assets (files) for a specific book.
  */
 export const deleteBookAssetsBatch = adminMutation({
-  args: { bookSlug: v.string() },
+  args: { bookSlug: v.string(), subfolder: v.optional(v.string()) },
   returns: v.object({
     deletedFolders: v.number(),
     deletedAssets: v.number(),
@@ -327,8 +327,8 @@ export const deleteBookAssetsBatch = adminMutation({
     r2KeysToDelete: v.array(v.string()),
     hasMore: v.boolean(),
   }),
-  handler: async (ctx, { bookSlug }) => {
-    const bookPath = `books/${bookSlug}`;
+  handler: async (ctx, { bookSlug, subfolder }) => {
+    const bookPath = subfolder ? `books/${bookSlug}/${subfolder}` : `books/${bookSlug}`;
     return await ctx.runMutation(components.assetManager.assetManager.deleteByPathPrefixBatch, {
       pathPrefix: bookPath,
       batchSize: BATCH_SIZE,

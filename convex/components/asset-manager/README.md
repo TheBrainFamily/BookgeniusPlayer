@@ -243,15 +243,45 @@ Change types tracked:
 - `asset:create`, `asset:publish`, `asset:update`, `asset:archive`, `asset:delete`
 - `asset:move`, `asset:rename`
 
+### Example: Local Filesystem Sync Daemon
+
+The changelog enables powerful sync tools. See `apps/convex-sync/` for a complete example that maintains a **live local filesystem mirror** of your Convex assets:
+
+```
+┌─────────────────┐     WebSocket subscription     ┌─────────────────┐
+│   Local Disk    │ ◄──────────────────────────── │     Convex      │
+│                 │     changelog.listSince        │   Asset Manager │
+│  /sync-folder/  │                                │                 │
+│  ├── images/    │     Initial sync + real-time   │  changelog DB   │
+│  │   └── hero   │     updates via cursor         │                 │
+│  └── sounds/    │                                │                 │
+└─────────────────┘                                └─────────────────┘
+```
+
+The daemon:
+
+- Performs initial sync of all folders and files
+- Subscribes to real-time changelog updates via WebSocket
+- Processes each change type (publish, archive, move, rename, delete)
+- Tracks downloaded versions via filesystem extended attributes (xattr)
+- Resumes from last cursor on restart (no re-download of unchanged files)
+
+```bash
+# Run the sync daemon
+bun apps/convex-sync/src/index.ts --sync-dir ./local-assets
+```
+
+This pattern can be adapted for:
+
+- **Development/AI workflows**: Work with assets locally, agents can easily search through the files using their favorite fs tools
+- **Build pipelines**: Sync assets to a build server for static site generation
+- **Backup systems**: Maintain an offline copy of all assets
+
 ## Storage Backends
 
 ### Convex Storage (Default)
 
 Built-in, zero configuration. Good for development and smaller files.
-
-```typescript
-// No configuration needed - uses Convex storage by default
-```
 
 ### Cloudflare R2
 

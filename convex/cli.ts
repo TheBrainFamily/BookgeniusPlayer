@@ -133,16 +133,35 @@ export const getTextContent = adminAction({
 
 // --- Changelog Operations (for real-time sync) ---
 
+/**
+ * Compound cursor for reliable pagination (flat args for ConvexMobile SDK compatibility).
+ * Uses cursorCreatedAt + cursorId to avoid skipping items with identical timestamps.
+ * For initial fetch, use cursorCreatedAt: 0, cursorId: ""
+ */
 export const watchChangelog = adminQuery({
-  args: { cursor: v.number(), limit: v.optional(v.number()) },
+  args: { cursorCreatedAt: v.number(), cursorId: v.string(), limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.changelog.listSince, args);
+    const cursor = { createdAt: args.cursorCreatedAt, id: args.cursorId };
+    return await ctx.runQuery(components.assetManager.changelog.listSince, {
+      cursor,
+      limit: args.limit,
+    });
   },
 });
 
 export const watchFolderChanges = adminQuery({
-  args: { folderPath: v.string(), cursor: v.number(), limit: v.optional(v.number()) },
+  args: {
+    folderPath: v.string(),
+    cursorCreatedAt: v.number(),
+    cursorId: v.string(),
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
-    return await ctx.runQuery(components.assetManager.changelog.listForFolder, args);
+    const cursor = { createdAt: args.cursorCreatedAt, id: args.cursorId };
+    return await ctx.runQuery(components.assetManager.changelog.listForFolder, {
+      folderPath: args.folderPath,
+      cursor,
+      limit: args.limit,
+    });
   },
 });

@@ -8,7 +8,14 @@ import { ConvexClient } from "convex/browser";
 import { api } from "@convex/_generated/api";
 import { ConvexHttpClient } from "./client";
 import { loadState, saveState } from "./config";
-import type { Config, SyncState, ChangelogEntry, ConvexPublishedFile } from "./types";
+import type {
+  Config,
+  SyncState,
+  ChangelogEntry,
+  ConvexPublishedFile,
+  CompoundCursor,
+} from "./types";
+import { INITIAL_CURSOR } from "./types";
 
 const XATTR_KEY = "com.convex.versionId";
 
@@ -45,7 +52,7 @@ export class SyncDaemon {
     this.config = config;
     this.httpClient = new ConvexHttpClient(config.convexUrl, config.adminKey);
     this.realtimeClient = new ConvexClient(config.convexUrl);
-    this.state = config.reset ? { cursor: 0 } : loadState(config.syncDir);
+    this.state = config.reset ? { cursor: INITIAL_CURSOR } : loadState(config.syncDir);
   }
 
   private log(msg: string) {
@@ -71,8 +78,8 @@ export class SyncDaemon {
     mkdirSync(this.config.syncDir, { recursive: true });
 
     // Initial sync or catch-up
-    if (this.state.cursor > 0 && !this.config.reset) {
-      this.log(`📥 Resuming from cursor: ${this.state.cursor}`);
+    if (this.state.cursor.createdAt > 0 && !this.config.reset) {
+      this.log(`📥 Resuming from cursor: ${this.state.cursor.createdAt}`);
       await this.catchUpOnChanges();
     } else {
       this.log("📥 Starting initial sync...");
@@ -98,7 +105,7 @@ export class SyncDaemon {
     this.syncedFiles = 0;
 
     // Get current cursor FIRST (so we don't miss changes during sync)
-    const changelog = await this.httpClient.getChangelog(0, 1);
+    const changelog = await this.httpClient.getChangelog(INITIAL_CURSOR, 1);
     const currentCursor = changelog.nextCursor;
 
     // Get all folders
@@ -225,7 +232,7 @@ export class SyncDaemon {
   }
 
   /** Setup subscription with a specific cursor, resubscribing when cursor advances */
-  private setupChangeSubscription(cursor: number): void {
+  private setupChangeSubscription(cursor: CompoundCursor): void {
     // Unsubscribe from previous subscription if exists
     if (this.unsubscribe) {
       this.unsubscribe();
@@ -233,7 +240,12 @@ export class SyncDaemon {
 
     this.unsubscribe = this.realtimeClient.onUpdate(
       api.cli.watchChangelog,
-      { cursor, limit: 100, _adminKey: this.config.adminKey },
+      {
+        cursorCreatedAt: cursor.createdAt,
+        cursorId: cursor.id,
+        limit: 100,
+        _adminKey: this.config.adminKey,
+      },
       async (response) => {
         if (response.changes.length > 0) {
           this.log(`📬 Received ${response.changes.length} changes`);

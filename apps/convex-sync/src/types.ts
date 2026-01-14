@@ -29,13 +29,22 @@ export interface ChangelogEntry {
   createdAt: number;
 }
 
+/** Compound cursor for reliable pagination (prevents skipping items with same timestamp) */
+export interface CompoundCursor {
+  createdAt: number;
+  id: string;
+}
+
+/** Initial cursor for starting from the beginning */
+export const INITIAL_CURSOR: CompoundCursor = { createdAt: 0, id: "" };
+
 export interface ChangelogResponse {
   changes: ChangelogEntry[];
-  nextCursor: number;
+  nextCursor: CompoundCursor;
 }
 
 export interface SyncState {
-  cursor: number;
+  cursor: CompoundCursor;
   lastSync?: string;
 }
 

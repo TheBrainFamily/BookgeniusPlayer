@@ -52,14 +52,18 @@ function convexRun(command: string, args: Record<string, unknown>): string {
 }
 
 async function confirm(message: string, expected: string): Promise<boolean> {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  if (process.env.NODE_ENV === "development") {
+    return new Promise((resolve) => resolve(true));
+  } else {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-  return new Promise((resolve) => {
-    rl.question(`${message}\n> `, (answer) => {
-      rl.close();
-      resolve(answer === expected);
+    return new Promise((resolve) => {
+      rl.question(`${message}\n> `, (answer) => {
+        rl.close();
+        resolve(answer === expected);
+      });
     });
-  });
+  }
 }
 
 async function deleteR2KeysBatch(keys: string[]): Promise<{ deleted: number; failed: number }> {
@@ -163,15 +167,42 @@ async function main() {
   }
 
   console.log("\nDeleting book assets...");
-  hasMore = true;
-  while (hasMore) {
-    try {
+  try {
+    hasMore = true;
+    while (hasMore) {
       const result = convexRun("reset:deleteBookAssetsBatch", { bookSlug });
       const parsed = JSON.parse(result);
       console.log(result.trim());
       hasMore = parsed.hasMore;
-    } catch (err) {
-      console.error("Failed:", err instanceof Error ? err.message : String(err));
+    }
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+
+    if (errorMsg.includes("Too many reads")) {
+      console.log("\nBook too large for bulk deletion. Switching to subfolder mode...");
+
+      const subfolders = ["characters", "backgrounds", "music", "chapters"];
+      for (const subfolder of subfolders) {
+        console.log(`\nDeleting ${subfolder}...`);
+        hasMore = true;
+        while (hasMore) {
+          const result = convexRun("reset:deleteBookAssetsBatch", { bookSlug, subfolder });
+          const parsed = JSON.parse(result);
+          console.log(result.trim());
+          hasMore = parsed.hasMore;
+        }
+      }
+
+      console.log("\nDeleting remaining book assets...");
+      hasMore = true;
+      while (hasMore) {
+        const result = convexRun("reset:deleteBookAssetsBatch", { bookSlug });
+        const parsed = JSON.parse(result);
+        console.log(result.trim());
+        hasMore = parsed.hasMore;
+      }
+    } else {
+      console.error("Failed:", errorMsg);
       process.exit(1);
     }
   }

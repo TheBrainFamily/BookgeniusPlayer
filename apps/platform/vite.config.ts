@@ -6,7 +6,7 @@ import tailwind from "@tailwindcss/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  server: { host: "::", port: 8080, proxy: { "/api": "http://localhost" } },
+  server: { host: "::", port: 8080, strictPort: true, proxy: { "/api": "http://localhost" } },
   plugins: [react(), mode === "development" && componentTagger(), tailwind()].filter(Boolean),
   resolve: {
     alias: {

@@ -564,14 +564,18 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       listForFolder: FunctionReference<
         "query",
         "internal",
-        { cursor: number; folderPath: string; limit?: number },
+        {
+          cursor: { createdAt: number; id: string };
+          folderPath: string;
+          limit?: number;
+        },
         any,
         Name
       >;
       listSince: FunctionReference<
         "query",
         "internal",
-        { cursor: number; limit?: number },
+        { cursor: { createdAt: number; id: string }; limit?: number },
         any,
         Name
       >;

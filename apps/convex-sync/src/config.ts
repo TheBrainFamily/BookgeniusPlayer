@@ -6,6 +6,7 @@ import { existsSync, readFileSync, mkdirSync } from "fs";
 import { homedir } from "os";
 import { join, resolve } from "path";
 import type { Config, SyncState } from "./types";
+import { INITIAL_CURSOR } from "./types";
 
 // Load .env files (Bun does this automatically for `bun run` but not for compiled binaries)
 function loadEnvFiles() {
@@ -215,12 +216,17 @@ export function loadState(syncDir: string): SyncState {
   const path = getStateFile(syncDir);
   if (existsSync(path)) {
     try {
-      return JSON.parse(readFileSync(path, "utf-8"));
+      const state = JSON.parse(readFileSync(path, "utf-8")) as SyncState;
+      // Migrate legacy numeric cursor to compound cursor
+      if (typeof state.cursor === "number") {
+        return { ...state, cursor: { createdAt: state.cursor as unknown as number, id: "" } };
+      }
+      return state;
     } catch {
-      return { cursor: 0 };
+      return { cursor: INITIAL_CURSOR };
     }
   }
-  return { cursor: 0 };
+  return { cursor: INITIAL_CURSOR };
 }
 
 /** Save sync state */

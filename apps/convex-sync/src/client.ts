@@ -2,7 +2,7 @@
  * Convex HTTP client for asset management queries
  */
 
-import type { ConvexFolder, ConvexPublishedFile, ChangelogResponse } from "./types";
+import type { ConvexFolder, ConvexPublishedFile, ChangelogResponse, CompoundCursor } from "./types";
 
 export class ConvexHttpClient {
   private convexUrl: string;
@@ -60,9 +60,13 @@ export class ConvexHttpClient {
     return files.find((f) => f.basename === basename) ?? null;
   }
 
-  /** Get changelog entries since a cursor */
-  async getChangelog(cursor: number, limit = 100): Promise<ChangelogResponse> {
-    return this.query<ChangelogResponse>("cli:watchChangelog", { cursor, limit });
+  /** Get changelog entries since a cursor (flat args for backend compatibility) */
+  async getChangelog(cursor: CompoundCursor, limit = 100): Promise<ChangelogResponse> {
+    return this.query<ChangelogResponse>("cli:watchChangelog", {
+      cursorCreatedAt: cursor.createdAt,
+      cursorId: cursor.id,
+      limit,
+    });
   }
 
   /** Download file content from URL */

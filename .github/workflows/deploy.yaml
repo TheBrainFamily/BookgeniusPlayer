@@ -14,7 +14,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    environment: cloudflare
+    environment: production
     steps:
       - name: Set-up s5cmd
         uses: peak/action-setup-s5cmd@main
@@ -115,14 +115,14 @@ jobs:
       - name: Build Platform
         run: bun build:platform
         env:
-          VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
-          VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
+          VITE_AUTH_PROVIDER: ${{ secrets.VITE_AUTH_PROVIDER }}
+          VITE_PAYMENTS_PROVIDER: ${{ secrets.VITE_PAYMENTS_PROVIDER }}
           VITE_SUPPORT_EMAIL: support@bookgenius.net
           CI: true
 
@@ -132,7 +132,7 @@ jobs:
       - name: Build snapplify platform
         run: bun build:platform
         env:
-          VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
           VITE_AUTH_PROVIDER: "snapplify"
           VITE_PAYMENTS_PROVIDER: "default"
           VITE_SUPPORT_EMAIL: "support@snapplify.com"
@@ -148,14 +148,14 @@ jobs:
       - name: build bookgeniusz.pl
         run: bun build:platform
         env:
-          VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_BOOKGENIUSZ_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_BOOKGENIUSZ_SECRET_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_AUTH_PROVIDER: ${{ vars.VITE_AUTH_PROVIDER }}
-          VITE_PAYMENTS_PROVIDER: ${{ vars.VITE_PAYMENTS_PROVIDER }}
+          VITE_AUTH_PROVIDER: ${{ secrets.VITE_AUTH_PROVIDER }}
+          VITE_PAYMENTS_PROVIDER: ${{ secrets.VITE_PAYMENTS_PROVIDER }}
           VITE_SUPPORT_EMAIL: support@bookgeniusz.pl
           VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: true
@@ -166,8 +166,8 @@ jobs:
       - name: Deploy assets to S3
         env:
           ASSET_CONTEXT: ${{ env.ASSET_CONTEXT }}
-          S3_BUCKET: ${{ vars.S3_BUCKET }}
-          S3_ENDPOINT_URL: ${{ vars.S3_ENDPOINT_URL }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
           PREVIEW_KEY: ${{ secrets.PREVIEW_KEY }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

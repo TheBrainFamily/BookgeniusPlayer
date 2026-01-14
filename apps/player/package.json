@@ -1,15 +1,15 @@
 {
   "name": "@bookgenius/player",
   "version": "1.0.0",
-  "description": "BookGenius interactive audiobook player - embeddable React component",
+  "description": "BookGenius interactive ebook reader - embeddable React component",
   "keywords": [
-    "audiobook",
-    "player",
-    "react",
-    "interactive"
+    "interactive-book",
+    "ebook",
+    "reader",
+    "react"
   ],
-  "license": "UNLICENSED",
-  "author": "BookGenius",
+  "license": "MIT",
+  "author": "Lukasz Gandecki <lgandecki@thebrain.pro>",
   "type": "module",
   "main": "./dist-lib/index.js",
   "module": "./dist-lib/index.js",

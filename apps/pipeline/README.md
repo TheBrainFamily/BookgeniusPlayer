@@ -10,7 +10,7 @@ cd <repository-directory>
 2. **Install dependencies:**
 
 ```bash
-pnpm install
+bun install
 ```
 
 4. **Scripts and tools:**
@@ -33,7 +33,7 @@ Example:
 1.  Download **fb2** – it's a CLI tool that creates the necessary folders and more.
 
     ```bash
-    pnpm run generate-new-book
+    bun run generate-new-book
     ```
 
     alternatively you can run
@@ -114,7 +114,7 @@ Example:
 2. Once its moved, you can run the frontend:
 
    ```bash
-   pnpm start public_books/Krolowa-Sniegu
+   bun start public_books/Krolowa-Sniegu
    ```
 
 ## Generating rich.xml from chapters.xml from frontend repo

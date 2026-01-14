@@ -13,7 +13,7 @@ describe("changelog: real-time sync", () => {
       await t.mutation(api.assetManager.createFolderByPath, { path: "test-folder" });
 
       // Check changelog entry was created
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
+      const changes = await t.query(api.changelog.listSince, { cursor: { createdAt: 0, id: "" } });
       expect(changes.changes).toHaveLength(1);
       expect(changes.changes[0].changeType).toBe("folder:create");
       expect(changes.changes[0].folderPath).toBe("test-folder");
@@ -27,7 +27,7 @@ describe("changelog: real-time sync", () => {
         name: "Test Folder",
       });
 
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
+      const changes = await t.query(api.changelog.listSince, { cursor: { createdAt: 0, id: "" } });
       expect(changes.changes).toHaveLength(1);
       expect(changes.changes[0].changeType).toBe("folder:create");
       expect(changes.changes[0].folderPath).toBe("test-folder"); // slugified
@@ -43,7 +43,7 @@ describe("changelog: real-time sync", () => {
 
       await t.mutation(api.assetManager.updateFolder, { path: "my-folder", name: "Updated Name" });
 
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
+      const changes = await t.query(api.changelog.listSince, { cursor: { createdAt: 0, id: "" } });
       expect(changes.changes).toHaveLength(2);
       expect(changes.changes[0].changeType).toBe("folder:create");
       expect(changes.changes[1].changeType).toBe("folder:update");
@@ -59,21 +59,28 @@ describe("changelog: real-time sync", () => {
       await t.mutation(api.assetManager.createFolderByPath, { path: "folder1" });
 
       // Get all changes and verify we have one
-      const allChanges = await t.query(api.changelog.listSince, { cursor: 0 });
+      const allChanges = await t.query(api.changelog.listSince, {
+        cursor: { createdAt: 0, id: "" },
+      });
       expect(allChanges.changes).toHaveLength(1);
 
-      // Use a cursor of 0 to get all, then verify cursor advances
-      expect(allChanges.nextCursor).toBeGreaterThan(0);
+      // Verify cursor is now a compound cursor with createdAt > 0
+      expect(typeof allChanges.nextCursor).toBe("object");
+      expect((allChanges.nextCursor as { createdAt: number }).createdAt).toBeGreaterThan(0);
 
       // Create second folder
       await t.mutation(api.assetManager.createFolderByPath, { path: "folder2" });
 
       // Query all changes - should have 2 now
-      const allChangesAfter = await t.query(api.changelog.listSince, { cursor: 0 });
+      const allChangesAfter = await t.query(api.changelog.listSince, {
+        cursor: { createdAt: 0, id: "" },
+      });
       expect(allChangesAfter.changes).toHaveLength(2);
 
-      // Verify the cursor advances with each change
-      expect(allChangesAfter.nextCursor).toBeGreaterThanOrEqual(allChanges.nextCursor);
+      // Verify the cursor advances with each change (compare createdAt values)
+      const firstCursor = allChanges.nextCursor as { createdAt: number; id: string };
+      const secondCursor = allChangesAfter.nextCursor as { createdAt: number; id: string };
+      expect(secondCursor.createdAt).toBeGreaterThanOrEqual(firstCursor.createdAt);
     });
 
     it("listForFolder returns changes for specific folder only", async () => {
@@ -84,14 +91,14 @@ describe("changelog: real-time sync", () => {
 
       const changesA = await t.query(api.changelog.listForFolder, {
         folderPath: "folder-a",
-        cursor: 0,
+        cursor: { createdAt: 0, id: "" },
       });
       expect(changesA.changes).toHaveLength(1);
       expect(changesA.changes[0].folderPath).toBe("folder-a");
 
       const changesB = await t.query(api.changelog.listForFolder, {
         folderPath: "folder-b",
-        cursor: 0,
+        cursor: { createdAt: 0, id: "" },
       });
       expect(changesB.changes).toHaveLength(1);
       expect(changesB.changes[0].folderPath).toBe("folder-b");
@@ -105,7 +112,10 @@ describe("changelog: real-time sync", () => {
       await t.mutation(api.assetManager.createFolderByPath, { path: "f2" });
       await t.mutation(api.assetManager.createFolderByPath, { path: "f3" });
 
-      const changes = await t.query(api.changelog.listSince, { cursor: 0, limit: 2 });
+      const changes = await t.query(api.changelog.listSince, {
+        cursor: { createdAt: 0, id: "" },
+        limit: 2,
+      });
       expect(changes.changes).toHaveLength(2);
     });
   });
@@ -127,7 +137,7 @@ describe("changelog: real-time sync", () => {
         toFolderPath: "dest",
       });
 
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
+      const changes = await t.query(api.changelog.listSince, { cursor: { createdAt: 0, id: "" } });
       const moveChange = changes.changes.find((c) => c.changeType === "asset:move");
       expect(moveChange).toBeDefined();
       expect(moveChange?.folderPath).toBe("dest");
@@ -151,7 +161,7 @@ describe("changelog: real-time sync", () => {
         newBasename: "new-name.txt",
       });
 
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
+      const changes = await t.query(api.changelog.listSince, { cursor: { createdAt: 0, id: "" } });
       const renameChange = changes.changes.find((c) => c.changeType === "asset:rename");
       expect(renameChange).toBeDefined();
       expect(renameChange?.folderPath).toBe("docs");
@@ -174,7 +184,7 @@ describe("changelog: real-time sync", () => {
         storageId,
       });
 
-      const changes = await t.query(api.changelog.listSince, { cursor: 0 });
+      const changes = await t.query(api.changelog.listSince, { cursor: { createdAt: 0, id: "" } });
       const publishChange = changes.changes.find((c) => c.changeType === "asset:publish");
       expect(publishChange).toBeDefined();
       expect(publishChange?.folderPath).toBe("images");

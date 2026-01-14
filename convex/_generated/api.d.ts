@@ -621,13 +621,17 @@ export declare const components: {
       listForFolder: FunctionReference<
         "query",
         "internal",
-        { cursor: number; folderPath: string; limit?: number },
+        {
+          cursor: { createdAt: number; id: string };
+          folderPath: string;
+          limit?: number;
+        },
         any
       >;
       listSince: FunctionReference<
         "query",
         "internal",
-        { cursor: number; limit?: number },
+        { cursor: { createdAt: number; id: string }; limit?: number },
         any
       >;
     };
