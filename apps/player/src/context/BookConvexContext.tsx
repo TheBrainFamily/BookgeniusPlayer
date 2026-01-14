@@ -1,11 +1,8 @@
 /**
- * BookConvexContext - Convex-based book data provider (HTML Source format only)
+ * BookConvexContext - Convex-based book data provider
  *
  * This context provides all book data from Convex with reactive updates.
  * It loads pre-compiled HTML from chapters-source/ folder.
- *
- * Books must be migrated to HTML source format before they can be loaded.
- * Run: bun apps/bookgenius-cms/scripts/migrate-book-to-html.ts <book-slug>
  */
 
 import React, {
@@ -753,14 +750,8 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     if (htmlSourceChaptersQuery === undefined) return;
 
     if (htmlSourceChaptersQuery === null || htmlSourceChaptersQuery.length === 0) {
-      console.error("[BookConvex] No HTML source chapters found - book needs migration");
-      console.error(
-        "[BookConvex] Run: bun apps/bookgenius-cms/scripts/migrate-book-to-html.ts",
-        bookSlug,
-      );
-      setError(
-        `Book "${bookSlug}" has not been migrated to HTML source format. Run the migration script.`,
-      );
+      console.error("[BookConvex] No HTML source chapters found for book:", bookSlug);
+      setError(`Book "${bookSlug}" has no chapters available.`);
       return;
     }
 

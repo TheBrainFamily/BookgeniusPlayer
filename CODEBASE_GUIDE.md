@@ -49,12 +49,10 @@ Interactive book reader application built with React + Vite.
 
 ### Services
 
-| File                                      | Description                                                                                                                    |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `src/services/live/xmlProcessor.ts`       | **XML to HTML conversion** - transforms chapter XML to player HTML, handles play/prose formats, adds `.play-container` wrapper |
-| `src/services/live/characterExtractor.ts` | Extracts character metadata from XML                                                                                           |
-| `src/services/chapterRenderer.ts`         | Renders individual chapters to DOM                                                                                             |
-| `src/services/ScrollCoordinator.ts`       | Coordinates scroll behavior                                                                                                    |
+| File                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| `src/services/chapterRenderer.ts`   | Renders individual chapters to DOM |
+| `src/services/ScrollCoordinator.ts` | Coordinates scroll behavior        |
 
 ### Hooks
 
@@ -151,14 +149,6 @@ Next.js admin panel for content management.
 | `admin/components/dialogs/CreateChapterDialog.tsx`   | New chapter dialog   |
 | `admin/components/dialogs/CreateCharacterDialog.tsx` | New character dialog |
 
-### Scripts
-
-| File                    | Description                                                                                  |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| `scripts/importBook.ts` | **Generic book importer** - imports from legacy `books/` folder including notes and variants |
-| `scripts/import1984.ts` | Legacy 1984-specific importer                                                                |
-| `scripts/resetBooks.ts` | Reset book data                                                                              |
-
 ### Lib
 
 | File                           | Description                |
@@ -202,7 +192,7 @@ BookConvexContext
 
 - Metadata stores `form: "Play"` or `form: "Mixed"` or `form: "prose"`
 - `BookConvexContext` normalizes to lowercase in `bookData.metadata.bookForm`
-- `xmlProcessor.ts` uses original case for HTML generation (adds `.play-container`)
+- HTML source uses `.play-container` wrapper for play format
 - `useBookContent.ts` adds `play-mode` class to `#book-container`
 
 ### Notes & Variants
@@ -227,5 +217,3 @@ books/{slug}/
   ├── getBackgroundsForBook.ts
   └── getBackgroundSongsForBook.ts
 ```
-
-Import with: `bun run scripts/importBook.ts {slug}`

@@ -257,47 +257,8 @@ export const listChapters = publicQuery({
 });
 
 // =============================================================================
-// Compiled Chapter HTML Queries
+// HTML Source Chapter Queries
 // =============================================================================
-
-// =============================================================================
-// V2 Format Queries (combined HTML + occurrences)
-// =============================================================================
-
-export const listCompiledChapters = publicQuery({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const compiledPath = `${bookPath}/chapters-compiled`;
-
-    const files = await ctx.runQuery(
-      components.assetManager.assetManager.listPublishedFilesInFolder,
-      { folderPath: compiledPath },
-    );
-
-    if (files.length === 0) return null;
-
-    const metadataEntries = await ctx.db
-      .query("chapterMetadata")
-      .withIndex("by_folder", (q) => q.eq("folderPath", compiledPath))
-      .collect();
-    const metadataByBasename = new Map(metadataEntries.map((entry) => [entry.basename, entry]));
-
-    const chapters = files.map((file) => {
-      const metadata = metadataByBasename.get(file.basename);
-
-      return {
-        basename: file.basename,
-        url: file.url,
-        versionId: file.versionId as string,
-        chapterNumber: metadata?.chapterNumber ?? extractChapterNumber(file.basename),
-        title: metadata?.title,
-        paragraphCount: metadata?.paragraphCount,
-      };
-    });
-
-    return chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
-  },
-});
 
 export const listHtmlSourceChapters = publicQuery({
   args: { bookPath: v.string() },

@@ -16,8 +16,7 @@ Admin interface for managing book content, character assets, cues, and productio
 │       ├── editors/      # XML, Metadata, and Chapter content editors
 │       └── ...           # Asset management (FolderTree, AssetList)
 ├── lib/                  # Shared logic: hooks, contexts, queries, types
-├── components/ui/        # Base Radix + Tailwind components
-└── scripts/              # CLI utilities for imports and migrations
+└── components/ui/        # Base Radix + Tailwind components
 ```
 
 ## WHERE TO LOOK
@@ -38,12 +37,6 @@ Admin interface for managing book content, character assets, cues, and productio
 - **FolderTree / AssetList**: Unified explorer for Convex-managed assets.
 - **CharacterGrid / BundleView**: AI-avatar and voice sample management.
 - **CuesView**: Management of synchronized background and music assets.
-
-## SCRIPTS
-
-- `importBook.ts`: Import a new book from the filesystem into Convex.
-- `resetBooks.ts`: Wipe book-related data for development resets.
-- `migrate-book-to-html.ts`: Transform legacy XML content to HTML format.
 
 ## NOTES
 
