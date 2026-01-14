@@ -52,8 +52,8 @@ type Props = {
   minDurationMs?: number; // default 100ms
 };
 
-// Overlay states for CSS animation sequencing
-type OverlayState = "hidden" | "fading-in" | "fading-out";
+// Overlay states for proper CSS animation sequencing
+type OverlayState = "hidden" | "fading-in" | "visible" | "fading-out";
 
 export const RouteTransitionProvider: React.FC<Props> = ({ children, minDurationMs = 100 }) => {
   const [overlayState, setOverlayState] = useState<OverlayState>("hidden");
@@ -66,7 +66,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
   const location = useLocation(); // used to reset if user navigates away quickly
 
   // Derived state for context consumers
-  const navigating = overlayState === "fading-in";
+  const navigating = overlayState === "fading-in" || overlayState === "visible";
 
   const startTransition = useCallback((m: LoaderMeta) => {
     setMeta({
@@ -163,7 +163,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
         {children}
       </div>
 
-      {/* SplashScreen - fade is handled by #player-scope.visible transition */}
+      {/* SplashScreen with fadeIn for smooth appearance */}
       {meta && (
         <SplashScreen
           book={{ title: meta.title, author: meta.author, loadingPhrases: meta.phrases }}
@@ -171,6 +171,7 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
           isLoaded={overlayState === "fading-out" || overlayState === "hidden"}
           showStartButton={meta.showStartButton}
           onStartClick={meta.onStartClick}
+          fadeIn
         />
       )}
     </RouteTransitionContext.Provider>
