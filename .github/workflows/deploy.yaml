@@ -14,7 +14,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    environment: cloudflare
+    environment: production
     steps:
       - name: Set-up s5cmd
         uses: peak/action-setup-s5cmd@main
@@ -63,26 +63,6 @@ jobs:
             echo "IS_PRODUCTION=true" >> $GITHUB_ENV
             echo "DOMAIN=bookgenius.net" >> $GITHUB_ENV
           fi
-
-      - name: Detect changed books / scripts
-        id: changed
-        run: |
-          set -euo pipefail
-          BASE="${{ steps.sha.outputs.base }}"
-          HEAD="${{ steps.sha.outputs.head }}"
-
-          mapfile -t files < <(git diff --name-only "$BASE" "$HEAD" -- books/ apps/books-generator/)
-
-          echo "Checking for books-generator changes..."
-          REBUILD_ALL=0
-          if [ "$(printf '%s\n' "${files[@]}" | grep -c '^apps/books-generator/')" -gt 0 ]; then
-            echo "Rebuilding all books"
-            REBUILD_ALL=1
-          fi
-
-          mapfile -t books < <(printf '%s\n' "${files[@]}" | awk -F'/' '/^books\//{print $2}' | sort -u)
-          echo "rebuild_all=$REBUILD_ALL" >> $GITHUB_OUTPUT
-          echo "books_csv=$(IFS=, ; echo "${books[*]}")" >> $GITHUB_OUTPUT
 
       - name: Install git-lfs (skip auto smudge)
         run: |
