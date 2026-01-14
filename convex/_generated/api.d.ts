@@ -36,6 +36,7 @@ import type * as importHelpers from "../importHelpers.js";
 import type * as lib_characterDataV2 from "../lib/characterDataV2.js";
 import type * as lib_extractDominantColor from "../lib/extractDominantColor.js";
 import type * as lib_parseFormData from "../lib/parseFormData.js";
+import type * as lib_sharedTypes from "../lib/sharedTypes.js";
 import type * as metadata from "../metadata.js";
 import type * as metadataMigrations from "../metadataMigrations.js";
 import type * as musicCues from "../musicCues.js";
@@ -82,6 +83,7 @@ declare const fullApi: ApiFromModules<{
   "lib/characterDataV2": typeof lib_characterDataV2;
   "lib/extractDominantColor": typeof lib_extractDominantColor;
   "lib/parseFormData": typeof lib_parseFormData;
+  "lib/sharedTypes": typeof lib_sharedTypes;
   metadata: typeof metadata;
   metadataMigrations: typeof metadataMigrations;
   musicCues: typeof musicCues;

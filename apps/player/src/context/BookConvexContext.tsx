@@ -54,6 +54,10 @@ import type {
 import { bookIndex } from "@player/logic/BookIndex";
 import type { CharacterIndex, ChapterOccurrences } from "@convex/lib/characterDataV2";
 import { mergeV2ToCharacterData } from "@convex/lib/characterDataV2";
+import type { CharacterBundle } from "@convex/lib/sharedTypes";
+
+// Re-export for consumers that import from this file
+export type { CharacterBundle } from "@convex/lib/sharedTypes";
 
 // =============================================================================
 // Types
@@ -78,23 +82,6 @@ type HtmlSourceChapterQueryItem = {
   paragraphCount?: number;
   sourceFormat: string;
 };
-
-export interface CharacterBundle {
-  path: string;
-  slug: string;
-  name: string;
-  metadata: {
-    displayName?: string;
-    summary?: string;
-    aiPrompt?: string;
-    avatarGenerationState?: "generating" | "ready" | "error" | "none";
-    avatarProposalUrls?: string[];
-  };
-  avatar?: { url: string; versionId: string; contentType?: string };
-  avatarLarge?: { url: string; versionId: string; contentType?: string };
-  speaks?: { url: string; versionId: string; contentType?: string };
-  listens?: { url: string; versionId: string; contentType?: string };
-}
 
 export interface BackgroundInfo {
   path: string;

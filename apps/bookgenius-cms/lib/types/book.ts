@@ -8,6 +8,13 @@
  * - backgroundCues / musicCues (cue positions)
  */
 
+// Re-export shared types from canonical location
+export {
+  type AssetInfo,
+  type CharacterBundle,
+  type CharacterMetadata,
+} from "@convex/lib/sharedTypes";
+
 // =============================================================================
 // Metadata Types
 // =============================================================================
@@ -21,14 +28,6 @@ export interface BookMetadata {
   backgroundStyle?: string;
   periodStyle?: string;
   avatarStyle?: string;
-}
-
-export interface CharacterMetadata {
-  displayName: string;
-  summary: string;
-  aiPrompt?: string;
-  avatarGenerationState?: "generating" | "ready" | "error" | "none";
-  avatarProposalUrls?: string[];
 }
 
 export interface ChapterMetadata {
@@ -54,15 +53,6 @@ export interface MusicCueMetadata {
 // =============================================================================
 // Derived Types (for UI components)
 // =============================================================================
-
-export interface CharacterBundle {
-  path: string; // Full path to character folder, e.g., "books/1984/characters/winston"
-  slug: string; // Character slug, e.g., "winston"
-  metadata: CharacterMetadata;
-  avatar?: { url: string; versionId: string };
-  speaks?: { url: string; versionId: string };
-  listens?: { url: string; versionId: string };
-}
 
 export interface ChapterInfo {
   path: string; // Full path to chapter asset

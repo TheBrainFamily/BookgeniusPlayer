@@ -16,27 +16,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@convex/_generated/api";
-import type { CharacterMetadata } from "../types/book";
+import type { CharacterBundle } from "@convex/lib/sharedTypes";
 
-// =============================================================================
-// Types
-// =============================================================================
-
-interface AssetInfo {
-  url: string;
-  versionId: string;
-  contentType?: string;
-}
-
-export interface CharacterBundle {
-  path: string;
-  slug: string;
-  name: string;
-  metadata: CharacterMetadata;
-  avatar?: AssetInfo;
-  speaks?: AssetInfo;
-  listens?: AssetInfo;
-}
+// Re-export for consumers that import from this file
+export type { CharacterBundle } from "@convex/lib/sharedTypes";
 
 interface UseCharacterBundleResult {
   bundle: CharacterBundle | null | undefined;
