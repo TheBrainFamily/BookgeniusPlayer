@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { ANSWERS_SERVER_URL } from "@player/lib/consts";
 
@@ -7,7 +7,6 @@ const HEARTBEAT_INTERVAL_MS = 30_000;
 export function useEmbeddingsHeartbeat() {
   const { bookData } = useBookConvex();
   const bookSlug = bookData?.slug;
-  const sentInitial = useRef(false);
 
   useEffect(() => {
     if (!bookSlug) return;
@@ -19,10 +18,8 @@ export function useEmbeddingsHeartbeat() {
       } catch {}
     };
 
-    if (!sentInitial.current) {
-      sendHeartbeat();
-      sentInitial.current = true;
-    }
+    // Send immediately when bookSlug changes, then continue on interval
+    sendHeartbeat();
 
     const interval = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
     return () => clearInterval(interval);
