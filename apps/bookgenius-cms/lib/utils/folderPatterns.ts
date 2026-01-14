@@ -5,8 +5,6 @@
  * Used by UI components to render appropriate views (book dashboard, character grid, etc.)
  */
 
-import { type CharacterAssetType, getCharacterAssetType } from "../types/book";
-
 // =============================================================================
 // Folder Type Detection
 // =============================================================================
@@ -116,58 +114,6 @@ export function parseCharacterPath(path: string): ParsedCharacterPath | null {
 export function getBookPathFromAny(path: string): string | null {
   const parsed = parseBookPath(path);
   return parsed?.bookPath ?? null;
-}
-
-// =============================================================================
-// Character Bundle Detection
-// =============================================================================
-
-export interface CharacterBundleCheck {
-  hasAvatar: boolean;
-  hasSpeaks: boolean;
-  hasListens: boolean;
-  isComplete: boolean;
-  missing: CharacterAssetType[];
-}
-
-/**
- * Check if a folder contains a complete character bundle.
- *
- * A complete character bundle has:
- * - avatar.{png|jpg|jpeg|webp}
- * - speaks.{mp4|webm|mov}
- * - listens.{mp4|webm|mov}
- */
-export function checkCharacterBundle(assetBasenames: string[]): CharacterBundleCheck {
-  const found = { avatar: false, speaks: false, listens: false };
-
-  for (const basename of assetBasenames) {
-    const type = getCharacterAssetType(basename);
-    if (type) {
-      found[type] = true;
-    }
-  }
-
-  const missing: CharacterAssetType[] = [];
-  if (!found.avatar) missing.push("avatar");
-  if (!found.speaks) missing.push("speaks");
-  if (!found.listens) missing.push("listens");
-
-  return {
-    hasAvatar: found.avatar,
-    hasSpeaks: found.speaks,
-    hasListens: found.listens,
-    isComplete: missing.length === 0,
-    missing,
-  };
-}
-
-/**
- * Quick check if a list of basenames looks like a character bundle.
- * Requires at least avatar to be present.
- */
-export function isCharacterBundleLike(assetBasenames: string[]): boolean {
-  return assetBasenames.some((name) => getCharacterAssetType(name) === "avatar");
 }
 
 // =============================================================================
