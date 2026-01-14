@@ -283,7 +283,40 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   const audiobookTracksQuery = useQuery(api.bookQueries.listAudiobookTracks, { bookPath });
   const cutScenesQuery = useQuery(api.bookQueries.listCutScenes, { bookPath });
   const notesQuery = useQuery(api.bookQueries.listNotes, { bookPath });
-  const variantsQuery = useQuery(api.bookQueries.listVariants, { bookPath });
+
+  // Variants use manual pagination to handle books with >8192 variants (Convex array limit)
+  // We accumulate results across pages in state
+  const [variantsCursor, setVariantsCursor] = useState<string | undefined>(undefined);
+  const [accumulatedVariants, setAccumulatedVariants] = useState<Variant[]>([]);
+
+  // Query for current page of variants
+  const variantsPage = useQuery(api.bookQueries.listVariants, { bookPath, cursor: variantsCursor });
+
+  // Accumulate variants as pages load
+  useEffect(() => {
+    if (!variantsPage) return;
+
+    // Add new items to accumulated list
+    setAccumulatedVariants((prev) => {
+      // If cursor is undefined, this is the first page - replace entirely
+      if (!variantsCursor) {
+        return variantsPage.items;
+      }
+      // Otherwise append new items
+      return [...prev, ...variantsPage.items];
+    });
+
+    // Continue pagination if more pages available
+    if (!variantsPage.isDone) {
+      setVariantsCursor(variantsPage.cursor);
+    }
+  }, [variantsPage, variantsCursor]);
+
+  // Reset variants state when book changes
+  useEffect(() => {
+    setVariantsCursor(undefined);
+    setAccumulatedVariants([]);
+  }, [bookPath]);
 
   const getTextContent = useAction(api.cli.getTextContent);
 
@@ -857,7 +890,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       audiobookTracks: audiobookTracksQuery ?? [],
       cutScenes: cutScenesQuery ?? [],
       notes: notesQuery ?? [],
-      variants: variantsQuery ?? [],
+      variants: accumulatedVariants,
       bookStringified,
       chaptersData,
       charactersData,
@@ -887,7 +920,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       audiobookTracksQuery,
       cutScenesQuery,
       notesQuery,
-      variantsQuery,
+      accumulatedVariants,
       bookStringified,
       chaptersData,
       charactersData,
@@ -927,7 +960,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       knownVideoFiles,
       textVersion,
       notes: notesQuery ?? [],
-      variants: variantsQuery ?? [],
+      variants: accumulatedVariants,
       cutScenes: cutScenesQuery ?? [],
       audiobookTracks: audiobookTracksQuery ?? [],
     });
@@ -952,7 +985,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
     knownVideoFiles,
     textVersion,
     notesQuery,
-    variantsQuery,
+    accumulatedVariants,
     cutScenesQuery,
     audiobookTracksQuery,
   ]);

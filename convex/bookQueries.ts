@@ -703,18 +703,29 @@ export const listNotes = publicQuery({
 });
 
 /**
- * List text variants for a book.
- * Returns all sentence simplifications for the specified book.
+ * List text variants for a book with pagination.
+ * Returns sentence simplifications in chunks to avoid Convex's 8192 array limit.
+ *
+ * @param bookPath - The book path to query
+ * @param cursor - Optional cursor for pagination (pass the cursor from previous response)
+ * @param limit - Number of items per page (default: 6000, safe margin below 8192 limit)
+ * @returns { items, cursor, isDone } - items array, cursor for next page, isDone flag
  */
 export const listVariants = publicQuery({
-  args: { bookPath: v.string() },
-  handler: async (ctx, { bookPath }) => {
-    const variants = await ctx.db
-      .query("variants")
-      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
-      .collect();
+  args: { bookPath: v.string(), cursor: v.optional(v.string()), limit: v.optional(v.number()) },
+  handler: async (ctx, { bookPath, cursor, limit = 6000 }) => {
+    const query = ctx.db.query("variants").withIndex("by_book", (q) => q.eq("bookPath", bookPath));
 
-    return variants.map((v) => ({ id: v.variantId, simplifications: v.simplifications }));
+    const paginatedResult = await query.paginate({ cursor: cursor ?? null, numItems: limit });
+
+    return {
+      items: paginatedResult.page.map((v) => ({
+        id: v.variantId,
+        simplifications: v.simplifications,
+      })),
+      cursor: paginatedResult.continueCursor,
+      isDone: paginatedResult.isDone,
+    };
   },
 });
 
