@@ -813,6 +813,7 @@ const BottomInput: React.FC<BottomInputProps> = ({ className }) => {
       <OptionalElement
         className={cn("w-full flex justify-center", className)}
         id="bottom-input-container"
+        slideDirection="down"
       >
         <motion.div
           className={cn(

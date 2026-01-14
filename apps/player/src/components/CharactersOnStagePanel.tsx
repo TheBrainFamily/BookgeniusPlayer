@@ -72,12 +72,17 @@ const CharactersOnStagePanel = () => {
 
   const shouldHideAvatars = isNarrowScreen && isOverlayEffectivelyVisible;
 
+  // Calculate slide offset: when overlay is hidden on desktop, panel slides down to fill the gap
+  // On mobile, no slide needed since panel and input are mutually exclusive
+  const slideOffset = !isNarrowScreen && !isOverlayVisible ? "calc(25% + 0.5rem)" : "0";
+
   return (
     <div
       className={cn(
-        "characters-on-stage-panel w-full flex justify-center items-center max-w-full absolute bottom-2 lg:bottom-14 m-0 pointer-events-none",
+        "characters-on-stage-panel w-full flex justify-center items-center max-w-full absolute bottom-2 lg:bottom-14 m-0 pointer-events-none transition-transform duration-300 ease-out",
         shouldHideAvatars ? "opacity-0" : "opacity-100",
       )}
+      style={{ transform: `translateY(${slideOffset})` }}
     >
       <div className="relative w-full h-full overflow-x-auto no-scrollbar">
         <div
