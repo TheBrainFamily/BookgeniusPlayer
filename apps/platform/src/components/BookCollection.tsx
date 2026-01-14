@@ -20,7 +20,13 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
   const language = useMemo(() => detectLanguageFromDomain(), []);
 
   const filteredBooks = useMemo(() => {
-    const availableBooks = getBooksByCurrentLanguage(books);
+    let availableBooks = getBooksByCurrentLanguage(books);
+
+    // Hide Polish 1984 - it's already in featured section
+    if (language === "pl") {
+      availableBooks = availableBooks.filter((book) => book.slug !== "1984");
+    }
+
     if (!searchQuery.trim()) return availableBooks;
 
     const query = searchQuery.toLowerCase();
@@ -93,25 +99,32 @@ const BookCollection = ({ searchQuery = "" }: BookCollectionProps) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 px-4 md:px-0">
-            {filteredBooks
-              .map((book) => (
-                <BookCard
-                  key={book.id}
-                  book={book}
-                  variant="default"
-                  showLanguageFlag
-                  onClick={handleBookClick}
-                />
-              ))
+            {[...filteredBooks]
               .sort((a, b) => {
-                const aPref = a.props.book.language === language ? 0 : 1;
-                const bPref = b.props.book.language === language ? 0 : 1;
+                const aPref = a.language === language ? 0 : 1;
+                const bPref = b.language === language ? 0 : 1;
                 if (aPref !== bPref) return aPref - bPref;
                 // Keep original order when preference is the same
-                const aIdx = originalOrder.get(a.props.book.id) ?? 0;
-                const bIdx = originalOrder.get(b.props.book.id) ?? 0;
+                const aIdx = originalOrder.get(a.id) ?? 0;
+                const bIdx = originalOrder.get(b.id) ?? 0;
                 return aIdx - bIdx;
-              })}
+              })
+              .map((book) => (
+                <div
+                  key={book.id}
+                  // Hide English 1984 at xl (4 columns) to avoid 4+4+1 layout
+                  className={
+                    book.slug === "1984-English" && language === "en" ? "xl:hidden" : undefined
+                  }
+                >
+                  <BookCard
+                    book={book}
+                    variant="default"
+                    showLanguageFlag
+                    onClick={handleBookClick}
+                  />
+                </div>
+              ))}
           </div>
         )}
       </div>

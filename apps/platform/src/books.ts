@@ -2,45 +2,6 @@ import type { Book } from "@platform/utils/types.ts";
 
 export const books: Book[] = [
   {
-    id: 2,
-    title: "1984",
-    slug: "1984-English",
-    author: "George Orwell",
-    metadata: {
-      en: {
-        genre: "Dystopian",
-        description:
-          "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
-        features: ["English Audio", "Sound Effects", "Animation"],
-        phrases: [
-          "Installing telescreens...",
-          "Configuring thoughtcrime detection...",
-          "Erasing the past...",
-          "Activating thought police...",
-        ],
-      },
-      pl: {
-        genre: "Dystopia",
-        description:
-          "Wejdź w totalitarny świat Wielkiego Brata dzięki sugestywnym wizualizacjom i niepokojącej oprawie dźwiękowej.",
-        features: ["Polski lektor", "Efekty dźwiękowe", "Animacja"],
-        phrases: [
-          "Instalowanie teleekranów...",
-          "Konfigurowanie systemu wykrywania myślozbrodni...",
-          "Wymazywanie przeszłości...",
-          "Aktywacja policji myśli...",
-        ],
-      },
-    },
-    year: "1949",
-    rating: 4.9,
-    video: "/1984-english.v1.mp4",
-    poster: "/1984-english.v1.webp",
-    readTime: 720,
-    language: "en",
-    type: "novel",
-  },
-  {
     id: 3,
     title: "Alice in Wonderland",
     slug: "Alice-Wonderland",
@@ -431,55 +392,6 @@ export const books: Book[] = [
     type: "play",
   },
   {
-    id: 1,
-    title: "1984",
-    slug: "1984",
-    author: "George Orwell",
-    metadata: {
-      en: {
-        genre: "Dystopian",
-        description:
-          "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
-        features: ["Voice Acting", "Ambient Sound", "Animation"],
-        phrases: [
-          "Big Brother is watching...",
-          "Rewriting history...",
-          "Monitoring your thoughts...",
-          "Increasing chocolate rations...",
-          "Preparing Room 101...",
-          "Adjusting reality...",
-          "Fighting thoughtcrime...",
-        ],
-      },
-      pl: {
-        genre: "Dystopia",
-        description:
-          "Wejdź w totalitarny świat Wielkiego Brata z sugestywnymi wizualizacjami i niepokojącą oprawą dźwiękową.",
-        features: ["Aktorstwo głosowe", "Dźwięki otoczenia", "Animacja"],
-        phrases: [
-          "Wielki Brat patrzy...",
-          "Przepisywanie historii...",
-          "Monitorowanie twoich myśli...",
-          "Zwiększanie racji czekolady...",
-          "Przygotowywanie Pokoju 101...",
-          "Dostosowywanie rzeczywistości...",
-          "Walka z myślozbrodnią...",
-          "Instalowanie teleekranów...",
-          "Konfigurowanie systemu wykrywania myślozbrodni...",
-          "Wymazywanie przeszłości...",
-          "Aktywacja policji myśli...",
-        ],
-      },
-    },
-    year: "1949",
-    rating: 4.9,
-    video: "/1984.v1.mp4",
-    poster: "/1984.v1.webp",
-    readTime: 720,
-    language: "pl",
-    type: "novel",
-  },
-  {
     id: 5,
     title: "Królowa Śniegu",
     slug: "Krolowa-Sniegu",
@@ -595,6 +507,94 @@ export const books: Book[] = [
     video: "/conrad-secret-agent.v1.mp4",
     poster: "/conrad-secret-agent.v1.webp",
     readTime: 600,
+    language: "en",
+    type: "novel",
+  },
+  {
+    id: 1,
+    title: "1984",
+    slug: "1984",
+    author: "George Orwell",
+    metadata: {
+      en: {
+        genre: "Dystopian",
+        description:
+          "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
+        features: ["Voice Acting", "Ambient Sound", "Animation"],
+        phrases: [
+          "Big Brother is watching...",
+          "Rewriting history...",
+          "Monitoring your thoughts...",
+          "Increasing chocolate rations...",
+          "Preparing Room 101...",
+          "Adjusting reality...",
+          "Fighting thoughtcrime...",
+        ],
+      },
+      pl: {
+        genre: "Dystopia",
+        description:
+          "Wejdź w totalitarny świat Wielkiego Brata z sugestywnymi wizualizacjami i niepokojącą oprawą dźwiękową.",
+        features: ["Aktorstwo głosowe", "Dźwięki otoczenia", "Animacja"],
+        phrases: [
+          "Wielki Brat patrzy...",
+          "Przepisywanie historii...",
+          "Monitorowanie twoich myśli...",
+          "Zwiększanie racji czekolady...",
+          "Przygotowywanie Pokoju 101...",
+          "Dostosowywanie rzeczywistości...",
+          "Walka z myślozbrodnią...",
+          "Instalowanie teleekranów...",
+          "Konfigurowanie systemu wykrywania myślozbrodni...",
+          "Wymazywanie przeszłości...",
+          "Aktywacja policji myśli...",
+        ],
+      },
+    },
+    year: "1949",
+    rating: 4.9,
+    video: "/1984.v1.mp4",
+    poster: "/1984.v1.webp",
+    readTime: 720,
+    language: "pl",
+    type: "novel",
+  },
+  {
+    id: 2,
+    title: "1984",
+    slug: "1984-English",
+    author: "George Orwell",
+    metadata: {
+      en: {
+        genre: "Dystopian",
+        description:
+          "Enter the totalitarian world of Big Brother with immersive visuals and haunting soundscape.",
+        features: ["English Audio", "Sound Effects", "Animation"],
+        phrases: [
+          "Installing telescreens...",
+          "Configuring thoughtcrime detection...",
+          "Erasing the past...",
+          "Activating thought police...",
+        ],
+      },
+      pl: {
+        genre: "Dystopia",
+        description:
+          "Wejdź w totalitarny świat Wielkiego Brata dzięki sugestywnym wizualizacjom i niepokojącej oprawie dźwiękowej.",
+        features: ["Polski lektor", "Efekty dźwiękowe", "Animacja"],
+        phrases: [
+          "Instalowanie teleekranów...",
+          "Konfigurowanie systemu wykrywania myślozbrodni...",
+          "Wymazywanie przeszłości...",
+          "Aktywacja policji myśli...",
+        ],
+      },
+    },
+    year: "1949",
+    rating: 4.9,
+    video: "/1984-english.v1.mp4",
+    poster: "/1984-english.v1.webp",
+    readTime: 720,
     language: "en",
     type: "novel",
   },

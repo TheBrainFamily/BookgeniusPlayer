@@ -21,12 +21,12 @@
   },
   "featured": {
     "featuredMasterpieces": "Featured Masterpieces",
-    "description": "Experience two legendary works of literature like never before. Each story features cinematic visuals, professional voice acting, and immersive soundscapes that transform reading into a complete sensory journey."
+    "description": "Experience two legendary works of literature like never before. Each story features cinematic visuals and immersive soundscapes that transform reading into a complete sensory journey."
   },
   "collection": {
     "ourCollection": "Our Collection",
     "searchResults": "Search Results",
-    "description": "Each visual novel is a complete production featuring professional voice acting, animated scenes, and immersive soundtracks that bring literature to life.",
+    "description": "Each visual novel is a complete production featuring animated scenes and immersive soundtracks that bring literature to life.",
     "searchResultsFor": "Showing results for",
     "noResults": "No books found matching",
     "noResultsHint": "Try searching for a different title, author, or genre"

@@ -9,11 +9,14 @@ import {
 interface OptionalElementProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
+  /** When set, element will slide in the specified direction when hiding */
+  slideDirection?: "up" | "down" | "none";
 }
 
 export const OptionalElement: React.FC<OptionalElementProps> = ({
   children,
   className,
+  slideDirection = "none",
   ...props
 }) => {
   const pauseAllTimers = useElementVisibilityStore((state) => state.pauseAllTimers);
@@ -51,6 +54,12 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
     }
   }, [isDesktop, isHovered, startAllTimers]);
 
+  // Helper to get transform value based on visibility and slide direction
+  const getTransformValue = (visible: boolean) => {
+    if (visible || slideDirection === "none") return "translateY(0)";
+    return slideDirection === "down" ? "translateY(100%)" : "translateY(-100%)";
+  };
+
   // Determine if element should be visible
   useEffect(() => {
     const element = elementRef.current;
@@ -60,6 +69,10 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
     const isBecomingVisible = currentlyVisible && !previousVisibilityRef.current;
     const isBecomingHidden = !currentlyVisible && previousVisibilityRef.current;
 
+    const hasSlide = slideDirection !== "none";
+    const transformTransition = hasSlide ? ", transform 0.3s ease-out" : "";
+    const transformTransitionSlow = hasSlide ? ", transform 0.6s ease-out" : "";
+
     // Reset animation when hover state changes OR when becoming visible
     if (isBecomingVisible || (isHovered && !previousVisibilityRef.current)) {
       // Reset transition first to interrupt any ongoing animation
@@ -67,21 +80,24 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
       // Force reflow to apply the reset
       void element.offsetHeight;
       // Now set the fast transition for showing
-      element.style.transition = `opacity 0.3s ease-in-out`;
+      element.style.transition = `opacity 0.3s ease-in-out${transformTransition}`;
     } else if (isBecomingHidden) {
       // Different transition durations based on hide reason
       if (lastHideReason === "inactivity" && !isHovered) {
-        element.style.transition = `opacity 4s ease-in-out`;
+        element.style.transition = `opacity 4s ease-in-out${transformTransitionSlow}`;
       } else {
         // Fast hiding for tap or other reasons, or when hover ends
-        element.style.transition = `opacity 0.3s ease-in-out`;
+        element.style.transition = `opacity 0.3s ease-in-out${transformTransition}`;
       }
     }
 
     element.style.opacity = currentlyVisible ? "1" : "0";
+    if (hasSlide) {
+      element.style.transform = getTransformValue(currentlyVisible);
+    }
 
     previousVisibilityRef.current = currentlyVisible;
-  }, [shouldBeVisible, lastHideReason, isHovered]);
+  }, [shouldBeVisible, lastHideReason, isHovered, slideDirection]);
 
   const handleMouseEnter = () => {
     // Only enable hover effects on desktop-width screens
@@ -114,6 +130,8 @@ export const OptionalElement: React.FC<OptionalElementProps> = ({
       style={{
         // Set initial opacity - useEffect may not run if ref is null on mount
         opacity: isElementVisible ? 1 : 0,
+        // Set initial transform for slide effect
+        transform: getTransformValue(isElementVisible),
         // Always allow pointer events on desktop, and on mobile only disable when truly hidden
         pointerEvents: isDesktop ? "auto" : shouldBeVisible || isHovered ? "auto" : "none",
       }}
