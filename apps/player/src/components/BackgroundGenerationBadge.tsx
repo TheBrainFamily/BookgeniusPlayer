@@ -136,6 +136,8 @@ const BackgroundOptionsModal: React.FC<BackgroundOptionsModalProps> = ({ bg, bgK
     } catch (err) {
       console.error("Failed to regenerate background:", err);
       completeGeneration(newKey);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
