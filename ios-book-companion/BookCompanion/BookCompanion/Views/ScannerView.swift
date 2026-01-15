@@ -7,22 +7,33 @@
 
 import SwiftUI
 import UIKit
+import AVFoundation
 
 /// Main view for the page scanning interface
 struct ScannerView: View {
 
     @StateObject private var viewModel = ScannerViewModel()
+    @State private var previewLayer: AVCaptureVideoPreviewLayer?
 
     var body: some View {
         ZStack {
             // Camera preview
-            CameraPreview(session: viewModel.cameraManager.captureSession)
+            CameraPreview(
+                session: viewModel.cameraManager.captureSession,
+                onPreviewLayer: { layer in
+                    if previewLayer !== layer {
+                        previewLayer = layer
+                    }
+                    viewModel.cameraManager.setPreviewLayer(layer)
+                }
+            )
                 .ignoresSafeArea()
 
             // Detection overlay
             DetectionOverlay(
-                rectangles: viewModel.detectedRectangles,
-                gateState: viewModel.gateState
+                rectangles: overlayRectangles,
+                gateState: viewModel.gateState,
+                previewLayer: previewLayer
             )
 
             // UI controls overlay
@@ -64,6 +75,16 @@ struct ScannerView: View {
             viewModel.stop()
         }
     }
+
+    private var overlayRectangles: [DetectedRectangle] {
+        if viewModel.isRectangleStable, let locked = viewModel.lockedRectangle {
+            return [locked]
+        }
+        if let smoothed = viewModel.smoothedRectangle {
+            return [smoothed]
+        }
+        return viewModel.detectedRectangles
+    }
 }
 
 // MARK: - Detection Overlay
@@ -73,11 +94,16 @@ struct DetectionOverlay: View {
 
     let rectangles: [DetectedRectangle]
     let gateState: CaptureGateState
+    let previewLayer: AVCaptureVideoPreviewLayer?
 
     var body: some View {
         GeometryReader { geometry in
             ForEach(rectangles.indices, id: \.self) { index in
-                RectanglePath(rectangle: rectangles[index], size: geometry.size)
+                RectanglePath(
+                    rectangle: rectangles[index],
+                    size: geometry.size,
+                    previewLayer: previewLayer
+                )
                     .stroke(strokeColor, lineWidth: strokeWidth)
                     .animation(.easeInOut(duration: 0.1), value: gateState)
             }
@@ -107,28 +133,15 @@ struct RectanglePath: Shape {
 
     let rectangle: DetectedRectangle
     let size: CGSize
+    let previewLayer: AVCaptureVideoPreviewLayer?
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
 
-        // Convert normalized coordinates to screen coordinates
-        // Note: Vision Y is bottom-up, SwiftUI Y is top-down
-        let topLeft = CGPoint(
-            x: rectangle.topLeft.x * size.width,
-            y: (1 - rectangle.topLeft.y) * size.height
-        )
-        let topRight = CGPoint(
-            x: rectangle.topRight.x * size.width,
-            y: (1 - rectangle.topRight.y) * size.height
-        )
-        let bottomLeft = CGPoint(
-            x: rectangle.bottomLeft.x * size.width,
-            y: (1 - rectangle.bottomLeft.y) * size.height
-        )
-        let bottomRight = CGPoint(
-            x: rectangle.bottomRight.x * size.width,
-            y: (1 - rectangle.bottomRight.y) * size.height
-        )
+        let topLeft = convert(rectangle.topLeft)
+        let topRight = convert(rectangle.topRight)
+        let bottomLeft = convert(rectangle.bottomLeft)
+        let bottomRight = convert(rectangle.bottomRight)
 
         path.move(to: topLeft)
         path.addLine(to: topRight)
@@ -137,6 +150,28 @@ struct RectanglePath: Shape {
         path.closeSubpath()
 
         return path
+    }
+
+    private func convert(_ visionPoint: CGPoint) -> CGPoint {
+        guard let previewLayer else {
+            return CGPoint(
+                x: visionPoint.x * size.width,
+                y: (1 - visionPoint.y) * size.height
+            )
+        }
+
+        // Vision: normalized, origin bottom-left. Capture device: origin top-left.
+        let devicePoint = CGPoint(x: visionPoint.x, y: 1 - visionPoint.y)
+        let layerPoint = previewLayer.layerPointConverted(fromCaptureDevicePoint: devicePoint)
+
+        let layerSize = previewLayer.bounds.size
+        guard layerSize.width > 0, layerSize.height > 0 else {
+            return layerPoint
+        }
+
+        let scaleX = size.width / layerSize.width
+        let scaleY = size.height / layerSize.height
+        return CGPoint(x: layerPoint.x * scaleX, y: layerPoint.y * scaleY)
     }
 }
 
@@ -229,6 +264,12 @@ struct StatusBar: View {
         case .noRectangle:
             return "Point at a book page"
         case .deviceMoving:
+            if !isDeviceStable {
+                return "Keep phone still..."
+            }
+            if !isRectangleStable {
+                return "Hold page steady..."
+            }
             return "Keep phone still..."
         case .blurry:
             return "Too blurry"

@@ -153,6 +153,7 @@ final class SharpnessFrameBuffer {
         let sampleBuffer: CMSampleBuffer
         let sharpnessScore: Float
         let timestamp: CMTime
+        let isEligible: Bool
     }
 
     // MARK: - Configuration
@@ -175,7 +176,8 @@ final class SharpnessFrameBuffer {
     // MARK: - Public Methods
 
     /// Add a frame to the buffer, scoring it for sharpness
-    func addFrame(_ sampleBuffer: CMSampleBuffer) {
+    func addFrame(_ sampleBuffer: CMSampleBuffer, eligible: Bool) {
+        guard eligible else { return }
         guard let score = scorer.score(sampleBuffer: sampleBuffer) else {
             return
         }
@@ -184,7 +186,8 @@ final class SharpnessFrameBuffer {
         let scored = ScoredFrame(
             sampleBuffer: sampleBuffer,
             sharpnessScore: score,
-            timestamp: timestamp
+            timestamp: timestamp,
+            isEligible: eligible
         )
 
         lock.lock()
@@ -198,24 +201,28 @@ final class SharpnessFrameBuffer {
 
     /// Get the sharpest frame currently in the buffer
     /// - Returns: The frame with highest sharpness score, or nil if buffer is empty
-    func getSharpestFrame() -> CMSampleBuffer? {
+    func getSharpestFrame(
+        eligibleOnly: Bool = false,
+        within seconds: TimeInterval? = nil
+    ) -> CMSampleBuffer? {
         lock.lock()
         defer { lock.unlock() }
 
-        return frames.max(by: { $0.sharpnessScore < $1.sharpnessScore })?.sampleBuffer
+        let filtered = filterFrames(eligibleOnly: eligibleOnly, within: seconds)
+        return filtered.max(by: { $0.sharpnessScore < $1.sharpnessScore })?.sampleBuffer
     }
 
     /// Get the current sharpness score (latest frame)
-    func currentSharpness() -> Float? {
+    func currentSharpness(eligibleOnly: Bool = false) -> Float? {
         lock.lock()
         defer { lock.unlock() }
 
-        return frames.last?.sharpnessScore
+        return filterFrames(eligibleOnly: eligibleOnly, within: nil).last?.sharpnessScore
     }
 
     /// Check if current sharpness is above minimum threshold
-    func isSharpEnough() -> Bool {
-        guard let score = currentSharpness() else {
+    func isSharpEnough(eligibleOnly: Bool = false) -> Bool {
+        guard let score = currentSharpness(eligibleOnly: eligibleOnly) else {
             print("[SharpnessBuffer] No frames in buffer")
             return false
         }
@@ -231,5 +238,22 @@ final class SharpnessFrameBuffer {
         defer { lock.unlock() }
 
         frames.removeAll()
+    }
+
+    private func filterFrames(eligibleOnly: Bool, within seconds: TimeInterval?) -> [ScoredFrame] {
+        var filtered = frames
+        if eligibleOnly {
+            filtered = filtered.filter { $0.isEligible }
+        }
+
+        if let seconds {
+            let now = filtered.last?.timestamp ?? CMTime.invalid
+            let nowSeconds = now == CMTime.invalid ? nil : CMTimeGetSeconds(now)
+            if let nowSeconds {
+                filtered = filtered.filter { abs(CMTimeGetSeconds($0.timestamp) - nowSeconds) <= seconds }
+            }
+        }
+
+        return filtered
     }
 }

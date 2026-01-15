@@ -28,6 +28,8 @@ final class ScannerViewModel: ObservableObject {
     @Published private(set) var gateState: CaptureGateState = .noRectangle
     @Published private(set) var isRectangleStable: Bool = false
     @Published private(set) var isDeviceStable: Bool = false
+    @Published private(set) var smoothedRectangle: DetectedRectangle?
+    @Published private(set) var lockedRectangle: DetectedRectangle?
 
     // MARK: - Components
 
@@ -41,6 +43,7 @@ final class ScannerViewModel: ObservableObject {
 
     private let sharpnessBuffer: SharpnessFrameBuffer
     private let dewarper: ImageDewarper
+    private let captureStore: CaptureStore
 
     // MARK: - Subscriptions
 
@@ -48,7 +51,13 @@ final class ScannerViewModel: ObservableObject {
 
     // MARK: - Captured Pages
 
-    private(set) var capturedPages: [CaptureResult] = []
+    private(set) var capturedPages: [StoredCapture] = []
+    private var nextCaptureIndex: Int = 1
+
+    // MARK: - Frame Eligibility
+
+    private let frameEligibilityLock = NSLock()
+    private var isFrameEligible: Bool = false
 
     // MARK: - Initialization
 
@@ -60,10 +69,12 @@ final class ScannerViewModel: ObservableObject {
         motionTracker = MotionTracker()
         sharpnessBuffer = SharpnessFrameBuffer(bufferSize: 8)
         dewarper = ImageDewarper()
+        captureStore = CaptureStore()
 
         // Initialize capture gate with dependencies
         captureGate = CaptureGate(
             rectangleDetector: rectangleDetector,
+            rectangleTracker: rectangleTracker,
             motionTracker: motionTracker,
             sharpnessBuffer: sharpnessBuffer,
             dewarper: dewarper
@@ -125,7 +136,9 @@ final class ScannerViewModel: ObservableObject {
         cameraManager.framePublisher
             .receive(on: DispatchQueue.global(qos: .userInteractive))
             .sink { [weak self] sampleBuffer in
-                self?.sharpnessBuffer.addFrame(sampleBuffer)
+                guard let self else { return }
+                let eligible = self.currentFrameEligibility()
+                self.sharpnessBuffer.addFrame(sampleBuffer, eligible: eligible)
             }
             .store(in: &cancellables)
 
@@ -157,6 +170,26 @@ final class ScannerViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: &$isRectangleStable)
 
+        rectangleTracker.$smoothedRectangle
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$smoothedRectangle)
+
+        rectangleTracker.$lockedRectangle
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$lockedRectangle)
+
+        // Update frame eligibility for sharpness buffering
+        Publishers.CombineLatest3(
+            rectangleDetector.$hasDetection,
+            rectangleTracker.$isStable,
+            motionTracker.$isStable
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] hasDetection, rectangleStable, deviceStable in
+            self?.setFrameEligibility(hasDetection && rectangleStable && deviceStable)
+        }
+        .store(in: &cancellables)
+
         // Forward motion tracker state
         motionTracker.$isStable
             .receive(on: DispatchQueue.main)
@@ -169,12 +202,21 @@ final class ScannerViewModel: ObservableObject {
     }
 
     private func handleCapture(_ result: CaptureResult) {
-        // Store the captured page
-        capturedPages.append(result)
-        captureCount = capturedPages.count
-
         // Show preview briefly
         lastCapturedImage = result.image
+
+        let captureIndex = nextCaptureIndex
+        nextCaptureIndex += 1
+
+        Task.detached(priority: .utility) { [weak self] in
+            guard let self else { return }
+            if let stored = await self.captureStore.save(result: result, index: captureIndex) {
+                await MainActor.run {
+                    self.capturedPages.append(stored)
+                    self.captureCount = self.capturedPages.count
+                }
+            }
+        }
 
         // Hide preview after delay
         Task {
@@ -185,5 +227,23 @@ final class ScannerViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    private func setFrameEligibility(_ value: Bool) {
+        frameEligibilityLock.lock()
+        let previous = isFrameEligible
+        isFrameEligible = value
+        frameEligibilityLock.unlock()
+
+        if previous && !value {
+            sharpnessBuffer.clear()
+        }
+    }
+
+    private func currentFrameEligibility() -> Bool {
+        frameEligibilityLock.lock()
+        let value = isFrameEligible
+        frameEligibilityLock.unlock()
+        return value
     }
 }

@@ -22,6 +22,9 @@ final class RectangleTracker: ObservableObject {
     /// The currently locked rectangle (if stable)
     @Published private(set) var lockedRectangle: DetectedRectangle?
 
+    /// Smoothed rectangle for overlay stability
+    @Published private(set) var smoothedRectangle: DetectedRectangle?
+
     /// How long the current lock has been held (for UI feedback)
     @Published private(set) var lockDuration: TimeInterval = 0
 
@@ -69,6 +72,7 @@ final class RectangleTracker: ObservableObject {
     func unlock() {
         isStable = false
         lockedRectangle = nil
+        smoothedRectangle = nil
         lockDuration = 0
         stableFrameCount = 0
         lockStartTime = nil
@@ -128,6 +132,8 @@ final class RectangleTracker: ObservableObject {
         if recentRectangles.count > requiredStableFrames {
             recentRectangles.removeFirst()
         }
+
+        updateSmoothedRectangle()
 
         // Check stability
         let stable = checkStability()
@@ -196,8 +202,36 @@ final class RectangleTracker: ObservableObject {
         stableFrameCount = 0
         isStable = false
         lockedRectangle = nil
+        smoothedRectangle = nil
         lockDuration = 0
         lockStartTime = nil
         recentRectangles.removeAll()
+    }
+
+    private func updateSmoothedRectangle() {
+        guard !recentRectangles.isEmpty else {
+            smoothedRectangle = nil
+            return
+        }
+
+        let count = CGFloat(recentRectangles.count)
+        let totalConfidence = recentRectangles.reduce(0) { $0 + $1.confidence }
+        let avgConfidence = totalConfidence / Float(recentRectangles.count)
+
+        func avg(_ keyPath: KeyPath<DetectedRectangle, CGPoint>) -> CGPoint {
+            let sum = recentRectangles.reduce(CGPoint.zero) { partial, rect in
+                let point = rect[keyPath: keyPath]
+                return CGPoint(x: partial.x + point.x, y: partial.y + point.y)
+            }
+            return CGPoint(x: sum.x / count, y: sum.y / count)
+        }
+
+        smoothedRectangle = DetectedRectangle(
+            topLeft: avg(\.topLeft),
+            topRight: avg(\.topRight),
+            bottomLeft: avg(\.bottomLeft),
+            bottomRight: avg(\.bottomRight),
+            confidence: avgConfidence
+        )
     }
 }

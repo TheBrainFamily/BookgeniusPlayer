@@ -57,6 +57,12 @@ struct DetectedRectangle: Equatable {
     }
 }
 
+/// Rectangle observation tied to a specific video frame timestamp
+struct TimedRectangle: Equatable {
+    let rectangle: DetectedRectangle
+    let timestamp: CMTime
+}
+
 /// Detects rectangles in camera frames using Vision.
 /// Publishes detected rectangles for downstream processing.
 final class RectangleDetector: ObservableObject {
@@ -72,6 +78,12 @@ final class RectangleDetector: ObservableObject {
     /// Frame count for debugging
     @MainActor @Published private(set) var frameCount: Int = 0
 
+    /// Size of the current video frame (pixels)
+    @MainActor @Published private(set) var imageSize: CGSize = .zero
+
+    /// Most recent rectangle observation with timestamp
+    @MainActor @Published private(set) var latestObservation: TimedRectangle?
+
     // MARK: - Processing Queue
 
     private let processingQueue = DispatchQueue(
@@ -82,6 +94,19 @@ final class RectangleDetector: ObservableObject {
     // MARK: - Subscriptions
 
     private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Selection State
+
+    /// Last selected rectangle for temporal consistency
+    private var lastRectangle: DetectedRectangle?
+
+    // MARK: - Tracking
+
+    private var sequenceHandler = VNSequenceRequestHandler()
+    private var trackingRequest: VNTrackRectangleRequest?
+    private var trackingFrameIndex: Int = 0
+    private let detectionRefreshInterval: Int = 12
+    private let trackingConfidenceThreshold: Float = 0.6
 
     // MARK: - Initialization
 
@@ -107,19 +132,138 @@ final class RectangleDetector: ObservableObject {
             return
         }
 
+        let width = CVPixelBufferGetWidth(pixelBuffer)
+        let height = CVPixelBufferGetHeight(pixelBuffer)
+        let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+
         // Update frame count on main actor
         Task { @MainActor in
             self.frameCount += 1
+            let newSize = CGSize(width: width, height: height)
+            if self.imageSize != newSize {
+                self.imageSize = newSize
+            }
         }
 
-        // Create a fresh request for each frame
-        let request = VNDetectRectanglesRequest { [weak self] request, error in
-            self?.handleResults(request: request, error: error)
+        trackingFrameIndex += 1
+        let shouldRefreshDetection = trackingRequest != nil && trackingFrameIndex % detectionRefreshInterval == 0
+
+        if shouldRefreshDetection {
+            if performDetection(on: pixelBuffer, timestamp: timestamp) {
+                return
+            }
+            if performTracking(on: pixelBuffer, timestamp: timestamp) {
+                return
+            }
+        } else if trackingRequest != nil {
+            if performTracking(on: pixelBuffer, timestamp: timestamp) {
+                return
+            }
+            _ = performDetection(on: pixelBuffer, timestamp: timestamp)
+        } else {
+            _ = performDetection(on: pixelBuffer, timestamp: timestamp)
         }
+    }
+
+    private func performTracking(on pixelBuffer: CVPixelBuffer, timestamp: CMTime) -> Bool {
+        guard let trackingRequest else { return false }
+
+        do {
+            try sequenceHandler.perform([trackingRequest], on: pixelBuffer, orientation: .up)
+        } catch {
+            handleTrackingError(error)
+            self.trackingRequest = nil
+            publishEmptyIfNeeded()
+            return false
+        }
+
+        guard let results = trackingRequest.results else {
+            self.trackingRequest = nil
+            publishEmptyIfNeeded()
+            return false
+        }
+
+        if let observation = results.first as? VNRectangleObservation {
+            guard observation.confidence >= trackingConfidenceThreshold else {
+                self.trackingRequest = nil
+                publishEmptyIfNeeded()
+                return false
+            }
+
+            let rectangle = rectangleFromObservation(observation)
+            lastRectangle = rectangle
+            trackingRequest.inputObservation = observation
+            publish(rectangle: rectangle, timestamp: timestamp)
+            return true
+        }
+
+        self.trackingRequest = nil
+        publishEmptyIfNeeded()
+        return false
+    }
+
+    private func performDetection(on pixelBuffer: CVPixelBuffer, timestamp: CMTime) -> Bool {
+        let rectangleCandidate = performRectangleDetection(on: pixelBuffer)
+        let segmentationCandidate = performDocumentSegmentation(on: pixelBuffer)
+
+        if let selected = selectCandidate(
+            rectangleCandidate: rectangleCandidate,
+            segmentationCandidate: segmentationCandidate
+        ) {
+            lastRectangle = selected.rectangle
+            updateTrackingRequest(with: selected.observation)
+            publish(rectangle: selected.rectangle, timestamp: timestamp)
+            return true
+        }
+
+        publishEmptyIfNeeded()
+        return false
+    }
+
+    private func performDocumentSegmentation(
+        on pixelBuffer: CVPixelBuffer
+    ) -> (observation: VNRectangleObservation, rectangle: DetectedRectangle)? {
+        guard #available(iOS 15.0, *) else {
+            return nil
+        }
+
+        let handler = VNImageRequestHandler(
+            cvPixelBuffer: pixelBuffer,
+            orientation: .up,
+            options: [:]
+        )
+
+        let firstPass = segmentationResults(
+            handler: handler,
+            regionOfInterest: lastRectangle.map { regionOfInterest(for: $0) }
+        )
+
+        let results = firstPass ?? segmentationResults(handler: handler, regionOfInterest: nil)
+
+        guard let results, !results.isEmpty else {
+            return nil
+        }
+
+        let candidates: [(observation: VNRectangleObservation, rectangle: DetectedRectangle)] = results.map { observation in
+            (observation, rectangleFromObservation(observation))
+        }
+
+        let filtered = candidates.filter { $0.rectangle.area > 0.05 }
+        let sorted = filtered.sorted { lhs, rhs in
+            score(rectangle: lhs.rectangle) > score(rectangle: rhs.rectangle)
+        }
+
+        return sorted.first
+    }
+
+    private func performRectangleDetection(
+        on pixelBuffer: CVPixelBuffer
+    ) -> (observation: VNRectangleObservation, rectangle: DetectedRectangle)? {
+        let request = VNDetectRectanglesRequest()
 
         // Configure for book pages - tuned for actual page detection
-        request.minimumAspectRatio = 0.5    // Portrait pages (taller than wide)
-        request.maximumAspectRatio = 0.9    // Not too square (filters laptops)
+        request.minimumAspectRatio = 0.3    // Allow wide spreads
+        request.maximumAspectRatio = 2.0    // Allow wide spreads
         request.quadratureTolerance = 30    // Tolerance for skew
         request.minimumConfidence = 0.6     // Moderate confidence
         request.maximumObservations = 2     // Just 1-2 candidates
@@ -131,60 +275,202 @@ final class RectangleDetector: ObservableObject {
             options: [:]
         )
 
+        let firstPass = rectangleResults(
+            handler: handler,
+            request: request,
+            regionOfInterest: lastRectangle.map { regionOfInterest(for: $0) }
+        )
+
+        let results = firstPass ?? rectangleResults(handler: handler, request: request, regionOfInterest: nil)
+
+        guard let results, !results.isEmpty else {
+            return nil
+        }
+
+        let candidates: [(observation: VNRectangleObservation, rectangle: DetectedRectangle)] = results.map { observation in
+            (observation, rectangleFromObservation(observation))
+        }
+
+        let filtered = candidates.filter { $0.rectangle.area > 0.05 }
+        let sorted = filtered.sorted { lhs, rhs in
+            score(rectangle: lhs.rectangle) > score(rectangle: rhs.rectangle)
+        }
+
+        return sorted.first
+    }
+
+    @available(iOS 15.0, *)
+    private func segmentationResults(
+        handler: VNImageRequestHandler,
+        regionOfInterest: CGRect?
+    ) -> [VNRectangleObservation]? {
+        let request = VNDetectDocumentSegmentationRequest()
+        if let regionOfInterest {
+            request.regionOfInterest = regionOfInterest
+        }
+
+        do {
+            try handler.perform([request])
+        } catch {
+            print("[RectangleDetector] Segmentation error: \(error)")
+            return nil
+        }
+
+        let results = request.results ?? []
+        let rectangles = results.compactMap { $0 as? VNRectangleObservation }
+        return rectangles
+    }
+
+    private func rectangleResults(
+        handler: VNImageRequestHandler,
+        request: VNDetectRectanglesRequest,
+        regionOfInterest: CGRect?
+    ) -> [VNRectangleObservation]? {
+        if let regionOfInterest {
+            request.regionOfInterest = regionOfInterest
+        } else {
+            request.regionOfInterest = CGRect(x: 0, y: 0, width: 1, height: 1)
+        }
+
         do {
             try handler.perform([request])
         } catch {
             print("[RectangleDetector] Detection error: \(error)")
+            return nil
+        }
+
+        return request.results as? [VNRectangleObservation]
+    }
+
+    private func makeTrackingRequest(from observation: VNRectangleObservation) -> VNTrackRectangleRequest {
+        let request = VNTrackRectangleRequest(rectangleObservation: observation)
+        request.trackingLevel = .accurate
+        return request
+    }
+
+    private func updateTrackingRequest(with observation: VNRectangleObservation) {
+        if let trackingRequest {
+            trackingRequest.inputObservation = observation
+        } else {
+            trackingRequest = makeTrackingRequest(from: observation)
         }
     }
 
-    private func handleResults(request: VNRequest, error: Error?) {
-        if let error = error {
-            print("[RectangleDetector] Vision error: \(error)")
-            Task { @MainActor in
-                self.detectedRectangles = []
-                self.hasDetection = false
+    private func handleTrackingError(_ error: Error) {
+        let nsError = error as NSError
+        let message = nsError.localizedDescription
+        if nsError.domain == "com.apple.Vision" && nsError.code == 9 {
+            if message.contains("Exceeded maximum allowed number of Trackers") {
+                sequenceHandler = VNSequenceRequestHandler()
+                print("[RectangleDetector] Tracker limit reached, resetting sequence handler")
+            } else if message.contains("Tracking of") {
+                // Low-confidence tracking failure is expected; fall back to detection quietly.
+            } else {
+                print("[RectangleDetector] Tracking error: \(error)")
             }
-            return
+        } else {
+            print("[RectangleDetector] Tracking error: \(error)")
         }
+    }
 
-        guard let results = request.results as? [VNRectangleObservation] else {
-            Task { @MainActor in
-                self.detectedRectangles = []
-                self.hasDetection = false
+    private func selectCandidate(
+        rectangleCandidate: (observation: VNRectangleObservation, rectangle: DetectedRectangle)?,
+        segmentationCandidate: (observation: VNRectangleObservation, rectangle: DetectedRectangle)?
+    ) -> (observation: VNRectangleObservation, rectangle: DetectedRectangle)? {
+        switch (rectangleCandidate, segmentationCandidate) {
+        case (nil, nil):
+            return nil
+        case (let rect?, nil):
+            return rect
+        case (nil, let seg?):
+            return seg
+        case (let rect?, let seg?):
+            // Avoid picking a much smaller segmentation rectangle (often text block).
+            let areaRatio = seg.rectangle.area / max(rect.rectangle.area, 0.0001)
+            if areaRatio < 0.7 {
+                return rect
             }
-            return
+            return score(rectangle: seg.rectangle) >= score(rectangle: rect.rectangle) ? seg : rect
         }
+    }
 
-        // Convert Vision observations to our model and filter for page-like rectangles
-        let allRectangles = results.map { observation in
-            DetectedRectangle(
-                topLeft: observation.topLeft,
-                topRight: observation.topRight,
-                bottomLeft: observation.bottomLeft,
-                bottomRight: observation.bottomRight,
-                confidence: observation.confidence
-            )
-        }
+    private func rectangleFromObservation(_ observation: VNRectangleObservation) -> DetectedRectangle {
+        DetectedRectangle(
+            topLeft: observation.topLeft,
+            topRight: observation.topRight,
+            bottomLeft: observation.bottomLeft,
+            bottomRight: observation.bottomRight,
+            confidence: observation.confidence
+        )
+    }
 
-        // Filter: must cover at least 5% of screen area (a real page would be much larger)
-        // and prefer larger rectangles (actual pages vs small detected shapes)
-        let rectangles = allRectangles
-            .filter { $0.area > 0.05 }  // At least 5% of screen
-            .sorted { $0.area > $1.area }  // Largest first
-            .prefix(1)  // Just the best candidate
-            .map { $0 }
+    private func regionOfInterest(for rectangle: DetectedRectangle) -> CGRect {
+        let xs = [rectangle.topLeft.x, rectangle.bottomLeft.x, rectangle.topRight.x, rectangle.bottomRight.x]
+        let ys = [rectangle.topLeft.y, rectangle.bottomLeft.y, rectangle.topRight.y, rectangle.bottomRight.y]
 
-        // Debug: log periodically
-        if !results.isEmpty && Task.isCancelled == false {
-            let areas = allRectangles.map { String(format: "%.2f", $0.area) }
-            let filtered = rectangles.map { String(format: "%.2f", $0.area) }
-            print("[RectangleDetector] Found \(results.count) rect(s), areas: \(areas), kept: \(filtered)")
-        }
+        let minX = xs.min() ?? 0
+        let maxX = xs.max() ?? 1
+        let minY = ys.min() ?? 0
+        let maxY = ys.max() ?? 1
 
+        let padding: CGFloat = 0.08
+        let expanded = CGRect(
+            x: minX - padding,
+            y: minY - padding,
+            width: (maxX - minX) + padding * 2,
+            height: (maxY - minY) + padding * 2
+        )
+
+        let clampedX = max(0, expanded.origin.x)
+        let clampedY = max(0, expanded.origin.y)
+        let clampedMaxX = min(1, expanded.maxX)
+        let clampedMaxY = min(1, expanded.maxY)
+
+        return CGRect(
+            x: clampedX,
+            y: clampedY,
+            width: max(0, clampedMaxX - clampedX),
+            height: max(0, clampedMaxY - clampedY)
+        )
+    }
+
+    private func publish(rectangle: DetectedRectangle, timestamp: CMTime) {
         Task { @MainActor in
-            self.detectedRectangles = rectangles
-            self.hasDetection = !rectangles.isEmpty
+            self.detectedRectangles = [rectangle]
+            self.hasDetection = true
+            self.latestObservation = TimedRectangle(rectangle: rectangle, timestamp: timestamp)
         }
+    }
+
+    private func publishEmptyIfNeeded() {
+        guard trackingRequest == nil else { return }
+        lastRectangle = nil
+        Task { @MainActor in
+            self.detectedRectangles = []
+            self.hasDetection = false
+            self.latestObservation = nil
+        }
+    }
+
+    private func score(rectangle: DetectedRectangle) -> CGFloat {
+        let areaScore = rectangle.area
+        guard let last = lastRectangle else {
+            return areaScore
+        }
+
+        let maxDistance = max(
+            hypot(rectangle.topLeft.x - last.topLeft.x, rectangle.topLeft.y - last.topLeft.y),
+            max(
+                hypot(rectangle.topRight.x - last.topRight.x, rectangle.topRight.y - last.topRight.y),
+                max(
+                    hypot(rectangle.bottomLeft.x - last.bottomLeft.x, rectangle.bottomLeft.y - last.bottomLeft.y),
+                    hypot(rectangle.bottomRight.x - last.bottomRight.x, rectangle.bottomRight.y - last.bottomRight.y)
+                )
+            )
+        )
+
+        // Normalize distance into [0,1] closeness score.
+        let closeness = max(0, 1 - (maxDistance / 0.15))
+        return areaScore * 0.8 + closeness * 0.2
     }
 }

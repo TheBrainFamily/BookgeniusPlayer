@@ -30,6 +30,16 @@ final class CameraManager: NSObject, ObservableObject {
     /// Rotation coordinator - accessed from delegate
     nonisolated(unsafe) private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
 
+    /// Preview layer for coordinate mapping and rotation alignment
+    nonisolated(unsafe) private weak var previewLayer: AVCaptureVideoPreviewLayer?
+
+    /// Capture device reference for rotation coordinator
+    private var captureDevice: AVCaptureDevice?
+
+    /// Last applied rotation angles to avoid redundant updates
+    nonisolated(unsafe) private var lastAppliedCaptureAngle: CGFloat?
+    nonisolated(unsafe) private var lastAppliedPreviewAngle: CGFloat?
+
     // MARK: - Frame Processing
 
     /// Publisher for sample buffers - subscribers can process frames
@@ -81,6 +91,12 @@ final class CameraManager: NSObject, ObservableObject {
         }
     }
 
+    /// Attach the preview layer so rotation and coordinate mapping stay aligned
+    func setPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
+        previewLayer = layer
+        updateRotationCoordinatorIfPossible()
+    }
+
     /// Start the capture session
     func startSession() {
         guard permissionGranted else { return }
@@ -129,6 +145,7 @@ final class CameraManager: NSObject, ObservableObject {
             error = .cameraUnavailable
             return
         }
+        captureDevice = camera
 
         // Configure camera for document scanning
         do {
@@ -178,23 +195,27 @@ final class CameraManager: NSObject, ObservableObject {
 
             // Set up rotation coordinator for correct orientation
             if let connection = output.connection(with: .video) {
-                // Use RotationCoordinator for iOS 17+
-                rotationCoordinator = AVCaptureDevice.RotationCoordinator(
-                    device: camera,
-                    previewLayer: nil
-                )
+                updateRotationCoordinatorIfPossible()
 
-                // Apply initial rotation
-                if let angle = rotationCoordinator?.videoRotationAngleForHorizonLevelCapture {
-                    if connection.isVideoRotationAngleSupported(angle) {
-                        connection.videoRotationAngle = angle
-                    }
+                // Apply initial rotation for capture connection
+                if let angle = rotationCoordinator?.videoRotationAngleForHorizonLevelCapture,
+                   connection.isVideoRotationAngleSupported(angle) {
+                    connection.videoRotationAngle = angle
+                    lastAppliedCaptureAngle = angle
                 }
             }
         } else {
             self.error = .configurationFailed
             return
         }
+    }
+
+    private func updateRotationCoordinatorIfPossible() {
+        guard let device = captureDevice else { return }
+        rotationCoordinator = AVCaptureDevice.RotationCoordinator(
+            device: device,
+            previewLayer: previewLayer
+        )
     }
 }
 
@@ -217,8 +238,21 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
         // Update rotation if needed (device orientation changed)
         if let coordinator = rotationCoordinator {
             let angle = coordinator.videoRotationAngleForHorizonLevelCapture
-            if connection.isVideoRotationAngleSupported(angle) {
+            if connection.isVideoRotationAngleSupported(angle),
+               angle != lastAppliedCaptureAngle {
                 connection.videoRotationAngle = angle
+                lastAppliedCaptureAngle = angle
+            }
+
+            if let previewLayer = previewLayer {
+                let previewAngle = coordinator.videoRotationAngleForHorizonLevelPreview
+                if previewLayer.connection?.isVideoRotationAngleSupported(previewAngle) == true,
+                   previewAngle != lastAppliedPreviewAngle {
+                    lastAppliedPreviewAngle = previewAngle
+                    DispatchQueue.main.async {
+                        previewLayer.connection?.videoRotationAngle = previewAngle
+                    }
+                }
             }
         }
 

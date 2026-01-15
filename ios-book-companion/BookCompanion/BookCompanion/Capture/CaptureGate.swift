@@ -46,6 +46,7 @@ final class CaptureGate: ObservableObject {
     // MARK: - Dependencies
 
     private let rectangleDetector: RectangleDetector
+    private let rectangleTracker: RectangleTracker
     private let motionTracker: MotionTracker
     private let sharpnessBuffer: SharpnessFrameBuffer
     private let dewarper: ImageDewarper
@@ -62,6 +63,9 @@ final class CaptureGate: ObservableObject {
     /// Cooldown between captures (prevents double-captures)
     private let captureCooldown: TimeInterval = 0.5
 
+    /// Short window to pick the sharpest frame once stable
+    private let captureBurstWindow: TimeInterval = 0.2
+
     // MARK: - Internal State
 
     private var cancellables = Set<AnyCancellable>()
@@ -69,6 +73,12 @@ final class CaptureGate: ObservableObject {
     private var autoCaptureTask: Task<Void, Never>?
     private var isInCooldown: Bool = false
     private var lastCapturedRectangle: DetectedRectangle?
+
+    // MARK: - Rectangle Observation Buffer
+
+    private var recentObservations: [TimedRectangle] = []
+    private let observationBufferSize: Int = 12
+    private let observationMaxDelta: TimeInterval = 0.25
 
     // MARK: - Haptics
 
@@ -78,11 +88,13 @@ final class CaptureGate: ObservableObject {
 
     init(
         rectangleDetector: RectangleDetector,
+        rectangleTracker: RectangleTracker,
         motionTracker: MotionTracker,
         sharpnessBuffer: SharpnessFrameBuffer,
         dewarper: ImageDewarper
     ) {
         self.rectangleDetector = rectangleDetector
+        self.rectangleTracker = rectangleTracker
         self.motionTracker = motionTracker
         self.sharpnessBuffer = sharpnessBuffer
         self.dewarper = dewarper
@@ -95,33 +107,41 @@ final class CaptureGate: ObservableObject {
 
     /// Manually trigger capture
     func triggerCapture() {
-        guard let rectangle = rectangleDetector.detectedRectangles.first else {
-            return
-        }
-        performCapture(rectangle: rectangle)
+        performCapture()
     }
 
     // MARK: - Private Methods
 
     private func setupSubscriptions() {
         // Combine detection + motion signals
-        Publishers.CombineLatest(
+        Publishers.CombineLatest3(
             rectangleDetector.$hasDetection,
-            motionTracker.$isStable
+            motionTracker.$isStable,
+            rectangleTracker.$isStable
         )
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] hasDetection, deviceStable in
+        .sink { [weak self] hasDetection, deviceStable, rectangleStable in
             self?.updateState(
                 hasDetection: hasDetection,
-                deviceStable: deviceStable
+                deviceStable: deviceStable,
+                rectangleStable: rectangleStable
             )
         }
         .store(in: &cancellables)
+
+        rectangleDetector.$latestObservation
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] observation in
+                guard let observation else { return }
+                self?.storeObservation(observation)
+            }
+            .store(in: &cancellables)
     }
 
     private func updateState(
         hasDetection: Bool,
-        deviceStable: Bool
+        deviceStable: Bool,
+        rectangleStable: Bool
     ) {
         // Skip updates during cooldown
         guard !isInCooldown else { return }
@@ -135,9 +155,9 @@ final class CaptureGate: ObservableObject {
 
         if !hasDetection {
             newState = .noRectangle
-        } else if !deviceStable {
+        } else if !deviceStable || !rectangleStable {
             newState = .deviceMoving
-        } else if !sharpnessBuffer.isSharpEnough() {
+        } else if !sharpnessBuffer.isSharpEnough(eligibleOnly: true) {
             newState = .blurry
         } else {
             newState = .ready
@@ -168,22 +188,33 @@ final class CaptureGate: ObservableObject {
             try? await Task.sleep(for: .seconds(autoCaptureDelay))
 
             guard !Task.isCancelled,
-                  state == .ready,
-                  let rectangle = rectangleDetector.detectedRectangles.first else {
+                  state == .ready else {
                 return
             }
 
-            performCapture(rectangle: rectangle)
+            performCapture()
         }
     }
 
-    private func performCapture(rectangle: DetectedRectangle) {
+    private func performCapture() {
         // Prevent capture during cooldown
         guard !isInCooldown else { return }
 
-        // Get the sharpest frame from buffer
-        guard let sampleBuffer = sharpnessBuffer.getSharpestFrame() else {
+        // Get the sharpest eligible frame from recent burst window
+        guard let sampleBuffer = sharpnessBuffer.getSharpestFrame(
+            eligibleOnly: true,
+            within: captureBurstWindow
+        ) ?? sharpnessBuffer.getSharpestFrame(eligibleOnly: true) else {
             print("[CaptureGate] No sharp frame available")
+            return
+        }
+
+        let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+
+        guard let rectangle = rectangleForTimestamp(timestamp)
+            ?? rectangleTracker.lockedRectangle
+            ?? rectangleDetector.detectedRectangles.first else {
+            print("[CaptureGate] No rectangle for capture")
             return
         }
 
@@ -211,6 +242,7 @@ final class CaptureGate: ObservableObject {
 
         // Enter cooldown
         enterCooldown()
+        rectangleTracker.enterCooldown()
 
         // Publish result
         capturePublisher.send(result)
@@ -229,5 +261,34 @@ final class CaptureGate: ObservableObject {
             try? await Task.sleep(for: .seconds(captureCooldown))
             isInCooldown = false
         }
+    }
+
+    private func storeObservation(_ observation: TimedRectangle) {
+        recentObservations.append(observation)
+        if recentObservations.count > observationBufferSize {
+            recentObservations.removeFirst(recentObservations.count - observationBufferSize)
+        }
+    }
+
+    private func rectangleForTimestamp(_ timestamp: CMTime) -> DetectedRectangle? {
+        guard !recentObservations.isEmpty else { return nil }
+
+        let target = CMTimeGetSeconds(timestamp)
+        var best: TimedRectangle?
+        var bestDelta = Double.greatestFiniteMagnitude
+
+        for observation in recentObservations {
+            let delta = abs(CMTimeGetSeconds(observation.timestamp) - target)
+            if delta < bestDelta {
+                bestDelta = delta
+                best = observation
+            }
+        }
+
+        guard bestDelta <= observationMaxDelta else {
+            return nil
+        }
+
+        return best?.rectangle
     }
 }
