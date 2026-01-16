@@ -173,20 +173,17 @@ final class RectangleDetector: ObservableObject {
         } catch {
             handleTrackingError(error)
             self.trackingRequest = nil
-            publishEmptyIfNeeded()
             return false
         }
 
         guard let results = trackingRequest.results else {
             self.trackingRequest = nil
-            publishEmptyIfNeeded()
             return false
         }
 
         if let observation = results.first as? VNRectangleObservation {
             guard observation.confidence >= trackingConfidenceThreshold else {
                 self.trackingRequest = nil
-                publishEmptyIfNeeded()
                 return false
             }
 
@@ -198,7 +195,6 @@ final class RectangleDetector: ObservableObject {
         }
 
         self.trackingRequest = nil
-        publishEmptyIfNeeded()
         return false
     }
 
@@ -352,6 +348,8 @@ final class RectangleDetector: ObservableObject {
         if let trackingRequest {
             trackingRequest.inputObservation = observation
         } else {
+            // Reset the sequence handler to avoid accumulating stale trackers.
+            sequenceHandler = VNSequenceRequestHandler()
             trackingRequest = makeTrackingRequest(from: observation)
         }
     }

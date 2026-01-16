@@ -40,6 +40,9 @@ final class CaptureGate: ObservableObject {
     /// Whether the gate is currently open (ready to capture)
     @Published private(set) var isOpen: Bool = false
 
+    /// Whether the user has requested a capture
+    @Published private(set) var isCaptureRequested: Bool = false
+
     /// Publisher for capture events
     let capturePublisher = PassthroughSubject<CaptureResult, Never>()
 
@@ -53,12 +56,18 @@ final class CaptureGate: ObservableObject {
 
     // MARK: - Configuration
 
-    /// Automatically capture when gate opens (vs manual trigger)
-    var autoCapture: Bool = true
-
-    /// Minimum time gate must be open before auto-capture
-    /// Gives user a moment to see the "ready" state
-    private let autoCaptureDelay: TimeInterval = 0.3
+    /// Whether the capture gate is enabled
+    var isEnabled: Bool = true {
+        didSet {
+            guard oldValue != isEnabled else { return }
+            if !isEnabled {
+                isInCooldown = false
+                isCaptureRequested = false
+                state = .noRectangle
+                isOpen = false
+            }
+        }
+    }
 
     /// Cooldown between captures (prevents double-captures)
     private let captureCooldown: TimeInterval = 0.5
@@ -69,20 +78,12 @@ final class CaptureGate: ObservableObject {
     // MARK: - Internal State
 
     private var cancellables = Set<AnyCancellable>()
-    private var gateOpenTime: Date?
-    private var autoCaptureTask: Task<Void, Never>?
     private var isInCooldown: Bool = false
-    private var lastCapturedRectangle: DetectedRectangle?
-
     // MARK: - Rectangle Observation Buffer
 
     private var recentObservations: [TimedRectangle] = []
     private let observationBufferSize: Int = 12
     private let observationMaxDelta: TimeInterval = 0.25
-
-    // MARK: - Haptics
-
-    private let hapticGenerator = UIImpactFeedbackGenerator(style: .medium)
 
     // MARK: - Initialization
 
@@ -99,33 +100,29 @@ final class CaptureGate: ObservableObject {
         self.sharpnessBuffer = sharpnessBuffer
         self.dewarper = dewarper
 
-        hapticGenerator.prepare()
         setupSubscriptions()
     }
 
     // MARK: - Public Methods
 
     /// Manually trigger capture
-    func triggerCapture() {
-        performCapture()
+    func requestCapture() {
+        guard isEnabled else { return }
+        guard !isCaptureRequested else { return }
+        isCaptureRequested = true
     }
 
     // MARK: - Private Methods
 
     private func setupSubscriptions() {
-        // Combine detection + motion signals
-        Publishers.CombineLatest3(
-            rectangleDetector.$hasDetection,
-            motionTracker.$isStable,
-            rectangleTracker.$isStable
+        // Combine frame tick + motion signals (detection is optional for capture)
+        Publishers.CombineLatest(
+            rectangleDetector.$frameCount,
+            motionTracker.$isStable
         )
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] hasDetection, deviceStable, rectangleStable in
-            self?.updateState(
-                hasDetection: hasDetection,
-                deviceStable: deviceStable,
-                rectangleStable: rectangleStable
-            )
+        .sink { [weak self] _, deviceStable in
+            self?.updateState(deviceStable: deviceStable)
         }
         .store(in: &cancellables)
 
@@ -138,24 +135,30 @@ final class CaptureGate: ObservableObject {
             .store(in: &cancellables)
     }
 
-    private func updateState(
-        hasDetection: Bool,
-        deviceStable: Bool,
-        rectangleStable: Bool
-    ) {
+    private func updateState(deviceStable: Bool) {
         // Skip updates during cooldown
         guard !isInCooldown else { return }
+        guard isEnabled else {
+            if state != .noRectangle {
+                state = .noRectangle
+                isOpen = false
+            }
+            isCaptureRequested = false
+            return
+        }
 
-        // Cancel any pending auto-capture
-        autoCaptureTask?.cancel()
-        autoCaptureTask = nil
+        guard isCaptureRequested else {
+            if state != .noRectangle {
+                state = .noRectangle
+                isOpen = false
+            }
+            return
+        }
 
         // Determine state based on signals
         let newState: CaptureGateState
 
-        if !hasDetection {
-            newState = .noRectangle
-        } else if !deviceStable || !rectangleStable {
+        if !deviceStable {
             newState = .deviceMoving
         } else if !sharpnessBuffer.isSharpEnough(eligibleOnly: true) {
             newState = .blurry
@@ -164,41 +167,17 @@ final class CaptureGate: ObservableObject {
         }
 
         // Update state
-        let wasReady = state == .ready
         state = newState
         isOpen = (newState == .ready)
 
-        // Handle state transitions
-        if newState == .ready && !wasReady {
-            // Just became ready
-            gateOpenTime = Date()
-            hapticGenerator.impactOccurred()
-
-            // Schedule auto-capture if enabled
-            if autoCapture {
-                scheduleAutoCapture()
-            }
-        } else if newState != .ready {
-            gateOpenTime = nil
-        }
-    }
-
-    private func scheduleAutoCapture() {
-        autoCaptureTask = Task { @MainActor in
-            try? await Task.sleep(for: .seconds(autoCaptureDelay))
-
-            guard !Task.isCancelled,
-                  state == .ready else {
-                return
-            }
-
+        if newState == .ready {
             performCapture()
         }
     }
 
     private func performCapture() {
         // Prevent capture during cooldown
-        guard !isInCooldown else { return }
+        guard !isInCooldown, isEnabled, isCaptureRequested else { return }
 
         // Get the sharpest eligible frame from recent burst window
         guard let sampleBuffer = sharpnessBuffer.getSharpestFrame(
@@ -211,25 +190,19 @@ final class CaptureGate: ObservableObject {
 
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
 
-        guard let rectangle = rectangleForTimestamp(timestamp)
+        let rectangle = rectangleForTimestamp(timestamp)
             ?? rectangleTracker.lockedRectangle
-            ?? rectangleDetector.detectedRectangles.first else {
-            print("[CaptureGate] No rectangle for capture")
-            return
-        }
+            ?? rectangleDetector.detectedRectangles.first
+            ?? defaultRectangle()
 
-        // Dewarp and enhance the image
-        guard let processedImage = dewarper.processFrame(
-            sampleBuffer: sampleBuffer,
-            rectangle: rectangle
-        ) else {
-            print("[CaptureGate] Dewarp failed")
+        guard let rawImage = dewarper.renderRaw(sampleBuffer: sampleBuffer) else {
+            print("[CaptureGate] Raw render failed")
             return
         }
 
         // Create result
         let result = CaptureResult(
-            image: processedImage,
+            image: rawImage,
             rectangle: rectangle,
             timestamp: Date()
         )
@@ -241,6 +214,7 @@ final class CaptureGate: ObservableObject {
         print("[CaptureGate] CAPTURED!")
 
         // Enter cooldown
+        isCaptureRequested = false
         enterCooldown()
         rectangleTracker.enterCooldown()
 
@@ -290,5 +264,15 @@ final class CaptureGate: ObservableObject {
         }
 
         return best?.rectangle
+    }
+
+    private func defaultRectangle() -> DetectedRectangle {
+        DetectedRectangle(
+            topLeft: CGPoint(x: 0, y: 1),
+            topRight: CGPoint(x: 1, y: 1),
+            bottomLeft: CGPoint(x: 0, y: 0),
+            bottomRight: CGPoint(x: 1, y: 0),
+            confidence: 0
+        )
     }
 }

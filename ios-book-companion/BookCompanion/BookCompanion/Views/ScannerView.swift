@@ -8,12 +8,15 @@
 import SwiftUI
 import UIKit
 import AVFoundation
+import AVKit
 
 /// Main view for the page scanning interface
 struct ScannerView: View {
 
     @StateObject private var viewModel = ScannerViewModel()
     @State private var previewLayer: AVCaptureVideoPreviewLayer?
+    @State private var isReviewPresented = false
+    @State private var prefersCropped = true
 
     var body: some View {
         ZStack {
@@ -45,7 +48,8 @@ struct ScannerView: View {
                     hasDetection: viewModel.hasDetection,
                     frameCount: viewModel.frameCount,
                     isRectangleStable: viewModel.isRectangleStable,
-                    isDeviceStable: viewModel.isDeviceStable
+                    isDeviceStable: viewModel.isDeviceStable,
+                    isCaptureRequested: viewModel.isCaptureRequested
                 )
                 .padding()
 
@@ -54,9 +58,8 @@ struct ScannerView: View {
                 // Bottom bar - controls
                 ControlBar(
                     gateState: viewModel.gateState,
-                    onManualCapture: viewModel.manualCapture,
-                    onToggleAutoCapture: viewModel.toggleAutoCapture,
-                    autoCapture: viewModel.autoCapture
+                    onManualCapture: viewModel.requestCapture,
+                    onReview: { isReviewPresented = true }
                 )
                 .padding()
                 .padding(.bottom, 20)
@@ -73,6 +76,17 @@ struct ScannerView: View {
         }
         .onDisappear {
             viewModel.stop()
+        }
+        .onCameraCaptureEvent(isEnabled: viewModel.cameraManager.permissionGranted) { event in
+            if event.phase == .ended {
+                viewModel.requestCapture()
+            }
+        }
+        .sheet(isPresented: $isReviewPresented) {
+            ReviewView(
+                captures: viewModel.storedCaptures,
+                prefersCropped: $prefersCropped
+            )
         }
     }
 
@@ -185,6 +199,7 @@ struct StatusBar: View {
     let frameCount: Int
     let isRectangleStable: Bool
     let isDeviceStable: Bool
+    let isCaptureRequested: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -262,17 +277,11 @@ struct StatusBar: View {
     private var statusText: String {
         switch gateState {
         case .noRectangle:
-            return "Point at a book page"
+            return isCaptureRequested ? "Hold still..." : "Press shutter or volume"
         case .deviceMoving:
-            if !isDeviceStable {
-                return "Keep phone still..."
-            }
-            if !isRectangleStable {
-                return "Hold page steady..."
-            }
             return "Keep phone still..."
         case .blurry:
-            return "Too blurry"
+            return "Checking focus..."
         case .ready:
             return "Ready!"
         case .captured:
@@ -287,22 +296,10 @@ struct ControlBar: View {
 
     let gateState: CaptureGateState
     let onManualCapture: () -> Void
-    let onToggleAutoCapture: () -> Void
-    let autoCapture: Bool
+    let onReview: () -> Void
 
     var body: some View {
-        HStack(spacing: 40) {
-            // Auto-capture toggle
-            Button(action: onToggleAutoCapture) {
-                VStack(spacing: 4) {
-                    Image(systemName: autoCapture ? "bolt.fill" : "bolt.slash")
-                        .font(.title2)
-                    Text(autoCapture ? "Auto" : "Manual")
-                        .font(.caption2)
-                }
-                .foregroundStyle(autoCapture ? .yellow : .white)
-            }
-
+        HStack(spacing: 32) {
             // Manual capture button
             Button(action: onManualCapture) {
                 ZStack {
@@ -315,19 +312,19 @@ struct ControlBar: View {
                         .frame(width: 60, height: 60)
                 }
             }
-            .disabled(gateState != .ready && !autoCapture)
 
             // Placeholder for symmetry
-            VStack(spacing: 4) {
-                Image(systemName: "photo.stack")
-                    .font(.title2)
-                Text("Review")
-                    .font(.caption2)
+            Button(action: onReview) {
+                VStack(spacing: 4) {
+                    Image(systemName: "photo.stack")
+                        .font(.title2)
+                    Text("Review")
+                        .font(.caption2)
+                }
+                .foregroundStyle(.white)
             }
-            .foregroundStyle(.white)
-            .opacity(0.5)
         }
-        .padding(.horizontal, 30)
+        .padding(.horizontal, 24)
         .padding(.vertical, 16)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
     }

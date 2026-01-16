@@ -136,12 +136,8 @@ final class CameraManager: NSObject, ObservableObject {
             captureSession.sessionPreset = .hd1280x720
         }
 
-        // Get the back camera
-        guard let camera = AVCaptureDevice.default(
-            .builtInWideAngleCamera,
-            for: .video,
-            position: .back
-        ) else {
+        // Get the back camera (prefer ultra-wide when available)
+        guard let camera = selectBackCamera() else {
             error = .cameraUnavailable
             return
         }
@@ -216,6 +212,27 @@ final class CameraManager: NSObject, ObservableObject {
             device: device,
             previewLayer: previewLayer
         )
+    }
+
+    private func selectBackCamera() -> AVCaptureDevice? {
+        let preferredTypes: [AVCaptureDevice.DeviceType] = [
+            .builtInUltraWideCamera,
+            .builtInWideAngleCamera
+        ]
+
+        let discovery = AVCaptureDevice.DiscoverySession(
+            deviceTypes: preferredTypes,
+            mediaType: .video,
+            position: .back
+        )
+
+        for type in preferredTypes {
+            if let device = discovery.devices.first(where: { $0.deviceType == type }) {
+                return device
+            }
+        }
+
+        return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
     }
 }
 

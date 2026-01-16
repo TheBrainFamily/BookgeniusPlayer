@@ -18,7 +18,6 @@ final class ScannerViewModel: ObservableObject {
 
     @Published private(set) var lastCapturedImage: UIImage?
     @Published private(set) var captureCount: Int = 0
-    @Published var autoCapture: Bool = true
 
     // MARK: - Forwarded State (from child objects, for SwiftUI reactivity)
 
@@ -30,6 +29,8 @@ final class ScannerViewModel: ObservableObject {
     @Published private(set) var isDeviceStable: Bool = false
     @Published private(set) var smoothedRectangle: DetectedRectangle?
     @Published private(set) var lockedRectangle: DetectedRectangle?
+    @Published private(set) var isCaptureRequested: Bool = false
+    @Published private(set) var storedCaptures: [StoredCapture] = []
 
     // MARK: - Components
 
@@ -44,6 +45,7 @@ final class ScannerViewModel: ObservableObject {
     private let sharpnessBuffer: SharpnessFrameBuffer
     private let dewarper: ImageDewarper
     private let captureStore: CaptureStore
+    private let postCaptureProcessor: PostCaptureProcessor
 
     // MARK: - Subscriptions
 
@@ -51,7 +53,6 @@ final class ScannerViewModel: ObservableObject {
 
     // MARK: - Captured Pages
 
-    private(set) var capturedPages: [StoredCapture] = []
     private var nextCaptureIndex: Int = 1
 
     // MARK: - Frame Eligibility
@@ -70,6 +71,7 @@ final class ScannerViewModel: ObservableObject {
         sharpnessBuffer = SharpnessFrameBuffer(bufferSize: 8)
         dewarper = ImageDewarper()
         captureStore = CaptureStore()
+        postCaptureProcessor = PostCaptureProcessor()
 
         // Initialize capture gate with dependencies
         captureGate = CaptureGate(
@@ -79,6 +81,7 @@ final class ScannerViewModel: ObservableObject {
             sharpnessBuffer: sharpnessBuffer,
             dewarper: dewarper
         )
+        captureGate.isEnabled = false
 
         setupSubscriptions()
     }
@@ -105,22 +108,20 @@ final class ScannerViewModel: ObservableObject {
         // Start camera
         cameraManager.startSession()
         print("[ScannerViewModel] Camera session started")
+
+        captureGate.isEnabled = true
     }
 
     func stop() {
         cameraManager.stopSession()
         motionTracker.stop()
+        captureGate.isEnabled = false
     }
 
     // MARK: - Actions
 
-    func manualCapture() {
-        captureGate.triggerCapture()
-    }
-
-    func toggleAutoCapture() {
-        autoCapture.toggle()
-        captureGate.autoCapture = autoCapture
+    func requestCapture() {
+        captureGate.requestCapture()
     }
 
     // MARK: - Private Methods
@@ -179,14 +180,13 @@ final class ScannerViewModel: ObservableObject {
             .assign(to: &$lockedRectangle)
 
         // Update frame eligibility for sharpness buffering
-        Publishers.CombineLatest3(
-            rectangleDetector.$hasDetection,
-            rectangleTracker.$isStable,
-            motionTracker.$isStable
+        Publishers.CombineLatest(
+            motionTracker.$isStable,
+            captureGate.$isCaptureRequested
         )
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] hasDetection, rectangleStable, deviceStable in
-            self?.setFrameEligibility(hasDetection && rectangleStable && deviceStable)
+        .sink { [weak self] deviceStable, captureRequested in
+            self?.setFrameEligibility(deviceStable && captureRequested)
         }
         .store(in: &cancellables)
 
@@ -199,6 +199,10 @@ final class ScannerViewModel: ObservableObject {
         captureGate.$state
             .receive(on: DispatchQueue.main)
             .assign(to: &$gateState)
+
+        captureGate.$isCaptureRequested
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$isCaptureRequested)
     }
 
     private func handleCapture(_ result: CaptureResult) {
@@ -212,15 +216,25 @@ final class ScannerViewModel: ObservableObject {
             guard let self else { return }
             if let stored = await self.captureStore.save(result: result, index: captureIndex) {
                 await MainActor.run {
-                    self.capturedPages.append(stored)
-                    self.captureCount = self.capturedPages.count
+                    self.storedCaptures.append(stored)
+                    self.captureCount = self.storedCaptures.count
+                }
+
+                if let processed = self.postCaptureProcessor.process(result.image),
+                   let processedURL = await self.captureStore.saveProcessed(image: processed, for: stored) {
+                    await MainActor.run {
+                        self.updateStoredCapture(id: stored.id, processedURL: processedURL)
+                        if self.lastCapturedImage == result.image {
+                            self.lastCapturedImage = processed
+                        }
+                    }
                 }
             }
         }
 
         // Hide preview after delay
         Task {
-            try? await Task.sleep(for: .seconds(1.5))
+            try? await Task.sleep(for: .seconds(0.5))
             if lastCapturedImage == result.image {
                 withAnimation {
                     lastCapturedImage = nil
@@ -245,5 +259,10 @@ final class ScannerViewModel: ObservableObject {
         let value = isFrameEligible
         frameEligibilityLock.unlock()
         return value
+    }
+
+    private func updateStoredCapture(id: UUID, processedURL: URL) {
+        guard let index = storedCaptures.firstIndex(where: { $0.id == id }) else { return }
+        storedCaptures[index].processedFileURL = processedURL
     }
 }

@@ -55,6 +55,16 @@ final class ImageDewarper {
         return processPixelBuffer(pixelBuffer, rectangle: rectangle)
     }
 
+    /// Render a raw UIImage from a sample buffer (no dewarp)
+    func renderRaw(sampleBuffer: CMSampleBuffer) -> UIImage? {
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            return nil
+        }
+
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        return renderToUIImage(ciImage)
+    }
+
     /// Process a pixel buffer with a detected rectangle
     func processPixelBuffer(
         _ pixelBuffer: CVPixelBuffer,
