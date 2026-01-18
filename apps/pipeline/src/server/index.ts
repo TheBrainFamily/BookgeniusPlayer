@@ -4,11 +4,16 @@ import path from "path";
 import fs from "fs";
 import { appRouter } from "./router";
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
+import scanRoutes from "../scan-server/scanRoutes";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 
 const app = express();
-app.use(cors({ origin: [/^http:\/\/localhost:\d+$/], credentials: false }));
+app.use(cors({ origin: true, credentials: false })); // Allow all origins for iOS dev
+app.use(express.json()); // Parse JSON bodies
+
+// Mount scan routes for iOS book scanning
+app.use("/api/scan", scanRoutes);
 
 // Simple health
 app.get("/health", (_req, res) => {

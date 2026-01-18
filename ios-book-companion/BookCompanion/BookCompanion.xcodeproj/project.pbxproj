@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FF1CCE982F1A8938000D3972 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = FF1CCE972F1A8938000D3972 /* ConvexMobile */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		FF27DD132F196A96004178DE /* BookCompanion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookCompanion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF1CCE982F1A8938000D3972 /* ConvexMobile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = BookCompanion;
 			packageProductDependencies = (
+				FF1CCE972F1A8938000D3972 /* ConvexMobile */,
 			);
 			productName = BookCompanion;
 			productReference = FF27DD132F196A96004178DE /* BookCompanion.app */;
@@ -85,7 +91,7 @@
 					};
 				};
 			};
-			buildConfigurationList = FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */;
+			buildConfigurationList = FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -94,6 +100,9 @@
 			);
 			mainGroup = FF27DD0A2F196A96004178DE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FF1CCE962F1A8938000D3972 /* XCRemoteSwiftPackageReference "convex-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FF27DD142F196A96004178DE /* Products */;
 			projectDirPath = "";
@@ -256,6 +265,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "BookCompanion uses your camera to scan book pages for reading assistance.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "connect to the pipeline";
 				INFOPLIST_KEY_NSMotionUsageDescription = "BookCompanion uses motion data to detect when you're holding the phone steady for clearer page captures.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -287,6 +297,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "BookCompanion uses your camera to scan book pages for reading assistance.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "connect to the pipeline";
 				INFOPLIST_KEY_NSMotionUsageDescription = "BookCompanion uses motion data to detect when you're holding the phone steady for clearer page captures.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -309,7 +320,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */ = {
+		FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FF27DD1F2F196A99004178DE /* Debug */,
@@ -328,6 +339,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FF1CCE962F1A8938000D3972 /* XCRemoteSwiftPackageReference "convex-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:get-convex/convex-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.7.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FF1CCE972F1A8938000D3972 /* ConvexMobile */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FF1CCE962F1A8938000D3972 /* XCRemoteSwiftPackageReference "convex-swift" */;
+			productName = ConvexMobile;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FF27DD0B2F196A96004178DE /* Project object */;
 }

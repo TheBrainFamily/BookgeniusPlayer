@@ -312,9 +312,7 @@ final class RectangleDetector: ObservableObject {
             return nil
         }
 
-        let results = request.results ?? []
-        let rectangles = results.compactMap { $0 as? VNRectangleObservation }
-        return rectangles
+        return request.results
     }
 
     private func rectangleResults(
@@ -335,7 +333,7 @@ final class RectangleDetector: ObservableObject {
             return nil
         }
 
-        return request.results as? [VNRectangleObservation]
+        return request.results
     }
 
     private func makeTrackingRequest(from observation: VNRectangleObservation) -> VNTrackRectangleRequest {

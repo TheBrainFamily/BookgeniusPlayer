@@ -8,6 +8,7 @@
 
 @preconcurrency import AVFoundation
 import Combine
+import UIKit
 
 /// Manages the camera session and provides frames for analysis.
 /// Configures for 1080p to balance OCR detail and processing speed.
@@ -26,6 +27,7 @@ final class CameraManager: NSObject, ObservableObject {
     nonisolated(unsafe) let captureSession = AVCaptureSession()
 
     private var videoOutput: AVCaptureVideoDataOutput?
+    private var photoOutput: AVCapturePhotoOutput?
 
     /// Rotation coordinator - accessed from delegate
     nonisolated(unsafe) private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
@@ -35,6 +37,9 @@ final class CameraManager: NSObject, ObservableObject {
 
     /// Capture device reference for rotation coordinator
     private var captureDevice: AVCaptureDevice?
+
+    /// Photo capture delegate storage
+    private var photoDelegates: [Int64: PhotoCaptureDelegate] = [:]
 
     /// Last applied rotation angles to avoid redundant updates
     nonisolated(unsafe) private var lastAppliedCaptureAngle: CGFloat?
@@ -111,6 +116,40 @@ final class CameraManager: NSObject, ObservableObject {
         }
     }
 
+    /// Capture a full-resolution photo using the photo output.
+    func capturePhoto(onShutter: @escaping () -> Void, completion: @escaping (UIImage?) -> Void) {
+        guard let photoOutput else {
+            completion(nil)
+            return
+        }
+
+        let codec: AVVideoCodecType = photoOutput.availablePhotoCodecTypes.contains(.hevc) ? .hevc : .jpeg
+        let settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: codec])
+        settings.flashMode = .off
+        settings.photoQualityPrioritization = .speed
+        if #available(iOS 16.0, *) {
+            let maxDimensions = photoOutput.maxPhotoDimensions
+            if maxDimensions.width > 0 && maxDimensions.height > 0 {
+                settings.maxPhotoDimensions = maxDimensions
+            }
+        } else {
+            settings.isHighResolutionPhotoEnabled = true
+        }
+
+        let delegate = PhotoCaptureDelegate(
+            onShutter: onShutter,
+            completion: { [weak self] (image: UIImage?, uniqueID: Int64) in
+                Task { @MainActor in
+                    self?.photoDelegates[uniqueID] = nil
+                    completion(image)
+                }
+            }
+        )
+
+        photoDelegates[settings.uniqueID] = delegate
+        photoOutput.capturePhoto(with: settings, delegate: delegate)
+    }
+
     /// Stop the capture session
     func stopSession() {
         let session = captureSession
@@ -129,14 +168,16 @@ final class CameraManager: NSObject, ObservableObject {
         captureSession.beginConfiguration()
         defer { captureSession.commitConfiguration() }
 
-        // Set session preset for 1080p
-        if captureSession.canSetSessionPreset(.hd1920x1080) {
+        // Set session preset for full-resolution photos
+        if captureSession.canSetSessionPreset(.photo) {
+            captureSession.sessionPreset = .photo
+        } else if captureSession.canSetSessionPreset(.hd1920x1080) {
             captureSession.sessionPreset = .hd1920x1080
         } else if captureSession.canSetSessionPreset(.hd1280x720) {
             captureSession.sessionPreset = .hd1280x720
         }
 
-        // Get the back camera (prefer ultra-wide when available)
+        // Get the back camera (prefer standard wide angle)
         guard let camera = selectBackCamera() else {
             error = .cameraUnavailable
             return
@@ -155,6 +196,11 @@ final class CameraManager: NSObject, ObservableObject {
             // Enable auto-exposure
             if camera.isExposureModeSupported(.continuousAutoExposure) {
                 camera.exposureMode = .continuousAutoExposure
+            }
+
+            // Ensure we stay on the native wide camera (no digital zoom)
+            if camera.minAvailableVideoZoomFactor <= 1.0 && camera.maxAvailableVideoZoomFactor >= 1.0 {
+                camera.videoZoomFactor = 1.0
             }
 
             camera.unlockForConfiguration()
@@ -204,6 +250,52 @@ final class CameraManager: NSObject, ObservableObject {
             self.error = .configurationFailed
             return
         }
+
+        let photoOutput = AVCapturePhotoOutput()
+        if captureSession.canAddOutput(photoOutput) {
+            captureSession.addOutput(photoOutput)
+            self.photoOutput = photoOutput
+            photoOutput.maxPhotoQualityPrioritization = .speed
+
+            if #available(iOS 17.0, *) {
+                if photoOutput.isResponsiveCaptureSupported {
+                    photoOutput.isResponsiveCaptureEnabled = true
+                }
+                if photoOutput.isZeroShutterLagSupported {
+                    photoOutput.isZeroShutterLagEnabled = true
+                }
+                if photoOutput.isFastCapturePrioritizationSupported {
+                    photoOutput.isFastCapturePrioritizationEnabled = true
+                }
+                if photoOutput.isAutoDeferredPhotoDeliverySupported {
+                    photoOutput.isAutoDeferredPhotoDeliveryEnabled = false
+                }
+            }
+
+            if #available(iOS 16.0, *) {
+                let supported = camera.activeFormat.supportedMaxPhotoDimensions
+                if let best = supported.max(by: { lhs, rhs in
+                    Int(lhs.width) * Int(lhs.height) < Int(rhs.width) * Int(rhs.height)
+                }) {
+                    photoOutput.maxPhotoDimensions = best
+                }
+            } else {
+                photoOutput.isHighResolutionCaptureEnabled = true
+            }
+
+            let codec: AVVideoCodecType = photoOutput.availablePhotoCodecTypes.contains(.hevc) ? .hevc : .jpeg
+            let preparedSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: codec])
+            preparedSettings.photoQualityPrioritization = .speed
+            if #available(iOS 16.0, *) {
+                let maxDimensions = photoOutput.maxPhotoDimensions
+                if maxDimensions.width > 0 && maxDimensions.height > 0 {
+                    preparedSettings.maxPhotoDimensions = maxDimensions
+                }
+            } else {
+                preparedSettings.isHighResolutionPhotoEnabled = true
+            }
+            photoOutput.setPreparedPhotoSettingsArray([preparedSettings], completionHandler: nil)
+        }
     }
 
     private func updateRotationCoordinatorIfPossible() {
@@ -216,8 +308,9 @@ final class CameraManager: NSObject, ObservableObject {
 
     private func selectBackCamera() -> AVCaptureDevice? {
         let preferredTypes: [AVCaptureDevice.DeviceType] = [
-            .builtInUltraWideCamera,
-            .builtInWideAngleCamera
+            .builtInWideAngleCamera,
+            .builtInDualCamera,
+            .builtInTripleCamera
         ]
 
         let discovery = AVCaptureDevice.DiscoverySession(
@@ -233,6 +326,43 @@ final class CameraManager: NSObject, ObservableObject {
         }
 
         return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+    }
+}
+
+private final class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
+
+    private let onShutter: () -> Void
+    private let completion: (UIImage?, Int64) -> Void
+    private var didSignalShutter = false
+
+    init(onShutter: @escaping () -> Void, completion: @escaping (UIImage?, Int64) -> Void) {
+        self.onShutter = onShutter
+        self.completion = completion
+    }
+
+    func photoOutput(
+        _ output: AVCapturePhotoOutput,
+        didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings
+    ) {
+        guard !didSignalShutter else { return }
+        didSignalShutter = true
+        DispatchQueue.main.async {
+            self.onShutter()
+        }
+    }
+
+    func photoOutput(
+        _ output: AVCapturePhotoOutput,
+        didFinishProcessingPhoto photo: AVCapturePhoto,
+        error: Error?
+    ) {
+        let image: UIImage?
+        if let data = photo.fileDataRepresentation() {
+            image = UIImage(data: data)
+        } else {
+            image = nil
+        }
+        completion(image, photo.resolvedSettings.uniqueID)
     }
 }
 

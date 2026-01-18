@@ -13,10 +13,18 @@ import AVKit
 /// Main view for the page scanning interface
 struct ScannerView: View {
 
-    @StateObject private var viewModel = ScannerViewModel()
+    let uploadService: UploadService
+
+    @StateObject private var viewModel: ScannerViewModel
     @State private var previewLayer: AVCaptureVideoPreviewLayer?
     @State private var isReviewPresented = false
     @State private var prefersCropped = true
+    @State private var flashOpacity: CGFloat = 0
+
+    init(uploadService: UploadService) {
+        self.uploadService = uploadService
+        _viewModel = StateObject(wrappedValue: ScannerViewModel(uploadService: uploadService))
+    }
 
     var body: some View {
         ZStack {
@@ -49,7 +57,9 @@ struct ScannerView: View {
                     frameCount: viewModel.frameCount,
                     isRectangleStable: viewModel.isRectangleStable,
                     isDeviceStable: viewModel.isDeviceStable,
-                    isCaptureRequested: viewModel.isCaptureRequested
+                    isCaptureRequested: viewModel.isCaptureRequested,
+                    uploadedPageCount: viewModel.uploadedPageCount,
+                    uploadingPageIndex: viewModel.uploadingPageIndex
                 )
                 .padding()
 
@@ -70,6 +80,11 @@ struct ScannerView: View {
                 CapturePreview(image: lastCapture)
                     .transition(.scale.combined(with: .opacity))
             }
+
+            Color.white
+                .opacity(flashOpacity)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
         }
         .task {
             await viewModel.start()
@@ -80,6 +95,12 @@ struct ScannerView: View {
         .onCameraCaptureEvent(isEnabled: viewModel.cameraManager.permissionGranted) { event in
             if event.phase == .ended {
                 viewModel.requestCapture()
+            }
+        }
+        .onChange(of: viewModel.shutterFlashToken) { _ in
+            flashOpacity = 1
+            withAnimation(.easeOut(duration: 0.2)) {
+                flashOpacity = 0
             }
         }
         .sheet(isPresented: $isReviewPresented) {
@@ -200,6 +221,8 @@ struct StatusBar: View {
     let isRectangleStable: Bool
     let isDeviceStable: Bool
     let isCaptureRequested: Bool
+    let uploadedPageCount: Int
+    let uploadingPageIndex: Int?
 
     var body: some View {
         VStack(spacing: 8) {
@@ -220,14 +243,28 @@ struct StatusBar: View {
 
                 Spacer()
 
-                // Capture count
+                // Capture and upload count
                 if captureCount > 0 {
-                    Text("\(captureCount) pages")
-                        .font(.subheadline)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(.ultraThinMaterial, in: Capsule())
+                    HStack(spacing: 4) {
+                        Text("\(captureCount) captured")
+                        if uploadedPageCount > 0 || uploadingPageIndex != nil {
+                            Text("•")
+                            if let uploading = uploadingPageIndex {
+                                ProgressView()
+                                    .scaleEffect(0.6)
+                                Text("↑\(uploading)")
+                            } else {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundStyle(.green)
+                                Text("\(uploadedPageCount) sent")
+                            }
+                        }
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: Capsule())
                 }
             }
 
@@ -277,7 +314,7 @@ struct StatusBar: View {
     private var statusText: String {
         switch gateState {
         case .noRectangle:
-            return isCaptureRequested ? "Hold still..." : "Press shutter or volume"
+            return isCaptureRequested ? "Capturing..." : "Press shutter or volume"
         case .deviceMoving:
             return "Keep phone still..."
         case .blurry:
@@ -355,5 +392,5 @@ struct CapturePreview: View {
 // MARK: - Preview
 
 #Preview {
-    ScannerView()
+    ScannerView(uploadService: UploadService())
 }

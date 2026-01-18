@@ -19,6 +19,12 @@ final class ScannerViewModel: ObservableObject {
     @Published private(set) var lastCapturedImage: UIImage?
     @Published private(set) var captureCount: Int = 0
 
+    // MARK: - Upload State
+
+    @Published private(set) var uploadingPageIndex: Int?
+    @Published private(set) var lastUploadError: String?
+    @Published private(set) var uploadedPageCount: Int = 0
+
     // MARK: - Forwarded State (from child objects, for SwiftUI reactivity)
 
     @Published private(set) var detectedRectangles: [DetectedRectangle] = []
@@ -31,6 +37,7 @@ final class ScannerViewModel: ObservableObject {
     @Published private(set) var lockedRectangle: DetectedRectangle?
     @Published private(set) var isCaptureRequested: Bool = false
     @Published private(set) var storedCaptures: [StoredCapture] = []
+    @Published private(set) var shutterFlashToken: UUID?
 
     // MARK: - Components
 
@@ -38,14 +45,16 @@ final class ScannerViewModel: ObservableObject {
     let rectangleDetector: RectangleDetector
     let rectangleTracker: RectangleTracker
     let motionTracker: MotionTracker
-    let captureGate: CaptureGate
 
     // MARK: - Private Components
 
-    private let sharpnessBuffer: SharpnessFrameBuffer
-    private let dewarper: ImageDewarper
     private let captureStore: CaptureStore
     private let postCaptureProcessor: PostCaptureProcessor
+    private let shutterHaptic = UIImpactFeedbackGenerator(style: .medium)
+
+    // MARK: - Upload Components
+
+    private let uploadService: UploadService
 
     // MARK: - Subscriptions
 
@@ -55,34 +64,19 @@ final class ScannerViewModel: ObservableObject {
 
     private var nextCaptureIndex: Int = 1
 
-    // MARK: - Frame Eligibility
-
-    private let frameEligibilityLock = NSLock()
-    private var isFrameEligible: Bool = false
-
     // MARK: - Initialization
 
-    init() {
+    init(uploadService: UploadService) {
         // Initialize components
         cameraManager = CameraManager()
         rectangleDetector = RectangleDetector()
         rectangleTracker = RectangleTracker()
         motionTracker = MotionTracker()
-        sharpnessBuffer = SharpnessFrameBuffer(bufferSize: 8)
-        dewarper = ImageDewarper()
         captureStore = CaptureStore()
         postCaptureProcessor = PostCaptureProcessor()
+        self.uploadService = uploadService
 
-        // Initialize capture gate with dependencies
-        captureGate = CaptureGate(
-            rectangleDetector: rectangleDetector,
-            rectangleTracker: rectangleTracker,
-            motionTracker: motionTracker,
-            sharpnessBuffer: sharpnessBuffer,
-            dewarper: dewarper
-        )
-        captureGate.isEnabled = false
-
+        shutterHaptic.prepare()
         setupSubscriptions()
     }
 
@@ -109,47 +103,46 @@ final class ScannerViewModel: ObservableObject {
         cameraManager.startSession()
         print("[ScannerViewModel] Camera session started")
 
-        captureGate.isEnabled = true
     }
 
     func stop() {
         cameraManager.stopSession()
         motionTracker.stop()
-        captureGate.isEnabled = false
     }
 
     // MARK: - Actions
 
     func requestCapture() {
-        captureGate.requestCapture()
+        guard !isCaptureRequested else { return }
+        isCaptureRequested = true
+
+        cameraManager.capturePhoto(onShutter: { [weak self] in
+            Task { @MainActor in
+                self?.handleShutterFeedback()
+            }
+        }, completion: { [weak self] (image: UIImage?) in
+            guard let self else { return }
+            Task { @MainActor in
+                self.isCaptureRequested = false
+                guard let image else {
+                    self.gateState = .noRectangle
+                    return
+                }
+
+                let result = CaptureResult(
+                    image: image,
+                    rectangle: self.defaultRectangle(),
+                    timestamp: Date()
+                )
+                self.handleCapture(result)
+            }
+        })
     }
 
     // MARK: - Private Methods
 
     private func setupSubscriptions() {
-        // Connect rectangle detector to camera frames
-        rectangleDetector.subscribe(to: cameraManager.framePublisher)
-
-        // Connect rectangle tracker to detector
-        rectangleTracker.subscribe(to: rectangleDetector)
-
-        // Feed frames to sharpness buffer
-        cameraManager.framePublisher
-            .receive(on: DispatchQueue.global(qos: .userInteractive))
-            .sink { [weak self] sampleBuffer in
-                guard let self else { return }
-                let eligible = self.currentFrameEligibility()
-                self.sharpnessBuffer.addFrame(sampleBuffer, eligible: eligible)
-            }
-            .store(in: &cancellables)
-
-        // Handle capture events
-        captureGate.capturePublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] result in
-                self?.handleCapture(result)
-            }
-            .store(in: &cancellables)
+        // Rectangle detection currently not used for capture flow.
 
         // MARK: - Forward child state to trigger SwiftUI updates
 
@@ -179,30 +172,10 @@ final class ScannerViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: &$lockedRectangle)
 
-        // Update frame eligibility for sharpness buffering
-        Publishers.CombineLatest(
-            motionTracker.$isStable,
-            captureGate.$isCaptureRequested
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] deviceStable, captureRequested in
-            self?.setFrameEligibility(deviceStable && captureRequested)
-        }
-        .store(in: &cancellables)
-
         // Forward motion tracker state
         motionTracker.$isStable
             .receive(on: DispatchQueue.main)
             .assign(to: &$isDeviceStable)
-
-        // Forward capture gate state
-        captureGate.$state
-            .receive(on: DispatchQueue.main)
-            .assign(to: &$gateState)
-
-        captureGate.$isCaptureRequested
-            .receive(on: DispatchQueue.main)
-            .assign(to: &$isCaptureRequested)
     }
 
     private func handleCapture(_ result: CaptureResult) {
@@ -212,7 +185,7 @@ final class ScannerViewModel: ObservableObject {
         let captureIndex = nextCaptureIndex
         nextCaptureIndex += 1
 
-        Task.detached(priority: .utility) { [weak self] in
+        Task { [weak self] in
             guard let self else { return }
             if let stored = await self.captureStore.save(result: result, index: captureIndex) {
                 await MainActor.run {
@@ -228,6 +201,12 @@ final class ScannerViewModel: ObservableObject {
                             self.lastCapturedImage = processed
                         }
                     }
+
+                    // Upload the processed image immediately
+                    await self.uploadProcessedPage(
+                        pageIndex: captureIndex,
+                        processedImage: processed
+                    )
                 }
             }
         }
@@ -240,29 +219,66 @@ final class ScannerViewModel: ObservableObject {
                     lastCapturedImage = nil
                 }
             }
+            if gateState == .captured {
+                gateState = .noRectangle
+            }
         }
     }
 
-    private func setFrameEligibility(_ value: Bool) {
-        frameEligibilityLock.lock()
-        let previous = isFrameEligible
-        isFrameEligible = value
-        frameEligibilityLock.unlock()
-
-        if previous && !value {
-            sharpnessBuffer.clear()
+    /// Upload a processed page to the pipeline server
+    private func uploadProcessedPage(pageIndex: Int, processedImage: UIImage) async {
+        guard let imageData = processedImage.jpegData(compressionQuality: 0.85) else {
+            print("[ScannerViewModel] Failed to convert image to JPEG data")
+            return
         }
-    }
 
-    private func currentFrameEligibility() -> Bool {
-        frameEligibilityLock.lock()
-        let value = isFrameEligible
-        frameEligibilityLock.unlock()
-        return value
+        await MainActor.run {
+            self.uploadingPageIndex = pageIndex
+            self.lastUploadError = nil
+        }
+
+        do {
+            _ = try await uploadService.uploadPage(pageIndex: pageIndex, imageData: imageData)
+            await MainActor.run {
+                self.uploadingPageIndex = nil
+                self.uploadedPageCount += 1
+            }
+            print("[ScannerViewModel] Successfully uploaded page \(pageIndex)")
+        } catch {
+            await MainActor.run {
+                self.uploadingPageIndex = nil
+                self.lastUploadError = error.localizedDescription
+            }
+            print("[ScannerViewModel] Upload failed for page \(pageIndex): \(error)")
+        }
     }
 
     private func updateStoredCapture(id: UUID, processedURL: URL) {
         guard let index = storedCaptures.firstIndex(where: { $0.id == id }) else { return }
         storedCaptures[index].processedFileURL = processedURL
+    }
+
+    private func handleShutterFeedback() {
+        isCaptureRequested = false
+        gateState = .captured
+        shutterFlashToken = UUID()
+        shutterHaptic.impactOccurred()
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(120))
+            if gateState == .captured {
+                gateState = .noRectangle
+            }
+        }
+    }
+
+    private func defaultRectangle() -> DetectedRectangle {
+        DetectedRectangle(
+            topLeft: CGPoint(x: 0, y: 1),
+            topRight: CGPoint(x: 1, y: 1),
+            bottomLeft: CGPoint(x: 0, y: 0),
+            bottomRight: CGPoint(x: 1, y: 0),
+            confidence: 0
+        )
     }
 }

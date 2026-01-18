@@ -119,6 +119,16 @@ export const convex = {
     return await client.mutation(api.generator.markFailed, args);
   },
 
+  async upsertCharacterChapterSummary(args: {
+    bookPath: string;
+    characterSlug: string;
+    chapterNumber: number;
+    summary: string;
+    isFirstAppearance: boolean;
+  }) {
+    return await client.mutation(api.metadata.upsertCharacterChapterSummary, args);
+  },
+
   async uploadNotes(args: {
     notes: {
       bookPath: string;

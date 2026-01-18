@@ -30,11 +30,13 @@ final class CaptureStore {
     }
 
     func save(result: CaptureResult, index: Int) async -> StoredCapture? {
-        await withCheckedContinuation { continuation in
+        let baseURL = baseURL
+        let ioQueue = ioQueue
+        return await withCheckedContinuation { continuation in
             ioQueue.async {
                 do {
                     try FileManager.default.createDirectory(
-                        at: self.baseURL,
+                        at: baseURL,
                         withIntermediateDirectories: true
                     )
                 } catch {
@@ -42,9 +44,9 @@ final class CaptureStore {
                 }
 
                 let filename = String(format: "page-%04d.heic", index)
-                let fileURL = self.baseURL.appendingPathComponent(filename)
+                let fileURL = baseURL.appendingPathComponent(filename)
 
-                guard let data = self.encodeHeic(result.image, quality: 0.98) else {
+                guard let data = Self.encodeHeic(result.image, quality: 0.98) else {
                     print("[CaptureStore] Failed to encode HEIC")
                     continuation.resume(returning: nil)
                     return
@@ -67,7 +69,8 @@ final class CaptureStore {
     }
 
     func saveProcessed(image: UIImage, for stored: StoredCapture) async -> URL? {
-        await withCheckedContinuation { continuation in
+        let ioQueue = ioQueue
+        return await withCheckedContinuation { continuation in
             ioQueue.async {
                 let directory = stored.fileURL.deletingLastPathComponent()
                 let baseName = stored.fileURL.deletingPathExtension().lastPathComponent
@@ -90,7 +93,7 @@ final class CaptureStore {
         }
     }
 
-    private func encodeHeic(_ image: UIImage, quality: CGFloat) -> Data? {
+    private static func encodeHeic(_ image: UIImage, quality: CGFloat) -> Data? {
         guard let cgImage = image.cgImage else {
             return nil
         }

@@ -48,3 +48,20 @@ convex-test
 books/
 .env.test
 ConvexReactiveAssets/
+apps/pipeline/scanned-books/
+
+# iOS / Xcode
+## User-specific Xcode data (breakpoints, UI state, window positions)
+xcuserdata/
+*.xcuserstate
+## Build artifacts
+DerivedData/
+build/
+*.ipa
+## CocoaPods (if using - uncomment if needed)
+# Pods/
+## Fastlane (if using)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
