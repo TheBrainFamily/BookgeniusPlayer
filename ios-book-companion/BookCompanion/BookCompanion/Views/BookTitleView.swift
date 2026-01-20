@@ -9,12 +9,18 @@ import SwiftUI
 
 struct BookTitleView: View {
 
-    @State private var bookTitle: String = ""
+    @State private var bookTitle: String
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
 
     let uploadService: UploadService
-    let onSessionStarted: (String, String) -> Void  // (sessionId, bookSlug)
+    let onSessionStarted: (String, String, String) -> Void  // (sessionId, bookSlug, bookTitle)
+
+    init(uploadService: UploadService, initialTitle: String = "", onSessionStarted: @escaping (String, String, String) -> Void) {
+        self.uploadService = uploadService
+        self.onSessionStarted = onSessionStarted
+        self._bookTitle = State(initialValue: initialTitle)
+    }
 
     var body: some View {
         NavigationStack {
@@ -91,12 +97,14 @@ struct BookTitleView: View {
         isLoading = true
         errorMessage = nil
 
+        let titleToSave = bookTitle // Capture before async
+
         Task {
             do {
-                let response = try await uploadService.startSession(bookTitle: bookTitle)
+                let response = try await uploadService.startSession(bookTitle: titleToSave)
                 await MainActor.run {
                     isLoading = false
-                    onSessionStarted(response.sessionId, response.bookSlug)
+                    onSessionStarted(response.sessionId, response.bookSlug, titleToSave)
                 }
             } catch {
                 await MainActor.run {
@@ -109,7 +117,7 @@ struct BookTitleView: View {
 }
 
 #Preview {
-    BookTitleView(uploadService: UploadService()) { sessionId, bookSlug in
-        print("Session started: \(sessionId) - \(bookSlug)")
+    BookTitleView(uploadService: UploadService()) { sessionId, bookSlug, bookTitle in
+        print("Session started: \(sessionId) - \(bookSlug) - \(bookTitle)")
     }
 }

@@ -64,6 +64,12 @@ final class ScannerViewModel: ObservableObject {
 
     private var nextCaptureIndex: Int = 1
 
+    /// Set the starting page index (for resuming a session)
+    func setStartingPageIndex(_ index: Int) {
+        nextCaptureIndex = index
+        print("[ScannerViewModel] Starting from page index: \(index)")
+    }
+
     // MARK: - Initialization
 
     init(uploadService: UploadService) {

@@ -103,11 +103,13 @@ export async function loadAllPageResults(
     const files = await fs.readdir(pagesDir);
     const jsonFiles = files.filter((f) => f.endsWith(".json"));
 
-    const results: PageOCRResult[] = [];
-    for (const file of jsonFiles) {
-      const content = await fs.readFile(path.join(pagesDir, file), "utf-8");
-      results.push(JSON.parse(content) as PageOCRResult);
-    }
+    // Load all files in parallel
+    const results = await Promise.all(
+      jsonFiles.map(async (file) => {
+        const content = await fs.readFile(path.join(pagesDir, file), "utf-8");
+        return JSON.parse(content) as PageOCRResult;
+      }),
+    );
 
     // Sort by pageIndex
     return results.sort((a, b) => a.pageIndex - b.pageIndex);
@@ -206,13 +208,15 @@ export async function saveBookAnalysis(
 ): Promise<void> {
   const sessionDir = await ensureSessionDir(bookSlug, sessionId);
 
-  // Save full analysis
+  // Save full analysis and individual chapters in parallel
   const analysisPath = path.join(sessionDir, "analysis.json");
-  await fs.writeFile(analysisPath, JSON.stringify(analysis, null, 2));
+  const writes = [
+    fs.writeFile(analysisPath, JSON.stringify(analysis, null, 2)),
+    ...analysis.chapters.map((chapter) => {
+      const chapterPath = path.join(sessionDir, `analysis-chapter-${chapter.chapterNumber}.json`);
+      return fs.writeFile(chapterPath, JSON.stringify(chapter, null, 2));
+    }),
+  ];
 
-  // Save individual chapter analyses for debugging/incremental access
-  for (const chapter of analysis.chapters) {
-    const chapterPath = path.join(sessionDir, `analysis-chapter-${chapter.chapterNumber}.json`);
-    await fs.writeFile(chapterPath, JSON.stringify(chapter, null, 2));
-  }
+  await Promise.all(writes);
 }

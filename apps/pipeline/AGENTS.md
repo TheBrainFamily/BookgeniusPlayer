@@ -6,7 +6,7 @@ AI-powered pipeline that transforms EPUB/FB2 files into interactive audiobook co
 
 ```bash
 # Start server (port 4000)
-cd apps/pipeline/server && bunx src/index.ts
+cd apps/pipeline/server && bun start
 
 # Run full pipeline
 bun src/pipeline-cli.ts path/to/book.fb2 --slug my-book

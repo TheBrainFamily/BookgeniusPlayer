@@ -37,8 +37,11 @@ export const SessionMetadataSchema = z.object({
   bookSlug: z.string(),
   bookTitle: z.string(),
   startedAt: z.string(),
-  status: z.enum(["scanning", "processing", "completed", "failed"]),
+  status: z.enum(["scanning", "idle", "processing", "completed", "failed"]),
   totalPages: z.number().optional(),
+  // Incremental processing progress
+  lastActivityAt: z.string().optional(), // ISO timestamp of last page upload
+  processedChapters: z.array(z.number()).optional(), // Chapter numbers that have been analyzed
 });
 
 export type SessionMetadata = z.infer<typeof SessionMetadataSchema>;

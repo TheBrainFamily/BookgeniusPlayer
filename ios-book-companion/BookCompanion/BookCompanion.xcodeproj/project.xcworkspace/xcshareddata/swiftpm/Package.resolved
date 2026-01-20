@@ -1,5 +1,5 @@
 {
-  "originHash" : "282b63ebaef8b422f2c5f9be0fcc9f6d858de6c1cc0f987b2556ee892ba69585",
+  "originHash" : "b658aead49c39554e87d33d63c518a18324f15ed3766131fab845e1e615d3d3b",
   "pins" : [
     {
       "identity" : "convex-swift",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "6a87b8a74bf8c9d36f205558bf6eff90fbd36673",
         "version" : "0.7.0"
+      }
+    },
+    {
+      "identity" : "eventsource",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattt/EventSource",
+      "state" : {
+        "revision" : "ca2a9d90cbe49e09b92f4b6ebd922c03ebea51d0",
+        "version" : "1.3.0"
       }
     }
   ],

@@ -5,6 +5,7 @@ import fs from "fs";
 import { appRouter } from "./router";
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
 import scanRoutes from "../scan-server/scanRoutes";
+import pageQuestionRoutes from "../scan-server/pageQuestionRoutes";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 
@@ -14,6 +15,9 @@ app.use(express.json()); // Parse JSON bodies
 
 // Mount scan routes for iOS book scanning
 app.use("/api/scan", scanRoutes);
+
+// Mount page question routes for iOS reading companion
+app.use("/api/page-question", pageQuestionRoutes);
 
 // Simple health
 app.get("/health", (_req, res) => {

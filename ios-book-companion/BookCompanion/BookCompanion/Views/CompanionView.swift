@@ -10,12 +10,14 @@ import SwiftUI
 struct CompanionView: View {
 
     let bookSlug: String?
+    @Binding var selectedChapterNumber: Int
 
     @StateObject private var viewModel: CompanionViewModel
     @State private var selectedCharacter: CharacterProfile?
 
-    init(bookSlug: String?) {
+    init(bookSlug: String?, selectedChapterNumber: Binding<Int>) {
         self.bookSlug = bookSlug
+        self._selectedChapterNumber = selectedChapterNumber
         _viewModel = StateObject(wrappedValue: CompanionViewModel(bookSlug: bookSlug))
     }
 
@@ -80,6 +82,9 @@ struct CompanionView: View {
         }
         .onChange(of: bookSlug) { newValue in
             viewModel.updateBookSlug(newValue)
+        }
+        .onChange(of: viewModel.selectedChapterNumber) { _, newValue in
+            selectedChapterNumber = newValue
         }
     }
 
@@ -169,17 +174,14 @@ private struct AvatarCard: View {
                     .frame(height: 86)
 
                 if let avatarUrl = character.avatarUrl, let url = URL(string: avatarUrl) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        default:
-                            Image(systemName: character.symbolName)
-                                .font(.system(size: 34, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.9))
-                        }
+                    CachedAsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Image(systemName: character.symbolName)
+                            .font(.system(size: 34, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.9))
                     }
                     .frame(width: 86, height: 86)
                     .clipShape(Circle())
@@ -226,17 +228,14 @@ private struct CharacterSummarySheet: View {
                                 .frame(width: 120, height: 120)
 
                             if let avatarUrl = character.avatarUrl, let url = URL(string: avatarUrl) {
-                                AsyncImage(url: url) { phase in
-                                    switch phase {
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    default:
-                                        Image(systemName: character.symbolName)
-                                            .font(.system(size: 48, weight: .semibold))
-                                            .foregroundStyle(.white.opacity(0.95))
-                                    }
+                                CachedAsyncImage(url: url) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                } placeholder: {
+                                    Image(systemName: character.symbolName)
+                                        .font(.system(size: 48, weight: .semibold))
+                                        .foregroundStyle(.white.opacity(0.95))
                                 }
                                 .frame(width: 120, height: 120)
                                 .clipShape(Circle())
@@ -355,17 +354,14 @@ private struct FullAvatarView: View {
                 Spacer()
 
                 if let avatarUrl = character.avatarUrl, let url = URL(string: avatarUrl) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                        default:
-                            ProgressView()
-                                .tint(.white)
-                        }
+                    CachedAsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                    } placeholder: {
+                        ProgressView()
+                            .tint(.white)
                     }
                     .frame(maxWidth: 320, maxHeight: 320)
                 }
@@ -404,5 +400,5 @@ private struct EmptyCompanionState: View {
 }
 
 #Preview {
-    CompanionView(bookSlug: "sample-book")
+    CompanionView(bookSlug: "sample-book", selectedChapterNumber: .constant(1))
 }

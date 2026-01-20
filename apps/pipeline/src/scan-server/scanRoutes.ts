@@ -1,6 +1,8 @@
 import { Router, type Request } from "express";
 import { randomUUID } from "crypto";
 import multer from "multer";
+import fs from "fs/promises";
+import path from "path";
 import {
   saveSessionMetadata,
   loadSessionMetadata,
@@ -14,6 +16,17 @@ import type { SessionMetadata, SessionStatusResponse } from "./ocrSchema";
 import { processOCRResults, summarizeChapters } from "./chapterDetector";
 import { analyzeChaptersRolling, summarizeAnalysis } from "./chapterAnalyzer";
 import { importScannedBook } from "../tools/importScannedBook";
+import {
+  registerSession,
+  onPageOCRComplete,
+  startTimeoutChecker,
+  getProcessingProgress,
+} from "./sessionProcessor";
+
+const SCANNED_BOOKS_DIR = path.join(__dirname, "../../scanned-books");
+
+// Start the timeout checker for incremental processing
+startTimeoutChecker();
 
 // Extend Express Request to include multer file
 interface MulterRequest extends Request {
@@ -53,15 +66,21 @@ router.post("/start-session", async (req, res) => {
     const bookSlug = providedSlug || toSlug(bookTitle);
     const sessionId = randomUUID();
 
+    const now = new Date().toISOString();
     const metadata: SessionMetadata = {
       sessionId,
       bookSlug,
       bookTitle,
-      startedAt: new Date().toISOString(),
+      startedAt: now,
       status: "scanning",
+      lastActivityAt: now,
+      processedChapters: [],
     };
 
     await saveSessionMetadata(bookSlug, sessionId, metadata);
+
+    // Register session for incremental processing
+    registerSession(bookSlug, sessionId);
 
     console.log(`[Scan] Started session ${sessionId} for "${bookTitle}" (${bookSlug})`);
 
@@ -102,13 +121,30 @@ router.post("/upload-page", upload.single("image"), async (req: MulterRequest, r
     const imagePath = await savePageImage(bookSlug, sessionId, pageIndex, file.buffer);
     console.log(`[Scan] Saved page ${pageIndex} to ${imagePath}`);
 
+    // Update session lastActivityAt
+    const metadata = await loadSessionMetadata(bookSlug, sessionId);
+    if (metadata) {
+      await saveSessionMetadata(bookSlug, sessionId, {
+        ...metadata,
+        lastActivityAt: new Date().toISOString(),
+      });
+    }
+
+    // Register session if not already (for resumed sessions)
+    registerSession(bookSlug, sessionId);
+
     // Respond immediately, then process OCR in background
     res.json({ pageIndex, ocrStatus: "processing" });
 
-    // Fire-and-forget OCR processing
-    processPageOCR(bookSlug, sessionId, pageIndex).catch((err) => {
-      console.error(`[Scan] Background OCR failed for page ${pageIndex}:`, err);
-    });
+    // Fire-and-forget OCR processing, then trigger incremental chapter processing
+    processPageOCR(bookSlug, sessionId, pageIndex)
+      .then(() => {
+        // Notify session processor that a page OCR completed
+        return onPageOCRComplete(bookSlug, sessionId);
+      })
+      .catch((err) => {
+        console.error(`[Scan] Background OCR failed for page ${pageIndex}:`, err);
+      });
   } catch (error) {
     console.error("[Scan] upload-page error:", error);
     res.status(500).json({ error: "Failed to upload page" });
@@ -160,9 +196,74 @@ router.get("/session/:sessionId/status", async (req, res) => {
 });
 
 /**
+ * GET /api/scan/book/:bookSlug/session
+ * Returns the latest session for this book with processing progress
+ */
+router.get("/book/:bookSlug/session", async (req, res) => {
+  try {
+    const { bookSlug } = req.params;
+
+    // Find all sessions for this book
+    const bookDir = path.join(SCANNED_BOOKS_DIR, bookSlug);
+    let sessionDirs: string[];
+    try {
+      const entries = await fs.readdir(bookDir);
+      sessionDirs = entries.filter((e) => e.startsWith("session-"));
+    } catch {
+      res.status(404).json({ error: "No sessions found for this book" });
+      return;
+    }
+
+    if (sessionDirs.length === 0) {
+      res.status(404).json({ error: "No sessions found for this book" });
+      return;
+    }
+
+    // Load all session metadata and find the most recent one
+    let latestSession: SessionMetadata | null = null;
+    let latestTime = 0;
+
+    for (const dir of sessionDirs) {
+      const sessionId = dir.replace("session-", "");
+      const metadata = await loadSessionMetadata(bookSlug, sessionId);
+      if (metadata) {
+        const time = new Date(metadata.lastActivityAt || metadata.startedAt).getTime();
+        if (time > latestTime) {
+          latestTime = time;
+          latestSession = metadata;
+        }
+      }
+    }
+
+    if (!latestSession) {
+      res.status(404).json({ error: "No valid sessions found" });
+      return;
+    }
+
+    // Get processing progress
+    const progress = await getProcessingProgress(bookSlug, latestSession.sessionId);
+
+    res.json({
+      sessionId: latestSession.sessionId,
+      bookSlug: latestSession.bookSlug,
+      bookTitle: latestSession.bookTitle,
+      status: latestSession.status,
+      // Return the actual book page number, not the scan index
+      lastPageIndex: progress?.lastBookPageNumber ?? 0,
+      processedChapters: progress?.processedChapters ?? [],
+      isProcessing: progress?.isProcessing ?? false,
+    });
+  } catch (error) {
+    console.error("[Scan] get book session error:", error);
+    res.status(500).json({ error: "Failed to get session" });
+  }
+});
+
+/**
  * POST /api/scan/session/:sessionId/finish
  * Body: { bookSlug }
  * Fire-and-forget: Returns immediately, processes in background
+ * @deprecated Use incremental processing instead - this is kept for backwards compatibility
  */
 router.post("/session/:sessionId/finish", async (req, res) => {
   try {

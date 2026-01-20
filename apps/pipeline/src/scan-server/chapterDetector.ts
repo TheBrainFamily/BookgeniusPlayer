@@ -122,6 +122,27 @@ export function validatePageNumbers(pages: LogicalPage[]): LogicalPage[] {
   return validated;
 }
 
+/** Check if a chapter marker should be ignored (backward jump = likely hallucination) */
+function isBackwardChapterMarker(
+  chapterNum: number | undefined,
+  highestSeen: number,
+  isSameChapter: boolean,
+): boolean {
+  if (chapterNum === undefined || isSameChapter) return false;
+  return chapterNum > 0 && chapterNum <= highestSeen;
+}
+
+/** Find the last page with an actual OCR page number before the given index */
+function findLastRealPageNumber(pages: LogicalPage[], beforeIndex: number): number | undefined {
+  for (let i = beforeIndex - 1; i >= 0; i--) {
+    if (pages[i].pageNumber !== null) {
+      return pages[i].pageNumber!;
+    }
+  }
+  // Fallback to validated number if no real OCR number found
+  return pages[beforeIndex - 1]?.validatedPageNumber;
+}
+
 /**
  * Detect chapters from validated pages
  *
@@ -129,39 +150,45 @@ export function validatePageNumbers(pages: LogicalPage[]): LogicalPage[] {
  * - Consecutive pages with the same chapterNumber are merged into one chapter
  * - chapterNumber: 0 mid-book is treated as "unknown" (continues current chapter)
  * - Only pages at the START before any chapter marker become prologue (Chapter 0)
+ * - Backward chapter markers are ignored (likely OCR hallucinations)
  */
 export function detectChapters(pages: LogicalPage[]): DetectedChapter[] {
   const chapters: DetectedChapter[] = [];
   let currentChapter: DetectedChapter | null = null;
-  let hasSeenRealChapter = false; // Track if we've seen a non-zero chapter
+  let hasSeenRealChapter = false;
+  let highestChapterSeen = 0;
 
   for (const page of pages) {
-    const pageChapterNum = page.chapterNumber;
+    const chapterNum = page.chapterNumber;
+    const isMarker = chapterNum !== undefined;
+    const isSame =
+      currentChapter !== null && isMarker && chapterNum === currentChapter.chapterNumber;
+    const isUnknown = chapterNum === 0 && hasSeenRealChapter;
+    const isBackward = isBackwardChapterMarker(chapterNum, highestChapterSeen, isSame);
 
-    // Determine if this page indicates a chapter change
-    const isChapterMarker = pageChapterNum !== undefined;
-    const isSameChapter =
-      currentChapter !== null && isChapterMarker && pageChapterNum === currentChapter.chapterNumber;
+    if (isBackward) {
+      console.log(
+        `[ChapterDetector] Ignoring backward chapter marker: Chapter ${chapterNum} on page ${page.validatedPageNumber} (highest seen: ${highestChapterSeen})`,
+      );
+    }
 
-    // Treat chapterNumber: 0 as "unknown" if we've already seen a real chapter
-    // This prevents mid-book OCR confusion from creating spurious Chapter 0 entries
-    const isUnknownChapter = pageChapterNum === 0 && hasSeenRealChapter;
-
-    if (isChapterMarker && !isSameChapter && !isUnknownChapter) {
+    if (isMarker && !isSame && !isUnknown && !isBackward) {
       // This is a NEW chapter (different number than current)
       if (currentChapter) {
-        currentChapter.endPageNumber = pages[pages.indexOf(page) - 1]?.validatedPageNumber;
+        // Find the last page with a real OCR number (skip illustration pages)
+        currentChapter.endPageNumber = findLastRealPageNumber(pages, pages.indexOf(page));
         chapters.push(currentChapter);
       }
 
-      // Track that we've seen a real chapter
-      if (pageChapterNum !== 0) {
+      // Track that we've seen a real chapter and update highest seen
+      if (chapterNum !== 0) {
         hasSeenRealChapter = true;
+        highestChapterSeen = Math.max(highestChapterSeen, chapterNum);
       }
 
       // Start new chapter
       currentChapter = {
-        chapterNumber: pageChapterNum,
+        chapterNumber: chapterNum,
         title: page.chapterTitle,
         startPageNumber: page.validatedPageNumber,
         pages: [page],

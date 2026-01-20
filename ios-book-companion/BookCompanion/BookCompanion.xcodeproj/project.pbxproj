@@ -8,16 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		FF1CCE982F1A8938000D3972 /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = FF1CCE972F1A8938000D3972 /* ConvexMobile */; };
+		FF46EB6A2F1E668A00EE815A /* EventSource in Frameworks */ = {isa = PBXBuildFile; productRef = FF46EB692F1E668A00EE815A /* EventSource */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FF27DD132F196A96004178DE /* BookCompanion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookCompanion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF46EB8C2F1F970400EE815A /* macosbooksTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = macosbooksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FF27DD152F196A96004178DE /* BookCompanion */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = BookCompanion;
+			sourceTree = "<group>";
+		};
+		FF46EB8D2F1F970400EE815A /* macosbooksTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = macosbooksTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -27,7 +34,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF46EB6A2F1E668A00EE815A /* EventSource in Frameworks */,
 				FF1CCE982F1A8938000D3972 /* ConvexMobile in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF46EB892F1F970400EE815A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				FF27DD152F196A96004178DE /* BookCompanion */,
+				FF46EB8D2F1F970400EE815A /* macosbooksTests */,
 				FF27DD142F196A96004178DE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -46,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				FF27DD132F196A96004178DE /* BookCompanion.app */,
+				FF46EB8C2F1F970400EE815A /* macosbooksTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -71,10 +88,33 @@
 			name = BookCompanion;
 			packageProductDependencies = (
 				FF1CCE972F1A8938000D3972 /* ConvexMobile */,
+				FF46EB692F1E668A00EE815A /* EventSource */,
 			);
 			productName = BookCompanion;
 			productReference = FF27DD132F196A96004178DE /* BookCompanion.app */;
 			productType = "com.apple.product-type.application";
+		};
+		FF46EB8B2F1F970400EE815A /* macosbooksTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF46EB902F1F970400EE815A /* Build configuration list for PBXNativeTarget "macosbooksTests" */;
+			buildPhases = (
+				FF46EB882F1F970400EE815A /* Sources */,
+				FF46EB892F1F970400EE815A /* Frameworks */,
+				FF46EB8A2F1F970400EE815A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FF46EB8D2F1F970400EE815A /* macosbooksTests */,
+			);
+			name = macosbooksTests;
+			packageProductDependencies = (
+			);
+			productName = macosbooksTests;
+			productReference = FF46EB8C2F1F970400EE815A /* macosbooksTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -89,9 +129,12 @@
 					FF27DD122F196A96004178DE = {
 						CreatedOnToolsVersion = 16.2;
 					};
+					FF46EB8B2F1F970400EE815A = {
+						CreatedOnToolsVersion = 16.2;
+					};
 				};
 			};
-			buildConfigurationList = FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */;
+			buildConfigurationList = FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -102,6 +145,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				FF1CCE962F1A8938000D3972 /* XCRemoteSwiftPackageReference "convex-swift" */,
+				FF46EB682F1E668A00EE815A /* XCRemoteSwiftPackageReference "EventSource" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FF27DD142F196A96004178DE /* Products */;
@@ -109,6 +153,7 @@
 			projectRoot = "";
 			targets = (
 				FF27DD122F196A96004178DE /* BookCompanion */,
+				FF46EB8B2F1F970400EE815A /* macosbooksTests */,
 			);
 		};
 /* End PBXProject section */
@@ -121,10 +166,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FF46EB8A2F1F970400EE815A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FF27DD0F2F196A96004178DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF46EB882F1F970400EE815A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -317,10 +376,44 @@
 			};
 			name = Release;
 		};
+		FF46EB912F1F970400EE815A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6CT6LJPY6T;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pro.lgandecki.macosbooksTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FF46EB922F1F970400EE815A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6CT6LJPY6T;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = pro.lgandecki.macosbooksTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */ = {
+		FF27DD0E2F196A96004178DE /* Build configuration list for PBXProject "BookCompanion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FF27DD1F2F196A99004178DE /* Debug */,
@@ -338,6 +431,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		FF46EB902F1F970400EE815A /* Build configuration list for PBXNativeTarget "macosbooksTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF46EB912F1F970400EE815A /* Debug */,
+				FF46EB922F1F970400EE815A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -349,6 +451,14 @@
 				minimumVersion = 0.7.0;
 			};
 		};
+		FF46EB682F1E668A00EE815A /* XCRemoteSwiftPackageReference "EventSource" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mattt/EventSource";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -356,6 +466,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FF1CCE962F1A8938000D3972 /* XCRemoteSwiftPackageReference "convex-swift" */;
 			productName = ConvexMobile;
+		};
+		FF46EB692F1E668A00EE815A /* EventSource */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FF46EB682F1E668A00EE815A /* XCRemoteSwiftPackageReference "EventSource" */;
+			productName = EventSource;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

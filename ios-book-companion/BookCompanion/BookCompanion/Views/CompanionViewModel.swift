@@ -3,10 +3,16 @@
 //  BookCompanion
 //
 //  Loads book metadata and chapter HTML from Convex for the Companion view.
+//  Uses real-time subscriptions for live updates as chapters are processed.
 //
 
 import Foundation
 import SwiftUI
+import Combine
+import ConvexMobile
+
+// Global Convex client - maintains WebSocket connection
+let convexClient = ConvexClient(deploymentUrl: "https://limitless-manatee-952.convex.cloud")
 
 @MainActor
 final class CompanionViewModel: ObservableObject {
@@ -20,10 +26,10 @@ final class CompanionViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
 
-    private let convexClient = ConvexPublicClient()
     private var bookSlug: String?
     private var charactersByChapter: [Int: Set<String>] = [:]
-    private var hasLoaded = false
+    private var cancellables = Set<AnyCancellable>()
+    private var isSubscribed = false
 
     var isMissingBook: Bool {
         bookSlug == nil
@@ -35,18 +41,209 @@ final class CompanionViewModel: ObservableObject {
 
     func updateBookSlug(_ slug: String?) {
         if slug != bookSlug {
+            // Cancel existing subscriptions
+            cancellables.removeAll()
+            isSubscribed = false
+
             bookSlug = slug
-            hasLoaded = false
-            Task { [weak self] in
-                await self?.loadIfNeeded()
-            }
+            setupSubscriptions()
         }
     }
 
     func loadIfNeeded() async {
         guard !isMissingBook else { return }
-        guard !hasLoaded else { return }
-        await load()
+        guard !isSubscribed else { return }
+        setupSubscriptions()
+    }
+
+    /// Force refresh - with subscriptions, data updates automatically
+    /// This is kept for pull-to-refresh UX feedback
+    func refresh() async {
+        // With real-time subscriptions, data is always fresh
+        // This method exists for UX - shows loading indicator briefly
+        guard !isMissingBook else { return }
+        isLoading = true
+        try? await Task.sleep(nanoseconds: 300_000_000) // 0.3s for visual feedback
+        isLoading = false
+    }
+
+    /// Set up real-time subscriptions to Convex queries
+    private func setupSubscriptions() {
+        guard let bookSlug else { return }
+        guard !isSubscribed else { return }
+
+        isLoading = true
+        errorMessage = nil
+        isSubscribed = true
+
+        let bookPath = "books/\(bookSlug)"
+
+        // Subscribe to character bundles - updates when new characters are added
+        convexClient.subscribe(to: "bookQueries:listCharacterBundles", with: ["bookPath": bookPath], yielding: [CharacterBundle].self)
+            .replaceError(with: [])
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] bundles in
+                self?.updateCharacters(from: bundles)
+            }
+            .store(in: &cancellables)
+
+        // Subscribe to chapters - updates when new chapters are imported
+        convexClient.subscribe(to: "bookQueries:listHtmlSourceChapters", with: ["bookPath": bookPath], yielding: [HtmlSourceChapter]?.self)
+            .replaceError(with: nil)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] chaptersSource in
+                self?.updateChapters(from: chaptersSource ?? [])
+            }
+            .store(in: &cancellables)
+
+        // Subscribe to character chapter summaries - updates when analysis completes
+        convexClient.subscribe(to: "metadata:listAllChapterSummariesForBook", with: ["bookPath": bookPath], yielding: [CharacterChapterSummary].self)
+            .replaceError(with: [])
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] summaries in
+                self?.updateChapterSummaries(summaries)
+                self?.isLoading = false
+            }
+            .store(in: &cancellables)
+    }
+
+    /// Update characters from subscription
+    private func updateCharacters(from bundles: [CharacterBundle]) {
+        // Preserve chapter summaries from existing characters
+        var existingSummaries: [String: [Int: ChapterSummaryInfo]] = [:]
+        var existingBySlug: [String: CharacterProfile] = [:]
+        for char in characters {
+            existingSummaries[char.slug] = char.chapterSummaries
+            existingBySlug[char.slug] = char
+        }
+
+        // Build new profiles, checking if anything actually changed
+        var hasChanges = bundles.count != characters.count
+        var newProfiles: [CharacterProfile] = []
+
+        for bundle in bundles {
+            let newAvatarUrl = bundle.avatarLarge?.url ?? bundle.avatar?.url
+            let newSummary = bundle.metadata.summary ?? "Summary coming soon."
+
+            if let existing = existingBySlug[bundle.slug] {
+                // Check if this character's display data changed
+                if existing.avatarUrl != newAvatarUrl || existing.globalSummary != newSummary || existing.name != bundle.name {
+                    hasChanges = true
+                    newProfiles.append(CharacterProfile(
+                        slug: bundle.slug,
+                        name: bundle.name,
+                        globalSummary: newSummary,
+                        avatarUrl: newAvatarUrl,
+                        chapterSummaries: existing.chapterSummaries
+                    ))
+                } else {
+                    // Reuse existing object to preserve identity
+                    newProfiles.append(existing)
+                }
+            } else {
+                // New character
+                hasChanges = true
+                newProfiles.append(CharacterProfile(
+                    slug: bundle.slug,
+                    name: bundle.name,
+                    globalSummary: newSummary,
+                    avatarUrl: newAvatarUrl,
+                    chapterSummaries: existingSummaries[bundle.slug] ?? [:]
+                ))
+            }
+        }
+
+        // Only update if something actually changed - prevents unnecessary re-renders
+        if hasChanges {
+            self.characters = newProfiles.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        }
+    }
+
+    /// Update chapters from subscription
+    private func updateChapters(from chaptersSource: [HtmlSourceChapter]) {
+        let allChapters = ChapterBuilder.buildChapters(from: chaptersSource)
+        let computedChapters = allChapters.filter { $0.number > 0 }
+        let computedPages = ChapterBuilder.buildPages(from: computedChapters)
+
+        self.chapters = computedChapters
+        self.pages = computedPages
+
+        // Load character appearances from chapter HTML
+        Task {
+            let appearances = try? await loadChapterAppearances(from: chaptersSource)
+            await MainActor.run {
+                self.charactersByChapter = (appearances ?? [:]).filter { $0.key > 0 }
+            }
+        }
+
+        // Set initial selection if not set
+        if selectedChapterNumber == 1, let first = computedChapters.first {
+            selectedChapterNumber = first.number
+            selectedPage = first.startPage
+        }
+    }
+
+    /// Update character summaries from subscription
+    private func updateChapterSummaries(_ allSummaries: [CharacterChapterSummary]) {
+        // Build summary map
+        var summariesByCharacter: [String: [Int: ChapterSummaryInfo]] = [:]
+        for summary in allSummaries where summary.chapterNumber > 0 {
+            if summariesByCharacter[summary.characterSlug] == nil {
+                summariesByCharacter[summary.characterSlug] = [:]
+            }
+            summariesByCharacter[summary.characterSlug]?[summary.chapterNumber] = ChapterSummaryInfo(
+                summary: summary.summary,
+                isFirstAppearance: summary.isFirstAppearance
+            )
+        }
+
+        // Check if any summaries actually changed before updating
+        var hasChanges = false
+        for char in characters {
+            let newSummaries = summariesByCharacter[char.slug]
+            let existingSummaries = char.chapterSummaries
+
+            // Check if summary count changed or any summary content changed
+            if newSummaries?.count != existingSummaries.count {
+                hasChanges = true
+                break
+            }
+            if let newSummaries = newSummaries {
+                for (chapterNum, newInfo) in newSummaries {
+                    if existingSummaries[chapterNum]?.summary != newInfo.summary {
+                        hasChanges = true
+                        break
+                    }
+                }
+            }
+            if hasChanges { break }
+        }
+
+        // Only update if summaries actually changed
+        // Note: This doesn't affect character card appearance, only detail views
+        guard hasChanges else { return }
+
+        self.characters = characters.map { char in
+            let newSummaries = summariesByCharacter[char.slug] ?? char.chapterSummaries
+            // Only create new object if summaries actually changed for this character
+            if newSummaries.count == char.chapterSummaries.count {
+                var same = true
+                for (k, v) in newSummaries {
+                    if char.chapterSummaries[k]?.summary != v.summary {
+                        same = false
+                        break
+                    }
+                }
+                if same { return char }
+            }
+            return CharacterProfile(
+                slug: char.slug,
+                name: char.name,
+                globalSummary: char.globalSummary,
+                avatarUrl: char.avatarUrl,
+                chapterSummaries: newSummaries
+            )
+        }
     }
 
     func isCharacter(_ character: CharacterProfile, in chapterNumber: Int) -> Bool {
@@ -91,84 +288,6 @@ final class CompanionViewModel: ObservableObject {
         }, set: { newValue in
             self.setPage(newValue)
         })
-    }
-
-    private func load() async {
-        guard let bookSlug else { return }
-
-        isLoading = true
-        errorMessage = nil
-
-        let bookPath = "books/\(bookSlug)"
-
-        do {
-            async let bundlesTask: [CharacterBundle] = convexClient.query(
-                path: "bookQueries:listCharacterBundles",
-                args: ["bookPath": bookPath]
-            )
-            async let chaptersTask: [HtmlSourceChapter]? = convexClient.query(
-                path: "bookQueries:listHtmlSourceChapters",
-                args: ["bookPath": bookPath]
-            )
-            async let summariesTask: [CharacterChapterSummary] = convexClient.query(
-                path: "metadata:listAllChapterSummariesForBook",
-                args: ["bookPath": bookPath]
-            )
-
-            let (bundles, chaptersSourceOptional, allSummaries) = try await (bundlesTask, chaptersTask, summariesTask)
-            let chaptersSource = chaptersSourceOptional ?? []
-
-            // Build a map of character slug -> chapter number -> summary info
-            // Filter out chapter 0 (front matter/prologue)
-            var summariesByCharacter: [String: [Int: ChapterSummaryInfo]] = [:]
-            for summary in allSummaries where summary.chapterNumber > 0 {
-                if summariesByCharacter[summary.characterSlug] == nil {
-                    summariesByCharacter[summary.characterSlug] = [:]
-                }
-                summariesByCharacter[summary.characterSlug]?[summary.chapterNumber] = ChapterSummaryInfo(
-                    summary: summary.summary,
-                    isFirstAppearance: summary.isFirstAppearance
-                )
-            }
-
-            let profiles = bundles.map { bundle in
-                CharacterProfile(
-                    slug: bundle.slug,
-                    name: bundle.name,
-                    globalSummary: bundle.metadata.summary ?? "Summary coming soon.",
-                    avatarUrl: bundle.avatarLarge?.url ?? bundle.avatar?.url,
-                    chapterSummaries: summariesByCharacter[bundle.slug] ?? [:]
-                )
-            }.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-
-            // Filter out chapter 0 (front matter/prologue) - start from chapter 1
-            let allChapters = ChapterBuilder.buildChapters(from: chaptersSource)
-            let computedChapters = allChapters.filter { $0.number > 0 }
-            let pages = ChapterBuilder.buildPages(from: computedChapters)
-
-            // Filter chapter appearances to exclude chapter 0
-            let allAppearances = try await loadChapterAppearances(from: chaptersSource)
-            let chapterAppearances = allAppearances.filter { $0.key > 0 }
-
-            self.characters = profiles
-            self.chapters = computedChapters
-            self.pages = pages
-            self.charactersByChapter = chapterAppearances
-
-            if let first = computedChapters.first {
-                selectedChapterNumber = first.number
-                selectedPage = first.startPage
-            } else {
-                selectedChapterNumber = 1
-                selectedPage = 1
-            }
-
-            hasLoaded = true
-        } catch {
-            errorMessage = "Failed to load book data. \(error.localizedDescription)"
-        }
-
-        isLoading = false
     }
 
     private func loadChapterAppearances(from chapters: [HtmlSourceChapter]) async throws -> [Int: Set<String>] {
@@ -232,8 +351,10 @@ struct ChapterSummaryInfo {
     let isFirstAppearance: Bool
 }
 
-struct CharacterProfile: Identifiable {
-    let id = UUID()
+struct CharacterProfile: Identifiable, Equatable {
+    // Use slug as stable identity - prevents view recreation on data updates
+    var id: String { slug }
+
     let slug: String
     let name: String
     let globalSummary: String
@@ -255,12 +376,19 @@ struct CharacterProfile: Identifiable {
         self.globalSummary = globalSummary
         self.avatarUrl = avatarUrl
         self.chapterSummaries = chapterSummaries
-        self.symbolName = CharacterProfile.symbols.randomElement() ?? "person.fill"
-        self.gradient = CharacterProfile.palette.randomElement() ?? LinearGradient(
-            colors: [.blue, .purple],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        // Deterministic symbol/gradient based on slug hash - prevents flickering on updates
+        let hashValue = abs(slug.hashValue)
+        self.symbolName = CharacterProfile.symbols[hashValue % CharacterProfile.symbols.count]
+        self.gradient = CharacterProfile.palette[hashValue % CharacterProfile.palette.count]
+    }
+
+    // Equatable: only re-render when actual display data changes
+    static func == (lhs: CharacterProfile, rhs: CharacterProfile) -> Bool {
+        lhs.slug == rhs.slug &&
+        lhs.name == rhs.name &&
+        lhs.globalSummary == rhs.globalSummary &&
+        lhs.avatarUrl == rhs.avatarUrl
+        // Note: chapterSummaries changes don't affect the character card itself
     }
 
     /// Returns the summary for a specific chapter, or nil if the character doesn't appear in that chapter
@@ -383,3 +511,5 @@ enum CharacterSlugParser {
         }
     }
 }
+
+// Convex Decodable Types are defined in ConvexPublicClient.swift

@@ -41,6 +41,17 @@ struct SessionStatusResponse: Codable {
     let pages: [PageStatus]
 }
 
+/// Response from the book session endpoint (for resume flow)
+struct BookSessionResponse: Codable {
+    let sessionId: String
+    let bookSlug: String
+    let bookTitle: String
+    let status: String
+    let lastPageIndex: Int
+    let processedChapters: [Int]
+    let isProcessing: Bool
+}
+
 /// Upload errors
 enum UploadError: Error, LocalizedError {
     case serverUnreachable
@@ -70,12 +81,92 @@ actor UploadService {
     /// Base URL for the pipeline server (hardcoded for local dev)
     private let baseURL = URL(string: "http://192.168.1.26:4000")!
 
+    // MARK: - UserDefaults Keys for Persistence
+
+    private static let sessionIdKey = "bookcompanion.sessionId"
+    private static let bookSlugKey = "bookcompanion.bookSlug"
+    private static let bookTitleKey = "bookcompanion.bookTitle"
+
     // MARK: - Session State
 
     private var currentSessionId: String?
     private var currentBookSlug: String?
+    private var currentBookTitle: String?
+
+    // MARK: - Initialization
+
+    init() {
+        // Restore session from UserDefaults
+        currentSessionId = UserDefaults.standard.string(forKey: Self.sessionIdKey)
+        currentBookSlug = UserDefaults.standard.string(forKey: Self.bookSlugKey)
+        currentBookTitle = UserDefaults.standard.string(forKey: Self.bookTitleKey)
+
+        if let sessionId = currentSessionId, let bookSlug = currentBookSlug {
+            print("[UploadService] Restored session: \(sessionId) for \(bookSlug)")
+        }
+    }
+
+    // MARK: - Persistence Helpers
+
+    private func persistSession() {
+        UserDefaults.standard.set(currentSessionId, forKey: Self.sessionIdKey)
+        UserDefaults.standard.set(currentBookSlug, forKey: Self.bookSlugKey)
+        UserDefaults.standard.set(currentBookTitle, forKey: Self.bookTitleKey)
+    }
+
+    private func clearPersistedSession() {
+        UserDefaults.standard.removeObject(forKey: Self.sessionIdKey)
+        UserDefaults.standard.removeObject(forKey: Self.bookSlugKey)
+        UserDefaults.standard.removeObject(forKey: Self.bookTitleKey)
+    }
 
     // MARK: - Public Interface
+
+    /// Get the persisted book slug (if any)
+    var persistedBookSlug: String? {
+        currentBookSlug
+    }
+
+    /// Get the persisted book title (if any)
+    var persistedBookTitle: String? {
+        currentBookTitle
+    }
+
+    /// Check if there's a persisted session
+    var hasPersistedSession: Bool {
+        currentSessionId != nil && currentBookSlug != nil
+    }
+
+    /// Get the active session info from the server for a book
+    func getBookSession(bookSlug: String) async throws -> BookSessionResponse {
+        let url = baseURL.appendingPathComponent("api/scan/book/\(bookSlug)/session")
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw UploadError.invalidResponse
+        }
+
+        if httpResponse.statusCode == 404 {
+            throw UploadError.sessionNotStarted
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw UploadError.serverUnreachable
+        }
+
+        let sessionResponse = try JSONDecoder().decode(BookSessionResponse.self, from: data)
+
+        // Update local state with the session info
+        currentSessionId = sessionResponse.sessionId
+        currentBookSlug = sessionResponse.bookSlug
+        currentBookTitle = sessionResponse.bookTitle
+        persistSession()
+
+        print("[UploadService] Loaded session: \(sessionResponse.sessionId), last page: \(sessionResponse.lastPageIndex)")
+
+        return sessionResponse
+    }
 
     /// Start a new scanning session for a book
     func startSession(bookTitle: String) async throws -> StartSessionResponse {
@@ -97,9 +188,11 @@ actor UploadService {
 
         let sessionResponse = try JSONDecoder().decode(StartSessionResponse.self, from: data)
 
-        // Store session info
+        // Store session info and persist
         currentSessionId = sessionResponse.sessionId
         currentBookSlug = sessionResponse.bookSlug
+        currentBookTitle = bookTitle
+        persistSession()
 
         print("[UploadService] Started session: \(sessionResponse.sessionId) for \(sessionResponse.bookSlug)")
 
@@ -219,7 +312,7 @@ actor UploadService {
         currentSessionId != nil
     }
 
-    /// Clear the current session
+    /// Clear the current session (keeps persistence for resume)
     nonisolated func clearSession() {
         Task {
             await self.doClearSession()
@@ -229,5 +322,15 @@ actor UploadService {
     private func doClearSession() {
         currentSessionId = nil
         currentBookSlug = nil
+        currentBookTitle = nil
+    }
+
+    /// Clear both in-memory and persisted session (for starting a new book)
+    func clearSessionAndPersistence() {
+        currentSessionId = nil
+        currentBookSlug = nil
+        currentBookTitle = nil
+        clearPersistedSession()
+        print("[UploadService] Cleared session and persistence")
     }
 }

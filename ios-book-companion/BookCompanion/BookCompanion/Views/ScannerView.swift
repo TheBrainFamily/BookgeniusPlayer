@@ -14,6 +14,7 @@ import AVKit
 struct ScannerView: View {
 
     let uploadService: UploadService
+    let startingPageIndex: Int
 
     @StateObject private var viewModel: ScannerViewModel
     @State private var previewLayer: AVCaptureVideoPreviewLayer?
@@ -21,8 +22,9 @@ struct ScannerView: View {
     @State private var prefersCropped = true
     @State private var flashOpacity: CGFloat = 0
 
-    init(uploadService: UploadService) {
+    init(uploadService: UploadService, startingPageIndex: Int = 1) {
         self.uploadService = uploadService
+        self.startingPageIndex = startingPageIndex
         _viewModel = StateObject(wrappedValue: ScannerViewModel(uploadService: uploadService))
     }
 
@@ -87,6 +89,8 @@ struct ScannerView: View {
                 .allowsHitTesting(false)
         }
         .task {
+            // Set starting page index for resumed sessions
+            viewModel.setStartingPageIndex(startingPageIndex)
             await viewModel.start()
         }
         .onDisappear {
