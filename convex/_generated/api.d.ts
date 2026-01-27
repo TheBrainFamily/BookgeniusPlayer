@@ -45,6 +45,7 @@ import type * as notes from "../notes.js";
 import type * as paragraphEditor from "../paragraphEditor.js";
 import type * as prompts_promptForSingleUserDescription from "../prompts/promptForSingleUserDescription.js";
 import type * as prompts_storyContext from "../prompts/storyContext.js";
+import type * as r2Config from "../r2Config.js";
 import type * as reset from "../reset.js";
 import type * as variants from "../variants.js";
 
@@ -92,6 +93,7 @@ declare const fullApi: ApiFromModules<{
   paragraphEditor: typeof paragraphEditor;
   "prompts/promptForSingleUserDescription": typeof prompts_promptForSingleUserDescription;
   "prompts/storyContext": typeof prompts_storyContext;
+  r2Config: typeof r2Config;
   reset: typeof reset;
   variants: typeof variants;
 }>;
@@ -618,6 +620,30 @@ export declare const components: {
         "internal",
         { name?: string; newPath?: string; path: string },
         any
+      >;
+    };
+    backfillR2PublicUrl: {
+      backfillBatch: FunctionReference<
+        "mutation",
+        "internal",
+        {},
+        {
+          done: boolean;
+          processed: number;
+          r2PublicUrl: null | string;
+          remaining: number;
+        }
+      >;
+      getBackfillStats: FunctionReference<
+        "query",
+        "internal",
+        {},
+        {
+          alreadyBackfilled: number;
+          r2PublicUrl: null | string;
+          remaining: number;
+          totalWithR2Key: number;
+        }
       >;
     };
     changelog: {

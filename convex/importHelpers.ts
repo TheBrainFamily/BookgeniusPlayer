@@ -5,16 +5,7 @@
 import { v } from "convex/values";
 import { components, internal } from "./_generated/api";
 import { adminMutation } from "./functions";
-
-function getR2Config() {
-  if (!process.env.R2_BUCKET) return undefined;
-  return {
-    R2_BUCKET: process.env.R2_BUCKET,
-    R2_ENDPOINT: process.env.R2_ENDPOINT!,
-    R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
-    R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
-  };
-}
+import { getR2Config } from "./r2Config";
 
 const storageBackendValidator = v.union(v.literal("convex"), v.literal("r2"));
 

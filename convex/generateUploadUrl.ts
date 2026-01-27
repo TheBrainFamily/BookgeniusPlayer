@@ -1,8 +1,9 @@
 import { v } from "convex/values";
 import { internalMutation } from "./_generated/server";
 import { internal, components } from "./_generated/api";
-import { adminMutation, authedMutation, publicQuery, publicAction } from "./functions";
+import { authedMutation, publicAction } from "./functions";
 import { requireBookWriteAccess } from "./bookAuthz";
+import { getR2Config } from "./r2Config";
 
 /**
  * Extract book path from a folder path.
@@ -14,62 +15,7 @@ function extractBookPath(folderPath: string): string | null {
   return match ? match[1] : null;
 }
 
-/**
- * Get R2 config from env vars. Returns undefined if not configured.
- * Called once per request, passed to component functions.
- */
-function getR2Config() {
-  if (!process.env.R2_BUCKET) return undefined;
-  return {
-    R2_BUCKET: process.env.R2_BUCKET,
-    R2_ENDPOINT: process.env.R2_ENDPOINT!,
-    R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
-    R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
-  };
-}
-
-// =============================================================================
-// Storage Backend Configuration
-// =============================================================================
-
 const storageBackendValidator = v.union(v.literal("convex"), v.literal("r2"));
-
-/**
- * Configure which storage backend to use for new uploads - ADMIN ONLY.
- * Default is "convex". Call with "r2" to use Cloudflare R2.
- *
- * For R2, you must provide:
- * - Env vars: R2_BUCKET, R2_TOKEN, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT
- * - r2PublicUrl: The public URL for your R2 bucket (requires custom domain setup in Cloudflare)
- * - r2KeyPrefix (optional): Prefix for R2 keys to avoid collisions when sharing a bucket
- */
-export const configureStorageBackend = adminMutation({
-  args: {
-    backend: storageBackendValidator,
-    // Required when backend is "r2" - the public URL for serving files
-    r2PublicUrl: v.optional(v.string()),
-    // Optional prefix for R2 keys when sharing a bucket across multiple apps
-    r2KeyPrefix: v.optional(v.string()),
-  },
-  returns: v.null(),
-  handler: async (ctx, args) => {
-    return await ctx.runMutation(
-      components.versionedAssets.assetManager.configureStorageBackend,
-      args,
-    );
-  },
-});
-
-/**
- * Get the current storage backend configuration.
- */
-export const getStorageBackendConfig = publicQuery({
-  args: {},
-  returns: storageBackendValidator,
-  handler: async (ctx) => {
-    return await ctx.runQuery(components.versionedAssets.assetManager.getStorageBackendConfig, {});
-  },
-});
 
 // =============================================================================
 // Upload Flow
@@ -103,11 +49,11 @@ export const startUpload = authedMutation({
       basename: args.basename,
     });
 
-    // Check book write access if this is a book folder
+    // Check book write access if this is a book folder (admins bypass)
     const bookPath = extractBookPath(args.folderPath);
-    if (bookPath) {
+    if (bookPath && !ctx.isAdmin) {
       await requireBookWriteAccess(ctx, bookPath);
-    } else if (!ctx.isAdmin) {
+    } else if (!bookPath && !ctx.isAdmin) {
       // Non-book folders require admin
       throw new Error("Forbidden: Only admins can upload to non-book folders");
     }
@@ -173,12 +119,12 @@ export const finishUpload = authedMutation({
       size: args.size,
     });
 
-    // Check book write access if this is a book folder
-    if (args.folderPath) {
+    // Check book write access if this is a book folder (admins bypass)
+    if (args.folderPath && !ctx.isAdmin) {
       const bookPath = extractBookPath(args.folderPath);
       if (bookPath) {
         await requireBookWriteAccess(ctx, bookPath);
-      } else if (!ctx.isAdmin) {
+      } else {
         throw new Error("Forbidden: Only admins can upload to non-book folders");
       }
     }

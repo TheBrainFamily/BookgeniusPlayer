@@ -41,6 +41,7 @@ final class CameraManager: NSObject, ObservableObject {
     /// Photo capture delegate storage
     private var photoDelegates: [Int64: PhotoCaptureDelegate] = [:]
 
+
     /// Last applied rotation angles to avoid redundant updates
     nonisolated(unsafe) private var lastAppliedCaptureAngle: CGFloat?
     nonisolated(unsafe) private var lastAppliedPreviewAngle: CGFloat?

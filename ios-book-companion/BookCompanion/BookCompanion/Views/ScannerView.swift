@@ -30,7 +30,7 @@ struct ScannerView: View {
 
     var body: some View {
         ZStack {
-            // Camera preview
+            // Hidden camera preview (needed for coordinate conversion in DetectionOverlay)
             CameraPreview(
                 session: viewModel.cameraManager.captureSession,
                 onPreviewLayer: { layer in
@@ -39,6 +39,13 @@ struct ScannerView: View {
                     }
                     viewModel.cameraManager.setPreviewLayer(layer)
                 }
+            )
+                .opacity(0) // Hidden - only used for coordinate mapping
+                .ignoresSafeArea()
+
+            // Edge-detected preview (spoiler prevention - shows page shape, not text)
+            FilteredCameraPreview(
+                framePublisher: viewModel.cameraManager.framePublisher
             )
                 .ignoresSafeArea()
 

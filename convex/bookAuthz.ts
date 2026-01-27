@@ -21,23 +21,8 @@ export interface BookAccessResult {
 }
 
 /**
- * Extract admin key - checks explicit arg first, then ctx._adminKey.
- */
-function getAdminKey(ctx: unknown, explicitKey?: string): string | undefined {
-  if (explicitKey) return explicitKey;
-  if (ctx && typeof ctx === "object" && "_adminKey" in ctx) {
-    return (ctx as { _adminKey?: string })._adminKey;
-  }
-  return undefined;
-}
-
-/**
  * Require write access to a book.
  * Admins can edit any book. Owners and editors can edit their books.
- *
- * Admin key is checked from:
- * 1. Explicit adminKey argument (for wrappers)
- * 2. ctx._adminKey (for handlers where wrapper already added it)
  *
  * @throws Error if not authenticated or no write access
  */
@@ -47,12 +32,11 @@ export async function requireBookWriteAccess(
   adminKey?: string,
 ): Promise<BookAccessResult> {
   // Admin key bypass for scripts/CLI
-  const key = getAdminKey(ctx, adminKey);
-  if (isValidAdminKey(key)) {
+  if (isValidAdminKey(adminKey)) {
     return { principalId: "admin-key", role: "admin" };
   }
 
-  const identity = await requireIdentity(ctx, key);
+  const identity = await requireIdentity(ctx, adminKey);
   const principal = principalId(identity);
 
   // Admins can edit anything
@@ -95,12 +79,11 @@ export async function requireBookReadAccess(
   adminKey?: string,
 ): Promise<BookAccessResult> {
   // Admin key bypass for scripts/CLI
-  const key = getAdminKey(ctx, adminKey);
-  if (isValidAdminKey(key)) {
+  if (isValidAdminKey(adminKey)) {
     return { principalId: "admin-key", role: "admin" };
   }
 
-  const identity = await requireIdentity(ctx, key);
+  const identity = await requireIdentity(ctx, adminKey);
   const principal = principalId(identity);
 
   // Admins can read anything
@@ -144,12 +127,11 @@ export async function requireBookWriteAccessFromAction(
   adminKey?: string,
 ): Promise<BookAccessResult> {
   // Admin key bypass for scripts/CLI
-  const key = getAdminKey(ctx, adminKey);
-  if (isValidAdminKey(key)) {
+  if (isValidAdminKey(adminKey)) {
     return { principalId: "admin-key", role: "admin" };
   }
 
-  const identity = await requireIdentity(ctx, key);
+  const identity = await requireIdentity(ctx, adminKey);
   const principal = principalId(identity);
   const adminFlag = isAdmin(identity);
 

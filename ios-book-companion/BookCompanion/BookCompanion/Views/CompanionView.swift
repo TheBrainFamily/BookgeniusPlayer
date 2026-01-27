@@ -3,6 +3,7 @@
 //  BookCompanion
 //
 //  Character companion view with chapter/page selectors and avatar grid.
+//  Supports both portrait (vertical) and landscape (horizontal) layouts.
 //
 
 import SwiftUI
@@ -15,6 +16,14 @@ struct CompanionView: View {
     @StateObject private var viewModel: CompanionViewModel
     @State private var selectedCharacter: CharacterProfile?
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    /// Returns true when in landscape orientation (compact height or regular width with compact height)
+    private var isLandscape: Bool {
+        verticalSizeClass == .compact
+    }
+
     init(bookSlug: String?, selectedChapterNumber: Binding<Int>) {
         self.bookSlug = bookSlug
         self._selectedChapterNumber = selectedChapterNumber
@@ -22,6 +31,27 @@ struct CompanionView: View {
     }
 
     var body: some View {
+        Group {
+            if isLandscape {
+                horizontalLayout
+            } else {
+                verticalLayout
+            }
+        }
+        .task {
+            await viewModel.loadIfNeeded()
+        }
+        .onChange(of: bookSlug) { newValue in
+            viewModel.updateBookSlug(newValue)
+        }
+        .onChange(of: viewModel.selectedChapterNumber) { _, newValue in
+            selectedChapterNumber = newValue
+        }
+    }
+
+    // MARK: - Vertical Layout (Portrait)
+
+    private var verticalLayout: some View {
         NavigationStack {
             Group {
                 if viewModel.isMissingBook {
@@ -77,16 +107,131 @@ struct CompanionView: View {
                 )
             }
         }
-        .task {
-            await viewModel.loadIfNeeded()
+    }
+
+    // MARK: - Horizontal Layout (Landscape)
+
+    private var horizontalLayout: some View {
+        Group {
+            if viewModel.isMissingBook {
+                EmptyCompanionState()
+            } else {
+                VStack(spacing: 0) {
+                    // Top bar: Chapter, Page, Search - all in one line
+                    landscapeTopBar
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemBackground))
+
+                    Divider()
+
+                    // Full-width character grid, scrollable vertically
+                    ScrollView(.vertical, showsIndicators: true) {
+                        LazyVGrid(columns: landscapeGridColumns, spacing: 12) {
+                            ForEach(viewModel.filteredCharacters) { character in
+                                Button {
+                                    selectedCharacter = character
+                                } label: {
+                                    LandscapeAvatarCard(character: character)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                    }
+                }
+            }
         }
-        .onChange(of: bookSlug) { newValue in
-            viewModel.updateBookSlug(newValue)
-        }
-        .onChange(of: viewModel.selectedChapterNumber) { _, newValue in
-            selectedChapterNumber = newValue
+        .sheet(item: $selectedCharacter) { character in
+            CharacterSummarySheet(
+                character: character,
+                chapter: viewModel.selectedChapter,
+                page: viewModel.selectedPage,
+                isInChapter: viewModel.isCharacter(character, in: viewModel.selectedChapter.number),
+                firstAppearanceChapter: viewModel.firstAppearanceChapter(for: character)
+            )
         }
     }
+
+    // MARK: - Landscape Top Bar (Chapter, Page, Search in one line)
+
+    private var landscapeTopBar: some View {
+        HStack(spacing: 12) {
+            // Chapter picker
+            Menu {
+                ForEach(viewModel.chapters.map { $0.number }, id: \.self) { number in
+                    Button("Chapter \(number)") {
+                        viewModel.chapterBinding.wrappedValue = number
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text("Ch. \(viewModel.selectedChapterNumber)")
+                        .fontWeight(.semibold)
+                    Image(systemName: "chevron.down")
+                        .font(.caption)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+            }
+            .buttonStyle(.plain)
+
+            // Page picker
+            Menu {
+                ForEach(viewModel.pages, id: \.self) { page in
+                    Button("Page \(page)") {
+                        viewModel.pageBinding.wrappedValue = page
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text("Pg. \(viewModel.selectedPage)")
+                        .fontWeight(.semibold)
+                    Image(systemName: "chevron.down")
+                        .font(.caption)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+            }
+            .buttonStyle(.plain)
+
+            // Search field - takes remaining space
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search characters", text: $viewModel.searchQuery)
+                    .textFieldStyle(.plain)
+                if !viewModel.searchQuery.isEmpty {
+                    Button {
+                        viewModel.searchQuery = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 8))
+
+            // Character count
+            Text("\(viewModel.filteredCharacters.count)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var landscapeGridColumns: [GridItem] {
+        // More columns in landscape for full-width grid
+        [
+            GridItem(.adaptive(minimum: 100, maximum: 140), spacing: 12)
+        ]
+    }
+
+    // MARK: - Portrait Grid Columns
 
     private var gridColumns: [GridItem] {
         [
@@ -95,6 +240,8 @@ struct CompanionView: View {
             GridItem(.flexible(), spacing: 16)
         ]
     }
+
+    // MARK: - Portrait Selection Header
 
     private var selectionHeader: some View {
         VStack(spacing: 12) {
@@ -202,6 +349,52 @@ private struct AvatarCard: View {
         }
         .padding(12)
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+}
+
+// MARK: - Landscape Avatar Card (compact for landscape grid)
+
+private struct LandscapeAvatarCard: View {
+
+    let character: CharacterProfile
+
+    var body: some View {
+        VStack(spacing: 6) {
+            ZStack {
+                Circle()
+                    .fill(character.gradient)
+                    .frame(width: 56, height: 56)
+
+                if let avatarUrl = character.avatarUrl, let url = URL(string: avatarUrl) {
+                    CachedAsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Image(systemName: character.symbolName)
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.9))
+                    }
+                    .frame(width: 56, height: 56)
+                    .clipShape(Circle())
+                } else {
+                    Image(systemName: character.symbolName)
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+            }
+
+            Text(character.name)
+                .font(.caption2)
+                .fontWeight(.medium)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

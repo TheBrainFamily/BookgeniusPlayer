@@ -19,7 +19,8 @@ struct CameraPreview: UIViewRepresentable {
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
         view.previewLayer.session = session
-        view.previewLayer.videoGravity = .resizeAspectFill
+        // Use resizeAspect so preview matches exactly what gets captured (with letterboxing)
+        view.previewLayer.videoGravity = .resizeAspect
         onPreviewLayer?(view.previewLayer)
         return view
     }

@@ -8,7 +8,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { z } from "zod";
-import { convex, type AvatarState } from "../server/convex-client";
+import { convex, getCharacterFolders, type AvatarState } from "../server/convex-client";
 import { callGeminiWrapper } from "../callClaude";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "../callFastGemini";
 import type { DetectedChapter } from "../scan-server/chapterDetector";
@@ -181,7 +181,21 @@ async function importNewCharacters(
   // Generate visual prompts for avatar generation
   let visualPrompts = new Map<string, string>();
   if (generateAvatars) {
-    const newForAvatars = characters.filter((c) => !avatarsInProgress.has(`${bookPath}/${c.slug}`));
+    // Check Convex for existing avatar states to avoid regenerating prompts
+    const existingCharacters = await getCharacterFolders(bookPath);
+    const existingAvatarStates = new Map<string, string>();
+    for (const char of existingCharacters) {
+      existingAvatarStates.set(char.slug, char.avatarGenerationState ?? "none");
+    }
+
+    // Only generate prompts for characters that don't already have avatars
+    const newForAvatars = characters.filter((c) => {
+      const convexState = existingAvatarStates.get(c.slug);
+      if (convexState === "ready" || convexState === "generating") return false;
+      if (avatarsInProgress.has(`${bookPath}/${c.slug}`)) return false;
+      return true;
+    });
+
     if (newForAvatars.length > 0) {
       visualPrompts = await generateCharacterVisualPrompts(newForAvatars, chapterText);
     }
@@ -216,13 +230,31 @@ async function generateAvatarsForCharacters(
 ): Promise<void> {
   const avatarStyle = `Digital painting for an ebook avatar. Soft cinematic-style. Realistic with dramatic lighting.`;
 
+  // Fetch existing characters from Convex to check avatar state
+  // This survives server restarts (unlike the in-memory sets)
+  const existingCharacters = await getCharacterFolders(bookPath);
+  const existingAvatarStates = new Map<string, string>();
+  for (const char of existingCharacters) {
+    existingAvatarStates.set(char.slug, char.avatarGenerationState ?? "none");
+  }
+
   // Filter characters that need avatars and don't already have one
   const charactersToGenerate = characters.filter((char) => {
     const visualGuide = visualPrompts.get(char.name);
     if (!visualGuide) return false;
 
     const avatarKey = `${bookPath}/${char.slug}`;
-    // Skip if already completed or currently in progress
+
+    // Check Convex state first (persisted) - skip if ready or currently generating
+    const convexState = existingAvatarStates.get(char.slug);
+    if (convexState === "ready" || convexState === "generating") {
+      console.log(
+        `[IncrementalImport] Skipping avatar for ${char.name} - already ${convexState} in Convex`,
+      );
+      return false;
+    }
+
+    // Also check in-memory cache (for current session)
     if (avatarsCompleted.has(avatarKey) || avatarsInProgress.has(avatarKey)) return false;
 
     avatarsInProgress.add(avatarKey);
@@ -231,7 +263,9 @@ async function generateAvatarsForCharacters(
 
   if (charactersToGenerate.length === 0) return;
 
-  console.log(`[IncrementalImport] Generating ${charactersToGenerate.length} avatars in parallel...`);
+  console.log(
+    `[IncrementalImport] Generating ${charactersToGenerate.length} avatars in parallel...`,
+  );
 
   // Generate all avatars in parallel (like the original implementation)
   await Promise.all(
@@ -241,10 +275,17 @@ async function generateAvatarsForCharacters(
       const visualGuide = visualPrompts.get(char.name)!;
 
       try {
-        await convex.markCharacterAvatarState({ characterPath, state: "generating" as AvatarState });
+        await convex.markCharacterAvatarState({
+          characterPath,
+          state: "generating" as AvatarState,
+        });
 
         console.log(`[IncrementalImport] Generating avatar: ${char.name}`);
-        const imageBuffer = await generateCharacterImageWithOpenAI(visualGuide, char.name, avatarStyle);
+        const imageBuffer = await generateCharacterImageWithOpenAI(
+          visualGuide,
+          char.name,
+          avatarStyle,
+        );
 
         if (imageBuffer) {
           // Mark as completed FIRST to prevent any race condition

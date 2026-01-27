@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { callGeminiWrapper } from "../../callClaude";
 import { type NewReferenceCardsResponse } from "../../types";
 import { NewReferenceCardsResponseSchema } from "../../schemes";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
+import { callGrokWithSchema } from "../../callGrok";
 
 export const getReferenceCardsForWholeBook = async (): Promise<NewReferenceCardsResponse> => {
   const booksSettings = getBookSettings();
@@ -52,7 +52,7 @@ ${knownCharactersMapped}\n\n`
 
   console.log("combinedPrompt length:", combinedPrompt.length);
 
-  return callGeminiWrapper(combinedPrompt, NewReferenceCardsResponseSchema);
+  return callGrokWithSchema(combinedPrompt, NewReferenceCardsResponseSchema);
 };
 
 if (require.main === module) {

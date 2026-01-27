@@ -337,21 +337,22 @@ export async function onPageOCRComplete(bookSlug: string, sessionId: string): Pr
 
 /**
  * Check a session and process any completable chapters
+ * Returns true if any work was done, false if nothing to process
  */
 async function checkAndProcessSession(
   bookSlug: string,
   sessionId: string,
   isTimeoutTrigger: boolean,
-): Promise<void> {
+): Promise<boolean> {
   const key = `${bookSlug}/${sessionId}`;
   const session = activeSessions.get(key);
 
-  if (!session) return;
+  if (!session) return false;
 
   // Prevent concurrent processing
   if (session.isProcessing) {
     console.log(`[SessionProcessor] Session ${key} already processing, skipping`);
-    return;
+    return false;
   }
 
   session.isProcessing = true;
@@ -362,12 +363,8 @@ async function checkAndProcessSession(
     const completedPages = pageResults.filter((p) => p.ocrStatus === "completed");
 
     if (completedPages.length === 0) {
-      return;
+      return false;
     }
-
-    // Run chapter detection on current pages
-    const chapterResult = processOCRResults(completedPages);
-    await saveChapterDetectionResult(bookSlug, sessionId, chapterResult);
 
     // Load or create processing state
     let state = await loadProcessingState(bookSlug, sessionId);
@@ -376,20 +373,37 @@ async function checkAndProcessSession(
     }
 
     // Check if there are new pages since last processing
-    const totalPageCount = chapterResult.allPages.length;
+    const totalPageCount = completedPages.length;
     if (totalPageCount === state.lastProcessedPageCount && !isTimeoutTrigger) {
-      // No new pages - nothing to do
-      return;
+      // No new pages and not a timeout trigger - nothing to do
+      return false;
     }
 
+    // Quick check: if no new pages and this is a timeout, we've already processed everything
+    if (totalPageCount === state.lastProcessedPageCount && isTimeoutTrigger) {
+      console.log(
+        `[SessionProcessor] Session ${key} has no new pages since last processing - marking complete`,
+      );
+      return false;
+    }
+
+    // Run chapter detection on current pages
+    const chapterResult = processOCRResults(completedPages);
+    await saveChapterDetectionResult(bookSlug, sessionId, chapterResult);
+
     // Process completable chapters
-    await processChaptersIncremental(
+    const newState = await processChaptersIncremental(
       bookSlug,
       sessionId,
       chapterResult.chapters,
       state,
       isTimeoutTrigger,
     );
+
+    // Check if any work was done
+    const workDone =
+      newState.lastProcessedChapter > state.lastProcessedChapter ||
+      newState.lastProcessedPageCount > state.lastProcessedPageCount;
 
     // Update session metadata
     const metadata = await loadSessionMetadata(bookSlug, sessionId);
@@ -400,8 +414,11 @@ async function checkAndProcessSession(
         totalPages: pageResults.length,
       });
     }
+
+    return workDone;
   } catch (error) {
     console.error(`[SessionProcessor] Error processing session ${key}:`, error);
+    return false;
   } finally {
     session.isProcessing = false;
   }
@@ -422,15 +439,23 @@ async function checkIdleSessions(): Promise<void> {
       console.log(
         `[SessionProcessor] Session ${key} idle for ${Math.round(idleTime / 1000)}s, triggering processing`,
       );
-      await checkAndProcessSession(session.bookSlug, session.sessionId, true);
+      const workDone = await checkAndProcessSession(session.bookSlug, session.sessionId, true);
 
-      // After timeout processing, mark session as idle (not actively scanning)
-      const metadata = await loadSessionMetadata(session.bookSlug, session.sessionId);
-      if (metadata && metadata.status === "scanning") {
-        await saveSessionMetadata(session.bookSlug, session.sessionId, {
-          ...metadata,
-          status: "idle" as SessionMetadata["status"],
-        });
+      if (!workDone) {
+        // No work done on timeout - session is fully processed, unregister it
+        console.log(
+          `[SessionProcessor] Session ${key} fully processed, unregistering from active monitoring`,
+        );
+        activeSessions.delete(key);
+
+        // Mark session as idle
+        const metadata = await loadSessionMetadata(session.bookSlug, session.sessionId);
+        if (metadata && metadata.status === "scanning") {
+          await saveSessionMetadata(session.bookSlug, session.sessionId, {
+            ...metadata,
+            status: "idle" as SessionMetadata["status"],
+          });
+        }
       }
     }
   }

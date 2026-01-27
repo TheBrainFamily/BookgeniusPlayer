@@ -3,6 +3,9 @@
  *
  * Drop-in replacement for ConvexHttpClient that automatically adds
  * the admin key to all function calls, bypassing JWT authentication.
+ *
+ * Note: The admin key is passed in args. All publicQuery/publicMutation/adminQuery
+ * functions accept _adminKey in their validators, so it won't appear in validation errors.
  */
 import { ConvexHttpClient } from "convex/browser";
 import type { FunctionReference, FunctionArgs, FunctionReturnType } from "convex/server";
