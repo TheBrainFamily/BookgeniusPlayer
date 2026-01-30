@@ -11,7 +11,7 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 
 const app = express();
 app.use(cors({ origin: true, credentials: false })); // Allow all origins for iOS dev
-app.use(express.json()); // Parse JSON bodies
+app.use(express.json({ limit: "10mb" })); // Parse JSON bodies
 
 // Mount scan routes for iOS book scanning
 app.use("/api/scan", scanRoutes);

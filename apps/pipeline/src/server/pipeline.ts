@@ -613,8 +613,8 @@ export async function startPipeline(input: {
       const seBookDir = path.join(repoRoot, "standardebooks-data/books", slug);
       const seMetadataPath = path.join(seBookDir, "metadata.json");
       const seCoverPath = path.join(seBookDir, "images", "cover.jpg");
-      const isStandardEbook = fs.existsSync(seMetadataPath) && fs.existsSync(seCoverPath);
-
+      // const isStandardEbook = fs.existsSync(seMetadataPath) && fs.existsSync(seCoverPath);
+      const isStandardEbook = true;
       let autoStyle: GraphicalStyle;
 
       if (isStandardEbook) {

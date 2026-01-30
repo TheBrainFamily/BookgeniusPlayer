@@ -33,9 +33,9 @@ export interface GenerateEmbeddingsOptions {
   writeToFile?: boolean;
 }
 
-// const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
+// const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY as string);
 // const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
 
 async function computeEmbeddingsThroughHttp(document: Document): Promise<DocumentWithEmbeddings> {
   const embeddingResponse = await ai.models.embedContent({

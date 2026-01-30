@@ -6,6 +6,8 @@ import {
 } from "./chapterDetector";
 import type { PageOCRResult } from "./ocrSchema";
 
+import { describe, it, expect } from "vitest";
+
 // Helper to create a minimal OCR result
 function createOCRResult(
   pageIndex: number,

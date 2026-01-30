@@ -151,19 +151,30 @@ export const generateBackgrounds = async (options: GenerateBackgroundsOptions = 
   if (chaptersNeedingPrompts.length > 0) {
     const newPrompts = await Promise.all(
       chaptersNeedingPrompts.map(async (chapter) => {
-        const prompt = `Create a visual description of the book chapter provided below.
-      This will be used as a prompt for an artist to draw a picture for a background for a chapter of a book during ${genericPrompt.periodStyle}, so make sure it's time appropriate.
-      Do not include any plot details, any information about people in the scene, nothing about whats happening.
-      Do not include any characters in the scene.
-      Do not make it overly detailed. Make it generic, backgroundy, paintely, possibly abstract, atmospheric.
-      Describe only ONE scene, if the chapter has multiple scenes, describe the first one.
-      Reply with a 2-3 sentences. 
-      Chapter Text: <chapter>${chapter.content}</chapter>
+        const prompt = `Create a visual description for an ebook background image.
+This will be used during ${genericPrompt.periodStyle}, so make it time appropriate.
 
-      ## Return format:
-      {
-        "sceneDescription": "string",
-      }`;
+CRITICAL RULES:
+- This is a BACKGROUND for reading text, not a standalone illustration
+- NO characters, people, or figures in the scene
+- NO plot details or action happening
+- Describe only ONE scene (the first if chapter has multiple)
+
+CAMERA & COMPOSITION:
+- For OUTDOOR scenes: Use a wide establishing shot or bird's eye view
+- For INDOOR scenes: Position camera far back for a wide shot of the room
+- Avoid close-ups of cluttered surfaces (desks with papers, tables with many objects)
+- Prefer simple, clean compositions with atmospheric depth
+- If showing a room interior, focus on architectural space not object clutter
+
+Keep description to 2-3 sentences. Be generic, atmospheric, painterly.
+
+Chapter Text: <chapter>${chapter.content}</chapter>
+
+## Return format:
+{
+  "sceneDescription": "string",
+}`;
 
         const schema = z.object({ sceneDescription: z.string() });
         const response = await callSlowGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
@@ -196,6 +207,8 @@ export const generateBackgrounds = async (options: GenerateBackgroundsOptions = 
   console.log(`Cleaned prompts: ${JSON.stringify(cleanedPrompts)}`);
 
   const generator = FREE_RUN ? generateImageWithFluxToFolder : generateImageWithOpenAIToFolder;
+  genericPrompt.backgroundStyle = `${genericPrompt.backgroundStyle}\n\n## Scene description\n\n`;
+
   await Promise.all(
     cleanedPrompts.map(async (prompt) => {
       const imagePath = await generator(
@@ -301,13 +314,24 @@ export const generateStylePreview = async (
     return undefined;
   }
 
-  const prompt = `Create a visual description of the book chapter provided below.
-This will be used as a prompt for an artist to draw a picture for a background for a chapter of a book during ${style.periodStyle}, so make sure it's time appropriate.
-Do not include any plot details, any information about people in the scene, nothing about whats happening.
-Do not include any characters in the scene.
-Do not make it overly detailed. Make it generic, backgroundy, paintely, possibly abstract, atmospheric.
-Describe only ONE scene, if the chapter has multiple scenes, describe the first one.
-Reply with a 2-3 sentences. 
+  const prompt = `Create a visual description for an ebook background image.
+This will be used during ${style.periodStyle}, so make it time appropriate.
+
+CRITICAL RULES:
+- This is a BACKGROUND for reading text, not a standalone illustration
+- NO characters, people, or figures in the scene
+- NO plot details or action happening
+- Describe only ONE scene (the first if chapter has multiple)
+
+CAMERA & COMPOSITION:
+- For OUTDOOR scenes: Use a wide establishing shot or bird's eye view
+- For INDOOR scenes: Position camera far back for a wide shot of the room
+- Avoid close-ups of cluttered surfaces (desks with papers, tables with many objects)
+- Prefer simple, clean compositions with atmospheric depth
+- If showing a room interior, focus on architectural space not object clutter
+
+Keep description to 2-3 sentences. Be generic, atmospheric, painterly.
+
 Chapter Text: <chapter>${chapter.content}</chapter>
 
 ## Return format:
@@ -320,6 +344,7 @@ Chapter Text: <chapter>${chapter.content}</chapter>
 
   const outputFolder = "style-previews";
   const generator = FREE_RUN ? generateImageWithFluxToFolder : generateImageWithOpenAIToFolder;
+  style.backgroundStyle = `${style.backgroundStyle}\n\n## Scene description\n\n`;
   const imagePath = (await generator(
     response.sceneDescription,
     chapterNumber,

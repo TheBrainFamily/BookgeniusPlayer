@@ -273,7 +273,7 @@ export const identifyAndRewriteParagraphs = async (
 
   // const llmProviders = [callGeminiWrapper, callClaude];
 
-  const llmProviders = [callGrok, callGeminiWrapper, callClaude, callGpt5];
+  const llmProviders = [callGeminiWrapper, callGrok, callClaude, callGpt5];
   // const llmProviders = [callGeminiWrapper];
   try {
     const selectedProvider = llmProviders[attempt % llmProviders.length];

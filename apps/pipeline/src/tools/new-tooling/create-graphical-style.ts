@@ -25,43 +25,31 @@ function getBookTextForStyleAnalysis(): string {
   return bookText;
 }
 
-/** Shared style examples used in both auto and user-guided generation */
-const STYLE_EXAMPLES = `{
-    "backgroundStyle": "Digital painting for an ebook background. Soft cinematic-style. Dark psychological noir aesthetic set in late Victorian London. Cinematic lighting accentuates intrigue, paranoia, and moral ambiguity through stark but soften contrasts and heavy shadows. Color palette dominated by muted greys, deep browns, and shadowy blues punctuated subtly by lantern yellows and hazy gaslight ambience. Vintage espionage illustrations, Victorian noir atmospherics, and trending moody realism.",
-    "periodStyle": "Victorian England",
-    "avatarStyle": "Digital painting for an ebook avatar. Soft cinematic-style. Dark psychological noir aesthetic set in late Victorian London. Cinematic lighting accentuates intrigue, paranoia, and moral ambiguity through stark but soften contrasts and heavy shadows. Color palette dominated by muted greys, deep browns, and shadowy blues punctuated subtly by lantern yellows and hazy gaslight ambience. Influenced by vintage espionage illustrations, Victorian noir atmospherics, and trending moody realism.",
-  },
-  {
-  "backgroundStyle": "Digital painting for an ebook background. Epic adventure style inspired by late 19th-century colonial explorations in Egypt and Sudan. Warm, sun-drenched cinematic aesthetic evoking the vast deserts. Dramatic lighting with golden hour sunsets, highlighting themes of peril, discovery, and youthful bravery. Color palette featuring earthy ochres, terracotta reds, deep Nile blues, and vibrant greens of fertile valleys, accented by torchlight oranges and starry night skies. Influenced by vintage adventure illustrations, Orientalist paintings, and trending historical realism.",
-  "periodStyle": "Late 19th Century Colonial Egypt and Sudan",
-  "avatarStyle": "Digital painting for an ebook avatar. Epic adventure style inspired by late 19th-century colonial explorations in Egypt and Sudan. Warm, sun-drenched cinematic aesthetic evoking the vast deserts, lush Nile oases, and ancient ruins. Themes of peril, discovery, and youthful bravery. Color palette featuring earthy ochres, terracotta reds, deep Nile blues, and vibrant greens of fertile valleys, accented by torchlight oranges and starry night skies. Influenced by vintage adventure illustrations, Orientalist paintings, and trending historical realism."
-}
-{
-  "backgroundStyle": "Brutalist industrial realism. A heavy, tactile aesthetic defined by raw textures, cold surfaces, and imposing structures. The lighting is harsh and functional, creating a sense of isolation and utilitarian grit. Color palette dominated by cold greys, rusted iron, and sickly sodium-vapor yellows. The mood is uncompromising, heavy, and starkly realistic.",
-  "periodStyle": "Late 20th Century Industrial / Dystopian",
-  "avatarStyle": "Gritty, realistic digital painting with a focus on weathered textures and harsh, direct lighting. The aesthetic is cold and unyielding, using a desaturated palette to emphasize a sense of exhaustion, resilience, or industrial rot."
-}
-{
-  "backgroundStyle": "Golden Age illustration style. Intricate line work combined with soft watercolor washes. The aesthetic is whimsical yet slightly melancholic, featuring elegant, flowing ornamentation and flattened perspectives. Color palette of muted jewel tones, antique golds, and faded parchment. The atmosphere is mythical and timeless, with a focus on decorative beauty and narrative detail.",
-  "periodStyle": "Early 20th Century Storybook Illustration",
-  "avatarStyle": "Stylized digital painting evoking Golden Age illustrators. Fine, delicate outlines and a soft, matte color finish. The character design emphasizes elegant silhouettes and a sense of ancient mystery or folkloric charm."
-}
-{
-  "backgroundStyle": "Minimalist abstract digital art. A conceptual aesthetic focusing on layered textures, organic gradients, and symbolic geometry. The style is non-representational and atmospheric, using a sophisticated, muted palette of sage, sand, and deep navy. The feel is cerebral and contemplative, using negative space and distressed textures to create a sense of mystery and modern sophistication.",
-  "periodStyle": "Contemporary / Universal",
-  "avatarStyle": "Abstracted digital portraiture. Features a blend of sharp geometric shapes and soft, bleeding ink textures. The style is more concerned with mood and psychological state than literal features, using a limited but bold color palette and high artistic stylization."
-}
-{
-  "backgroundStyle": "Impressionist oil painting style inspired by Claude Monet. Focuses on the transient effects of light and atmosphere through soft, dappled brushstrokes. The composition is airy and ethereal, utilizing a high-key color palette of vibrant pastels, shimmering blues, and sun-drenched golds. The feel is romantic and fleeting, with a heavy emphasis on texture and color harmony over sharp lines.",
-  "periodStyle": "Late 19th Century French Impressionism",
-  "avatarStyle": "Digital painting with soft Impressionist brushwork. Gentle, diffused lighting that blends the subject into the atmosphere. The color palette is luminous and varied, using visible strokes of lavender, rose, and pale ochre. Captures a sense of quiet movement and natural elegance."
-}
+const STYLE_TEMPLATE = `{
+"backgroundStyle": "# Task
+Create a non-distracting background image for an ebook that will have text overlaid on it. The image should function like a theatrical stage set or a 2D game background—a detailed but subtly rendered environment where action could take place.
 
-This one worked really great when the mood matches:
-{
-  "backgroundStyle": "Expressionist Graphic Noir. High-contrast digital painting with a stark, moody atmosphere. Sharp angles and deep, dramatic shadows dominate the composition. The aesthetic is painterly and theatrical rather than photorealistic, emphasizing monumental scale and oppressive order. Color palette is primarily monochromatic—charcoal, slate, and ink-black—punctuated by striking, symbolic red accents. Soft-focus textures ensure a non-distracting depth.",
-  "periodStyle": "Mid-20th Century Alternative History / Noir",
-  "avatarStyle": "Digital painting in an Expressionist Graphic Noir style. High-contrast character rendering with sharp, dramatic lighting and deep shadows. The look is stylized and gritty, featuring a monochromatic palette with bold red highlights. Focuses on psychological depth and a sense of gravity or hidden conspiracy."
+## Instruction
+
+### Illustration Style:
+REPLACE_WITH_STYLE
+
+### Core Principles
+Thematic Resonance: The background must evoke the core themes of REPLACE_WITH_BOOK: (explain)
+
+Consistent Art Style: The image must use the visual language of the character art: gentle curves, organic shapes, and a painterly, soft-edged feel.
+
+Subtle Depth: The composition should have a clear foreground, midground, and background to create a sense of depth, but the overall contrast should be kept low and unified to prevent it from overpowering the text that will sit in front of it.
+
+### Technical Execution
+Color Palette: Harmonious and limited. Use a cohesive color scheme appropriate to the period and mood (e.g., sepia tones, cool blues, or warm earth colors). Avoid jarring color clashes or highly saturated distinct colors; the palette should feel blended, utilizing analogous colors or soft complementaries.
+
+Lighting: Soft, diffused, and atmospheric. Light should appear to filter through haze, mist, or windows (e.g., golden hour, moonlight, or soft ambient glow). Avoid harsh shadows or high-contrast chiaroscuro. The lighting should wrap around objects to create volume without creating visual noise.
+
+Detail & Focus: The background should have a 'soft focus' feel. Details should be broad, suggested, and impressionistic rather than sharp and clear, ensuring the environment doesn't draw the eye away from the text.
+CRITICAL: The finish must be SMOOTH and MATTE. Do not use impasto, thick paint, visible canvas grain, or noisy textures. The image must be clean enough to read small text overlaid on top. Avoid cluttered scenes with many distinct small objects; rely on large shapes and textures.",
+"periodStyle": "Define the specific era/setting here (e.g., 'Dystopian Future City' or '18th Century French Countryside')",
+"avatarStyle": "Digital painting for an ebook avatar. Gentle, diffused lighting with low contrast. The color palette is harmonious and period-appropriate. MATCH THE BACKGROUND ART STYLE."
 }`;
 
 export const createGraphicalStyle = async (
@@ -71,23 +59,46 @@ export const createGraphicalStyle = async (
   const bookText = getBookTextForStyleAnalysis();
   const shouldSave = options?.saveToFile ?? true;
 
-  const prompt = `Based on the book title ${bookTitle}, and beginning of the book, create a graphical style for the book. Make sure it's time appropriate.
+  const prompt = `You are an expert Art Director for ebook publishing. Your task is to analyze a book ${bookTitle} excerpt and generate a precise visual style guide in JSON format.
 
+1. **Analyze** the provided <bookText> and <bookTitle> to determine the mood, era, and atmosphere.
+2. **Select** the single most appropriate "Illustration Style" from the provided list of options below.
+3. **Fill in the Template**: You must complete the 'backgroundStyle' template by replacing the placeholders.
+    - IMPORTANT: When replacing REPLACE_WITH_STYLE, use the description exactly as written in the list. Do not add words like "impasto" or "heavy texture."
+    - REPLACE_WITH_BOOK: Insert the book title.
+    - (explain): Briefly explain the thematic resonance in 1 sentence.
+4. Adjust the avatar style with the illustration style. Keep in mind - avatars should be more detailed than the backgrounds.
+
+### List of Illustration Style Options (Choose One):
+
+1. **Romantic Digital Fantasy:** A Romantic Digital Fantasy style mimicking the softness of airbrushing or soft-glaze oil painting. It relies heavily on "blooming" light effects and smooth gradients. The edges are feathered and indistinct, creating a dreamlike, ethereal atmosphere.
+2. **Digital Pastel on Smooth Paper:** A Digital Pastel style rendered on smooth paper. The lighting is diffused and fuzzy, avoiding hard lines in favor of soft, smudged transitions that create a warm, intimate, and slightly rustic feel without visual noise or grain.
+3. **Tonalist Smooth Painting:** A classic Tonalist style, resembling a "Brunaille" or an aged, varnished surface. The technique focuses on "sfumato"—the blurring of edges through thick atmosphere or haze. Brushwork is broad, blended, and sweeping, lacking fine detail or harsh strokes.
+4. **Muted Gouache / Opaque Acrylic:** A Muted Gouache style. Forms are defined and slightly "blocky," with light and shadow carved out in distinct planes. Resembles 2D game concept art where paint is applied opaquely, giving surfaces a matte, smooth finish.
+5. **Romantic Fantasy Glazing:** A Romantic Fantasy style characterized by deep, warm shadows and piercing "god rays" of golden light. Uses soft glazing techniques (thin layers of smooth paint) to create a dreamlike quality where textures merge gently into darkness.
+6. **Historical Realism / Soft Focus:** Resembling a 19th-century oil study but rendered digitally for smoothness. The palette is dominated by muted earth tones. Brushwork is loose but blended to suggest terrain and fabric without heavy texture.
+7. **Gothic Atmospheric Mist:** Evocative of Victorian mystery. Relies on heavy fog and gloom to obscure architectural details, focusing on the interplay between oppressive shadows and warm, diffused gas lamps. Surfaces appear wet or slick but smooth.
+8. **Vintage Narrative Poster:** Reminiscent of mid-20th-century gouache or poster art. Features strong silhouettes and simplified geometry. The mood is established through a limited, brooding color palette and distinct shape design rather than intricate surface detail.
+9. **Cinematic Noir Concept Art:** Focus on cold, oppressive symmetry. Leans toward photorealism but maintains a stylized, matte finish. Lighting is cool-toned, creating distinct pools of illumination but keeping the shadows soft and noise-free.
+
+## Style template:
+<style_template>
+${STYLE_TEMPLATE}
+</style_template>
+
+## Excerpt
   <bookText>
   ${bookText}
   </bookText>
-  
-  Good examples:
-  ${STYLE_EXAMPLES}
 
-Do not specify any elements in the backgroundStyle or avatarStyle, as those will be then used for every single image as part of a wider prompt. Make this generic, talk only about style, period, and overall feel. 
 
-  
-  It has to be in a format: {
-    "backgroundStyle": "string",
-    "periodStyle": "string",
-    "avatarStyle": "string",
-  }`;
+## Output JSON Format:
+
+{
+"backgroundStyle": "(The full, filled-out text of the prompt template)",
+"periodStyle": "(A short string defining the specific era/setting, e.g., '1920s Prohibition Chicago' or 'Medieval Fantasy Tavern')",
+"avatarStyle": "adjusted avatarStyle"
+}`;
   const schema = z.object({
     backgroundStyle: z.string(),
     periodStyle: z.string(),
@@ -118,7 +129,9 @@ ${bookText}
 </bookText>
 
 Good examples of the output format:
-${STYLE_EXAMPLES}
+<style_template>
+${STYLE_TEMPLATE}
+</style_template>
 
 IMPORTANT:
 - Use the periodStyle provided: "${periodStyle}"
@@ -127,7 +140,14 @@ IMPORTANT:
 - backgroundStyle should start with "Digital painting for an ebook background..."
 - avatarStyle should start with "Digital painting for an ebook avatar..."
 - Make sure the style is cohesive between backgrounds and avatars
-- if the user passes a desscription like "in the style of X", describe that style and don't repeat the artist name, the image generator has no knowledge about specific people so that will only be confusing. 
+- If the user passes a description like "in the style of X", describe that style and don't repeat the artist name
+
+CRITICAL COMPOSITION RULES (must be included in backgroundStyle):
+- Create non-distracting backgrounds for an ebook with text overlaid
+- Details should be suggested and impressionistic, not sharp and clear
+- Overall contrast should be low enough to not overpower text
+- Clear foreground/midground/background for depth
+- Avoid cluttered scenes with many distinct small objects 
 
 Return format:
 {
@@ -176,12 +196,14 @@ ${bookText.substring(0, 5000)}
 </bookText>
 
 Good examples of output format:
-${STYLE_EXAMPLES}
+<style_template>
+${STYLE_TEMPLATE}
+</style_template>
 
 CRITICAL REQUIREMENTS:
 - Your style MUST match the cover art's aesthetic AND medium
 - If the cover is an oil painting, describe an oil painting style
-- If the cover is a watercolor, describe a watercolor style  
+- If the cover is a watercolor, describe a watercolor style
 - If the cover is an engraving or etching, describe that technique
 - Do NOT default to "Digital painting" - match the actual medium of the cover
 - Do NOT name specific artists in the style descriptions (image generators don't know them)
@@ -189,6 +211,14 @@ CRITICAL REQUIREMENTS:
 - backgroundStyle should start with the appropriate medium (e.g., "Oil painting for an ebook background...", "Watercolor illustration for an ebook background...", "Detailed engraving style for an ebook background...")
 - avatarStyle should use the same medium as backgroundStyle
 - periodStyle is for HISTORICAL ACCURACY - it tells the image generator what era the book is set in, so it doesn't add anachronistic elements (e.g., modern cars in 1890s London). Base this on the BOOK'S SETTING from the text, not the cover art's era.
+
+CRITICAL COMPOSITION RULES (must be included in backgroundStyle):
+- Create non-distracting backgrounds for an ebook with text overlaid
+- The image should function like a theatrical stage set—detailed but subtly rendered
+- Details should be suggested and impressionistic, not sharp and clear
+- Overall contrast should be low enough to not overpower text
+- Clear foreground/midground/background for depth
+- Avoid cluttered scenes with many distinct small objects
 
 Return format:
 {
@@ -206,3 +236,11 @@ Return format:
   const response = await callGeminiWithImage(prompt, coverImageBase64, mimeType, schema);
   return response;
 };
+
+if (require.main === module) {
+  const doIt = async () => {
+    const response = await createGraphicalStyle("Agatha Christie, The Mysterious Affair at Styles");
+    console.log(response);
+  };
+  doIt();
+}

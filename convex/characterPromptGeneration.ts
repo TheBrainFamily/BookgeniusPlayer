@@ -117,9 +117,11 @@ export const generateCharacterPrompt = internalAction({
       const bookSlug = bookPath.split("/").pop() || bookPath;
       const prompt = promptForSingleUserDescription(bookSlug, characterName, bookContext);
 
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
       if (!apiKey) {
-        console.error("[generateCharacterPrompt] GEMINI_API_KEY environment variable not set");
+        console.error(
+          "[generateCharacterPrompt] GOOGLE_GENERATIVE_AI_API_KEY environment variable not set",
+        );
         return { success: false };
       }
 

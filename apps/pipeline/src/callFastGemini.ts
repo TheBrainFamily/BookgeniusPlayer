@@ -41,7 +41,7 @@ export const callFastGemini = async (
 export const callFastGeminiNoStream = async (prompt: string) => {
   const config = { responseMimeType: "text/plain" };
   const model = "gemini-3-flash-preview";
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
 
   const contents = [{ role: "user", parts: [{ text: prompt }] }];
 
@@ -76,7 +76,7 @@ Based on the book text answer the user's question, using quotes from the wider b
 };
 
 export const callGeminiWithThinking = async (prompt: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
   const config = {
     responseMimeType: "text/plain",
     httpOptions: {
@@ -121,7 +121,7 @@ export const callGeminiWithThinkingAndSchema = async <T>(
   zodSchema: z.ZodSchema<T>,
   model: string = "gemini-3-pro-preview",
 ) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
 
   const parsedSchema = toGeminiSchema(zodSchema);
   const safetySettings = [
@@ -413,10 +413,7 @@ export const callGeminiWithImage = async <T>(
 
 // if (require.main === module) {
 //   const doIt = async () => {
-//     const response = await callGeminiWithThinkingAndSchema(
-//       "What is the capital of France?",
-//       z.object({ capital: z.string() }),
-//     );
+//     const response = await callGeminiWithThinking("What is the capital of France?");
 //     console.log(response);
 //   };
 //   doIt();

@@ -562,7 +562,7 @@ export const appRouter = router({
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
 
-      convertAndSaveSEBook(input.slug);
+      await convertAndSaveSEBook(input.slug);
 
       const bookRoot = path.join(repoRoot, "books-data", input.slug);
       const richPath = path.join(bookRoot, "input", "rich.xml");
