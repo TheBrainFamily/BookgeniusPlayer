@@ -53,14 +53,12 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
   build/cms-app/ \
   "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/"
 
-# Second pass: short-cache all HTML (Next.js static export creates multiple HTML pages).
+# Second pass: short-cache HTML entry points (CMS lives under /admin).
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-  --exclude "*" \
-  --include "*.html" \
   --cache-control "$short_cache" \
   --content-type "text/html; charset=utf-8" \
-  build/cms-app/ \
-  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/"
+  build/cms-app/admin/*.html \
+  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/admin/"
 
 
 
