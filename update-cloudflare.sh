@@ -55,9 +55,11 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
 
 # Second pass: short-cache HTML entry points (CMS lives under /admin).
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
+  --exclude "*" \
+  --include "*.html" \
   --cache-control "$short_cache" \
   --content-type "text/html; charset=utf-8" \
-  build/cms-app/admin/*.html \
+  build/cms-app/admin/ \
   "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/admin/"
 
 
