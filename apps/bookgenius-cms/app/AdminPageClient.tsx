@@ -1,58 +1,86 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
 import { AdminPanel } from "@/admin/AdminPanel";
 
 export function AdminPageClient() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
 
-  // Get search params
-  const folder = searchParams.get("folder") ?? "";
-  const asset = searchParams.get("asset");
-  const version = searchParams.get("version");
+  const basePath = "/admin";
+
+  const readQuery = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      folder: params.get("folder") ?? "",
+      asset: params.get("asset"),
+      version: params.get("version"),
+    };
+  }, []);
+
+  const [query, setQuery] = useState(() => readQuery());
+
+  useEffect(() => {
+    const handlePopState = () => setQuery(readQuery());
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [readQuery]);
+
+  const pushQuery = useCallback(
+    (next: { folder: string; asset: string | null; version: string | null }) => {
+      const params = new URLSearchParams();
+      if (next.folder) params.set("folder", next.folder);
+      if (next.asset) params.set("asset", next.asset);
+      if (next.version) params.set("version", next.version);
+      const qs = params.toString();
+      const nextUrl = qs ? `${basePath}?${qs}` : basePath;
+      window.history.pushState(null, "", nextUrl);
+      setQuery(next);
+    },
+    [basePath],
+  );
 
   // Navigation handlers
   const handleFolderSelect = useCallback(
     (folderPath: string) => {
-      const params = new URLSearchParams();
-      if (folderPath) params.set("folder", folderPath);
-      router.push(`/${params.toString() ? `?${params}` : ""}`);
+      pushQuery({ folder: folderPath, asset: null, version: null });
     },
-    [router],
+    [pushQuery],
   );
 
   const handleAssetSelect = useCallback(
     (assetInfo: { folderPath: string; basename: string } | null) => {
-      const params = new URLSearchParams();
       if (assetInfo) {
-        if (assetInfo.folderPath) params.set("folder", assetInfo.folderPath);
-        params.set("asset", assetInfo.basename);
+        pushQuery({ folder: assetInfo.folderPath, asset: assetInfo.basename, version: null });
       } else {
-        if (folder) params.set("folder", folder);
+        pushQuery({ folder: query.folder, asset: null, version: null });
       }
-      router.push(`/${params.toString() ? `?${params}` : ""}`);
     },
-    [router, folder],
+    [pushQuery, query.folder],
   );
 
   const handleVersionSelect = useCallback(
     (versionId: string | null) => {
-      const params = new URLSearchParams();
-      if (folder) params.set("folder", folder);
-      if (asset) params.set("asset", asset);
-      if (versionId) params.set("version", versionId);
-      router.push(`/${params.toString() ? `?${params}` : ""}`);
+      pushQuery({ folder: query.folder, asset: query.asset ?? null, version: versionId });
     },
-    [router, folder, asset],
+    [pushQuery, query.folder, query.asset],
   );
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      window.location.replace(`${basePath}/sign-in`);
+    }
+  }, [basePath, isLoaded, isSignedIn]);
+
+  if (!isLoaded || !isSignedIn) {
+    return null;
+  }
 
   return (
     <AdminPanel
-      folderPath={folder}
-      selectedAsset={asset ? { folderPath: folder, basename: asset } : null}
-      selectedVersionId={version ?? null}
+      folderPath={query.folder}
+      selectedAsset={query.asset ? { folderPath: query.folder, basename: query.asset } : null}
+      selectedVersionId={query.version ?? null}
       onFolderSelect={handleFolderSelect}
       onAssetSelect={handleAssetSelect}
       onVersionSelect={handleVersionSelect}

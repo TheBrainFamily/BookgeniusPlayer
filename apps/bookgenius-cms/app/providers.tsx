@@ -32,7 +32,13 @@ export function Providers({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider
+      publishableKey={publishableKey}
+      signInUrl="/admin/sign-in"
+      signUpUrl="/admin/sign-up"
+      afterSignInUrl="/admin"
+      afterSignUpUrl="/admin"
+    >
       <ConvexProviderWithClerk client={clients.convexQueryClient.convexClient} useAuth={useAuth}>
         <QueryClientProvider client={clients.queryClient}>{children}</QueryClientProvider>
       </ConvexProviderWithClerk>
