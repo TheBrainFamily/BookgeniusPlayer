@@ -102,7 +102,7 @@
   "devDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "convex": "^1.21.1",
+    "convex": "^1.31.2",
     "i18next": "^25.2.1",
     "lucide-react": "^0.479.0",
     "motion": "^12.10.5",
