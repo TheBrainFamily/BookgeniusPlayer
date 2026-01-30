@@ -14,17 +14,32 @@ const FeaturedBooks = () => {
   const { t } = useTranslation();
   const language = detectLanguageFromDomain();
 
-  const handleBookClick = (book: (typeof books)[0]) => {
+  const handleBookClick = (
+    book: (typeof books)[0],
+    clickData: {
+      rect: { x: number; y: number; width: number; height: number };
+      capturedFrame: string | null;
+    },
+  ) => {
     const title = book.title ?? "BookGenius";
     const phrases = book.metadata?.[language]?.phrases ?? [];
     const author = book.author;
 
     // Indicate user came from platform for proper loader behavior
     setNavigatedFromPlatform(true);
-    // Start the transition overlay with book-specific meta
-    startTransition({ title, phrases, author, showStartButton: false, onStartClick: undefined });
+    // Start the transition overlay with book-specific meta and card rect for expansion animation
+    startTransition({
+      title,
+      phrases,
+      author,
+      showStartButton: false,
+      onStartClick: undefined,
+      cardRect: clickData.rect,
+      video: book.video,
+      capturedFrame: clickData.capturedFrame,
+    });
 
-    // Wait for overlay to fade in before navigating (prevents flash of gray body background)
+    // Wait for overlay to fade in before navigating (prevents flash when route unmounts)
     setTimeout(() => {
       navigate(`/reader?book=${book.slug}`, { state: { meta: { title, phrases, author } } });
     }, SPLASH_FADE_DURATION_MS);

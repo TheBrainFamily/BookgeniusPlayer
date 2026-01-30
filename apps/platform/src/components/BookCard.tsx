@@ -15,12 +15,38 @@ import { type TFunction } from "i18next";
 
 type Book = (typeof books)[number];
 
+/** Rectangle in viewport coordinates */
+type CardRect = { x: number; y: number; width: number; height: number };
+
+/** Data passed on card click for the transition */
+type CardClickData = {
+  rect: CardRect;
+  /** Captured video frame as data URL for instant display during transition */
+  capturedFrame: string | null;
+};
+
 type BookCardProps = {
   book: Book;
-  onClick: (book: Book) => void;
+  onClick: (book: Book, clickData: CardClickData) => void;
   variant?: "default" | "featured";
   showLanguageFlag?: boolean;
   className?: string;
+};
+
+/** Capture current video frame to a data URL */
+const captureVideoFrame = (video: HTMLVideoElement): string | null => {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(video, 0, 0);
+    return canvas.toDataURL("image/jpeg", 0.8);
+  } catch {
+    // Cross-origin or other errors
+    return null;
+  }
 };
 
 const displayReadTime = (t: TFunction, readTime: { h: number; m: number }) => {
@@ -28,6 +54,12 @@ const displayReadTime = (t: TFunction, readTime: { h: number; m: number }) => {
     return `${readTime.h} ${t("common.hours")} ${readTime.m > 0 ? `${readTime.m} ${t("common.minutes")}` : ""}`;
   }
   return `${readTime.m} ${t("common.minutes")}`;
+};
+
+/** Get element's bounding rect in viewport coordinates */
+const getElementRect = (el: Element): CardRect => {
+  const rect = el.getBoundingClientRect();
+  return { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
 };
 
 export default function BookCard({
@@ -56,11 +88,30 @@ export default function BookCard({
   return (
     <Card
       className={`${cardBase} ${className}`}
-      onClick={() => onClick(book)}
+      onClick={(e) => {
+        // Get the video container rect (not the whole card)
+        const videoContainer = e.currentTarget.querySelector("[data-video-container]");
+        const videoElement = e.currentTarget.querySelector("video");
+        const rect = videoContainer
+          ? getElementRect(videoContainer)
+          : getElementRect(e.currentTarget);
+        const capturedFrame = videoElement ? captureVideoFrame(videoElement) : null;
+        onClick(book, { rect, capturedFrame });
+      }}
       role="button"
       tabIndex={0}
       aria-label={`Open ${book.title}`}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick(book)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          const videoContainer = e.currentTarget.querySelector("[data-video-container]");
+          const videoElement = e.currentTarget.querySelector("video");
+          const rect = videoContainer
+            ? getElementRect(videoContainer)
+            : getElementRect(e.currentTarget);
+          const capturedFrame = videoElement ? captureVideoFrame(videoElement) : null;
+          onClick(book, { rect, capturedFrame });
+        }
+      }}
     >
       {isFeatured && (
         <>
@@ -83,6 +134,7 @@ export default function BookCard({
 
       <CardHeader className="pb-3 sm:pb-4 p-2 sm:p-4 md:p-6">
         <div
+          data-video-container
           className={`w-full ${mediaHeights} rounded-lg mb-3 sm:mb-4 relative overflow-hidden group-hover:animate-bookglow`}
         >
           <video
@@ -161,7 +213,17 @@ export default function BookCard({
             variant="secondary"
             onClick={(e) => {
               e.stopPropagation();
-              onClick(book);
+              // Find the video container for the expansion origin
+              const card = e.currentTarget.closest("[role='button']");
+              const videoContainer = card?.querySelector("[data-video-container]");
+              const videoElement = card?.querySelector("video");
+              const rect = videoContainer
+                ? getElementRect(videoContainer)
+                : card
+                  ? getElementRect(card)
+                  : getElementRect(e.currentTarget);
+              const capturedFrame = videoElement ? captureVideoFrame(videoElement) : null;
+              onClick(book, { rect, capturedFrame });
             }}
           >
             <Play className={playIconClasses} />
