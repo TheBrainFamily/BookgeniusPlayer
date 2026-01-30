@@ -384,7 +384,7 @@ router.post("/upload", upload.single("image"), async (req: MulterRequest, res: R
 router.get("/stream/:sessionId", async (req: Request, res: Response) => {
   const { sessionId } = req.params;
 
-  const session = sessionCache.get(sessionId);
+  const session = sessionCache.get(sessionId as string);
   if (!session) {
     res.status(404).json({ error: "Session not found or expired" });
     return;
@@ -454,7 +454,7 @@ router.get("/stream-follow-up/:sessionId", async (req: Request, res: Response) =
     return;
   }
 
-  const session = sessionCache.get(sessionId);
+  const session = sessionCache.get(sessionId as string);
   if (!session) {
     res.status(404).json({ error: "Session not found or expired" });
     return;

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { convex } from "./convex-client";
+import { convex } from "../server/convex-client";
 import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 
