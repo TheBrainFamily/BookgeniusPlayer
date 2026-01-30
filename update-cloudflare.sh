@@ -55,12 +55,28 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
 
 # Second pass: short-cache HTML entry points (CMS lives under /admin).
 s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
-  --exclude "*" \
-  --include "*.html" \
   --cache-control "$short_cache" \
   --content-type "text/html; charset=utf-8" \
-  build/cms-app/admin/ \
-  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/admin/"
+  build/cms-app/admin/index.html \
+  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/admin/index.html"
+
+s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
+  --cache-control "$short_cache" \
+  --content-type "text/html; charset=utf-8" \
+  build/cms-app/admin/sign-in.html \
+  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/admin/sign-in.html"
+
+s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
+  --cache-control "$short_cache" \
+  --content-type "text/html; charset=utf-8" \
+  build/cms-app/admin/sign-up.html \
+  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/admin/sign-up.html"
+
+s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
+  --cache-control "$short_cache" \
+  --content-type "text/html; charset=utf-8" \
+  build/cms-app/admin/404.html \
+  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/admin/404.html"
 
 
 
