@@ -10,6 +10,9 @@ export function AdminPageClient() {
   const basePath = "/admin";
 
   const readQuery = useCallback(() => {
+    if (typeof window === "undefined") {
+      return { folder: "", asset: null, version: null };
+    }
     const params = new URLSearchParams(window.location.search);
     return {
       folder: params.get("folder") ?? "",
@@ -18,7 +21,11 @@ export function AdminPageClient() {
     };
   }, []);
 
-  const [query, setQuery] = useState(() => readQuery());
+  const [query, setQuery] = useState<{
+    folder: string;
+    asset: string | null;
+    version: string | null;
+  }>(() => readQuery());
 
   useEffect(() => {
     const handlePopState = () => setQuery(readQuery());
