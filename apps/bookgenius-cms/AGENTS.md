@@ -1,45 +1,38 @@
-# AGENTS - BookGenius CMS
+# CMS - Admin Interface
 
-## OVERVIEW
+Admin interface for managing book content, character assets, cues, and pipeline using Next.js 15 and Convex.
 
-Admin interface for managing book content, character assets, cues, and production pipeline using Next.js 15 and Convex.
-
-## STRUCTURE
+## Structure
 
 ```
-./
-├── app/                  # Next.js App Router (Layout, Providers, /admin route)
-├── admin/                # Core CMS implementation
-│   └── components/       # Component library organized by domain
-│       ├── book/         # Dashboard, Chapters, Characters, Cues views
-│       ├── dialogs/      # Modals for creation and asset selection
-│       ├── editors/      # XML, Metadata, and Chapter content editors
-│       └── ...           # Asset management (FolderTree, AssetList)
-├── lib/                  # Shared logic: hooks, contexts, queries, types
-└── components/ui/        # Base Radix + Tailwind components
+app/           # Next.js App Router
+admin/         # Core CMS implementation
+├── components/
+│   ├── book/      # Dashboard, Chapters, Characters views
+│   ├── dialogs/   # Creation and asset selection modals
+│   └── editors/   # XML, Metadata, Chapter editors
+lib/           # Shared hooks, contexts, queries
+components/ui/ # Radix + Tailwind base components
 ```
 
-## WHERE TO LOOK
+## Key Locations
 
-| Task                       | Location                                        |
-| -------------------------- | ----------------------------------------------- |
-| Edit Chapter logic         | `admin/components/book/ChapterEditorView.tsx`   |
-| Character asset bundles    | `admin/components/book/CharacterBundleView.tsx` |
-| XML/Monaco integration     | `admin/components/editors/XmlEditor.tsx`        |
-| CMS-specific data fetching | `lib/queries.ts`                                |
-| Book state management      | `lib/contexts/BookContext.tsx`                  |
-| Asset upload workflow      | `admin/components/UploadDialog.tsx`             |
+| Task              | Location                                        |
+| ----------------- | ----------------------------------------------- |
+| Chapter editing   | `admin/components/book/ChapterEditorView.tsx`   |
+| Character bundles | `admin/components/book/CharacterBundleView.tsx` |
+| CMS queries       | `lib/queries.ts`                                |
+| Book state        | `lib/contexts/BookContext.tsx`                  |
+| Asset uploads     | `admin/components/UploadDialog.tsx`             |
 
-## KEY COMPONENTS
+## Key Components
 
-- **BookDashboard**: Root view for book-specific content management.
-- **ChapterEditor**: Interactive editing interface for XML/Chapter content.
-- **FolderTree / AssetList**: Unified explorer for Convex-managed assets.
-- **CharacterGrid / BundleView**: AI-avatar and voice sample management.
-- **CuesView**: Management of synchronized background and music assets.
+- **BookDashboard**: Root view for book content management
+- **FolderTree / AssetList**: Convex-managed asset explorer
+- **CharacterGrid**: AI avatar and voice sample management
+- **CuesView**: Background and music asset synchronization
 
-## NOTES
+## Notes
 
-- Uses `@convex-dev/react-query` for type-safe, cached data fetching.
-- Heavy reliance on Monaco-based editors for structured content.
-- Asset paths follow the `books/[BOOK]/...` convention in R2/Convex.
+- Uses `@convex-dev/react-query` for cached data fetching
+- Asset paths follow `books/[BOOK]/...` convention

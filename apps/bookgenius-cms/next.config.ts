@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  basePath: "/admin",
+  output: "export",
   // Allow importing from ../convex
   transpilePackages: ["convex"],
 

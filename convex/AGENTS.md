@@ -1,42 +1,34 @@
-# CONVEX BACKEND
+# Convex Backend
 
-Backend-as-a-Service providing data persistence, media orchestration, and AI-powered content generation.
+Backend-as-a-Service for data persistence, media orchestration, and AI content generation.
 
-## SCHEMA
+## Key Files
 
-- `notes`: Annotations and footnotes for book chapters/paragraphs.
-- `variants`: AI-generated sentence simplifications for different reading levels.
-- `backgroundCues` / `musicCues`: Spatial mapping of media assets to book positions.
-- `musicFileMetadata` / `backgroundFileMetadata`: Processed media metadata (previews, duration).
-- `bookGenerationJobs`: Progress tracking for the book processing pipeline.
-- `authTables`: Integrated Convex Auth tables.
+| File                   | Purpose                                            |
+| ---------------------- | -------------------------------------------------- |
+| `schema.ts`            | All table definitions                              |
+| `bookQueries.ts`       | Domain queries: books, characters, chapters, cues  |
+| `generateUploadUrl.ts` | Intent-based upload flow (start → upload → finish) |
+| `avatarGeneration.ts`  | AI avatar generation with OpenAI                   |
+| `paragraphEditor.ts`   | Server-side XML manipulation                       |
+| `cli.ts`               | Admin operations for Convex CLI                    |
 
-## KEY FILES
+## Schema Overview
 
-| File                   | Purpose                                                        |
-| ---------------------- | -------------------------------------------------------------- |
-| `bookQueries.ts`       | Domain-specific queries for books, characters, and assets.     |
-| `generateUploadUrl.ts` | Intent-based upload orchestration (Start -> Upload -> Finish). |
-| `avatarGeneration.ts`  | OpenAI-integrated actions for character avatar generation.     |
-| `paragraphEditor.ts`   | Server-side XML manipulation for character/speaker assignment. |
-| `chapterCompiler.ts`   | Logic for processing and compiling chapter HTML/XML.           |
-| `cli.ts`               | Admin operations exposed for Convex CLI.                       |
-| `authHelpers.ts`       | Clerk-based authentication guards (`requireAuth`).             |
+- `notes` - Annotations and footnotes
+- `variants` - AI-generated sentence simplifications
+- `backgroundCues` / `musicCues` - Media-to-paragraph mapping
+- `bookGenerationJobs` - Pipeline progress tracking
 
-## PATTERNS
+## Patterns
 
-- **Asset Management**: Delegates core storage logic to `components/asset-manager/`.
-- **Intent-Based Uploads**: `startUpload` (returns URL) -> Client Upload -> `finishUpload` (triggers post-processing).
-- **Dual Storage**: Transparently handles both Convex internal storage and Cloudflare R2.
-- **Action-Heavy**: Uses Actions for long-running AI generation (GPT-4o, DALL-E 3) and media processing.
-- **Folder Conventions**: Strict structure (`books/{slug}/characters/{slug}`) enforced via queries.
+See [docs/conventions/convex-patterns.md](../docs/conventions/convex-patterns.md) for:
 
-## COMPONENT: ASSET-MANAGER
+- Intent-based uploads
+- Folder conventions
 
-The `convex/components/asset-manager/` is a modular file system providing versioning, folder structures, and dual-backend storage. See its specific `AGENTS.md` for internal details.
-
-## TESTING
+## Testing
 
 ```bash
-cd convex && bun test
+bunx vitest run convex/
 ```

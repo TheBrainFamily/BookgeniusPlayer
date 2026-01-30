@@ -3,7 +3,7 @@
 import { type ReactNode, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConvexQueryClient } from "@convex-dev/react-query";
-import { ClerkProvider, useAuth } from "@clerk/nextjs";
+import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -26,9 +26,13 @@ export function Providers({ children }: { children: ReactNode }) {
 
     return { convexQueryClient, queryClient };
   });
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!publishableKey) {
+    throw new Error("Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY environment variable");
+  }
 
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={publishableKey}>
       <ConvexProviderWithClerk client={clients.convexQueryClient.convexClient} useAuth={useAuth}>
         <QueryClientProvider client={clients.queryClient}>{children}</QueryClientProvider>
       </ConvexProviderWithClerk>

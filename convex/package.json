@@ -13,7 +13,7 @@
   "dependencies": {
     "@convex-dev/auth": "^0.0.90",
     "@convex-dev/r2": "^0.8.1",
-    "convex-versioned-assets": "^0.1.1",
+    "convex-versioned-assets": "1.0.5",
     "@xmldom/xmldom": "^0.9.8",
     "convex": "^1.31.2",
     "convex-helpers": "^0.1.108",

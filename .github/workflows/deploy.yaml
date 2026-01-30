@@ -140,6 +140,13 @@ jobs:
           VITE_IS_PRODUCTION: ${{ env.IS_PRODUCTION }}
           CI: true
 
+      - name: Build CMS
+        run: bun --filter bookgenius-cms build
+        env:
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          CI: true
+
       - name: Prepare s3 folder
         run: bun prepare:docker
 

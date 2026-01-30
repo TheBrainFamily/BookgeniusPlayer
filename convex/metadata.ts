@@ -314,3 +314,73 @@ export const upsertChapterMetadataInternal = internalMutation({
     return { chapterId };
   },
 });
+
+// =============================================================================
+// Character Chapter Summaries
+// =============================================================================
+
+export const upsertCharacterChapterSummary = adminMutation({
+  args: {
+    bookPath: v.string(),
+    characterSlug: v.string(),
+    chapterNumber: v.number(),
+    summary: v.string(),
+    isFirstAppearance: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+
+    const existing = await ctx.db
+      .query("characterChapterSummaries")
+      .withIndex("by_book_character_chapter", (q) =>
+        q
+          .eq("bookPath", args.bookPath)
+          .eq("characterSlug", args.characterSlug)
+          .eq("chapterNumber", args.chapterNumber),
+      )
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        summary: args.summary,
+        isFirstAppearance: args.isFirstAppearance,
+        updatedAt: now,
+      });
+      return { summaryId: existing._id };
+    }
+
+    const summaryId = await ctx.db.insert("characterChapterSummaries", {
+      bookPath: args.bookPath,
+      characterSlug: args.characterSlug,
+      chapterNumber: args.chapterNumber,
+      summary: args.summary,
+      isFirstAppearance: args.isFirstAppearance,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return { summaryId };
+  },
+});
+
+export const listCharacterChapterSummaries = publicQuery({
+  args: { bookPath: v.string(), characterSlug: v.string() },
+  handler: async (ctx, { bookPath, characterSlug }) => {
+    return await ctx.db
+      .query("characterChapterSummaries")
+      .withIndex("by_book_character", (q) =>
+        q.eq("bookPath", bookPath).eq("characterSlug", characterSlug),
+      )
+      .collect();
+  },
+});
+
+export const listAllChapterSummariesForBook = publicQuery({
+  args: { bookPath: v.string() },
+  handler: async (ctx, { bookPath }) => {
+    return await ctx.db
+      .query("characterChapterSummaries")
+      .withIndex("by_book", (q) => q.eq("bookPath", bookPath))
+      .collect();
+  },
+});

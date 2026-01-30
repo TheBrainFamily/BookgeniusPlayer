@@ -24,6 +24,11 @@ const apps = [
     sourceDir: path.join(projectRoot, "apps", "platform", "dist"),
     targetDir: path.join(buildDir, "platform-app"),
   },
+  {
+    name: "cms",
+    sourceDir: path.join(projectRoot, "apps", "bookgenius-cms", "out"),
+    targetDir: path.join(buildDir, "cms-app", "admin"),
+  },
 ];
 
 // --- HELPER FUNCTIONS (unchanged) ---

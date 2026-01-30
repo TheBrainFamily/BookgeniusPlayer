@@ -47,6 +47,21 @@ export default defineSchema({
     .index("by_book_slug", ["bookPath", "slug"])
     .index("by_path", ["characterPath"]),
 
+  // Character chapter summaries (per-chapter descriptions of a character's role/actions)
+  characterChapterSummaries: defineTable({
+    bookPath: v.string(),
+    characterSlug: v.string(),
+    chapterNumber: v.number(),
+    summary: v.string(), // Chapter-specific summary (e.g., "First appearance" or role in chapter)
+    isFirstAppearance: v.boolean(), // True if this is the character's first appearance
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_book", ["bookPath"])
+    .index("by_book_character", ["bookPath", "characterSlug"])
+    .index("by_book_chapter", ["bookPath", "chapterNumber"])
+    .index("by_book_character_chapter", ["bookPath", "characterSlug", "chapterNumber"]),
+
   // Chapter metadata (per asset basename)
   chapterMetadata: defineTable({
     bookPath: v.string(),

@@ -224,14 +224,26 @@ export const bookMutation = customMutation(baseMutation, {
 /**
  * Public query - no authentication required.
  * Use for reading published book content, assets, etc.
+ * Accepts optional _adminKey for compatibility with AdminConvexHttpClient.
  */
-export const publicQuery = baseQuery;
+export const publicQuery = customQuery(baseQuery, {
+  args: { _adminKey: v.optional(v.string()) },
+  input: async (_ctx, _args) => {
+    return { ctx: {}, args: {} };
+  },
+});
 
 /**
  * Public mutation - no authentication required.
  * Use sparingly - only for truly public operations.
+ * Accepts optional _adminKey for compatibility with AdminConvexHttpClient.
  */
-export const publicMutation = baseMutation;
+export const publicMutation = customMutation(baseMutation, {
+  args: { _adminKey: v.optional(v.string()) },
+  input: async (_ctx, _args) => {
+    return { ctx: {}, args: {} };
+  },
+});
 
 // ============================================================================
 // Internal functions (re-exported unchanged)
@@ -253,10 +265,7 @@ export const authedMutation = customMutation(baseMutation, {
   args: { _adminKey: v.optional(v.string()) },
   input: async (ctx, { _adminKey }) => {
     const identity = await requireIdentity(ctx, _adminKey);
-    return {
-      ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity), _adminKey },
-      args: {},
-    };
+    return { ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity) }, args: {} };
   },
 });
 
@@ -266,8 +275,6 @@ export const authedMutation = customMutation(baseMutation, {
 export interface AuthedMutationCtx {
   principalId: string;
   isAdmin: boolean;
-  /** Admin key for nested auth calls (undefined for normal users) */
-  _adminKey?: string;
 }
 
 // ============================================================================
@@ -339,10 +346,7 @@ export const authedAction = customAction(baseAction, {
   args: { _adminKey: v.optional(v.string()) },
   input: async (ctx, { _adminKey }) => {
     const identity = await requireIdentity(ctx, _adminKey);
-    return {
-      ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity), _adminKey },
-      args: {},
-    };
+    return { ctx: { principalId: principalId(identity), isAdmin: isAdmin(identity) }, args: {} };
   },
 });
 

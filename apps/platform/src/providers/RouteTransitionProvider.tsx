@@ -156,8 +156,9 @@ export const RouteTransitionProvider: React.FC<Props> = ({ children, minDuration
       <div
         className={`platform-content ${navigating ? "platform-content--blurring" : ""}`}
         style={{
-          transition: `filter ${SPLASH_FADE_DURATION_MS}ms ease-out`,
+          transition: `filter ${SPLASH_FADE_DURATION_MS}ms ease-out, transform ${SPLASH_FADE_DURATION_MS}ms ease-out`,
           filter: navigating ? "blur(8px)" : "blur(0px)",
+          transform: navigating ? "scale(1.05)" : "scale(1)",
         }}
       >
         {children}
