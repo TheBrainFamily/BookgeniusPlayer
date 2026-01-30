@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { AdminPanel } from "@/admin/AdminPanel";
 
@@ -9,11 +9,8 @@ export function AdminPageClient() {
 
   const basePath = "/admin";
 
-  const readQuery = useCallback(() => {
-    if (typeof window === "undefined") {
-      return { folder: "", asset: null, version: null };
-    }
-    const params = new URLSearchParams(window.location.search);
+  const parseSearch = useCallback((search: string) => {
+    const params = new URLSearchParams(search);
     return {
       folder: params.get("folder") ?? "",
       asset: params.get("asset"),
@@ -21,17 +18,19 @@ export function AdminPageClient() {
     };
   }, []);
 
-  const [query, setQuery] = useState<{
-    folder: string;
-    asset: string | null;
-    version: string | null;
-  }>(() => readQuery());
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    if (typeof window === "undefined") return () => {};
+    window.addEventListener("popstate", onStoreChange);
+    return () => window.removeEventListener("popstate", onStoreChange);
+  }, []);
 
-  useEffect(() => {
-    const handlePopState = () => setQuery(readQuery());
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [readQuery]);
+  const getSnapshot = useCallback(() => {
+    if (typeof window === "undefined") return "";
+    return window.location.search;
+  }, []);
+
+  const search = useSyncExternalStore(subscribe, getSnapshot, () => "");
+  const query = useMemo(() => parseSearch(search), [parseSearch, search]);
 
   const pushQuery = useCallback(
     (next: { folder: string; asset: string | null; version: string | null }) => {
@@ -42,7 +41,7 @@ export function AdminPageClient() {
       const qs = params.toString();
       const nextUrl = qs ? `${basePath}?${qs}` : basePath;
       window.history.pushState(null, "", nextUrl);
-      setQuery(next);
+      window.dispatchEvent(new PopStateEvent("popstate"));
     },
     [basePath],
   );
