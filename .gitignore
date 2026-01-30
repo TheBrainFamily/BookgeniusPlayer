@@ -67,3 +67,4 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 
 claude-agent-sdk-demos
+xcuserdata
