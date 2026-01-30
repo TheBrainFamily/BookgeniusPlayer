@@ -45,6 +45,23 @@ s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
   build/platform-app-snapplify/ \
   "s3://${S3_BUCKET}/app/platform-snapplify/${ASSET_CONTEXT}/"
 
+# --- cms app ---
+# First pass: long-cache non-HTML assets.
+s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
+  --exclude "*.html" \
+  --cache-control "$long_cache" \
+  build/cms-app/ \
+  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/"
+
+# Second pass: short-cache all HTML (Next.js static export creates multiple HTML pages).
+s5cmd "${ENDPOINT_FLAG[@]}" --numworkers 256 cp -c 256 \
+  --exclude "*" \
+  --include "*.html" \
+  --cache-control "$short_cache" \
+  --content-type "text/html; charset=utf-8" \
+  build/cms-app/ \
+  "s3://${S3_BUCKET}/app/cms/${ASSET_CONTEXT}/"
+
 
 
 # --- optional: books/assets + versions.json when explicitly requested ---
@@ -89,10 +106,12 @@ fi
 
 # --- CloudFlare cache purge for production ---
   curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=platform-intl&warm=1&host=${DOMAIN}" -H "x-preview-key: $PREVIEW_KEY"
+  curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=cms&warm=1&host=${DOMAIN}" -H "x-preview-key: $PREVIEW_KEY"
 
   if [[ "${ASSET_CONTEXT}" == "prod" ]]; then
     curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=platform&warm=1&host=bookgeniusz.pl" -H "x-preview-key: $PREVIEW_KEY"
     curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=platform-snapplify&warm=1&host=bookgenius.snapplify.com" -H "x-preview-key: $PREVIEW_KEY"
+    curl -X POST "https://bg-updater.bookgenius.net/?ctx=${ASSET_CONTEXT}&apps=cms&warm=1&host=bookgeniusz.pl" -H "x-preview-key: $PREVIEW_KEY"
   fi
 
   curl -X POST "https://bg-updater.bookgenius.net/?mode=recompute&ctx=${ASSET_CONTEXT}" -H "x-preview-key: $PREVIEW_KEY"

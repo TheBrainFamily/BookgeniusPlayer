@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { AdminPanel } from "@/admin/AdminPanel";
 
-export default function AdminPage() {
+export function AdminPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -18,7 +18,7 @@ export default function AdminPage() {
     (folderPath: string) => {
       const params = new URLSearchParams();
       if (folderPath) params.set("folder", folderPath);
-      router.push(`/admin${params.toString() ? `?${params}` : ""}`);
+      router.push(`/${params.toString() ? `?${params}` : ""}`);
     },
     [router],
   );
@@ -32,7 +32,7 @@ export default function AdminPage() {
       } else {
         if (folder) params.set("folder", folder);
       }
-      router.push(`/admin${params.toString() ? `?${params}` : ""}`);
+      router.push(`/${params.toString() ? `?${params}` : ""}`);
     },
     [router, folder],
   );
@@ -43,7 +43,7 @@ export default function AdminPage() {
       if (folder) params.set("folder", folder);
       if (asset) params.set("asset", asset);
       if (versionId) params.set("version", versionId);
-      router.push(`/admin${params.toString() ? `?${params}` : ""}`);
+      router.push(`/${params.toString() ? `?${params}` : ""}`);
     },
     [router, folder, asset],
   );
