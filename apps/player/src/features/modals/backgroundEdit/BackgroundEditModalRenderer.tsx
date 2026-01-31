@@ -11,8 +11,17 @@ export const BackgroundEditModalRenderer: React.FC = () => {
 
   useEscapeKey(isOpen, closeModal);
 
+  const portalTarget =
+    typeof document !== "undefined"
+      ? (document.getElementById("player-scope") ?? document.body)
+      : null;
+
+  if (!portalTarget) {
+    return null;
+  }
+
   return createPortal(
     <AnimatePresence>{isOpen && <BackgroundEditModal />}</AnimatePresence>,
-    document.body,
+    portalTarget,
   );
 };

@@ -211,6 +211,25 @@ export const updateFile = bookMutation({
 });
 
 /**
+ * Update all cues that reference a specific file.
+ */
+export const updateFileForBasename = bookMutation({
+  args: { oldBasename: v.string(), newBasename: v.string() },
+  handler: async (ctx, { oldBasename, newBasename }) => {
+    const cues = await ctx.bookDb
+      .query("backgroundCues")
+      .filter((q) => q.eq(q.field("fileBasename"), oldBasename))
+      .collect();
+
+    for (const cue of cues) {
+      await ctx.bookDb.patch(cue._id, { fileBasename: newBasename });
+    }
+
+    return { updated: cues.length };
+  },
+});
+
+/**
  * Update a cue's colors.
  */
 export const updateColors = bookMutation({
