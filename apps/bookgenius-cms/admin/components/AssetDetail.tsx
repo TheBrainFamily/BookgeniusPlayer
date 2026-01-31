@@ -56,6 +56,27 @@ function copyToClipboard(text: string, label: string) {
   toast.success(`${label} copied to clipboard`);
 }
 
+async function downloadFile(url: string, filename: string) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Download failed");
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    // Fallback: open in new tab
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
 // eslint-disable-next-line complexity -- TODO: refactor to reduce complexity
 export function AssetDetail({
   folderPath,
@@ -266,15 +287,12 @@ export function AssetDetail({
               {publishedFile?.url && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" asChild>
-                      <a
-                        href={publishedFile.url}
-                        download={basename}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Download className="h-4 w-4" />
-                      </a>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => downloadFile(publishedFile.url!, basename)}
+                    >
+                      <Download className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Download</TooltipContent>

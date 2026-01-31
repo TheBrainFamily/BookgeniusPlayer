@@ -287,36 +287,41 @@ export function UploadDialog({
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="chapter">Chapter</Label>
+                  <Label htmlFor="chapter">Chapter (optional)</Label>
                   <Input
                     id="chapter"
                     type="number"
                     min="0"
-                    placeholder="0"
+                    placeholder=""
                     value={chapter}
                     onChange={(e) => setChapter(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="paragraph">Paragraph</Label>
+                  <Label htmlFor="paragraph">Paragraph (optional)</Label>
                   <Input
                     id="paragraph"
                     type="number"
                     min="0"
-                    placeholder="0"
+                    placeholder=""
                     value={paragraph}
                     onChange={(e) => setParagraph(e.target.value)}
                   />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Specify which chapter and paragraph this {assetType} appears at.
+                Leave empty to upload without creating a cue. You can add cues later from the Cues
+                view.
               </p>
             </>
           )}
 
-          {/* Background-specific color fields */}
-          {assetType === "background" && (
+          {/* Background-specific color fields (only when creating a cue)
+              TODO: Colors should be stored on file metadata, not per-cue.
+              Currently if someone replaces a dark video with a bright one,
+              existing cues keep the old colors. Move colors to asset metadata
+              and have cues inherit from their file. */}
+          {assetType === "background" && chapter && paragraph && (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="backgroundColor">Background Color</Label>

@@ -7,10 +7,14 @@
  * - avatar (image)
  * - speaks (video)
  * - listens (video)
+ *
+ * Supports toggle between "Overview" (structured slots) and "Files" (raw folder contents).
  */
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useCharacterBundle } from "@/lib/hooks/useCharacterBundle";
+import { queries } from "@/lib/queries";
 import { MetadataEditor } from "../editors/MetadataEditor";
 import {
   ArrowLeft,
@@ -22,15 +26,21 @@ import {
   AlertCircle,
   Loader2,
   Pencil,
+  FolderOpen,
+  FileIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { getContentTypeCategory } from "@/lib/utils";
 
 // =============================================================================
 // Types
 // =============================================================================
+
+type ViewMode = "overview" | "files";
 
 interface CharacterDetailViewProps {
   characterPath: string;
@@ -111,6 +121,146 @@ function AssetSlot({ label, icon, asset, onUpload, isImage = false }: AssetSlotP
 }
 
 // =============================================================================
+// Files View Component (read-only list of files in folder)
+// =============================================================================
+
+function FilesView({ folderPath }: { folderPath: string }) {
+  const { data: files, isLoading } = useQuery(queries.publishedFilesInFolder(folderPath));
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!files || files.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
+        <FolderOpen className="h-12 w-12 mb-2" />
+        <p>No files in this folder</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {files.map((file) => {
+        const category = getContentTypeCategory(file.contentType);
+        const isImage = category === "image";
+        const isVideo = category === "video";
+
+        return (
+          <div
+            key={file.basename}
+            className="border border-border rounded-lg overflow-hidden bg-card"
+          >
+            {/* Preview */}
+            <div className="aspect-square bg-muted flex items-center justify-center">
+              {isImage && file.url ? (
+                <img src={file.url} alt={file.basename} className="w-full h-full object-cover" />
+              ) : isVideo && file.url ? (
+                <video
+                  src={file.url}
+                  className="w-full h-full object-cover"
+                  muted
+                  loop
+                  autoPlay
+                  playsInline
+                />
+              ) : (
+                <FileIcon className="h-12 w-12 text-muted-foreground" />
+              )}
+            </div>
+            {/* Info */}
+            <div className="p-2">
+              <p className="text-sm font-medium truncate" title={file.basename}>
+                {file.basename}
+              </p>
+              <p className="text-xs text-muted-foreground">{file.contentType}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// =============================================================================
+// Overview Content Component
+// =============================================================================
+
+interface OverviewContentProps {
+  bundle: NonNullable<ReturnType<typeof useCharacterBundle>["bundle"]>;
+  displayAvatar: { url: string; versionId: string; contentType?: string } | undefined;
+  onUploadAsset: (basename: string) => void;
+}
+
+function OverviewContent({ bundle, displayAvatar, onUploadAsset }: OverviewContentProps) {
+  const summary = bundle.metadata.summary;
+  const isComplete = bundle.avatar && bundle.speaks && bundle.listens;
+
+  return (
+    <>
+      {/* Summary */}
+      {summary && (
+        <div className="bg-muted/50 rounded-lg p-4">
+          <p className="text-sm text-muted-foreground italic">"{summary}"</p>
+        </div>
+      )}
+
+      {/* Asset Slots */}
+      <div>
+        <h2 className="text-lg font-medium mb-4">Character Assets</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <AssetSlot
+            label="Avatar"
+            icon={<ImageIcon className="h-4 w-4" />}
+            asset={displayAvatar}
+            onUpload={() => onUploadAsset("avatar-large.png")}
+            isImage
+          />
+          <AssetSlot
+            label="Speaks"
+            icon={<Video className="h-4 w-4" />}
+            asset={bundle.speaks}
+            onUpload={() => onUploadAsset("speaks.mp4")}
+          />
+          <AssetSlot
+            label="Listens"
+            icon={<Video className="h-4 w-4" />}
+            asset={bundle.listens}
+            onUpload={() => onUploadAsset("listens.mp4")}
+          />
+        </div>
+      </div>
+
+      {/* Completeness Status */}
+      <div className="bg-surface-1 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-sm font-medium">Bundle Status</span>
+          <Badge variant={isComplete ? "success" : "warning"}>
+            {isComplete ? "Complete" : "Incomplete"}
+          </Badge>
+        </div>
+        <div className="flex gap-4 text-sm text-muted-foreground">
+          <span className={bundle.avatar ? "text-success" : ""}>
+            {bundle.avatar ? "✓" : "○"} Avatar
+          </span>
+          <span className={bundle.speaks ? "text-success" : ""}>
+            {bundle.speaks ? "✓" : "○"} Speaks
+          </span>
+          <span className={bundle.listens ? "text-success" : ""}>
+            {bundle.listens ? "✓" : "○"} Listens
+          </span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// =============================================================================
 // Main Component
 // =============================================================================
 
@@ -122,6 +272,7 @@ export function CharacterDetailView({
 }: CharacterDetailViewProps) {
   const { bundle, isLoading, error } = useCharacterBundle(characterPath);
   const [showMetadataEditor, setShowMetadataEditor] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("overview");
 
   const displayAvatar = optimisticAvatarUrl
     ? { url: optimisticAvatarUrl, versionId: "optimistic", contentType: "image/png" }
@@ -165,7 +316,7 @@ export function CharacterDetailView({
   }
 
   const displayName = bundle.metadata.displayName || bundle.name;
-  const summary = bundle.metadata.summary;
+  const showSidebar = showMetadataEditor && viewMode === "overview";
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -182,14 +333,29 @@ export function CharacterDetailView({
             </div>
             <p className="text-sm text-muted-foreground truncate">{characterPath}</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowMetadataEditor(!showMetadataEditor)}
-          >
-            <Pencil className="h-4 w-4 mr-2" />
-            {showMetadataEditor ? "Hide" : "Edit"} Details
-          </Button>
+          {/* View Mode Toggle */}
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+            <TabsList className="h-8">
+              <TabsTrigger value="overview" className="h-7 px-2">
+                <User className="h-4 w-4 mr-1" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="files" className="h-7 px-2">
+                <FolderOpen className="h-4 w-4 mr-1" />
+                Files
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          {viewMode === "overview" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowMetadataEditor(!showMetadataEditor)}
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              {showMetadataEditor ? "Hide" : "Edit"} Details
+            </Button>
+          )}
         </div>
       </div>
 
@@ -197,66 +363,20 @@ export function CharacterDetailView({
         {/* Main Content */}
         <ScrollArea className="flex-1">
           <div className="p-6 space-y-6">
-            {/* Summary */}
-            {summary && (
-              <div className="bg-muted/50 rounded-lg p-4">
-                <p className="text-sm text-muted-foreground italic">"{summary}"</p>
-              </div>
+            {viewMode === "files" ? (
+              <FilesView folderPath={characterPath} />
+            ) : (
+              <OverviewContent
+                bundle={bundle}
+                displayAvatar={displayAvatar}
+                onUploadAsset={onUploadAsset}
+              />
             )}
-
-            {/* Asset Slots */}
-            <div>
-              <h2 className="text-lg font-medium mb-4">Character Assets</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <AssetSlot
-                  label="Avatar"
-                  icon={<ImageIcon className="h-4 w-4" />}
-                  asset={displayAvatar}
-                  onUpload={() => onUploadAsset("avatar-large.png")}
-                  isImage
-                />
-                <AssetSlot
-                  label="Speaks"
-                  icon={<Video className="h-4 w-4" />}
-                  asset={bundle.speaks}
-                  onUpload={() => onUploadAsset("speaks.mp4")}
-                />
-                <AssetSlot
-                  label="Listens"
-                  icon={<Video className="h-4 w-4" />}
-                  asset={bundle.listens}
-                  onUpload={() => onUploadAsset("listens.mp4")}
-                />
-              </div>
-            </div>
-
-            {/* Completeness Status */}
-            <div className="bg-surface-1 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium">Bundle Status</span>
-                {bundle.avatar && bundle.speaks && bundle.listens ? (
-                  <Badge variant="success">Complete</Badge>
-                ) : (
-                  <Badge variant="warning">Incomplete</Badge>
-                )}
-              </div>
-              <div className="flex gap-4 text-sm text-muted-foreground">
-                <span className={bundle.avatar ? "text-success" : ""}>
-                  {bundle.avatar ? "✓" : "○"} Avatar
-                </span>
-                <span className={bundle.speaks ? "text-success" : ""}>
-                  {bundle.speaks ? "✓" : "○"} Speaks
-                </span>
-                <span className={bundle.listens ? "text-success" : ""}>
-                  {bundle.listens ? "✓" : "○"} Listens
-                </span>
-              </div>
-            </div>
           </div>
         </ScrollArea>
 
         {/* Metadata Editor Sidebar */}
-        {showMetadataEditor && (
+        {showSidebar && (
           <div className="w-80 border-l border-border bg-card shrink-0">
             <MetadataEditor
               folderPath={characterPath}
