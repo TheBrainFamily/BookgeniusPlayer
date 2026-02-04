@@ -12,6 +12,7 @@ import path from "path";
 import fs from "fs-extra";
 import { convex } from "./convex-client";
 import "dotenv/config";
+import { computeParagraphCount } from "../lib/paragraphCount";
 
 async function fixChaptersUpload(bookSlug: string): Promise<void> {
   const repoRoot = path.resolve(__dirname, "../../");
@@ -45,6 +46,7 @@ async function fixChaptersUpload(bookSlug: string): Promise<void> {
     const chapterNumber = parseInt(match[1], 10);
     const filePath = path.join(tempOutput, file);
     const content = await fs.readFile(filePath, "utf-8");
+    const paragraphCount = computeParagraphCount(content);
     const basename = `chapter-${chapterNumber}.html`;
 
     console.log(`  Uploading chapter ${chapterNumber}...`);
@@ -62,6 +64,7 @@ async function fixChaptersUpload(bookSlug: string): Promise<void> {
         folderPath: `${bookPath}/chapters-source`,
         basename,
         chapterNumber,
+        paragraphCount,
         sourceFormat: "html",
       });
 

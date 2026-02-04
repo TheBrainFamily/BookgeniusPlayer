@@ -3,6 +3,9 @@ import path from "path";
 import { convex } from "../server/convex-client";
 import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
+import { getChapterTitle } from "src/tools/new-tooling/get-chapter-title";
+import { DOMParser, type Element as XMLElement } from "@xmldom/xmldom";
+import { computeParagraphCount } from "../lib/paragraphCount";
 
 type Args = {
   bookSlug: string;
@@ -49,7 +52,20 @@ function detectContentType(filePath: string): string {
 }
 
 function listHtmlFiles(inputDir: string): string[] {
-  return fs.readdirSync(inputDir).filter((file) => file.toLowerCase().endsWith(".html"));
+  const htmlFiles = fs.readdirSync(inputDir).filter((file) => file.toLowerCase().endsWith(".html"));
+  if (htmlFiles.length >= 1) {
+    return htmlFiles;
+  } else {
+    const xmlFiles = fs
+      .readdirSync(inputDir)
+      .filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
+    if (xmlFiles.length >= 1) {
+      return xmlFiles;
+    } else {
+      console.error(`No .html or .xml files found in ${inputDir}`);
+      process.exit(1);
+    }
+  }
 }
 
 async function main() {
@@ -74,7 +90,7 @@ async function main() {
   const files = stat.isDirectory()
     ? listHtmlFiles(inputPath).map((file) => ({
         source: path.join(inputPath, file),
-        basename: file,
+        basename: mapFilenameToBasename(file),
       }))
     : [{ source: inputPath, basename: basename ?? path.basename(inputPath) }];
 
@@ -114,12 +130,23 @@ async function main() {
     }
 
     const content = fs.readFileSync(file.source);
+    const paragraphCount = computeParagraphCount(content.toString("utf-8"));
     try {
       await convex.uploadFile({
         folderPath,
         basename: file.basename,
         content,
         contentType: detectContentType(file.source),
+      });
+      const bookPath = `books/${bookSlug}`;
+      await convex.updateChapterMetadata({
+        bookPath,
+        folderPath: `${bookPath}/chapters-source`,
+        basename: file.basename,
+        chapterNumber: parseInt(file.basename.split("-")[1], 10),
+        title: getChapterTitle(parseChapterIntoDom(content.toString("utf-8"))),
+        paragraphCount,
+        sourceFormat: "html",
       });
       console.log(`Uploaded ${file.basename}`);
       stats.uploaded += 1;
@@ -134,7 +161,30 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.error("Fatal error:", error);
-  process.exit(1);
-});
+function parseChapterIntoDom(chapter: string): XMLElement {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(chapter, "text/html");
+  const root = doc.documentElement as XMLElement;
+  return root;
+}
+
+export function mapFilenameToBasename(filename: string): string {
+  const match = filename.match(/^rewritten-paragraphs-for-chapter-(\d+)\.xml$/);
+  if (match) {
+    return `chapter-${match[1]}.html`;
+  } else {
+    const match = filename.match(/^chapter-(\d+)\.html$/);
+    if (match) {
+      return `chapter-${match[1]}.html`;
+    } else {
+      throw new Error(`Invalid filename: ${filename}`);
+    }
+  }
+}
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error("Fatal error:", error);
+    process.exit(1);
+  });
+}

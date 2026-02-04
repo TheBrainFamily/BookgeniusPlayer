@@ -18,6 +18,7 @@ import { convex, getCharacterFolders, getChapterXml } from "./convex-client";
 import { uploadBookFolder } from "./upload-books-to-r2";
 import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
+import { computeParagraphCount } from "../lib/paragraphCount";
 import "dotenv/config";
 import { v4 as uuidv4 } from "uuid";
 
@@ -182,6 +183,7 @@ async function cloneBook(sourceSlug: string, targetSlug: string): Promise<CloneR
 
     if (chapterContent) {
       const basename = `chapter-${i}.html`;
+      const paragraphCount = computeParagraphCount(chapterContent);
 
       await convex.uploadFile({
         folderPath: `${targetBookPath}/chapters-source`,
@@ -196,6 +198,7 @@ async function cloneBook(sourceSlug: string, targetSlug: string): Promise<CloneR
         folderPath: `${targetBookPath}/chapters-source`,
         basename,
         chapterNumber: i,
+        paragraphCount,
         sourceFormat: "html",
       });
 

@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 
 import ModalUI from "@player/components/modals/ModalUI";
 import { systemNavigateTo } from "@player/helpers/paragraphsNavigation";
-import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { Button } from "../ui/button";
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { useLocationRange } from "@player/hooks/useLocationRange";
@@ -34,12 +33,12 @@ const BookChaptersModal: React.FC<BookChaptersModalProps> = ({ onClose }) => {
     return bookData.chapters.map((chapter, index) => {
       return {
         id: parseInt(chapter.id),
-        title: getChapterTitle(parseInt(chapter.id), t),
+        title: chapter.title,
         page: (index + 1).toString(),
         isLocked: hasDemoAccess && parseInt(chapter.id, 10) > maxDemoChapter,
       };
     });
-  }, [t, hasDemoAccess, bookData]);
+  }, [hasDemoAccess, bookData]);
 
   const navigateToChapter = (chapterId: number) => {
     systemNavigateTo({ currentChapter: chapterId, currentParagraph: 0 });

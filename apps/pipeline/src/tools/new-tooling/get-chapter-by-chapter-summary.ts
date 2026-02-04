@@ -1,10 +1,11 @@
-import { callClaude, callGeminiWrapper } from "../../callClaude";
+import { callGeminiWrapper } from "../../callClaude";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { readBookFile } from "../../helpers/readBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { logger } from "../../logger";
+import { callGrokAzure } from "src/callGrokAzure";
 
 export const makeRollingChapterSummaries = async () => {
   const bookSettings = getBookSettings();
@@ -78,7 +79,7 @@ Provide your summary clearly organized according to the structure above, explici
   `;
 
     // Use `prompt` with your LLM here and store the output as `summary`
-    const llmProviders = [callGeminiWrapper, callClaude];
+    const llmProviders = [callGrokAzure, callGeminiWrapper];
     const selectedProvider = llmProviders[attempt % llmProviders.length];
     try {
       const summary = await selectedProvider(

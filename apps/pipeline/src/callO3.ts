@@ -22,7 +22,6 @@ export const callO3WithSchema = async <T>(
     model: openai(model),
     schema: zodSchema,
     prompt,
-    // providerOptions: { google: { thinkingConfig: { thinkingBudget: 0, includeThoughts: true } } },
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
   });
 

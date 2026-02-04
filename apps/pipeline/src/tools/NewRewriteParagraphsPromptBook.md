@@ -34,6 +34,24 @@ Identify mentions of the characters within the text.
 - **Flexibility:** Match names even if they appear in different grammatical cases (e.g., Polish declensions like "Winstona", "Winstonowi") or possessives (English "Winston's") or when referenced by title ("General") - but only if its a clear reference to the character.
 - **Structure:** `<span data-c="character-id">Mentioned Name</span>`
 
+## 3. Unknown Character Speakers
+
+When dialogue is spoken by a character **NOT in the Characters List**:
+
+- **Tag their SPEECH ONLY** - add `data-speaker` attribute to the paragraph
+- **DO NOT tag their mentions** - no `data-c` spans for unknown characters
+- **Generate a descriptive slug** based on how the text refers to them or their observable traits
+
+### Slug Guidelines for Unknown Characters:
+
+- Keep descriptions concise but uniquely identifying (2-5 words)
+- Use observable traits: role, appearance, location, action
+- Be specific enough to differentiate similar characters (e.g., two soldiers → `tall-soldier-at-gate` vs `wounded-soldier`)
+
+**Good Examples:** `tall-soldier-at-gate`, `old-woman-selling-bread`, `gruff-innkeeper`, `the-nurse`
+
+**Bad Examples:** `person` (too generic), `speaker` (not descriptive), `character-1` (meaningless), `soldier` (too generic)
+
 # Constraints (CRITICAL)
 
 1. **Text Invariance:** The visible text inside the tags must remain **EXACTLY** the same as the input. Do not fix grammar, do not correct spelling, do not remove archaic words.
@@ -63,8 +81,13 @@ Identify mentions of the characters within the text.
 **Output HTML:**
 
 ```html
-<p><span data-c="ksiaze-ramzes">Książę</span> spojrzał na <span data-c="sara">Sarę</span>, a jego wzrok złagodniał.</p>
-<p data-speaker="sara">— Panie mój — wyszeptała <span data-c="sara">Sara</span> — twe słowa są jak światło.</p>
+<p>
+  <span data-c="ksiaze-ramzes">Książę</span> spojrzał na <span data-c="sara">Sarę</span>, a jego
+  wzrok złagodniał.
+</p>
+<p data-speaker="sara">
+  — Panie mój — wyszeptała <span data-c="sara">Sara</span> — twe słowa są jak światło.
+</p>
 ```
 
 ## Example 2: English (Quotes & Formatting)
@@ -92,7 +115,9 @@ Identify mentions of the characters within the text.
   'But they were <em>in</em> the well,' <span data-c="alice">Alice</span> said to the
   <span data-c="dormouse">Dormouse</span>, ignoring the remark.
 </p>
-<p data-speaker="dormouse">'Of course they were', said the <span data-c="dormouse">Dormouse</span>; '—well in.'</p>
+<p data-speaker="dormouse">
+  'Of course they were', said the <span data-c="dormouse">Dormouse</span>; '—well in.'
+</p>
 ```
 
 ## Example 3: Multiple Speakers (Edge Case)
@@ -120,6 +145,30 @@ Identify mentions of the characters within the text.
   <span data-c="dzieci-parsons">dziećmi</span>.
 </p>
 ```
+
+## Example 4: Unknown Character Speaker
+
+**Characters (JSON):**
+
+```json
+[{ "id": "winston", "name": "Winston", "desc": "Protagonist" }]
+```
+
+**Input HTML:**
+
+```html
+<p>"Stand back!" shouted the tall soldier at the gate.</p>
+<p>Winston obeyed silently.</p>
+```
+
+**Output HTML:**
+
+```html
+<p data-speaker="tall-soldier-at-gate">"Stand back!" shouted the tall soldier at the gate.</p>
+<p><span data-c="winston">Winston</span> obeyed silently.</p>
+```
+
+Note: The soldier gets `data-speaker` with a descriptive slug, but is NOT wrapped in `data-c` because they're not in the Characters List.
 
 ---
 

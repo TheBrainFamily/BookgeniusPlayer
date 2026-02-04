@@ -15,6 +15,7 @@ import type { DetectedChapter } from "../scan-server/chapterDetector";
 import type { ChapterAnalysis, BookCharacter } from "../scan-server/ocrSchema";
 import { generateChapterHtml } from "../scan-server/htmlGenerator";
 import { generateCharacterImageWithOpenAI } from "./new-tooling/generate-pictures-for-entities";
+import { computeParagraphCount } from "../lib/paragraphCount";
 
 const SCANNED_BOOKS_DIR = path.resolve(__dirname, "../../scanned-books");
 
@@ -330,6 +331,7 @@ async function importChapter(
   // Upload HTML
   const folderPath = `${bookPath}/chapters-source`;
   const basename = `chapter-${chapter.chapterNumber}.html`;
+  const paragraphCount = computeParagraphCount(generated.html);
 
   await convex.uploadFile({
     folderPath,
@@ -345,6 +347,7 @@ async function importChapter(
     basename,
     chapterNumber: chapter.chapterNumber,
     title: chapter.title || undefined,
+    paragraphCount,
     sourceFormat: "HTML",
   });
 

@@ -14,10 +14,11 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { JSDOM } from "jsdom";
 import { AdminConvexHttpClient } from "../../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import { convertSEBook, getSEBookImagesDir, type SEImageReference } from "./index";
-import { JSDOM } from "jsdom";
+import { computeParagraphCount } from "../../lib/paragraphCount";
 
 const SE_BOOKS_DIR = path.resolve(__dirname, "../../../standardebooks-data/books");
 const LEGACY_BOOKS_DIR = path.resolve(__dirname, "../../../../../books");
@@ -289,9 +290,7 @@ async function step3_ImportChapters(
   for (const chapter of chapters) {
     console.log(`  Chapter ${chapter.chapterNumber}: ${chapter.title || "(no title)"}`);
 
-    const dom = new JSDOM(chapter.html);
-    const section = dom.window.document.querySelector("section");
-    const paragraphCount = section?.children.length || 0;
+    const paragraphCount = computeParagraphCount(chapter.html);
 
     await client.action(api.chapterCompiler.uploadHtmlSourceChapter, {
       bookPath,

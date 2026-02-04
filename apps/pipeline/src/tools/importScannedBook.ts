@@ -27,6 +27,7 @@ import type { ChapterDetectionResult } from "../scan-server/chapterDetector";
 import type { BookAnalysis, BookCharacter } from "../scan-server/ocrSchema";
 import { generateBookHtml, type GeneratedChapterHtml } from "../scan-server/htmlGenerator";
 import { generateCharacterImageWithOpenAI } from "./new-tooling/generate-pictures-for-entities";
+import { computeParagraphCount } from "../lib/paragraphCount";
 import "dotenv/config";
 
 const SCANNED_BOOKS_DIR = path.resolve(__dirname, "../../scanned-books");
@@ -386,8 +387,9 @@ async function step4_ImportChapters(
   console.log(`  Importing ${chapters.length} chapters`);
 
   for (const chapter of chapters) {
+    const paragraphCount = computeParagraphCount(chapter.html);
     console.log(
-      `  Chapter ${chapter.chapterNumber}: ${chapter.title || "(no title)"} (${chapter.paragraphCount} paragraphs)`,
+      `  Chapter ${chapter.chapterNumber}: ${chapter.title || "(no title)"} (${paragraphCount} paragraphs)`,
     );
 
     // Upload HTML content
@@ -408,6 +410,7 @@ async function step4_ImportChapters(
       basename,
       chapterNumber: chapter.chapterNumber,
       title: chapter.title || undefined,
+      paragraphCount,
       sourceFormat: "HTML",
     });
   }

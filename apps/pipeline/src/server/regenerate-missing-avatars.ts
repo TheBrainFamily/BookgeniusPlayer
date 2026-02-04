@@ -161,6 +161,60 @@ async function generateSingleAvatar(
   }
 }
 
+/**
+ * Generate a generic avatar for unknown/minor characters.
+ * This avatar matches the book's art style but shows a mysterious silhouette
+ * that can be used for any speaker not in the character list.
+ */
+async function generateGenericAvatar(bookPath: string, avatarStyle: string): Promise<void> {
+  const genericPath = `${bookPath}/characters/generic`;
+
+  // Check if generic avatar already exists
+  try {
+    const files = await getPublishedFilesInFolder(genericPath);
+    const hasAvatar = files.some((f) => f.basename === "avatar-large.png");
+    if (hasAvatar) {
+      console.log("✅ Generic avatar already exists, skipping");
+      return;
+    }
+  } catch {
+    // Folder doesn't exist yet, that's fine
+  }
+
+  console.log("📷 Generating generic avatar for unknown characters...");
+
+  const genericPrompt = `A mysterious figure shown from behind or in silhouette.
+No distinct facial features visible. The figure should feel enigmatic and anonymous,
+suitable for representing any unnamed or minor character.
+Atmospheric lighting with the figure partially obscured by shadow or mist.`;
+
+  try {
+    const generator =
+      process.env.FREE_RUN === "true"
+        ? generateCharacterImageWithFlux
+        : generateCharacterImageWithOpenAI;
+    const imageBuffer = await generator(genericPrompt, "Unknown Character", avatarStyle);
+
+    if (!imageBuffer) {
+      console.error("❌ Failed to generate generic avatar");
+      return;
+    }
+
+    console.log("📤 Uploading generic avatar...");
+    await convex.uploadFile({
+      folderPath: genericPath,
+      basename: "avatar-large.png",
+      content: imageBuffer,
+      contentType: "image/png",
+    });
+
+    console.log("✅ Successfully generated and uploaded generic avatar");
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    console.error("❌ Error generating generic avatar:", errorMsg);
+  }
+}
+
 async function regenerateMissingAvatars(bookPath: string, avatarStyle: string): Promise<void> {
   const { missingLarge } = await findCharactersMissingAvatars(bookPath);
 
@@ -246,6 +300,9 @@ async function main() {
   }
 
   await regenerateMissingAvatars(bookPath, styleData.avatarStyle);
+
+  // Generate a generic avatar for unknown/minor characters
+  await generateGenericAvatar(bookPath, styleData.avatarStyle);
 }
 
 main().catch((e) => {

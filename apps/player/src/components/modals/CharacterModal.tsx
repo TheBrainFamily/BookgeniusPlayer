@@ -11,10 +11,10 @@ import { getSavedLocation, systemNavigateTo } from "@player/helpers/paragraphsNa
 import { useBookConvex } from "@player/context/BookConvexContext";
 import { highlightSearchInParagraph } from "@player/utils/textHighlighting";
 import { DialogEnhanceClose } from "../ui/dialog";
-import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
+import { slugToDisplayName } from "@player/helpers/minorCharacterUtils";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { FILTER_OPTIONS } from "@player/utils/filterOptions";
@@ -51,11 +51,20 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
   const { setValue } = useBottomInput();
   const { openModal: openSearchModal, setLastClickedAppearanceId, setResults } = useSearchModal();
   const { pauseAllTimers, showAllElements } = useElementVisibilityStore();
-  const { charactersData } = useBookConvex();
+  const { charactersData, bookData } = useBookConvex();
+  const chapterTitle = useMemo(
+    () => bookData!.chapters.find((c) => c.id === String(chapter))?.title,
+    [chapter, bookData],
+  );
 
   const matchingCharacter = useMemo(
     () => charactersData.find((c) => c.slug === characterSlug),
     [characterSlug, charactersData],
+  );
+  // Generic avatar for unknown/minor characters (if available)
+  const genericCharacter = useMemo(
+    () => charactersData.find((c) => c.slug === "generic-avatar"),
+    [charactersData],
   );
   const latestSummary = useMemo(
     () => (matchingCharacter ? findLatestSummaryInRange(matchingCharacter, endChapter) : ""),
@@ -176,7 +185,45 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
     return option ? t(option.translationKey) : type;
   };
 
-  if (!matchingCharacter) return null;
+  // Handle unknown characters (speakers not in characterMetadata)
+  if (!matchingCharacter) {
+    const displayName = slugToDisplayName(characterSlug);
+    // Use generic avatar from Convex if available, otherwise SVG fallback
+    const unknownAvatarSrc =
+      genericCharacter?.media?.avatarUrl ??
+      getAvatarSource({
+        slug: characterSlug,
+        characterName: displayName,
+        bookSlug: "",
+        infoPerChapter: [],
+      });
+
+    return (
+      <ModalUI onClose={handleOnClose} className="bg-transparent" size="md">
+        <motion.div
+          className="flex flex-col items-center gap-4 p-6 bg-black/70 textured-bg border border-white/30 rounded-xl"
+          variants={variants.container}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          onPointerUp={handleOnClose}
+        >
+          <div className="w-24 h-24 rounded-full overflow-hidden border border-white/20">
+            <img src={unknownAvatarSrc} alt={displayName} className="w-full h-full object-cover" />
+          </div>
+          <h4 className="text-lg font-bold text-white">{displayName}</h4>
+          <DialogEnhanceClose
+            className="absolute top-4 right-4 cursor-pointer"
+            onPointerUp={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleOnClose();
+            }}
+          />
+        </motion.div>
+      </ModalUI>
+    );
+  }
 
   if (!resolvedMediaSrc) {
     console.error("no resolved media src for character modal", matchingCharacter);
@@ -294,8 +341,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
                                 <span className="flex items-center gap-1 min-w-0">
                                   <FileText size={12} className="flex-shrink-0" />
                                   <span className="line-clamp-1">
-                                    {appearance.percentInChapter}% {t("of_chapter")}{" "}
-                                    {getChapterTitle(appearance.chapter, t)}
+                                    {appearance.percentInChapter}% {t("of_chapter")} {chapterTitle}
                                   </span>
                                 </span>
                               </div>

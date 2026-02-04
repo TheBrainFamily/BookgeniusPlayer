@@ -32,6 +32,7 @@ import {
 } from "../../src/tools/new-tooling/create-graphical-style";
 import { getBookSettings } from "../../src/helpers/getBookSettings";
 import { generateTagName } from "../../src/helpers/generateTagName";
+import { computeParagraphCount } from "../lib/paragraphCount";
 import {
   initProgress,
   markStepStarted,
@@ -204,6 +205,7 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
     const filePath = path.join(tempOutputDir, file);
     const content = fs.readFileSync(filePath);
     const basename = `chapter-${chapterNumber}.html`;
+    const paragraphCount = computeParagraphCount(content.toString("utf-8"));
 
     addLog(job, `Uploading chapter ${chapterNumber} to Convex...`);
 
@@ -220,6 +222,7 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
         basename,
         chapterNumber,
         title: `Chapter ${chapterNumber}`,
+        paragraphCount,
         sourceFormat: "html",
       });
       addLog(job, `✔ Chapter ${chapterNumber} uploaded`);

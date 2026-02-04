@@ -46,8 +46,6 @@ export const getParagraphsFromChapterWithText = (
     .filter((element) => element?.text.length > 0)
     .map((pageText, index) => {
       const text = pageText.text
-        .replace(/\u201c/g, '"')
-        .replace(/\u201d/g, '"')
         .replace(/\u2019/g, "'")
         .replace(/\u2018/g, "'")
         .replace(/\u2013/g, "-")

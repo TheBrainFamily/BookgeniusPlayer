@@ -7,6 +7,8 @@ import { readBookFile } from "../../helpers/readBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { callGrokAzureWithSchema } from "src/callGrokAzure";
+import { buildParagraphsForSummary } from "./summaryParagraphs";
 
 // Define the schema for reference cards response
 const ScenesSummariesPerChapterSchema = z.object({
@@ -41,12 +43,7 @@ export async function generateSingleChapterSummary(
 ): Promise<ScenesSummariesPerChapter> {
   const { chapterNum, paragraphs, rollingSummary, bookLanguage = "English" } = options;
 
-  const paragraphsForPage = paragraphs
-    .map(
-      (paragraph) =>
-        `<p id="${paragraph.dataIndex}">${paragraph.text.trim().replace(/"/g, "'")}</p>`,
-    )
-    .join("\n");
+  const paragraphsForPage = buildParagraphsForSummary(paragraphs);
 
   const prompt = `
 ## Fiction Book Chapter Summary
@@ -169,12 +166,7 @@ export const turnChapterSummariesIntoBulletPointsMappedToParagraphs = async () =
 
       const paragraphsFromChapter = getParagraphsFromChapter(chapterNum, true, true);
 
-      const paragraphsForPage = paragraphsFromChapter
-        .map(
-          (paragraph) =>
-            `<p id="${paragraph.dataIndex}">${paragraph.text.trim().replace(/"/g, "'")}</p>`,
-        )
-        .join("\n");
+      const paragraphsForPage = buildParagraphsForSummary(paragraphsFromChapter);
 
       const prompt = `
 ## Fiction Book Chapter Summary
@@ -235,17 +227,16 @@ Provide your summary clearly organized according to the structure above, explici
       let summary: ScenesSummariesPerChapter;
 
       try {
-        summary = (await callSlowGeminiWithThinkingAndSchemaAndParsed(
+        summary = (await callGrokAzureWithSchema(
           `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages..`,
           ScenesSummariesPerChapterSchema,
         )) as ScenesSummariesPerChapter;
       } catch (e) {
         console.error(`Error for chapter ${chapterNum}`, e);
         try {
-          summary = (await callClaude(
+          summary = (await callSlowGeminiWithThinkingAndSchemaAndParsed(
             `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages.`,
             ScenesSummariesPerChapterSchema,
-            2,
           )) as ScenesSummariesPerChapter;
         } catch (e) {
           console.error(`Error for chapter ${chapterNum}`, e);

@@ -111,7 +111,7 @@ function buildAttributeString(attributes?: Record<string, string>): string {
 
 export function buildParagraphXml(p: Paragraph): string {
   const attrs = buildAttributeString(p.attributes);
-  return `<${p.elementType}${attrs}>${p.text.trim().replace(/"/g, "'")}</${p.elementType}>`;
+  return `<${p.elementType}${attrs}>${p.text.trim()}</${p.elementType}>`;
 }
 
 export function buildChunkXml(paragraphs: Paragraph[]): string {

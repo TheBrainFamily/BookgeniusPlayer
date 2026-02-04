@@ -8,7 +8,7 @@
     "reader",
     "react"
   ],
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "author": "Lukasz Gandecki <lgandecki@thebrain.pro>",
   "type": "module",
   "main": "./dist-lib/index.js",

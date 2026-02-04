@@ -1,6 +1,6 @@
 # BookGenius
 
-An open-source interactive ebook reader platform with AI-powered content enhancement. Transform classic literature into immersive reading experiences with AI-generated narration, character voices, background music, and visual elements.
+A source-available interactive ebook reader platform with AI-powered content enhancement. Transform classic literature into immersive reading experiences with AI-generated narration, character voices, background music, and visual elements.
 
 > **Early Pre-Release**: This project is in active development. Instructions for running locally and contributing will follow soon.
 
@@ -76,4 +76,4 @@ Mobile application built with React Native and Expo, bringing the reading experi
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+Fizzy O'Saasy License - see [LICENSE](LICENSE) for details.

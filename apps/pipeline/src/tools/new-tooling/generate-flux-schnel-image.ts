@@ -8,6 +8,7 @@ import {
   sanitizePromptForModeration,
   generateAbstractPortraitPrompt,
 } from "./generate-pictures-for-entities";
+import { logError } from "src/helpers/logError";
 
 const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
@@ -138,22 +139,47 @@ export const generateFluxImage = async (
     finalPrompt = `${generalPrompt} Only scene-setting environment. ${prompt}`;
   }
 
+  // this is input for flux-2-pro
+  // const input = {
+  //   aspect_ratio: type === "avatar" ? "1:1" : "16:9",
+  //   input_images: [],
+  //   output_format: type === "background" ? "webp" : "png",
+  //   output_quality: 80,
+  //   prompt: finalPrompt,
+  //   resolution: "1 MP",
+  //   safety_tolerance: 5,
+  //   seed: 43605,
+  // };
+
   const input = {
+    images: [],
+    prompt: finalPrompt,
+    go_fast: false,
     aspect_ratio: type === "avatar" ? "1:1" : "16:9",
-    input_images: [],
     output_format: type === "background" ? "webp" : "png",
     output_quality: 80,
-    prompt: finalPrompt,
-    resolution: "1 MP",
-    safety_tolerance: 5,
-    seed: 43605,
+    output_megapixels: "1",
+    disable_safety_checker: true,
   };
 
   try {
-    const output = await replicate.run("black-forest-labs/flux-2-pro", { input });
+    const output = await replicate.run("black-forest-labs/flux-2-klein-4b", { input });
 
-    // @ts-expect-error wrong types of replicate - flux-2-pro returns object with .url() method
-    const url = output.url();
+    let url: string;
+    try {
+      // @ts-expect-error wrong types of replicate - flux-2-pro returns object with .url() method
+      url = output.url();
+    } catch {
+      try {
+        url = (output as unknown as { url: () => string }[])[0].url();
+      } catch (e) {
+        logError("Failed to get URL from output", e);
+      }
+    }
+
+    if (!url!) {
+      throw new Error("Failed to get URL from output");
+    }
 
     logger.info(`Replicate returned URL: ${url}`);
 
@@ -198,7 +224,7 @@ export const generateFluxImage = async (
 
 if (require.main === module) {
   generateFluxImage(
-    "A beautiful woman with long brown hair and blue eyes",
+    "A beautiful woman with long brown hair and blue eyes, seductive pose, naked, red lips, sexy, elegant, beautiful, 18 years old, breasts exposed",
     "test",
     "SinCity style",
     "avatar",

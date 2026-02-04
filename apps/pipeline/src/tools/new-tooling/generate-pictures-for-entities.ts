@@ -331,18 +331,6 @@ Propaganda posters for their graphic boldness and limited color palette.
     filteredPrompts.map(async (prompt) => {
       if (!knownCharactersArray.includes(prompt.name)) {
         console.log("Generating for ", prompt.name);
-
-        // const translationPrompt = `Process the following draft of a visual prompt: "${prompt.visualGuide}". Remove relations (who is a cousin to who, etc), information about what happens to that person, etc.
-        // Remove any indication of episodic things, for example someone getting a bruise later. Leave this as a purely visual information, based on what we know.
-        // Remove any indication of nudity, sexual content, etc. Remove suggestions that someone is naked or descriptions of private body parts.
-        // If prompt in different language than English, translate it to English.
-        // Reply with prompt directly, without any other text, so this can be used directly as a prompt for image generation. Do not say: "Here is the prompt" or "understood", just reply with the prompt.`;
-        // const visulGuideTranslatedAndCleaned = await callClaude(translationPrompt, undefined, 10, 0);
-
-        // console.log(visulGuideTranslatedAndCleaned);
-        // const image = await generateImage(visulGuideTranslatedAndCleaned, prompt.name);
-        // const image = await generateImage(visulGuideTranslatedAndCleaned, prompt.name);
-
         await generateAndSaveCharacterImage(prompt.visualGuide, prompt.name, generalPrompt);
       }
     }),

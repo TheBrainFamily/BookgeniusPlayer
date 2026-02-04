@@ -188,10 +188,14 @@ function transformFormatBToPlayRows(section: Element, doc: Document): void {
 
       // Move content paragraphs
       for (const innerChild of Array.from(child.children)) {
+        const isExplicitDidaskalia = innerChild.getAttribute("data-is-didaskalia") === "true";
+        const isPureEm =
+          innerChild.tagName.toLowerCase() === "p" ? isPureEmParagraph(innerChild) : false;
+        const isDidaskalia = isExplicitDidaskalia || isPureEm;
         const p = innerChild.cloneNode(true) as Element;
         p.setAttribute("data-text-alignment", state.alignment);
         p.setAttribute("data-is-character", "false");
-        p.setAttribute("data-is-didaskalia", "false");
+        p.setAttribute("data-is-didaskalia", isDidaskalia ? "true" : "false");
         characterText.appendChild(p);
       }
 
@@ -348,6 +352,8 @@ export function detectSourceFormat(html: string): "compiled" | "source" {
 export type RenderMode = "default" | "enhancedProse" | "poemProse";
 
 export type EnhancedProseOptions = { speakerDisplayNames?: Map<string, string> };
+
+export type ParagraphCountOptions = { renderMode?: RenderMode; bookForm?: string | null };
 
 function createPlayRowFromSpeakerGroup(
   paragraphs: Element[],
@@ -759,6 +765,47 @@ export function normalizeBookHtml(html: string): string {
   });
 
   return doc.body.innerHTML;
+}
+
+function countDataIndexFromHtml(html: string): number {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  return doc.querySelectorAll("[data-index]").length;
+}
+
+/**
+ * Count paragraphs the same way the player indexes them (via data-index).
+ * This ensures calculateReadProgress stays accurate without loading all chapters client-side.
+ */
+export function countParagraphsFromChapterHtml(
+  html: string,
+  options: ParagraphCountOptions = {},
+): number {
+  if (!html.trim()) {
+    return 0;
+  }
+
+  if (typeof DOMParser === "undefined") {
+    throw new Error("DOMParser is not available. Provide a DOMParser implementation first.");
+  }
+
+  let normalizedHtml = html;
+  if (detectSourceFormat(html) === "source") {
+    const renderMode = options.renderMode ?? "default";
+    const bookForm = options.bookForm?.toLowerCase() ?? "";
+    const useEnhancedProse = renderMode === "enhancedProse" && bookForm !== "play";
+    const usePoemProse = renderMode === "poemProse";
+
+    if (usePoemProse) {
+      normalizedHtml = normalizeChapterHtmlPoemProse(html);
+    } else if (useEnhancedProse) {
+      normalizedHtml = normalizeChapterHtmlEnhanced(html);
+    } else {
+      normalizedHtml = normalizeChapterHtml(html);
+    }
+  }
+
+  return countDataIndexFromHtml(normalizedHtml);
 }
 
 export interface CharacterOccurrence {

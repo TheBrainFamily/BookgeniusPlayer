@@ -8,7 +8,6 @@ import React, {
   useRef,
 } from "react";
 import { useTranslation } from "react-i18next";
-import type { TFunction } from "i18next";
 
 import { motion } from "motion/react";
 import { Search, FileText, Minimize2, Maximize2, X } from "lucide-react";
@@ -29,10 +28,10 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@player/components/ui/accordion";
-import { getChapterTitle } from "@player/utils/getChapterTitle";
 import { cn } from "@player/lib/utils";
 import { findScrollParent } from "@player/utils/findScrollParent";
 import { FILTER_OPTIONS, FILTER_VALUE_MAP, type SearchFilter } from "@player/utils/filterOptions";
+import { useBookConvex } from "@player/context/BookConvexContext";
 
 interface SearchModalProps {
   onClose: () => void;
@@ -51,6 +50,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   // eslint-disable-next-line complexity -- search UI with filtering, loading states, and result rendering
 }) => {
   const { t } = useTranslation();
+  const { bookData } = useBookConvex();
 
   const deferredResults = useDeferredValue(searchResults);
 
@@ -368,8 +368,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                     <ChapterGroup
                       key={chapter}
                       chapter={Number(chapter)}
+                      chapterTitle={
+                        bookData!.chapters.find((c) => c.id === String(chapter))?.title ?? ""
+                      }
                       items={items}
-                      t={t}
                       clickedAppearanceId={clickedAppearanceId}
                       searchQuery={searchQuery}
                     />
@@ -457,28 +459,27 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
 const ChapterGroup = memo(function ChapterGroup({
   chapter,
+  chapterTitle,
   items,
-  t,
   clickedAppearanceId,
   searchQuery,
 }: {
   chapter: number;
+  chapterTitle: string;
   items: SearchResultItemData[];
-  t: TFunction;
   clickedAppearanceId?: string;
   searchQuery?: string;
 }) {
-  const chapterTitle = useMemo(
+  const chapterTitleElement = useMemo(
     () => (
       <div className="flex items-center gap-2">
         <FileText size={16} />
         <span className="font-medium">
-          {getChapterTitle(Number(chapter), t)} ({items.length}{" "}
-          {items.length === 1 ? "result" : "results"})
+          {chapterTitle} ({items.length} {items.length === 1 ? "result" : "results"})
         </span>
       </div>
     ),
-    [chapter, items.length, t],
+    [chapterTitle, items.length],
   );
 
   return (
@@ -487,7 +488,7 @@ const ChapterGroup = memo(function ChapterGroup({
       className="border-book-primary-20 rounded-lg mb-3 overflow-hidden"
     >
       <AccordionTrigger className="px-2 py-3 bg-book-primary-10 hover:bg-book-primary-20 text-book-primary hover:no-underline cursor-pointer transition-all duration-200 ease-out hover:scale-[1.01] hover:shadow-sm">
-        {chapterTitle}
+        {chapterTitleElement}
       </AccordionTrigger>
       <AccordionContent className="px-0 pb-0">
         <div className="space-y-2 py-2 px-1">

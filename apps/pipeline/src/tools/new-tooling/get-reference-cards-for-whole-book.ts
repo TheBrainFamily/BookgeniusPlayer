@@ -52,7 +52,17 @@ ${knownCharactersMapped}\n\n`
 
   console.log("combinedPrompt length:", combinedPrompt.length);
 
-  return callGrokWithSchema(combinedPrompt, NewReferenceCardsResponseSchema);
+  const response = await callGrokWithSchema(combinedPrompt, NewReferenceCardsResponseSchema);
+
+  // Add synthetic generic-avatar for unknown/minor speakers
+  // This will get an avatar generated but won't be passed to the rewrite prompts
+  response.characters.push({
+    name: "generic-avatar",
+    referenceCard:
+      "A mysterious figure shown from behind or in silhouette. No distinct facial features visible. Enigmatic and anonymous, suitable for representing any unnamed character. Atmospheric lighting with the figure partially obscured by shadow or mist.",
+  });
+
+  return response;
 };
 
 if (require.main === module) {

@@ -7,6 +7,7 @@ import { logger } from "../logger";
 import fs from "fs";
 import { compareXmlTextContent } from "./new-tooling/compare-chapters-xml";
 import { restoreOriginalTextInHtml } from "./new-tooling/restore-text-in-html";
+import { restoreUnwrappedBlocks } from "./new-tooling/restore-unwrapped-blocks";
 import path from "path";
 import { type NewReferenceCardsResponse } from "../types";
 import { writeBookFile } from "../helpers/writeBookFile";
@@ -148,6 +149,15 @@ async function processChunk(
       logger.error(`Error restoring original text for chapter ${chapter} chunk ${chunkIndex}`, e);
     }
 
+    try {
+      restored = restoreUnwrappedBlocks(originalChunkXml, restored);
+    } catch (e) {
+      logger.error(
+        `Error restoring unwrapped blocks for chapter ${chapter} chunk ${chunkIndex}`,
+        e,
+      );
+    }
+
     if (restored && compareXmlTextContent(originalChunkXml, restored)) {
       logger.info(`✅ Chunk ${chunkIndex} validated for chapter ${chapter}`);
       writeBookFile(`${chunkFileName.replace(".xml", "")}-${selectedProvider.name}.xml`, restored);
@@ -271,10 +281,8 @@ export const identifyAndRewriteParagraphs = async (
 
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-gemini2.md`, compiledPrompt);
 
-  // const llmProviders = [callGeminiWrapper, callClaude];
-
   const llmProviders = [callGeminiWrapper, callGrok, callClaude, callGpt5];
-  // const llmProviders = [callGeminiWrapper];
+
   try {
     const selectedProvider = llmProviders[attempt % llmProviders.length];
     logger.info("Using provider: " + selectedProvider.name);
@@ -291,6 +299,12 @@ export const identifyAndRewriteParagraphs = async (
       restored = restoreOriginalTextInHtml(paragraphsForPage, clearedResponse);
     } catch (e) {
       logger.error("Error restoring original text for chapter " + chapter, e);
+    }
+
+    try {
+      restored = restoreUnwrappedBlocks(paragraphsForPage, restored);
+    } catch (e) {
+      logger.error("Error restoring unwrapped blocks for chapter " + chapter, e);
     }
 
     if (restored && compareXmlTextContent(paragraphsForPage, restored)) {
@@ -337,10 +351,9 @@ export const identifyCharactersAndRewriteParagraphs = async (
 ) => {
   const bookSettings = getBookSettings();
 
-  const charactersForChapter = referenceCards.characters.map((c) => ({
-    name: c.name,
-    summary: c.referenceCard,
-  }));
+  const charactersForChapter = referenceCards.characters
+    .filter((c) => c.name !== "generic-avatar") // Exclude synthetic generic-avatar from LLM prompts
+    .map((c) => ({ name: c.name, summary: c.referenceCard }));
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
   // Prepare all chapter data

@@ -180,6 +180,26 @@ describe("Format B", () => {
       // Pure em paragraphs should become didaskalia
       expect(result).toContain('data-is-didaskalia="true"');
     });
+
+    it("marks pure em paragraphs inside format B speaker blocks as didaskalia", () => {
+      const input = `<section data-chapter="1">
+        <div data-speaker="macbeth" data-label="MACBETH">
+          <p>To know my deed, 'twere best not know myself.</p>
+          <p><em>Knocking within</em></p>
+          <p>Wake Duncan with thy knocking! I would thou couldst!</p>
+        </div>
+      </section>`;
+
+      const result = normalizeChapterHtml(input);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(result, "text/html");
+
+      const didaskalia = Array.from(doc.querySelectorAll(".character-text p")).find((p) =>
+        p.textContent?.includes("Knocking within"),
+      );
+
+      expect(didaskalia?.getAttribute("data-is-didaskalia")).toBe("true");
+    });
   });
 
   describe("data-index injection", () => {

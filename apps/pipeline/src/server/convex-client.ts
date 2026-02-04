@@ -67,6 +67,7 @@ export const convex = {
     basename: string;
     chapterNumber: number;
     title?: string;
+    paragraphCount?: number;
     sourceFormat?: string;
   }) {
     return await client.mutation(api.metadata.updateChapterMetadata, args);
