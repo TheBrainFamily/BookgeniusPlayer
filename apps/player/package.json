@@ -32,7 +32,7 @@
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "convex": "^1.0.0",
+    "convex": "^1.31.5",
     "motion": "^12.0.0",
     "zustand": "^4.0.0 || ^5.0.0",
     "i18next": "^23.0.0 || ^24.0.0 || ^25.0.0",
@@ -102,7 +102,7 @@
   "devDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "convex": "^1.31.2",
+    "convex": "^1.31.5",
     "i18next": "^25.2.1",
     "lucide-react": "^0.479.0",
     "motion": "^12.10.5",

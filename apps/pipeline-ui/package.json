@@ -18,7 +18,7 @@
     "@trpc/react-query": "^11.0.0-rc.660",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "convex": "^1.31.2",
+    "convex": "^1.31.5",
     "lucide-react": "^0.454.0",
     "monaco-editor": "^0.52.0",
     "react": "^18.2.0",
