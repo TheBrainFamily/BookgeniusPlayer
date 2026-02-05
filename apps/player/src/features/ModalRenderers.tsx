@@ -15,6 +15,7 @@ import { MusicEditModalRenderer } from "./modals/musicEdit/MusicEditModalRendere
 import { MusicAddModalRenderer } from "./modals/musicAdd/MusicAddModalRenderer";
 import { NoteEditModalRenderer } from "./modals/noteEdit/NoteEditModalRenderer";
 import { GraphicsSettingsModalRenderer } from "./modals/graphicsSettings/GraphicsSettingsModalRenderer";
+import { ImageZoomModalRenderer } from "./modals/imageZoom/ImageZoomModalRenderer";
 
 export const ModalRenderers: React.FC = () => {
   return (
@@ -35,6 +36,7 @@ export const ModalRenderers: React.FC = () => {
       <MusicAddModalRenderer />
       <NoteEditModalRenderer />
       <GraphicsSettingsModalRenderer />
+      <ImageZoomModalRenderer />
     </>
   );
 };

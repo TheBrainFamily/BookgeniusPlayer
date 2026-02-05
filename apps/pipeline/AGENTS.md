@@ -24,6 +24,7 @@ bun src/continue-pipeline-cli.ts books-data/my-book --status
 | ----------------------------- | ------------------------- | -------------------------------- |
 | `import_epub`                 | EPUB → FB2 → rich.xml     | `input/rich.xml`                 |
 | `create_settings`             | Detect language, metadata | `bookSettings.json`              |
+| `upload_figures`              | Upload SE figures         | Convex `books/*/figures`         |
 | `generate_reference_cards`    | Character summaries       | `single-summary-per-person.json` |
 | `rewrite_paragraphs`          | Inject character tags     | `rewritten-paragraphs-*.xml`     |
 | `generate_graphical_style`    | Visual style JSON         | `graphicalStyle.json`            |

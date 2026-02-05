@@ -5,6 +5,7 @@ import { adminMutation, publicQuery } from "./functions";
 const PIPELINE_STEPS = [
   "import_epub",
   "create_settings",
+  "upload_figures",
   "generate_reference_cards",
   "rewrite_paragraphs",
   "generate_graphical_style",
@@ -88,6 +89,7 @@ export const ensureBookStructure = adminMutation({
     await createFolder(`${bookPath}/characters-data`);
     await createFolder(`${bookPath}/backgrounds`);
     await createFolder(`${bookPath}/music`);
+    await createFolder(`${bookPath}/figures`);
 
     const existingBook = await ctx.db
       .query("books")

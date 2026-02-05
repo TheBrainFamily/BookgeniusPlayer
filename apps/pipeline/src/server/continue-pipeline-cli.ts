@@ -135,6 +135,7 @@ async function main() {
 
   // Determine which step to start from
   let fromStep: Step | undefined;
+  let completedSteps: Step[] | undefined;
 
   if (argv["from-step"]) {
     const specifiedStep = argv["from-step"] as string;
@@ -147,6 +148,12 @@ async function main() {
     console.log(`Starting from specified step: ${fromStep} (${StepLabels[fromStep]})`);
   } else {
     // Auto-detect from progress file
+    const progress = readProgress(slug);
+    if (progress) {
+      completedSteps = Object.entries(progress.completedSteps)
+        .filter(([, value]) => value.status === "done")
+        .map(([step]) => step as Step);
+    }
     fromStep = getNextStep(slug) || undefined;
     if (fromStep) {
       console.log(`Auto-detected next step: ${fromStep} (${StepLabels[fromStep]})`);
@@ -158,7 +165,7 @@ async function main() {
 
   console.log(`\nContinuing pipeline for slug="${slug}" from step: ${fromStep}`);
 
-  const job = await startPipeline({ slug, fromStep });
+  const job = await startPipeline({ slug, fromStep, completedSteps });
 
   // Poll job state and stream logs
   let lastLogIndex = 0;

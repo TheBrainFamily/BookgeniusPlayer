@@ -60,7 +60,7 @@ function formatChapterElement(chapter: Element, serializer: XMLSerializer): stri
 
 function formatSource(xml: string): string {
   const parser = new DOMParser({ onError: () => {} });
-  const doc = parser.parseFromString(xml, "text/xml");
+  const doc = parser.parseFromString(xml, "text/html");
   const serializer = new XMLSerializer();
 
   // If the file is just one <Chapter>, format that; otherwise format all Chapters found.

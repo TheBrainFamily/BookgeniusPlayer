@@ -76,44 +76,21 @@ Based on the book text answer the user's question, using quotes from the wider b
 };
 
 export const callGeminiWithThinking = async (prompt: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
-  const config = {
-    responseMimeType: "text/plain",
-    httpOptions: {
-      timeout: 15 * 60 * 1000, // 15 minutes in milliseconds
-    },
-  };
-  const model = "gemini-3-flash-preview";
-  // const model = "gemini-3-pro-preview";
-
-  const contents = [{ role: "user", parts: [{ text: prompt }] }];
   const safetySettings = [
-    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-    {
-      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-      threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-      threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
-    {
-      category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
-      threshold: HarmBlockThreshold.BLOCK_NONE,
-    },
+    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.OFF },
+    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.OFF },
+    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.OFF },
+    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.OFF },
+    { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.OFF },
   ];
-
-  console.log("before response", model);
-  const response = await ai.models.generateContent({
-    model,
-    config: { ...config, safetySettings },
-    contents,
+  console.log("CALLING GEMINI WITH THINKING");
+  const { text } = await generateText({
+    model: google("gemini-3-flash-preview"),
+    prompt,
+    experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
+    providerOptions: { google: { safetySettings } },
   });
-
-  console.log("after response");
-
-  return response?.text;
+  return text;
 };
 
 export const callGeminiWithThinkingAndSchema = async <T>(

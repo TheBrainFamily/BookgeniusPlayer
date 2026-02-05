@@ -185,7 +185,11 @@ export const callClaude = async <T = string>(
 };
 
 const doIt = async () => {
-  const result = await callClaude("Identify all named book characters (people) in this page.\n");
+  const result = (await callGeminiWrapper(
+    "Identify all named book characters (people) in this page.\n",
+    undefined,
+    1,
+  )) as string;
   logger.info(result);
 };
 // Execute only if this file is being run directly (not imported)

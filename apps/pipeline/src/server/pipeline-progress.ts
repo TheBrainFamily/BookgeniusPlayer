@@ -22,6 +22,7 @@ export interface PipelineProgress {
 const STEP_ORDER: Step[] = [
   "import_epub",
   "create_settings",
+  "upload_figures",
   "generate_reference_cards",
   "rewrite_paragraphs",
   "generate_graphical_style",

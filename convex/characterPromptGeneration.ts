@@ -97,7 +97,7 @@ export const generateCharacterPrompt = internalAction({
       }
 
       const parser = new DOMParser();
-      const doc = parser.parseFromString(xmlResult.content, "text/xml");
+      const doc = parser.parseFromString(xmlResult.content, "text/html");
 
       const section = doc.getElementsByTagName("section")[0] as XmlDomElement;
       if (!section) {

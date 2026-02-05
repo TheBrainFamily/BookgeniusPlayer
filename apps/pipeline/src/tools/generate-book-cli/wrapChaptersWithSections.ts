@@ -17,7 +17,7 @@ import { JSDOM } from "jsdom";
  * whitespace‑agnostic.
  */
 export function wrapChaptersWithSections(xml: string): string {
-  const dom = new JSDOM(xml, { contentType: "text/xml" });
+  const dom = new JSDOM(xml, { contentType: "text/html" });
   const doc = dom.window.document;
 
   const NS = doc.documentElement.namespaceURI || null;

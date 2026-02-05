@@ -40,6 +40,7 @@ export type StyleSelectionState = z.infer<typeof StyleSelectionStateSchema>;
 export const StepEnum = z.enum([
   "import_epub",
   "create_settings",
+  "upload_figures",
   "generate_reference_cards",
   "rewrite_paragraphs",
   "generate_graphical_style",
@@ -59,6 +60,7 @@ export type Step = z.infer<typeof StepEnum>;
 export const StepLabels: Record<Step, string> = {
   import_epub: "Import EPUB",
   create_settings: "Create Settings",
+  upload_figures: "Upload Figures",
   generate_reference_cards: "Generate Reference Cards",
   rewrite_paragraphs: "Rewrite Paragraphs",
   generate_graphical_style: "Generate Graphical Style",

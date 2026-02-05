@@ -53,7 +53,14 @@ export function restoreUnwrappedLines(originalInner: string, modelInner: string)
   const blocks = extractOriginalBlocks(originalInner);
   if (blocks.length === 0) return modelInner;
 
-  const lines = modelInner.split(/\r?\n/);
+  const parser = new DOMParser();
+  let normalizedModel = modelInner.includes("\n")
+    ? modelInner
+    : modelInner.replace(/<\/p>\s*/gi, "</p>\n").replace(/\s*<p\b/gi, "\n<p");
+  if (!modelInner.includes("\n")) {
+    normalizedModel = normalizedModel.replace(/^\n+/, "").replace(/\n+$/, "");
+  }
+  const lines = normalizedModel.split(/\r?\n/);
   const output: string[] = [];
   let changed = false;
   let originalIndex = 0;
@@ -71,14 +78,20 @@ export function restoreUnwrappedLines(originalInner: string, modelInner: string)
       continue;
     }
 
-    const normalizedText = normalizeText(trimmed);
+    let lineContent = trimmed;
+    const closingPMatch = lineContent.match(/<\/p>\s*$/i);
+    if (closingPMatch) {
+      lineContent = lineContent.slice(0, closingPMatch.index).trimEnd();
+    }
+
+    const normalizedText = normalizeText(getTextContent(lineContent, parser));
     const matchIndex = findMatchingIndex(blocks, originalIndex, normalizedText);
 
     if (matchIndex >= 0) {
       const indentMatch = line.match(/^\s*/);
       const indent = indentMatch ? indentMatch[0] : "";
       const block = blocks[matchIndex];
-      output.push(`${indent}${block.openTag}${trimmed}${block.closeTag}`);
+      output.push(`${indent}${block.openTag}${lineContent}${block.closeTag}`);
       originalIndex = matchIndex + 1;
       changed = true;
       continue;

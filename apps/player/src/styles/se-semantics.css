@@ -290,6 +290,7 @@
     margin: auto;
     max-height: 100vh;
     max-width: 100%;
+    cursor: zoom-in;
   }
 
   figure.full-page {

@@ -241,7 +241,7 @@ export const setParagraphSpeaker = bookAction({
     console.log("[setParagraphSpeaker] HTML length:", htmlResult.content.length);
 
     const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+    const doc = parser.parseFromString(htmlResult.content, "text/html");
 
     const paragraph = findParagraphByIndex(doc, paragraphIndex);
     console.log(
@@ -345,7 +345,7 @@ export const modifyCharacterTag = bookAction({
     }
 
     const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+    const doc = parser.parseFromString(htmlResult.content, "text/html");
 
     const paragraph = findParagraphByIndex(doc, paragraphIndex);
     if (!paragraph) {
@@ -451,7 +451,7 @@ export const wrapTextWithCharacter = bookAction({
     }
 
     const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+    const doc = parser.parseFromString(htmlResult.content, "text/html");
 
     const paragraph = findParagraphByIndex(doc, paragraphIndex);
     if (!paragraph) {
@@ -547,7 +547,7 @@ export const removeNoteFromChapter = bookAction({
     }
 
     const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlResult.content, "text/xml");
+    const doc = parser.parseFromString(htmlResult.content, "text/html");
 
     let noteFound = false;
 

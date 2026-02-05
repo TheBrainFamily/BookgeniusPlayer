@@ -35,7 +35,7 @@ export const callGpt5 = async <T = string>(
 ) => {
   const chatCompletion = await client.chat.completions.create({
     messages: [{ role: "user", content: prompt }],
-    model: "gpt-5.1",
+    model: "gpt-5.2",
     reasoning_effort: "medium",
   });
   return chatCompletion.choices[0].message.content as string;

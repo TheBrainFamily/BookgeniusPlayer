@@ -8,6 +8,7 @@ import { replaceXmlTagsIntoHtmlTags } from "@player/helpers/replaceXmlTagsIntoHt
 import { activateCharacterInteractions } from "@player/helpers/activateCharacterInteractions";
 import { activateFootnoteInteractions } from "@player/helpers/activateFootnoteInteractions";
 import { useBookConvex } from "@player/context/BookConvexContext";
+import { useImageModal } from "@player/stores/modals/imageModal.store";
 import {
   markLayoutUnstable,
   LAYOUT_UNSTABLE_VIRTUALIZER_MS,
@@ -48,6 +49,7 @@ export function useBookContent() {
   const { currentChapter } = location;
   const { isPlayFormat } = useBookForm();
   const { openModal: openCharacterDetailsModal } = useCharacterModal();
+  const { openModal: openImageModal } = useImageModal();
 
   // Initialize to -1 so the first real version (0 or 1) is always detected as a change
   // Using textVersion as initial value would miss the first update if component mounts after version change
@@ -76,6 +78,21 @@ export function useBookContent() {
       if (event.metaKey || event.ctrlKey) return;
 
       const target = event.target as HTMLElement;
+
+      const imageTarget = target instanceof HTMLImageElement ? target : target.closest("img");
+      if (imageTarget) {
+        const isInlineAvatar = imageTarget.closest(".inline-avatar");
+        const isInChapter = imageTarget.closest("section[data-chapter]");
+        if (!isInlineAvatar && isInChapter) {
+          const src = imageTarget.currentSrc || imageTarget.src;
+          if (src) {
+            event.preventDefault();
+            event.stopPropagation();
+            openImageModal({ src, alt: imageTarget.alt || undefined });
+            return;
+          }
+        }
+      }
 
       const isInlineAvatar = target.closest(".inline-avatar");
       const isCharacterHighlighted = target.classList.contains("character-highlighted-activated");
@@ -163,7 +180,7 @@ export function useBookContent() {
       activateFootnoteInteractions(complexitySpan);
       setSentenceAsClicked(currentSentenceId);
     },
-    [openCharacterDetailsModal, isPlayFormat],
+    [openCharacterDetailsModal, openImageModal, isPlayFormat],
   );
 
   useEffect(() => {

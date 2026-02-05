@@ -1,4 +1,4 @@
-import { callClaude, callGeminiWrapper } from "../callClaude";
+import { callGeminiWrapper } from "../callClaude";
 import {
   getParagraphsFromChapter,
   getSectionAttributesFromChapter,
@@ -129,7 +129,6 @@ async function processChunk(
     callGeminiWrapper,
     callGeminiWrapper,
     callGrok,
-    callClaude,
     callGpt5,
   ];
 
@@ -299,7 +298,7 @@ export const identifyAndRewriteParagraphs = async (
 
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-gemini2.md`, compiledPrompt);
 
-  const llmProviders = [callGeminiWrapper, callGrok, callClaude, callGpt5];
+  const llmProviders = [callGeminiWrapper, callGeminiWrapper, callGrok, callGpt5];
 
   try {
     const selectedProvider = llmProviders[attempt % llmProviders.length];

@@ -5,6 +5,7 @@ export type StepDependency = { step: Step; deps: Step[] };
 export const STEP_DEPENDENCIES: StepDependency[] = [
   { step: "import_epub", deps: [] },
   { step: "create_settings", deps: ["import_epub"] },
+  { step: "upload_figures", deps: ["create_settings"] },
   { step: "generate_reference_cards", deps: ["create_settings"] },
   { step: "rewrite_paragraphs", deps: ["generate_reference_cards"] },
   { step: "generate_graphical_style", deps: ["create_settings"] },

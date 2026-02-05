@@ -132,6 +132,8 @@ function getContentType(filename: string): string {
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
     ".webp": "image/webp",
     ".mp4": "video/mp4",
     ".webm": "video/webm",
@@ -471,14 +473,62 @@ async function uploadGraphicalStyleToConvex(job: Job, tempOutputDir: string) {
   }
 }
 
+async function uploadFiguresToConvex(job: Job, repoRoot: string) {
+  const seBookDir = path.join(repoRoot, "standardebooks-data", "books", job.slug);
+  const metadataPath = path.join(seBookDir, "metadata.json");
+  const imagesDir = path.join(seBookDir, "images");
+
+  if (!fs.existsSync(metadataPath) || !fs.existsSync(imagesDir)) {
+    addLog(job, "No Standard Ebooks images detected - skipping figure upload");
+    return;
+  }
+
+  const files = fs.readdirSync(imagesDir).filter((f) => /\.(png|jpe?g|gif|svg|webp)$/i.test(f));
+
+  if (files.length === 0) {
+    addLog(job, `No figure images found in ${imagesDir}`);
+    return;
+  }
+
+  addLog(job, `Uploading ${files.length} Standard Ebooks figures to Convex...`);
+
+  let uploaded = 0;
+  for (const file of files) {
+    const filePath = path.join(imagesDir, file);
+    try {
+      const content = fs.readFileSync(filePath);
+      await convex.uploadFile({
+        folderPath: `${job.bookPath}/figures`,
+        basename: file,
+        content,
+        contentType: getContentType(file),
+      });
+      uploaded++;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      addLog(job, `⚠ Failed to upload figure ${file}: ${msg}`);
+    }
+  }
+
+  addLog(job, `✔ Figures uploaded: ${uploaded}/${files.length}`);
+}
+
 export async function startPipeline(input: {
   epubPath?: string;
   fb2Path?: string;
   slug?: string;
   ebookConvertBin?: string;
   fromStep?: Step;
+  completedSteps?: Step[];
 }) {
-  const { epubPath, fb2Path, slug: providedSlug, ebookConvertBin, fromStep } = input;
+  const {
+    epubPath,
+    fb2Path,
+    slug: providedSlug,
+    ebookConvertBin,
+    fromStep,
+    completedSteps,
+  } = input;
   const baseName = epubPath ? path.basename(epubPath, path.extname(epubPath)) : null;
   const slug = providedSlug || slugify(baseName || "book");
   const bookPath = `books/${slug}`;
@@ -487,6 +537,7 @@ export async function startPipeline(input: {
 
   const stepOrder = getStepOrder();
   const fromStepIndex = fromStep ? getStepIndex(fromStep) : -1;
+  const completedStepSet = new Set<Step>(completedSteps ?? []);
 
   const job: Job = {
     id: uuidv4(),
@@ -498,6 +549,9 @@ export async function startPipeline(input: {
     logs: [],
     steps: stepOrder.map((step) => {
       const stepIndex = getStepIndex(step);
+      if (completedStepSet.has(step) && step !== fromStep) {
+        return { step, status: "done" as const };
+      }
       if (fromStepIndex > 0 && stepIndex < fromStepIndex) {
         return { step, status: "done" as const };
       }
@@ -517,6 +571,11 @@ export async function startPipeline(input: {
   const tempOutputDir = path.join(bookRoot, "temporary-output");
 
   const schedulerState = createSchedulerState();
+  for (const step of job.steps) {
+    if (step.status === "done") {
+      schedulerState.completedSteps.add(step.step);
+    }
+  }
   let referenceCards: NewReferenceCardsResponse;
 
   initStyleSelection(bookRoot);
@@ -577,6 +636,10 @@ export async function startPipeline(input: {
         .catch((e) => {
           addLog(job, `⚠ Failed to update book metadata: ${e.message}`);
         });
+    },
+
+    upload_figures: async () => {
+      await uploadFiguresToConvex(job, repoRoot);
     },
 
     generate_reference_cards: async () => {
@@ -876,8 +939,6 @@ export async function startPipeline(input: {
         "upload_answer_server_data",
       ];
       for (const skip of skipSteps) {
-        const idx = stepsToRun.indexOf(skip);
-        if (idx !== -1) stepsToRun.splice(idx, 1);
         schedulerState.completedSteps.add(skip);
         const s = job.steps.find((x) => x.step === skip);
         if (s) s.status = "done";
