@@ -6,7 +6,7 @@ import { getBookSettings } from "../../helpers/getBookSettings";
 import { readBookFile } from "../../helpers/readBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { writeBookFile } from "../../helpers/writeBookFile";
-import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { callGrokAzureWithSchema } from "../../callGrokAzure";
 import { buildParagraphsForSummary } from "./summaryParagraphs";
 
@@ -104,11 +104,12 @@ Provide your summary clearly organized according to the structure above, explici
   let summary: ScenesSummariesPerChapter;
 
   try {
-    summary = (await callSlowGeminiWithThinkingAndSchemaAndParsed(
+    summary = (await callGeminiWithThinkingAndSchemaAndParsed(
       bookLanguage === "Polish"
         ? `${prompt}\n Książka jest po Polsku, więc napisz podsumowanie również po Polsku.`
         : prompt,
       ScenesSummariesPerChapterSchema,
+      "gemini-3-flash-preview",
     )) as ScenesSummariesPerChapter;
   } catch (e) {
     console.error(`Error for chapter ${chapterNum}`, e);
@@ -234,9 +235,10 @@ Provide your summary clearly organized according to the structure above, explici
       } catch (e) {
         console.error(`Error for chapter ${chapterNum}`, e);
         try {
-          summary = (await callSlowGeminiWithThinkingAndSchemaAndParsed(
+          summary = (await callGeminiWithThinkingAndSchemaAndParsed(
             `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages.`,
             ScenesSummariesPerChapterSchema,
+            "gemini-3-flash-preview",
           )) as ScenesSummariesPerChapter;
         } catch (e) {
           console.error(`Error for chapter ${chapterNum}`, e);

@@ -6,10 +6,9 @@ import {
 } from "@google/genai";
 import { type z } from "zod";
 import { google } from "@ai-sdk/google";
-import { generateObject, generateText, streamText, wrapLanguageModel } from "ai";
+import { generateObject, generateText, streamText } from "ai";
 import { toGeminiSchema } from "gemini-zod";
 import "dotenv/config";
-import { openrouter } from "@openrouter/ai-sdk-provider";
 import type { LanguageModelV2Middleware } from "@ai-sdk/provider";
 
 export const callFastGemini = async (
@@ -84,12 +83,16 @@ export const callGeminiWithThinking = async (prompt: string) => {
     { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.OFF },
   ];
   console.log("CALLING GEMINI WITH THINKING");
-  const { text } = await generateText({
+  const { textStream } = await streamText({
     model: google("gemini-3-flash-preview"),
     prompt,
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
     providerOptions: { google: { safetySettings } },
   });
+  let text = "";
+  for await (const textPart of textStream) {
+    text += textPart;
+  }
   return text;
 };
 
@@ -245,54 +248,6 @@ export const anthropicThinkingSchemaMiddleware: LanguageModelV2Middleware = {
 
     return result;
   },
-};
-
-export const callSlowGeminiWithThinkingAndSchemaAndParsed = async <T>(
-  prompt: string,
-  zodSchema: z.ZodSchema<T>,
-  model: string = "google/gemini-3-flash-preview",
-) => {
-  const claudeModel = wrapLanguageModel({
-    model: openrouter(model),
-    middleware: anthropicThinkingSchemaMiddleware,
-  });
-  const { object } = await generateObject({
-    model:
-      model.includes("claude") || model.includes("minimax") || model.includes("kimi")
-        ? claudeModel
-        : openrouter(model),
-    schema: zodSchema,
-    prompt,
-    experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
-    providerOptions: {
-      openrouter: {
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-        ],
-      },
-    },
-  });
-
-  return object as T;
 };
 
 export const callGeminiWithImage = async <T>(

@@ -12,7 +12,7 @@ import {
   generateImageWithFluxToFolder,
 } from "./generate-flux-schnel-image";
 import { type GraphicalStyle } from "./create-graphical-style";
-import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { generateCharacterImageWithOpenAI } from "./generate-pictures-for-entities";
 import { bookFileExists } from "../../helpers/bookFileExists";
 import type { NewReferenceCardsResponse } from "../../types";
@@ -182,7 +182,11 @@ Chapter Text: <chapter>${chapter.content}</chapter>
 }`;
 
         const schema = z.object({ sceneDescription: z.string() });
-        const response = await callSlowGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
+        const response = await callGeminiWithThinkingAndSchemaAndParsed(
+          prompt,
+          schema,
+          "gemini-3-flash-preview",
+        );
         console.log(`${chapter.number} - ${JSON.stringify(response)}`);
         return {
           chapter: chapter.number,
@@ -345,7 +349,11 @@ Chapter Text: <chapter>${chapter.content}</chapter>
 }`;
 
   const schema = z.object({ sceneDescription: z.string() });
-  const response = await callSlowGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
+  const response = await callGeminiWithThinkingAndSchemaAndParsed(
+    prompt,
+    schema,
+    "gemini-3-flash-preview",
+  );
 
   const outputFolder = "style-previews";
   const generator = FREE_RUN ? generateImageWithFluxToFolder : generateImageWithOpenAIToFolder;
