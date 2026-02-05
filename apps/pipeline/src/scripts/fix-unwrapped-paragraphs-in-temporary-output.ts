@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import fs from "fs";
 import path from "path";
-import { restoreUnwrappedBlocks } from "../tools/new-tooling/restore-unwrapped-blocks";
+import { restoreUnwrappedLines } from "../tools/new-tooling/restore-unwrapped-lines";
 import { buildSectionWrapper, extractSectionInner } from "../tools/new-tooling/section-wrapper";
 
 const DEFAULT_OUTPUT_ROOT =
@@ -110,7 +110,7 @@ function main() {
       const modelExtract = extractSectionInner(modelRaw);
       const originalExtract = extractSectionInner(originalRaw);
 
-      const fixedInner = restoreUnwrappedBlocks(originalExtract.inner, modelExtract.inner);
+      const fixedInner = restoreUnwrappedLines(originalExtract.inner, modelExtract.inner);
       const hasChanges = fixedInner !== modelExtract.inner;
 
       const output = hasChanges ? buildSectionWrapper(fixedInner, modelExtract.wrapper) : modelRaw;
