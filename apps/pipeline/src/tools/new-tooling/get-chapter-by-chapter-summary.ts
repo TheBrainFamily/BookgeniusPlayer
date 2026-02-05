@@ -5,7 +5,7 @@ import { writeBookFile } from "../../helpers/writeBookFile";
 import { readBookFile } from "../../helpers/readBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { logger } from "../../logger";
-import { callGrokAzure } from "src/callGrokAzure";
+import { callGrokAzure } from "../../callGrokAzure";
 
 export const makeRollingChapterSummaries = async () => {
   const bookSettings = getBookSettings();

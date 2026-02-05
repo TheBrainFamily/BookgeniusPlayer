@@ -362,6 +362,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
 
   const characters = useMemo<CharacterBundle[]>(() => {
     if (!charactersQuery) return [];
+    console.log(`charactersQuery`, charactersQuery);
     return charactersQuery.map((c) => ({
       path: c.path,
       slug: c.slug,

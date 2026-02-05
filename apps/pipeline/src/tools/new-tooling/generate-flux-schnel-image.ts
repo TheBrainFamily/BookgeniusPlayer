@@ -8,7 +8,7 @@ import {
   sanitizePromptForModeration,
   generateAbstractPortraitPrompt,
 } from "./generate-pictures-for-entities";
-import { logError } from "src/helpers/logError";
+import { logError } from "../../helpers/logError";
 
 const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 

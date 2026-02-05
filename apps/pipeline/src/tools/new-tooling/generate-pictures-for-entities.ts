@@ -280,7 +280,10 @@ ${chapters
   .join("\n")}
 </chapters>`;
 
-    const charactersXml = characterNames.map((name) => `<character name="${name}"/>`).join("\n");
+    const charactersXml = characterNames
+      .filter((name) => name !== "generic-avatar")
+      .map((name) => `<character name="${name}"/>`)
+      .join("\n");
     prompt = initialPrompt
       .replace("{{characters}}", `<characters>${charactersXml}</characters>`)
       .replace("{{bookText}}", bookText);
@@ -288,6 +291,11 @@ ${chapters
 
   const response = await callGeminiWithThinkingAndSchemaAndParsed(prompt, CharactersSchema);
   logger.info(`Response: `, response);
+  response.characters.push({
+    name: "generic-avatar",
+    visualGuide:
+      "A mysterious figure shown from behind or in silhouette. No distinct facial features visible. Anonymous, sexless, suitable for representing any unnamed character. Atmospheric lighting with the figure partially obscured by shadow or mist.",
+  });
   return response;
 };
 
@@ -300,7 +308,15 @@ export const generatePicturesForEntities = async (
   let generatedPrompts: CharactersType;
   if (bookFileExists("generated-prompts.json", FILE_TYPE.TEMPORARY)) {
     generatedPrompts = JSON.parse(readBookFile("generated-prompts.json", FILE_TYPE.TEMPORARY));
-    console.log("inside generated prompts");
+    console.log("[generatePicturesForEntities] Using cached generated-prompts.json");
+    console.log(
+      "[generatePicturesForEntities] Cached characters:",
+      generatedPrompts.characters.map((c) => c.name),
+    );
+    console.log(
+      "[generatePicturesForEntities] Reference cards characters:",
+      referenceCards.characters.map((c) => c.name),
+    );
   } else {
     generatedPrompts = await generatePicturePrompts(referenceCards, { skipBookAnalysis });
     writeBookFile(

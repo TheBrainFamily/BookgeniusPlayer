@@ -7,7 +7,7 @@ import { readBookFile } from "../../helpers/readBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { callSlowGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
-import { callGrokAzureWithSchema } from "src/callGrokAzure";
+import { callGrokAzureWithSchema } from "../../callGrokAzure";
 import { buildParagraphsForSummary } from "./summaryParagraphs";
 
 // Define the schema for reference cards response

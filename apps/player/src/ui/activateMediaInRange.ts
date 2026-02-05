@@ -314,6 +314,7 @@ function populateInlineAvatarShell(
   characterData: CharacterData | undefined,
   location: { chapter: number; paragraph: number } | null,
   snapshotOverride?: CharacterSnapshot | null,
+  genericCharacter?: CharacterData,
 ): boolean {
   if (shell.querySelector("img")) {
     return false;
@@ -325,9 +326,38 @@ function populateInlineAvatarShell(
     return false;
   }
 
+  // Handle unknown characters (not in Convex)
   if (!characterData) {
-    console.warn(`[populateInlineAvatarShell] ${characterSlug}: no characterData provided`);
-    return false;
+    console.log("generic", genericCharacter);
+    // Try generic avatar first, then SVG fallback
+    const genericAvatarUrl = genericCharacter?.media?.avatarUrl;
+    console.log(`[populateInlineAvatarShell] Unknown character "${characterSlug}":`, {
+      hasGenericCharacter: !!genericCharacter,
+      genericCharacterSlug: genericCharacter?.slug,
+      genericAvatarUrl,
+      genericMedia: genericCharacter?.media,
+    });
+    const fallbackSrc = genericAvatarUrl ?? generateFallbackAvatarUrl(characterSlug);
+
+    // Generate display name from slug: "other-board-members" -> "Other Board Members"
+    const displayName = characterSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+    shell.title = displayName;
+
+    const placeholderImg = document.createElement("img");
+    placeholderImg.src = normalizeSrcForInlineAvatar(fallbackSrc);
+    placeholderImg.classList.add(
+      "absolute",
+      "top-0",
+      "left-0",
+      "w-full",
+      "h-full",
+      "object-cover",
+      "rounded-full",
+    );
+    placeholderImg.alt = displayName;
+    shell.appendChild(placeholderImg);
+    return true;
   }
 
   const snapshot =
@@ -462,6 +492,7 @@ export function activateMediaInRange(
 ) {
   const charactersData = getCharactersData();
   const charactersBySlug = new Map(charactersData.map((c) => [c.slug, c]));
+  const genericCharacter = charactersBySlug.get("generic-avatar");
 
   if (isPlayFormat && !isMobile()) {
     const activeParagraph = document.querySelector<HTMLElement>(`.active-paragraph`);
@@ -570,6 +601,7 @@ export function activateMediaInRange(
             characterData,
             locationForPlaceholder,
             snapshot,
+            genericCharacter,
           );
         }
       } else {
@@ -680,7 +712,9 @@ export const openPlayRowCharacterModal = (
 };
 
 export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
+  console.log("getCharactersData", getCharactersData());
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
+  const genericCharacter = charactersBySlug.get("generic-avatar");
   const chapterAttr = section.dataset.chapter;
   const chapterNumber = chapterAttr ? parseInt(chapterAttr, 10) : 0;
 
@@ -694,7 +728,7 @@ export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
     const paragraphIndex = paragraphEl?.dataset.index ? parseInt(paragraphEl.dataset.index, 10) : 0;
     const location = { chapter: chapterNumber, paragraph: paragraphIndex };
 
-    populateInlineAvatarShell(shell, characterData, location);
+    populateInlineAvatarShell(shell, characterData, location, undefined, genericCharacter);
   });
 
   const personaCells = section.querySelectorAll<HTMLElement>(

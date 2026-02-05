@@ -258,8 +258,16 @@ async function uploadCharactersToConvex(
     }
   }
 
+  console.log(
+    "[uploadCharactersToConvex] Characters to process:",
+    referenceCards.characters.map((c) => c.name),
+  );
+
   for (const character of referenceCards.characters) {
     const characterSlug = generateTagName(character.name).toLowerCase();
+    console.log(
+      `[uploadCharactersToConvex] Processing character: "${character.name}" -> slug: "${characterSlug}"`,
+    );
     const promptEntry = generatedPrompts.characters.find(
       (p) => generateTagName(p.name).toLowerCase() === characterSlug,
     );
@@ -276,7 +284,11 @@ async function uploadCharactersToConvex(
     const avatarExtensions = [".png", ".jpg", ".jpeg", ".webp"];
     for (const ext of avatarExtensions) {
       const avatarPath = path.join(outputDir, "characters", `${characterSlug}${ext}`);
-      if (fs.existsSync(avatarPath)) {
+      const fileExists = fs.existsSync(avatarPath);
+      console.log(
+        `[uploadCharactersToConvex] Checking avatar: ${avatarPath} - exists: ${fileExists}`,
+      );
+      if (fileExists) {
         addLog(job, `Uploading avatar for ${character.name}...`);
         try {
           const content = fs.readFileSync(avatarPath);
@@ -651,6 +663,28 @@ export async function startPipeline(input: {
       } else {
         autoStyle = await createGraphicalStyle(slug, { saveToFile: false });
       }
+
+      const isFreeRun = process.env.FREE_RUN === "true";
+      if (isFreeRun) {
+        const FREE_RUN_AVATAR_STYLE =
+          "Abstract geometric avatar Bauhaus style, simple shapes, limited color palette. Natural look, flat shade.";
+        const forcedStyle = { ...autoStyle, avatarStyle: FREE_RUN_AVATAR_STYLE };
+
+        setAutoStyleComplete(bookRoot, forcedStyle);
+        setStyleChoice(bookRoot, "auto");
+
+        writeBookFile(
+          "graphicalStyle.json",
+          JSON.stringify(forcedStyle, null, 2),
+          FILE_TYPE.TEMPORARY,
+        );
+        addLog(job, "FREE_RUN enabled - skipping style selection and previews");
+
+        styleSelectionCallbacks.delete(job.id);
+        await uploadGraphicalStyleToConvex(job, tempOutputDir);
+        return;
+      }
+
       setAutoStyleComplete(bookRoot, autoStyle);
       addLog(job, "Auto style generated, awaiting user input");
 
@@ -739,6 +773,10 @@ export async function startPipeline(input: {
     },
 
     generate_backgrounds: async () => {
+      if (process.env.FREE_RUN === "true") {
+        addLog(job, "FREE_RUN enabled - skipping background generation and upload");
+        return;
+      }
       setBookArg(slug);
       await generateBackgrounds({});
       await uploadBackgroundsToConvex(job, outputDir);
@@ -830,7 +868,7 @@ export async function startPipeline(input: {
       (step) => step !== "complete" && step !== "failed",
     );
 
-    if (process.env.QUICK_MODE === "true") {
+    if (process.env.QUICK_MODE === "true" || process.env.FREE_RUN === "true") {
       const skipSteps: Step[] = [
         "make_chapter_summaries",
         "map_summaries_to_paragraphs",

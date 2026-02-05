@@ -342,6 +342,16 @@ export function mergeV2ToCharacterData(
           avatar: o.avatar,
         })),
       });
+    } else {
+      if (slug === "generic-avatar") {
+        result.push({
+          slug,
+          characterName: meta.name,
+          bookSlug,
+          infoPerChapter: [],
+          media: meta.media,
+        });
+      }
     }
   }
 

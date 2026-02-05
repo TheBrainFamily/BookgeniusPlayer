@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { trpc } from "../trpc";
-import { Loader2, ArrowLeft, BookOpen } from "lucide-react";
+import { Loader2, ArrowLeft, BookOpen, Search, X } from "lucide-react";
 import { BookCard, type CollectionBook } from "../components/BookCard";
 import { BookModal } from "../components/BookModal";
 import { Button } from "@/components/ui/button";
@@ -136,15 +136,18 @@ function AuthorLetterRow({
 export function StandardEbooksPage() {
   const navigate = useNavigate();
   const [groupedBooks, setGroupedBooks] = useState<Record<string, SEBook[]>>({});
+  const [allBooks, setAllBooks] = useState<SEBook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalBooks, setTotalBooks] = useState(0);
   const [modalBook, setModalBook] = useState<CollectionBook | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const data = await trpc.getStandardEbooksIndex.query();
         setGroupedBooks(data.groupedByAuthorLetter);
+        setAllBooks(data.books);
         setTotalBooks(data.books.length);
       } catch (e) {
         console.error("Failed to load Standard Ebooks index:", e);
@@ -178,7 +181,33 @@ export function StandardEbooksPage() {
     );
   }
 
-  const sortedLetters = Object.keys(groupedBooks).sort();
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredBooks = normalizedQuery
+    ? allBooks.filter((book) => {
+        const haystack = [
+          book.title,
+          book.author,
+          book.authorFileAs,
+          book.description,
+          book.subjects.join(" "),
+        ]
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(normalizedQuery);
+      })
+    : allBooks;
+
+  const visibleGroupedBooks = normalizedQuery
+    ? filteredBooks.reduce<Record<string, SEBook[]>>((acc, book) => {
+        const firstLetter = (book.authorFileAs || book.author).charAt(0).toUpperCase();
+        if (!acc[firstLetter]) acc[firstLetter] = [];
+        acc[firstLetter].push(book);
+        return acc;
+      }, {})
+    : groupedBooks;
+
+  const sortedLetters = Object.keys(visibleGroupedBooks).sort();
+  const visibleCount = normalizedQuery ? filteredBooks.length : totalBooks;
 
   return (
     <div className="pb-24 page-enter">
@@ -189,7 +218,7 @@ export function StandardEbooksPage() {
             Standard Ebooks
           </h2>
           <p className="text-lg text-muted-foreground mt-2">
-            {totalBooks} professionally formatted public domain books
+            {visibleCount} professionally formatted public domain books
           </p>
         </div>
         <Button variant="ghost" size="default" onClick={() => navigate("/")} className="gap-2">
@@ -198,17 +227,53 @@ export function StandardEbooksPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col">
-        {sortedLetters.map((letter, idx) => (
-          <div key={letter} className={`animate-fade-in stagger-${Math.min(idx + 1, 6)}`}>
-            <AuthorLetterRow
-              letter={letter}
-              books={groupedBooks[letter]}
-              onSelectBook={handleBookSelect}
-              onOpenModal={handleOpenModal}
+      <div className="px-4 md:px-8 xl:px-48 mb-10">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="relative w-full md:max-w-2xl">
+            <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by title, author, or subject..."
+              className="w-full pl-10 pr-10 py-2 rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
+            {searchQuery.trim() && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-muted"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
-        ))}
+          <div className="text-sm text-muted-foreground">
+            {normalizedQuery
+              ? `Showing ${visibleCount} of ${totalBooks} books`
+              : `${totalBooks} books`}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col">
+        {sortedLetters.length === 0 ? (
+          <div className="px-4 md:px-8 xl:px-48 py-10 text-muted-foreground">
+            No books match your search.
+          </div>
+        ) : (
+          sortedLetters.map((letter, idx) => (
+            <div key={letter} className={`animate-fade-in stagger-${Math.min(idx + 1, 6)}`}>
+              <AuthorLetterRow
+                letter={letter}
+                books={visibleGroupedBooks[letter]}
+                onSelectBook={handleBookSelect}
+                onOpenModal={handleOpenModal}
+              />
+            </div>
+          ))
+        )}
       </div>
 
       <BookModal book={modalBook} onClose={handleCloseModal} onSelect={handleBookSelect} />

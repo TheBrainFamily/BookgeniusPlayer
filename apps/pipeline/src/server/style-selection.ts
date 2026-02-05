@@ -49,13 +49,14 @@ function getStyleSelectionPath(bookRoot: string): string {
 
 export function initStyleSelection(bookRoot: string): StyleSelectionState {
   const now = Date.now();
+  const isFreeRun = process.env.FREE_RUN === "true";
   const state: StyleSelectionState = {
-    status: "generating_auto_style",
+    status: isFreeRun ? "complete" : "generating_auto_style",
     autoStyle: null,
     userPrompt: null,
     userStyle: null,
     previews: null,
-    selected: null,
+    selected: isFreeRun ? "auto" : null,
     timeoutAt: null,
     startedAt: now,
     updatedAt: now,

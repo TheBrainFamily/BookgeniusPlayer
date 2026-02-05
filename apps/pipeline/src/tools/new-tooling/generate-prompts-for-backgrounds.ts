@@ -104,6 +104,11 @@ export type GenerateBackgroundsOptions = {
 };
 
 export const generateBackgrounds = async (options: GenerateBackgroundsOptions = {}) => {
+  if (FREE_RUN) {
+    logger.info("FREE_RUN enabled - skipping background generation.");
+    return;
+  }
+
   const {
     customStyle,
     chapterNumbers,

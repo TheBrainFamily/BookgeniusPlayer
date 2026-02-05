@@ -603,6 +603,10 @@ export const appRouter = router({
   submitStyleDescription: procedure
     .input(z.object({ jobId: z.string(), description: z.string().nullable() }))
     .mutation(async ({ input }) => {
+      if (process.env.FREE_RUN === "true") {
+        throw new Error("Style selection disabled when FREE_RUN=true");
+      }
+
       const job = jobs.get(input.jobId);
       if (!job) throw new Error("Job not found");
 
@@ -647,6 +651,10 @@ export const appRouter = router({
   chooseStyle: procedure
     .input(z.object({ jobId: z.string(), choice: z.enum(["auto", "user"]) }))
     .mutation(async ({ input }) => {
+      if (process.env.FREE_RUN === "true") {
+        throw new Error("Style selection disabled when FREE_RUN=true");
+      }
+
       const job = jobs.get(input.jobId);
       if (!job) throw new Error("Job not found");
 
@@ -677,6 +685,10 @@ export const appRouter = router({
     .input(z.object({ jobId: z.string() }))
     // eslint-disable-next-line complexity -- multiple file operations and style processing steps
     .mutation(async ({ input }) => {
+      if (process.env.FREE_RUN === "true") {
+        throw new Error("Style previews disabled when FREE_RUN=true");
+      }
+
       const job = jobs.get(input.jobId);
       if (!job) throw new Error("Job not found");
 

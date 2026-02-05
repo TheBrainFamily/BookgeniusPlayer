@@ -7,7 +7,8 @@ import { logger } from "../logger";
 import fs from "fs";
 import { compareXmlTextContent } from "./new-tooling/compare-chapters-xml";
 import { restoreOriginalTextInHtml } from "./new-tooling/restore-text-in-html";
-import { restoreUnwrappedBlocks } from "./new-tooling/restore-unwrapped-blocks";
+import { restoreUnwrappedLines } from "./new-tooling/restore-unwrapped-lines";
+import { sanitizeNestedParagraphs } from "./new-tooling/sanitize-nested-paragraphs";
 import path from "path";
 import { type NewReferenceCardsResponse } from "../types";
 import { writeBookFile } from "../helpers/writeBookFile";
@@ -123,7 +124,14 @@ async function processChunk(
   );
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-chunk-${chunkIndex}.md`, compiledPrompt);
 
-  const llmProviders = [callGeminiWrapper, callGrok, callClaude, callGpt5];
+  const llmProviders = [
+    callGeminiWrapper,
+    callGeminiWrapper,
+    callGeminiWrapper,
+    callGrok,
+    callClaude,
+    callGpt5,
+  ];
 
   try {
     const selectedProvider = llmProviders[attempt % llmProviders.length];
@@ -141,6 +149,10 @@ async function processChunk(
     logger.info(`Response for chapter ${chapter} chunk ${chunkIndex}:`, response.slice(0, 50));
 
     const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
+    writeBookFile(
+      `rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}-${selectedProvider.name}.raw.xml`,
+      clearedResponse,
+    );
 
     let restored = clearedResponse;
     try {
@@ -150,10 +162,16 @@ async function processChunk(
     }
 
     try {
-      restored = restoreUnwrappedBlocks(originalChunkXml, restored);
+      restored = restoreUnwrappedLines(originalChunkXml, restored);
+    } catch (e) {
+      logger.error(`Error restoring unwrapped lines for chapter ${chapter} chunk ${chunkIndex}`, e);
+    }
+
+    try {
+      restored = sanitizeNestedParagraphs(restored);
     } catch (e) {
       logger.error(
-        `Error restoring unwrapped blocks for chapter ${chapter} chunk ${chunkIndex}`,
+        `Error sanitizing nested paragraphs for chapter ${chapter} chunk ${chunkIndex}`,
         e,
       );
     }
@@ -302,9 +320,15 @@ export const identifyAndRewriteParagraphs = async (
     }
 
     try {
-      restored = restoreUnwrappedBlocks(paragraphsForPage, restored);
+      restored = restoreUnwrappedLines(paragraphsForPage, restored);
     } catch (e) {
-      logger.error("Error restoring unwrapped blocks for chapter " + chapter, e);
+      logger.error("Error restoring unwrapped lines for chapter " + chapter, e);
+    }
+
+    try {
+      restored = sanitizeNestedParagraphs(restored);
+    } catch (e) {
+      logger.error("Error sanitizing nested paragraphs for chapter " + chapter, e);
     }
 
     if (restored && compareXmlTextContent(paragraphsForPage, restored)) {
