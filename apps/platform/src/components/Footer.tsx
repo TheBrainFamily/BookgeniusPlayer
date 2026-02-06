@@ -44,7 +44,7 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
                 variant="ghost"
                 className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit"
               >
-                <a href="#book-collection">{t("footer.quickLinks.viewCollection")}</a>
+                <a href="#library">{t("footer.quickLinks.viewCollection")}</a>
               </Button>
               {[
                 t("footer.quickLinks.myProgress"),

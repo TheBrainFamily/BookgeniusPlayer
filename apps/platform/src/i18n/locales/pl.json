@@ -1,23 +1,23 @@
 {
   "hero": {
     "bookGenius": "BookGeniusz",
-    "title": "Odkryj literaturę",
-    "subtitle": "na nowo",
-    "description": "Wejdź do świata powieści wizualnych z niezwykłymi animacjami i klimatyczną ścieżką dźwiękową. Tu każda historia staje się wyjątkowym doświadczeniem, które ożywia klasyczne dzieła literatury.",
-    "startReading": "Zacznij Czytać",
-    "viewCollection": "Przejrzyj zbiór"
+    "title": "Czytaj klasykę",
+    "subtitle": "mądrzej",
+    "description": "Nigdy więcej nie zapomnisz, kto jest kim. Zadawaj pytania bez spoilerów. Wracaj dokładnie tam, gdzie skończyłeś. Ponad 1000 klasycznych książek — a wybrane tytuły z imersyjnymi animacjami i ścieżką dźwiękową.",
+    "startReading": "Przeglądaj Bibliotekę",
+    "viewCollection": "Zobacz Produkcje"
   },
   "navigation": {
-    "search": "Szukaj powieści wizualnych, autorów...",
-    "searchMobile": "Szukaj powieści...",
+    "search": "Szukaj książek, autorów...",
+    "searchMobile": "Szukaj książek...",
     "signOut": "Wyloguj się",
     "signIn": "Zaloguj się",
     "signUp": "Zarejestruj się"
   },
   "stats": {
-    "visualNovels": "Nowele Wizualne",
-    "immersive": "Angażujący",
-    "productions": "Produkcja"
+    "booksCount": "Książek",
+    "characterTracking": "Śledzenie Postaci",
+    "spoilerFreeQA": "Bez Spoilerów"
   },
   "featured": {
     "featuredMasterpieces": "Wyróżnione arcydzieła",
@@ -32,10 +32,10 @@
     "noResultsHint": "Spróbuj wyszukać inny tytuł, autora lub gatunek"
   },
   "footer": {
-    "description": "Odkryj literaturę na nowo dzięki naszym wciągającym powieściom wizualnym z pięknymi animacjami i nastrojową ścieżką dźwiękową.",
+    "description": "Czytaj klasykę mądrzej ze śledzeniem postaci, pytaniami bez spoilerów i wybranymi tytułami z imersyjnymi produkcjami.",
     "quickLinks": {
       "title": "Szybki dostęp",
-      "viewCollection": "Przejrzyj zbiór",
+      "viewCollection": "Przeglądaj Bibliotekę",
       "myProgress": "Moje postępy",
       "readingHistory": "Historia czytelnicza",
       "settings": "Ustawienia",
@@ -48,6 +48,35 @@
     "termsOfService": "Warunki korzystania z usługi",
     "cookiePolicy": "Polityka plików cookies",
     "helpCenter": "Centrum pomocy"
+  },
+  "features": {
+    "heading": "Mądrzejszy sposób na",
+    "headingHighlight": "Czytanie",
+    "subheading": "Każda książka w naszej bibliotece zawiera narzędzia, które sprawiają, że czytanie jest przyjemniejsze.",
+    "characterTracking": {
+      "title": "Nigdy nie zapomnij, kto jest kim",
+      "description": "Dotknij imię dowolnej postaci, aby zobaczyć kim jest, jak łączy się z innymi i co się z nią wydarzyło — tylko do miejsca, w którym czytasz. Bez spoilerów."
+    },
+    "qa": {
+      "title": "Pytania bez spoilerów",
+      "description": "Ciekawi Cię fabuła? Zadaj dowolne pytanie o książkę i otrzymaj odpowiedź opartą tylko na tym, co już przeczytałeś. Jak przyjaciel, który już ją czytał."
+    },
+    "readAnywhere": {
+      "title": "Czytaj wszędzie",
+      "description": "Twoja pozycja w książce synchronizuje się między urządzeniami. Dostosuj czcionki, motywy i ustawienia grafiki do swoich preferencji."
+    }
+  },
+  "productions": {
+    "immersive": "Imersyjne",
+    "productionsWord": "Produkcje",
+    "description": "Wybrane tytuły z animowanymi scenami, głosami postaci i klimatyczną ścieżką dźwiękową."
+  },
+  "library": {
+    "browseThe": "Przeglądaj",
+    "libraryWord": "Bibliotekę",
+    "description": "klasycznych książek ze śledzeniem postaci i pytaniami bez spoilerów",
+    "searchPlaceholder": "Szukaj po tytule, autorze lub temacie...",
+    "noResults": "Nie znaleziono książek pasujących do wyszukiwania."
   },
   "common": {
     "loading": "Ładowanie...",
@@ -65,7 +94,7 @@
     "returnHome": "Wróć do biblioteki",
     "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu."
   },
-  "title": "Wciągające powieści wizualne",
+  "title": "Inteligentny Czytnik Klasyki",
   "continueReading": "Czytaj dalej",
   "reachedFreePreview": "Wykorzystano limit bezpłatnego dostępu.",
   "bestAccessAvailable": "Wersja beta już jest!",

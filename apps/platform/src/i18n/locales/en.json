@@ -1,23 +1,23 @@
 {
   "hero": {
     "bookGenius": "BookGenius",
-    "title": "Experience Literature",
-    "subtitle": "Like Never Before",
-    "description": "Immerse yourself in fully-produced visual novels with stunning animations, character voices, and atmospheric soundtracks. Each story becomes a living, breathing experience that brings classic literature to vibrant life.",
-    "startReading": "Start Reading",
-    "viewCollection": "View Collection"
+    "title": "Read Classic Literature",
+    "subtitle": "Smarter",
+    "description": "Never lose track of a character again. Ask questions without spoilers. Pick up right where you left off. Over 1,000 classic books — plus select titles with immersive animations and soundtracks.",
+    "startReading": "Explore Library",
+    "viewCollection": "See Productions"
   },
   "navigation": {
-    "search": "Search visual novels, authors...",
-    "searchMobile": "Search novels...",
+    "search": "Search books, authors...",
+    "searchMobile": "Search books...",
     "signOut": "Sign Out",
     "signIn": "Sign In",
     "signUp": "Sign Up"
   },
   "stats": {
-    "visualNovels": "Visual Novels",
-    "immersive": "Immersive",
-    "productions": "Productions"
+    "booksCount": "Books",
+    "characterTracking": "Character Tracking",
+    "spoilerFreeQA": "Spoiler-Free"
   },
   "featured": {
     "featuredMasterpieces": "Featured Masterpieces",
@@ -32,10 +32,10 @@
     "noResultsHint": "Try searching for a different title, author, or genre"
   },
   "footer": {
-    "description": "Experience literature like never before with our immersive visual novels featuring beautiful animations and atmospheric soundtracks.",
+    "description": "Read classic literature smarter with character tracking, spoiler-free Q&A, and select titles with immersive productions.",
     "quickLinks": {
       "title": "Quick Links",
-      "viewCollection": "View Collection",
+      "viewCollection": "Browse Library",
       "myProgress": "My Progress",
       "readingHistory": "Reading History",
       "settings": "Settings",
@@ -48,6 +48,35 @@
     "termsOfService": "Terms of Service",
     "cookiePolicy": "Cookie Policy",
     "helpCenter": "Help center"
+  },
+  "features": {
+    "heading": "A Smarter Way to",
+    "headingHighlight": "Read",
+    "subheading": "Every book in our library comes with tools that make reading more enjoyable.",
+    "characterTracking": {
+      "title": "Never Forget Who's Who",
+      "description": "Tap any character's name to see who they are, how they connect to others, and what's happened with them — only up to where you've read. No spoilers."
+    },
+    "qa": {
+      "title": "Spoiler-Free Q&A",
+      "description": "Curious about the plot? Ask anything about the book and get answers based only on what you've read so far. Like a friend who's already read it."
+    },
+    "readAnywhere": {
+      "title": "Read Anywhere",
+      "description": "Your reading position syncs across devices. Customize fonts, themes, and graphics settings to match how you like to read."
+    }
+  },
+  "productions": {
+    "immersive": "Immersive",
+    "productionsWord": "Productions",
+    "description": "Select titles featuring animated scenes, character voices, and atmospheric soundtracks."
+  },
+  "library": {
+    "browseThe": "Browse the",
+    "libraryWord": "Library",
+    "description": "classic books with character tracking and spoiler-free Q&A",
+    "searchPlaceholder": "Search by title, author, or subject...",
+    "noResults": "No books match your search."
   },
   "common": {
     "loading": "Loading...",
@@ -65,7 +94,7 @@
     "returnHome": "Return to Library",
     "description": "It seems this page has been lost in the vast library of the internet."
   },
-  "title": "Immersive Visual Novel",
+  "title": "Smart Classic Literature Reader",
   "continueReading": "Continue Reading",
   "reachedFreePreview": "You've reached the end of the free preview.",
   "bestAccessAvailable": "Best Access Available!",

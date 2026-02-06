@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { memo, useState, useEffect, useCallback, useRef } from "react";
 import { BookOpen, Play, Clock } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
@@ -28,7 +28,13 @@ export interface BookCardProps {
 }
 
 // eslint-disable-next-line complexity
-export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: BookCardProps) {
+function StandardEbooksBookCard({
+  book,
+  onSelect,
+  onOpenModal,
+  index,
+  totalColumns,
+}: BookCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const hoverTimeoutRef = useRef<number | null>(null);
@@ -245,7 +251,7 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
 
         <div className="h-[72px] mt-3">
           <h3
-            className={`text-base font-medium line-clamp-2 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}
+            className={`text-base font-medium text-foreground line-clamp-2 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}
           >
             {book.title}
           </h3>
@@ -259,3 +265,6 @@ export function BookCard({ book, onSelect, onOpenModal, index, totalColumns }: B
     </div>
   );
 }
+
+export const BookCard = memo(StandardEbooksBookCard);
+BookCard.displayName = "StandardEbooksBookCard";

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import Navigation from "@platform/components/Navigation";
 import HeroSection from "@platform/components/HeroSection";
-import BookCollection from "@platform/components/BookCollection";
+import FeaturesSection from "@platform/components/FeaturesSection";
+import ProductionsCarousel from "@platform/components/FeaturedBooks";
+import LibrarySection from "@platform/components/LibrarySection";
 import Footer from "@platform/components/Footer";
-import FeaturedBooks from "@platform/components/FeaturedBooks";
+import { useDevPerformanceMonitor } from "@platform/hooks/useDevPerformanceMonitor";
 
 const Index = () => {
+  useDevPerformanceMonitor("home");
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -23,14 +26,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <main className="flex flex-col flex-1 justify-center">
+      <main className="flex flex-col flex-1">
         {!trimmedSearchQuery && (
           <>
             <HeroSection />
-            <FeaturedBooks />
+            <FeaturesSection />
           </>
         )}
-        <BookCollection searchQuery={trimmedSearchQuery} />
+        <ProductionsCarousel />
+        <LibrarySection searchQuery={trimmedSearchQuery} />
       </main>
       <Footer onSearchQuery={setSearchQuery} />
     </div>
