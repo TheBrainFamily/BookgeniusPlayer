@@ -123,13 +123,7 @@ function AuthorLetterRow({
               key={book.slug}
               className={`flex-shrink-0 w-[275px] snap-start book-card-enter stagger-${Math.min(i + 1, 12)} hover:!z-50`}
             >
-              <BookCard
-                book={book}
-                index={i}
-                totalColumns={6}
-                onSelect={onSelectBook}
-                onOpenModal={onOpenModal}
-              />
+              <BookCard book={book} onSelect={onSelectBook} onOpenModal={onOpenModal} />
             </div>
           ))}
         </div>

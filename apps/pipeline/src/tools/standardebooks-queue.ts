@@ -5,7 +5,6 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import dotenv from "dotenv";
 import { convertAndSaveSEBook } from "./se-converter/index";
-import { startPipeline } from "../server/pipeline";
 import { classifyDramaBooks, type BookAnalysis } from "./se-converter/drama-classifier";
 
 dotenv.config({ path: path.resolve(import.meta.dir, "..", "..", ".env") });
@@ -84,26 +83,112 @@ function summarizeQueue(queue: QueueFile) {
   console.log(`  skipped: ${counts.skipped}`);
 }
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+let activePipelineChild: Bun.Subprocess | null = null;
+
+function getPipelineRunnerPath() {
+  return path.join(PIPELINE_ROOT, "src", "server", "queue-pipeline-runner.ts");
 }
 
-async function waitForJob(job: { status: string; logs?: string[]; error?: string }) {
-  let lastLogIndex = 0;
-  while (true) {
-    const logs = job.logs || [];
-    if (logs.length > lastLogIndex) {
-      for (let i = lastLogIndex; i < logs.length; i += 1) {
-        console.log(logs[i]);
-      }
-      lastLogIndex = logs.length;
+async function pipeProcessOutput(
+  stream: ReadableStream<Uint8Array> | null,
+  write: (text: string) => void,
+  onText?: (text: string) => void,
+) {
+  if (!stream) return;
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const text = decoder.decode(value, { stream: true });
+      if (!text) continue;
+      write(text);
+      onText?.(text);
+    }
+    const flush = decoder.decode();
+    if (flush) {
+      write(flush);
+      onText?.(flush);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+async function runPipelineInSubprocess(
+  slug: string,
+): Promise<{ status: "done" } | { status: "error"; error: string }> {
+  const runnerPath = getPipelineRunnerPath();
+  if (!fs.existsSync(runnerPath)) {
+    return { status: "error", error: `Pipeline runner not found: ${runnerPath}` };
+  }
+
+  return await new Promise((resolve, reject) => {
+    let stderrTail = "";
+    const child = Bun.spawn(["bun", runnerPath, "--slug", slug], {
+      cwd: PIPELINE_ROOT,
+      stdin: "ignore",
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    activePipelineChild = child;
+
+    const stdoutPromise = pipeProcessOutput(child.stdout, (text) => process.stdout.write(text));
+    const stderrPromise = pipeProcessOutput(
+      child.stderr,
+      (text) => process.stderr.write(text),
+      (text) => {
+        stderrTail = (stderrTail + text).slice(-8000);
+      },
+    );
+
+    Promise.all([stdoutPromise, stderrPromise]).catch((err) => {
+      activePipelineChild = null;
+      reject(err);
+    });
+
+    child.exited
+      .then(async (code) => {
+        await Promise.allSettled([stdoutPromise, stderrPromise]);
+        activePipelineChild = null;
+        if (code === 0) {
+          resolve({ status: "done" });
+          return;
+        }
+        const trimmed = stderrTail.trim();
+        const fallbackError = `Pipeline subprocess failed (code=${code})`;
+        const error = trimmed ? trimmed.split("\n").slice(-10).join("\n") : fallbackError;
+        resolve({ status: "error", error });
+      })
+      .catch((err) => {
+        activePipelineChild = null;
+        reject(err);
+      });
+  });
+}
+
+function setupSignalHandlers() {
+  const shutdown = (signal: NodeJS.Signals) => {
+    console.log(`\nReceived ${signal}. Stopping queue...`);
+    const child = activePipelineChild;
+    if (!child || child.killed) {
+      process.exit(130);
+      return;
     }
 
-    if (job.status === "done") return { status: "done" as const };
-    if (job.status === "error") return { status: "error" as const, error: job.error };
+    child.kill("SIGTERM");
+    setTimeout(() => {
+      if (!child.killed) {
+        console.log("Force killing active pipeline subprocess...");
+        child.kill("SIGKILL");
+      }
+      process.exit(130);
+    }, 10_000);
+  };
 
-    await sleep(1000);
-  }
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
 }
 
 async function buildQueue() {
@@ -178,6 +263,7 @@ async function buildQueue() {
 }
 
 async function runQueue(limit?: number) {
+  setupSignalHandlers();
   const queue = readQueue();
   let consecutiveFailures = 0;
   let processed = 0;
@@ -212,8 +298,7 @@ async function runQueue(limit?: number) {
 
     try {
       await convertAndSaveSEBook(item.slug);
-      const job = await startPipeline({ slug: item.slug });
-      const result = await waitForJob(job);
+      const result = await runPipelineInSubprocess(item.slug);
 
       if (result.status === "done") {
         item.status = "done";

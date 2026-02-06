@@ -23,31 +23,49 @@ export interface BookCardProps {
   book: CollectionBook;
   onSelect: (slug: string) => void;
   onOpenModal?: (book: CollectionBook) => void;
-  index: number;
-  totalColumns: number;
 }
 
 // eslint-disable-next-line complexity
-function StandardEbooksBookCard({
-  book,
-  onSelect,
-  onOpenModal,
-  index,
-  totalColumns,
-}: BookCardProps) {
+function StandardEbooksBookCard({ book, onSelect, onOpenModal }: BookCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [expandToLeft, setExpandToLeft] = useState(false);
   const hoverTimeoutRef = useRef<number | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const panelWidth = 275;
+  const requiredExpansionWidth = panelWidth * (book.generatedDescription ? 2 : 1);
 
-  const isRightSide = index % totalColumns >= totalColumns / 2;
+  const recalculateDirection = useCallback(() => {
+    const cardElement = cardRef.current;
+    if (!cardElement) return;
+
+    const rect = cardElement.getBoundingClientRect();
+    const spaceRight = window.innerWidth - rect.right;
+    const spaceLeft = rect.left;
+
+    if (spaceRight >= requiredExpansionWidth) {
+      setExpandToLeft(false);
+      return;
+    }
+
+    if (spaceLeft >= requiredExpansionWidth) {
+      setExpandToLeft(true);
+      return;
+    }
+
+    setExpandToLeft(spaceLeft > spaceRight);
+  }, [requiredExpansionWidth]);
 
   const handleMouseEnter = useCallback(() => {
+    recalculateDirection();
     setIsHovered(true);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
     hoverTimeoutRef.current = window.setTimeout(() => {
       setIsExpanded(true);
     }, 500);
-  }, []);
+  }, [recalculateDirection]);
 
   const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
@@ -57,6 +75,22 @@ function StandardEbooksBookCard({
     }
     setIsExpanded(false);
   }, []);
+
+  useEffect(() => {
+    if (!isHovered) return;
+
+    const handleViewportChange = () => {
+      recalculateDirection();
+    };
+
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("scroll", handleViewportChange, true);
+
+    return () => {
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("scroll", handleViewportChange, true);
+    };
+  }, [isHovered, recalculateDirection]);
 
   useEffect(() => {
     return () => {
@@ -82,8 +116,6 @@ function StandardEbooksBookCard({
     }
   }, [isExpanded, book, onSelect, onOpenModal]);
 
-  const panelWidth = 275;
-
   const coverElement = (
     <div className="relative flex-shrink-0" style={{ width: "100%" }}>
       <div
@@ -91,7 +123,7 @@ function StandardEbooksBookCard({
         style={{
           backgroundColor: book.coverColor || "#333",
           borderRadius: isExpanded
-            ? isRightSide
+            ? expandToLeft
               ? "0 0.75rem 0.75rem 0"
               : "0.75rem 0 0 0.75rem"
             : "0.75rem",
@@ -113,7 +145,7 @@ function StandardEbooksBookCard({
           className="absolute inset-0 pointer-events-none transition-opacity duration-300"
           style={{
             opacity: isExpanded ? 1 : 0,
-            background: isRightSide
+            background: expandToLeft
               ? "linear-gradient(to right, hsl(var(--card) / 0.6) 0%, hsl(var(--card) / 0.3) 10%, transparent 30%)"
               : "linear-gradient(to left, hsl(var(--card) / 0.6) 0%, hsl(var(--card) / 0.3) 10%, transparent 30%)",
           }}
@@ -128,8 +160,8 @@ function StandardEbooksBookCard({
       style={{
         width: isExpanded ? panelWidth : 0,
         opacity: isExpanded ? 1 : 0,
-        marginLeft: isRightSide ? 0 : -2,
-        marginRight: isRightSide ? -2 : 0,
+        marginLeft: expandToLeft ? 0 : -2,
+        marginRight: expandToLeft ? -2 : 0,
         marginTop: -1,
         marginBottom: 11,
       }}
@@ -205,7 +237,7 @@ function StandardEbooksBookCard({
       style={{
         width: isExpanded ? panelWidth : 0,
         opacity: isExpanded ? 1 : 0,
-        borderRadius: isRightSide ? "0.75rem 0 0 0.75rem" : "0 0.75rem 0.75rem 0",
+        borderRadius: expandToLeft ? "0.75rem 0 0 0.75rem" : "0 0.75rem 0.75rem 0",
         boxShadow: isExpanded ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)" : "none",
         marginTop: -1,
         marginBottom: 11,
@@ -230,11 +262,11 @@ function StandardEbooksBookCard({
         className="transition-transform duration-300 ease-out will-change-transform"
         style={{
           transform: isHovered ? "scale(1.02)" : "scale(1)",
-          transformOrigin: isRightSide ? "right top" : "left top",
+          transformOrigin: expandToLeft ? "right top" : "left top",
         }}
       >
-        <div className="flex" style={{ justifyContent: isRightSide ? "flex-end" : "flex-start" }}>
-          {isRightSide ? (
+        <div className="flex" style={{ justifyContent: expandToLeft ? "flex-end" : "flex-start" }}>
+          {expandToLeft ? (
             <>
               {descElement}
               {infoElement}

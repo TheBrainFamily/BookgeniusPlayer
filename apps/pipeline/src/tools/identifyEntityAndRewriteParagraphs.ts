@@ -1,8 +1,5 @@
 import { callGeminiWrapper, callGeminiVertexWrapper } from "../callClaude";
-import {
-  getParagraphsFromChapter,
-  getSectionAttributesFromChapter,
-} from "./createParagraphsWithPageNumbers";
+import { getChapterParagraphsAndSectionAttributes } from "./createParagraphsWithPageNumbers";
 import { logger } from "../logger";
 import fs from "fs";
 import { compareXmlTextContent } from "./new-tooling/compare-chapters-xml";
@@ -30,6 +27,18 @@ import {
   type ChapterChunk,
 } from "./chapterChunker";
 import { callGrok } from "../callGrok";
+
+const RETRY_DELAYS_MS = [2000, 5000, 10000] as const;
+const CHAPTER_SCAN_LOG_EVERY = Number.parseInt(
+  process.env.REWRITE_CHAPTER_SCAN_LOG_EVERY || "25",
+  10,
+);
+const CHAPTER_SCAN_SLOW_MS = Number.parseInt(process.env.REWRITE_CHAPTER_SCAN_SLOW_MS || "500", 10);
+
+function getRetryDelayMs(attempt: number): number {
+  if (attempt <= 0) return 0;
+  return RETRY_DELAYS_MS[Math.min(attempt - 1, RETRY_DELAYS_MS.length - 1)];
+}
 
 /**
  * Build the XML characters string for the prompt
@@ -92,10 +101,7 @@ ${previousChunkOutput}
 /**
  * Process a single chunk with optional context from previous chunk
  */
-type ProcessChunkOptions = {
-  attempt?: number;
-  signal?: AbortSignal;
-};
+type ProcessChunkOptions = { attempt?: number; signal?: AbortSignal };
 
 async function processChunk(
   chapter: number,
@@ -116,7 +122,7 @@ async function processChunk(
   }
 
   if (attempt > 0) {
-    await abortableSleep(10000 * attempt * attempt, signal);
+    await abortableSleep(getRetryDelayMs(attempt), signal);
   }
   if (attempt > 5) {
     logger.error(`❌ Too many attempts for chapter ${chapter} chunk ${chunkIndex}`);
@@ -131,12 +137,7 @@ async function processChunk(
   );
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-chunk-${chunkIndex}.md`, compiledPrompt);
 
-  const llmProviders = [
-    callGeminiWrapper,
-    callGeminiVertexWrapper,
-    callGrok,
-    callGpt5,
-  ];
+  const llmProviders = [callGeminiWrapper, callGeminiVertexWrapper, callGrok, callGpt5];
 
   try {
     checkAborted(signal, `chapter ${chapter} chunk ${chunkIndex} before provider call`);
@@ -153,7 +154,7 @@ async function processChunk(
     const geminiReminder = `\n This is your ${attempt + 1}th attempt. That means you failed previous one. Make sure to output valid html.`;
 
     const response = (await selectedProvider(
-      `${compiledPrompt} ${attempt === 1 || attempt === 2 ? geminiReminder : ""}`,
+      `${attempt === 1 || attempt === 2 ? geminiReminder : ""} ${compiledPrompt}`,
       undefined,
       1,
     )) as string;
@@ -198,28 +199,20 @@ async function processChunk(
         clearedResponse,
       );
       logger.info(`❌ Validation failed for chapter ${chapter} chunk ${chunkIndex}, retrying...`);
-      return processChunk(
-        chapter,
-        chunkIndex,
-        chunk,
-        jsonCharacters,
-        previousChunkOutput,
-        { attempt: attempt + 1, signal },
-      );
+      return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, {
+        attempt: attempt + 1,
+        signal,
+      });
     }
   } catch (e) {
     if (isAbortError(e)) {
       throw e;
     }
     logger.error(`Error for chapter ${chapter} chunk ${chunkIndex}`, e);
-    return processChunk(
-      chapter,
-      chunkIndex,
-      chunk,
-      jsonCharacters,
-      previousChunkOutput,
-      { attempt: attempt + 1, signal },
-    );
+    return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, {
+      attempt: attempt + 1,
+      signal,
+    });
   }
 }
 
@@ -250,14 +243,9 @@ async function processChunkedChapter(
       `📦 Processing chapter ${chapter} chunk ${i + 1}/${chunks.length} (${chunk.tokenCount} tokens)`,
     );
 
-    const result = await processChunk(
-      chapter,
-      i,
-      chunk,
-      jsonCharacters,
-      previousChunkOutput,
-      { signal },
-    );
+    const result = await processChunk(chapter, i, chunk, jsonCharacters, previousChunkOutput, {
+      signal,
+    });
     processedChunks.push(result);
   }
 
@@ -281,13 +269,9 @@ export const identifyAndRewriteParagraphs = async (
     return readBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
   }
 
-  const paragraphsFromChapter: { text: string; dataIndex: number; elementType: string }[] =
-    getParagraphsFromChapter(chapter);
-
+  const { paragraphs: paragraphsFromChapter, sectionAttributes } =
+    getChapterParagraphsAndSectionAttributes(chapter);
   const chapterFormat = getChapterFormat(chapter);
-
-  // Get section-level attributes to preserve (e.g., data-epub-type for semantic styling)
-  const sectionAttributes = getSectionAttributesFromChapter(chapter);
 
   if (chapterFormat !== "play" && needsChunking(paragraphsFromChapter)) {
     logger.info(`📦 Chapter ${chapter} exceeds token limit, using chunked processing`);
@@ -302,7 +286,7 @@ export const identifyAndRewriteParagraphs = async (
 
   // Original single-shot processing for shorter chapters
   if (attempt > 0) {
-    await abortableSleep(10000 * attempt * attempt, signal);
+    await abortableSleep(getRetryDelayMs(attempt), signal);
   }
   if (attempt > 4) {
     logger.error("❌ Too many attempts for chapter " + chapter);
@@ -336,7 +320,7 @@ export const identifyAndRewriteParagraphs = async (
     const geminiReminder = `\n This is your ${attempt + 1}th attempt. That means you failed previous one. Make sure to output valid html.`;
 
     const response = (await selectedProvider(
-      `${compiledPrompt} ${attempt === 1 ? geminiReminder : ""}`,
+      `${attempt === 1 ? geminiReminder : ""} ${compiledPrompt}`,
       undefined,
       1,
     )) as string;
@@ -411,6 +395,7 @@ interface ChapterData {
   sectionAttributes: Record<string, string>;
 }
 
+/* eslint-disable complexity */
 export const identifyCharactersAndRewriteParagraphs = async (
   referenceCards: NewReferenceCardsResponse,
   signal?: AbortSignal,
@@ -429,11 +414,24 @@ export const identifyCharactersAndRewriteParagraphs = async (
     (_, i) => bookSettings.startFromChapter + i,
   );
 
-  const chapterDataList: ChapterData[] = chapters.map((chapter) => {
+  const scanStart = Date.now();
+  logger.info(
+    `🔎 Pre-scan start for ${chapters.length} chapters (logEvery=${CHAPTER_SCAN_LOG_EVERY}, slow>${CHAPTER_SCAN_SLOW_MS}ms)`,
+  );
+
+  const chapterDataList: ChapterData[] = [];
+  let alreadyCompleteCount = 0;
+  let chunkedCount = 0;
+
+  for (let index = 0; index < chapters.length; index++) {
+    checkAborted(signal, `pre-scan chapter index ${index}`);
+    const chapter = chapters[index];
+    const chapterScanStart = Date.now();
+
     // Check if already complete
     if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
-      logger.info(`✅ Chapter ${chapter} already complete`);
-      return {
+      alreadyCompleteCount += 1;
+      const chapterData: ChapterData = {
         chapter,
         paragraphs: [],
         chunks: [],
@@ -441,15 +439,32 @@ export const identifyCharactersAndRewriteParagraphs = async (
         needsChunking: false,
         sectionAttributes: {},
       };
+      chapterDataList.push(chapterData);
+
+      const elapsedMs = Date.now() - chapterScanStart;
+      const processed = index + 1;
+      if (
+        elapsedMs >= CHAPTER_SCAN_SLOW_MS ||
+        processed === 1 ||
+        processed === chapters.length ||
+        processed % CHAPTER_SCAN_LOG_EVERY === 0
+      ) {
+        logger.info(
+          `🔎 Pre-scan ${processed}/${chapters.length}: chapter ${chapter} already complete (${elapsedMs}ms)`,
+        );
+      }
+      continue;
     }
 
-    const paragraphs = getParagraphsFromChapter(chapter);
+    const { paragraphs, sectionAttributes } = getChapterParagraphsAndSectionAttributes(chapter);
     const chapterFormat = getChapterFormat(chapter);
     const shouldChunk = chapterFormat !== "play" && needsChunking(paragraphs);
     const chunks = shouldChunk ? chunkParagraphs(paragraphs) : [];
-    const sectionAttributes = getSectionAttributesFromChapter(chapter);
+    if (shouldChunk) {
+      chunkedCount += 1;
+    }
 
-    return {
+    const chapterData: ChapterData = {
       chapter,
       paragraphs,
       chunks,
@@ -457,7 +472,26 @@ export const identifyCharactersAndRewriteParagraphs = async (
       needsChunking: shouldChunk,
       sectionAttributes,
     };
-  });
+    chapterDataList.push(chapterData);
+
+    const elapsedMs = Date.now() - chapterScanStart;
+    const processed = index + 1;
+    if (
+      elapsedMs >= CHAPTER_SCAN_SLOW_MS ||
+      processed === 1 ||
+      processed === chapters.length ||
+      processed % CHAPTER_SCAN_LOG_EVERY === 0
+    ) {
+      logger.info(
+        `🔎 Pre-scan ${processed}/${chapters.length}: chapter ${chapter}, paragraphs=${paragraphs.length}, format=${chapterFormat}, chunked=${shouldChunk} (${elapsedMs}ms)`,
+      );
+    }
+  }
+
+  const scanElapsedMs = Date.now() - scanStart;
+  logger.info(
+    `🔎 Pre-scan complete in ${scanElapsedMs}ms: total=${chapters.length}, alreadyComplete=${alreadyCompleteCount}, chunked=${chunkedCount}, simple=${chapters.length - alreadyCompleteCount - chunkedCount}`,
+  );
 
   // Separate chapters that need chunking from those that don't
   const chunkedChapters = chapterDataList.filter((c) => c.needsChunking && c.chunks.length > 0);
@@ -570,6 +604,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
 
   logger.info(`✅ All chapters processed`);
 };
+/* eslint-enable complexity */
 
 if (require.main === module) {
   const referenceCards = JSON.parse(

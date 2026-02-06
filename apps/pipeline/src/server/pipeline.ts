@@ -183,7 +183,14 @@ async function runStep(job: Job, step: Step, fn: () => Promise<void>) {
     if (!aborted || !job.error) {
       job.error = errorMessage;
     }
-    addLog(job, `${aborted ? "⚠" : "✖"} ${StepLabels[step]} ${aborted ? "cancelled" : `failed: ${job.error}`}`);
+    if (!aborted) {
+      job.status = "error";
+      job.currentStep = "failed";
+    }
+    addLog(
+      job,
+      `${aborted ? "⚠" : "✖"} ${StepLabels[step]} ${aborted ? "cancelled" : `failed: ${job.error}`}`,
+    );
     addLog(job, stack || "");
 
     markStepError(job.slug, step, errorMessage, s.startedAt!, s.endedAt);
@@ -948,7 +955,8 @@ export async function startPipeline(input: {
       try {
         while (true) {
           const doneOrFailed =
-            schedulerState.completedSteps.size + schedulerState.failedSteps.size >= stepsToRun.length;
+            schedulerState.completedSteps.size + schedulerState.failedSteps.size >=
+            stepsToRun.length;
           if (doneOrFailed) {
             break;
           }

@@ -130,7 +130,10 @@ function isQuotaOrRateLimitError(error: unknown): boolean {
 }
 
 function getVertexConfig(): { apiKey: string; enabled: true } | { enabled: false } {
-  const apiKey = process.env.VERTEX_API_KEY;
+  const apiKey =
+    process.env.VERTEX_API_KEY ||
+    process.env.GOOGLE_CLOUD_API_KEY ||
+    process.env.GOOGLE_VERTEX_API_KEY;
 
   if (apiKey) {
     return { enabled: true, apiKey };
@@ -158,22 +161,41 @@ function getSafetySettings() {
   ];
 }
 
+async function collectStreamedText(
+  stream: AsyncGenerator<{ text?: string }>,
+): Promise<string | null> {
+  let text = "";
+  for await (const chunk of stream) {
+    const piece = chunk.text ?? "";
+    if (!piece) continue;
+    // SDKs differ: some stream deltas, others stream cumulative snapshots.
+    if (piece.startsWith(text)) {
+      text = piece;
+    } else {
+      text += piece;
+    }
+  }
+
+  return text || null;
+}
+
 async function tryVertexTextFallback(prompt: string, model: string): Promise<string | null> {
   const vertex = getVertexConfig();
   if (!vertex.enabled) {
     return null;
   }
 
-  console.log("FALLING BACK TO VERTEX FOR GEMINI TEXT CALL", model);
+  console.log("FALLING BACK TO VERTEX STREAM FOR GEMINI TEXT CALL", model);
   const ai = new GoogleGenAI({ vertexai: true, apiKey: vertex.apiKey });
 
-  const response = await ai.models.generateContent({
+  const stream = await ai.models.generateContentStream({
     model,
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: { responseMimeType: "text/plain", safetySettings: getSafetySettings() },
   });
 
-  return response.text ?? "";
+  const text = await collectStreamedText(stream);
+  return text ?? "";
 }
 
 async function tryVertexSchemaFallback<T>(
@@ -186,10 +208,10 @@ async function tryVertexSchemaFallback<T>(
     return null;
   }
 
-  console.log("FALLING BACK TO VERTEX FOR GEMINI STRUCTURED CALL", model);
+  console.log("FALLING BACK TO VERTEX STREAM FOR GEMINI STRUCTURED CALL", model);
   const ai = new GoogleGenAI({ vertexai: true, apiKey: vertex.apiKey });
 
-  const response = await ai.models.generateContent({
+  const stream = await ai.models.generateContentStream({
     model,
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: {
@@ -199,7 +221,7 @@ async function tryVertexSchemaFallback<T>(
     },
   });
 
-  const text = response.text;
+  const text = await collectStreamedText(stream);
   if (!text) {
     throw new Error("Vertex fallback returned empty structured response");
   }

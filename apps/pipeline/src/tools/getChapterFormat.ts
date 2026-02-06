@@ -1,23 +1,63 @@
+import fs from "fs";
+import path from "path";
 import { JSDOM } from "jsdom";
-import { readBookFile, doesBookFileExist } from "../helpers/readBookFile";
-import { FILE_TYPE } from "../helpers/filesHelpers";
+import { resolveBookDir } from "../helpers/resolveBookDir";
 
 export type ChapterFormat = "play" | "mixed" | "prose";
 
-function parseRichXml(): Document | null {
-  if (!doesBookFileExist("rich.xml", FILE_TYPE.INPUT)) {
+type CachedChapterFormats = {
+  richXmlPath: string;
+  mtimeMs: number;
+  formats: Map<number, ChapterFormat>;
+};
+
+let cachedChapterFormats: CachedChapterFormats | undefined;
+
+function loadChapterFormats(): Map<number, ChapterFormat> | null {
+  const bookDir = resolveBookDir();
+  const richXmlPath = path.join(bookDir, "input", "rich.xml");
+
+  if (!fs.existsSync(richXmlPath)) {
     return null;
   }
 
-  const richXml = readBookFile("rich.xml", FILE_TYPE.INPUT);
+  const stats = fs.statSync(richXmlPath);
+  if (
+    cachedChapterFormats &&
+    cachedChapterFormats.richXmlPath === richXmlPath &&
+    cachedChapterFormats.mtimeMs === stats.mtimeMs
+  ) {
+    return cachedChapterFormats.formats;
+  }
+
+  const richXml = fs.readFileSync(richXmlPath, "utf8");
   const dom = new JSDOM(richXml, { contentType: "text/html" });
-  return dom.window.document;
+  const doc = dom.window.document;
+  const formats = new Map<number, ChapterFormat>();
+
+  const sections = doc.querySelectorAll("section[data-chapter]");
+  for (const section of Array.from(sections)) {
+    const chapterRaw = section.getAttribute("data-chapter");
+    const chapterNum = Number.parseInt(chapterRaw || "0", 10);
+    if (chapterNum <= 0 || Number.isNaN(chapterNum)) {
+      continue;
+    }
+
+    const formatRaw = section.getAttribute("data-chapter-format") as ChapterFormat | null;
+    const format =
+      formatRaw === "play" || formatRaw === "mixed" || formatRaw === "prose" ? formatRaw : "prose";
+    formats.set(chapterNum, format);
+  }
+
+  cachedChapterFormats = { richXmlPath, mtimeMs: stats.mtimeMs, formats };
+
+  return formats;
 }
 
 export function getChapterFormat(chapterNumber: number): ChapterFormat {
-  const doc = parseRichXml();
+  const formats = loadChapterFormats();
 
-  if (!doc) {
+  if (!formats) {
     const envForm = process.env.BOOK_FORM;
     if (envForm === "play" || envForm === "mixed" || envForm === "prose") {
       return envForm;
@@ -25,40 +65,17 @@ export function getChapterFormat(chapterNumber: number): ChapterFormat {
     return "prose";
   }
 
-  const section = doc.querySelector(`section[data-chapter="${chapterNumber}"]`);
-
-  if (!section) {
-    return "prose";
-  }
-
-  const format = section.getAttribute("data-chapter-format") as ChapterFormat | null;
-
-  if (format === "play" || format === "mixed" || format === "prose") {
-    return format;
-  }
-
-  return "prose";
+  return formats.get(chapterNumber) || "prose";
 }
 
 export function getAllChapterFormats(): Map<number, ChapterFormat> {
-  const doc = parseRichXml();
-  const formats = new Map<number, ChapterFormat>();
+  const formats = loadChapterFormats();
 
-  if (!doc) {
-    return formats;
+  if (!formats) {
+    return new Map<number, ChapterFormat>();
   }
 
-  const sections = doc.querySelectorAll("section[data-chapter]");
-
-  for (const section of Array.from(sections)) {
-    const chapterNum = parseInt(section.getAttribute("data-chapter") || "0", 10);
-    if (chapterNum > 0) {
-      const format = section.getAttribute("data-chapter-format") as ChapterFormat | null;
-      formats.set(chapterNum, format || "prose");
-    }
-  }
-
-  return formats;
+  return new Map(formats);
 }
 
 export function hasNonProseChapters(): boolean {

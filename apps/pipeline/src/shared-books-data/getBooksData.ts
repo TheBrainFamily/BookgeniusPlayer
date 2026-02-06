@@ -5,6 +5,9 @@ import { getCurrentBook } from "../helpers/getCurrentBook";
 import { generateChaptersXmlFromRich } from "../tools/new-tooling/generate-chapters-xml-from-rich";
 
 export type BookData = { bookText: string; chapters: string };
+type CachedBookData = { bookDir: string; richXmlPath: string; mtimeMs: number; data: BookData };
+
+let cachedBookData: CachedBookData | undefined;
 
 export function checkIfBookDataExists() {
   const bookSlug = getCurrentBook();
@@ -24,9 +27,23 @@ export function checkIfBookDataExists() {
 
 export const getBookData = (): BookData => {
   const bookDir = resolveBookDir();
+  const richXmlPath = path.join(bookDir, "input", "rich.xml");
+  const richXmlStats = fs.statSync(richXmlPath);
 
-  const currentBookText = fs.readFileSync(path.join(bookDir, "input", "rich.xml"), "utf8");
+  if (
+    cachedBookData &&
+    cachedBookData.bookDir === bookDir &&
+    cachedBookData.richXmlPath === richXmlPath &&
+    cachedBookData.mtimeMs === richXmlStats.mtimeMs
+  ) {
+    return cachedBookData.data;
+  }
+
+  const currentBookText = fs.readFileSync(richXmlPath, "utf8");
   const currentBookChapters = generateChaptersXmlFromRich(currentBookText);
 
-  return { bookText: currentBookText, chapters: currentBookChapters };
+  const data = { bookText: currentBookText, chapters: currentBookChapters };
+  cachedBookData = { bookDir, richXmlPath, mtimeMs: richXmlStats.mtimeMs, data };
+
+  return data;
 };

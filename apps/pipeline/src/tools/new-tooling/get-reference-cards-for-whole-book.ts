@@ -4,7 +4,7 @@ import { type NewReferenceCardsResponse } from "../../types";
 import { NewReferenceCardsResponseSchema } from "../../schemes";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
-import { callGeminiWithThinkingAndSchemaAndParsed } from "src/callFastGemini";
+import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 
 export const getReferenceCardsForWholeBook = async (): Promise<NewReferenceCardsResponse> => {
   const booksSettings = getBookSettings();

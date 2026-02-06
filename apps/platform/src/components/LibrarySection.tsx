@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { Loader2, BookOpen, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { standardEbooksTrpc } from "@platform/lib/standardEbooksTrpc";
 import {
   BookCard,
   type CollectionBook,
@@ -12,23 +11,42 @@ import { BookModal } from "@platform/components/standard-ebooks/StandardEbooksBo
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 import { SPLASH_FADE_DURATION_MS } from "@player/components/SplashScreen";
 
-type SEBook = {
-  slug: string;
-  title: string;
-  author: string;
-  authorFileAs: string;
-  description: string;
-  wordCount: number;
-  language: string;
-  subjects: string[];
-  generatedDescription?: string;
-  generatedHook?: string;
-};
+type BookMeta = { t: string; a: string; w: number; c?: string };
+
+const SE_COVER_CDN = "https://odyssey-cdn.lgandecki.net/bookgenius";
+type Descriptions = Record<string, { description: string; hook: string }>;
 
 const LIBRARY_CARD_WIDTH = 275;
 const LIBRARY_CARD_GAP = 20;
 const LIBRARY_CARD_SLOT = LIBRARY_CARD_WIDTH + LIBRARY_CARD_GAP;
 const LIBRARY_OVERSCAN = 4;
+
+const CATEGORY_ORDER = [
+  { id: "most-popular", label: "Most Popular" },
+  { id: "page-turners", label: "Page-Turners" },
+  { id: "quick-reads", label: "Quick Reads" },
+  { id: "epic-reads", label: "Epic Reads" },
+  { id: "detective-mystery", label: "Detective & Mystery" },
+  { id: "science-fiction", label: "Science Fiction" },
+  { id: "horror-gothic", label: "Horror & Gothic" },
+  { id: "adventure", label: "Adventure" },
+  { id: "romance", label: "Romance" },
+  { id: "comedy-satire", label: "Comedy & Satire" },
+  { id: "childrens", label: "Children's" },
+  { id: "fantasy", label: "Fantasy" },
+  { id: "historical-fiction", label: "Historical Fiction" },
+  { id: "psychological-fiction", label: "Psychological Fiction" },
+  { id: "philosophy-ideas", label: "Philosophy & Ideas" },
+  { id: "memoir-biography", label: "Memoir & Biography" },
+  { id: "poetry", label: "Poetry" },
+  { id: "social-justice-reform", label: "Social Justice & Reform" },
+  { id: "war-literature", label: "War Literature" },
+  { id: "exploration-lost-worlds", label: "Exploration & Lost Worlds" },
+  { id: "dystopia-utopia", label: "Dystopia & Utopia" },
+  { id: "russian-literature", label: "Russian Literature" },
+  { id: "french-literature", label: "French Literature" },
+  { id: "nautical-adventures", label: "Nautical Adventures" },
+] as const;
 
 function formatReadingTime(wordCount: number): string {
   const minutes = Math.ceil(wordCount / 250);
@@ -37,32 +55,40 @@ function formatReadingTime(wordCount: number): string {
   return `~${hours} hrs`;
 }
 
-function seBookToCollectionBook(book: SEBook): CollectionBook {
+function slugToCollectionBook(
+  slug: string,
+  meta: BookMeta,
+  desc?: { description: string; hook: string },
+): CollectionBook {
   return {
-    title: book.title,
-    author: book.author,
-    slug: book.slug,
-    cover: `http://localhost:4000/se-cover/${book.slug}`,
-    coverThumb: `http://localhost:4000/se-cover/${book.slug}`,
+    title: meta.t,
+    author: meta.a,
+    slug,
+    cover: meta.c ? `${SE_COVER_CDN}/${meta.c}/${slug}.jpg` : "",
+    coverThumb: meta.c ? `${SE_COVER_CDN}/${meta.c}/${slug}.jpg` : "",
     coverColor: "#2a2a3d",
     epoch: "",
-    genre: book.subjects[0] || "",
+    genre: "",
     kind: "",
     hasAudio: false,
-    generatedDescription: book.generatedDescription || book.description,
-    generatedHook: book.generatedHook || "",
-    readingTime: formatReadingTime(book.wordCount),
+    generatedDescription: desc?.description || "",
+    generatedHook: desc?.hook || "",
+    readingTime: formatReadingTime(meta.w),
   };
 }
 
-function AuthorLetterRow({
-  letter,
-  books,
+function CategoryRow({
+  label,
+  slugs,
+  bookMeta,
+  descriptions,
   onSelectBook,
   onOpenModal,
 }: {
-  letter: string;
-  books: SEBook[];
+  label: string;
+  slugs: string[];
+  bookMeta: Record<string, BookMeta>;
+  descriptions: Descriptions | null;
   onSelectBook: (slug: string) => void;
   onOpenModal: (book: CollectionBook) => void;
 }) {
@@ -73,7 +99,7 @@ function AuthorLetterRow({
   const scrollPosRef = useRef<number>(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const [virtualRange, setVirtualRange] = useState({ start: 0, end: Math.min(books.length, 12) });
+  const [virtualRange, setVirtualRange] = useState({ start: 0, end: Math.min(slugs.length, 12) });
 
   const updateScrollState = useCallback(() => {
     if (!scrollRef.current) return;
@@ -85,12 +111,12 @@ function AuthorLetterRow({
     const end = Math.max(
       start,
       Math.min(
-        books.length,
+        slugs.length,
         Math.ceil((scrollLeft + clientWidth) / LIBRARY_CARD_SLOT) + LIBRARY_OVERSCAN,
       ),
     );
     setVirtualRange((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
-  }, [books.length]);
+  }, [slugs.length]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -120,14 +146,14 @@ function AuthorLetterRow({
       scrollRef.current.scrollLeft = scrollPosRef.current;
     }
     updateScrollState();
-  }, [isVisible, books, updateScrollState]);
+  }, [isVisible, slugs, updateScrollState]);
 
   useEffect(() => {
     if (!isVisible) return;
     updateScrollState();
     window.addEventListener("resize", updateScrollState);
     return () => window.removeEventListener("resize", updateScrollState);
-  }, [books.length, isVisible, updateScrollState]);
+  }, [slugs.length, isVisible, updateScrollState]);
 
   useEffect(
     () => () => {
@@ -155,7 +181,14 @@ function AuthorLetterRow({
     });
   }, []);
 
-  const collectionBooks = useMemo(() => books.map(seBookToCollectionBook), [books]);
+  const collectionBooks = useMemo(
+    () =>
+      slugs
+        .filter((s) => bookMeta[s])
+        .map((s) => slugToCollectionBook(s, bookMeta[s], descriptions?.[s])),
+    [slugs, bookMeta, descriptions],
+  );
+
   const visibleBooks = useMemo(
     () => collectionBooks.slice(virtualRange.start, virtualRange.end),
     [collectionBooks, virtualRange.end, virtualRange.start],
@@ -174,8 +207,8 @@ function AuthorLetterRow({
   return (
     <div ref={containerRef} className="mb-10 space-y-5 min-h-[460px]">
       <div className="flex items-center justify-between px-8 md:px-12 lg:px-20 group">
-        <h3 className="text-3xl font-bold text-foreground">{letter}</h3>
-        <span className="text-muted-foreground">{books.length} books</span>
+        <h3 className="text-3xl font-bold text-foreground">{label}</h3>
+        <span className="text-muted-foreground">{slugs.length} books</span>
       </div>
 
       <div className="relative group/carousel">
@@ -221,13 +254,7 @@ function AuthorLetterRow({
                   marginRight: globalIndex < collectionBooks.length - 1 ? LIBRARY_CARD_GAP : 0,
                 }}
               >
-                <BookCard
-                  book={book}
-                  index={globalIndex}
-                  totalColumns={6}
-                  onSelect={onSelectBook}
-                  onOpenModal={onOpenModal}
-                />
+                <BookCard book={book} onSelect={onSelectBook} onOpenModal={onOpenModal} />
               </div>
             );
           })}
@@ -249,42 +276,39 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { startTransition, setNavigatedFromPlatform } = useRouteTransition();
-  const [groupedBooks, setGroupedBooks] = useState<Record<string, SEBook[]>>({});
-  const [allBooks, setAllBooks] = useState<SEBook[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalBooks, setTotalBooks] = useState(0);
+  const [categories, setCategories] = useState<Record<string, string[]> | null>(null);
+  const [bookMeta, setBookMeta] = useState<Record<string, BookMeta> | null>(null);
+  const [descriptions, setDescriptions] = useState<Descriptions | null>(null);
   const [modalBook, setModalBook] = useState<CollectionBook | null>(null);
   const [localSearch, setLocalSearch] = useState("");
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        // @ts-expect-error - incorrect typing somehow
-        const data = await standardEbooksTrpc.getStandardEbooksIndex.query();
-        setGroupedBooks(data.groupedByAuthorLetter);
-        setAllBooks(data.books);
-        setTotalBooks(data.books.length);
-      } catch (e) {
-        console.error("Failed to load Standard Ebooks index:", e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadData();
+    Promise.all([
+      import("../../../pipeline/standardebooks-data/categories.json"),
+      import("../../../pipeline/standardebooks-data/book-meta.json"),
+    ]).then(([cats, meta]) => {
+      setCategories(cats.default as Record<string, string[]>);
+      setBookMeta(meta.default as Record<string, BookMeta>);
+    });
+
+    import("../../../pipeline/standardebooks-data/descriptions.json").then((d) => {
+      setDescriptions(d.default as Descriptions);
+    });
   }, []);
 
-  const bookBySlug = useMemo(() => new Map(allBooks.map((book) => [book.slug, book])), [allBooks]);
+  const isLoading = !categories || !bookMeta;
+  const totalBooks = bookMeta ? Object.keys(bookMeta).length : 0;
 
-  // Combine nav search and local search
   const effectiveQuery = searchQuery.trim() || localSearch.trim();
   const normalizedQuery = effectiveQuery.toLowerCase();
 
   const handleBookSelect = useCallback(
     (slug: string) => {
-      const book = bookBySlug.get(slug);
-      const title = book?.title ?? "BookGenius";
-      const author = book?.author ?? "";
-      const phrases = book?.generatedHook ? [book.generatedHook] : [];
+      const meta = bookMeta?.[slug];
+      const desc = descriptions?.[slug];
+      const title = meta?.t ?? "BookGenius";
+      const author = meta?.a ?? "";
+      const phrases = desc?.hook ? [desc.hook] : [];
 
       setNavigatedFromPlatform(true);
       startTransition({ title, phrases, author, showStartButton: false });
@@ -295,7 +319,7 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
         });
       }, SPLASH_FADE_DURATION_MS);
     },
-    [bookBySlug, navigate, setNavigatedFromPlatform, startTransition],
+    [bookMeta, descriptions, navigate, setNavigatedFromPlatform, startTransition],
   );
 
   const handleOpenModal = useCallback((book: CollectionBook) => {
@@ -306,32 +330,53 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
     setModalBook(null);
   }, []);
 
-  const filteredBooks = normalizedQuery
-    ? allBooks.filter((book) => {
-        const haystack = [
-          book.title,
-          book.author,
-          book.authorFileAs,
-          book.description,
-          book.subjects.join(" "),
-        ]
-          .join(" ")
-          .toLowerCase();
+  // Search: find matching slugs across all books
+  const searchResults = useMemo(() => {
+    if (!normalizedQuery || !bookMeta) return null;
+    return Object.entries(bookMeta)
+      .filter(([, meta]) => {
+        const haystack = `${meta.t} ${meta.a}`.toLowerCase();
         return haystack.includes(normalizedQuery);
       })
-    : allBooks;
+      .map(([slug]) => slug);
+  }, [normalizedQuery, bookMeta]);
 
-  const visibleGroupedBooks = normalizedQuery
-    ? filteredBooks.reduce<Record<string, SEBook[]>>((acc, book) => {
-        const firstLetter = (book.authorFileAs || book.author).charAt(0).toUpperCase();
-        if (!acc[firstLetter]) acc[firstLetter] = [];
-        acc[firstLetter].push(book);
-        return acc;
-      }, {})
-    : groupedBooks;
+  const visibleCount = searchResults ? searchResults.length : totalBooks;
 
-  const sortedLetters = Object.keys(visibleGroupedBooks).sort();
-  const visibleCount = normalizedQuery ? filteredBooks.length : totalBooks;
+  // Redistribute overlapping leading books so adjacent categories don't start identically
+  const displayCategories = useMemo(() => {
+    if (!categories) return null;
+    const result = { ...categories };
+
+    const mostPopularLeads = new Set((result["most-popular"] ?? []).slice(0, 6));
+    const pageTurners = result["page-turners"];
+
+    if (pageTurners) {
+      const overlapping: string[] = [];
+      const rest: string[] = [];
+      for (const slug of pageTurners) {
+        if (mostPopularLeads.has(slug)) overlapping.push(slug);
+        else rest.push(slug);
+      }
+      if (overlapping.length > 0) {
+        const merged = [...rest];
+        for (const slug of overlapping) {
+          const minPos = Math.min(6, merged.length);
+          const pos = minPos + Math.floor(Math.random() * (merged.length - minPos + 1));
+          merged.splice(pos, 0, slug);
+        }
+        result["page-turners"] = merged;
+      }
+    }
+
+    return result;
+  }, [categories]);
+
+  // Which categories to show
+  const visibleCategories = useMemo(() => {
+    if (searchResults) return null; // show flat search results instead
+    return CATEGORY_ORDER.filter((cat) => displayCategories?.[cat.id]?.length);
+  }, [searchResults, displayCategories]);
 
   return (
     <section id="library" className="pt-16 pb-24">
@@ -389,16 +434,29 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
         </div>
       ) : (
         <div className="flex flex-col">
-          {sortedLetters.length === 0 ? (
-            <div className="px-8 md:px-12 lg:px-20 py-10 text-muted-foreground">
-              {t("library.noResults", "No books match your search.")}
-            </div>
+          {searchResults ? (
+            searchResults.length === 0 ? (
+              <div className="px-8 md:px-12 lg:px-20 py-10 text-muted-foreground">
+                {t("library.noResults", "No books match your search.")}
+              </div>
+            ) : (
+              <CategoryRow
+                label={`Search Results`}
+                slugs={searchResults}
+                bookMeta={bookMeta!}
+                descriptions={descriptions}
+                onSelectBook={handleBookSelect}
+                onOpenModal={handleOpenModal}
+              />
+            )
           ) : (
-            sortedLetters.map((letter, idx) => (
-              <div key={letter} className={`animate-fade-in stagger-${Math.min(idx + 1, 6)}`}>
-                <AuthorLetterRow
-                  letter={letter}
-                  books={visibleGroupedBooks[letter]}
+            visibleCategories?.map((cat, idx) => (
+              <div key={cat.id} className={`animate-fade-in stagger-${Math.min(idx + 1, 6)}`}>
+                <CategoryRow
+                  label={cat.label}
+                  slugs={displayCategories![cat.id]}
+                  bookMeta={bookMeta!}
+                  descriptions={descriptions}
                   onSelectBook={handleBookSelect}
                   onOpenModal={handleOpenModal}
                 />
