@@ -9,7 +9,204 @@ import { google } from "@ai-sdk/google";
 import { generateObject, generateText, streamText } from "ai";
 import { toGeminiSchema } from "gemini-zod";
 import "dotenv/config";
-import type { LanguageModelV2Middleware } from "@ai-sdk/provider";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+type GeminiCallOptions = { preferVertex?: boolean };
+
+type ErrorLike = {
+  message?: string;
+  statusCode?: number;
+  responseHeaders?: Record<string, string | undefined>;
+  responseBody?: string;
+  errors?: unknown[];
+};
+
+function parseRetryDelayToMs(raw: string | undefined): number | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  const numeric = Number.parseFloat(trimmed);
+  if (!Number.isNaN(numeric) && /^\d+(\.\d+)?$/.test(trimmed)) {
+    return numeric * 1000;
+  }
+
+  const match = trimmed.match(/(\d+(?:\.\d+)?)\s*s/i);
+  if (match) {
+    const value = Number.parseFloat(match[1]);
+    return Number.isNaN(value) ? null : value * 1000;
+  }
+
+  return null;
+}
+
+function parseRetryDelayFromBody(responseBody: string | undefined): number | null {
+  if (!responseBody) return null;
+  try {
+    const parsed = JSON.parse(responseBody) as {
+      error?: { details?: Array<{ "@type"?: string; retryDelay?: string }> };
+    };
+    const details = parsed?.error?.details ?? [];
+    const retryInfo = details.find((d) => d?.["@type"]?.includes("google.rpc.RetryInfo"));
+    const retryDelay = retryInfo?.retryDelay;
+    const parsedDelay = parseRetryDelayToMs(retryDelay);
+    if (parsedDelay !== null) {
+      return parsedDelay;
+    }
+  } catch {
+    // ignore JSON parse issues; we'll fall back to message pattern
+  }
+
+  const messageMatch = responseBody.match(/Please retry in\s+(\d+(?:\.\d+)?)s\.?/i);
+  if (messageMatch) {
+    const seconds = Number.parseFloat(messageMatch[1]);
+    if (!Number.isNaN(seconds)) {
+      return seconds * 1000;
+    }
+  }
+
+  return null;
+}
+
+function getErrorCandidates(error: unknown): ErrorLike[] {
+  const root = (error ?? {}) as ErrorLike;
+  const nested = Array.isArray(root.errors) ? (root.errors as ErrorLike[]) : [];
+  return [root, ...nested];
+}
+
+function extractRetryDelayMs(error: unknown): number | null {
+  const candidates = getErrorCandidates(error);
+
+  for (const candidate of candidates) {
+    const retryAfterMs = candidate.responseHeaders?.["retry-after-ms"];
+    if (retryAfterMs) {
+      const parsed = Number.parseFloat(retryAfterMs);
+      if (!Number.isNaN(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+
+    const retryAfter = candidate.responseHeaders?.["retry-after"];
+    if (retryAfter) {
+      const seconds = Number.parseFloat(retryAfter);
+      if (!Number.isNaN(seconds) && seconds > 0) {
+        return seconds * 1000;
+      }
+      const dateMs = Date.parse(retryAfter);
+      if (!Number.isNaN(dateMs) && dateMs > Date.now()) {
+        return dateMs - Date.now();
+      }
+    }
+
+    const bodyDelay = parseRetryDelayFromBody(candidate.responseBody);
+    if (bodyDelay !== null) {
+      return bodyDelay;
+    }
+
+    const msgDelay = parseRetryDelayToMs(candidate.message);
+    if (msgDelay !== null) {
+      return msgDelay;
+    }
+  }
+
+  return null;
+}
+
+function isQuotaOrRateLimitError(error: unknown): boolean {
+  const candidates = getErrorCandidates(error);
+  return candidates.some((candidate) => {
+    if (candidate.statusCode === 429) {
+      return true;
+    }
+    const message = (candidate.message ?? "").toLowerCase();
+    return (
+      message.includes("quota exceeded") ||
+      message.includes("resource_exhausted") ||
+      message.includes("rate limit") ||
+      message.includes("too many requests")
+    );
+  });
+}
+
+function getVertexConfig(): { apiKey: string; enabled: true } | { enabled: false } {
+  const apiKey = process.env.VERTEX_API_KEY;
+
+  if (apiKey) {
+    return { enabled: true, apiKey };
+  }
+
+  return { enabled: false };
+}
+
+function getSafetySettings() {
+  return [
+    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+  ];
+}
+
+async function tryVertexTextFallback(prompt: string, model: string): Promise<string | null> {
+  const vertex = getVertexConfig();
+  if (!vertex.enabled) {
+    return null;
+  }
+
+  console.log("FALLING BACK TO VERTEX FOR GEMINI TEXT CALL", model);
+  const ai = new GoogleGenAI({ vertexai: true, apiKey: vertex.apiKey });
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    config: { responseMimeType: "text/plain", safetySettings: getSafetySettings() },
+  });
+
+  return response.text ?? "";
+}
+
+async function tryVertexSchemaFallback<T>(
+  prompt: string,
+  zodSchema: z.ZodSchema<T>,
+  model: string,
+): Promise<T | null> {
+  const vertex = getVertexConfig();
+  if (!vertex.enabled) {
+    return null;
+  }
+
+  console.log("FALLING BACK TO VERTEX FOR GEMINI STRUCTURED CALL", model);
+  const ai = new GoogleGenAI({ vertexai: true, apiKey: vertex.apiKey });
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: toGeminiSchema(zodSchema),
+      safetySettings: getSafetySettings(),
+    },
+  });
+
+  const text = response.text;
+  if (!text) {
+    throw new Error("Vertex fallback returned empty structured response");
+  }
+
+  const parsed = JSON.parse(text) as unknown;
+  return zodSchema.parse(parsed);
+}
 
 export const callFastGemini = async (
   prompt: string,
@@ -74,7 +271,8 @@ Based on the book text answer the user's question, using quotes from the wider b
   return text;
 };
 
-export const callGeminiWithThinking = async (prompt: string) => {
+export const callGeminiWithThinking = async (prompt: string, options: GeminiCallOptions = {}) => {
+  const { preferVertex = false } = options;
   const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.OFF },
     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.OFF },
@@ -83,17 +281,53 @@ export const callGeminiWithThinking = async (prompt: string) => {
     { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.OFF },
   ];
   console.log("CALLING GEMINI WITH THINKING");
-  const { textStream } = await streamText({
-    model: google("gemini-3-flash-preview"),
-    prompt,
-    experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
-    providerOptions: { google: { safetySettings } },
-  });
-  let text = "";
-  for await (const textPart of textStream) {
-    text += textPart;
+  const model = "gemini-3-flash-preview";
+  const maxRateLimitRetries = 1;
+
+  if (preferVertex) {
+    const vertexResult = await tryVertexTextFallback(prompt, model).catch(() => null);
+    if (vertexResult !== null) {
+      return vertexResult;
+    }
   }
-  return text;
+
+  for (let attempt = 0; attempt <= maxRateLimitRetries; attempt++) {
+    try {
+      const { textStream } = await streamText({
+        model: google(model),
+        prompt,
+        maxRetries: 0,
+        experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
+        providerOptions: { google: { safetySettings } },
+      });
+      let text = "";
+      for await (const textPart of textStream) {
+        text += textPart;
+      }
+      return text;
+    } catch (error) {
+      if (isQuotaOrRateLimitError(error)) {
+        if (!preferVertex) {
+          const vertexResult = await tryVertexTextFallback(prompt, model).catch(() => null);
+          if (vertexResult !== null) {
+            return vertexResult;
+          }
+        }
+
+        const retryDelayMs = extractRetryDelayMs(error);
+        if (retryDelayMs !== null && attempt < maxRateLimitRetries) {
+          console.log(
+            `Gemini rate-limit detected, waiting ${Math.round(retryDelayMs)}ms before retry`,
+          );
+          await sleep(retryDelayMs);
+          continue;
+        }
+      }
+      throw error;
+    }
+  }
+
+  throw new Error("Unexpected Gemini retry loop exit");
 };
 
 export const callGeminiWithThinkingAndSchema = async <T>(
@@ -138,116 +372,55 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
   prompt: string,
   zodSchema: z.ZodSchema<T>,
   model: string = "gemini-3-flash-preview",
+  options: GeminiCallOptions = {},
 ) => {
+  const { preferVertex = false } = options;
   console.log("CALLING GEMINI WITH THINKING AND SCHEMA AND PARSED", model);
-  const { object } = await generateObject({
-    model: google(model),
-    schema: zodSchema,
-    prompt,
-    // providerOptions: { google: { thinkingConfig: { thinkingBudget: 0, includeThoughts: true } } },
-    experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
-    providerOptions: {
-      google: {
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-        ],
-      },
-    },
-  });
+  const maxRateLimitRetries = 1;
 
-  return object as T;
-};
-
-export const anthropicThinkingSchemaMiddleware: LanguageModelV2Middleware = {
-  transformParams: ({ params }) => {
-    // Change forced tool choice to optional (Anthropic compatible)
-    params.toolChoice = { type: "auto" };
-
-    // Convert schema to optional tool
-    if (params.responseFormat?.type === "json" && params.responseFormat.schema) {
-      params.tools = [
-        {
-          type: "function",
-          name: "json",
-          description: "Respond with a structured JSON object matching the required schema.",
-          inputSchema: params.responseFormat.schema,
-        },
-      ];
-
-      params.responseFormat = { type: "text" };
-
-      // Add instruction to use the tool
-      params.prompt.push({
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: "Please provide your answer using the json tool. Use extended thinking if needed to ensure accuracy.",
-          },
-        ],
-        providerOptions: undefined,
-      });
+  if (preferVertex) {
+    const vertexResult = await tryVertexSchemaFallback(prompt, zodSchema, model).catch(() => null);
+    if (vertexResult !== null) {
+      return vertexResult;
     }
+  }
 
-    return Promise.resolve(params);
-  },
+  for (let attempt = 0; attempt <= maxRateLimitRetries; attempt++) {
+    try {
+      const { object } = await generateObject({
+        model: google(model),
+        schema: zodSchema,
+        prompt,
+        maxRetries: 0,
+        experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
+        providerOptions: { google: { safetySettings: getSafetySettings() } },
+      });
+      return object as T;
+    } catch (error) {
+      if (isQuotaOrRateLimitError(error)) {
+        if (!preferVertex) {
+          const vertexResult = await tryVertexSchemaFallback(prompt, zodSchema, model).catch(
+            () => null,
+          );
+          if (vertexResult !== null) {
+            return vertexResult;
+          }
+        }
 
-  wrapGenerate: async ({ doGenerate }) => {
-    const result = await doGenerate();
-
-    console.log("result", result);
-    // Extract tool call from content array and convert to text response
-    if (result.content && result.content.length > 0) {
-      const toolCallContent = result.content.find(
-        (item) => item.type === "tool-call" && item.toolName === "json",
-      );
-      if (toolCallContent && toolCallContent.type === "tool-call") {
-        // Parse the input string to get the actual JSON object
-        const parsedInput =
-          typeof toolCallContent.input === "string"
-            ? JSON.parse(toolCallContent.input)
-            : toolCallContent.input;
-
-        // Replace content with text content containing the JSON
-        result.content = [{ type: "text", text: JSON.stringify(parsedInput, null, 2) }];
-      } else {
-        try {
-          result.content = [
-            {
-              type: "text",
-              // @ts-expect-error(TODO FIX LATER, IT WORKS)
-              text: result.content[result.content.length - 1].text
-                .replace(/^```json\n/, "")
-                .replace(/\n```$/, ""),
-            },
-          ];
-        } catch (e) {
-          console.error("error", e);
+        const retryDelayMs = extractRetryDelayMs(error);
+        if (retryDelayMs !== null && attempt < maxRateLimitRetries) {
+          console.log(
+            `Gemini rate-limit detected, waiting ${Math.round(retryDelayMs)}ms before retry`,
+          );
+          await sleep(retryDelayMs);
+          continue;
         }
       }
+      throw error;
     }
+  }
 
-    return result;
-  },
+  throw new Error("Unexpected Gemini structured retry loop exit");
 };
 
 export const callGeminiWithImage = async <T>(

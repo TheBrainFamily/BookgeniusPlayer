@@ -53,6 +53,7 @@ import {
 } from "./style-selection";
 import { STEP_DEPENDENCIES, getReadySteps, createSchedulerState } from "./parallel-scheduler";
 import { buildNotesToUploadFromNoteMap, normalizeNoteRefId } from "./notes-import";
+import { isAbortError } from "../../src/helpers/abortHelpers";
 
 export type StyleSelectionCallback = {
   onUserStyleSubmitted?: (userStyle: GraphicalStyle | null) => void;
@@ -176,19 +177,22 @@ async function runStep(job: Job, step: Step, fn: () => Promise<void>) {
   } catch (e: unknown) {
     s.status = "error";
     s.endedAt = Date.now();
-    job.status = "error";
-    job.currentStep = "failed";
     const errorMessage = e instanceof Error ? e.message : String(e);
-    job.error = errorMessage;
     const stack = e instanceof Error ? e.stack : String(e);
-    addLog(job, `✖ ${StepLabels[step]} failed: ${job.error}`);
+    const aborted = isAbortError(e);
+    if (!aborted || !job.error) {
+      job.error = errorMessage;
+    }
+    addLog(job, `${aborted ? "⚠" : "✖"} ${StepLabels[step]} ${aborted ? "cancelled" : `failed: ${job.error}`}`);
     addLog(job, stack || "");
 
-    markStepError(job.slug, step, job.error, s.startedAt!, s.endedAt);
+    markStepError(job.slug, step, errorMessage, s.startedAt!, s.endedAt);
     await convex
       .reportProgress({ bookPath: job.bookPath, step, status: "error", error: errorMessage })
       .catch(() => {});
-    await convex.markFailed({ bookPath: job.bookPath, error: errorMessage }).catch(() => {});
+    if (!aborted) {
+      await convex.markFailed({ bookPath: job.bookPath, error: errorMessage }).catch(() => {});
+    }
 
     console.error(`Step ${step} failed:`, e);
     throw e;
@@ -562,6 +566,8 @@ export async function startPipeline(input: {
   const tempOutputDir = path.join(bookRoot, "temporary-output");
 
   const schedulerState = createSchedulerState();
+  const pipelineAbortController = new AbortController();
+  const pipelineSignal = pipelineAbortController.signal;
   for (const step of job.steps) {
     if (step.status === "done") {
       schedulerState.completedSteps.add(step.step);
@@ -671,7 +677,7 @@ export async function startPipeline(input: {
       referenceCards = JSON.parse(
         readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
       ) as NewReferenceCardsResponse;
-      await identifyCharactersAndRewriteParagraphs(referenceCards);
+      await identifyCharactersAndRewriteParagraphs(referenceCards, pipelineSignal);
       await uploadChaptersToConvex(job, tempOutputDir);
     },
 
@@ -937,46 +943,70 @@ export async function startPipeline(input: {
     }
 
     const runScheduler = async () => {
-      while (
-        schedulerState.completedSteps.size + schedulerState.failedSteps.size <
-        stepsToRun.length
-      ) {
-        const readySteps = getReadySteps(
-          stepsToRun,
-          schedulerState.completedSteps,
-          schedulerState.runningSteps,
-        );
+      let schedulerError: unknown;
 
-        if (readySteps.length === 0 && schedulerState.runningSteps.size === 0) {
-          throw new Error("Pipeline deadlock: no steps ready and none running");
-        }
+      try {
+        while (true) {
+          const doneOrFailed =
+            schedulerState.completedSteps.size + schedulerState.failedSteps.size >= stepsToRun.length;
+          if (doneOrFailed) {
+            break;
+          }
 
-        for (const step of readySteps) {
-          schedulerState.runningSteps.add(step);
-          job.activeSteps = Array.from(schedulerState.runningSteps);
+          if (!pipelineSignal.aborted) {
+            const readySteps = getReadySteps(
+              stepsToRun,
+              schedulerState.completedSteps,
+              schedulerState.runningSteps,
+            );
 
-          const promise = runStepParallel(step)
-            .then(() => {
-              schedulerState.completedSteps.add(step);
-              schedulerState.runningSteps.delete(step);
+            if (readySteps.length === 0 && schedulerState.runningSteps.size === 0) {
+              throw new Error("Pipeline deadlock: no steps ready and none running");
+            }
+
+            for (const step of readySteps) {
+              schedulerState.runningSteps.add(step);
               job.activeSteps = Array.from(schedulerState.runningSteps);
-            })
-            .catch((e) => {
-              schedulerState.failedSteps.add(step);
-              schedulerState.runningSteps.delete(step);
-              job.activeSteps = Array.from(schedulerState.runningSteps);
-              throw e;
+
+              const promise = runStepParallel(step)
+                .then(() => {
+                  schedulerState.completedSteps.add(step);
+                  schedulerState.runningSteps.delete(step);
+                  job.activeSteps = Array.from(schedulerState.runningSteps);
+                })
+                .catch((e) => {
+                  schedulerState.failedSteps.add(step);
+                  schedulerState.runningSteps.delete(step);
+                  job.activeSteps = Array.from(schedulerState.runningSteps);
+                  throw e;
+                });
+
+              schedulerState.stepPromises.set(step, promise);
+            }
+          } else if (schedulerState.runningSteps.size === 0) {
+            break;
+          }
+
+          if (schedulerState.runningSteps.size > 0) {
+            const runningPromises = Array.from(schedulerState.runningSteps).map(
+              (step) => schedulerState.stepPromises.get(step)!,
+            );
+            await Promise.race(runningPromises).catch((e) => {
+              if (!schedulerError) {
+                schedulerError = e;
+              }
+              pipelineAbortController.abort();
             });
-
-          schedulerState.stepPromises.set(step, promise);
+          }
         }
+      } finally {
+        pipelineAbortController.abort();
+        await Promise.allSettled(Array.from(schedulerState.stepPromises.values()));
+        job.activeSteps = Array.from(schedulerState.runningSteps);
+      }
 
-        if (schedulerState.runningSteps.size > 0) {
-          const runningPromises = Array.from(schedulerState.runningSteps).map(
-            (step) => schedulerState.stepPromises.get(step)!,
-          );
-          await Promise.race(runningPromises);
-        }
+      if (schedulerError) {
+        throw schedulerError;
       }
     };
 

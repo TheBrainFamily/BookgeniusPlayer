@@ -113,13 +113,13 @@ Provide your summary clearly organized according to the structure above, explici
     )) as ScenesSummariesPerChapter;
   } catch (e) {
     console.error(`Error for chapter ${chapterNum}`, e);
-    summary = (await callClaude(
-      bookLanguage === "Polish"
-        ? `${prompt}\n Książka jest po Polsku, więc napisz podsumowanie również po Polsku.`
-        : prompt,
-      ScenesSummariesPerChapterSchema,
-      2,
-    )) as ScenesSummariesPerChapter;
+      summary = (await callClaude(
+        bookLanguage === "Polish"
+          ? `${prompt}\n Książka jest po Polsku, więc napisz podsumowanie również po Polsku.`
+          : prompt,
+        ScenesSummariesPerChapterSchema,
+        2,
+      )) as ScenesSummariesPerChapter;
   }
 
   summary.chapterSummary.chapterNumber = chapterNum;

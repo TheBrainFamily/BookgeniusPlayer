@@ -1,4 +1,4 @@
-import { callGeminiWrapper } from "../callClaude";
+import { callGeminiWrapper, callGeminiVertexWrapper } from "../callClaude";
 import {
   getParagraphsFromChapter,
   getSectionAttributesFromChapter,
@@ -19,7 +19,7 @@ import { generateTagName } from "../helpers/generateTagName";
 import { getChapterFormat } from "./getChapterFormat";
 import { doesBookFileExist } from "../helpers/readBookFile";
 import { callGpt5 } from "../callO3";
-import { sleep } from "./sleep";
+import { abortableSleep, checkAborted, isAbortError } from "../helpers/abortHelpers";
 import {
   needsChunking,
   chunkParagraphs,
@@ -92,14 +92,21 @@ ${previousChunkOutput}
 /**
  * Process a single chunk with optional context from previous chunk
  */
+type ProcessChunkOptions = {
+  attempt?: number;
+  signal?: AbortSignal;
+};
+
 async function processChunk(
   chapter: number,
   chunkIndex: number,
   chunk: ChapterChunk,
   jsonCharacters: string,
   previousChunkOutput: string | null,
-  attempt: number = 0,
+  options: ProcessChunkOptions = {},
 ): Promise<string> {
+  const { attempt = 0, signal } = options;
+  checkAborted(signal, `chapter ${chapter} chunk ${chunkIndex}`);
   const chunkFileName = `rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`;
 
   // Check if chunk already processed
@@ -109,9 +116,9 @@ async function processChunk(
   }
 
   if (attempt > 0) {
-    await sleep(10000 * attempt * attempt);
+    await abortableSleep(10000 * attempt * attempt, signal);
   }
-  if (attempt > 4) {
+  if (attempt > 5) {
     logger.error(`❌ Too many attempts for chapter ${chapter} chunk ${chunkIndex}`);
     throw new Error(`Too many attempts for chapter ${chapter} chunk ${chunkIndex}`);
   }
@@ -126,13 +133,13 @@ async function processChunk(
 
   const llmProviders = [
     callGeminiWrapper,
-    callGeminiWrapper,
-    callGeminiWrapper,
+    callGeminiVertexWrapper,
     callGrok,
     callGpt5,
   ];
 
   try {
+    checkAborted(signal, `chapter ${chapter} chunk ${chunkIndex} before provider call`);
     const selectedProvider = llmProviders[attempt % llmProviders.length];
     logger.info(
       `Using provider for chapter ${chapter} chunk ${chunkIndex}: ${selectedProvider.name}`,
@@ -143,8 +150,13 @@ async function processChunk(
       `original-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`,
       originalChunkXml,
     );
+    const geminiReminder = `\n This is your ${attempt + 1}th attempt. That means you failed previous one. Make sure to output valid html.`;
 
-    const response = (await selectedProvider(compiledPrompt, undefined, 1)) as string;
+    const response = (await selectedProvider(
+      `${compiledPrompt} ${attempt === 1 || attempt === 2 ? geminiReminder : ""}`,
+      undefined,
+      1,
+    )) as string;
     logger.info(`Response for chapter ${chapter} chunk ${chunkIndex}:`, response.slice(0, 50));
 
     const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
@@ -192,10 +204,13 @@ async function processChunk(
         chunk,
         jsonCharacters,
         previousChunkOutput,
-        attempt + 1,
+        { attempt: attempt + 1, signal },
       );
     }
   } catch (e) {
+    if (isAbortError(e)) {
+      throw e;
+    }
     logger.error(`Error for chapter ${chapter} chunk ${chunkIndex}`, e);
     return processChunk(
       chapter,
@@ -203,7 +218,7 @@ async function processChunk(
       chunk,
       jsonCharacters,
       previousChunkOutput,
-      attempt + 1,
+      { attempt: attempt + 1, signal },
     );
   }
 }
@@ -216,7 +231,9 @@ async function processChunkedChapter(
   charactersForChapter: { name: string; summary: string }[],
   paragraphs: Paragraph[],
   sectionAttributes?: Record<string, string>,
+  signal?: AbortSignal,
 ): Promise<string> {
+  checkAborted(signal, `chapter ${chapter} chunked processing`);
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
   const chunks = chunkParagraphs(paragraphs);
 
@@ -225,6 +242,7 @@ async function processChunkedChapter(
   const processedChunks: string[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
+    checkAborted(signal, `chapter ${chapter} chunk loop ${i}`);
     const chunk = chunks[i];
     const previousChunkOutput = i > 0 ? processedChunks[i - 1] : null;
 
@@ -232,7 +250,14 @@ async function processChunkedChapter(
       `📦 Processing chapter ${chapter} chunk ${i + 1}/${chunks.length} (${chunk.tokenCount} tokens)`,
     );
 
-    const result = await processChunk(chapter, i, chunk, jsonCharacters, previousChunkOutput);
+    const result = await processChunk(
+      chapter,
+      i,
+      chunk,
+      jsonCharacters,
+      previousChunkOutput,
+      { signal },
+    );
     processedChunks.push(result);
   }
 
@@ -248,7 +273,9 @@ export const identifyAndRewriteParagraphs = async (
   chapter: number,
   charactersForChapter: { name: string; summary: string }[],
   attempt = 0,
+  signal?: AbortSignal,
 ): Promise<string | undefined> => {
+  checkAborted(signal, `chapter ${chapter} rewrite`);
   if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
     logger.info("✅ Already rewritten for chapter " + chapter);
     return readBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY);
@@ -269,12 +296,13 @@ export const identifyAndRewriteParagraphs = async (
       charactersForChapter,
       paragraphsFromChapter,
       sectionAttributes,
+      signal,
     );
   }
 
   // Original single-shot processing for shorter chapters
   if (attempt > 0) {
-    await sleep(10000 * attempt * attempt);
+    await abortableSleep(10000 * attempt * attempt, signal);
   }
   if (attempt > 4) {
     logger.error("❌ Too many attempts for chapter " + chapter);
@@ -298,13 +326,20 @@ export const identifyAndRewriteParagraphs = async (
 
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-gemini2.md`, compiledPrompt);
 
-  const llmProviders = [callGeminiWrapper, callGeminiWrapper, callGrok, callGpt5];
+  const llmProviders = [callGeminiWrapper, callGeminiVertexWrapper, callGrok, callGpt5];
 
   try {
+    checkAborted(signal, `chapter ${chapter} before provider call`);
     const selectedProvider = llmProviders[attempt % llmProviders.length];
     logger.info("Using provider: " + selectedProvider.name);
     writeBookFile(`original-paragraphs-for-chapter-${chapter}.xml`, paragraphsForPage);
-    const response = (await selectedProvider(compiledPrompt, undefined, 1)) as string;
+    const geminiReminder = `\n This is your ${attempt + 1}th attempt. That means you failed previous one. Make sure to output valid html.`;
+
+    const response = (await selectedProvider(
+      `${compiledPrompt} ${attempt === 1 ? geminiReminder : ""}`,
+      undefined,
+      1,
+    )) as string;
     logger.info(
       "identify entities for paragraph response for chapter " + chapter,
       response.slice(0, 50),
@@ -355,12 +390,15 @@ export const identifyAndRewriteParagraphs = async (
       );
 
       logger.info("❌ Changes to paragraphs for chapter " + chapter);
-      return identifyAndRewriteParagraphs(chapter, charactersForChapter, attempt + 1);
+      return identifyAndRewriteParagraphs(chapter, charactersForChapter, attempt + 1, signal);
     }
     return response;
   } catch (e) {
+    if (isAbortError(e)) {
+      throw e;
+    }
     logger.error("Error for chapter " + chapter, e);
-    return identifyAndRewriteParagraphs(chapter, charactersForChapter, attempt + 1);
+    return identifyAndRewriteParagraphs(chapter, charactersForChapter, attempt + 1, signal);
   }
 };
 
@@ -375,7 +413,9 @@ interface ChapterData {
 
 export const identifyCharactersAndRewriteParagraphs = async (
   referenceCards: NewReferenceCardsResponse,
+  signal?: AbortSignal,
 ) => {
+  checkAborted(signal, "identifyCharactersAndRewriteParagraphs start");
   const bookSettings = getBookSettings();
 
   const charactersForChapter = referenceCards.characters
@@ -429,24 +469,27 @@ export const identifyCharactersAndRewriteParagraphs = async (
 
   // Process simple chapters in parallel (no chunking needed)
   const simplePromises = simpleChapters.map((data) =>
-    identifyAndRewriteParagraphs(data.chapter, charactersForChapter),
+    identifyAndRewriteParagraphs(data.chapter, charactersForChapter, 0, signal),
   );
 
   // PHASE 1: Process all chunk 0s AND chunk 1s in parallel
   // Chunk 1 gets RAW chunk 0 text as context (not tagged output)
   const phase1Promises: Promise<string>[] = [];
   for (const data of chunkedChapters) {
+    checkAborted(signal, `queue phase 1 for chapter ${data.chapter}`);
     const { chapter, chunks } = data;
 
     // Chunk 0 (no context)
     logger.info(`📦 Queueing chapter ${chapter} chunk 0/${chunks.length}`);
-    phase1Promises.push(processChunk(chapter, 0, chunks[0], jsonCharacters, null));
+    phase1Promises.push(processChunk(chapter, 0, chunks[0], jsonCharacters, null, { signal }));
 
     // Chunk 1 (RAW chunk 0 text as context) - if exists
     if (chunks.length > 1) {
       const rawChunk0Context = buildChunkXml(chunks[0].paragraphs);
       logger.info(`📦 Queueing chapter ${chapter} chunk 1/${chunks.length} (with RAW context)`);
-      phase1Promises.push(processChunk(chapter, 1, chunks[1], jsonCharacters, rawChunk0Context));
+      phase1Promises.push(
+        processChunk(chapter, 1, chunks[1], jsonCharacters, rawChunk0Context, { signal }),
+      );
     }
   }
 
@@ -454,6 +497,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
   logger.info(
     `🚀 Phase 1: Running ${phase1Promises.length} chunk tasks + ${simplePromises.length} simple tasks in parallel`,
   );
+  checkAborted(signal, "before phase 1 Promise.all");
   await Promise.all([...phase1Promises, ...simplePromises]);
 
   // PHASE 2+: Process remaining chunks (chunk 2, 3, etc.) using TAGGED previous chunk output
@@ -461,6 +505,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
   let hasMoreChunks = true;
 
   while (hasMoreChunks) {
+    checkAborted(signal, `phase ${currentChunkIndex} loop`);
     const phasePromises: Promise<string>[] = [];
     hasMoreChunks = false;
 
@@ -468,6 +513,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
       const { chapter, chunks } = data;
 
       if (chunks.length > currentChunkIndex) {
+        checkAborted(signal, `queue chapter ${chapter} chunk ${currentChunkIndex}`);
         hasMoreChunks = true;
         // Get TAGGED output from previous chunk
         const taggedPreviousChunk = readBookFile(
@@ -484,6 +530,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
             chunks[currentChunkIndex],
             jsonCharacters,
             taggedPreviousChunk,
+            { signal },
           ),
         );
       }
@@ -493,6 +540,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
       logger.info(
         `🚀 Phase ${currentChunkIndex}: Running ${phasePromises.length} chunk tasks in parallel`,
       );
+      checkAborted(signal, `before phase ${currentChunkIndex} Promise.all`);
       await Promise.all(phasePromises);
     }
 
@@ -501,6 +549,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
 
   // Combine all chunks for each chunked chapter
   for (const data of chunkedChapters) {
+    checkAborted(signal, `combine chapter ${data.chapter}`);
     const { chapter, chunks, sectionAttributes } = data;
 
     // Check if already combined

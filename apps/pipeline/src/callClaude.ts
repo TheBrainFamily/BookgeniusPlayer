@@ -53,6 +53,21 @@ export const callGeminiWrapper = async <T>(
   return result;
 };
 
+export const callGeminiVertexWrapper = async <T>(
+  prompt: string,
+  schema?: z.ZodSchema<T>,
+  maxRetries = 5,
+) => {
+  const result = await callClaudeInternal(prompt, schema, {
+    maxRetries,
+    thinkingTokens: 1024,
+    useGemini: true,
+    useGeminiThinking: true,
+    preferVertex: true,
+  });
+  return result;
+};
+
 const DEBUG = false;
 /**
  * Call a Large Language Model with optional schema validation and automatic retry
@@ -62,24 +77,35 @@ const DEBUG = false;
  * @returns The LLM response, either as a string or parsed according to the provided schema
  */
 
-export const callClaude = async <T = string>(
+const callClaudeInternal = async <T = string>(
   prompt: string,
   schema?: z.ZodSchema<T>,
-  maxRetries = 5,
-  thinkingTokens = 1024 * 10,
-  useGemini = false,
-  useGeminiThinking = true,
+  options: {
+    maxRetries?: number;
+    thinkingTokens?: number;
+    useGemini?: boolean;
+    useGeminiThinking?: boolean;
+    preferVertex?: boolean;
+  } = {},
   // eslint-disable-next-line complexity -- multi-provider retry with fallback logic; refactor pending
 ) => {
+  const {
+    maxRetries = 5,
+    thinkingTokens = 1024 * 10,
+    useGemini = false,
+    useGeminiThinking = true,
+    preferVertex = false,
+  } = options;
+
   let lastError: unknown;
   let attempts = 0;
   const maxAttempts = maxRetries + 1; // First attempt + retries
 
   let model: string = "claude";
   if (useGemini) {
-    model = "gemini";
+    model = preferVertex ? "gemini-vertex" : "gemini";
     if (useGeminiThinking) {
-      model = "gemini-thinking";
+      model = preferVertex ? "gemini-vertex-thinking" : "gemini-thinking";
     }
   }
   // TODO PINGWING when failed with "exception TypeError: fetch failed sending request","stack":"Error: exception TypeError: fetch failed sending reques" we shouldn't retry
@@ -106,14 +132,19 @@ export const callClaude = async <T = string>(
           DEBUG ? { prompt } : undefined,
         );
         if (schema) {
-          const extracted = await callGeminiWithThinkingAndSchemaAndParsed(prompt, schema);
+          const extracted = await callGeminiWithThinkingAndSchemaAndParsed(
+            prompt,
+            schema,
+            undefined,
+            { preferVertex },
+          );
           logger.success(`Received structured response for prompt: ${prompt.substring(0, 50)}`, {
             response: extracted,
             prompt,
           });
           return extracted;
         } else {
-          replyText = await callGeminiWithThinking(prompt);
+          replyText = await callGeminiWithThinking(prompt, { preferVertex });
         }
       } else {
         logger.debug(
@@ -182,6 +213,22 @@ export const callClaude = async <T = string>(
   // This should never be reached due to the throw in the catch block,
   // but TypeScript requires a return statement
   throw lastError;
+};
+
+export const callClaude = async <T = string>(
+  prompt: string,
+  schema?: z.ZodSchema<T>,
+  maxRetries = 5,
+  thinkingTokens = 1024 * 10,
+  useGemini = false,
+  useGeminiThinking = true,
+) => {
+  return callClaudeInternal(prompt, schema, {
+    maxRetries,
+    thinkingTokens,
+    useGemini,
+    useGeminiThinking,
+  });
 };
 
 const doIt = async () => {
