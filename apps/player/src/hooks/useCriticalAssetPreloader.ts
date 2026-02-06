@@ -13,6 +13,7 @@ import { useBookConvex } from "@player/context/BookConvexContext";
 import { dealWithBackground } from "@player/ui/background";
 import { initializeReadingPosition } from "@player/services/initializeReadingPosition";
 import { type ExtendedLocation } from "@player/helpers/paragraphsNavigation";
+import { getChapterWindowAround } from "@player/logic/virtualizationWindow";
 
 export function useCriticalAssetPreloader() {
   const [readingPosition, setReadingPosition] = useState<ExtendedLocation | null>(null);
@@ -39,7 +40,7 @@ export function useCriticalAssetPreloader() {
     chapterPreloadStartedRef.current = true;
 
     const startChapter = readingPosition.currentChapter ?? readingPosition.chapter ?? 1;
-    const requested = [startChapter - 1, startChapter, startChapter + 1];
+    const requested = getChapterWindowAround(startChapter);
     void ensureCompiledChaptersLoaded(requested);
   }, [isLoading, readingPosition, ensureCompiledChaptersLoaded]);
 

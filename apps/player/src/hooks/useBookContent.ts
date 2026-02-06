@@ -21,6 +21,7 @@ import {
   updateMountedChaptersInPlace,
 } from "@player/logic/BookContentVirtualizer";
 import { bookIndex } from "@player/logic/BookIndex";
+import { getChapterWindowAround } from "@player/logic/virtualizationWindow";
 import { openPlayRowCharacterModal } from "@player/ui/activateMediaInRange";
 import { scrollCoordinator } from "@player/services/ScrollCoordinator";
 import { useBookForm } from "@player/hooks/useBookForm";
@@ -68,7 +69,7 @@ export function useBookContent() {
 
   useEffect(() => {
     if (typeof currentChapter !== "number") return;
-    const requested = [currentChapter - 1, currentChapter, currentChapter + 1];
+    const requested = getChapterWindowAround(currentChapter);
     void ensureCompiledChaptersLoaded(requested);
   }, [currentChapter, ensureCompiledChaptersLoaded]);
 

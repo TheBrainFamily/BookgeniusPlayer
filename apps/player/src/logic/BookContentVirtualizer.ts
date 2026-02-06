@@ -1,4 +1,5 @@
 import { bookIndex } from "@player/logic/BookIndex";
+import { getVirtualizationWindowRadius } from "@player/logic/virtualizationWindow";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
 import { hydrateInlineAvatarsInSection } from "@player/ui/activateMediaInRange";
 import { highlightCharacter } from "@player/ui/highlightCharacter";
@@ -269,7 +270,11 @@ class ChapterVirtualizer {
   }
 
   private computeDesiredWindow(targetChapter: number): number[] {
-    const candidates = [targetChapter - 1, targetChapter, targetChapter + 1];
+    const radius = getVirtualizationWindowRadius();
+    const candidates: number[] = [];
+    for (let chapterId = targetChapter - radius; chapterId <= targetChapter + radius; chapterId++) {
+      candidates.push(chapterId);
+    }
     return candidates.filter((id) => bookIndex.hasChapter(id)).sort((a, b) => a - b);
   }
 
