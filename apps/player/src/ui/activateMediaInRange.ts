@@ -712,7 +712,6 @@ export const openPlayRowCharacterModal = (
 };
 
 export function hydrateInlineAvatarsInSection(section: HTMLElement): void {
-  console.log("getCharactersData", getCharactersData());
   const charactersBySlug = new Map(getCharactersData().map((c) => [c.slug, c]));
   const genericCharacter = charactersBySlug.get("generic-avatar");
   const chapterAttr = section.dataset.chapter;
