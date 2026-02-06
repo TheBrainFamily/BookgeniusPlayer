@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { JSDOM } from "jsdom";
+import { extractSENotesFromXhtml, rewriteSeNoteRefsToDataNote, type SENote } from "./notes";
 
 export interface SEImageReference {
   /** Original filename (e.g., "illustration-1.svg") */
@@ -17,6 +18,8 @@ export interface SEConversionResult {
   lastChapter: number;
   /** List of images referenced in the book content */
   images: SEImageReference[];
+  /** Extracted endnotes/footnotes keyed as fnN */
+  notes: SENote[];
 }
 
 // Files to skip - these are not actual book content
@@ -99,6 +102,76 @@ function htmlToValidXml(html: string): string {
     .replace(/\s+(ns\d+|epub):type="([^"]*)"/gi, ' data-epub-type="$2"')
     .replace(/\s+(ns\d+|epub):[a-z-]+="[^"]*"/gi, "")
     .replace(/<(\/?)(ns\d+|epub):([a-z-]+)/gi, "<$1$3");
+}
+
+function normalizeTextForComparison(text: string): string {
+  return text.toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function extractNormalizedTextFromXhtml(content: string): string {
+  const dom = new JSDOM(content, { contentType: "application/xhtml+xml" });
+  const body = dom.window.document.body;
+  const text = body?.textContent || "";
+  return normalizeTextForComparison(text);
+}
+
+function extractNormalizedTextFromHtml(html: string): string {
+  const dom = new JSDOM(html);
+  const body = dom.window.document.body;
+  const text = body?.textContent || "";
+  return normalizeTextForComparison(text);
+}
+
+function countWords(text: string): number {
+  if (!text) return 0;
+  return text.split(" ").filter(Boolean).length;
+}
+
+export function assertSeConversionTextCoverage(
+  sourceFiles: { filename: string; content: string }[],
+  convertedHtml: string,
+  options: { minRatio?: number; maxRatio?: number; minWords?: number; sampleWords?: number } = {},
+): void {
+  const minRatio = options.minRatio ?? 0.995;
+  const maxRatio = options.maxRatio ?? 1.1;
+  const minWords = options.minWords ?? 200;
+  const sampleWords = options.sampleWords ?? 24;
+
+  const sourceText = normalizeTextForComparison(
+    sourceFiles.map((file) => extractNormalizedTextFromXhtml(file.content)).join(" "),
+  );
+  const outputText = extractNormalizedTextFromHtml(convertedHtml);
+
+  const sourceWords = countWords(sourceText);
+  const outputWords = countWords(outputText);
+
+  if (sourceWords < minWords) {
+    return;
+  }
+
+  if (outputWords === 0) {
+    throw new Error(
+      `SE conversion text check failed: output words 0 vs input ${sourceWords} (ratio 0.000).`,
+    );
+  }
+
+  const ratio = outputWords / Math.max(1, sourceWords);
+  if (ratio >= minRatio && ratio <= maxRatio) return;
+
+  const tokens = sourceText.split(" ").filter(Boolean);
+  const headSample = tokens.slice(0, sampleWords).join(" ");
+  const tailSample = tokens.slice(-sampleWords).join(" ");
+  const headFound = headSample ? outputText.includes(headSample) : true;
+  const tailFound = tailSample ? outputText.includes(tailSample) : true;
+
+  const headSnippet = headSample.slice(0, 120);
+  const tailSnippet = tailSample.slice(0, 120);
+
+  throw new Error(
+    `SE conversion text check failed: output words ${outputWords} vs input ${sourceWords} (ratio ${ratio.toFixed(3)}). ` +
+      `headFound=${headFound}, tailFound=${tailFound}. ` +
+      `headSample="${headSnippet}..." tailSample="${tailSnippet}..."`,
+  );
 }
 
 function slugify(name: string): string {
@@ -301,7 +374,8 @@ function convertDramaTablesToPlayFormat(doc: Document): void {
 }
 
 // eslint-disable-next-line complexity
-function extractChaptersFromFile(
+function extractChaptersFromElement(
+  container: Element,
   file: { filename: string; content: string },
   startChapter: number,
 ): {
@@ -309,22 +383,15 @@ function extractChaptersFromFile(
   htmlParts: string[];
   nextChapter: number;
 } {
-  const dom = new JSDOM(file.content, { contentType: "application/xhtml+xml" });
-  const doc = dom.window.document;
-  const body = doc.querySelector("body");
-
-  if (!body) return { chapters: [], htmlParts: [], nextChapter: startChapter };
-
-  const article = body.querySelector("article, section") || body;
-  const chapterFormat = detectChapterFormat(article as Element);
+  const chapterFormat = detectChapterFormat(container);
 
   if (chapterFormat === "play") {
-    convertDramaTablesToPlayFormat(doc);
+    convertDramaTablesToPlayFormat(container.ownerDocument);
   } else {
-    annotateDramaTables(doc);
+    annotateDramaTables(container.ownerDocument);
   }
 
-  const allNestedSections = article.querySelectorAll(
+  const allNestedSections = container.querySelectorAll(
     ":scope > section[data-epub-type], :scope > section[epub\\:type]",
   );
   const nestedChapterSections = Array.from(allNestedSections).filter((section) => {
@@ -338,13 +405,13 @@ function extractChaptersFromFile(
   let chapterCounter = startChapter;
 
   if (nestedChapterSections.length > 0) {
-    const mainTitleEl = article.querySelector(
+    const mainTitleEl = container.querySelector(
       ":scope > h1, :scope > h2, :scope > header h1, :scope > header h2",
     );
     const mainTitle = mainTitleEl ? extractTextContent(mainTitleEl) : null;
 
     const preambleNodes: Node[] = [];
-    for (const child of Array.from(article.childNodes)) {
+    for (const child of Array.from(container.childNodes)) {
       if (child.nodeType === 1 && (child as Element).tagName?.toLowerCase() === "section") break;
       preambleNodes.push(child);
     }
@@ -392,14 +459,14 @@ function extractChaptersFromFile(
       chapterCounter++;
     }
   } else {
-    const titleEl = article.querySelector("h1, h2, header h1, header h2");
+    const titleEl = container.querySelector("h1, h2, header h1, header h2");
     const title = titleEl ? extractTextContent(titleEl) : file.filename.replace(".xhtml", "");
 
-    const innerHTML = htmlToValidXml(article.innerHTML);
+    const innerHTML = htmlToValidXml(container.innerHTML);
     // Preserve article/section-level epub:type for CSS targeting (dedication, epigraph, etc.)
-    const articleEpubType =
-      article.getAttribute("epub:type") || article.getAttribute("data-epub-type") || "";
-    const epubTypeAttr = articleEpubType ? ` data-epub-type="${articleEpubType}"` : "";
+    const containerEpubType =
+      container.getAttribute("epub:type") || container.getAttribute("data-epub-type") || "";
+    const epubTypeAttr = containerEpubType ? ` data-epub-type="${containerEpubType}"` : "";
     const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
     htmlParts.push(
       `<section data-chapter="${chapterCounter}"${formatAttr}${epubTypeAttr}>\n${innerHTML}\n</section>`,
@@ -408,9 +475,44 @@ function extractChaptersFromFile(
     chapters.push({
       number: chapterCounter,
       title: escapeXml(title),
-      content: escapeXml(extractTextContent(article).substring(0, 500)),
+      content: escapeXml(extractTextContent(container).substring(0, 500)),
     });
     chapterCounter++;
+  }
+
+  return { chapters, htmlParts, nextChapter: chapterCounter };
+}
+
+function extractChaptersFromFile(
+  file: { filename: string; content: string },
+  startChapter: number,
+): {
+  chapters: { number: number; title: string; content: string }[];
+  htmlParts: string[];
+  nextChapter: number;
+} {
+  const dom = new JSDOM(file.content, { contentType: "application/xhtml+xml" });
+  const doc = dom.window.document;
+  const body = doc.querySelector("body");
+
+  if (!body) return { chapters: [], htmlParts: [], nextChapter: startChapter };
+
+  const topLevelElements = Array.from(body.children).filter((child) => {
+    const tag = child.tagName?.toLowerCase();
+    return tag === "article" || tag === "section";
+  });
+
+  const containers = topLevelElements.length > 0 ? topLevelElements : [body];
+
+  let chapterCounter = startChapter;
+  const chapters: { number: number; title: string; content: string }[] = [];
+  const htmlParts: string[] = [];
+
+  for (const container of containers) {
+    const result = extractChaptersFromElement(container, file, chapterCounter);
+    chapters.push(...result.chapters);
+    htmlParts.push(...result.htmlParts);
+    chapterCounter = result.nextChapter;
   }
 
   return { chapters, htmlParts, nextChapter: chapterCounter };
@@ -471,7 +573,7 @@ export function convertSeXhtmlToHtml(
     )
     .join("\n")}\n</chapters>`;
 
-  return { textHtml, chaptersXml, lastChapter: chapterCounter - 1, images };
+  return { textHtml, chaptersXml, lastChapter: chapterCounter - 1, images, notes: [] };
 }
 
 export async function convertSEBook(
@@ -512,7 +614,28 @@ export async function convertSEBook(
     content: fs.readFileSync(path.join(textDir, filename), "utf-8"),
   }));
 
-  return convertSeXhtmlToHtml(xhtmlFiles, options);
+  const result = convertSeXhtmlToHtml(xhtmlFiles, options);
+
+  // SE notes are typically stored in endnotes.xhtml, with occasional notes.xhtml variants.
+  const noteFiles = ["endnotes.xhtml", "notes.xhtml"];
+  const notesById = new Map<string, string>();
+  for (const noteFilename of noteFiles) {
+    const notePath = path.join(textDir, noteFilename);
+    if (!fs.existsSync(notePath)) continue;
+
+    const extracted = extractSENotesFromXhtml(fs.readFileSync(notePath, "utf-8"));
+    for (const note of extracted) {
+      if (!notesById.has(note.noteId)) {
+        notesById.set(note.noteId, note.content);
+      }
+    }
+  }
+
+  result.notes = Array.from(notesById.entries()).map(([noteId, content]) => ({ noteId, content }));
+  result.textHtml = rewriteSeNoteRefsToDataNote(result.textHtml);
+
+  assertSeConversionTextCoverage(xhtmlFiles, result.textHtml);
+  return result;
 }
 
 /**
@@ -541,6 +664,14 @@ export async function convertAndSaveSEBook(bookSlug: string): Promise<void> {
 
   const richXml = wrapInRichXml(result.textHtml);
   fs.writeFileSync(path.join(inputDir, "rich.xml"), richXml, "utf8");
+
+  const seNotesPath = path.join(inputDir, "se-notes.json");
+  if (result.notes.length > 0) {
+    fs.writeFileSync(seNotesPath, JSON.stringify(result.notes, null, 2), "utf8");
+    console.log(`[SE Converter] ${bookSlug} wrote ${result.notes.length} notes to ${seNotesPath}`);
+  } else if (fs.existsSync(seNotesPath)) {
+    fs.unlinkSync(seNotesPath);
+  }
 
   console.log(`[SE Converter] ${bookSlug} saved to ${inputDir}/rich.xml`);
 }

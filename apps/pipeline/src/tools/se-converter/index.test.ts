@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { convertSeXhtmlToHtml, wrapInRichXml } from "./index";
+import { convertSeXhtmlToHtml, wrapInRichXml, assertSeConversionTextCoverage } from "./index";
 
 describe("SE Converter", () => {
   describe("simple chapters (no nesting)", () => {
@@ -63,6 +63,67 @@ describe("SE Converter", () => {
       expect(result.textHtml).toContain('data-chapter="2"');
       expect(result.textHtml.indexOf("Chapter One")).toBeLessThan(
         result.textHtml.indexOf("Chapter Two"),
+      );
+    });
+
+    it("includes all top-level articles in a single file", () => {
+      const files = [
+        {
+          filename: "poems.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <article id="poem-1" epub:type="z3998:poem">
+      <h2 epub:type="ordinal z3998:roman">I</h2>
+      <p>First poem line.</p>
+    </article>
+    <article id="poem-2" epub:type="z3998:poem">
+      <h2 epub:type="ordinal z3998:roman">II</h2>
+      <p>Second poem line.</p>
+    </article>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.lastChapter).toBe(2);
+      expect(result.textHtml).toContain('data-chapter="1"');
+      expect(result.textHtml).toContain('data-chapter="2"');
+      expect(result.textHtml).toContain("First poem line.");
+      expect(result.textHtml).toContain("Second poem line.");
+      expect(result.textHtml.indexOf("First poem line.")).toBeLessThan(
+        result.textHtml.indexOf("Second poem line."),
+      );
+    });
+  });
+
+  describe("text coverage validation", () => {
+    it("throws when converted HTML drops most of the source text", () => {
+      const files = [
+        {
+          filename: "poems.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <article id="poem-1" epub:type="z3998:poem">
+      <h2>I</h2>
+      <p>First poem line one. First poem line two.</p>
+    </article>
+    <article id="poem-2" epub:type="z3998:poem">
+      <h2>II</h2>
+      <p>Second poem line one. Second poem line two.</p>
+    </article>
+  </body>
+</html>`,
+        },
+      ];
+
+      const truncatedHtml = `<!DOCTYPE html><html><body><section><p>First poem line one.</p></section></body></html>`;
+
+      expect(() => assertSeConversionTextCoverage(files, truncatedHtml, { minWords: 1 })).toThrow(
+        /SE conversion text check failed/,
       );
     });
   });

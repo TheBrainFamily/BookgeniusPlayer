@@ -21,4 +21,10 @@ describe("sanitizeNestedParagraphs", () => {
     const expected = "<p>Start A mid B end</p>";
     expect(sanitizeNestedParagraphs(input)).toBe(expected);
   });
+
+  it("repairs malformed <br <...> sequences by closing the <br> tag", () => {
+    const input = '<p>Line one<br <span class="i1">Indented line</span><br>Next line</p>';
+    const expected = '<p>Line one<br> <span class="i1">Indented line</span><br>Next line</p>';
+    expect(sanitizeNestedParagraphs(input)).toBe(expected);
+  });
 });

@@ -4,7 +4,7 @@ import { type NewReferenceCardsResponse } from "../../types";
 import { NewReferenceCardsResponseSchema } from "../../schemes";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
-import { callGrokWithSchema } from "../../callGrok";
+import { callGeminiWithThinkingAndSchemaAndParsed } from "src/callFastGemini";
 
 export const getReferenceCardsForWholeBook = async (): Promise<NewReferenceCardsResponse> => {
   const booksSettings = getBookSettings();
@@ -52,7 +52,10 @@ ${knownCharactersMapped}\n\n`
 
   console.log("combinedPrompt length:", combinedPrompt.length);
 
-  const response = await callGrokWithSchema(combinedPrompt, NewReferenceCardsResponseSchema);
+  const response = await callGeminiWithThinkingAndSchemaAndParsed(
+    combinedPrompt,
+    NewReferenceCardsResponseSchema,
+  );
 
   // Add synthetic generic-avatar for unknown/minor speakers
   // This will get an avatar generated but won't be passed to the rewrite prompts

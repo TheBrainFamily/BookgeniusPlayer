@@ -70,3 +70,4 @@ claude-agent-sdk-demos
 xcuserdata
 
 apps/pipeline/app.log
+.tmp

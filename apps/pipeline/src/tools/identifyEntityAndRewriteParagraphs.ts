@@ -309,6 +309,10 @@ export const identifyAndRewriteParagraphs = async (
       "identify entities for paragraph response for chapter " + chapter,
       response.slice(0, 50),
     );
+    writeBookFile(
+      `identify-entities-for-paragraph-response-for-chapter-${chapter}-${selectedProvider.name}.raw.txt`,
+      response,
+    );
     const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
 
     let restored = clearedResponse;

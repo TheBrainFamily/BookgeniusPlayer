@@ -10,133 +10,12 @@
 
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
+import { analyzeBook, type BookAnalysis } from "./drama-classifier";
 
 const BOOKS_DIR = join(import.meta.dir, "../../../standardebooks-data/books");
 const OUTPUT_FILE = join(import.meta.dir, "../../../list-of-play-books.txt");
 
 type BookCategory = "FULL_PLAY" | "EMBEDDED_DRAMA" | "DIALOGUE_ONLY";
-
-interface BookAnalysis {
-  slug: string;
-  category: BookCategory;
-  hasDramatisPersonae: boolean;
-  hasActFiles: boolean;
-  hasSceneSections: boolean;
-  hasDramaTables: boolean;
-  actCount: number;
-  dramaTables: number;
-  regularParagraphs: number;
-  notes: string[];
-}
-
-// eslint-disable-next-line complexity
-async function analyzeBook(bookSlug: string): Promise<BookAnalysis | null> {
-  const textDir = join(BOOKS_DIR, bookSlug, "text");
-
-  try {
-    const files = await readdir(textDir);
-    const xhtmlFiles = files.filter((f) => f.endsWith(".xhtml"));
-
-    const analysis: BookAnalysis = {
-      slug: bookSlug,
-      category: "DIALOGUE_ONLY",
-      hasDramatisPersonae: files.includes("dramatis-personae.xhtml"),
-      hasActFiles: files.some((f) => /^act-\d+\.xhtml$/.test(f)),
-      hasSceneSections: false,
-      hasDramaTables: false,
-      actCount: files.filter((f) => /^act-\d+\.xhtml$/.test(f)).length,
-      dramaTables: 0,
-      regularParagraphs: 0,
-      notes: [],
-    };
-
-    let hasAnyDramaContent = false;
-
-    for (const file of xhtmlFiles) {
-      const content = await Bun.file(join(textDir, file)).text();
-
-      // Count drama tables (embedded drama sections)
-      const dramaTableMatches = content.match(/<table[^>]*epub:type="z3998:drama"/g);
-      if (dramaTableMatches) {
-        analysis.dramaTables += dramaTableMatches.length;
-        analysis.hasDramaTables = true;
-        hasAnyDramaContent = true;
-      }
-
-      // Check for scene sections (full play indicator)
-      if (
-        content.includes('epub:type="z3998:scene"') ||
-        content.includes("epub:type='z3998:scene'")
-      ) {
-        analysis.hasSceneSections = true;
-        hasAnyDramaContent = true;
-      }
-
-      // Count regular paragraphs (outside of drama context)
-      // Skip dramatis-personae, endnotes, etc
-      if (
-        ![
-          "dramatis-personae.xhtml",
-          "endnotes.xhtml",
-          "colophon.xhtml",
-          "imprint.xhtml",
-          "titlepage.xhtml",
-          "halftitlepage.xhtml",
-        ].includes(file)
-      ) {
-        const paragraphs = content.match(/<p[^>]*>/g);
-        if (paragraphs) {
-          analysis.regularParagraphs += paragraphs.length;
-        }
-      }
-
-      // Check for stage directions (another indicator)
-      if (content.includes('epub:type="z3998:stage-direction"')) {
-        hasAnyDramaContent = true;
-      }
-    }
-
-    if (!hasAnyDramaContent && !analysis.hasDramatisPersonae && !analysis.hasActFiles) {
-      return null; // Not a drama book
-    }
-
-    // Categorize
-    if (analysis.hasDramatisPersonae && analysis.hasActFiles && analysis.hasSceneSections) {
-      analysis.category = "FULL_PLAY";
-      analysis.notes.push("Classic play structure");
-    } else if (analysis.hasDramatisPersonae && analysis.hasActFiles) {
-      analysis.category = "FULL_PLAY";
-      analysis.notes.push("Has acts and dramatis-personae");
-    } else if (analysis.hasSceneSections && analysis.actCount > 0) {
-      analysis.category = "FULL_PLAY";
-      analysis.notes.push("Scene-based structure");
-    } else if (analysis.hasDramaTables) {
-      // Has <table epub:type="z3998:drama"> embedded in prose
-      if (analysis.regularParagraphs > 100 && analysis.dramaTables < 20) {
-        analysis.category = "EMBEDDED_DRAMA";
-        analysis.notes.push(
-          `${analysis.dramaTables} drama tables in ${analysis.regularParagraphs} paragraphs of prose`,
-        );
-      } else if (analysis.dramaTables > 50) {
-        analysis.category = "FULL_PLAY";
-        analysis.notes.push("Primarily drama tables");
-      } else {
-        analysis.category = "EMBEDDED_DRAMA";
-        analysis.notes.push(`Mixed content: ${analysis.dramaTables} drama sections`);
-      }
-    } else if (analysis.hasDramatisPersonae) {
-      analysis.category = "FULL_PLAY";
-      analysis.notes.push("Has dramatis-personae only");
-    } else {
-      analysis.category = "DIALOGUE_ONLY";
-      analysis.notes.push("Uses persona markup but not structured drama");
-    }
-
-    return analysis;
-  } catch {
-    return null;
-  }
-}
 
 async function findDramaBooks() {
   const bookDirs = await readdir(BOOKS_DIR);
@@ -146,9 +25,9 @@ async function findDramaBooks() {
   const dialogueOnly: BookAnalysis[] = [];
 
   for (const bookSlug of bookDirs) {
-    const analysis = await analyzeBook(bookSlug);
+    const analysis = await analyzeBook(bookSlug, BOOKS_DIR);
     if (analysis) {
-      switch (analysis.category) {
+      switch (analysis.category as BookCategory) {
         case "FULL_PLAY":
           fullPlays.push(analysis);
           break;

@@ -6,6 +6,7 @@ import { Toaster } from "@platform/components/ui/toaster";
 import { Toaster as Sonner } from "@platform/components/ui/sonner";
 import { TooltipProvider } from "@platform/components/ui/tooltip";
 import Index from "./pages/Index";
+import { StandardEbooksPage } from "./pages/StandardEbooksPage";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import AuthComponentsWrapper from "./pages/AuthComponentsWrapper";
@@ -45,6 +46,7 @@ const AppWithAuth = () => {
           <SnapplifyChat />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/standard-ebooks" element={<StandardEbooksPage />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/experience/:slug" element={<BookExperience />} />
             <Route path="/GenreExploration" element={<GenreExploration />} />

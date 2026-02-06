@@ -52,6 +52,7 @@ import {
   setStyleChoice,
 } from "./style-selection";
 import { STEP_DEPENDENCIES, getReadySteps, createSchedulerState } from "./parallel-scheduler";
+import { buildNotesToUploadFromNoteMap, normalizeNoteRefId } from "./notes-import";
 
 export type StyleSelectionCallback = {
   onUserStyleSubmitted?: (userStyle: GraphicalStyle | null) => void;
@@ -216,7 +217,7 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
         folderPath: `${job.bookPath}/chapters-source`,
         basename,
         content,
-        contentType: "application/html",
+        contentType: "text/html",
       });
       await convex.updateChapterMetadata({
         bookPath: job.bookPath,
@@ -359,81 +360,70 @@ async function uploadBackgroundsToConvex(job: Job, outputDir: string) {
 
 // eslint-disable-next-line complexity
 async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
-  const fb2Path = findFb2FilePath(inputDir);
-  if (!fb2Path) {
-    addLog(job, `⚠ No FB2 file found, skipping notes extraction`);
-    return;
-  }
-
   const richXmlPath = path.join(inputDir, "rich.xml");
   if (!fs.existsSync(richXmlPath)) {
     addLog(job, `⚠ No rich.xml found, skipping notes extraction`);
     return;
   }
 
-  const fb2Content = fs.readFileSync(fb2Path, "utf-8");
-  const fb2Doc = parseFb2Xml(fb2Content);
-  const notesBody = fb2Doc.querySelector("body[name='notes']");
+  const noteMap = new Map<string, string>();
+  const fb2Path = findFb2FilePath(inputDir);
+  if (fb2Path) {
+    const fb2Content = fs.readFileSync(fb2Path, "utf-8");
+    const fb2Doc = parseFb2Xml(fb2Content);
+    const notesBody = fb2Doc.querySelector("body[name='notes']");
 
-  if (!notesBody) {
-    addLog(job, `No notes section found in FB2`);
-    return;
+    if (!notesBody) {
+      addLog(job, `No notes section found in FB2`);
+    } else {
+      const sections = notesBody.querySelectorAll("section");
+      for (const section of Array.from(sections)) {
+        const id = section.getAttribute("id");
+        const normalizedId = id ? normalizeNoteRefId(id) : null;
+        const content =
+          section
+            .querySelector("p")
+            ?.innerHTML?.replace(' xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"', "") || "";
+        if (normalizedId && content) {
+          noteMap.set(normalizedId, content);
+        }
+      }
+    }
+  } else {
+    addLog(job, `⚠ No FB2 file found, trying Standard Ebooks notes fallback`);
   }
 
-  const sections = notesBody.querySelectorAll("section");
-  const noteMap = new Map<string, string>();
-
-  for (const section of Array.from(sections)) {
-    const id = section.getAttribute("id");
-    const content =
-      section
-        .querySelector("p")
-        ?.innerHTML?.replace(' xmlns="http://www.gribuser.ru/xml/fictionbook/2.0"', "") || "";
-    if (id && content) {
-      noteMap.set(id, content);
+  if (noteMap.size === 0) {
+    const seNotesPath = path.join(inputDir, "se-notes.json");
+    if (fs.existsSync(seNotesPath)) {
+      try {
+        const seNotes = JSON.parse(fs.readFileSync(seNotesPath, "utf-8")) as {
+          noteId: string;
+          content: string;
+        }[];
+        for (const note of seNotes) {
+          const normalizedId = normalizeNoteRefId(note.noteId);
+          if (normalizedId && note.content) {
+            noteMap.set(normalizedId, note.content);
+          }
+        }
+        if (noteMap.size > 0) {
+          addLog(job, `Found ${noteMap.size} notes in se-notes.json`);
+        }
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        addLog(job, `⚠ Failed to parse se-notes.json: ${msg}`);
+      }
     }
   }
 
   if (noteMap.size === 0) {
-    addLog(job, `No notes found in FB2`);
+    addLog(job, `No notes found in available note sources`);
     return;
   }
 
-  addLog(job, `Found ${noteMap.size} notes in FB2`);
-
   const richXml = fs.readFileSync(richXmlPath, "utf-8");
-  const notesToUpload: { bookPath: string; noteId: string; content: string; chapter: number }[] =
-    [];
-  const usedNoteIds = new Set<string>();
-
-  // Regex: match <section data-chapter="N"> and capture chapter content until next section or end
-  const chapterRegex =
-    /<section[^>]*data-chapter="(\d+)"[^>]*>([\s\S]*?)(?=<section[^>]*data-chapter="|$)/g;
-  // Match both <note id="X"> and <a data-note="X"> formats
-  const noteRefRegex = /(?:<note\s+id=['"]([^'"]+)['"]|<a\s+data-note=['"]([^'"]+)['"])/g;
-
-  let chapterMatch;
-  while ((chapterMatch = chapterRegex.exec(richXml)) !== null) {
-    const chapterNum = parseInt(chapterMatch[1], 10);
-    const chapterContent = chapterMatch[2];
-
-    let noteMatch;
-    while ((noteMatch = noteRefRegex.exec(chapterContent)) !== null) {
-      const noteId = noteMatch[1] || noteMatch[2];
-      const fb2NoteId = noteId.startsWith("fn") ? noteId : `fn${noteId}`;
-      const lookupId = noteMap.has(fb2NoteId) ? fb2NoteId : noteId;
-
-      if (noteMap.has(lookupId) && !usedNoteIds.has(lookupId)) {
-        notesToUpload.push({
-          bookPath: job.bookPath,
-          noteId: fb2NoteId,
-          content: noteMap.get(lookupId)!,
-          chapter: chapterNum,
-        });
-        usedNoteIds.add(lookupId);
-      }
-    }
-  }
+  const notesToUpload = buildNotesToUploadFromNoteMap({ bookPath: job.bookPath, richXml, noteMap });
 
   if (notesToUpload.length === 0) {
     addLog(job, `No note references found in chapters`);
@@ -444,6 +434,7 @@ async function extractAndUploadNotesToConvex(job: Job, inputDir: string) {
     await convex.uploadNotes({ notes: notesToUpload });
     addLog(job, `✔ Uploaded ${notesToUpload.length} notes to Convex`);
 
+    const usedNoteIds = new Set(notesToUpload.map((n) => n.noteId));
     const orphaned = noteMap.size - usedNoteIds.size;
     if (orphaned > 0) {
       addLog(job, `⚠ ${orphaned} notes not referenced in any chapter`);

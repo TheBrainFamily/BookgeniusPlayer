@@ -1,4 +1,5 @@
 export function sanitizeNestedParagraphs(html: string): string {
+  html = html.replace(/<br\s+(?=<)/gi, "<br> ");
   let depth = 0;
   let out = "";
   let i = 0;
