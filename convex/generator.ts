@@ -7,6 +7,7 @@ const PIPELINE_STEPS = [
   "create_settings",
   "upload_figures",
   "generate_reference_cards",
+  "generate_character_roles",
   "rewrite_paragraphs",
   "generate_graphical_style",
   "generate_backgrounds",
@@ -270,9 +271,10 @@ export const ensureCharacterFolder = adminMutation({
     characterSlug: v.string(),
     displayName: v.string(),
     summary: v.optional(v.string()),
+    role: v.optional(v.string()),
     aiPrompt: v.optional(v.string()),
   },
-  handler: async (ctx, { bookPath, characterSlug, displayName, summary, aiPrompt }) => {
+  handler: async (ctx, { bookPath, characterSlug, displayName, summary, role, aiPrompt }) => {
     const characterPath = `${bookPath}/characters/${characterSlug}`;
 
     try {
@@ -294,6 +296,7 @@ export const ensureCharacterFolder = adminMutation({
       await ctx.db.patch(existing._id, {
         displayName: displayName ?? existing.displayName,
         summary: summary ?? existing.summary,
+        role: role ?? existing.role,
         aiPrompt: aiPrompt ?? existing.aiPrompt,
         avatarGenerationState: existing.avatarGenerationState ?? "none",
         updatedAt: now,
@@ -305,6 +308,7 @@ export const ensureCharacterFolder = adminMutation({
         slug: characterSlug,
         displayName,
         summary: summary || "",
+        role,
         aiPrompt,
         avatarGenerationState: "none",
         createdAt: now,

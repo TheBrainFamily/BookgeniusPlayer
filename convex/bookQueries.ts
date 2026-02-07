@@ -113,6 +113,7 @@ export const listCharacters = publicQuery({
       metadata: {
         displayName: character.displayName,
         summary: character.summary,
+        role: character.role,
         aiPrompt: character.aiPrompt,
         avatarGenerationState: character.avatarGenerationState,
         avatarProposalUrls: character.avatarProposalUrls,
@@ -152,6 +153,7 @@ export const getCharacterBundle = publicQuery({
       metadata: {
         displayName: string;
         summary: string;
+        role?: string;
         aiPrompt?: string;
         avatarGenerationState?: "generating" | "ready" | "error" | "none";
         avatarProposalUrls?: string[];
@@ -167,6 +169,7 @@ export const getCharacterBundle = publicQuery({
       metadata: {
         displayName: character.displayName,
         summary: character.summary,
+        role: character.role,
         aiPrompt: character.aiPrompt,
         avatarGenerationState: character.avatarGenerationState ?? undefined,
         avatarProposalUrls: character.avatarProposalUrls ?? undefined,
@@ -501,6 +504,7 @@ export const listCharacterBundles = publicQuery({
         metadata: {
           displayName: string;
           summary: string;
+          role?: string;
           aiPrompt?: string;
           avatarGenerationState?: "generating" | "ready" | "error" | "none";
           avatarProposalUrls?: string[];
@@ -516,6 +520,7 @@ export const listCharacterBundles = publicQuery({
         metadata: {
           displayName: meta?.displayName ?? folder.name ?? folder.path.split("/").pop()!,
           summary: meta?.summary ?? "",
+          role: meta?.role,
           aiPrompt: meta?.aiPrompt,
           avatarGenerationState: meta?.avatarGenerationState,
           avatarProposalUrls: meta?.avatarProposalUrls,

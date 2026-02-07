@@ -28,6 +28,7 @@ export interface AssetInfo {
 export interface CharacterMetadata {
   displayName?: string;
   summary?: string;
+  role?: string;
   aiPrompt?: string;
   avatarGenerationState?: "generating" | "ready" | "error" | "none";
   avatarProposalUrls?: string[];

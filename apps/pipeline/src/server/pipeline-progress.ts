@@ -24,6 +24,7 @@ const STEP_ORDER: Step[] = [
   "create_settings",
   "upload_figures",
   "generate_reference_cards",
+  "generate_character_roles",
   "rewrite_paragraphs",
   "generate_graphical_style",
   "generate_picture_prompts",

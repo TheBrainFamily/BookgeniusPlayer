@@ -18,6 +18,10 @@ import {
   generatePicturesForEntities,
   generatePicturePrompts,
 } from "../../src/tools/new-tooling/generate-pictures-for-entities";
+import {
+  generateRolesAndRemoveSpoilersFromSummaries,
+  type CharacterRoleCleanupResponse,
+} from "../../src/tools/new-tooling/generate-roles-and-remove-spoilers-from-summaries";
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import type { NewReferenceCardsResponse } from "../../src/types";
 import {
@@ -53,6 +57,11 @@ import {
 import { STEP_DEPENDENCIES, getReadySteps, createSchedulerState } from "./parallel-scheduler";
 import { buildNotesToUploadFromNoteMap, normalizeNoteRefId } from "./notes-import";
 import { isAbortError } from "../../src/helpers/abortHelpers";
+import {
+  buildCleanedCharacterSummaryMap,
+  resolveCharacterMetadataForUpload,
+  type CleanedCharacterSummary,
+} from "./character-metadata-cleanup";
 
 export type StyleSelectionCallback = {
   onUserStyleSubmitted?: (userStyle: GraphicalStyle | null) => void;
@@ -246,12 +255,30 @@ async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
   }
 }
 
+function loadCleanedCharacterSummaryMap(): Map<string, CleanedCharacterSummary> {
+  const fileName = "single-summary-per-person-roles.json";
+  const filePath = getFilePath(fileName, FILE_TYPE.PERMANENT);
+  if (!fs.existsSync(filePath)) {
+    return new Map();
+  }
+
+  try {
+    const parsed = JSON.parse(
+      readBookFile(fileName, FILE_TYPE.PERMANENT),
+    ) as CharacterRoleCleanupResponse;
+    return buildCleanedCharacterSummaryMap(parsed);
+  } catch {
+    return new Map();
+  }
+}
+
 async function uploadCharactersToConvex(
   job: Job,
   referenceCards: NewReferenceCardsResponse,
   outputDir: string,
   tempOutputDir: string,
 ) {
+  const cleanedSummariesBySlug = loadCleanedCharacterSummaryMap();
   const generatedPromptsPath = path.join(tempOutputDir, "generated-prompts.json");
   let generatedPrompts: { characters: { name: string; visualGuide: string }[] } = {
     characters: [],
@@ -285,12 +312,14 @@ async function uploadCharactersToConvex(
       (p) => generateTagName(p.name).toLowerCase() === characterSlug,
     );
     const aiPrompt = promptEntry?.visualGuide;
+    const resolvedMetadata = resolveCharacterMetadataForUpload(character, cleanedSummariesBySlug);
 
     await convex.ensureCharacterFolder({
       bookPath: job.bookPath,
       characterSlug,
       displayName: character.name,
-      summary: character.referenceCard,
+      summary: resolvedMetadata.summary,
+      role: resolvedMetadata.role,
       aiPrompt,
     });
 
@@ -676,6 +705,28 @@ export async function startPipeline(input: {
             addLog(job, `⚠ Failed to create character folder for ${character.name}: ${e.message}`);
           });
       }
+    },
+
+    generate_character_roles: async () => {
+      setBookArg(slug);
+      const fileName = "single-summary-per-person-roles.json";
+      const filePath = getFilePath(fileName, FILE_TYPE.PERMANENT);
+
+      let cleaned: CharacterRoleCleanupResponse;
+      if (fs.existsSync(filePath)) {
+        cleaned = JSON.parse(
+          readBookFile(fileName, FILE_TYPE.PERMANENT),
+        ) as CharacterRoleCleanupResponse;
+        addLog(job, "Using existing spoiler-cleaned character summaries");
+      } else {
+        cleaned = await generateRolesAndRemoveSpoilersFromSummaries();
+        writeBookFile(fileName, JSON.stringify(cleaned, null, 2), FILE_TYPE.PERMANENT);
+      }
+
+      addLog(
+        job,
+        `Generated cleaned summaries and roles for ${cleaned.characters.length} characters`,
+      );
     },
 
     rewrite_paragraphs: async () => {

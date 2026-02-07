@@ -546,6 +546,19 @@ describe("mergeV2ToCharacterData", () => {
     expect(result[0].infoPerChapter[0].summary).toBe("Mysterious girl");
     expect(result[0].infoPerChapter[1].summary).toBe("Winston's lover");
   });
+
+  it("preserves role on merged character data", () => {
+    const index: CharacterIndex = {
+      form: "prose",
+      characters: { winston: { name: "Winston Smith", summary: "A clerk", role: "State Clerk" } },
+    };
+
+    const chapters: Record<number, ChapterOccurrences> = { 1: { winston: { s: [1], t: [] } } };
+
+    const result = mergeV2ToCharacterData(index, chapters, "1984");
+
+    expect(result[0].role).toBe("State Clerk");
+  });
 });
 
 describe("buildCharacterIndex", () => {
@@ -555,6 +568,7 @@ describe("buildCharacterIndex", () => {
         slug: "winston",
         name: "Winston Smith",
         summary: "A clerk at the Ministry",
+        role: "State Clerk",
         media: { avatarUrl: "avatar.png", speaksUrl: "speaks.mp4" },
       },
       { slug: "julia", name: "Julia", summary: "Winston's lover" },
@@ -567,6 +581,7 @@ describe("buildCharacterIndex", () => {
     expect(index.characters["winston"]).toEqual({
       name: "Winston Smith",
       summary: "A clerk at the Ministry",
+      role: "State Clerk",
       media: { avatarUrl: "avatar.png", speaksUrl: "speaks.mp4" },
     });
     expect(index.characters["julia"]).toEqual({

@@ -7,6 +7,7 @@ export const STEP_DEPENDENCIES: StepDependency[] = [
   { step: "create_settings", deps: ["import_epub"] },
   { step: "upload_figures", deps: ["create_settings"] },
   { step: "generate_reference_cards", deps: ["create_settings"] },
+  { step: "generate_character_roles", deps: ["generate_reference_cards"] },
   { step: "rewrite_paragraphs", deps: ["generate_reference_cards"] },
   { step: "generate_graphical_style", deps: ["create_settings"] },
   { step: "generate_picture_prompts", deps: ["generate_reference_cards"] },
@@ -16,7 +17,7 @@ export const STEP_DEPENDENCIES: StepDependency[] = [
   { step: "generate_backgrounds", deps: ["generate_graphical_style"] },
   {
     step: "generate_entity_pictures",
-    deps: ["generate_graphical_style", "generate_picture_prompts"],
+    deps: ["generate_graphical_style", "generate_picture_prompts", "generate_character_roles"],
   },
 ];
 

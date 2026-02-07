@@ -125,9 +125,10 @@ export const updateCharacterMetadata = adminMutation({
     characterSlug: v.string(),
     displayName: v.optional(v.string()),
     summary: v.optional(v.string()),
+    role: v.optional(v.string()),
     aiPrompt: v.optional(v.string()),
   },
-  handler: async (ctx, { bookPath, characterSlug, displayName, summary, aiPrompt }) => {
+  handler: async (ctx, { bookPath, characterSlug, displayName, summary, role, aiPrompt }) => {
     const characterPath = `${bookPath}/characters/${characterSlug}`;
     const now = Date.now();
 
@@ -140,6 +141,7 @@ export const updateCharacterMetadata = adminMutation({
       await ctx.db.patch(existing._id, {
         displayName: displayName ?? existing.displayName,
         summary: summary ?? existing.summary,
+        role: role ?? existing.role,
         aiPrompt: aiPrompt ?? existing.aiPrompt,
         updatedAt: now,
       });
@@ -152,6 +154,7 @@ export const updateCharacterMetadata = adminMutation({
       slug: characterSlug,
       displayName: displayName ?? characterSlug,
       summary: summary ?? "",
+      role,
       aiPrompt,
       createdAt: now,
       updatedAt: now,
@@ -218,6 +221,7 @@ export const upsertCharacterMetadataInternal = internalMutation({
     characterSlug: v.string(),
     displayName: v.optional(v.string()),
     summary: v.optional(v.string()),
+    role: v.optional(v.string()),
     aiPrompt: v.optional(v.string()),
     avatarGenerationState: v.optional(
       v.union(v.literal("generating"), v.literal("ready"), v.literal("error"), v.literal("none")),
@@ -239,6 +243,7 @@ export const upsertCharacterMetadataInternal = internalMutation({
       await ctx.db.patch(existing._id, {
         displayName: args.displayName ?? existing.displayName,
         summary: args.summary ?? existing.summary,
+        role: args.role ?? existing.role,
         aiPrompt: args.aiPrompt ?? existing.aiPrompt,
         avatarGenerationState: args.avatarGenerationState ?? existing.avatarGenerationState,
         avatarProposalUrls: args.avatarProposalUrls ?? existing.avatarProposalUrls,
@@ -253,6 +258,7 @@ export const upsertCharacterMetadataInternal = internalMutation({
       slug: args.characterSlug,
       displayName: args.displayName ?? args.characterSlug,
       summary: args.summary ?? "",
+      role: args.role,
       aiPrompt: args.aiPrompt,
       avatarGenerationState: args.avatarGenerationState,
       avatarProposalUrls: args.avatarProposalUrls,

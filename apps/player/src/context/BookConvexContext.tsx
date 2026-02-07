@@ -579,6 +579,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
       characterIndex.characters[char.slug] = {
         name: char.metadata.displayName ?? char.name,
         summary: char.metadata.summary ?? "",
+        role: char.metadata.role,
       };
     }
 
@@ -778,6 +779,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
         return {
           ...char,
           characterName: bundle.metadata.displayName ?? bundle.name,
+          role: bundle.metadata.role ?? char.role,
           infoPerChapter: char.infoPerChapter.map((chapterInfo) => ({
             ...chapterInfo,
             summary: bundle.metadata.summary ?? "",

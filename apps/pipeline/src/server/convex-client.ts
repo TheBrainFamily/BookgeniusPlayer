@@ -78,6 +78,7 @@ export const convex = {
     characterSlug: string;
     displayName: string;
     summary?: string;
+    role?: string;
     aiPrompt?: string;
   }) {
     return await client.mutation(api.generator.ensureCharacterFolder, args);

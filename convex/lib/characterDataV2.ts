@@ -10,6 +10,7 @@ export type ChapterOccurrences = Record<string, CharacterOccurrences>;
 export type CharacterMeta = {
   name: string;
   summary: string;
+  role?: string;
   media?: { avatarUrl?: string; speaksUrl?: string; listensUrl?: string };
   overrides?: {
     from: [chapter: number, paragraph: number];
@@ -44,6 +45,7 @@ export type V1InfoPerChapter = {
 export type V1CharacterData = {
   slug: string;
   characterName: string;
+  role?: string;
   bookSlug: string;
   infoPerChapter: V1InfoPerChapter[];
   overrides?: {
@@ -70,6 +72,7 @@ export type CharacterBundle = {
   slug: string;
   name: string;
   summary: string;
+  role?: string;
   media?: { avatarUrl?: string; speaksUrl?: string; listensUrl?: string };
 };
 
@@ -163,7 +166,12 @@ export function v1ToV2(
 
   const characters: Record<string, CharacterMeta> = {};
   for (const bundle of bundles) {
-    characters[bundle.slug] = { name: bundle.name, summary: bundle.summary, media: bundle.media };
+    characters[bundle.slug] = {
+      name: bundle.name,
+      summary: bundle.summary,
+      role: bundle.role,
+      media: bundle.media,
+    };
   }
 
   const summarySequences = new Map<string, ChapterSummaryInfo[]>();
@@ -288,7 +296,12 @@ export function buildCharacterIndex(
   const characters: Record<string, CharacterMeta> = {};
 
   for (const bundle of bundles) {
-    characters[bundle.slug] = { name: bundle.name, summary: bundle.summary, media: bundle.media };
+    characters[bundle.slug] = {
+      name: bundle.name,
+      summary: bundle.summary,
+      role: bundle.role,
+      media: bundle.media,
+    };
   }
 
   return { form, characters };
@@ -331,6 +344,7 @@ export function mergeV2ToCharacterData(
       result.push({
         slug,
         characterName: meta.name,
+        role: meta.role,
         bookSlug,
         infoPerChapter,
         media: meta.media,
@@ -347,6 +361,7 @@ export function mergeV2ToCharacterData(
         result.push({
           slug,
           characterName: meta.name,
+          role: meta.role,
           bookSlug,
           infoPerChapter: [],
           media: meta.media,

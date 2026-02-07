@@ -35,6 +35,7 @@ export default defineSchema({
     slug: v.string(),
     displayName: v.string(),
     summary: v.string(),
+    role: v.optional(v.string()),
     aiPrompt: v.optional(v.string()),
     avatarGenerationState: v.optional(
       v.union(v.literal("generating"), v.literal("ready"), v.literal("error"), v.literal("none")),

@@ -53,6 +53,7 @@ export type CharacterMedia = { avatarUrl?: string; listensUrl?: string; speaksUr
 export type CharacterData = {
   slug: string;
   characterName: string;
+  role?: string;
   bookSlug: string;
   infoPerChapter: InfoPerChapter[];
   overrides?: CharacterOverride[];

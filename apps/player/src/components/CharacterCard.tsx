@@ -12,6 +12,7 @@ import { useBookConvex } from "@player/context/BookConvexContext";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
 import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
+import { resolveCharacterCardCaption } from "./characterCardCaption";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -25,6 +26,7 @@ type CharacterCardProps = {
   captionMode?: CaptionMode;
 };
 
+/* eslint-disable complexity */
 const CharacterCard: React.FC<CharacterCardProps> = ({
   entity,
   currentSpeakers,
@@ -63,6 +65,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
 
   const displayName = snapshot?.displayName ?? entity.characterName;
   const summary = snapshot?.summary ?? entity.summary;
+  const cardCaption = resolveCharacterCardCaption(characterData?.role, summary);
 
   const cardRef = useRef<HTMLDivElement>(null);
   const rafIdRef = useRef<number | null>(null);
@@ -210,9 +213,9 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
             <h4 className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[8px] sm:text-[10px] md:text-xs font-bold text-white tracking-wide uppercase">
               {entity.label || displayName}
             </h4>
-            {summary && captionMode !== "hover-title" && (
+            {cardCaption && captionMode !== "hover-title" && (
               <p className="w-full whitespace-nowrap overflow-hidden text-ellipsis text-[7px] sm:text-[9px] md:text-xs italic text-gray-200">
-                {summary}
+                {cardCaption}
               </p>
             )}
           </div>
@@ -221,5 +224,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     </div>
   );
 };
+/* eslint-enable complexity */
 
 export default CharacterCard;
