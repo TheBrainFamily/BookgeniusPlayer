@@ -14,6 +14,7 @@
     "epub:extract-images": "bun .scripts/extract-inline-images.ts",
     "fb2-converter:run": "bun src/tools/fb2-converter/index.ts",
     "test:vertex-fallback": "bun src/tools/test-vertex-fallback.ts",
+    "bench:collect-context": "bun src/tools/collect-benchmark-context.ts",
     "generate-new-book": "bun src/tools/generate-book-cli/index.ts",
     "pipeline:from-fb2": "bun src/server/pipeline-cli.ts",
     "postinstall": "patch-package",
