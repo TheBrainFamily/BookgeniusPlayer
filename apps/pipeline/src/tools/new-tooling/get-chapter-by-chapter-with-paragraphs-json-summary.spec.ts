@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "./get-chapter-by-chapter-with-paragraphs-json-summary";
-import { callGrokAzureWithSchema } from "../../callGrokAzure";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { convex } from "../../server/convex-client";
 
@@ -140,8 +139,6 @@ vi.mock("../../helpers/getCurrentBook", () => ({
   getCurrentBook: vi.fn(() => "books-data/test-book"),
 }));
 
-vi.mock("../../callGrokAzure", () => ({ callGrokAzureWithSchema: vi.fn() }));
-
 vi.mock("../../callFastGemini", () => ({ callGeminiWithThinkingAndSchemaAndParsed: vi.fn() }));
 
 vi.mock("../../server/convex-client", () => ({
@@ -179,18 +176,18 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
       }),
     );
 
-    vi.mocked(callGrokAzureWithSchema).mockImplementation(async (prompt: string) => {
-      const chapterNum = testState.getChapterFromPrompt(prompt);
-      return {
-        ...baseSummary(chapterNum),
-        chapterSummary: {
-          ...baseSummary(chapterNum).chapterSummary,
-          characterActions: [{ slug: "alice", chapterAction: `alice-action-${chapterNum}` }],
-        },
-      };
-    });
-
-    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockResolvedValue(baseSummary(1));
+    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockImplementation(
+      async (prompt: string) => {
+        const chapterNum = testState.getChapterFromPrompt(prompt);
+        return {
+          ...baseSummary(chapterNum),
+          chapterSummary: {
+            ...baseSummary(chapterNum).chapterSummary,
+            characterActions: [{ slug: "alice", chapterAction: `alice-action-${chapterNum}` }],
+          },
+        };
+      },
+    );
   });
 
   it("injects detected characters from rewritten XML and parses data-c + data-speaker", async () => {
@@ -238,7 +235,7 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
       /rewritten-paragraphs-for-chapter-2\.xml/i,
     );
 
-    expect(vi.mocked(callGrokAzureWithSchema)).not.toHaveBeenCalled();
+    expect(vi.mocked(callGeminiWithThinkingAndSchemaAndParsed)).not.toHaveBeenCalled();
   });
 
   it("computes isFirstAppearance in a two-pass way even with parallel chapter processing", async () => {
@@ -252,19 +249,21 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
       `<section data-chapter="2"><p><span data-c="bob">Bob</span></p></section>`,
     );
 
-    vi.mocked(callGrokAzureWithSchema).mockImplementation(async (prompt: string) => {
-      const chapterNum = testState.getChapterFromPrompt(prompt);
-      if (chapterNum === 1) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      }
-      return {
-        ...baseSummary(chapterNum),
-        chapterSummary: {
-          ...baseSummary(chapterNum).chapterSummary,
-          characterActions: [{ slug: "bob", chapterAction: `bob-action-${chapterNum}` }],
-        },
-      };
-    });
+    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockImplementation(
+      async (prompt: string) => {
+        const chapterNum = testState.getChapterFromPrompt(prompt);
+        if (chapterNum === 1) {
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+        return {
+          ...baseSummary(chapterNum),
+          chapterSummary: {
+            ...baseSummary(chapterNum).chapterSummary,
+            characterActions: [{ slug: "bob", chapterAction: `bob-action-${chapterNum}` }],
+          },
+        };
+      },
+    );
 
     await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
 
@@ -286,7 +285,7 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
       `<section data-chapter="1"><p><span data-c="alice">Alice</span></p></section>`,
     );
 
-    vi.mocked(callGrokAzureWithSchema).mockResolvedValue({
+    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockResolvedValue({
       ...baseSummary(1),
       chapterSummary: {
         ...baseSummary(1).chapterSummary,
@@ -334,5 +333,24 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
 
     expect(testState.upserts[0]?.bookPath).toBe("books/test-book");
     expect(vi.mocked(convex.upsertCharacterChapterSummary)).toHaveBeenCalled();
+  });
+
+  it("distributes chapter summary generation across gemini and vertex queue lanes", async () => {
+    testState.setChapterRange(1, 2);
+    testState.setRewrittenXml(
+      1,
+      `<section data-chapter="1"><p><span data-c="alice">Alice</span></p></section>`,
+    );
+    testState.setRewrittenXml(
+      2,
+      `<section data-chapter="2"><p><span data-c="bob">Bob</span></p></section>`,
+    );
+
+    await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
+
+    const preferVertexFlags = vi
+      .mocked(callGeminiWithThinkingAndSchemaAndParsed)
+      .mock.calls.map((call) => call[3]?.preferVertex);
+    expect(preferVertexFlags).toEqual(expect.arrayContaining([false, true]));
   });
 });

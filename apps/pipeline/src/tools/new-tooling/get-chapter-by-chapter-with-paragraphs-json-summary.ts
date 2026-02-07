@@ -8,11 +8,10 @@ import { writeBookFile } from "../../helpers/writeBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { generateTagName } from "../../helpers/generateTagName";
 import { getCurrentBook } from "../../helpers/getCurrentBook";
-import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
-import { callGrokAzureWithSchema } from "../../callGrokAzure";
 import { type NewReferenceCardsResponse } from "../../types";
 import { convex } from "../../server/convex-client";
 import { buildParagraphsForSummary } from "./summaryParagraphs";
+import { runChapterSummaryQueuedSchemaCall } from "./chapter-summary-llm-queue";
 
 const CharacterActionSchema = z.object({ slug: z.string(), chapterAction: z.string() });
 
@@ -325,28 +324,21 @@ ${detectedCharactersXml}
 <chapterText>
 ${paragraphsForPage}
 </chapterText>
-  `;
+      `;
 
       console.log("requesting summary for chapter", chapterNum);
       let summary: ScenesSummariesPerChapterBase;
-
       try {
-        summary = (await callGrokAzureWithSchema(
-          `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages..`,
-          ScenesSummariesPerChapterSchema,
-        )) as ScenesSummariesPerChapterBase;
-      } catch (grokError) {
-        console.error(`Error for chapter ${chapterNum} (grok)`, grokError);
-        try {
-          summary = (await callGeminiWithThinkingAndSchemaAndParsed(
-            `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages.`,
-            ScenesSummariesPerChapterSchema,
-            "gemini-3-flash-preview",
-          )) as ScenesSummariesPerChapterBase;
-        } catch (geminiError) {
-          console.error(`Error for chapter ${chapterNum} (gemini)`, geminiError);
-          throw new Error(`Failed to generate chapter summary for chapter ${chapterNum}`);
-        }
+        const { provider, result } = await runChapterSummaryQueuedSchemaCall({
+          prompt: `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages.`,
+          schema: ScenesSummariesPerChapterSchema,
+          model: "gemini-3-flash-preview",
+        });
+        console.log(`chapter ${chapterNum} summary provider: ${provider}`);
+        summary = result as ScenesSummariesPerChapterBase;
+      } catch (error) {
+        console.error(`Error for chapter ${chapterNum} (gemini/vertex queue)`, error);
+        throw new Error(`Failed to generate chapter summary for chapter ${chapterNum}`);
       }
 
       console.log(`\n\nChapter ${chapterNum} summary: done`);
