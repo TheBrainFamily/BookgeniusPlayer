@@ -30,7 +30,6 @@ bun src/continue-pipeline-cli.ts books-data/my-book --status
 | `generate_graphical_style`    | Visual style JSON         | `graphicalStyle.json`            |
 | `generate_backgrounds`        | Background images         | `backgrounds/*.png`              |
 | `generate_entity_pictures`    | Character avatars         | `characters/*.png`               |
-| `make_chapter_summaries`      | Rolling summaries         | `summaries-*.txt`                |
 | `map_summaries_to_paragraphs` | Paragraph mapping         | `bullet-points.json`             |
 | `generate_embeddings`         | Semantic embeddings       | `embeddings.json`                |
 | `upload_answer_server_data`   | Upload to R2              | R2 storage                       |

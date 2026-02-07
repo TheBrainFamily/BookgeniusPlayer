@@ -204,11 +204,10 @@ bookgenius/frontend/
 4. `rewrite_paragraphs` - Tag character mentions (Gemini/Claude/GPT)
 5. `generate_graphical_style` - Visual style config
 6. `generate_entity_pictures` - Character avatars (OpenAI/Flux)
-7. `make_chapter_summaries` - Rolling summaries
-8. `map_summaries_to_paragraphs` - Paragraph-level mapping
-9. `generate_embeddings` - Vector embeddings (Gemini)
-10. `upload_answer_server_data` - Upload to R2
-11. `generate_backgrounds` - Scene images (OpenAI/Flux)
+7. `map_summaries_to_paragraphs` - Paragraph-level mapping
+8. `generate_embeddings` - Vector embeddings (Gemini)
+9. `upload_answer_server_data` - Upload to R2
+10. `generate_backgrounds` - Scene images (OpenAI/Flux)
 
 **AI Integration**:
 | Service | Model | Purpose |

@@ -6,7 +6,6 @@ import { checkIfBookDataExists } from "../../shared-books-data/getBooksData";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { FILE_TYPE, getFilePath } from "../../helpers/filesHelpers";
 import { readBookFile } from "../../helpers/readBookFile";
-import { makeRollingChapterSummaries } from "./get-chapter-by-chapter-summary";
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "./get-chapter-by-chapter-with-paragraphs-json-summary";
 import { createBookSettings } from "../../helpers/createBookSettings";
 import "dotenv/config";
@@ -71,8 +70,7 @@ const doIt = async () => {
   await generatePicturesForEntities(referenceCards); //TODO see background todos
   //
   {
-    await makeRollingChapterSummaries(); // Generawanie podsumowan rozdzialow, idziemy rozdzial po rozdziale, i do kolejnego rozdzialu doklejamy wczesniejsze podsumowania.
-    await turnChapterSummariesIntoBulletPointsMappedToParagraphs(); // Bierzemy te wygenerowane podsumowania, i rozdzielamy je na akapity.
+    await turnChapterSummariesIntoBulletPointsMappedToParagraphs(); // Generujemy podsumowania rozdzialow mapowane do akapitow na podstawie zrewritowanych XML-i.
   }
   // logger.info("Generating intro summary for each character");
   await generateIntroSummary(referenceCards); // tutaj generujemy pierwszy wstep dla danej osoby. znajdujemy pierwszy akapit i rozdzial w ktorym ta osoba wystepuje, szukamy do tej kombinacji akapit/rozdzial sceny.

@@ -18,7 +18,6 @@ import {
   generatePicturesForEntities,
   generatePicturePrompts,
 } from "../../src/tools/new-tooling/generate-pictures-for-entities";
-import { makeRollingChapterSummaries } from "../../src/tools/new-tooling/get-chapter-by-chapter-summary";
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import type { NewReferenceCardsResponse } from "../../src/types";
 import {
@@ -872,11 +871,6 @@ export async function startPipeline(input: {
       await uploadCharactersToConvex(job, referenceCards, outputDir, tempOutputDir);
     },
 
-    make_chapter_summaries: async () => {
-      setBookArg(slug);
-      await makeRollingChapterSummaries();
-    },
-
     map_summaries_to_paragraphs: async () => {
       setBookArg(slug);
       await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
@@ -937,7 +931,6 @@ export async function startPipeline(input: {
 
     if (process.env.QUICK_MODE === "true" || process.env.FREE_RUN === "true") {
       const skipSteps: Step[] = [
-        "make_chapter_summaries",
         "map_summaries_to_paragraphs",
         "generate_embeddings",
         "upload_answer_server_data",

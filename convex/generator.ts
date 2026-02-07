@@ -11,7 +11,6 @@ const PIPELINE_STEPS = [
   "generate_graphical_style",
   "generate_backgrounds",
   "generate_entity_pictures",
-  "make_chapter_summaries",
   "map_summaries_to_paragraphs",
 ] as const;
 

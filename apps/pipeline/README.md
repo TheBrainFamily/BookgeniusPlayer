@@ -75,7 +75,7 @@ Example:
 
 7.  The next step involves character images, specifically running `generatePicturesForEntities`. Inside the function, locate `generalPrompt` and replace it with the specific prompt for your book. After running, you should get `generatedPrompts.json` and `.png` files. If images aren't generated, run the code again.
 
-8.  Next, run `makeRollingChapterSummaries` and `turnChapterSummariesIntoBulletPointsMappedToParagraphs` – do not run them in parallel, but you can have both of them uncommented and run one after another as one script execution.
+8.  Next, run `turnChapterSummariesIntoBulletPointsMappedToParagraphs`. This step reads rewritten chapter XML files and produces chapter summaries mapped to paragraphs.
 
 9.  The next step covers backgrounds; run `generateBackgrounds`. For this, you'll need the `visualStyleConfig.json` file:
 

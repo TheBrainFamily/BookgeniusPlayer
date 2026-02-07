@@ -8,16 +8,15 @@ import { spawn } from "child_process";
 import { setCurrentBook } from "../../src/helpers/getCurrentBook";
 import { convertBook } from "../../src/tools/fb2-converter/index";
 import { extractInlineImages } from "../../.scripts/extract-inline-images";
-import { generateSingleChapterSummary } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
-import {
-  computeBatchEmbeddingsThroughHTTP,
-  type BookEmbeddings,
-  type DocumentWithEmbeddings,
-  type Document,
-} from "../../src/services/answer-server/create-paragraph-embeddings";
-import { createR2Client } from "./upload-books-to-r2";
-import { readBookFile } from "../../src/helpers/readBookFile";
-import { FILE_TYPE } from "../../src/helpers/filesHelpers";
+// import {
+//   computeBatchEmbeddingsThroughHTTP,
+//   type BookEmbeddings,
+//   type DocumentWithEmbeddings,
+//   type Document,
+// } from "../../src/services/answer-server/create-paragraph-embeddings";
+// import { createR2Client } from "./upload-books-to-r2";
+// import { readBookFile } from "../../src/helpers/readBookFile";
+// import { FILE_TYPE } from "../../src/helpers/filesHelpers";
 import * as cheerio from "cheerio";
 import * as wl from "./wolne-lektury";
 import {
@@ -183,7 +182,7 @@ export const appRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      const { bookSlug, chapterNumber, chapterXml, bookLanguage = "English" } = input;
+      const { bookSlug, chapterNumber, chapterXml } = input;
 
       console.log(
         `[regenerateChapterEmbeddings] Starting for ${bookSlug} chapter ${chapterNumber}`,
@@ -209,90 +208,79 @@ export const appRouter = router({
         `[regenerateChapterEmbeddings] Extracted ${paragraphs.length} paragraphs from XML`,
       );
 
-      let rollingSummary: string;
-      try {
-        rollingSummary = readBookFile(
-          `summaries-chapter-by-chapter-${chapterNumber}.txt`,
-          FILE_TYPE.TEMPORARY,
-        );
-      } catch {
-        throw new Error(
-          `Rolling summary not found for chapter ${chapterNumber}. Run full pipeline first.`,
-        );
-      }
-
       console.log(`[regenerateChapterEmbeddings] Generating summary for chapter ${chapterNumber}`);
-      const chapterSummary = await generateSingleChapterSummary({
-        chapterNum: chapterNumber,
-        paragraphs,
-        rollingSummary,
-        bookLanguage,
-      });
+      throw new Error("single chapter embeddings generation not implemented");
+      // const chapterSummary = await generateSingleChapterSummary({
+      //   chapterNum: chapterNumber,
+      //   paragraphs,
+      //   rollingSummary,
+      //   bookLanguage,
+      // });
 
-      const documents: Document[] = chapterSummary.chapterSummary.chapterBulletPoints.map(
-        (bulletPoint) => {
-          const renderedText = bulletPoint.paragraphNumbers
-            .map((p) =>
-              paragraphs
-                .filter((pfc) => pfc.dataIndex === p)
-                .map((pfc) => pfc.text)
-                .join(" "),
-            )
-            .join("\n");
+      // const documents: Document[] = chapterSummary.chapterSummary.chapterBulletPoints.map(
+      //   (bulletPoint) => {
+      //     const renderedText = bulletPoint.paragraphNumbers
+      //       .map((p) =>
+      //         paragraphs
+      //           .filter((pfc) => pfc.dataIndex === p)
+      //           .map((pfc) => pfc.text)
+      //           .join(" "),
+      //       )
+      //       .join("\n");
 
-          return {
-            text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
-            chapter: chapterNumber,
-            paragraphNumber: bulletPoint.mainParagraphNumber,
-          };
-        },
-      );
+      //     return {
+      //       text: `<Summary>${bulletPoint.paragraphsSummary}</Summary> <Text>${renderedText}</Text>`,
+      //       chapter: chapterNumber,
+      //       paragraphNumber: bulletPoint.mainParagraphNumber,
+      //     };
+      //   },
+      // );
 
-      const pureSummaryDocuments: Document[] =
-        chapterSummary.chapterSummary.chapterBulletPoints.map((bulletPoint) => ({
-          text: bulletPoint.paragraphsSummary,
-          chapter: chapterNumber,
-          paragraphNumber: bulletPoint.mainParagraphNumber,
-        }));
+      // const pureSummaryDocuments: Document[] =
+      //   chapterSummary.chapterSummary.chapterBulletPoints.map((bulletPoint) => ({
+      //     text: bulletPoint.paragraphsSummary,
+      //     chapter: chapterNumber,
+      //     paragraphNumber: bulletPoint.mainParagraphNumber,
+      //   }));
 
-      console.log(
-        `[regenerateChapterEmbeddings] Generating embeddings for ${documents.length + pureSummaryDocuments.length} documents`,
-      );
-      const newChapterEmbeddings = await computeBatchEmbeddingsThroughHTTP([
-        ...documents,
-        ...pureSummaryDocuments,
-      ]);
+      // console.log(
+      //   `[regenerateChapterEmbeddings] Generating embeddings for ${documents.length + pureSummaryDocuments.length} documents`,
+      // );
+      // const newChapterEmbeddings = await computeBatchEmbeddingsThroughHTTP([
+      //   ...documents,
+      //   ...pureSummaryDocuments,
+      // ]);
 
-      const r2 = createR2Client();
-      const embeddingsKey = `answer-server-data/${bookSlug}/embeddings.json`;
-      const embeddingsFile = r2.file(embeddingsKey);
+      // const r2 = createR2Client();
+      // const embeddingsKey = `answer-server-data/${bookSlug}/embeddings.json`;
+      // const embeddingsFile = r2.file(embeddingsKey);
 
-      let existingEmbeddings: BookEmbeddings = new Map();
-      try {
-        const exists = await embeddingsFile.exists();
-        if (exists) {
-          const arr = (await embeddingsFile.json()) as [number, DocumentWithEmbeddings[]][];
-          existingEmbeddings = new Map(arr);
-          console.log(
-            `[regenerateChapterEmbeddings] Loaded existing embeddings with ${existingEmbeddings.size} chapters`,
-          );
-        }
-      } catch {
-        console.log(`[regenerateChapterEmbeddings] No existing embeddings found, starting fresh`);
-      }
+      // let existingEmbeddings: BookEmbeddings = new Map();
+      // try {
+      //   const exists = await embeddingsFile.exists();
+      //   if (exists) {
+      //     const arr = (await embeddingsFile.json()) as [number, DocumentWithEmbeddings[]][];
+      //     existingEmbeddings = new Map(arr);
+      //     console.log(
+      //       `[regenerateChapterEmbeddings] Loaded existing embeddings with ${existingEmbeddings.size} chapters`,
+      //     );
+      //   }
+      // } catch {
+      //   console.log(`[regenerateChapterEmbeddings] No existing embeddings found, starting fresh`);
+      // }
 
-      existingEmbeddings.set(chapterNumber, newChapterEmbeddings);
+      // existingEmbeddings.set(chapterNumber, newChapterEmbeddings);
 
-      const mergedJson = JSON.stringify(Array.from(existingEmbeddings.entries()), null, 2);
-      await embeddingsFile.write(mergedJson);
-      console.log(`[regenerateChapterEmbeddings] Uploaded merged embeddings to R2`);
+      // const mergedJson = JSON.stringify(Array.from(existingEmbeddings.entries()), null, 2);
+      // await embeddingsFile.write(mergedJson);
+      // console.log(`[regenerateChapterEmbeddings] Uploaded merged embeddings to R2`);
 
-      return {
-        success: true,
-        bookSlug,
-        chapterNumber,
-        embeddingsCount: newChapterEmbeddings.length,
-      };
+      // return {
+      //   success: true,
+      //   bookSlug,
+      //   chapterNumber,
+      //   embeddingsCount: newChapterEmbeddings.length,
+      // };
     }),
 
   searchWolneLektury: procedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
