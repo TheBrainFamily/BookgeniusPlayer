@@ -1,4 +1,3 @@
-import { callGeminiWrapper, callGeminiVertexWrapper } from "../callClaude";
 import { getChapterParagraphsAndSectionAttributes } from "./createParagraphsWithPageNumbers";
 import { logger } from "../logger";
 import fs from "fs";
@@ -15,8 +14,7 @@ import { readBookFile } from "../helpers/readBookFile";
 import { generateTagName } from "../helpers/generateTagName";
 import { getChapterFormat } from "./getChapterFormat";
 import { doesBookFileExist } from "../helpers/readBookFile";
-import { callGpt5 } from "../callO3";
-import { abortableSleep, checkAborted, isAbortError } from "../helpers/abortHelpers";
+import { checkAborted } from "../helpers/abortHelpers";
 import {
   needsChunking,
   chunkParagraphs,
@@ -26,19 +24,17 @@ import {
   type Paragraph,
   type ChapterChunk,
 } from "./chapterChunker";
-import { callGrok } from "../callGrok";
+import {
+  executeRewriteWithQueues,
+  type RewritePhase,
+  type RewriteProviderName,
+} from "./rewrite-orchestrator";
 
-const RETRY_DELAYS_MS = [2000, 5000, 10000] as const;
 const CHAPTER_SCAN_LOG_EVERY = Number.parseInt(
   process.env.REWRITE_CHAPTER_SCAN_LOG_EVERY || "25",
   10,
 );
 const CHAPTER_SCAN_SLOW_MS = Number.parseInt(process.env.REWRITE_CHAPTER_SCAN_SLOW_MS || "500", 10);
-
-function getRetryDelayMs(attempt: number): number {
-  if (attempt <= 0) return 0;
-  return RETRY_DELAYS_MS[Math.min(attempt - 1, RETRY_DELAYS_MS.length - 1)];
-}
 
 /**
  * Build the XML characters string for the prompt
@@ -98,71 +94,29 @@ ${previousChunkOutput}
     .replace("{{outputOnlyInstruction}}", outputOnlyInstruction);
 }
 
-/**
- * Process a single chunk with optional context from previous chunk
- */
-type ProcessChunkOptions = { attempt?: number; signal?: AbortSignal };
+function clearXmlFence(response: string): string {
+  return response.replace(/```xml\n/, "").replace(/\n```$/, "");
+}
 
-async function processChunk(
+function buildChunkValidationHandler(
   chapter: number,
   chunkIndex: number,
-  chunk: ChapterChunk,
-  jsonCharacters: string,
-  previousChunkOutput: string | null,
-  options: ProcessChunkOptions = {},
-): Promise<string> {
-  const { attempt = 0, signal } = options;
-  checkAborted(signal, `chapter ${chapter} chunk ${chunkIndex}`);
-  const chunkFileName = `rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`;
-
-  // Check if chunk already processed
-  if (doesBookFileExist(chunkFileName, FILE_TYPE.TEMPORARY)) {
-    logger.info(`✅ Chunk ${chunkIndex} already rewritten for chapter ${chapter}`);
-    return readBookFile(chunkFileName, FILE_TYPE.TEMPORARY);
-  }
-
-  if (attempt > 0) {
-    await abortableSleep(getRetryDelayMs(attempt), signal);
-  }
-  if (attempt > 5) {
-    logger.error(`❌ Too many attempts for chapter ${chapter} chunk ${chunkIndex}`);
-    throw new Error(`Too many attempts for chapter ${chapter} chunk ${chunkIndex}`);
-  }
-
-  const compiledPrompt = buildChunkedPrompt(
-    chunk.paragraphs,
-    chapter,
-    jsonCharacters,
-    previousChunkOutput,
-  );
-  writeBookFile(`compiled-prompt-for-chapter-${chapter}-chunk-${chunkIndex}.md`, compiledPrompt);
-
-  const llmProviders = [callGeminiWrapper, callGeminiVertexWrapper, callGrok, callGpt5];
-
-  try {
-    checkAborted(signal, `chapter ${chapter} chunk ${chunkIndex} before provider call`);
-    const selectedProvider = llmProviders[attempt % llmProviders.length];
-    logger.info(
-      `Using provider for chapter ${chapter} chunk ${chunkIndex}: ${selectedProvider.name}`,
-    );
-
-    const originalChunkXml = buildChunkXml(chunk.paragraphs);
+  originalChunkXml: string,
+): (params: {
+  response: string;
+  provider: RewriteProviderName;
+  phase: RewritePhase;
+  attemptNumber: number;
+}) => {
+  isValid: boolean;
+  clearedResponse: string;
+  restoredResponse: string;
+  failureReason?: string;
+} {
+  return ({ response, provider }) => {
+    const clearedResponse = clearXmlFence(response);
     writeBookFile(
-      `original-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`,
-      originalChunkXml,
-    );
-    const geminiReminder = `\n This is your ${attempt + 1}th attempt. That means you failed previous one. Make sure to output valid html.`;
-
-    const response = (await selectedProvider(
-      `${attempt === 1 || attempt === 2 ? geminiReminder : ""} ${compiledPrompt}`,
-      undefined,
-      1,
-    )) as string;
-    logger.info(`Response for chapter ${chapter} chunk ${chunkIndex}:`, response.slice(0, 50));
-
-    const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
-    writeBookFile(
-      `rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}-${selectedProvider.name}.raw.xml`,
+      `rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}-${provider}.raw.xml`,
       clearedResponse,
     );
 
@@ -188,32 +142,71 @@ async function processChunk(
       );
     }
 
-    if (restored && compareXmlTextContent(originalChunkXml, restored)) {
-      logger.info(`✅ Chunk ${chunkIndex} validated for chapter ${chapter}`);
-      writeBookFile(`${chunkFileName.replace(".xml", "")}-${selectedProvider.name}.xml`, restored);
-      writeBookFile(chunkFileName, restored);
-      return restored;
-    } else {
+    const isValid = restored !== "" && compareXmlTextContent(originalChunkXml, restored);
+    if (!isValid) {
       writeBookFile(
-        `broken-rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}-${selectedProvider.name}.xml`,
+        `broken-rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}-${provider}.xml`,
         clearedResponse,
       );
-      logger.info(`❌ Validation failed for chapter ${chapter} chunk ${chunkIndex}, retrying...`);
-      return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, {
-        attempt: attempt + 1,
-        signal,
-      });
     }
-  } catch (e) {
-    if (isAbortError(e)) {
-      throw e;
-    }
-    logger.error(`Error for chapter ${chapter} chunk ${chunkIndex}`, e);
-    return processChunk(chapter, chunkIndex, chunk, jsonCharacters, previousChunkOutput, {
-      attempt: attempt + 1,
-      signal,
-    });
+
+    return {
+      isValid,
+      clearedResponse,
+      restoredResponse: restored,
+      failureReason: isValid ? undefined : "chunk xml text comparison failed",
+    };
+  };
+}
+
+/**
+ * Process a single chunk with optional context from previous chunk
+ */
+async function processChunk(
+  chapter: number,
+  chunkIndex: number,
+  chunk: ChapterChunk,
+  jsonCharacters: string,
+  previousChunkOutput: string | null,
+  signal?: AbortSignal,
+): Promise<string> {
+  checkAborted(signal, `chapter ${chapter} chunk ${chunkIndex}`);
+  const chunkFileName = `rewritten-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`;
+
+  // Check if chunk already processed
+  if (doesBookFileExist(chunkFileName, FILE_TYPE.TEMPORARY)) {
+    logger.info(`✅ Chunk ${chunkIndex} already rewritten for chapter ${chapter}`);
+    return readBookFile(chunkFileName, FILE_TYPE.TEMPORARY);
   }
+
+  const compiledPrompt = buildChunkedPrompt(
+    chunk.paragraphs,
+    chapter,
+    jsonCharacters,
+    previousChunkOutput,
+  );
+  writeBookFile(`compiled-prompt-for-chapter-${chapter}-chunk-${chunkIndex}.md`, compiledPrompt);
+  const originalChunkXml = buildChunkXml(chunk.paragraphs);
+  writeBookFile(
+    `original-paragraphs-for-chapter-${chapter}-chunk-${chunkIndex}.xml`,
+    originalChunkXml,
+  );
+
+  const execution = await executeRewriteWithQueues({
+    chapter,
+    chunkIndex,
+    prompt: compiledPrompt,
+    signal,
+    validateResponse: buildChunkValidationHandler(chapter, chunkIndex, originalChunkXml),
+  });
+
+  logger.info(
+    `✅ Chunk ${chunkIndex} validated for chapter ${chapter} (provider=${execution.provider}, phase=${execution.phase})`,
+  );
+  writeBookFile(`${chunkFileName.replace(".xml", "")}-${execution.provider}.xml`, execution.output);
+  writeBookFile(chunkFileName, execution.output);
+
+  return execution.output;
 }
 
 /**
@@ -243,9 +236,14 @@ async function processChunkedChapter(
       `📦 Processing chapter ${chapter} chunk ${i + 1}/${chunks.length} (${chunk.tokenCount} tokens)`,
     );
 
-    const result = await processChunk(chapter, i, chunk, jsonCharacters, previousChunkOutput, {
+    const result = await processChunk(
+      chapter,
+      i,
+      chunk,
+      jsonCharacters,
+      previousChunkOutput,
       signal,
-    });
+    );
     processedChunks.push(result);
   }
 
@@ -257,10 +255,67 @@ async function processChunkedChapter(
   return combined;
 }
 
+function buildChapterValidationHandler(
+  chapter: number,
+  paragraphsForPage: string,
+): (params: {
+  response: string;
+  provider: RewriteProviderName;
+  phase: RewritePhase;
+  attemptNumber: number;
+}) => {
+  isValid: boolean;
+  clearedResponse: string;
+  restoredResponse: string;
+  failureReason?: string;
+} {
+  return ({ response, provider }) => {
+    const clearedResponse = clearXmlFence(response);
+    writeBookFile(
+      `identify-entities-for-paragraph-response-for-chapter-${chapter}-${provider}.raw.txt`,
+      response,
+    );
+
+    let restored = clearedResponse;
+    try {
+      restored = restoreOriginalTextInHtml(paragraphsForPage, clearedResponse);
+    } catch (e) {
+      logger.error("Error restoring original text for chapter " + chapter, e);
+    }
+
+    try {
+      restored = restoreUnwrappedLines(paragraphsForPage, restored);
+    } catch (e) {
+      logger.error("Error restoring unwrapped lines for chapter " + chapter, e);
+    }
+
+    try {
+      restored = sanitizeNestedParagraphs(restored);
+    } catch (e) {
+      logger.error("Error sanitizing nested paragraphs for chapter " + chapter, e);
+    }
+
+    const isValid = restored !== "" && compareXmlTextContent(paragraphsForPage, restored);
+    if (!isValid) {
+      writeBookFile(
+        `broken-rewritten-paragraphs-for-chapter-${chapter}-${provider}.xml`,
+        clearedResponse,
+      );
+    }
+
+    return {
+      isValid,
+      clearedResponse,
+      restoredResponse: restored,
+      failureReason: isValid ? undefined : "chapter xml text comparison failed",
+    };
+  };
+}
+
 export const identifyAndRewriteParagraphs = async (
   chapter: number,
   charactersForChapter: { name: string; summary: string }[],
-  attempt = 0,
+  _attempt = 0,
   signal?: AbortSignal,
 ): Promise<string | undefined> => {
   checkAborted(signal, `chapter ${chapter} rewrite`);
@@ -284,14 +339,6 @@ export const identifyAndRewriteParagraphs = async (
     );
   }
 
-  // Original single-shot processing for shorter chapters
-  if (attempt > 0) {
-    await abortableSleep(getRetryDelayMs(attempt), signal);
-  }
-  if (attempt > 4) {
-    logger.error("❌ Too many attempts for chapter " + chapter);
-    throw new Error("Too many attempts for chapter " + chapter);
-  }
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
   const paragraphsForPage = paragraphsFromChapter.map(buildParagraphXml).join("\n");
@@ -309,81 +356,33 @@ export const identifyAndRewriteParagraphs = async (
     .replace("{{characters_json}}", jsonCharacters);
 
   writeBookFile(`compiled-prompt-for-chapter-${chapter}-gemini2.md`, compiledPrompt);
+  writeBookFile(`original-paragraphs-for-chapter-${chapter}.xml`, paragraphsForPage);
 
-  const llmProviders = [callGeminiWrapper, callGeminiVertexWrapper, callGrok, callGpt5];
+  const execution = await executeRewriteWithQueues({
+    chapter,
+    prompt: compiledPrompt,
+    signal,
+    validateResponse: buildChapterValidationHandler(chapter, paragraphsForPage),
+  });
 
-  try {
-    checkAborted(signal, `chapter ${chapter} before provider call`);
-    const selectedProvider = llmProviders[attempt % llmProviders.length];
-    logger.info("Using provider: " + selectedProvider.name);
-    writeBookFile(`original-paragraphs-for-chapter-${chapter}.xml`, paragraphsForPage);
-    const geminiReminder = `\n This is your ${attempt + 1}th attempt. That means you failed previous one. Make sure to output valid html.`;
+  // Build section attributes string, including format and any preserved epub-type.
+  const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
+  const extraAttrs = Object.entries(sectionAttributes)
+    .filter(([key]) => key !== "data-chapter-format")
+    .map(([key, value]) => ` ${key}="${value.replace(/"/g, "&quot;")}"`)
+    .join("");
+  const finalRestored = `<section data-chapter="${chapter}"${formatAttr}${extraAttrs}>${execution.output}</section>`;
 
-    const response = (await selectedProvider(
-      `${attempt === 1 ? geminiReminder : ""} ${compiledPrompt}`,
-      undefined,
-      1,
-    )) as string;
-    logger.info(
-      "identify entities for paragraph response for chapter " + chapter,
-      response.slice(0, 50),
-    );
-    writeBookFile(
-      `identify-entities-for-paragraph-response-for-chapter-${chapter}-${selectedProvider.name}.raw.txt`,
-      response,
-    );
-    const clearedResponse = response.replace(/```xml\n/, "").replace(/\n```$/, "");
+  logger.info(
+    `✅ Rewritten chapter ${chapter} with provider=${execution.provider}, phase=${execution.phase}`,
+  );
+  writeBookFile(
+    `rewritten-paragraphs-for-chapter-${chapter}-${execution.provider}.xml`,
+    finalRestored,
+  );
+  writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, finalRestored);
 
-    let restored = clearedResponse;
-    try {
-      restored = restoreOriginalTextInHtml(paragraphsForPage, clearedResponse);
-    } catch (e) {
-      logger.error("Error restoring original text for chapter " + chapter, e);
-    }
-
-    try {
-      restored = restoreUnwrappedLines(paragraphsForPage, restored);
-    } catch (e) {
-      logger.error("Error restoring unwrapped lines for chapter " + chapter, e);
-    }
-
-    try {
-      restored = sanitizeNestedParagraphs(restored);
-    } catch (e) {
-      logger.error("Error sanitizing nested paragraphs for chapter " + chapter, e);
-    }
-
-    if (restored && compareXmlTextContent(paragraphsForPage, restored)) {
-      // Build section attributes string, including format and any preserved epub-type
-      const formatAttr = chapterFormat !== "prose" ? ` data-chapter-format="${chapterFormat}"` : "";
-      const extraAttrs = Object.entries(sectionAttributes)
-        .filter(([key]) => key !== "data-chapter-format") // Don't duplicate format attr
-        .map(([key, value]) => ` ${key}="${value.replace(/"/g, "&quot;")}"`)
-        .join("");
-      const finalRestored = `<section data-chapter="${chapter}"${formatAttr}${extraAttrs}>${restored}</section>`;
-      logger.info("✅ No changes to paragraphs for chapter " + chapter);
-      writeBookFile(
-        `rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`,
-        finalRestored,
-      );
-      writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, finalRestored);
-    } else {
-      writeBookFile(
-        `broken-rewritten-paragraphs-for-chapter-${chapter}-${selectedProvider.name}.xml`,
-        clearedResponse,
-      );
-
-      logger.info("❌ Changes to paragraphs for chapter " + chapter);
-      return identifyAndRewriteParagraphs(chapter, charactersForChapter, attempt + 1, signal);
-    }
-    return response;
-  } catch (e) {
-    if (isAbortError(e)) {
-      throw e;
-    }
-    logger.error("Error for chapter " + chapter, e);
-    return identifyAndRewriteParagraphs(chapter, charactersForChapter, attempt + 1, signal);
-  }
+  return finalRestored;
 };
 
 interface ChapterData {
@@ -427,7 +426,7 @@ async function processChunkedChapterFromPreScan(
       chunk,
       jsonCharacters,
       previousChunkOutput,
-      { signal },
+      signal,
     );
     processedChunks.push(rewrittenChunk);
   }

@@ -202,8 +202,9 @@ When a character exits the scene:
 ```html
 <p>
   <em
-    >Exeunt all but <span data-c="montague">MONTAGUE</span>, <span data-c="lady-montague">LADY MONTAGUE</span>, and
-    <span data-c="benvolio">BENVOLIO</span><span data-c="sampson" data-exits="sampson"></span
+    >Exeunt all but <span data-c="montague">MONTAGUE</span>,
+    <span data-c="lady-montague">LADY MONTAGUE</span>, and <span data-c="benvolio">BENVOLIO</span
+    ><span data-c="sampson" data-exits="sampson"></span
     ><span data-c="gregory" data-exits="gregory"></span
   ></em>
 </p>

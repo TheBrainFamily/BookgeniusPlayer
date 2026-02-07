@@ -929,7 +929,7 @@ export async function startPipeline(input: {
       (step) => step !== "complete" && step !== "failed",
     );
 
-    if (process.env.QUICK_MODE === "true" || process.env.FREE_RUN === "true") {
+    if (process.env.QUICK_MODE === "true") {
       const skipSteps: Step[] = [
         "map_summaries_to_paragraphs",
         "generate_embeddings",

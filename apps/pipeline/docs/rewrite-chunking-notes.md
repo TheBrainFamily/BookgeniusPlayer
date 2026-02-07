@@ -43,7 +43,42 @@ Also decide intentionally on the final file:
 - Spot-check compiled prompt for chunk 1 context.
 - Spot-check chunk boundaries in final combined chapter XML.
 
+## Queue and fallback behavior
+
+- Primary rewrite calls run through a shared Gemini/Vertex queue.
+- Primary provider selection is round-robin.
+- Retryable infra errors (for example 429/5xx/gateway/timeouts) are retried in the primary queue.
+- Validation or non-retryable provider failures trigger fallback pair calls:
+- GPT-5 and Grok run in parallel through dedicated fallback queues.
+- GPT-5 is preferred when both succeed.
+- Grok can be selected when GPT-5 fails.
+
+## Benchmark artifacts
+
+Per-run benchmark artifacts are stored under:
+
+- `books-data/<slug>/temporary-output/rewrite-benchmarks/<run-id>/`
+
+Main files:
+
+- `manifest.ndjson` one row per attempt (provider, phase, status, artifacts, winner flag)
+- `summary.json` aggregate counts and fallback stats
+- `outputs/` raw/restored responses per provider attempt
+- `diffs/` high-level comparisons of non-selected outputs vs selected output
+
+To inspect a run quickly:
+
+- `bun src/tools/rewrite-benchmark-report.ts` (latest run)
+- `bun src/tools/rewrite-benchmark-report.ts <run-id>` (specific run)
+
+How to detect Grok-as-final due GPT-5 failure:
+
+- Check `summary.json` field `grokSelectedDueToGptFailure`.
+- Filter `manifest.ndjson` for rows where `selectedAsFinal=true` and `provider=\"grok\"`.
+
 ## Relevant code
 
 - `apps/pipeline/src/tools/identifyEntityAndRewriteParagraphs.ts`
 - `apps/pipeline/src/tools/chapterChunker.ts`
+- `apps/pipeline/src/tools/rewrite-orchestrator.ts`
+- `apps/pipeline/src/tools/rewrite-benchmark-report.ts`

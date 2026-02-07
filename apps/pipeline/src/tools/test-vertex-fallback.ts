@@ -14,18 +14,24 @@ const StructuredSchema = z.object({
 
 function printEnvSummary() {
   const hasVertexApiKey = Boolean(
-    process.env.VERTEX_API_KEY || process.env.GOOGLE_CLOUD_API_KEY || process.env.GOOGLE_VERTEX_API_KEY,
+    process.env.VERTEX_API_KEY ||
+    process.env.GOOGLE_CLOUD_API_KEY ||
+    process.env.GOOGLE_VERTEX_API_KEY,
   );
   const hasGeminiApiKey = Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
 
   console.log("=== Env Summary ===");
   console.log(`GOOGLE_GENERATIVE_AI_API_KEY: ${hasGeminiApiKey ? "set" : "missing"}`);
-  console.log(`VERTEX_API_KEY / GOOGLE_CLOUD_API_KEY / GOOGLE_VERTEX_API_KEY: ${hasVertexApiKey ? "set" : "missing"}`);
+  console.log(
+    `VERTEX_API_KEY / GOOGLE_CLOUD_API_KEY / GOOGLE_VERTEX_API_KEY: ${hasVertexApiKey ? "set" : "missing"}`,
+  );
 }
 
 async function testDirectVertexExpress() {
   const apiKey =
-    process.env.VERTEX_API_KEY || process.env.GOOGLE_CLOUD_API_KEY || process.env.GOOGLE_VERTEX_API_KEY;
+    process.env.VERTEX_API_KEY ||
+    process.env.GOOGLE_CLOUD_API_KEY ||
+    process.env.GOOGLE_VERTEX_API_KEY;
 
   if (!apiKey) {
     console.log("Skipping direct Vertex test: no Vertex API key configured.");
@@ -33,10 +39,7 @@ async function testDirectVertexExpress() {
   }
 
   console.log("=== Direct Vertex Test ===");
-  const ai = new GoogleGenAI({
-    vertexai: true,
-    apiKey,
-  });
+  const ai = new GoogleGenAI({ vertexai: true, apiKey });
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",

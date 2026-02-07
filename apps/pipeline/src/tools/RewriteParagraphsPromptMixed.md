@@ -92,7 +92,10 @@ Identify mentions of the characters within ALL text (both prose and drama tables
 **Input HTML:**
 
 ```html
-<p>And then, just as Piglet was beginning to feel very frightened indeed, the Heffalump looked up and saw him.</p>
+<p>
+  And then, just as Piglet was beginning to feel very frightened indeed, the Heffalump looked up and
+  saw him.
+</p>
 <table data-drama="">
   <tbody>
     <tr data-speaker="heffalump">
@@ -112,8 +115,8 @@ Identify mentions of the characters within ALL text (both prose and drama tables
 
 ```html
 <p>
-  And then, just as <span data-c="piglet">Piglet</span> was beginning to feel very frightened indeed, the
-  <span data-c="heffalump">Heffalump</span> looked up and saw him.
+  And then, just as <span data-c="piglet">Piglet</span> was beginning to feel very frightened
+  indeed, the <span data-c="heffalump">Heffalump</span> looked up and saw him.
 </p>
 <table data-drama="">
   <tbody>
@@ -152,8 +155,13 @@ Identify mentions of the characters within ALL text (both prose and drama tables
 **Output HTML:**
 
 ```html
-<p data-speaker="rabbit">"Oh dear! Oh dear!" said the <span data-c="rabbit">Rabbit</span>, looking at his watch.</p>
-<p><span data-c="alice">Alice</span> had never seen a <span data-c="rabbit">rabbit</span> with a watch before.</p>
+<p data-speaker="rabbit">
+  "Oh dear! Oh dear!" said the <span data-c="rabbit">Rabbit</span>, looking at his watch.
+</p>
+<p>
+  <span data-c="alice">Alice</span> had never seen a <span data-c="rabbit">rabbit</span> with a
+  watch before.
+</p>
 <p data-speaker="rabbit">"I shall be too late!" he cried, and disappeared down the hole.</p>
 ```
 
@@ -193,7 +201,10 @@ Identify mentions of the characters within ALL text (both prose and drama tables
   <tbody>
     <tr data-speaker="pooh">
       <td data-persona="">Pooh</td>
-      <td>"Have you seen <span data-c="piglet">Piglet</span> today, <span data-c="eeyore">Eeyore</span>?"</td>
+      <td>
+        "Have you seen <span data-c="piglet">Piglet</span> today,
+        <span data-c="eeyore">Eeyore</span>?"
+      </td>
     </tr>
     <tr data-speaker="eeyore">
       <td data-persona="">Eeyore</td>

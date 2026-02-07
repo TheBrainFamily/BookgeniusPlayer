@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { NewReferenceCardsResponse } from "../types";
 import type { ChapterChunk, Paragraph } from "./chapterChunker";
+import * as chapterChunker from "./chapterChunker";
+
+process.env.REWRITE_BENCHMARK_RUN_ID = "identify-spec-run";
 
 const testState = vi.hoisted(() => {
   type WriteCall = { fileName: string; content: string; fileType?: string };
@@ -10,6 +13,7 @@ const testState = vi.hoisted(() => {
   const writeCalls: WriteCall[] = [];
   const providerCalls: ProviderCall[] = [];
   const chapterChunkCounts = new Map<number, number>();
+  const providerResponses = new Map<string, Array<string | Error>>();
 
   let chapterStart = 1;
   let chapterCount = 1;
@@ -22,6 +26,7 @@ const testState = vi.hoisted(() => {
     writeCalls.length = 0;
     providerCalls.length = 0;
     chapterChunkCounts.clear();
+    providerResponses.clear();
     chapterStart = 1;
     chapterCount = 1;
     blockedKey = null;
@@ -62,16 +67,27 @@ const testState = vi.hoisted(() => {
     const marker = "### Text Content";
     const markerIndex = prompt.indexOf(marker);
     const searchArea = markerIndex >= 0 ? prompt.slice(markerIndex) : prompt;
-    const match = searchArea.match(/C(\d+)-K(\d+)/);
-
-    if (!match) {
-      throw new Error(`Could not parse chapter/chunk from prompt: ${prompt.slice(0, 200)}`);
+    const chunkMatch = searchArea.match(/C(\d+)-K(\d+)/);
+    if (chunkMatch) {
+      return {
+        chapter: Number.parseInt(chunkMatch[1], 10),
+        chunk: Number.parseInt(chunkMatch[2], 10),
+      };
     }
 
-    return { chapter: Number.parseInt(match[1], 10), chunk: Number.parseInt(match[2], 10) };
+    const chapterMatch = prompt.match(/chapter-(\d+)-seed/);
+    if (chapterMatch) {
+      return { chapter: Number.parseInt(chapterMatch[1], 10), chunk: 0 };
+    }
+
+    throw new Error(`Could not parse chapter/chunk from prompt: ${prompt.slice(0, 200)}`);
   }
 
-  async function callProvider(prompt: string): Promise<string> {
+  function setProviderResponses(provider: string, responses: Array<string | Error>): void {
+    providerResponses.set(provider, [...responses]);
+  }
+
+  async function callProvider(provider: string, prompt: string): Promise<string> {
     const { chapter, chunk } = parseCurrentChunkFromPrompt(prompt);
     providerCalls.push({ chapter, chunk, prompt });
 
@@ -80,6 +96,15 @@ const testState = vi.hoisted(() => {
       return new Promise<string>((resolve) => {
         blockedResolver = resolve;
       });
+    }
+
+    const queue = providerResponses.get(provider);
+    if (queue && queue.length > 0) {
+      const next = queue.shift();
+      if (next instanceof Error) {
+        throw next;
+      }
+      return next as string;
     }
 
     return `<p>R-C${chapter}-K${chunk}</p>`;
@@ -108,6 +133,7 @@ const testState = vi.hoisted(() => {
     setChunkCounts,
     blockProviderFor,
     resolveBlockedProvider,
+    setProviderResponses,
     getChunkCount,
     callProvider,
     buildChunks,
@@ -164,6 +190,14 @@ vi.mock("../helpers/writeBookFile", () => ({
   }),
 }));
 
+vi.mock("../helpers/appendBookFile", () => ({
+  appendBookFile: vi.fn((fileName: string, content: string, fileType?: string) => {
+    const previous = testState.fileStore.get(fileName) || "";
+    testState.fileStore.set(fileName, `${previous}${content}`);
+    testState.writeCalls.push({ fileName, content, fileType });
+  }),
+}));
+
 vi.mock("../helpers/readBookFile", () => ({
   readBookFile: vi.fn((fileName: string) => {
     const content = testState.fileStore.get(fileName);
@@ -175,7 +209,11 @@ vi.mock("../helpers/readBookFile", () => ({
   doesBookFileExist: vi.fn((fileName: string) => testState.fileStore.has(fileName)),
 }));
 
-vi.mock("./new-tooling/compare-chapters-xml", () => ({ compareXmlTextContent: vi.fn(() => true) }));
+vi.mock("./new-tooling/compare-chapters-xml", () => ({
+  compareXmlTextContent: vi.fn(
+    (_original: string, modified: string) => !modified.includes("INVALID"),
+  ),
+}));
 
 vi.mock("./new-tooling/restore-text-in-html", () => ({
   restoreOriginalTextInHtml: vi.fn((_original: string, rewritten: string) => rewritten),
@@ -215,16 +253,16 @@ vi.mock("./chapterChunker", () => ({
 }));
 
 vi.mock("../callClaude", () => ({
-  callGeminiWrapper: vi.fn((prompt: string) => testState.callProvider(prompt)),
-  callGeminiVertexWrapper: vi.fn((prompt: string) => testState.callProvider(prompt)),
+  callGeminiWrapper: vi.fn((prompt: string) => testState.callProvider("gemini", prompt)),
+  callGeminiVertexWrapper: vi.fn((prompt: string) => testState.callProvider("vertex", prompt)),
 }));
 
 vi.mock("../callGrok", () => ({
-  callGrok: vi.fn((prompt: string) => testState.callProvider(prompt)),
+  callGrok: vi.fn((prompt: string) => testState.callProvider("grok", prompt)),
 }));
 
 vi.mock("../callO3", () => ({
-  callGpt5: vi.fn((prompt: string) => testState.callProvider(prompt)),
+  callGpt5: vi.fn((prompt: string) => testState.callProvider("gpt-5", prompt)),
 }));
 
 import { identifyCharactersAndRewriteParagraphs } from "./identifyEntityAndRewriteParagraphs";
@@ -252,6 +290,7 @@ describe("identifyCharactersAndRewriteParagraphs chunk scheduler", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     testState.reset();
+    vi.mocked(chapterChunker.needsChunking).mockReturnValue(true);
   });
 
   it("allows a chapter to continue to later chunks without waiting for another chapter's chunk 1", async () => {
@@ -303,5 +342,43 @@ describe("identifyCharactersAndRewriteParagraphs chunk scheduler", () => {
     expect(chunk1Prompt?.prompt).toContain("<PreviousContext>\n<p>R-C1-K0</p>\n</PreviousContext>");
     expect(chunk2Prompt?.prompt).toContain("<PreviousContext>\n<p>R-C1-K1</p>\n</PreviousContext>");
     expect(compiledChunk2PromptWrite?.content).toContain("<p>R-C1-K1</p>");
+  });
+
+  it("uses the same orchestrator for non-chunked chapters", async () => {
+    vi.mocked(chapterChunker.needsChunking).mockReturnValue(false);
+    testState.configureChapters(1, 1);
+
+    await identifyCharactersAndRewriteParagraphs(createReferenceCards());
+
+    const chapterOutput = testState.fileStore.get("rewritten-paragraphs-for-chapter-1.xml");
+    expect(chapterOutput).toContain('<section data-chapter="1"');
+    expect(testState.providerCalls.some((call) => call.chapter === 1 && call.chunk === 0)).toBe(
+      true,
+    );
+  });
+
+  it("falls back and selects grok when gpt-5 fallback fails", async () => {
+    testState.configureChapters(1, 1);
+    testState.setChunkCounts([[1, 1]]);
+    testState.setProviderResponses("gemini", ["<p>INVALID-primary</p>"]);
+    testState.setProviderResponses("vertex", ["<p>INVALID-primary</p>"]);
+    testState.setProviderResponses("gpt-5", [new Error("gpt failure")]);
+    testState.setProviderResponses("grok", ["<p>R-C1-K0</p>"]);
+
+    await identifyCharactersAndRewriteParagraphs(createReferenceCards());
+
+    const chapterOutput = testState.fileStore.get("rewritten-paragraphs-for-chapter-1.xml");
+    expect(chapterOutput).toContain("R-C1-K0");
+
+    const summaryWrite = [...testState.writeCalls]
+      .reverse()
+      .find(
+        (call) =>
+          call.fileName.includes("rewrite-benchmarks/") && call.fileName.endsWith("/summary.json"),
+      );
+    const summaryRaw = summaryWrite?.content;
+    expect(summaryRaw).toBeDefined();
+    const summary = JSON.parse(summaryRaw || "{}") as { grokSelectedDueToGptFailure?: number };
+    expect(summary.grokSelectedDueToGptFailure).toBeGreaterThanOrEqual(1);
   });
 });
