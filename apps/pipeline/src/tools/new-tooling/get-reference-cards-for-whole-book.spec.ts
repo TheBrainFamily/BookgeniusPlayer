@@ -1,0 +1,245 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NewReferenceCardsResponseSchema } from "../../schemes";
+import { getReferenceCardsForWholeBook } from "./get-reference-cards-for-whole-book";
+import { callGpt5WithSchema } from "../../callGpt5";
+import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { writeBookFile } from "../../helpers/writeBookFile";
+
+type WriteCall = { fileName: string; content: string; fileType?: string };
+
+const state = vi.hoisted(() => {
+  const writes: WriteCall[] = [];
+  const files = new Map<string, string>();
+
+  function reset(): void {
+    writes.length = 0;
+    files.clear();
+  }
+
+  function write(fileName: string, content: string, fileType?: string): string {
+    writes.push({ fileName, content, fileType });
+    files.set(fileName, content);
+    return `/tmp/${fileName}`;
+  }
+
+  return { writes, files, reset, write };
+});
+
+vi.mock("fs", () => ({ default: { readFileSync: vi.fn(() => "PROMPT TEMPLATE\n") } }));
+
+vi.mock("../../helpers/getBookSettings", () => ({
+  getBookSettings: vi.fn(() => ({ startFromChapter: 1, numberOfChaptersToProcess: 2 })),
+}));
+
+vi.mock("../../helpers/getChaptersUpTo", () => ({
+  getChaptersUpTo: vi.fn(() => [
+    { number: 1, title: "One", content: "A" },
+    { number: 2, title: "Two", content: "B" },
+  ]),
+}));
+
+vi.mock("../../helpers/writeBookFile", () => ({
+  writeBookFile: vi.fn((fileName: string, content: string, fileType?: string) =>
+    state.write(fileName, content, fileType),
+  ),
+}));
+
+vi.mock("../../callGpt5", () => ({ callGpt5WithSchema: vi.fn() }));
+
+vi.mock("../../callFastGemini", () => ({ callGeminiWithThinkingAndSchemaAndParsed: vi.fn() }));
+
+function gptResponse() {
+  return { characters: [{ name: "Alice", referenceCard: "From GPT" }] };
+}
+
+function geminiFlashResponse() {
+  return { characters: [{ name: "Bob", referenceCard: "From Gemini Flash" }] };
+}
+
+function geminiProResponse() {
+  return { characters: [{ name: "Carol", referenceCard: "From Gemini Pro" }] };
+}
+
+function parseManifestRows(): Array<Record<string, unknown>> {
+  const manifest = state.files.get("reference-cards-benchmarks/spec-run/manifest.ndjson");
+  if (!manifest) return [];
+  return manifest
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line) as Record<string, unknown>);
+}
+
+describe("getReferenceCardsForWholeBook", () => {
+  beforeEach(() => {
+    state.reset();
+    vi.clearAllMocks();
+    process.env.REFERENCE_CARDS_BENCHMARK_RUN_ID = "spec-run";
+    process.env.REFERENCE_CARDS_GEMINI_PRO_SAMPLE_RATE = "0.1";
+    vi.spyOn(Math, "random").mockReturnValue(0.9);
+
+    vi.mocked(callGpt5WithSchema).mockResolvedValue(gptResponse());
+    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockImplementation(
+      async (_prompt: string, _schema, model?: string) =>
+        model === "gemini-3-pro-preview" ? geminiProResponse() : geminiFlashResponse(),
+    );
+  });
+
+  it("returns GPT-5 result when GPT-5 and Gemini Flash both succeed", async () => {
+    const result = await getReferenceCardsForWholeBook();
+
+    expect(result.characters.some((c) => c.name === "Alice")).toBe(true);
+    expect(result.characters.some((c) => c.name === "Bob")).toBe(false);
+    expect(result.characters.filter((c) => c.name === "generic-avatar")).toHaveLength(1);
+    expect(callGpt5WithSchema).toHaveBeenCalledTimes(1);
+    expect(callGeminiWithThinkingAndSchemaAndParsed).toHaveBeenCalledWith(
+      expect.any(String),
+      NewReferenceCardsResponseSchema,
+      "gemini-3-flash-preview",
+    );
+  });
+
+  it("falls back to Gemini Flash when GPT-5 fails", async () => {
+    vi.mocked(callGpt5WithSchema).mockRejectedValue(new Error("gpt down"));
+
+    const result = await getReferenceCardsForWholeBook();
+
+    expect(result.characters.some((c) => c.name === "Bob")).toBe(true);
+    expect(result.characters.some((c) => c.name === "generic-avatar")).toBe(true);
+  });
+
+  it("throws when GPT-5 and Gemini Flash both fail", async () => {
+    vi.mocked(callGpt5WithSchema).mockRejectedValue(new Error("gpt failed"));
+    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockRejectedValue(
+      new Error("gemini failed"),
+    );
+
+    await expect(getReferenceCardsForWholeBook()).rejects.toThrow(/gpt failed/i);
+    await expect(getReferenceCardsForWholeBook()).rejects.toThrow(/gemini failed/i);
+  });
+
+  it("runs GPT-5 and Gemini Flash in parallel", async () => {
+    let resolveGpt: ((value: unknown) => void) | undefined;
+    let resolveGem: ((value: unknown) => void) | undefined;
+
+    const gptStarted = vi.fn();
+    const gemStarted = vi.fn();
+
+    vi.mocked(callGpt5WithSchema).mockImplementation(async () => {
+      gptStarted();
+      return new Promise((resolve) => {
+        resolveGpt = resolve;
+      }) as Promise<ReturnType<typeof gptResponse>>;
+    });
+
+    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockImplementation(async () => {
+      gemStarted();
+      return new Promise((resolve) => {
+        resolveGem = resolve;
+      }) as Promise<ReturnType<typeof geminiFlashResponse>>;
+    });
+
+    const pending = getReferenceCardsForWholeBook();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(gptStarted).toHaveBeenCalledTimes(1);
+    expect(gemStarted).toHaveBeenCalledTimes(1);
+
+    resolveGpt?.(gptResponse());
+    resolveGem?.(geminiFlashResponse());
+    await pending;
+  });
+
+  it("runs Gemini Pro in sampled requests and writes pro artifact", async () => {
+    vi.mocked(Math.random).mockReturnValue(0.01);
+
+    const result = await getReferenceCardsForWholeBook();
+
+    expect(result.characters.some((c) => c.name === "Alice")).toBe(true);
+    expect(callGeminiWithThinkingAndSchemaAndParsed).toHaveBeenCalledTimes(2);
+    expect(callGeminiWithThinkingAndSchemaAndParsed).toHaveBeenNthCalledWith(
+      2,
+      expect.any(String),
+      NewReferenceCardsResponseSchema,
+      "gemini-3-pro-preview",
+    );
+    expect(state.files.has("reference-cards-benchmarks/spec-run/outputs/gemini-pro.json")).toBe(
+      true,
+    );
+  });
+
+  it("marks Gemini Pro as not sampled when random is above threshold", async () => {
+    vi.mocked(Math.random).mockReturnValue(0.9);
+
+    await getReferenceCardsForWholeBook();
+
+    const rows = parseManifestRows();
+    const proRow = rows.find((row) => row.provider === "gemini-pro");
+    expect(proRow).toBeDefined();
+    expect(proRow?.sampled).toBe(false);
+    expect(proRow?.status).toBe("skipped");
+  });
+
+  it("does not fail when sampled Gemini Pro fails and GPT-5 succeeds", async () => {
+    vi.mocked(Math.random).mockReturnValue(0.01);
+    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockImplementation(
+      async (_prompt: string, _schema, model?: string) => {
+        if (model === "gemini-3-pro-preview") {
+          throw new Error("pro failed");
+        }
+        return geminiFlashResponse();
+      },
+    );
+
+    const result = await getReferenceCardsForWholeBook();
+
+    expect(result.characters.some((c) => c.name === "Alice")).toBe(true);
+    const rows = parseManifestRows();
+    const proRow = rows.find((row) => row.provider === "gemini-pro");
+    expect(proRow?.status).toBe("failure");
+  });
+
+  it("keeps generic-avatar only once", async () => {
+    vi.mocked(callGpt5WithSchema).mockResolvedValue({
+      characters: [
+        { name: "Alice", referenceCard: "From GPT" },
+        { name: "generic-avatar", referenceCard: "Already there" },
+      ],
+    });
+
+    const result = await getReferenceCardsForWholeBook();
+    expect(result.characters.filter((c) => c.name === "generic-avatar")).toHaveLength(1);
+  });
+
+  it("writes benchmark artifacts under dedicated run folder", async () => {
+    await getReferenceCardsForWholeBook();
+
+    const benchmarkWrites = state.writes.filter((write) =>
+      write.fileName.startsWith("reference-cards-benchmarks/spec-run/"),
+    );
+
+    expect(benchmarkWrites.length).toBeGreaterThan(0);
+    expect(state.files.has("reference-cards-benchmarks/spec-run/prompt.md")).toBe(true);
+    expect(state.files.has("reference-cards-benchmarks/spec-run/summary.json")).toBe(true);
+    expect(state.files.has("reference-cards-benchmarks/spec-run/outputs/selected.json")).toBe(true);
+  });
+
+  it("writes selected output using selected provider result", async () => {
+    vi.mocked(callGpt5WithSchema).mockRejectedValue(new Error("gpt fail"));
+
+    await getReferenceCardsForWholeBook();
+    const selected = state.files.get("reference-cards-benchmarks/spec-run/outputs/selected.json");
+
+    expect(selected).toBeDefined();
+    expect(JSON.parse(selected || "{}").characters?.[0]?.name).toBe("Bob");
+  });
+
+  it("writes prompt snapshot for legacy and benchmark paths", async () => {
+    await getReferenceCardsForWholeBook();
+    expect(vi.mocked(writeBookFile)).toHaveBeenCalledWith(
+      "get-reference-cards-for-whole-book-prompt.md",
+      expect.any(String),
+    );
+    expect(state.files.has("reference-cards-benchmarks/spec-run/prompt.md")).toBe(true);
+  });
+});
