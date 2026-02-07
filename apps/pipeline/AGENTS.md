@@ -76,3 +76,7 @@ books-data/{slug}/
 - **File helpers**: Use `readBookFile`/`writeBookFile` with `FILE_TYPE` enum
 - **Chunking**: Long chapters split for LLM context limits
 - **Convex sync**: Real-time upload via `convex-client.ts`
+
+## Operational Notes
+
+- **Rewrite chunking restarts**: See `apps/pipeline/docs/rewrite-chunking-notes.md` before resuming/restarting chunked `rewrite_paragraphs` runs.

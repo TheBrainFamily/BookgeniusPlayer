@@ -395,7 +395,52 @@ interface ChapterData {
   sectionAttributes: Record<string, string>;
 }
 
-/* eslint-disable complexity */
+async function processChunkedChapterFromPreScan(
+  data: ChapterData,
+  signal?: AbortSignal,
+): Promise<void> {
+  const { chapter, chunks, jsonCharacters, sectionAttributes } = data;
+  checkAborted(signal, `process pre-scanned chunked chapter ${chapter}`);
+
+  if (chunks.length === 0) {
+    return;
+  }
+
+  logger.info(`📦 Processing chapter ${chapter} in ${chunks.length} chunks`);
+
+  const processedChunks: string[] = [];
+
+  for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+    checkAborted(signal, `chapter ${chapter} chunk loop ${chunkIndex}`);
+    const chunk = chunks[chunkIndex];
+
+    // Feed each chunk (1+) with the previous rewritten chunk output for continuity.
+    const previousChunkOutput = chunkIndex > 0 ? processedChunks[chunkIndex - 1] : null;
+
+    logger.info(
+      `📦 Processing chapter ${chapter} chunk ${chunkIndex + 1}/${chunks.length} (${chunk.tokenCount} tokens)`,
+    );
+
+    const rewrittenChunk = await processChunk(
+      chapter,
+      chunkIndex,
+      chunk,
+      jsonCharacters,
+      previousChunkOutput,
+      { signal },
+    );
+    processedChunks.push(rewrittenChunk);
+  }
+
+  if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
+    return;
+  }
+
+  const combined = combineChunks(chapter, processedChunks, sectionAttributes);
+  writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, combined, FILE_TYPE.TEMPORARY);
+  logger.info(`✅ Chapter ${chapter} complete (${chunks.length} chunks combined)`);
+}
+
 export const identifyCharactersAndRewriteParagraphs = async (
   referenceCards: NewReferenceCardsResponse,
   signal?: AbortSignal,
@@ -506,105 +551,18 @@ export const identifyCharactersAndRewriteParagraphs = async (
     identifyAndRewriteParagraphs(data.chapter, charactersForChapter, 0, signal),
   );
 
-  // PHASE 1: Process all chunk 0s AND chunk 1s in parallel
-  // Chunk 1 gets RAW chunk 0 text as context (not tagged output)
-  const phase1Promises: Promise<string>[] = [];
-  for (const data of chunkedChapters) {
-    checkAborted(signal, `queue phase 1 for chapter ${data.chapter}`);
-    const { chapter, chunks } = data;
-
-    // Chunk 0 (no context)
-    logger.info(`📦 Queueing chapter ${chapter} chunk 0/${chunks.length}`);
-    phase1Promises.push(processChunk(chapter, 0, chunks[0], jsonCharacters, null, { signal }));
-
-    // Chunk 1 (RAW chunk 0 text as context) - if exists
-    if (chunks.length > 1) {
-      const rawChunk0Context = buildChunkXml(chunks[0].paragraphs);
-      logger.info(`📦 Queueing chapter ${chapter} chunk 1/${chunks.length} (with RAW context)`);
-      phase1Promises.push(
-        processChunk(chapter, 1, chunks[1], jsonCharacters, rawChunk0Context, { signal }),
-      );
-    }
-  }
-
-  // Run phase 1 + simple chapters in parallel
-  logger.info(
-    `🚀 Phase 1: Running ${phase1Promises.length} chunk tasks + ${simplePromises.length} simple tasks in parallel`,
+  const chunkedPromises = chunkedChapters.map((data) =>
+    processChunkedChapterFromPreScan(data, signal),
   );
-  checkAborted(signal, "before phase 1 Promise.all");
-  await Promise.all([...phase1Promises, ...simplePromises]);
 
-  // PHASE 2+: Process remaining chunks (chunk 2, 3, etc.) using TAGGED previous chunk output
-  let currentChunkIndex = 2;
-  let hasMoreChunks = true;
-
-  while (hasMoreChunks) {
-    checkAborted(signal, `phase ${currentChunkIndex} loop`);
-    const phasePromises: Promise<string>[] = [];
-    hasMoreChunks = false;
-
-    for (const data of chunkedChapters) {
-      const { chapter, chunks } = data;
-
-      if (chunks.length > currentChunkIndex) {
-        checkAborted(signal, `queue chapter ${chapter} chunk ${currentChunkIndex}`);
-        hasMoreChunks = true;
-        // Get TAGGED output from previous chunk
-        const taggedPreviousChunk = readBookFile(
-          `rewritten-paragraphs-for-chapter-${chapter}-chunk-${currentChunkIndex - 1}.xml`,
-          FILE_TYPE.TEMPORARY,
-        );
-        logger.info(
-          `📦 Queueing chapter ${chapter} chunk ${currentChunkIndex}/${chunks.length} (with TAGGED context)`,
-        );
-        phasePromises.push(
-          processChunk(
-            chapter,
-            currentChunkIndex,
-            chunks[currentChunkIndex],
-            jsonCharacters,
-            taggedPreviousChunk,
-            { signal },
-          ),
-        );
-      }
-    }
-
-    if (phasePromises.length > 0) {
-      logger.info(
-        `🚀 Phase ${currentChunkIndex}: Running ${phasePromises.length} chunk tasks in parallel`,
-      );
-      checkAborted(signal, `before phase ${currentChunkIndex} Promise.all`);
-      await Promise.all(phasePromises);
-    }
-
-    currentChunkIndex++;
-  }
-
-  // Combine all chunks for each chunked chapter
-  for (const data of chunkedChapters) {
-    checkAborted(signal, `combine chapter ${data.chapter}`);
-    const { chapter, chunks, sectionAttributes } = data;
-
-    // Check if already combined
-    if (doesBookFileExist(`rewritten-paragraphs-for-chapter-${chapter}.xml`, FILE_TYPE.TEMPORARY)) {
-      continue;
-    }
-
-    const processedChunks = chunks.map((_, i) =>
-      readBookFile(
-        `rewritten-paragraphs-for-chapter-${chapter}-chunk-${i}.xml`,
-        FILE_TYPE.TEMPORARY,
-      ),
-    );
-    const combined = combineChunks(chapter, processedChunks, sectionAttributes);
-    writeBookFile(`rewritten-paragraphs-for-chapter-${chapter}.xml`, combined, FILE_TYPE.TEMPORARY);
-    logger.info(`✅ Chapter ${chapter} complete (${chunks.length} chunks combined)`);
-  }
+  logger.info(
+    `🚀 Running ${chunkedPromises.length} chunked chapter tasks + ${simplePromises.length} simple tasks in parallel`,
+  );
+  checkAborted(signal, "before chapter-level Promise.all");
+  await Promise.all([...simplePromises, ...chunkedPromises]);
 
   logger.info(`✅ All chapters processed`);
 };
-/* eslint-enable complexity */
 
 if (require.main === module) {
   const referenceCards = JSON.parse(
