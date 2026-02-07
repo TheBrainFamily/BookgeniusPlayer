@@ -224,6 +224,26 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
     );
   });
 
+  it("splits malformed multi-value attributes instead of creating merged slugs", async () => {
+    testState.setChapterRange(1, 1);
+    testState.setRewrittenXml(
+      1,
+      `<section data-chapter="1">\n<p data-speaker="bob,carol"><span data-c="alice bob">Alice and Bob</span> speak.</p>\n</section>`,
+    );
+
+    await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
+
+    const chapterSummaryRaw = testState.files.get("summaries-with-paragraphs-1.json");
+    expect(chapterSummaryRaw).toBeDefined();
+    const chapterSummary = JSON.parse(chapterSummaryRaw || "{}");
+    const slugs = chapterSummary.chapterCharacters
+      .map((character: { slug: string }) => character.slug)
+      .sort();
+
+    expect(slugs).toEqual(expect.arrayContaining(["alice", "bob", "carol"]));
+    expect(slugs).not.toContain("alice-bob");
+  });
+
   it("fails hard when rewritten chapter XML is missing", async () => {
     testState.setChapterRange(1, 2);
     testState.setRewrittenXml(

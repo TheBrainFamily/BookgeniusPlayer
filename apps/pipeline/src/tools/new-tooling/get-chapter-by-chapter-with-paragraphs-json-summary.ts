@@ -60,6 +60,13 @@ function normalizeSlug(value: string): string {
   return generateTagName(value.trim());
 }
 
+function splitSlugTokens(raw: string): string[] {
+  return raw
+    .split(/[\s,;]+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length > 0);
+}
+
 function escapeXmlAttribute(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -106,31 +113,34 @@ function extractDetectedCharactersFromRewrittenXml(
   const mentionNameBySlug = new Map<string, string>();
 
   $("[data-c]").each((_index, element) => {
-    const rawSlug = $(element).attr("data-c")?.trim();
+    const rawSlug = $(element).attr("data-c");
     if (!rawSlug) {
       return;
     }
 
-    const slug = normalizeSlug(rawSlug);
-    mentionedSlugs.add(slug);
-
-    if (!mentionNameBySlug.has(slug)) {
-      const mentionText = $(element).text().trim();
-      if (mentionText.length > 0) {
+    const mentionText = $(element).text().trim();
+    for (const token of splitSlugTokens(rawSlug)) {
+      const slug = normalizeSlug(token);
+      if (!slug) {
+        continue;
+      }
+      mentionedSlugs.add(slug);
+      if (!mentionNameBySlug.has(slug) && mentionText.length > 0) {
         mentionNameBySlug.set(slug, mentionText);
       }
     }
   });
 
   $("[data-speaker]").each((_index, element) => {
-    const speakerRaw = $(element).attr("data-speaker") || "";
-    const tokens = speakerRaw
-      .split(/\s+/)
-      .map((token) => token.trim())
-      .filter((token) => token.length > 0);
-
-    for (const token of tokens) {
-      speakingSlugs.add(normalizeSlug(token));
+    const speakerRaw = $(element).attr("data-speaker");
+    if (!speakerRaw) {
+      return;
+    }
+    for (const token of splitSlugTokens(speakerRaw)) {
+      const slug = normalizeSlug(token);
+      if (slug) {
+        speakingSlugs.add(slug);
+      }
     }
   });
 

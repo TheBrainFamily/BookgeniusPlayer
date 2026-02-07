@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { type NewReferenceCardsResponse } from "../../types";
 import { generatePicturePrompts } from "./generate-pictures-for-entities";
-import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 
 type WriteCall = { fileName: string; content: string; fileType?: string };
 
@@ -23,44 +22,19 @@ const state = vi.hoisted(() => {
   return { writes, files, reset, write };
 });
 
-vi.mock("fs", () => ({ default: { readFileSync: vi.fn(() => "{{characters}}\n{{bookText}}") } }));
-
-vi.mock("../../helpers/getBookSettings", () => ({
-  getBookSettings: vi.fn(() => ({ startFromChapter: 1, numberOfChaptersToProcess: 1 })),
-}));
-
-vi.mock("../../helpers/getChaptersUpTo", () => ({
-  getChaptersUpTo: vi.fn(() => [{ number: 1, title: "Chapter 1", content: "Book text." }]),
-}));
-
 vi.mock("../../helpers/writeBookFile", () => ({
   writeBookFile: vi.fn((fileName: string, content: string, fileType?: string) =>
     state.write(fileName, content, fileType),
   ),
 }));
 
-vi.mock("../../callFastGemini", () => ({
-  callGeminiWithThinking: vi.fn(),
-  callGeminiWithThinkingAndSchemaAndParsed: vi.fn(),
-}));
-
 describe("generatePicturePrompts integration", () => {
   beforeEach(() => {
     state.reset();
     vi.clearAllMocks();
-
-    vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockResolvedValue({
-      characters: [
-        {
-          name: "alice",
-          visualGuide:
-            "Young woman with pale skin, short black hair, bright green eyes, and a crimson scarf.",
-        },
-      ],
-    });
   });
 
-  it("writes scorecard artifact with expected coverage metrics in ac-shadow mode", async () => {
+  it("always writes scorecard artifact with expected coverage metrics", async () => {
     const referenceCards: NewReferenceCardsResponse = {
       characters: [
         {
@@ -78,12 +52,10 @@ describe("generatePicturePrompts integration", () => {
       ],
     };
 
-    const result = await generatePicturePrompts(referenceCards, {
-      experimentMode: "ac-shadow",
-      experimentRunId: "test-run",
-    });
+    const result = await generatePicturePrompts(referenceCards, { experimentRunId: "test-run" });
 
     expect(result.characters.some((character) => character.name === "alice")).toBe(true);
+    expect(result.characters.some((character) => character.name === "bob")).toBe(true);
     expect(
       result.characters.filter((character) => character.name === "generic-avatar"),
     ).toHaveLength(1);
@@ -95,11 +67,11 @@ describe("generatePicturePrompts integration", () => {
     expect(scorecard).toEqual(
       expect.objectContaining({
         requestedCharactersCount: 2,
-        aReturnedCount: 1,
+        aReturnedCount: 2,
         cReturnedCount: 2,
-        aMissingCount: 1,
+        aMissingCount: 0,
         cMissingCount: 0,
-        missingDelta: -1,
+        missingDelta: 0,
       }),
     );
     expect(scorecard.qualityHeuristics).toEqual(
@@ -111,7 +83,7 @@ describe("generatePicturePrompts integration", () => {
     expect(state.files.has("visual-guide-experiments/test-run/name-mapping.json")).toBe(true);
   });
 
-  it("keeps normal behavior and skips experiment artifacts when experiment mode is off", async () => {
+  it("writes experiment artifacts even with default options", async () => {
     const referenceCards: NewReferenceCardsResponse = {
       characters: [
         {
@@ -127,17 +99,24 @@ describe("generatePicturePrompts integration", () => {
       ],
     };
 
-    const result = await generatePicturePrompts(referenceCards, { experimentMode: "off" });
+    const result = await generatePicturePrompts(referenceCards, { experimentRunId: "default-run" });
 
     expect(result.characters.some((character) => character.name === "alice")).toBe(true);
+    expect(result.characters.some((character) => character.name === "bob")).toBe(true);
     expect(
       result.characters.filter((character) => character.name === "generic-avatar"),
     ).toHaveLength(1);
-    expect(vi.mocked(callGeminiWithThinkingAndSchemaAndParsed)).toHaveBeenCalledTimes(1);
 
     const experimentWrites = Array.from(state.files.keys()).filter((fileName) =>
       fileName.startsWith("visual-guide-experiments/"),
     );
-    expect(experimentWrites).toHaveLength(0);
+    expect(experimentWrites).toEqual(
+      expect.arrayContaining([
+        "visual-guide-experiments/default-run/a-output.json",
+        "visual-guide-experiments/default-run/c-output.json",
+        "visual-guide-experiments/default-run/name-mapping.json",
+        "visual-guide-experiments/default-run/scorecard.json",
+      ]),
+    );
   });
 });

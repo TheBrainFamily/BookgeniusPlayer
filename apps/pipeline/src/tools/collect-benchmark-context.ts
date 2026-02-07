@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { createPatch } from "diff";
 import { generateTagName } from "../helpers/generateTagName";
 
 type ReferenceCharacter = { name: string; referenceCard?: string; visualGuide?: string };
@@ -49,6 +48,24 @@ type VisualData = {
 };
 
 type RewriteData = { summary: unknown; manifest: RewriteManifestRow[] };
+
+type XmlCoverageStats = {
+  referenceCardsTotal: number;
+  xmlDetectedTotal: number;
+  foundInXmlCount: number;
+  foundInXmlPercent: number;
+  missingFromXmlsCount: number;
+  missingFromXmlsSlugs: string[];
+  missingFromReferenceCardsCount: number;
+  missingFromReferenceCardsPercent: number;
+  missingFromReferenceCardsSlugs: string[];
+};
+
+type XmlCoverageReport = {
+  rewrittenChapterFiles: number;
+  xmlDetectedCharacterSlugs: number;
+  providers: { gpt5ReferenceCards: XmlCoverageStats; geminiFlashReferenceCards: XmlCoverageStats };
+};
 
 function usageAndExit(): never {
   console.error(`
@@ -104,7 +121,7 @@ function parseArgs(argv: string[]): CliOptions {
 }
 
 function getRepoRoot(): string {
-  return path.resolve(__dirname, "../../../..");
+  return path.resolve(__dirname, "../..");
 }
 
 function ensureDir(dir: string): void {
@@ -190,27 +207,6 @@ function toCharacterMap(
   return map;
 }
 
-function fence(text: string | undefined): string {
-  const value = text && text.length > 0 ? text : "<empty>";
-  return `~~~text\n${value}\n~~~`;
-}
-
-function buildTextPatch(
-  title: string,
-  leftLabel: string,
-  rightLabel: string,
-  left: string | undefined,
-  right: string | undefined,
-): string {
-  const leftText = left || "";
-  const rightText = right || "";
-  if (leftText === rightText) {
-    return "No textual differences.";
-  }
-
-  return createPatch(title, leftText, rightText, leftLabel, rightLabel, { context: 3 });
-}
-
 function buildReferenceCardsComparisonMarkdown(params: {
   runId?: string;
   summary: unknown;
@@ -242,58 +238,56 @@ function buildReferenceCardsComparisonMarkdown(params: {
   lines.push(JSON.stringify(manifest ?? [], null, 2));
   lines.push(`~~~`);
   lines.push("");
-  lines.push(`## Full Content Comparison (GPT-5 vs Gemini Flash)`);
+  lines.push(`## Per-Character Provider Snapshot`);
   lines.push("");
 
   for (const name of allNames) {
     const g = gptMap.get(name);
     const f = flashMap.get(name);
     const p = proMap.get(name);
+    const providerSections = [
+      buildProviderSection("gpt-5", g),
+      buildProviderSection("gemini-flash", f),
+      buildProviderSection("gemini-pro", p),
+    ].filter(
+      (section): section is { provider: string; fields: Array<{ key: string; value: string }> } =>
+        Boolean(section),
+    );
 
     lines.push(`### ${name}`);
-    lines.push(`- in_gpt5: ${g ? "yes" : "no"}`);
-    lines.push(`- in_gemini_flash: ${f ? "yes" : "no"}`);
-    lines.push(`- in_gemini_pro: ${p ? "yes" : "no"}`);
-    lines.push("");
-
-    lines.push(`#### GPT-5 referenceCard`);
-    lines.push(fence(g?.referenceCard));
-    lines.push(`#### Gemini Flash referenceCard`);
-    lines.push(fence(f?.referenceCard));
-    lines.push(`#### referenceCard diff (gpt-5 vs gemini-flash)`);
-    lines.push("~~~diff");
-    lines.push(
-      buildTextPatch(
-        `${name}-referenceCard`,
-        "gpt-5",
-        "gemini-flash",
-        g?.referenceCard,
-        f?.referenceCard,
-      ),
-    );
-    lines.push("~~~");
-    lines.push("");
-
-    lines.push(`#### GPT-5 visualGuide`);
-    lines.push(fence(g?.visualGuide));
-    lines.push(`#### Gemini Flash visualGuide`);
-    lines.push(fence(f?.visualGuide));
-    lines.push(`#### visualGuide diff (gpt-5 vs gemini-flash)`);
-    lines.push("~~~diff");
-    lines.push(
-      buildTextPatch(
-        `${name}-visualGuide`,
-        "gpt-5",
-        "gemini-flash",
-        g?.visualGuide,
-        f?.visualGuide,
-      ),
-    );
+    lines.push("~~~yaml");
+    for (const section of providerSections) {
+      if (section.fields.length === 0) {
+        lines.push(`${section.provider}: {}`);
+        continue;
+      }
+      lines.push(`${section.provider}:`);
+      for (const field of section.fields) {
+        lines.push(`  ${field.key}: ${JSON.stringify(field.value)}`);
+      }
+    }
     lines.push("~~~");
     lines.push("");
   }
 
   return lines.join("\n");
+}
+
+function buildProviderSection(
+  provider: string,
+  character: ReferenceCharacter | undefined,
+): { provider: string; fields: Array<{ key: string; value: string }> } | null {
+  if (!character) {
+    return null;
+  }
+  const fields: Array<{ key: string; value: string }> = [];
+  if (character.referenceCard && character.referenceCard.trim().length > 0) {
+    fields.push({ key: "referenceCard", value: character.referenceCard });
+  }
+  if (character.visualGuide && character.visualGuide.trim().length > 0) {
+    fields.push({ key: "visualGuide", value: character.visualGuide });
+  }
+  return { provider, fields };
 }
 
 function buildVisualGuideComparisonMarkdown(params: {
@@ -324,29 +318,54 @@ function buildVisualGuideComparisonMarkdown(params: {
   lines.push(JSON.stringify(nameMapping ?? {}, null, 2));
   lines.push("~~~");
   lines.push("");
-  lines.push(`## Full Guide Comparison (A old-prompt Gemini vs C reference-cards visualGuide)`);
+  lines.push(
+    `## Per-Character Guide Snapshot (A old-prompt Gemini vs C reference-cards visualGuide)`,
+  );
   lines.push("");
 
   for (const name of allNames) {
     const aGuide = aMap.get(name)?.visualGuide;
     const cGuide = cMap.get(name)?.visualGuide;
+    const providerSections = [
+      buildVisualProviderSection("A", aMap.has(name), aGuide),
+      buildVisualProviderSection("C", cMap.has(name), cGuide),
+    ].filter(
+      (section): section is { provider: string; fields: Array<{ key: string; value: string }> } =>
+        Boolean(section),
+    );
 
     lines.push(`### ${name}`);
-    lines.push(`- in_A: ${aMap.has(name) ? "yes" : "no"}`);
-    lines.push(`- in_C: ${cMap.has(name) ? "yes" : "no"}`);
-    lines.push("");
-    lines.push(`#### A visualGuide`);
-    lines.push(fence(aGuide));
-    lines.push(`#### C visualGuide`);
-    lines.push(fence(cGuide));
-    lines.push(`#### visualGuide diff (A vs C)`);
-    lines.push("~~~diff");
-    lines.push(buildTextPatch(`${name}-A-vs-C`, "A", "C", aGuide, cGuide));
+    lines.push("~~~yaml");
+    for (const section of providerSections) {
+      if (section.fields.length === 0) {
+        lines.push(`${section.provider}: {}`);
+        continue;
+      }
+      lines.push(`${section.provider}:`);
+      for (const field of section.fields) {
+        lines.push(`  ${field.key}: ${JSON.stringify(field.value)}`);
+      }
+    }
     lines.push("~~~");
     lines.push("");
   }
 
   return lines.join("\n");
+}
+
+function buildVisualProviderSection(
+  provider: string,
+  present: boolean,
+  guide: string | undefined,
+): { provider: string; fields: Array<{ key: string; value: string }> } | null {
+  if (!present) {
+    return null;
+  }
+  const fields: Array<{ key: string; value: string }> = [];
+  if (guide && guide.trim().length > 0) {
+    fields.push({ key: "visualGuide", value: guide });
+  }
+  return { provider, fields };
 }
 
 function buildRewriteReportMarkdown(params: {
@@ -419,6 +438,217 @@ function buildChapterSummaryArtifactsSection(tempOutputDir: string): string {
     `- prompts_without_summary: ${promptsWithoutSummary.length > 0 ? promptsWithoutSummary.join(", ") : "<none>"}`,
     `- summaries_without_prompt: ${summariesWithoutPrompt.length > 0 ? summariesWithoutPrompt.join(", ") : "<none>"}`,
     `- note: current chapter-summary queue path does not emit a per-provider manifest; inspect pipeline logs for provider-call failures.`,
+  ].join("\n");
+}
+
+function extractVisualGuides(
+  output: VisualGuideOutput | ReferenceCardsOutput | null | undefined,
+): Array<{ name: string; visualGuide?: string }> {
+  return (output?.characters || []).map((character) => ({
+    name: character.name,
+    visualGuide: character.visualGuide,
+  }));
+}
+
+function appendVisualGuideSection(
+  lines: string[],
+  title: string,
+  guides: Array<{ name: string; visualGuide?: string }>,
+): void {
+  lines.push(`## ${title}`);
+  lines.push("");
+  for (const guide of guides) {
+    lines.push(`### ${guide.name}`);
+    lines.push(
+      guide.visualGuide && guide.visualGuide.trim().length > 0 ? guide.visualGuide : "<empty>",
+    );
+    lines.push("");
+  }
+}
+
+function buildRawVisualGuidesMarkdown(params: {
+  visualA: VisualGuideOutput | null;
+  referenceGpt: ReferenceCardsOutput | null;
+  referenceFlash: ReferenceCardsOutput | null;
+}): string {
+  const lines: string[] = [];
+  appendVisualGuideSection(lines, "legacyVisualGuidesA", extractVisualGuides(params.visualA));
+  appendVisualGuideSection(
+    lines,
+    "referenceCardsGpt5VisualGuides",
+    extractVisualGuides(params.referenceGpt),
+  );
+  appendVisualGuideSection(
+    lines,
+    "referenceCardsGeminiFlashVisualGuides",
+    extractVisualGuides(params.referenceFlash),
+  );
+  return lines.join("\n");
+}
+
+function extractXmlAttributeValues(xml: string, attribute: string): string[] {
+  const regex = new RegExp(`${attribute}\\s*=\\s*["']([^"']+)["']`, "gi");
+  const values: string[] = [];
+  let match: RegExpExecArray | null = regex.exec(xml);
+  while (match) {
+    values.push(match[1]);
+    match = regex.exec(xml);
+  }
+  return values;
+}
+
+function splitSlugTokens(raw: string): string[] {
+  return raw
+    .split(/[\s,;]+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length > 0);
+}
+
+function listRewrittenChapterFiles(tempOutputDir: string): string[] {
+  const chapterFilePattern = /^rewritten-paragraphs-for-chapter-\d+\.xml$/;
+  if (!fs.existsSync(tempOutputDir)) {
+    return [];
+  }
+  return fs
+    .readdirSync(tempOutputDir)
+    .filter((fileName) => chapterFilePattern.test(fileName))
+    .sort((a, b) => {
+      const chapterA = Number.parseInt(a.replace(/\D/g, ""), 10);
+      const chapterB = Number.parseInt(b.replace(/\D/g, ""), 10);
+      return chapterA - chapterB;
+    });
+}
+
+function collectXmlDetectedSlugs(tempOutputDir: string): {
+  rewrittenChapterFiles: string[];
+  slugs: string[];
+} {
+  const rewrittenChapterFiles = listRewrittenChapterFiles(tempOutputDir);
+  const slugs = new Set<string>();
+
+  for (const fileName of rewrittenChapterFiles) {
+    const xmlPath = path.join(tempOutputDir, fileName);
+    const xml = fs.readFileSync(xmlPath, "utf8");
+
+    const dataCValues = extractXmlAttributeValues(xml, "data-c");
+    for (const value of dataCValues) {
+      for (const token of splitSlugTokens(value)) {
+        const normalized = normalizeName(token);
+        if (normalized.length > 0) {
+          slugs.add(normalized);
+        }
+      }
+    }
+
+    const dataSpeakerValues = extractXmlAttributeValues(xml, "data-speaker");
+    for (const value of dataSpeakerValues) {
+      for (const token of splitSlugTokens(value)) {
+        const normalized = normalizeName(token);
+        if (normalized.length > 0) {
+          slugs.add(normalized);
+        }
+      }
+    }
+  }
+
+  return { rewrittenChapterFiles, slugs: Array.from(slugs).sort((a, b) => a.localeCompare(b)) };
+}
+
+function collectProviderCharacterSlugs(output: ReferenceCardsOutput | null | undefined): string[] {
+  const unique = new Set<string>();
+  for (const character of output?.characters || []) {
+    const normalized = normalizeName(character.name);
+    if (normalized.length > 0) {
+      unique.add(normalized);
+    }
+  }
+  return Array.from(unique).sort((a, b) => a.localeCompare(b));
+}
+
+function computeCoverageStats(providerSlugs: string[], xmlSlugSet: Set<string>): XmlCoverageStats {
+  const xmlSlugs = Array.from(xmlSlugSet).sort((a, b) => a.localeCompare(b));
+  const providerSlugSet = new Set(providerSlugs);
+
+  const foundInXml = providerSlugs.filter((slug) => xmlSlugSet.has(slug));
+  const missingFromXmls = providerSlugs.filter((slug) => !xmlSlugSet.has(slug));
+  const missingFromReferenceCards = xmlSlugs.filter((slug) => !providerSlugSet.has(slug));
+
+  const referenceCardsTotal = providerSlugs.length;
+  const xmlDetectedTotal = xmlSlugs.length;
+  const foundInXmlCount = foundInXml.length;
+  const missingFromXmlsCount = missingFromXmls.length;
+  const missingFromReferenceCardsCount = missingFromReferenceCards.length;
+  const foundInXmlPercent =
+    referenceCardsTotal === 0
+      ? 0
+      : Number(((foundInXmlCount / referenceCardsTotal) * 100).toFixed(2));
+  const missingFromReferenceCardsPercent =
+    xmlDetectedTotal === 0
+      ? 0
+      : Number(((missingFromReferenceCardsCount / xmlDetectedTotal) * 100).toFixed(2));
+
+  return {
+    referenceCardsTotal,
+    xmlDetectedTotal,
+    foundInXmlCount,
+    foundInXmlPercent,
+    missingFromXmlsCount,
+    missingFromXmlsSlugs: missingFromXmls,
+    missingFromReferenceCardsCount,
+    missingFromReferenceCardsPercent,
+    missingFromReferenceCardsSlugs: missingFromReferenceCards,
+  };
+}
+
+function buildXmlCoverageReport(params: {
+  tempOutputDir: string;
+  referenceGpt: ReferenceCardsOutput | null;
+  referenceFlash: ReferenceCardsOutput | null;
+}): XmlCoverageReport {
+  const xmlDetected = collectXmlDetectedSlugs(params.tempOutputDir);
+  const xmlSlugSet = new Set(xmlDetected.slugs);
+  const gptSlugs = collectProviderCharacterSlugs(params.referenceGpt);
+  const flashSlugs = collectProviderCharacterSlugs(params.referenceFlash);
+
+  return {
+    rewrittenChapterFiles: xmlDetected.rewrittenChapterFiles.length,
+    xmlDetectedCharacterSlugs: xmlDetected.slugs.length,
+    providers: {
+      gpt5ReferenceCards: computeCoverageStats(gptSlugs, xmlSlugSet),
+      geminiFlashReferenceCards: computeCoverageStats(flashSlugs, xmlSlugSet),
+    },
+  };
+}
+
+function buildXmlCoverageMarkdown(report: XmlCoverageReport): string {
+  return [
+    `# XML Character Coverage`,
+    ``,
+    `- rewritten_chapter_files: ${report.rewrittenChapterFiles}`,
+    `- xml_detected_character_slugs: ${report.xmlDetectedCharacterSlugs}`,
+    ``,
+    `## gpt5ReferenceCards`,
+    `- referenceCardsTotal: ${report.providers.gpt5ReferenceCards.referenceCardsTotal}`,
+    `- xmlDetectedTotal: ${report.providers.gpt5ReferenceCards.xmlDetectedTotal}`,
+    `- foundInXmlCount: ${report.providers.gpt5ReferenceCards.foundInXmlCount}`,
+    `- foundInXmlPercent: ${report.providers.gpt5ReferenceCards.foundInXmlPercent}`,
+    `- missingFromXmlsCount: ${report.providers.gpt5ReferenceCards.missingFromXmlsCount}`,
+    `- missingFromXmlsSlugs: ${report.providers.gpt5ReferenceCards.missingFromXmlsSlugs.length > 0 ? report.providers.gpt5ReferenceCards.missingFromXmlsSlugs.join(", ") : "<none>"}`,
+    `- missingFromReferenceCardsCount: ${report.providers.gpt5ReferenceCards.missingFromReferenceCardsCount}`,
+    `- missingFromReferenceCardsPercent: ${report.providers.gpt5ReferenceCards.missingFromReferenceCardsPercent}`,
+    `- missingFromReferenceCardsSlugs: ${report.providers.gpt5ReferenceCards.missingFromReferenceCardsSlugs.length > 0 ? report.providers.gpt5ReferenceCards.missingFromReferenceCardsSlugs.join(", ") : "<none>"}`,
+    ``,
+    `## geminiFlashReferenceCards`,
+    `- referenceCardsTotal: ${report.providers.geminiFlashReferenceCards.referenceCardsTotal}`,
+    `- xmlDetectedTotal: ${report.providers.geminiFlashReferenceCards.xmlDetectedTotal}`,
+    `- foundInXmlCount: ${report.providers.geminiFlashReferenceCards.foundInXmlCount}`,
+    `- foundInXmlPercent: ${report.providers.geminiFlashReferenceCards.foundInXmlPercent}`,
+    `- missingFromXmlsCount: ${report.providers.geminiFlashReferenceCards.missingFromXmlsCount}`,
+    `- missingFromXmlsSlugs: ${report.providers.geminiFlashReferenceCards.missingFromXmlsSlugs.length > 0 ? report.providers.geminiFlashReferenceCards.missingFromXmlsSlugs.join(", ") : "<none>"}`,
+    `- missingFromReferenceCardsCount: ${report.providers.geminiFlashReferenceCards.missingFromReferenceCardsCount}`,
+    `- missingFromReferenceCardsPercent: ${report.providers.geminiFlashReferenceCards.missingFromReferenceCardsPercent}`,
+    `- missingFromReferenceCardsSlugs: ${report.providers.geminiFlashReferenceCards.missingFromReferenceCardsSlugs.length > 0 ? report.providers.geminiFlashReferenceCards.missingFromReferenceCardsSlugs.join(", ") : "<none>"}`,
+    ``,
   ].join("\n");
 }
 
@@ -532,6 +762,9 @@ function buildIndexMarkdown(params: {
     `- \`reference-cards-comparison.md\``,
     `- \`visual-guide-comparison.md\``,
     `- \`rewrite-report.md\``,
+    `- \`raw-visual-guides-comparison.md\` (legacy A vs reference-cards GPT-5 vs Gemini Flash)`,
+    `- \`xml-character-coverage.md\``,
+    `- \`xml-character-coverage.json\``,
     `- \`ai-context-full.md\` (single paste-friendly file)`,
     ``,
     params.chapterSection,
@@ -549,6 +782,9 @@ function writeBundleFiles(params: {
   visualMd: string;
   rewriteMd: string;
   chapterSection: string;
+  rawVisualGuidesMd: string;
+  xmlCoverageMd: string;
+  xmlCoverageReport: XmlCoverageReport;
 }): void {
   const indexMd = buildIndexMarkdown({
     slug: params.slug,
@@ -567,12 +803,20 @@ function writeBundleFiles(params: {
     params.visualMd,
     `---`,
     params.rewriteMd,
+    `---`,
+    params.xmlCoverageMd,
   ].join("\n\n");
 
   writeText(path.join(params.outDir, "README.md"), indexMd);
   writeText(path.join(params.outDir, "reference-cards-comparison.md"), params.referenceMd);
   writeText(path.join(params.outDir, "visual-guide-comparison.md"), params.visualMd);
   writeText(path.join(params.outDir, "rewrite-report.md"), params.rewriteMd);
+  writeText(path.join(params.outDir, "raw-visual-guides-comparison.md"), params.rawVisualGuidesMd);
+  writeText(path.join(params.outDir, "xml-character-coverage.md"), params.xmlCoverageMd);
+  writeText(
+    path.join(params.outDir, "xml-character-coverage.json"),
+    JSON.stringify(params.xmlCoverageReport, null, 2),
+  );
   writeText(path.join(params.outDir, "ai-context-full.md"), fullMd);
 
   const machineBundle = {
@@ -628,8 +872,19 @@ function main(): void {
     summary: rewriteData.summary,
     manifest: rewriteData.manifest,
   });
+  const xmlCoverageReport = buildXmlCoverageReport({
+    tempOutputDir,
+    referenceGpt: referenceData.gptOutput,
+    referenceFlash: referenceData.flashOutput,
+  });
+  const xmlCoverageMd = buildXmlCoverageMarkdown(xmlCoverageReport);
 
   const chapterSection = buildChapterSummaryArtifactsSection(tempOutputDir);
+  const rawVisualGuidesMd = buildRawVisualGuidesMarkdown({
+    visualA: visualData.aOutput,
+    referenceGpt: referenceData.gptOutput,
+    referenceFlash: referenceData.flashOutput,
+  });
   writeBundleFiles({
     outDir,
     slug: options.slug,
@@ -640,6 +895,9 @@ function main(): void {
     visualMd,
     rewriteMd,
     chapterSection,
+    rawVisualGuidesMd,
+    xmlCoverageMd,
+    xmlCoverageReport,
   });
 
   console.log(`Context bundle ready: ${outDir}`);

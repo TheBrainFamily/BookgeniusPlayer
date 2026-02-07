@@ -2,22 +2,14 @@ import { logger } from "../../logger";
 import OpenAI from "openai";
 import "dotenv/config";
 
-import fs from "fs";
-import { z } from "zod";
 import { getPictureFileNameForName } from "../../helpers/getPictureFileNameForName";
 import { readBookFile } from "../../helpers/readBookFile";
-import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
-import { getBookSettings } from "../../helpers/getBookSettings";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { bookFileExists } from "../../helpers/bookFileExists";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { type NewReferenceCardsResponse } from "../../types";
 import { generateCharacterImageWithFlux } from "./generate-flux-schnel-image";
-import { generateTagName } from "../../helpers/generateTagName";
-import {
-  callGeminiWithThinking,
-  callGeminiWithThinkingAndSchemaAndParsed,
-} from "../../callFastGemini";
+import { callGeminiWithThinking } from "../../callFastGemini";
 import {
   buildShadowCandidateFromReferenceCards,
   buildVisualGuideExperimentRunId,
@@ -25,23 +17,9 @@ import {
   writeVisualGuideExperimentArtifacts,
 } from "./visual-guide-experiment";
 const FREE_RUN = process.env.FREE_RUN === "true";
-const CharactersSchema = z.object({
-  characters: z.array(
-    z.object({
-      name: z.string(), // Character's full name
-      visualGuide: z.string(),
-    }),
-  ),
-});
+type CharactersType = { characters: Array<{ name: string; visualGuide: string }> };
 
-type CharactersType = z.infer<typeof CharactersSchema>;
-type VisualGuideExperimentMode = "off" | "ac-shadow";
-
-type GeneratePicturePromptsOptions = {
-  skipBookAnalysis?: boolean;
-  experimentMode?: VisualGuideExperimentMode;
-  experimentRunId?: string;
-};
+type GeneratePicturePromptsOptions = { skipBookAnalysis?: boolean; experimentRunId?: string };
 
 const knowCharactersFromAllPreviousBooks: { name: string; referenceCard: string }[] = [];
 const knownCharactersArray = knowCharactersFromAllPreviousBooks.map(({ name }) => name);
@@ -255,71 +233,43 @@ export const generatePicturePrompts = async (
   referenceCards: NewReferenceCardsResponse,
   options: GeneratePicturePromptsOptions = {},
 ) => {
-  const skipBookAnalysis = options.skipBookAnalysis || false;
-  const experimentMode = options.experimentMode || "off";
-  const characterNames = referenceCards.characters
-    .filter(({ name }) => !knownCharactersArray.includes(name))
-    .map((character) => normalizeCharacterName(character.name));
   const requestedCharacterNames = Array.from(
-    new Set(characterNames.filter((name) => name !== "generic-avatar")),
+    new Set(
+      referenceCards.characters
+        .filter(({ name }) => !knownCharactersArray.includes(name))
+        .map((character) => normalizeCharacterName(character.name))
+        .filter((name) => name !== "generic-avatar"),
+    ),
   );
-  logger.info(`Generating pictures for ${characterNames} characters`);
-  const initialPrompt = fs.readFileSync(`${__dirname}/generate-images-prompt.md`, "utf8");
+  logger.info(`Generating pictures for ${requestedCharacterNames.length} characters`);
 
-  let prompt: string;
-
-  if (skipBookAnalysis) {
-    const charactersXml = characterNames
-      .map(
-        (name) =>
-          `<character name="${name}" description="${referenceCards.characters.find((character) => generateTagName(character.name) === name)?.referenceCard}"/>`,
-      )
-      .join("\n");
-    prompt = initialPrompt
-      .replace("{{characters}}", `<characters>${charactersXml}</characters>`)
-      .replace("{{bookText}}", "");
-    console.log(prompt);
-    throw new Error("temporary error");
-  } else {
-    const bookSettings = getBookSettings();
-
-    const chapters = getChaptersUpTo(
-      bookSettings.startFromChapter,
-      bookSettings.startFromChapter + bookSettings.numberOfChaptersToProcess - 1,
-    );
-    const bookText = `<chapters>
-${chapters
-  .map(
-    (chapter) =>
-      `<chapter number="${chapter.number}"><title>${chapter.title}</title><content>${chapter.content}</content></chapter>`,
-  )
-  .join("\n")}
-</chapters>`;
-
-    const charactersXml = requestedCharacterNames
-      .map((name) => `<character name="${name}"/>`)
-      .join("\n");
-    prompt = initialPrompt
-      .replace("{{characters}}", `<characters>${charactersXml}</characters>`)
-      .replace("{{bookText}}", bookText);
+  const seenNames = new Set<string>();
+  const response: CharactersType = { characters: [] };
+  for (const character of referenceCards.characters) {
+    if (knownCharactersArray.includes(character.name)) {
+      continue;
+    }
+    const normalizedName = normalizeCharacterName(character.name);
+    if (seenNames.has(normalizedName)) {
+      continue;
+    }
+    seenNames.add(normalizedName);
+    response.characters.push({
+      name: normalizedName,
+      visualGuide: (character.visualGuide || "").trim(),
+    });
+  }
+  if (!response.characters.some((character) => character.name === "generic-avatar")) {
+    response.characters.push({
+      name: "generic-avatar",
+      visualGuide:
+        "A mysterious figure shown from behind or in silhouette. No distinct facial features visible. Anonymous, sexless, suitable for representing any unnamed character. Atmospheric lighting with the figure partially obscured by shadow or mist.",
+    });
   }
 
-  const response = (await callGeminiWithThinkingAndSchemaAndParsed(
-    prompt,
-    CharactersSchema,
-  )) as CharactersType;
-  logger.info(`Response: `, response);
-  response.characters.push({
-    name: "generic-avatar",
-    visualGuide:
-      "A mysterious figure shown from behind or in silhouette. No distinct facial features visible. Anonymous, sexless, suitable for representing any unnamed character. Atmospheric lighting with the figure partially obscured by shadow or mist.",
-  });
-
-  if (experimentMode === "ac-shadow") {
-    const runId = options.experimentRunId || buildVisualGuideExperimentRunId();
-    const cOutput = buildShadowCandidateFromReferenceCards(referenceCards, requestedCharacterNames);
-    writeVisualGuideExperimentArtifacts(runId, requestedCharacterNames, response, cOutput);
-  }
+  const runId = options.experimentRunId || buildVisualGuideExperimentRunId();
+  const cOutput = buildShadowCandidateFromReferenceCards(referenceCards, requestedCharacterNames);
+  writeVisualGuideExperimentArtifacts(runId, requestedCharacterNames, response, cOutput);
 
   return response;
 };
