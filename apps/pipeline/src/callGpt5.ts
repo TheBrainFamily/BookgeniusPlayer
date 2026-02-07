@@ -32,12 +32,13 @@ export const callGpt5WithSchema = async <T>(
   zodSchema: z.ZodSchema<T>,
   model: string = "gpt-5.2",
 ) => {
-  return generateObject({
+  const { object } = await generateObject({
     model: openai(model),
     schema: zodSchema,
     prompt,
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
   });
+  return object;
 };
 
 export const callGpt5 = async <T = string>(

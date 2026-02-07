@@ -417,6 +417,7 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
         experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
         providerOptions: {
           google: {
+            // @ts-expect-error wrong types
             safetySettings: getSafetySettings(),
             thinkingConfig: { thinkingLevel: "high" },
           } satisfies GoogleGenerativeAIProviderOptions,

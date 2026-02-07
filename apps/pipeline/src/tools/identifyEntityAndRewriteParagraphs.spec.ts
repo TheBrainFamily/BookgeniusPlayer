@@ -261,7 +261,7 @@ vi.mock("../callGrok", () => ({
   callGrok: vi.fn((prompt: string) => testState.callProvider("grok", prompt)),
 }));
 
-vi.mock("../callO3", () => ({
+vi.mock("../callGpt5", () => ({
   callGpt5: vi.fn((prompt: string) => testState.callProvider("gpt-5", prompt)),
 }));
 

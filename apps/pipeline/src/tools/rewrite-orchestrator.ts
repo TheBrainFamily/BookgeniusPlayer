@@ -2,7 +2,7 @@ import fs from "fs";
 import PQueue from "p-queue";
 import pLimit from "p-limit";
 import { callGeminiWrapper, callGeminiVertexWrapper } from "../callClaude";
-import { callGpt5 } from "../callO3";
+import { callGpt5 } from "../callGpt5";
 import { callGrok } from "../callGrok";
 import { FILE_TYPE } from "../helpers/filesHelpers";
 import { checkAborted, isAbortError } from "../helpers/abortHelpers";

@@ -31,7 +31,7 @@ export const pullTogetherChapters = () => {
         } catch {
           try {
             chapterText = readBookFile(
-              `rewritten-paragraphs-for-chapter-${i}-callO3.xml`,
+              `rewritten-paragraphs-for-chapter-${i}-callGpt5.xml`,
               FILE_TYPE.TEMPORARY,
             );
           } catch {

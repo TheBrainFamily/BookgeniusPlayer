@@ -90,7 +90,7 @@ vi.mock("../callClaude", () => ({
   callGeminiVertexWrapper: vi.fn((prompt: string) => state.invoke("vertex", prompt)),
 }));
 
-vi.mock("../callO3", () => ({
+vi.mock("../callGpt5", () => ({
   callGpt5: vi.fn((prompt: string) => state.invoke("gpt-5", prompt)),
 }));
 
