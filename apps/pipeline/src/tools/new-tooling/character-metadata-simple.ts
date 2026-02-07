@@ -11,7 +11,6 @@ import { createBookSettings } from "../../helpers/createBookSettings";
 import "dotenv/config";
 import { identifyCharactersAndRewriteParagraphs } from "../identifyEntityAndRewriteParagraphs";
 import { generatePicturesForEntities } from "./generate-pictures-for-entities";
-import { generateIntroSummary } from "./generate-intro-summary-simple";
 import { generateBackgrounds } from "./generate-prompts-for-backgrounds";
 
 process.on("unhandledRejection", (reason, promise) => {
@@ -68,15 +67,7 @@ const doIt = async () => {
   await identifyCharactersAndRewriteParagraphs(referenceCards); // return the xml with characters injected
   await generateBackgrounds();
   await generatePicturesForEntities(referenceCards); //TODO see background todos
-  //
-  {
-    await turnChapterSummariesIntoBulletPointsMappedToParagraphs(); // Generujemy podsumowania rozdzialow mapowane do akapitow na podstawie zrewritowanych XML-i.
-  }
-  // logger.info("Generating intro summary for each character");
-  await generateIntroSummary(referenceCards); // tutaj generujemy pierwszy wstep dla danej osoby. znajdujemy pierwszy akapit i rozdzial w ktorym ta osoba wystepuje, szukamy do tej kombinacji akapit/rozdzial sceny.
-  //
-  // generateCharactersMaster();
-  // pullTogetherChapters();
+  await turnChapterSummariesIntoBulletPointsMappedToParagraphs(); // Generujemy podsumowania rozdzialow mapowane do akapitow na podstawie zrewritowanych XML-i.
 };
 
 doIt().then(() => {

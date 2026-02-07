@@ -17,7 +17,7 @@ const api_key = process.env.AZURE_GPT_5_2_KEY;
 const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
 
 if (!api_key) {
-  throw new Error("OPENAI_KEY is not set");
+  throw new Error("AZURE_GPT_5_2_KEY is not set");
 }
 
 if (!endpoint) {

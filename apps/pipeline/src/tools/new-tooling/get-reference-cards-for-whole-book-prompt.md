@@ -39,6 +39,5 @@ Return the _final, complete_ results after processing _all_ chapters in the foll
 - Focus on reminding the reader who the character _is_ based on past context (role, relationships, key history), not what they _do_ or _say_ in the current chapter (N). Avoid spoilers!
 - Do not write more than 1-2 short sentences about the person. This is not a summary of a book, this is a memory-jog to quickly get someone to connect character name with the actual character.
 - If the person is known by two names, add the second one in the parentheses.
-- Jeśli tekst jest po Polsku, odpowiedz po Polsku
 
 ## Book text

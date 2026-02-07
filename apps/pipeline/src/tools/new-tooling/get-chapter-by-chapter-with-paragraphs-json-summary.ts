@@ -25,7 +25,7 @@ const ScenesSummariesPerChapterSchema = z.object({
         mainParagraphNumber: z.number(),
       }),
     ),
-    characterActions: z.array(CharacterActionSchema).optional(),
+    characterActions: z.array(CharacterActionSchema),
   }),
 });
 
@@ -296,7 +296,7 @@ You are building a searchable index for a fiction book: ${bookSettings.title} by
     - \`paragraphNumbers\`: An array of all paragraphs that cover this specific event.
     - \`mainParagraphNumber\`: The single most relevant paragraph (the "anchor") for this event. This is where a user would land if they clicked this search result.
 5. No spoilers - do not mention information that is not yet revealed in the chapter. If character A tells character B a lie, but we don't know its a lie yet, just mention that character A told character B something, but don't mention that it's a lie. Stick to the facts as they are revealed in the chapter.
-6. Add optional \`characterActions\` in the output. For each detected character slug, add concise chapter action summary under \`characterActions\` as \`{ slug, chapterAction }\`. If needed, you may include additional character slugs that appear relevant.
+6. Add \`characterActions\` in the output. For each detected character slug, add concise chapter action summary under \`characterActions\` as \`{ slug, chapterAction }\`. If needed, you may include additional character slugs that appear relevant.
 
 ### Output Format
 
@@ -340,7 +340,7 @@ ${paragraphsForPage}
       let summary: ScenesSummariesPerChapterBase;
       try {
         const { provider, result } = await runChapterSummaryQueuedSchemaCall({
-          prompt: `${prompt}\n Reply in the language of the book. It's usually Polish or English. Your instructions are in English so you often reply in English, buts its VERY important to reply in Polish when the book is in Polish, and same goes for other languages.`,
+          prompt,
           schema: ScenesSummariesPerChapterSchema,
           model: "gemini-3-flash-preview",
         });
