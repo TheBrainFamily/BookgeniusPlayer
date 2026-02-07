@@ -5,7 +5,7 @@ import {
   HarmCategory,
 } from "@google/genai";
 import { type z } from "zod";
-import { google } from "@ai-sdk/google";
+import { google, type GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
 import { generateObject, generateText, streamText } from "ai";
 import { toGeminiSchema } from "gemini-zod";
 import "dotenv/config";
@@ -415,7 +415,12 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
         prompt,
         maxRetries: 0,
         experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
-        providerOptions: { google: { safetySettings: getSafetySettings() } },
+        providerOptions: {
+          google: {
+            safetySettings: getSafetySettings(),
+            thinkingConfig: { thinkingLevel: "high" },
+          } satisfies GoogleGenerativeAIProviderOptions,
+        },
       });
       return object as T;
     } catch (error) {

@@ -31,4 +31,32 @@ describe("getParagraphsFromChapterWithText", () => {
 
     expect(html).toContain("“hello”");
   });
+
+  it("preserves curly apostrophes in text content", () => {
+    const bookText = `
+      <section data-chapter="1">
+        <p>The Empress Catherine the Great’s time.</p>
+      </section>
+    `;
+
+    const paragraphs = getParagraphsFromChapterWithText(1, bookText);
+    const html = paragraphs[0]?.text ?? "";
+
+    expect(html).toContain("Great’s");
+    expect(html).not.toContain("Great's");
+  });
+
+  it("preserves en dashes in text content", () => {
+    const bookText = `
+      <section data-chapter="1">
+        <p>Years 1805–1812 are covered here.</p>
+      </section>
+    `;
+
+    const paragraphs = getParagraphsFromChapterWithText(1, bookText);
+    const html = paragraphs[0]?.text ?? "";
+
+    expect(html).toContain("1805–1812");
+    expect(html).not.toContain("1805-1812");
+  });
 });

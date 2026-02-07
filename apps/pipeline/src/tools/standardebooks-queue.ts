@@ -335,6 +335,60 @@ async function runQueue(limit?: number) {
   summarizeQueue(queue);
 }
 
+async function runSingleSlug(slug: string) {
+  setupSignalHandlers();
+  const queueExists = fs.existsSync(QUEUE_PATH);
+  const queue = queueExists ? readQueue() : null;
+  const queueItem = queue?.items.find((item) => item.slug === slug);
+
+  if (queueExists && !queueItem) {
+    console.log(`Slug ${slug} not found in queue. Running generation without queue tracking.`);
+  }
+
+  if (queue && queueItem) {
+    queueItem.status = "running";
+    queueItem.attempts += 1;
+    queueItem.lastError = undefined;
+    queueItem.updatedAt = new Date().toISOString();
+    writeQueue(queue);
+  }
+
+  console.log(`\n=== Processing ${slug} ===`);
+
+  try {
+    await convertAndSaveSEBook(slug);
+    const result = await runPipelineInSubprocess(slug);
+
+    if (result.status === "done") {
+      if (queue && queueItem) {
+        queueItem.status = "done";
+        queueItem.updatedAt = new Date().toISOString();
+        writeQueue(queue);
+      }
+      console.log(`✔ Completed ${slug}`);
+      return;
+    }
+
+    if (queue && queueItem) {
+      queueItem.status = "failed";
+      queueItem.lastError = result.error || "Unknown error";
+      queueItem.updatedAt = new Date().toISOString();
+      writeQueue(queue);
+    }
+
+    throw new Error(result.error || "Pipeline subprocess failed");
+  } catch (err) {
+    if (queue && queueItem) {
+      queueItem.status = "failed";
+      queueItem.lastError = err instanceof Error ? err.message : String(err);
+      queueItem.updatedAt = new Date().toISOString();
+      writeQueue(queue);
+    }
+
+    throw err;
+  }
+}
+
 async function main() {
   const argv = await yargs(hideBin(process.argv))
     .scriptName("standardebooks-queue")
@@ -344,8 +398,18 @@ async function main() {
     .command(
       "run",
       "Run queue (one book at a time)",
-      (y) => y.option("limit", { type: "number", describe: "Max items to process" }),
+      (y) =>
+        y
+          .option("limit", { type: "number", describe: "Max items to process" })
+          .option("slug", {
+            type: "string",
+            describe: "Process only this slug (bypasses queue iteration)",
+          }),
       async (args) => {
+        if (args.slug) {
+          await runSingleSlug(args.slug);
+          return;
+        }
         await runQueue(args.limit);
       },
     )

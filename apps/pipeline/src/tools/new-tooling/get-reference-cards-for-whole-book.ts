@@ -5,6 +5,7 @@ import { NewReferenceCardsResponseSchema } from "../../schemes";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { writeBookFile } from "src/helpers/writeBookFile";
 
 export const getReferenceCardsForWholeBook = async (): Promise<NewReferenceCardsResponse> => {
   const booksSettings = getBookSettings();
@@ -51,6 +52,7 @@ ${knownCharactersMapped}\n\n`
   const combinedPrompt = `${prompt}${knownCharactersPrompt}\n\n## Book Text \n\n${filteredXml}`;
 
   console.log("combinedPrompt length:", combinedPrompt.length);
+  writeBookFile(`get-reference-cards-for-whole-book-prompt.md`, combinedPrompt);
 
   const response = await callGeminiWithThinkingAndSchemaAndParsed(
     combinedPrompt,
