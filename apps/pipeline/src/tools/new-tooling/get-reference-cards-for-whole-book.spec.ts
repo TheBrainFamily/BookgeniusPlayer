@@ -49,15 +49,35 @@ vi.mock("../../callGpt5", () => ({ callGpt5WithSchema: vi.fn() }));
 vi.mock("../../callFastGemini", () => ({ callGeminiWithThinkingAndSchemaAndParsed: vi.fn() }));
 
 function gptResponse() {
-  return { characters: [{ name: "Alice", referenceCard: "From GPT" }] };
+  return {
+    characters: [
+      { name: "Alice", referenceCard: "From GPT", visualGuide: "Alice visual guide from GPT" },
+    ],
+  };
 }
 
 function geminiFlashResponse() {
-  return { characters: [{ name: "Bob", referenceCard: "From Gemini Flash" }] };
+  return {
+    characters: [
+      {
+        name: "Bob",
+        referenceCard: "From Gemini Flash",
+        visualGuide: "Bob visual guide from Gemini Flash",
+      },
+    ],
+  };
 }
 
 function geminiProResponse() {
-  return { characters: [{ name: "Carol", referenceCard: "From Gemini Pro" }] };
+  return {
+    characters: [
+      {
+        name: "Carol",
+        referenceCard: "From Gemini Pro",
+        visualGuide: "Carol visual guide from Gemini Pro",
+      },
+    ],
+  };
 }
 
 function parseManifestRows(): Array<Record<string, unknown>> {
@@ -118,24 +138,24 @@ describe("getReferenceCardsForWholeBook", () => {
   });
 
   it("runs GPT-5 and Gemini Flash in parallel", async () => {
-    let resolveGpt: ((value: unknown) => void) | undefined;
-    let resolveGem: ((value: unknown) => void) | undefined;
+    let resolveGpt: ((value: ReturnType<typeof gptResponse>) => void) | undefined;
+    let resolveGem: ((value: ReturnType<typeof geminiFlashResponse>) => void) | undefined;
 
     const gptStarted = vi.fn();
     const gemStarted = vi.fn();
 
     vi.mocked(callGpt5WithSchema).mockImplementation(async () => {
       gptStarted();
-      return new Promise((resolve) => {
+      return new Promise<ReturnType<typeof gptResponse>>((resolve) => {
         resolveGpt = resolve;
-      }) as Promise<ReturnType<typeof gptResponse>>;
+      });
     });
 
     vi.mocked(callGeminiWithThinkingAndSchemaAndParsed).mockImplementation(async () => {
       gemStarted();
-      return new Promise((resolve) => {
+      return new Promise<ReturnType<typeof geminiFlashResponse>>((resolve) => {
         resolveGem = resolve;
-      }) as Promise<ReturnType<typeof geminiFlashResponse>>;
+      });
     });
 
     const pending = getReferenceCardsForWholeBook();
@@ -202,8 +222,12 @@ describe("getReferenceCardsForWholeBook", () => {
   it("keeps generic-avatar only once", async () => {
     vi.mocked(callGpt5WithSchema).mockResolvedValue({
       characters: [
-        { name: "Alice", referenceCard: "From GPT" },
-        { name: "generic-avatar", referenceCard: "Already there" },
+        { name: "Alice", referenceCard: "From GPT", visualGuide: "Alice visual guide from GPT" },
+        {
+          name: "generic-avatar",
+          referenceCard: "Already there",
+          visualGuide: "Generic visual guide already there",
+        },
       ],
     });
 

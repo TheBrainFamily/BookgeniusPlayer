@@ -14,7 +14,7 @@ Generate a JSON object containing a list of characters. Each character entry mus
 4.  **Emphasis:** Exaggerate unique visual traits mentioned in the text to make characters distinct.
 5.  **Inference:** If the text lacks visual detail, make _plausible inferences_ about appearance based _only_ on context directly relevant to visuals (e.g., setting implies clothing style, name suggests ethnicity, dialogue hints at age). **DO NOT** infer personality, role, relationships, or plot relevance from actions or dialogue.
 6.  **Timeframe:** Use the character's appearance as introduced or how they appear most consistently. Ignore future changes in appearance (e.g., due to injury, imprisonment, aging _if_ the story jumps significantly).
-7.  **ABSOLUTELY NO SPOILERS:** DO NOT mention actions, roles (like 'official', 'banker', 'servant' unless it directly describes _clothing_, e.g., 'wearing servant's attire'), relationships, events, deaths, changes in status, or any plot points. The description must be safe to read before finishing the book. Assume the reader knows _nothing_.
+7.  **ABSOLUTELY NO SPOILERS:** DO NOT mention actions, relationships, events, deaths, changes in status, or any plot points. The description must be safe to read before finishing the book.
 
 ## Example Snippet (Target Style):
 

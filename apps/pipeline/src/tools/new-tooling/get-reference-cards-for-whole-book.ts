@@ -34,9 +34,21 @@ const GENERIC_AVATAR_CARD = {
   name: "generic-avatar",
   referenceCard:
     "A mysterious figure shown from behind or in silhouette. No distinct facial features visible. Enigmatic and anonymous, suitable for representing any unnamed character. Atmospheric lighting with the figure partially obscured by shadow or mist.",
+  visualGuide:
+    "A mysterious figure shown from behind or in silhouette, with no visible facial features. Anonymous and gender-neutral appearance, softly outlined by atmospheric shadow or mist.",
 };
 
 const DEFAULT_PRO_SAMPLE_RATE = 0.1;
+const VISUAL_GUIDE_REQUEST_INSTRUCTION = `
+## Additional Required Field
+
+For every character, include \`visualGuide\`:
+- One short paragraph focused only on physical appearance, possibly including their job, role, ethnicity, age, build, hair, eyes, facial features, distinctive marks (scars, tattoos), clothing, and accessories _if_ they are characteristic or commonly worn. 
+- No spoilers, no relationships, no plot details.
+- If details are sparse, infer plausible visible traits from context (age range, styling, clothing, look, sex, ethnicity, etc.).
+- Exaggerate unique visual traits mentioned in the text to make characters distinct. Images based on the decription will be used as a memory jog for users. Especially if there is many similar people we should make them distinct. 
+- Lets say there is 5 soldiers that have no unique features described, imagine some elements. Don't create basically the same visualGuide for all of them.
+`;
 
 function buildRunId(): string {
   const iso = new Date().toISOString().replace(/[:.]/g, "-");
@@ -199,7 +211,7 @@ ${filteredChapters
 
 ${knownCharactersMapped}\n\n`
       : "";
-  const combinedPrompt = `${prompt}${knownCharactersPrompt}\n\n## Book Text \n\n${filteredXml}`;
+  const combinedPrompt = `${prompt}${knownCharactersPrompt}\n\n${VISUAL_GUIDE_REQUEST_INSTRUCTION}\n\n## Book Text \n\n${filteredXml}`;
   console.log("combinedPrompt length:", combinedPrompt.length);
   return combinedPrompt;
 }

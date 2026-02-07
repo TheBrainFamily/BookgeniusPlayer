@@ -24,6 +24,7 @@ export const NewReferenceCardsResponseSchema = z.object({
     z.object({
       name: z.string().describe("Character's full name"),
       referenceCard: z.string().describe("Background summary of the character. No spoilers."),
+      visualGuide: z.string().describe("Optional visual appearance guide for portrait generation."),
     }),
   ),
 });

@@ -70,6 +70,7 @@ const referenceCards = {
   characters: characters.map(({ name, display, summary }) => ({
     name,
     referenceCard: summary ? `${display}: ${summary}` : display,
+    visualGuide: display,
   })),
 };
 

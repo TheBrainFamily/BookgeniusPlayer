@@ -18,6 +18,12 @@ import {
   callGeminiWithThinking,
   callGeminiWithThinkingAndSchemaAndParsed,
 } from "../../callFastGemini";
+import {
+  buildShadowCandidateFromReferenceCards,
+  buildVisualGuideExperimentRunId,
+  normalizeCharacterName,
+  writeVisualGuideExperimentArtifacts,
+} from "./visual-guide-experiment";
 const FREE_RUN = process.env.FREE_RUN === "true";
 const CharactersSchema = z.object({
   characters: z.array(
@@ -27,6 +33,15 @@ const CharactersSchema = z.object({
     }),
   ),
 });
+
+type CharactersType = z.infer<typeof CharactersSchema>;
+type VisualGuideExperimentMode = "off" | "ac-shadow";
+
+type GeneratePicturePromptsOptions = {
+  skipBookAnalysis?: boolean;
+  experimentMode?: VisualGuideExperimentMode;
+  experimentRunId?: string;
+};
 
 const knowCharactersFromAllPreviousBooks: { name: string; referenceCard: string }[] = [];
 const knownCharactersArray = knowCharactersFromAllPreviousBooks.map(({ name }) => name);
@@ -238,15 +253,16 @@ const generateAndSaveCharacterImage = async (
 
 export const generatePicturePrompts = async (
   referenceCards: NewReferenceCardsResponse,
-  options: { skipBookAnalysis?: boolean } = {},
+  options: GeneratePicturePromptsOptions = {},
 ) => {
   const skipBookAnalysis = options.skipBookAnalysis || false;
-
+  const experimentMode = options.experimentMode || "off";
   const characterNames = referenceCards.characters
     .filter(({ name }) => !knownCharactersArray.includes(name))
-    .map((character) => {
-      return generateTagName(character.name);
-    });
+    .map((character) => normalizeCharacterName(character.name));
+  const requestedCharacterNames = Array.from(
+    new Set(characterNames.filter((name) => name !== "generic-avatar")),
+  );
   logger.info(`Generating pictures for ${characterNames} characters`);
   const initialPrompt = fs.readFileSync(`${__dirname}/generate-images-prompt.md`, "utf8");
 
@@ -280,8 +296,7 @@ ${chapters
   .join("\n")}
 </chapters>`;
 
-    const charactersXml = characterNames
-      .filter((name) => name !== "generic-avatar")
+    const charactersXml = requestedCharacterNames
       .map((name) => `<character name="${name}"/>`)
       .join("\n");
     prompt = initialPrompt
@@ -289,17 +304,25 @@ ${chapters
       .replace("{{bookText}}", bookText);
   }
 
-  const response = await callGeminiWithThinkingAndSchemaAndParsed(prompt, CharactersSchema);
+  const response = (await callGeminiWithThinkingAndSchemaAndParsed(
+    prompt,
+    CharactersSchema,
+  )) as CharactersType;
   logger.info(`Response: `, response);
   response.characters.push({
     name: "generic-avatar",
     visualGuide:
       "A mysterious figure shown from behind or in silhouette. No distinct facial features visible. Anonymous, sexless, suitable for representing any unnamed character. Atmospheric lighting with the figure partially obscured by shadow or mist.",
   });
+
+  if (experimentMode === "ac-shadow") {
+    const runId = options.experimentRunId || buildVisualGuideExperimentRunId();
+    const cOutput = buildShadowCandidateFromReferenceCards(referenceCards, requestedCharacterNames);
+    writeVisualGuideExperimentArtifacts(runId, requestedCharacterNames, response, cOutput);
+  }
+
   return response;
 };
-
-type CharactersType = z.infer<typeof CharactersSchema>;
 
 export const generatePicturesForEntities = async (
   referenceCards: NewReferenceCardsResponse,
