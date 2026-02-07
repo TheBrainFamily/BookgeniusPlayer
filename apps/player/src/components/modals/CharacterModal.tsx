@@ -15,6 +15,7 @@ import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { isVideoFile } from "@player/helpers/isVideoFile";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
 import { slugToDisplayName } from "@player/helpers/minorCharacterUtils";
+import { stripParenthetical } from "@player/components/characterCardCaption";
 import { useBottomInput } from "@player/stores/modals/bottomInput.store";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { FILTER_OPTIONS } from "@player/utils/filterOptions";
@@ -267,7 +268,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
         >
           <div className="flex items-center justify-center gap-2">
             <h4 className="px-5 text-lg font-bold text-white">
-              {snapshot?.displayName ?? matchingCharacter.characterName}
+              {stripParenthetical(snapshot?.displayName ?? matchingCharacter.characterName)}
             </h4>
           </div>
 

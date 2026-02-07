@@ -12,7 +12,7 @@ import { useBookConvex } from "@player/context/BookConvexContext";
 import { resolveCharacterSnapshot } from "@player/utils/characterOverrides";
 import { getAvatarSource } from "@player/helpers/svgAvatars";
 import { useAvatarGenerationStore } from "@player/stores/avatarGeneration.store";
-import { resolveCharacterCardCaption } from "./characterCardCaption";
+import { resolveCharacterCardCaption, stripParenthetical } from "./characterCardCaption";
 
 type Appearance = { chapterNumber: number; paragraphNumber: number; isTalkingInParagraph: boolean };
 
@@ -63,7 +63,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     [characterData, locationRef, entity.summary, entity.characterName],
   );
 
-  const displayName = snapshot?.displayName ?? entity.characterName;
+  const displayName = stripParenthetical(snapshot?.displayName ?? entity.characterName);
   const summary = snapshot?.summary ?? entity.summary;
   const cardCaption = resolveCharacterCardCaption(characterData?.role, summary);
 
