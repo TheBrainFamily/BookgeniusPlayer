@@ -19,7 +19,7 @@ Return the _final, complete_ results after processing _all_ chapters in the foll
   characters: [
     {
       name: "string", // Character's full name or the way they are usually referenced
-      summary: "string",
+      referenceCard: "string",
     },
   ],
 }
