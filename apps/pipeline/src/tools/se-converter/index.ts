@@ -34,6 +34,11 @@ const SKIP_FILES = new Set([
   "endnotes.xhtml",
 ]);
 
+const MERGEABLE_STRUCTURAL_TYPES = new Set(["part", "division", "book", "volume"]);
+const MAX_MERGED_PARAGRAPHS = 4;
+const MAX_MERGED_WORDS = 50;
+const MAX_MERGED_CHARS = 350;
+
 function parseSpineFromOpf(opfContent: string): string[] | null {
   const spineMatch = opfContent.match(/<spine[^>]*>([\s\S]*?)<\/spine>/);
   if (!spineMatch) return null;
@@ -125,6 +130,155 @@ function extractNormalizedTextFromHtml(html: string): string {
 function countWords(text: string): number {
   if (!text) return 0;
   return text.split(" ").filter(Boolean).length;
+}
+
+function getEpubTypeTokens(element: Element): string[] {
+  const epubType =
+    element.getAttribute("data-epub-type") || element.getAttribute("epub:type") || "";
+  return epubType.split(/\s+/).filter(Boolean);
+}
+
+function normalizeSectionText(section: Element): string {
+  return (section.textContent || "").replace(/\s+/g, " ").trim();
+}
+
+function extractTopLevelSection(htmlPart: string): Element | null {
+  const dom = new JSDOM(`<body>${htmlPart}</body>`);
+  return dom.window.document.querySelector("section[data-chapter]");
+}
+
+function escapeAttribute(value: string): string {
+  return value.replace(/"/g, "&quot;");
+}
+
+function buildNestedSectionWrapper(section: Element): string {
+  const epubType = section.getAttribute("data-epub-type") || "";
+  const chapterFormat = section.getAttribute("data-chapter-format") || "";
+  const epubTypeAttr = epubType ? ` data-epub-type="${escapeAttribute(epubType)}"` : "";
+  const chapterFormatAttr = chapterFormat
+    ? ` data-chapter-format="${escapeAttribute(chapterFormat)}"`
+    : "";
+  return `<section${epubTypeAttr}${chapterFormatAttr}>\n${section.innerHTML}\n</section>`;
+}
+
+function isMergeableStructuralSection(
+  htmlPart: string,
+): { merge: false } | { merge: true; wrapper: string } {
+  const section = extractTopLevelSection(htmlPart);
+  if (!section) return { merge: false };
+
+  const sectionTypeTokens = getEpubTypeTokens(section);
+  if (!sectionTypeTokens.some((token) => MERGEABLE_STRUCTURAL_TYPES.has(token))) {
+    return { merge: false };
+  }
+
+  const nonTitleParagraphCount = Array.from(section.querySelectorAll("p")).filter((paragraph) => {
+    // SE divider headings often use <hgroup><p>; do not treat those as narrative content.
+    if (paragraph.closest("hgroup")) return false;
+    return !getEpubTypeTokens(paragraph).includes("title");
+  }).length;
+
+  const normalizedText = normalizeSectionText(section);
+  const wordCount = countWords(normalizedText);
+  const charCount = normalizedText.length;
+
+  if (
+    nonTitleParagraphCount <= MAX_MERGED_PARAGRAPHS &&
+    wordCount <= MAX_MERGED_WORDS &&
+    charCount <= MAX_MERGED_CHARS
+  ) {
+    return { merge: true, wrapper: buildNestedSectionWrapper(section) };
+  }
+
+  return { merge: false };
+}
+
+function insertSectionContentAtStart(htmlPart: string, contentToInsert: string): string {
+  const openingTagMatch = htmlPart.match(/<section\b[^>]*>/i);
+  if (!openingTagMatch) return htmlPart;
+
+  const openingTag = openingTagMatch[0];
+  const openingTagIndex = htmlPart.indexOf(openingTag);
+  const insertPos = openingTagIndex + openingTag.length;
+
+  return `${htmlPart.slice(0, insertPos)}\n${contentToInsert}\n${htmlPart.slice(insertPos)}`;
+}
+
+function insertSectionContentAtEnd(htmlPart: string, contentToInsert: string): string {
+  const closingTagIndex = htmlPart.lastIndexOf("</section>");
+  if (closingTagIndex < 0) return htmlPart;
+
+  return `${htmlPart.slice(0, closingTagIndex)}\n${contentToInsert}\n${htmlPart.slice(closingTagIndex)}`;
+}
+
+function computeChapterContentPreviewFromHtmlPart(htmlPart: string): string {
+  const section = extractTopLevelSection(htmlPart);
+  if (!section) return "";
+  return escapeXml(normalizeSectionText(section).substring(0, 500));
+}
+
+function renumberMergedSections(
+  htmlParts: string[],
+  chapters: { number: number; title: string; content: string }[],
+): { htmlParts: string[]; chapters: { number: number; title: string; content: string }[] } {
+  const renumberedHtmlParts = htmlParts.map((htmlPart, index) =>
+    htmlPart.replace(/data-chapter="[^"]+"/, `data-chapter="${index + 1}"`),
+  );
+
+  const renumberedChapters = chapters.map((chapter, index) => ({
+    ...chapter,
+    number: index + 1,
+    content:
+      computeChapterContentPreviewFromHtmlPart(renumberedHtmlParts[index]) || chapter.content,
+  }));
+
+  return { htmlParts: renumberedHtmlParts, chapters: renumberedChapters };
+}
+
+function mergeSmallStructuralSections(
+  htmlParts: string[],
+  chapters: { number: number; title: string; content: string }[],
+): { htmlParts: string[]; chapters: { number: number; title: string; content: string }[] } {
+  if (htmlParts.length !== chapters.length) {
+    return { htmlParts, chapters };
+  }
+
+  const pendingWrappers: string[] = [];
+  const mergedHtmlParts: string[] = [];
+  const mergedChapters: { number: number; title: string; content: string }[] = [];
+
+  for (let i = 0; i < htmlParts.length; i++) {
+    const htmlPart = htmlParts[i];
+    const chapter = chapters[i];
+    const mergeCandidate = isMergeableStructuralSection(htmlPart);
+
+    if (mergeCandidate.merge) {
+      pendingWrappers.push(mergeCandidate.wrapper);
+      continue;
+    }
+
+    let sectionHtml = htmlPart;
+    if (pendingWrappers.length > 0) {
+      sectionHtml = insertSectionContentAtStart(sectionHtml, pendingWrappers.join("\n"));
+      pendingWrappers.length = 0;
+    }
+
+    mergedHtmlParts.push(sectionHtml);
+    mergedChapters.push(chapter);
+  }
+
+  if (pendingWrappers.length > 0) {
+    if (mergedHtmlParts.length === 0) {
+      return renumberMergedSections(htmlParts, chapters);
+    }
+    const lastIndex = mergedHtmlParts.length - 1;
+    mergedHtmlParts[lastIndex] = insertSectionContentAtEnd(
+      mergedHtmlParts[lastIndex],
+      pendingWrappers.join("\n"),
+    );
+  }
+
+  return renumberMergedSections(mergedHtmlParts, mergedChapters);
 }
 
 export function assertSeConversionTextCoverage(
@@ -522,8 +676,8 @@ export function convertSeXhtmlToHtml(
   xhtmlFiles: { filename: string; content: string }[],
   options: { figuresBasePath?: string } = {},
 ): SEConversionResult {
-  const allChapters: { number: number; title: string; content: string }[] = [];
-  const allHtmlParts: string[] = [];
+  let allChapters: { number: number; title: string; content: string }[] = [];
+  let allHtmlParts: string[] = [];
   let chapterCounter = 1;
 
   for (const file of xhtmlFiles) {
@@ -532,6 +686,10 @@ export function convertSeXhtmlToHtml(
     allHtmlParts.push(...result.htmlParts);
     chapterCounter = result.nextChapter;
   }
+
+  const merged = mergeSmallStructuralSections(allHtmlParts, allChapters);
+  allHtmlParts = merged.htmlParts;
+  allChapters = merged.chapters;
 
   let textHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${allHtmlParts.join("\n")}</body></html>`;
 
@@ -573,7 +731,7 @@ export function convertSeXhtmlToHtml(
     )
     .join("\n")}\n</chapters>`;
 
-  return { textHtml, chaptersXml, lastChapter: chapterCounter - 1, images, notes: [] };
+  return { textHtml, chaptersXml, lastChapter: allChapters.length, images, notes: [] };
 }
 
 export async function convertSEBook(

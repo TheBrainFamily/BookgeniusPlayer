@@ -129,7 +129,7 @@ describe("SE Converter", () => {
   });
 
   describe("part dividers (like Triplanetary)", () => {
-    it("includes part dividers as chapters", () => {
+    it("merges short part dividers into adjacent content chapters", () => {
       const files = [
         {
           filename: "book-1.xhtml",
@@ -199,14 +199,350 @@ describe("SE Converter", () => {
 
       const result = convertSeXhtmlToHtml(files);
 
-      expect(result.lastChapter).toBe(5);
+      expect(result.lastChapter).toBe(3);
       expect(result.textHtml).toContain('data-chapter="1"');
       expect(result.textHtml).toContain('data-chapter="2"');
       expect(result.textHtml).toContain('data-chapter="3"');
-      expect(result.textHtml).toContain('data-chapter="4"');
-      expect(result.textHtml).toContain('data-chapter="5"');
+      expect(result.textHtml).not.toContain('data-chapter="4"');
+      expect(result.textHtml).toContain('<section data-epub-type="part">');
       expect(result.textHtml).toContain("Book");
       expect(result.textHtml).toContain("Dawn");
+    });
+  });
+
+  describe("structural divider merging", () => {
+    it("merges consecutive structural headers into the next chapter", () => {
+      const files = [
+        {
+          filename: "book-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="book-1" epub:type="part">
+      <h2>Book I</h2>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "part-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="part-1" epub:type="division">
+      <hgroup>
+        <h2>Part I</h2>
+        <p epub:type="title">In Which Things Begin</p>
+      </hgroup>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>Actual chapter content.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.lastChapter).toBe(1);
+      expect(result.textHtml).toContain("Book I");
+      expect(result.textHtml).toContain("Part I");
+      expect(result.textHtml).toContain("Actual chapter content.");
+      expect((result.textHtml.match(/data-chapter="/g) || []).length).toBe(1);
+      expect((result.textHtml.match(/data-epub-type="part"/g) || []).length).toBe(1);
+      expect((result.textHtml.match(/data-epub-type="division"/g) || []).length).toBe(1);
+    });
+
+    it("merges trailing structural header backward into previous chapter", () => {
+      const files = [
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>Main body text.</p>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "book-2.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="book-2" epub:type="part">
+      <h2>Book II</h2>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.lastChapter).toBe(1);
+      expect(result.textHtml).toContain("Main body text.");
+      expect(result.textHtml).toContain("Book II");
+      expect((result.textHtml.match(/data-chapter="/g) || []).length).toBe(1);
+    });
+
+    it("merges divider into immediate next section when chapter is separated by epigraph", () => {
+      const files = [
+        {
+          filename: "part-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="part-1" epub:type="part">
+      <h2>Part I</h2>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "epigraph.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="epi-1" epub:type="epigraph">
+      <blockquote><p>Epigraph text.</p></blockquote>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>Chapter body text.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+      const chapter1Start = result.textHtml.indexOf('<section data-chapter="1"');
+      const chapter2Start = result.textHtml.indexOf('<section data-chapter="2"');
+      const chapter1 = result.textHtml.slice(chapter1Start, chapter2Start);
+
+      expect(result.lastChapter).toBe(2);
+      expect(chapter1Start).toBeGreaterThanOrEqual(0);
+      expect(chapter2Start).toBeGreaterThan(chapter1Start);
+      expect(chapter1).toContain("Part I");
+      expect(chapter1).toContain("Epigraph text.");
+      expect(result.textHtml).toContain("Chapter body text.");
+    });
+
+    it("merges short volume divider sections", () => {
+      const files = [
+        {
+          filename: "volume-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="volume-1" epub:type="volume">
+      <h2>Volume I</h2>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>Some chapter text.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.lastChapter).toBe(1);
+      expect(result.textHtml).toContain("Volume I");
+      expect(result.textHtml).toContain("Some chapter text.");
+      expect(result.textHtml).toContain('data-epub-type="volume"');
+    });
+
+    it("does not merge substantial part sections", () => {
+      const files = [
+        {
+          filename: "part-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="part-1" epub:type="part">
+      <h2>Part I</h2>
+      <p>Paragraph one with real narrative text.</p>
+      <p>Paragraph two with real narrative text.</p>
+      <p>Paragraph three with real narrative text.</p>
+      <p>Paragraph four with real narrative text.</p>
+      <p>Paragraph five with real narrative text.</p>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>Main chapter text.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.lastChapter).toBe(2);
+      expect(result.textHtml).toContain('data-chapter="1"');
+      expect(result.textHtml).toContain('data-chapter="2"');
+    });
+
+    it("does not merge when word threshold is exceeded", () => {
+      const files = [
+        {
+          filename: "part-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="part-1" epub:type="part">
+      <h2>Part I</h2>
+      <p>${Array.from({ length: 51 })
+        .map((_, i) => `word${i}`)
+        .join(" ")}</p>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>Body.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+      expect(result.lastChapter).toBe(2);
+    });
+
+    it("does not merge when char threshold is exceeded", () => {
+      const files = [
+        {
+          filename: "part-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="part-1" epub:type="part">
+      <h2>Part I</h2>
+      <p>${"abcdefghij ".repeat(33)}</p>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>Body.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+      expect(result.lastChapter).toBe(2);
+    });
+
+    it("keeps single structural divider file as standalone chapter", () => {
+      const files = [
+        {
+          filename: "part-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="part-1" epub:type="part">
+      <h2>Part I</h2>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.lastChapter).toBe(1);
+      expect(result.textHtml).toContain('data-chapter="1"');
+      expect(result.textHtml).toContain('data-epub-type="part"');
+    });
+
+    it("preserves text coverage after merging structural sections", () => {
+      const files = [
+        {
+          filename: "part-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="part-1" epub:type="part">
+      <h2>Part I</h2>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>${"a ".repeat(220)}</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(() =>
+        assertSeConversionTextCoverage(files, result.textHtml, { minWords: 1 }),
+      ).not.toThrow();
     });
   });
 
