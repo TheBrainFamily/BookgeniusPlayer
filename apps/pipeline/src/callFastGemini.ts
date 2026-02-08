@@ -4,11 +4,21 @@ import {
   HarmBlockThreshold,
   HarmCategory,
 } from "@google/genai";
-import { type z } from "zod";
+import { z } from "zod";
 import { google, type GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
 import { generateObject, generateText, streamText } from "ai";
-import { toGeminiSchema } from "gemini-zod";
 import "dotenv/config";
+
+/**
+ * Convert a Zod schema to a Gemini-compatible JSON schema.
+ * Replaces `gemini-zod` which doesn't support Zod v4.
+ */
+export function toGeminiSchema(zodSchema: z.ZodType): Record<string, unknown> {
+  const jsonSchema = z.toJSONSchema(zodSchema) as Record<string, unknown>;
+  delete jsonSchema["$schema"];
+  delete jsonSchema["additionalProperties"];
+  return jsonSchema;
+}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

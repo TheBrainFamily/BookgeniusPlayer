@@ -70,6 +70,14 @@ export const finishUpload = adminMutation({
       }
     }
 
+    if (args.contentType === "audio/mpeg" && args.folderPath?.endsWith("/music") && args.basename) {
+      const bookPath = args.folderPath.replace(/\/music$/, "");
+      await ctx.scheduler.runAfter(0, internal.musicMetadata.extractFromFile, {
+        bookPath,
+        fileBasename: args.basename,
+      });
+    }
+
     if (args.folderPath?.includes("/characters/") && args.basename?.startsWith("avatar-large.")) {
       await ctx.scheduler.runAfter(2000, internal.avatarGeneration.processUploadedAvatarLarge, {
         characterPath: args.folderPath,

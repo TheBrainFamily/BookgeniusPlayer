@@ -171,7 +171,7 @@ export const extractFromFile = internalAction({
       if (picture?.data && picture.data.length > 0) {
         // Determine file extension from mime type
         const mimeType = picture.format || "image/jpeg";
-        const ext = mimeType.includes("png") ? "png" : "jpg";
+        const ext = mimeType.includes("webp") ? "webp" : mimeType.includes("png") ? "png" : "jpg";
         coverBasename = fileBasename.replace(/\.[^.]+$/, `.${ext}`);
 
         // Convert to Uint8Array if needed
