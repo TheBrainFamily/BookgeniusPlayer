@@ -25,6 +25,28 @@ export function getStepDeps(step: Step): Step[] {
   return STEP_DEPENDENCIES.find((d) => d.step === step)?.deps || [];
 }
 
+export function getAllStepDeps(step: Step): Step[] {
+  const visited = new Set<Step>();
+  const ordered: Step[] = [];
+
+  const walk = (current: Step) => {
+    const deps = getStepDeps(current);
+    for (const dep of deps) {
+      if (visited.has(dep)) continue;
+      visited.add(dep);
+      walk(dep);
+      ordered.push(dep);
+    }
+  };
+
+  walk(step);
+  return ordered;
+}
+
+export function getMissingStepDeps(step: Step, completedSteps: Set<Step>): Step[] {
+  return getAllStepDeps(step).filter((dep) => !completedSteps.has(dep));
+}
+
 export function canRunStep(step: Step, completedSteps: Set<Step>): boolean {
   const deps = getStepDeps(step);
   return deps.every((dep) => completedSteps.has(dep));

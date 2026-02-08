@@ -7,6 +7,8 @@ import LibrarySection from "@platform/components/LibrarySection";
 import Footer from "@platform/components/Footer";
 import { useDevPerformanceMonitor } from "@platform/hooks/useDevPerformanceMonitor";
 
+const libraryLaunched = !!import.meta.env.VITE_LIBRARY_LAUNCHED;
+
 const Index = () => {
   useDevPerformanceMonitor("home");
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +27,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navigation searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <Navigation
+        searchQuery={libraryLaunched ? searchQuery : ""}
+        onSearchChange={libraryLaunched ? setSearchQuery : undefined}
+      />
       <main className="flex flex-col flex-1">
         {!trimmedSearchQuery && (
           <>
@@ -34,9 +39,9 @@ const Index = () => {
           </>
         )}
         <ProductionsCarousel />
-        <LibrarySection searchQuery={trimmedSearchQuery} />
+        {libraryLaunched && <LibrarySection searchQuery={trimmedSearchQuery} />}
       </main>
-      <Footer onSearchQuery={setSearchQuery} />
+      <Footer onSearchQuery={libraryLaunched ? setSearchQuery : undefined} />
     </div>
   );
 };

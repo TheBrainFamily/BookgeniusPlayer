@@ -403,7 +403,7 @@ p.dialogue .dialogue-avatar {
   }
 
   p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar,
-  blockquote[data-index]
+  blockquote[data-index]:not([data-epub-type="z3998:verse"])
     .character-placeholder.character-talking.start-of-paragraph
     .inline-avatar {
     float: left;
@@ -415,7 +415,7 @@ p.dialogue .dialogue-avatar {
   }
 
   p[data-index] .character-placeholder.character-talking.start-of-paragraph .inline-avatar img,
-  blockquote[data-index]
+  blockquote[data-index]:not([data-epub-type="z3998:verse"])
     .character-placeholder.character-talking.start-of-paragraph
     .inline-avatar
     img {
@@ -435,7 +435,7 @@ p.dialogue .dialogue-avatar {
   }
 
   p[data-index] .character-talking.start-of-paragraph,
-  blockquote[data-index] .character-talking.start-of-paragraph {
+  blockquote[data-index]:not([data-epub-type="z3998:verse"]) .character-talking.start-of-paragraph {
     margin-left: 0;
     margin-right: 0;
   }

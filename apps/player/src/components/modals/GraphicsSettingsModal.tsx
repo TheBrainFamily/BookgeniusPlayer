@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Monitor, Moon, Zap, Sun, Layers, Wind, Timer } from "lucide-react";
+import { Monitor, Moon, Zap, Sun, Layers, Wind, Timer, Eye, Film, Move, Rows3 } from "lucide-react";
 
 import ModalUI from "@player/components/modals/ModalUI";
 import { Label } from "@player/components/ui/label";
@@ -40,13 +40,23 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
     qualityLevel,
     backgroundBlur,
     animationSpeed,
+    contentOpacity,
+    videoContentOpacity,
+    edgeFade,
+    zoomDuration,
     setQualityLevel,
     setBackgroundBlur,
     setAnimationSpeed,
+    setContentOpacity,
+    setVideoContentOpacity,
+    setEdgeFade,
+    setZoomDuration,
   } = useGraphicsSettings();
 
+  const isFull = qualityLevel === "full";
+
   return (
-    <ModalUI title={t("graphics_settings", "Graphics")} onClose={onClose}>
+    <ModalUI title={t("graphics_settings", "Graphics")} onClose={onClose} hideOverlay>
       <div className="container max-h-[60vh] overflow-y-auto px-1 space-y-6">
         <div className="space-y-3">
           <div className="flex items-center gap-2">
@@ -112,7 +122,102 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
         <div
           className={cn(
             "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
-            qualityLevel !== "full" && "opacity-50",
+            !isFull && "opacity-50",
+          )}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4 text-white" />
+              <Label className="text-sm font-medium text-white">
+                {t("image_overlay", "Image Overlay")}:{" "}
+                <span className="text-blue-300">{contentOpacity}%</span>
+              </Label>
+            </div>
+            <Slider
+              disabled={!isFull}
+              variant="secondary"
+              min={0}
+              max={100}
+              step={5}
+              value={[contentOpacity]}
+              onValueChange={(value) => setContentOpacity(value[0])}
+              aria-label={t("image_overlay", "Image Overlay")}
+              className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
+            />
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>{t("transparent", "Transparent")}</span>
+              <span>{t("opaque", "Opaque")}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
+            !isFull && "opacity-50",
+          )}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Film className="h-4 w-4 text-white" />
+              <Label className="text-sm font-medium text-white">
+                {t("video_overlay", "Video Overlay")}:{" "}
+                <span className="text-blue-300">{videoContentOpacity}%</span>
+              </Label>
+            </div>
+            <Slider
+              disabled={!isFull}
+              variant="secondary"
+              min={0}
+              max={100}
+              step={5}
+              value={[videoContentOpacity]}
+              onValueChange={(value) => setVideoContentOpacity(value[0])}
+              aria-label={t("video_overlay", "Video Overlay")}
+              className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
+            />
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>{t("transparent", "Transparent")}</span>
+              <span>{t("opaque", "Opaque")}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
+            !isFull && "opacity-50",
+          )}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Rows3 className="h-4 w-4 text-white" />
+              <Label className="text-sm font-medium text-white">
+                {t("edge_fade", "Edge Fade")}: <span className="text-blue-300">{edgeFade}%</span>
+              </Label>
+            </div>
+            <Slider
+              disabled={!isFull}
+              variant="secondary"
+              min={0}
+              max={100}
+              step={5}
+              value={[edgeFade]}
+              onValueChange={(value) => setEdgeFade(value[0])}
+              aria-label={t("edge_fade", "Edge Fade")}
+              className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
+            />
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>{t("none", "None")}</span>
+              <span>{t("maximum", "Maximum")}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
+            !isFull && "opacity-50",
           )}
         >
           <div className="space-y-4">
@@ -124,7 +229,7 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
               </Label>
             </div>
             <Slider
-              disabled={qualityLevel !== "full"}
+              disabled={!isFull}
               variant="secondary"
               min={0}
               max={20}
@@ -144,7 +249,39 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
         <div
           className={cn(
             "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
-            qualityLevel !== "full" && "opacity-50",
+            !isFull && "opacity-50",
+          )}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Move className="h-4 w-4 text-white" />
+              <Label className="text-sm font-medium text-white">
+                {t("zoom_speed", "Zoom Speed")}:{" "}
+                <span className="text-blue-300">{zoomDuration}s</span>
+              </Label>
+            </div>
+            <Slider
+              disabled={!isFull}
+              variant="secondary"
+              min={10}
+              max={120}
+              step={5}
+              value={[zoomDuration]}
+              onValueChange={(value) => setZoomDuration(value[0])}
+              aria-label={t("zoom_speed", "Zoom Speed")}
+              className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-white/50"
+            />
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>{t("fast", "Fast")}</span>
+              <span>{t("slow", "Slow")}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "p-4 rounded-lg bg-black/50 border border-white/20 transition-all duration-300 w-full",
+            !isFull && "opacity-50",
           )}
         >
           <div className="space-y-4">
@@ -161,14 +298,14 @@ const GraphicsSettingsModal: React.FC<GraphicsSettingsModalProps> = ({ onClose }
                   <button
                     key={option.value}
                     type="button"
-                    disabled={qualityLevel !== "full"}
+                    disabled={!isFull}
                     onClick={() => setAnimationSpeed(option.value)}
                     className={cn(
                       "flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
                       isSelected
                         ? "bg-white/20 border-white/40 text-white"
                         : "bg-black/30 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20",
-                      qualityLevel !== "full" && "cursor-not-allowed",
+                      !isFull && "cursor-not-allowed",
                     )}
                   >
                     {t(

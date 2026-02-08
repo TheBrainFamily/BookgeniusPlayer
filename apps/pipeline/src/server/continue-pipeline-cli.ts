@@ -23,6 +23,108 @@ function extractSlugFromPath(bookPath: string): string {
   return parts[parts.length - 1];
 }
 
+function readCompletedSteps(slug: string): Step[] | undefined {
+  const progress = readProgress(slug);
+  if (!progress) return undefined;
+  return Object.entries(progress.completedSteps)
+    .filter(([, value]) => value.status === "done")
+    .map(([step]) => step as Step);
+}
+
+function requireValidStep(step: string): Step {
+  if (!isValidStep(step)) {
+    console.error(`Error: Invalid step slug: ${step}`);
+    console.error("Use --list-steps to see available step slugs");
+    process.exit(1);
+  }
+  return step as Step;
+}
+
+function handleStatus(slug: string): void {
+  const progress = readProgress(slug);
+  if (!progress) {
+    console.log(`No progress file found for ${slug}`);
+    console.log("This book has not been processed with progress tracking yet.");
+    return;
+  }
+
+  console.log(`Progress status for ${slug}:`);
+  console.log(`  Started: ${progress.startedAt}`);
+  console.log(`  Updated: ${progress.updatedAt}`);
+  console.log(`  Last completed step: ${progress.lastCompletedStep || "none"}`);
+  console.log(`  Last attempted step: ${progress.lastAttemptedStep || "none"}`);
+  console.log("\nStep completion:");
+  const stepOrder = getStepOrder();
+  stepOrder.forEach((step) => {
+    const stepProgress = progress.completedSteps[step];
+    if (stepProgress) {
+      const status = stepProgress.status === "done" ? "✔" : "✖";
+      console.log(`  ${status} ${step} - ${StepLabels[step]}`);
+    } else {
+      console.log(`  ○ ${step} - ${StepLabels[step]}`);
+    }
+  });
+
+  const nextStep = getNextStep(slug);
+  if (nextStep) {
+    console.log(`\nNext step to run: ${nextStep} (${StepLabels[nextStep]})`);
+    return;
+  }
+  console.log("\nAll steps completed!");
+}
+
+function handleMarkCompleted(slug: string, bookFolder: string, markCompletedStep: string): void {
+  const stepToMark = requireValidStep(markCompletedStep);
+  console.log(`Creating retroactive progress for ${slug}`);
+  console.log(`Marking steps up to and including "${stepToMark}" as completed`);
+  const progress = createRetroactiveProgress(slug, stepToMark);
+  console.log(
+    `Progress file created at: books-data/${slug}/temporary-output/pipeline-progress.json`,
+  );
+  console.log(`\nCompleted steps:`);
+  Object.keys(progress.completedSteps).forEach((step) => {
+    console.log(`  ✔ ${step}`);
+  });
+  const nextStep = getNextStep(slug);
+  if (!nextStep) return;
+
+  console.log(`\nNext step to run: ${nextStep} (${StepLabels[nextStep]})`);
+  console.log(`\nTo continue, run:`);
+  console.log(`  npx tsx server/src/continue-pipeline-cli.ts ${bookFolder}`);
+}
+
+function resolveStepSelection(
+  slug: string,
+  options: { fromStepArg?: string; onlyStepArg?: string },
+): { fromStep?: Step; onlyStep?: Step; completedSteps?: Step[] } {
+  if (options.fromStepArg && options.onlyStepArg) {
+    console.error("Error: --from-step and --only-step are mutually exclusive");
+    process.exit(1);
+  }
+
+  if (options.onlyStepArg) {
+    const onlyStep = requireValidStep(options.onlyStepArg);
+    const completedSteps = readCompletedSteps(slug);
+    console.log(`Running single step: ${onlyStep} (${StepLabels[onlyStep]})`);
+    return { onlyStep, completedSteps };
+  }
+
+  if (options.fromStepArg) {
+    const fromStep = requireValidStep(options.fromStepArg);
+    console.log(`Starting from specified step: ${fromStep} (${StepLabels[fromStep]})`);
+    return { fromStep };
+  }
+
+  const completedSteps = readCompletedSteps(slug);
+  const fromStep = getNextStep(slug) || undefined;
+  if (!fromStep) {
+    console.log("All steps already completed. Nothing to do.");
+    process.exit(0);
+  }
+  console.log(`Auto-detected next step: ${fromStep} (${StepLabels[fromStep]})`);
+  return { fromStep, completedSteps };
+}
+
 async function main() {
   const argv = await yargs(hideBin(process.argv))
     .scriptName("continue-pipeline")
@@ -34,6 +136,10 @@ async function main() {
     .option("from-step", {
       type: "string",
       describe: "Override auto-detect and start from this step",
+    })
+    .option("only-step", {
+      type: "string",
+      describe: "Run only this single step (fails if dependencies are not marked completed)",
     })
     .option("mark-completed", {
       type: "string",
@@ -75,97 +181,25 @@ async function main() {
 
   // Handle --status
   if (argv.status) {
-    const progress = readProgress(slug);
-    if (!progress) {
-      console.log(`No progress file found for ${slug}`);
-      console.log("This book has not been processed with progress tracking yet.");
-    } else {
-      console.log(`Progress status for ${slug}:`);
-      console.log(`  Started: ${progress.startedAt}`);
-      console.log(`  Updated: ${progress.updatedAt}`);
-      console.log(`  Last completed step: ${progress.lastCompletedStep || "none"}`);
-      console.log(`  Last attempted step: ${progress.lastAttemptedStep || "none"}`);
-      console.log("\nStep completion:");
-      const stepOrder = getStepOrder();
-      stepOrder.forEach((step) => {
-        const stepProgress = progress.completedSteps[step];
-        if (stepProgress) {
-          const status = stepProgress.status === "done" ? "✔" : "✖";
-          console.log(`  ${status} ${step} - ${StepLabels[step]}`);
-        } else {
-          console.log(`  ○ ${step} - ${StepLabels[step]}`);
-        }
-      });
-      const nextStep = getNextStep(slug);
-      if (nextStep) {
-        console.log(`\nNext step to run: ${nextStep} (${StepLabels[nextStep]})`);
-      } else {
-        console.log("\nAll steps completed!");
-      }
-    }
+    handleStatus(slug);
     process.exit(0);
   }
 
   // Handle --mark-completed
   if (argv["mark-completed"]) {
-    const stepToMark = argv["mark-completed"] as string;
-    if (!isValidStep(stepToMark)) {
-      console.error(`Error: Invalid step slug: ${stepToMark}`);
-      console.error("Use --list-steps to see available step slugs");
-      process.exit(1);
-    }
-    console.log(`Creating retroactive progress for ${slug}`);
-    console.log(`Marking steps up to and including "${stepToMark}" as completed`);
-    const progress = createRetroactiveProgress(slug, stepToMark as Step);
-    console.log(
-      `Progress file created at: books-data/${slug}/temporary-output/pipeline-progress.json`,
-    );
-    console.log(`\nCompleted steps:`);
-    Object.keys(progress.completedSteps).forEach((step) => {
-      console.log(`  ✔ ${step}`);
-    });
-    const nextStep = getNextStep(slug);
-    if (nextStep) {
-      console.log(`\nNext step to run: ${nextStep} (${StepLabels[nextStep]})`);
-      console.log(`\nTo continue, run:`);
-      console.log(`  npx tsx server/src/continue-pipeline-cli.ts ${bookFolder}`);
-    }
+    handleMarkCompleted(slug, bookFolder, argv["mark-completed"] as string);
     process.exit(0);
   }
 
-  // Determine which step to start from
-  let fromStep: Step | undefined;
-  let completedSteps: Step[] | undefined;
+  const { fromStep, onlyStep, completedSteps } = resolveStepSelection(slug, {
+    fromStepArg: argv["from-step"] as string | undefined,
+    onlyStepArg: argv["only-step"] as string | undefined,
+  });
 
-  if (argv["from-step"]) {
-    const specifiedStep = argv["from-step"] as string;
-    if (!isValidStep(specifiedStep)) {
-      console.error(`Error: Invalid step slug: ${specifiedStep}`);
-      console.error("Use --list-steps to see available step slugs");
-      process.exit(1);
-    }
-    fromStep = specifiedStep as Step;
-    console.log(`Starting from specified step: ${fromStep} (${StepLabels[fromStep]})`);
-  } else {
-    // Auto-detect from progress file
-    const progress = readProgress(slug);
-    if (progress) {
-      completedSteps = Object.entries(progress.completedSteps)
-        .filter(([, value]) => value.status === "done")
-        .map(([step]) => step as Step);
-    }
-    fromStep = getNextStep(slug) || undefined;
-    if (fromStep) {
-      console.log(`Auto-detected next step: ${fromStep} (${StepLabels[fromStep]})`);
-    } else {
-      console.log("All steps already completed. Nothing to do.");
-      process.exit(0);
-    }
-  }
+  const targetStep = onlyStep || fromStep;
+  console.log(`\nContinuing pipeline for slug="${slug}" from step: ${targetStep}`);
 
-  console.log(`\nContinuing pipeline for slug="${slug}" from step: ${fromStep}`);
-
-  const job = await startPipeline({ slug, fromStep, completedSteps });
+  const job = await startPipeline({ slug, fromStep, onlyStep, completedSteps });
 
   // Poll job state and stream logs
   let lastLogIndex = 0;

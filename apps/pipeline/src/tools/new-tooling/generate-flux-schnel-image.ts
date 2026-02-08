@@ -136,7 +136,7 @@ export const generateFluxImage = async (
       }
     }
   } else {
-    finalPrompt = `${generalPrompt} Only scene-setting environment. ${prompt}`;
+    finalPrompt = `${generalPrompt} ${prompt}`;
   }
 
   // this is input for flux-2-pro
@@ -162,6 +162,7 @@ export const generateFluxImage = async (
     disable_safety_checker: true,
   };
 
+  console.log(`[Flux] Generating image with prompt: ${finalPrompt}`);
   try {
     const output = await replicate.run("black-forest-labs/flux-2-klein-4b", { input });
 

@@ -138,6 +138,7 @@ async function generateCoverImage(imagePrompt: string, styleRef: Buffer | null):
   const prompt = `Abstract song cover art. No text, no letters, no words, no people. Soft, painterly. Match the visual style of the reference image (color palette, rendering technique, level of abstraction) — but do NOT recreate the scene. Create an abstract, mood-based composition instead. ${imagePrompt}`;
 
   if (styleRef) {
+    // @ts-expect-error - File constructor is not typed properly
     const image = new File([styleRef], "style-ref.webp", { type: "image/webp" });
     const result = await openai.images.edit({
       model: "gpt-image-1.5",

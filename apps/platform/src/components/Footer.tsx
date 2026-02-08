@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 interface FooterProps {
-  onSearchQuery: (query: string) => void;
+  onSearchQuery?: (query: string) => void;
 }
 
 const Footer = ({ onSearchQuery }: FooterProps) => {
@@ -33,58 +33,62 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-library-gold">
-              {t("footer.quickLinks.title")}
-            </h4>
-            <div className="space-y-2 flex flex-col">
-              <Button
-                asChild
-                onClick={() => onSearchQuery("")}
-                variant="ghost"
-                className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit"
-              >
-                <a href="#library">{t("footer.quickLinks.viewCollection")}</a>
-              </Button>
-              {[
-                t("footer.quickLinks.myProgress"),
-                t("footer.quickLinks.readingHistory"),
-                t("footer.quickLinks.settings"),
-              ].map((link) => (
+          {onSearchQuery && (
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-library-gold">
+                {t("footer.quickLinks.title")}
+              </h4>
+              <div className="space-y-2 flex flex-col">
                 <Button
-                  key={link}
+                  asChild
+                  onClick={() => onSearchQuery("")}
                   variant="ghost"
                   className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit"
                 >
-                  {link}
+                  <a href="#library">{t("footer.quickLinks.viewCollection")}</a>
                 </Button>
-              ))}
+                {[
+                  t("footer.quickLinks.myProgress"),
+                  t("footer.quickLinks.readingHistory"),
+                  t("footer.quickLinks.settings"),
+                ].map((link) => (
+                  <Button
+                    key={link}
+                    variant="ghost"
+                    className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit"
+                  >
+                    {link}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Genres */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-library-gold">
-              {t("footer.featuredAuthors")}
-            </h4>
-            <div className="space-y-2 flex flex-col">
-              {[
-                "William Shakespeare",
-                "George Orwell",
-                "Lewis Carroll",
-                "Hans Christian Andersen",
-              ].map((author) => (
-                <Button
-                  key={author}
-                  variant="ghost"
-                  onClick={() => onSearchQuery(author)}
-                  className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
-                >
-                  {author}
-                </Button>
-              ))}
+          {onSearchQuery && (
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-library-gold">
+                {t("footer.featuredAuthors")}
+              </h4>
+              <div className="space-y-2 flex flex-col">
+                {[
+                  "William Shakespeare",
+                  "George Orwell",
+                  "Lewis Carroll",
+                  "Hans Christian Andersen",
+                ].map((author) => (
+                  <Button
+                    key={author}
+                    variant="ghost"
+                    onClick={() => onSearchQuery(author)}
+                    className="p-0 h-auto text-muted-foreground hover:text-library-gold hover:bg-transparent text-left justify-start w-fit"
+                  >
+                    {author}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Help Center */}
           <div className="space-y-4">

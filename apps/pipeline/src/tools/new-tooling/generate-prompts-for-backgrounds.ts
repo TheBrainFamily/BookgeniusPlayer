@@ -105,11 +105,6 @@ export type GenerateBackgroundsOptions = {
 };
 
 export const generateBackgrounds = async (options: GenerateBackgroundsOptions = {}) => {
-  if (FREE_RUN) {
-    logger.info("FREE_RUN enabled - skipping background generation.");
-    return;
-  }
-
   const {
     customStyle,
     chapterNumbers,
@@ -157,7 +152,36 @@ export const generateBackgrounds = async (options: GenerateBackgroundsOptions = 
   if (chaptersNeedingPrompts.length > 0) {
     const newPrompts = await Promise.all(
       chaptersNeedingPrompts.map(async (chapter) => {
-        const prompt = `Create a visual description for an ebook background image.
+        const chapterContent = FREE_RUN ? chapter.content.slice(0, 8000) : chapter.content;
+
+        const prompt = FREE_RUN
+          ? `Extract the dominant MOOD and ATMOSPHERE from this chapter text as a soft sky/weather description.
+
+Output a short description of an atmospheric sky that captures the chapter's emotional tone.
+
+Think of it as: what would the sky look like if it reflected this chapter's mood?
+
+Examples of good responses:
+- "Warm peach and soft coral gradients fading into pale cream, like a gentle summer sunset"
+- "Cool pale blue-grey haze with wisps of white, still and quiet morning mist"
+- "Deep navy blue with scattered silver stars and a faint violet horizon glow"
+- "Soft golden amber light diffusing through gentle clouds, warm afternoon stillness"
+- "Dark slate grey with hints of deep purple, heavy brooding clouds before a storm"
+
+Rules:
+- ONLY describe sky, clouds, light, and color gradients
+- NO ground, landscapes, buildings, rooms, or objects
+- NO characters or people
+- NO text or words in the image
+- Keep it under 25 words
+
+Chapter Text: <chapter>${chapterContent}</chapter>
+
+## Return format:
+{
+  "sceneDescription": "string",
+}`
+          : `Create a visual description for an ebook background image.
 This will be used during ${genericPrompt.periodStyle}, so make it time appropriate.
 
 CRITICAL RULES:
@@ -175,7 +199,7 @@ CAMERA & COMPOSITION:
 
 Keep description to 2-3 sentences. Be generic, atmospheric, painterly.
 
-Chapter Text: <chapter>${chapter.content}</chapter>
+Chapter Text: <chapter>${chapterContent}</chapter>
 
 ## Return format:
 {
@@ -218,7 +242,9 @@ Chapter Text: <chapter>${chapter.content}</chapter>
   console.log(`Cleaned prompts: ${JSON.stringify(cleanedPrompts)}`);
 
   const generator = FREE_RUN ? generateImageWithFluxToFolder : generateImageWithOpenAIToFolder;
-  genericPrompt.backgroundStyle = `${genericPrompt.backgroundStyle}\n\n## Scene description\n\n`;
+  genericPrompt.backgroundStyle = FREE_RUN
+    ? `${genericPrompt.backgroundStyle}\n\nMood: `
+    : `${genericPrompt.backgroundStyle}\n\n## Scene description\n\n`;
 
   await Promise.all(
     cleanedPrompts.map(async (prompt) => {
@@ -427,5 +453,5 @@ Chapter Text: <chapter>${chapter.content}</chapter>
 };
 
 if (require.main === module) {
-  generateBackgrounds();
+  generateBackgrounds({ skipCache: true });
 }

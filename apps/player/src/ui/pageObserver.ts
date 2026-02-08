@@ -12,6 +12,8 @@ import {
 } from "./devVisualizers";
 import { activateMediaInRange } from "./activateMediaInRange";
 import { scrollCoordinator, debugLog } from "@player/services/ScrollCoordinator";
+import { useGraphicsSettings } from "@player/stores/graphicsSettings.store";
+import { getBookMediaType } from "./backgroundUtils";
 
 const DEV_ZONE_VISUALIZERS_ENABLED = false;
 
@@ -707,6 +709,39 @@ export function setupPageObserver(): {
   const spacersToObserve = rootEl.querySelectorAll(".transition-spacer");
 
   const visibleSpacers = new Map<Element, number>();
+  const SPACER_RESTORE_GRACE_MS = 220;
+  let pendingSpacerRestoreId: number | null = null;
+
+  const getUserGradientOpacity = () => {
+    const store = useGraphicsSettings.getState();
+    const isVideo = getBookMediaType() === "video";
+    return (isVideo ? store.videoContentOpacity : store.contentOpacity) / 100;
+  };
+
+  const cancelPendingSpacerRestore = () => {
+    if (pendingSpacerRestoreId !== null) {
+      window.clearTimeout(pendingSpacerRestoreId);
+      pendingSpacerRestoreId = null;
+    }
+  };
+
+  const scheduleSpacerRestore = () => {
+    cancelPendingSpacerRestore();
+
+    // Grace period bridges transient no-spacer gaps while virtualizer swaps chapters.
+    pendingSpacerRestoreId = window.setTimeout(() => {
+      pendingSpacerRestoreId = null;
+
+      if (visibleSpacers.size > 0) {
+        return;
+      }
+
+      const restoreOpacity = getUserGradientOpacity();
+      hideScrollIndicator();
+      rootEl.removeAttribute("data-spacer-active");
+      rootEl.style.setProperty("--gradient-opacity", restoreOpacity.toString());
+    }, SPACER_RESTORE_GRACE_MS);
+  };
 
   const applySpacerBlur = (visibilityPercent: number) => {
     const legacy = document.getElementById("legacy");
@@ -752,8 +787,16 @@ export function setupPageObserver(): {
         const clampedVisibility = Math.max(0, Math.min(1, visibilityPercent));
         const isVisible = visibleHeight > 0;
 
+        // Skip disconnected spacers entirely — they were removed by the virtualizer
+        // and a replacement spacer will handle the transition.
+        if (!entry.target.isConnected && !entry.isIntersecting) {
+          visibleSpacers.delete(entry.target);
+          return;
+        }
+
         shouldApplyBlur = true;
         if (isVisible) {
+          cancelPendingSpacerRestore();
           visibleSpacers.set(entry.target, clampedVisibility);
         } else {
           visibleSpacers.delete(entry.target);
@@ -761,7 +804,9 @@ export function setupPageObserver(): {
 
         // Determine if spacer is entering from bottom or leaving from top
         if (entry.isIntersecting) {
-          // Spacer is at least partially visible
+          // Spacer is at least partially visible — pageObserver owns --gradient-opacity
+          rootEl.setAttribute("data-spacer-active", "");
+          const userOpacity = getUserGradientOpacity();
           const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
           const nextChapter = nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
 
@@ -769,10 +814,10 @@ export function setupPageObserver(): {
             // Spacer is entering from bottom or fully in view
             hideScrollIndicator();
             if (visibilityPercent <= 0.4) {
-              // 0-40% visible: keep full opacity
-              rootEl.style.setProperty("--gradient-opacity", "1");
+              // 0-40% visible: keep user's opacity
+              rootEl.style.setProperty("--gradient-opacity", userOpacity.toString());
             } else if (visibilityPercent < 1.0) {
-              // 40-100% visible: fade from 1 to 0
+              // 40-100% visible: fade from user opacity to 0
               if (visibilityPercent > 0.75) {
                 scheduleScrollIndicator(nextChapter);
               }
@@ -812,12 +857,10 @@ export function setupPageObserver(): {
                 }
               }
 
-              // Map 0.4 -> 1.0 visibility to 1.0 -> 0.0 opacity
+              // Map 0.4 -> 1.0 visibility to userOpacity -> 0.0
               const fadePercent = (visibilityPercent - 0.4) / 0.6;
-              rootEl.style.setProperty(
-                "--gradient-opacity",
-                Math.max(0, 1 - fadePercent).toString(),
-              );
+              const fadedVal = userOpacity * Math.max(0, 1 - fadePercent);
+              rootEl.style.setProperty("--gradient-opacity", fadedVal.toString());
             } else {
               // 100% visible: full transparency
               rootEl.style.setProperty("--gradient-opacity", "0");
@@ -829,30 +872,27 @@ export function setupPageObserver(): {
               scheduleScrollIndicator(nextChapter);
               rootEl.style.setProperty("--gradient-opacity", "0");
             } else if (visibilityPercent >= 0.3) {
-              // 30-60% visible: fade from 0 to 1
-              // When 60% visible -> opacity = 0
-              // When 30% visible -> opacity = 1
+              // 30-60% visible: fade from 0 back to user opacity
               const fadePercent = (visibilityPercent - 0.3) / 0.3;
-              rootEl.style.setProperty("--gradient-opacity", (1 - fadePercent).toString());
+              const fadedVal = userOpacity * (1 - fadePercent);
+              rootEl.style.setProperty("--gradient-opacity", fadedVal.toString());
             } else {
               hideScrollIndicator();
-              rootEl.style.setProperty("--gradient-opacity", "1");
+              rootEl.removeAttribute("data-spacer-active");
+              rootEl.style.setProperty("--gradient-opacity", userOpacity.toString());
             }
           }
         } else {
           // Spacer is completely out of view
-          // For a moment when scrolling from top to bottom, the spacer may be
-          // considered non-intersecting but still be partially visible if it's
-          // very tall and the user scrolls quickly. To handle this, we check
-          // the boundingClientRect to see if it's still partially on screen.
           if (rect.bottom > rootBounds.top && rect.top < rootBounds.bottom) {
-            // Still partially visible - handle like intersecting case
+            const userOpacity = getUserGradientOpacity();
+            cancelPendingSpacerRestore();
+            rootEl.setAttribute("data-spacer-active", "");
             if (rect.top >= 0) {
-              // Leaving from bottom
               hideScrollIndicator();
-              rootEl.style.setProperty("--gradient-opacity", "1");
+              rootEl.removeAttribute("data-spacer-active");
+              rootEl.style.setProperty("--gradient-opacity", userOpacity.toString());
             } else {
-              // Leaving from top
               const nextChapterAttr = entry.target.getAttribute("data-next-chapter-start");
               const nextChapter =
                 nextChapterAttr != null ? Number.parseInt(nextChapterAttr, 10) : NaN;
@@ -862,7 +902,11 @@ export function setupPageObserver(): {
             return;
           }
 
-          hideScrollIndicator();
+          if (visibleSpacers.size > 0) {
+            return;
+          }
+
+          scheduleSpacerRestore();
         }
       });
 
@@ -907,6 +951,7 @@ export function setupPageObserver(): {
     observedSpacers.forEach((spacer) => {
       if (!spacer.isConnected) {
         spacerObserver.unobserve(spacer);
+        visibleSpacers.delete(spacer);
         toDelete.push(spacer);
         removed++;
       }
@@ -921,6 +966,7 @@ export function setupPageObserver(): {
   };
 
   const cleanup = () => {
+    cancelPendingSpacerRestore();
     spacerObserver.disconnect();
     observer.disconnect();
     window.removeEventListener("resize", handleResize);

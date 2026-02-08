@@ -6,6 +6,8 @@ import { hideBin } from "yargs/helpers";
 import dotenv from "dotenv";
 import { convertAndSaveSEBook } from "./se-converter/index";
 import { classifyDramaBooks, type BookAnalysis } from "./se-converter/drama-classifier";
+import { isValidStep } from "../server/pipeline-progress";
+import { type Step } from "../shared/pipelineTypes";
 
 dotenv.config({ path: path.resolve(import.meta.dir, "..", "..", ".env") });
 
@@ -118,6 +120,7 @@ async function pipeProcessOutput(
 
 async function runPipelineInSubprocess(
   slug: string,
+  onlyStep?: Step,
 ): Promise<{ status: "done" } | { status: "error"; error: string }> {
   const runnerPath = getPipelineRunnerPath();
   if (!fs.existsSync(runnerPath)) {
@@ -126,7 +129,12 @@ async function runPipelineInSubprocess(
 
   return await new Promise((resolve, reject) => {
     let stderrTail = "";
-    const child = Bun.spawn(["bun", runnerPath, "--slug", slug], {
+    const args = ["bun", runnerPath, "--slug", slug];
+    if (onlyStep) {
+      args.push("--only-step", onlyStep);
+    }
+
+    const child = Bun.spawn(args, {
       cwd: PIPELINE_ROOT,
       stdin: "ignore",
       stdout: "pipe",
@@ -262,7 +270,7 @@ async function buildQueue() {
   console.log(`Included embedded drama (whitelist): ${includedEmbedded}`);
 }
 
-async function runQueue(limit?: number) {
+async function runQueue(limit?: number, onlyStep?: Step) {
   setupSignalHandlers();
   const queue = readQueue();
   let consecutiveFailures = 0;
@@ -298,7 +306,7 @@ async function runQueue(limit?: number) {
 
     try {
       await convertAndSaveSEBook(item.slug);
-      const result = await runPipelineInSubprocess(item.slug);
+      const result = await runPipelineInSubprocess(item.slug, onlyStep);
 
       if (result.status === "done") {
         item.status = "done";
@@ -335,7 +343,7 @@ async function runQueue(limit?: number) {
   summarizeQueue(queue);
 }
 
-async function runSingleSlug(slug: string) {
+async function runSingleSlug(slug: string, onlyStep?: Step) {
   setupSignalHandlers();
   const queueExists = fs.existsSync(QUEUE_PATH);
   const queue = queueExists ? readQueue() : null;
@@ -356,8 +364,14 @@ async function runSingleSlug(slug: string) {
   console.log(`\n=== Processing ${slug} ===`);
 
   try {
-    await convertAndSaveSEBook(slug);
-    const result = await runPipelineInSubprocess(slug);
+    const bookDir = path.join(BOOKS_DATA_DIR, slug);
+    if (!onlyStep || !fs.existsSync(bookDir)) {
+      await convertAndSaveSEBook(slug);
+    } else {
+      console.log(`Using existing books-data/${slug} for single-step run`);
+    }
+
+    const result = await runPipelineInSubprocess(slug, onlyStep);
 
     if (result.status === "done") {
       if (queue && queueItem) {
@@ -404,13 +418,24 @@ async function main() {
           .option("slug", {
             type: "string",
             describe: "Process only this slug (bypasses queue iteration)",
+          })
+          .option("only-step", {
+            type: "string",
+            describe:
+              "Run exactly one step (fails if required dependencies are not marked completed)",
           }),
       async (args) => {
+        const onlyStepRaw = args["only-step"];
+        if (onlyStepRaw && !isValidStep(onlyStepRaw)) {
+          throw new Error(`Invalid step slug: ${onlyStepRaw}`);
+        }
+        const onlyStep = onlyStepRaw as Step | undefined;
+
         if (args.slug) {
-          await runSingleSlug(args.slug);
+          await runSingleSlug(args.slug, onlyStep);
           return;
         }
-        await runQueue(args.limit);
+        await runQueue(args.limit, onlyStep);
       },
     )
     .command("status", "Show queue status", {}, () => {

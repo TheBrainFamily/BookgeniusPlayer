@@ -39,6 +39,7 @@ import { generateTagName } from "../../src/helpers/generateTagName";
 import { computeParagraphCount } from "../lib/paragraphCount";
 import {
   initProgress,
+  readProgress,
   markStepStarted,
   markStepComplete,
   markStepError,
@@ -55,7 +56,12 @@ import {
   setPreviewsGenerated,
   setStyleChoice,
 } from "./style-selection";
-import { STEP_DEPENDENCIES, getReadySteps, createSchedulerState } from "./parallel-scheduler";
+import {
+  STEP_DEPENDENCIES,
+  getReadySteps,
+  createSchedulerState,
+  getMissingStepDeps,
+} from "./parallel-scheduler";
 import { buildNotesToUploadFromNoteMap, normalizeNoteRefId } from "./notes-import";
 import { isAbortError } from "../../src/helpers/abortHelpers";
 import {
@@ -549,6 +555,7 @@ export async function startPipeline(input: {
   slug?: string;
   ebookConvertBin?: string;
   fromStep?: Step;
+  onlyStep?: Step;
   completedSteps?: Step[];
 }) {
   const {
@@ -557,29 +564,48 @@ export async function startPipeline(input: {
     slug: providedSlug,
     ebookConvertBin,
     fromStep,
+    onlyStep,
     completedSteps,
   } = input;
   const baseName = epubPath ? path.basename(epubPath, path.extname(epubPath)) : null;
   const slug = providedSlug || slugify(baseName || "book");
   const bookPath = `books/${slug}`;
+  const isSingleStepRun = Boolean(onlyStep);
+  const resumeStep = onlyStep ?? fromStep;
 
   initProgress(slug);
 
+  let resolvedCompletedSteps = completedSteps;
+  if (isSingleStepRun && !resolvedCompletedSteps) {
+    const existingProgress = readProgress(slug);
+    if (existingProgress) {
+      resolvedCompletedSteps = Object.entries(existingProgress.completedSteps)
+        .filter(([, value]) => value.status === "done")
+        .map(([step]) => step as Step);
+    }
+  }
+
   const stepOrder = getStepOrder();
-  const fromStepIndex = fromStep ? getStepIndex(fromStep) : -1;
-  const completedStepSet = new Set<Step>(completedSteps ?? []);
+  const fromStepIndex = fromStep && !isSingleStepRun ? getStepIndex(fromStep) : -1;
+  const completedStepSet = new Set<Step>(resolvedCompletedSteps ?? []);
 
   const job: Job = {
     id: uuidv4(),
     slug,
     bookPath,
     status: "running",
-    currentStep: fromStep || "import_epub",
+    currentStep: resumeStep || "import_epub",
     activeSteps: [],
     logs: [],
     steps: stepOrder.map((step) => {
+      if (isSingleStepRun) {
+        if (completedStepSet.has(step) && step !== onlyStep) {
+          return { step, status: "done" as const };
+        }
+        return { step, status: "pending" as const };
+      }
       const stepIndex = getStepIndex(step);
-      if (completedStepSet.has(step) && step !== fromStep) {
+      if (completedStepSet.has(step) && step !== resumeStep) {
         return { step, status: "done" as const };
       }
       if (fromStepIndex > 0 && stepIndex < fromStepIndex) {
@@ -590,7 +616,9 @@ export async function startPipeline(input: {
   };
   jobs.set(job.id, job);
 
-  if (fromStep) {
+  if (isSingleStepRun && onlyStep) {
+    addLog(job, `Running single step: ${StepLabels[onlyStep]}`);
+  } else if (fromStep) {
     addLog(job, `Resuming pipeline from step: ${StepLabels[fromStep]}`);
   }
 
@@ -796,7 +824,13 @@ export async function startPipeline(input: {
       if (isFreeRun) {
         const FREE_RUN_AVATAR_STYLE =
           "Abstract geometric avatar Bauhaus style, simple shapes, limited color palette. Natural look, flat shade.";
-        const forcedStyle = { ...autoStyle, avatarStyle: FREE_RUN_AVATAR_STYLE };
+        const FREE_RUN_BACKGROUND_STYLE =
+          "Soft atmospheric sky painting for an ebook background. Gentle watercolor-like washes of color, subtle cloud forms, and atmospheric haze. Like Turner's atmospheric skies — soft gradients bleeding into each other, no hard edges. NO text, words, letters, or writing of any kind. NO specific objects, buildings, people, or recognizable scenes. Only soft color gradients, gentle clouds, and atmospheric light. Must be very low-contrast and muted enough for text to be overlaid on top. Smooth matte finish.";
+        const forcedStyle = {
+          ...autoStyle,
+          avatarStyle: FREE_RUN_AVATAR_STYLE,
+          backgroundStyle: FREE_RUN_BACKGROUND_STYLE,
+        };
 
         setAutoStyleComplete(bookRoot, forcedStyle);
         setStyleChoice(bookRoot, "auto");
@@ -901,10 +935,6 @@ export async function startPipeline(input: {
     },
 
     generate_backgrounds: async () => {
-      if (process.env.FREE_RUN === "true") {
-        addLog(job, "FREE_RUN enabled - skipping background generation and upload");
-        return;
-      }
       setBookArg(slug);
       await generateBackgrounds({});
       await uploadBackgroundsToConvex(job, outputDir);
@@ -987,11 +1017,22 @@ export async function startPipeline(input: {
       addLog(job, `⚠ Failed to create book structure: ${msg}`);
     }
 
-    const stepsToRun: Step[] = STEP_DEPENDENCIES.map((d) => d.step).filter(
-      (step) => step !== "complete" && step !== "failed",
-    );
+    const stepsToRun: Step[] = isSingleStepRun
+      ? [onlyStep as Step]
+      : STEP_DEPENDENCIES.map((d) => d.step).filter(
+          (step) => step !== "complete" && step !== "failed",
+        );
 
-    if (process.env.QUICK_MODE === "true") {
+    if (isSingleStepRun && onlyStep) {
+      const missingDeps = getMissingStepDeps(onlyStep, schedulerState.completedSteps);
+      if (missingDeps.length > 0) {
+        throw new Error(
+          `Cannot run single step "${onlyStep}". Missing completed dependencies: ${missingDeps.join(", ")}. Use continue-pipeline-cli --mark-completed <step> if those steps were already completed outside progress tracking.`,
+        );
+      }
+    }
+
+    if (!isSingleStepRun && process.env.QUICK_MODE === "true") {
       const skipSteps: Step[] = [
         "map_summaries_to_paragraphs",
         "generate_embeddings",

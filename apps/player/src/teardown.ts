@@ -1,6 +1,7 @@
 import { stopAllPlayback, getAudioContext } from "./audio-crossfader";
 import { useSearchModal } from "@player/stores/modals/searchModal.store";
 import { resetBackgroundDebouncer } from "./ui/background";
+import { resetBookMediaTypeCache } from "./ui/backgroundUtils";
 import { unloadBookColorsCSS } from "./utils/loadBookColors";
 import { useBookMenuModal } from "./stores/modals/bookMenuModal.store";
 import { useBookContentStore } from "./stores/bookContent.store";
@@ -13,6 +14,7 @@ import { useBookContentStore } from "./stores/bookContent.store";
  */
 export async function teardownPlayer(): Promise<void> {
   resetBackgroundDebouncer();
+  resetBookMediaTypeCache();
 
   try {
     // Stop all audio and clear state

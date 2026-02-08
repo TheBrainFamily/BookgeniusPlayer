@@ -134,7 +134,8 @@ function isQuotaOrRateLimitError(error: unknown): boolean {
       message.includes("quota exceeded") ||
       message.includes("resource_exhausted") ||
       message.includes("rate limit") ||
-      message.includes("too many requests")
+      message.includes("too many requests") ||
+      message.includes("overloaded")
     );
   });
 }

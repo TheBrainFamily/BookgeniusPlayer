@@ -8,7 +8,7 @@ import { useIntegrations } from "@platform/integrations";
 
 interface NavigationProps {
   searchQuery: string;
-  onSearchChange: (query: string) => void;
+  onSearchChange?: (query: string) => void;
 }
 
 const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
@@ -41,24 +41,26 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
           </a>
 
           {/* Search Bar */}
-          <div className="hidden md:flex relative max-w-md flex-1 mx-8">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t("navigation.search")}
-              className="pl-10 pr-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground focus:border-library-gold"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-            {searchQuery && (
-              <Button
-                variant="ghost"
-                onClick={() => onSearchChange("")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          {onSearchChange && (
+            <div className="hidden md:flex relative max-w-md flex-1 mx-8">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t("navigation.search")}
+                className="pl-10 pr-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground focus:border-library-gold"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  onClick={() => onSearchChange("")}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Navigation Links */}
           <div className="flex items-center space-x-4">
@@ -93,26 +95,28 @@ const Navigation = ({ searchQuery, onSearchChange }: NavigationProps) => {
         </div>
 
         {/* Mobile Search */}
-        <div className="md:hidden mt-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t("navigation.searchMobile", "Search novels...")}
-              className="pl-10 pr-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-            {searchQuery && (
-              <Button
-                variant="ghost"
-                onClick={() => onSearchChange("")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
+        {onSearchChange && (
+          <div className="md:hidden mt-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t("navigation.searchMobile", "Search novels...")}
+                className="pl-10 pr-10 bg-library-mahogany/50 border-library-walnut text-foreground placeholder:text-muted-foreground"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  onClick={() => onSearchChange("")}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </nav>
   );

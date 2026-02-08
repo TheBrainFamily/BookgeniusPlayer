@@ -1,12 +1,37 @@
 import { useEffect, useRef } from "react";
 import { useGraphicsSettings } from "@player/stores/graphicsSettings.store";
 import { usePlayerDOM } from "@player/context/PlayerDOMContext";
+import { getBookMediaType } from "@player/ui/backgroundUtils";
+
+function animateBlur(legacy: HTMLElement, targetBlur: number): number {
+  const durationMs = 1000;
+  const startTime = performance.now();
+  let rafId = 0;
+
+  const step = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / durationMs);
+    legacy.style.setProperty("--bg-blur-amount", `${targetBlur * progress}px`);
+    if (progress < 1) {
+      rafId = requestAnimationFrame(step);
+    }
+  };
+
+  rafId = requestAnimationFrame(step);
+  return rafId;
+}
 
 export function useApplyGraphicsSettings() {
-  const { legacy, bookContainer, bgVideoA, bgVideoB } = usePlayerDOM();
-  const { qualityLevel, backgroundBlur, animationSpeed } = useGraphicsSettings();
-  const initialBlurAnimationRef = useRef<number | null>(null);
-  const hasAnimatedBlurRef = useRef(false);
+  const { legacy, bookContainer, contentContainer, bgVideoA, bgVideoB } = usePlayerDOM();
+  const {
+    qualityLevel,
+    backgroundBlur,
+    animationSpeed,
+    contentOpacity,
+    videoContentOpacity,
+    edgeFade,
+    zoomDuration,
+  } = useGraphicsSettings();
+  const blurAnimatedRef = useRef(false);
 
   useEffect(() => {
     if (!legacy) return;
@@ -23,99 +48,39 @@ export function useApplyGraphicsSettings() {
   useEffect(() => {
     if (!legacy) return;
 
-    const cancelAnimation = () => {
-      if (initialBlurAnimationRef.current !== null) {
-        cancelAnimationFrame(initialBlurAnimationRef.current);
-        initialBlurAnimationRef.current = null;
-      }
-    };
-
-    const applyMultiplier = (multiplier: number) => {
-      legacy.style.setProperty("--bg-blur-multiplier", multiplier.toString());
-      legacy.style.setProperty("--bg-blur-amount", `${backgroundBlur * multiplier}px`);
-    };
-
-    const getMultiplierFromStyle = () => {
-      const multiplierValue = Number.parseFloat(
-        legacy.style.getPropertyValue("--bg-blur-multiplier"),
-      );
-      return Number.isFinite(multiplierValue) ? multiplierValue : null;
-    };
-
-    const animateToFull = (startMultiplier: number) => {
-      cancelAnimation();
-      applyMultiplier(startMultiplier);
-
-      const durationMs = 1000;
-      const startTime = performance.now();
-
-      const step = (now: number) => {
-        const progress = Math.min(1, (now - startTime) / durationMs);
-        const blurMultiplier = startMultiplier + (1 - startMultiplier) * progress;
-
-        applyMultiplier(blurMultiplier);
-
-        if (progress < 1) {
-          initialBlurAnimationRef.current = requestAnimationFrame(step);
-        } else {
-          initialBlurAnimationRef.current = null;
-        }
-      };
-
-      initialBlurAnimationRef.current = requestAnimationFrame(step);
-    };
-
-    if (backgroundBlur > 0) {
-      legacy.setAttribute("data-bg-blur", "true");
-      legacy.style.setProperty("--bg-blur-base", `${backgroundBlur}px`);
-
-      const isVisible = bookContainer?.classList.contains("visible") ?? true;
-      const existingMultiplier = getMultiplierFromStyle();
-      const currentMultiplier = existingMultiplier ?? (isVisible ? 1 : 0);
-
-      if (!bookContainer) {
-        applyMultiplier(currentMultiplier);
-        return () => {
-          cancelAnimation();
-        };
-      }
-
-      if (!isVisible) {
-        applyMultiplier(0);
-      } else if (!hasAnimatedBlurRef.current) {
-        hasAnimatedBlurRef.current = true;
-        const startMultiplier = existingMultiplier ?? 0;
-        animateToFull(startMultiplier);
-      } else {
-        applyMultiplier(currentMultiplier);
-      }
-
-      let observer: MutationObserver | null = null;
-      if (!hasAnimatedBlurRef.current) {
-        observer = new MutationObserver(() => {
-          if (!bookContainer.classList.contains("visible")) return;
-          if (hasAnimatedBlurRef.current) return;
-
-          hasAnimatedBlurRef.current = true;
-          const startMultiplier = getMultiplierFromStyle() ?? 0;
-          animateToFull(startMultiplier);
-        });
-
-        observer.observe(bookContainer, { attributes: true, attributeFilter: ["class"] });
-      }
-
-      return () => {
-        observer?.disconnect();
-        cancelAnimation();
-      };
+    if (backgroundBlur <= 0) {
+      legacy.removeAttribute("data-bg-blur");
+      legacy.style.removeProperty("--bg-blur-amount");
+      legacy.style.removeProperty("--bg-blur-base");
+      blurAnimatedRef.current = false;
+      return;
     }
 
-    hasAnimatedBlurRef.current = false;
-    cancelAnimation();
-    legacy.removeAttribute("data-bg-blur");
-    legacy.style.removeProperty("--bg-blur-base");
-    legacy.style.removeProperty("--bg-blur-multiplier");
-    legacy.style.removeProperty("--bg-blur-amount");
+    legacy.setAttribute("data-bg-blur", "true");
+    legacy.style.setProperty("--bg-blur-base", `${backgroundBlur}px`);
+
+    // First time: animate blur in over 1s when book becomes visible
+    if (!blurAnimatedRef.current) {
+      blurAnimatedRef.current = true;
+
+      const isVisible = bookContainer?.classList.contains("visible") ?? true;
+      if (!isVisible && bookContainer) {
+        legacy.style.setProperty("--bg-blur-amount", "0px");
+        const observer = new MutationObserver(() => {
+          if (!bookContainer.classList.contains("visible")) return;
+          observer.disconnect();
+          animateBlur(legacy, backgroundBlur);
+        });
+        observer.observe(bookContainer, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+      }
+
+      const rafId = animateBlur(legacy, backgroundBlur);
+      return () => cancelAnimationFrame(rafId);
+    }
+
+    // Subsequent changes: apply immediately
+    legacy.style.setProperty("--bg-blur-amount", `${backgroundBlur}px`);
   }, [legacy, bookContainer, backgroundBlur]);
 
   useEffect(() => {
@@ -133,4 +98,26 @@ export function useApplyGraphicsSettings() {
       }
     }
   }, [legacy, bgVideoA, bgVideoB, animationSpeed]);
+
+  useEffect(() => {
+    if (!legacy || !contentContainer) return;
+
+    legacy.style.setProperty("--zoom-duration", `${zoomDuration}s`);
+
+    // Map 0-100 slider to 0%-50% edge fade
+    const edgeFadePct = `${edgeFade * 0.5}%`;
+    contentContainer.style.setProperty("--edge-fade-pct", edgeFadePct);
+
+    const applyOpacity = () => {
+      // Skip when pageObserver owns --gradient-opacity during spacer transitions
+      if (contentContainer.hasAttribute("data-spacer-active")) return;
+
+      // Use book-level media type (first background) so opacity stays stable across chapters
+      const isVideo = getBookMediaType() === "video";
+      const opacity = isVideo ? videoContentOpacity / 100 : contentOpacity / 100;
+      contentContainer.style.setProperty("--gradient-opacity", opacity.toString());
+    };
+
+    applyOpacity();
+  }, [legacy, contentContainer, contentOpacity, videoContentOpacity, edgeFade, zoomDuration]);
 }

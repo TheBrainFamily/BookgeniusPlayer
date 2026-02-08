@@ -354,12 +354,14 @@ const BookMenuModal: React.FC<BookMenuModalProps> = ({
               onPointerUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                onClose();
                 useGraphicsSettingsModal.getState().openModal();
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   e.stopPropagation();
+                  onClose();
                   useGraphicsSettingsModal.getState().openModal();
                 }
               }}

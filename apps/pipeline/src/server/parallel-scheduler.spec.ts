@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canRunStep, getStepDeps } from "./parallel-scheduler";
+import { canRunStep, getMissingStepDeps, getStepDeps } from "./parallel-scheduler";
 
 describe("parallel-scheduler step dependencies", () => {
   it("requires generate_reference_cards before generate_character_roles", () => {
@@ -33,5 +33,13 @@ describe("parallel-scheduler step dependencies", () => {
   it("allows map_summaries_to_paragraphs only after rewrite_paragraphs", () => {
     expect(canRunStep("map_summaries_to_paragraphs", new Set())).toBe(false);
     expect(canRunStep("map_summaries_to_paragraphs", new Set(["rewrite_paragraphs"]))).toBe(true);
+  });
+
+  it("lists transitive dependencies missing for single-step runs", () => {
+    expect(getMissingStepDeps("generate_backgrounds", new Set())).toEqual([
+      "import_epub",
+      "create_settings",
+      "generate_graphical_style",
+    ]);
   });
 });
