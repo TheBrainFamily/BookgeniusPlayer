@@ -16,6 +16,7 @@ import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { generateCharacterImageWithOpenAI } from "./generate-pictures-for-entities";
 import { bookFileExists } from "../../helpers/bookFileExists";
 import type { NewReferenceCardsResponse } from "../../types";
+import { runChapterSummaryQueuedSchemaCall } from "./chapter-summary-llm-queue";
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("🚨 Unhandled Rejection at:", promise);
@@ -182,15 +183,16 @@ Chapter Text: <chapter>${chapter.content}</chapter>
 }`;
 
         const schema = z.object({ sceneDescription: z.string() });
-        const response = await callGeminiWithThinkingAndSchemaAndParsed(
+        const { provider, result } = await runChapterSummaryQueuedSchemaCall({
           prompt,
           schema,
-          "gemini-3-flash-preview",
-        );
-        console.log(`${chapter.number} - ${JSON.stringify(response)}`);
+          model: "gemini-3-flash-preview",
+        });
+        console.log(`chapter ${chapter.number} background prompt provider: ${provider}`);
+        console.log(`${chapter.number} - ${JSON.stringify(result)}`);
         return {
           chapter: chapter.number,
-          response: [{ sceneDescription: response.sceneDescription, startingParagraph: 0 }],
+          response: [{ sceneDescription: result.sceneDescription, startingParagraph: 0 }],
         };
       }),
     );
