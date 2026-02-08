@@ -24,6 +24,7 @@ import {
 } from "../../src/tools/new-tooling/generate-roles-and-remove-spoilers-from-summaries";
 import { turnChapterSummariesIntoBulletPointsMappedToParagraphs } from "../../src/tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import type { NewReferenceCardsResponse } from "../../src/types";
+import { NewReferenceCardsResponseSchema } from "../../src/schemes";
 import {
   generateBackgrounds,
   generateStylePreview,
@@ -59,6 +60,7 @@ import { buildNotesToUploadFromNoteMap, normalizeNoteRefId } from "./notes-impor
 import { isAbortError } from "../../src/helpers/abortHelpers";
 import {
   buildCleanedCharacterSummaryMap,
+  parseCharacterRoleCleanupResponse,
   resolveCharacterMetadataForUpload,
   type CleanedCharacterSummary,
 } from "./character-metadata-cleanup";
@@ -262,14 +264,9 @@ function loadCleanedCharacterSummaryMap(): Map<string, CleanedCharacterSummary> 
     return new Map();
   }
 
-  try {
-    const parsed = JSON.parse(
-      readBookFile(fileName, FILE_TYPE.PERMANENT),
-    ) as CharacterRoleCleanupResponse;
-    return buildCleanedCharacterSummaryMap(parsed);
-  } catch {
-    return new Map();
-  }
+  const parsedRaw = JSON.parse(readBookFile(fileName, FILE_TYPE.PERMANENT)) as unknown;
+  const parsed = parseCharacterRoleCleanupResponse(parsedRaw);
+  return buildCleanedCharacterSummaryMap(parsed);
 }
 
 async function uploadCharactersToConvex(
@@ -312,7 +309,10 @@ async function uploadCharactersToConvex(
       (p) => generateTagName(p.name).toLowerCase() === characterSlug,
     );
     const aiPrompt = promptEntry?.visualGuide;
-    const resolvedMetadata = resolveCharacterMetadataForUpload(character, cleanedSummariesBySlug);
+    const resolvedMetadata = resolveCharacterMetadataForUpload(
+      { slug: characterSlug, referenceCard: character.referenceCard },
+      cleanedSummariesBySlug,
+    );
 
     await convex.ensureCharacterFolder({
       bookPath: job.bookPath,
@@ -711,15 +711,26 @@ export async function startPipeline(input: {
       setBookArg(slug);
       const fileName = "single-summary-per-person-roles.json";
       const filePath = getFilePath(fileName, FILE_TYPE.PERMANENT);
+      const referenceCardsRaw = JSON.parse(
+        readBookFile("single-summary-per-person.json", FILE_TYPE.PERMANENT),
+      ) as unknown;
+      const referenceCards = NewReferenceCardsResponseSchema.parse(
+        referenceCardsRaw,
+      ) as NewReferenceCardsResponse;
+      const inputCharacters = referenceCards.characters.map((character) => ({
+        slug: generateTagName(character.name).toLowerCase(),
+        name: character.name,
+        referenceCard: character.referenceCard,
+      }));
 
       let cleaned: CharacterRoleCleanupResponse;
       if (fs.existsSync(filePath)) {
-        cleaned = JSON.parse(
-          readBookFile(fileName, FILE_TYPE.PERMANENT),
-        ) as CharacterRoleCleanupResponse;
+        cleaned = parseCharacterRoleCleanupResponse(
+          JSON.parse(readBookFile(fileName, FILE_TYPE.PERMANENT)) as unknown,
+        );
         addLog(job, "Using existing spoiler-cleaned character summaries");
       } else {
-        cleaned = await generateRolesAndRemoveSpoilersFromSummaries();
+        cleaned = await generateRolesAndRemoveSpoilersFromSummaries({ inputCharacters });
         writeBookFile(fileName, JSON.stringify(cleaned, null, 2), FILE_TYPE.PERMANENT);
       }
 

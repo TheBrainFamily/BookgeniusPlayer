@@ -1,10 +1,23 @@
-import { generateTagName } from "../helpers/generateTagName";
-import { type CharacterRoleCleanupResponse } from "../tools/new-tooling/generate-roles-and-remove-spoilers-from-summaries";
+import { z } from "zod";
 
 export type CleanedCharacterSummary = { referenceCard: string; role?: string };
+export const CharacterRoleCleanupResponseSchema = z.object({
+  characters: z.array(
+    z.object({
+      slug: z.string().min(1),
+      referenceCard: z.string(),
+      role: z.string().nullable().optional(),
+    }),
+  ),
+});
+export type CharacterRoleCleanupResponse = z.infer<typeof CharacterRoleCleanupResponseSchema>;
 
-function toCharacterSlug(name: string): string {
-  return generateTagName(name).toLowerCase();
+function normalizeSlug(slug: string): string {
+  return slug.trim().toLowerCase();
+}
+
+export function parseCharacterRoleCleanupResponse(raw: unknown): CharacterRoleCleanupResponse {
+  return CharacterRoleCleanupResponseSchema.parse(raw);
 }
 
 export function buildCleanedCharacterSummaryMap(
@@ -13,8 +26,12 @@ export function buildCleanedCharacterSummaryMap(
   const map = new Map<string, CleanedCharacterSummary>();
 
   for (const character of cleaned.characters) {
-    const slug = toCharacterSlug(character.name);
-    if (!slug || map.has(slug)) {
+    const slug = normalizeSlug(character.slug);
+    if (!slug) {
+      throw new Error("Empty slug in cleaned character response");
+    }
+    if (map.has(slug)) {
+      console.warn(`[character-metadata-cleanup] Duplicate cleaned character slug: ${slug}`);
       continue;
     }
     map.set(slug, {
@@ -27,10 +44,10 @@ export function buildCleanedCharacterSummaryMap(
 }
 
 export function resolveCharacterMetadataForUpload(
-  character: { name: string; referenceCard: string },
+  character: { slug: string; referenceCard: string },
   cleanedMap: Map<string, CleanedCharacterSummary>,
 ): { summary: string; role?: string } {
-  const cleaned = cleanedMap.get(toCharacterSlug(character.name));
+  const cleaned = cleanedMap.get(normalizeSlug(character.slug));
   if (!cleaned) {
     return { summary: character.referenceCard };
   }

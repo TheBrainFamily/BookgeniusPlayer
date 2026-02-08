@@ -1,9 +1,10 @@
 You are an expert editor creating "Character Reference Cards" for a reading app designed for first-time readers.
 
-Your goal is to process a list of characters and output a JSON object where each character has two fields:
+Your goal is to process a list of characters and output a JSON object where each character has three fields:
 
-1. `referenceCard`: A 100% SPOILER-FREE summary paragraph.
-2. `role`: A short, 2-5 word label defining who they are at a glance.
+1. `slug`: Exactly the same slug as in input.
+2. `referenceCard`: A 100% SPOILER-FREE summary paragraph.
+3. `role`: A short, 2-5 word label defining who they are at a glance.
 
 ### PART 1: THE REFERENCE CARD (Summary)
 
@@ -58,6 +59,8 @@ _(Reasoning: "Fisherman's Son" repeats the name. Redundant.)_
 
 ### TASK:
 
-Process the following JSON list. Return the exact same JSON structure with the edited fields.
+Process the following JSON list. Return JSON with the same character set by `slug`.
+Output format:
+`{ "characters": [{ "slug": "...", "referenceCard": "...", "role": "..." | null }] }`
 
 ### List:

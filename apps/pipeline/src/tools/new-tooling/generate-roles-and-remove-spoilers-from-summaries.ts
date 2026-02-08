@@ -4,6 +4,7 @@ import { z } from "zod";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { callGpt5WithSchema } from "../../callGpt5";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
+import { generateTagName } from "../../helpers/generateTagName";
 import { readBookFile } from "../../helpers/readBookFile";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { type NewReferenceCardsResponse } from "../../types";
@@ -15,19 +16,30 @@ const MODEL = "gemini-3-flash-preview";
 const RETRY_DELAYS_MS = [2000, 5000, 10000] as const;
 const MAX_ATTEMPTS_PER_PROVIDER = 4;
 
-const CharacterRoleCleanupSchema = z.object({
-  name: z.string(),
+const CharacterRoleCleanupInputCharacterSchema = z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  referenceCard: z.string(),
+});
+
+const CharacterRoleCleanupCharacterSchema = z.object({
+  slug: z.string().min(1),
   referenceCard: z.string(),
   role: z.string().nullable().optional(),
 });
 
-const CharacterRoleCleanupResponseSchema = z.object({
-  characters: z.array(CharacterRoleCleanupSchema),
+export const CharacterRoleCleanupResponseSchema = z.object({
+  characters: z.array(CharacterRoleCleanupCharacterSchema),
 });
 
 export type CharacterRoleCleanupResponse = z.infer<typeof CharacterRoleCleanupResponseSchema>;
+export type CharacterRoleCleanupInputCharacter = z.infer<
+  typeof CharacterRoleCleanupInputCharacterSchema
+>;
 
-type InputCharacter = { name: string; referenceCard: string };
+type GenerateRolesAndRemoveSpoilersOptions = {
+  inputCharacters?: CharacterRoleCleanupInputCharacter[];
+};
 
 function isRetryableProviderError(error: unknown): boolean {
   const candidate = error as {
@@ -63,16 +75,17 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function readInputCharacters(): InputCharacter[] {
+function readInputCharacters(): CharacterRoleCleanupInputCharacter[] {
   const parsed = JSON.parse(readBookFile(INPUT_FILE_NAME, FILE_TYPE.PERMANENT)) as unknown;
   const validated = NewReferenceCardsResponseSchema.parse(parsed) as NewReferenceCardsResponse;
   return validated.characters.map((character) => ({
+    slug: generateTagName(character.name).toLowerCase(),
     name: character.name,
     referenceCard: character.referenceCard,
   }));
 }
 
-function buildPrompt(characters: InputCharacter[]): string {
+function buildPrompt(characters: CharacterRoleCleanupInputCharacter[]): string {
   const template = fs.readFileSync(
     path.join(__dirname, "generate-roles-and-remove-spoilers-from-summaries.md"),
     "utf8",
@@ -82,47 +95,75 @@ function buildPrompt(characters: InputCharacter[]): string {
   return `${template}\n\`\`\`json\n${payload}\n\`\`\`\n`;
 }
 
-function normalizeName(name: string): string {
-  return name.trim().toLowerCase();
+function normalizeSlug(slug: string): string {
+  return slug.trim().toLowerCase();
 }
 
 function ensureCoverageAndOrder(
-  inputCharacters: InputCharacter[],
+  inputCharacters: CharacterRoleCleanupInputCharacter[],
   response: CharacterRoleCleanupResponse,
 ): CharacterRoleCleanupResponse {
-  const responseByName = new Map<string, { referenceCard: string; role: string | null }>();
+  const inputSlugs = inputCharacters.map((character) => normalizeSlug(character.slug));
+  const inputSlugSet = new Set(inputSlugs);
+
+  if (inputSlugs.length !== inputSlugSet.size) {
+    throw new Error("Input character list contains duplicate slugs");
+  }
+
+  const responseBySlug = new Map<string, { referenceCard: string; role: string | null }>();
   for (const character of response.characters) {
-    const normalized = normalizeName(character.name);
-    if (!normalized || responseByName.has(normalized)) {
-      continue;
+    const normalized = normalizeSlug(character.slug);
+    if (!normalized) {
+      throw new Error("Spoiler cleanup response contains an empty slug");
     }
-    responseByName.set(normalized, {
+    if (responseBySlug.has(normalized)) {
+      throw new Error(`Spoiler cleanup response contains duplicate slug: ${normalized}`);
+    }
+    responseBySlug.set(normalized, {
       referenceCard: character.referenceCard.trim(),
       role: character.role?.trim() || null,
     });
   }
 
-  const missingNames: string[] = [];
+  const missingSlugs: string[] = [];
+  const extraSlugs: string[] = [];
+
+  for (const inputSlug of inputSlugs) {
+    if (!responseBySlug.has(inputSlug)) {
+      missingSlugs.push(inputSlug);
+    }
+  }
+
+  for (const responseSlug of responseBySlug.keys()) {
+    if (!inputSlugSet.has(responseSlug)) {
+      extraSlugs.push(responseSlug);
+    }
+  }
+
+  if (missingSlugs.length > 0 || extraSlugs.length > 0) {
+    const messages: string[] = [];
+    if (missingSlugs.length > 0) {
+      messages.push(`missing slugs: ${missingSlugs.join(", ")}`);
+    }
+    if (extraSlugs.length > 0) {
+      messages.push(`unexpected slugs: ${extraSlugs.join(", ")}`);
+    }
+    throw new Error(`Spoiler cleanup response coverage mismatch (${messages.join(" | ")})`);
+  }
+
   const orderedCharacters = inputCharacters.map((character) => {
-    const normalized = normalizeName(character.name);
-    const fromResponse = responseByName.get(normalized);
+    const normalized = normalizeSlug(character.slug);
+    const fromResponse = responseBySlug.get(normalized);
     if (!fromResponse) {
-      missingNames.push(character.name);
-      return { name: character.name, referenceCard: character.referenceCard, role: null };
+      throw new Error(`Missing normalized response slug: ${normalized}`);
     }
 
     return {
-      name: character.name,
+      slug: character.slug,
       referenceCard: fromResponse.referenceCard,
       role: fromResponse.role,
     };
   });
-
-  if (missingNames.length > 0) {
-    throw new Error(
-      `Spoiler cleanup response missing ${missingNames.length} characters: ${missingNames.join(", ")}`,
-    );
-  }
 
   return { characters: orderedCharacters };
 }
@@ -153,68 +194,72 @@ async function runProviderWithRetries(
   );
 }
 
-export const generateRolesAndRemoveSpoilersFromSummaries =
-  async (): Promise<CharacterRoleCleanupResponse> => {
-    const inputCharacters = readInputCharacters();
-    const prompt = buildPrompt(inputCharacters);
-    writeBookFile(
-      "generate-roles-and-remove-spoilers-from-summaries-prompt.md",
-      prompt,
-      FILE_TYPE.TEMPORARY,
-    );
+export const generateRolesAndRemoveSpoilersFromSummaries = async (
+  options: GenerateRolesAndRemoveSpoilersOptions = {},
+): Promise<CharacterRoleCleanupResponse> => {
+  const inputCharacters =
+    options.inputCharacters?.map((character) =>
+      CharacterRoleCleanupInputCharacterSchema.parse(character),
+    ) ?? readInputCharacters();
+  const prompt = buildPrompt(inputCharacters);
+  writeBookFile(
+    "generate-roles-and-remove-spoilers-from-summaries-prompt.md",
+    prompt,
+    FILE_TYPE.TEMPORARY,
+  );
 
-    const failures: string[] = [];
+  const failures: string[] = [];
 
-    try {
-      const geminiResult = await runProviderWithRetries("Gemini API", async () => {
-        const result = await callGeminiWithThinkingAndSchemaAndParsed(
-          prompt,
-          CharacterRoleCleanupResponseSchema,
-          MODEL,
-          { preferVertex: false },
-        );
-        return CharacterRoleCleanupResponseSchema.parse(result);
-      });
-      const normalized = ensureCoverageAndOrder(inputCharacters, geminiResult);
-      writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
-      return normalized;
-    } catch (error) {
-      failures.push(error instanceof Error ? error.message : String(error));
-    }
+  try {
+    const geminiResult = await runProviderWithRetries("Gemini API", async () => {
+      const result = await callGeminiWithThinkingAndSchemaAndParsed(
+        prompt,
+        CharacterRoleCleanupResponseSchema,
+        MODEL,
+        { preferVertex: false },
+      );
+      return CharacterRoleCleanupResponseSchema.parse(result);
+    });
+    const normalized = ensureCoverageAndOrder(inputCharacters, geminiResult);
+    writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
+    return normalized;
+  } catch (error) {
+    failures.push(error instanceof Error ? error.message : String(error));
+  }
 
-    try {
-      const vertexResult = await runProviderWithRetries("Gemini Vertex", async () => {
-        const result = await callGeminiWithThinkingAndSchemaAndParsed(
-          prompt,
-          CharacterRoleCleanupResponseSchema,
-          MODEL,
-          { preferVertex: true },
-        );
-        return CharacterRoleCleanupResponseSchema.parse(result);
-      });
-      const normalized = ensureCoverageAndOrder(inputCharacters, vertexResult);
-      writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
-      return normalized;
-    } catch (error) {
-      failures.push(error instanceof Error ? error.message : String(error));
-    }
+  try {
+    const vertexResult = await runProviderWithRetries("Gemini Vertex", async () => {
+      const result = await callGeminiWithThinkingAndSchemaAndParsed(
+        prompt,
+        CharacterRoleCleanupResponseSchema,
+        MODEL,
+        { preferVertex: true },
+      );
+      return CharacterRoleCleanupResponseSchema.parse(result);
+    });
+    const normalized = ensureCoverageAndOrder(inputCharacters, vertexResult);
+    writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
+    return normalized;
+  } catch (error) {
+    failures.push(error instanceof Error ? error.message : String(error));
+  }
 
-    try {
-      const gpt5Result = await runProviderWithRetries("GPT-5", async () => {
-        const result = await callGpt5WithSchema(prompt, CharacterRoleCleanupResponseSchema);
-        return CharacterRoleCleanupResponseSchema.parse(result);
-      });
-      const normalized = ensureCoverageAndOrder(inputCharacters, gpt5Result);
-      writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
-      return normalized;
-    } catch (error) {
-      failures.push(error instanceof Error ? error.message : String(error));
-    }
+  try {
+    const gpt5Result = await runProviderWithRetries("GPT-5", async () => {
+      const result = await callGpt5WithSchema(prompt, CharacterRoleCleanupResponseSchema);
+      return CharacterRoleCleanupResponseSchema.parse(result);
+    });
+    const normalized = ensureCoverageAndOrder(inputCharacters, gpt5Result);
+    writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
+    return normalized;
+  } catch (error) {
+    failures.push(error instanceof Error ? error.message : String(error));
+  }
 
-    throw new Error(
-      `Failed to generate spoiler-cleaned summaries and roles via all providers. ${failures.join(" | ")}`,
-    );
-  };
+  throw new Error(
+    `Failed to generate spoiler-cleaned summaries and roles via all providers. ${failures.join(" | ")}`,
+  );
+};
 
 if (require.main === module) {
   generateRolesAndRemoveSpoilersFromSummaries()

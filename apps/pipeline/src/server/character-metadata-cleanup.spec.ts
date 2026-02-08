@@ -1,16 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   buildCleanedCharacterSummaryMap,
+  parseCharacterRoleCleanupResponse,
   resolveCharacterMetadataForUpload,
 } from "./character-metadata-cleanup";
 
 describe("character-metadata-cleanup", () => {
-  it("builds a slug-keyed map and keeps first duplicate slug entry", () => {
+  it("builds a slug-keyed map from cleaned response", () => {
     const map = buildCleanedCharacterSummaryMap({
       characters: [
-        { name: "Victor Frankenstein", referenceCard: "Clean Victor", role: "Obsessed Student" },
-        { name: "Victor   Frankenstein", referenceCard: "Duplicate Victor", role: "Duplicate" },
-        { name: "Elizabeth Lavenza", referenceCard: "Clean Elizabeth", role: null },
+        { slug: "victor-frankenstein", referenceCard: "Clean Victor", role: "Obsessed Student" },
+        { slug: "elizabeth-lavenza", referenceCard: "Clean Elizabeth", role: null },
       ],
     });
 
@@ -24,13 +24,30 @@ describe("character-metadata-cleanup", () => {
     });
   });
 
-  it("returns cleaned summary and role when available", () => {
+  it("warns and keeps first entry on duplicate slugs in cleaned response", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const map = buildCleanedCharacterSummaryMap({
+      characters: [
+        { slug: "victor-frankenstein", referenceCard: "First", role: "Role 1" },
+        { slug: "victor-frankenstein", referenceCard: "Second", role: "Role 2" },
+      ],
+    });
+
+    expect(map.get("victor-frankenstein")).toEqual({ referenceCard: "First", role: "Role 1" });
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[character-metadata-cleanup] Duplicate cleaned character slug: victor-frankenstein",
+    );
+    warnSpy.mockRestore();
+  });
+
+  it("returns cleaned summary and role when available by slug", () => {
     const cleanedMap = buildCleanedCharacterSummaryMap({
-      characters: [{ name: "Victor Frankenstein", referenceCard: "Clean Victor", role: "Student" }],
+      characters: [{ slug: "victor-frankenstein", referenceCard: "Clean Victor", role: "Student" }],
     });
 
     const result = resolveCharacterMetadataForUpload(
-      { name: "Victor Frankenstein", referenceCard: "Original Victor" },
+      { slug: "victor-frankenstein", referenceCard: "Original Victor" },
       cleanedMap,
     );
 
@@ -39,10 +56,18 @@ describe("character-metadata-cleanup", () => {
 
   it("falls back to original summary when cleaned entry is missing", () => {
     const result = resolveCharacterMetadataForUpload(
-      { name: "Unknown Character", referenceCard: "Original Unknown" },
+      { slug: "unknown-character", referenceCard: "Original Unknown" },
       new Map(),
     );
 
     expect(result).toEqual({ summary: "Original Unknown" });
+  });
+
+  it("fails fast for old malformed cleanup shape without slug", () => {
+    expect(() =>
+      parseCharacterRoleCleanupResponse({
+        characters: [{ name: "Victor Frankenstein", referenceCard: "Clean Victor", role: "Hero" }],
+      }),
+    ).toThrow();
   });
 });

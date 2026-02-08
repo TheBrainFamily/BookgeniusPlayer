@@ -248,6 +248,7 @@ export interface CharacterFolder {
   slug: string;
   displayName: string;
   summary: string;
+  role?: string;
   aiPrompt?: string;
   avatarGenerationState?: "generating" | "ready" | "error" | "none";
 }
@@ -264,6 +265,7 @@ export async function getCharacterFolders(bookPath: string): Promise<CharacterFo
     slug: c.slug,
     displayName: c.displayName,
     summary: c.summary,
+    role: c.role ?? undefined,
     aiPrompt: c.aiPrompt,
     avatarGenerationState: c.avatarGenerationState ?? undefined,
   }));
@@ -280,6 +282,7 @@ export async function updateCharacterFolder(args: {
   characterSlug: string;
   displayName: string;
   summary?: string;
+  role?: string;
   aiPrompt?: string;
 }) {
   return await client.mutation(api.generator.ensureCharacterFolder, args);
