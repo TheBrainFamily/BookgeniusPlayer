@@ -282,6 +282,54 @@ export function injectDataIndex(section: Element): void {
 }
 
 export function injectAvatarShells(section: Element, doc: Document): void {
+  const createAvatarShell = (speaker: string): HTMLSpanElement => {
+    const shell = doc.createElement("span");
+    shell.className = "character-placeholder character-talking start-of-paragraph";
+    shell.setAttribute("data-character", speaker);
+    shell.setAttribute("data-is-talking", "true");
+    return shell;
+  };
+
+  const letterSelector = 'blockquote[data-epub-type~="z3998:letter"]';
+  const letterBlockquotes = Array.from(section.querySelectorAll(letterSelector));
+  const processedLetterBlockquotes = new WeakSet<Element>();
+
+  for (const letterBlockquote of letterBlockquotes) {
+    processedLetterBlockquotes.add(letterBlockquote);
+
+    const speakerCounts = new Map<string, number>();
+    let totalSpeakerOccurrences = 0;
+
+    letterBlockquote.querySelectorAll("[data-speaker]").forEach((el) => {
+      const isInsideDramaTable = el.closest("table[data-drama]") !== null;
+      if (isInsideDramaTable) return;
+
+      const firstSpeaker = el.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean)[0];
+      if (!firstSpeaker) return;
+
+      speakerCounts.set(firstSpeaker, (speakerCounts.get(firstSpeaker) ?? 0) + 1);
+      totalSpeakerOccurrences += 1;
+    });
+
+    if (totalSpeakerOccurrences === 0) continue;
+
+    let dominantSpeaker: string | null = null;
+    let dominantCount = 0;
+    for (const [speaker, count] of speakerCounts) {
+      if (count > dominantCount) {
+        dominantSpeaker = speaker;
+        dominantCount = count;
+      }
+    }
+
+    if (!dominantSpeaker || dominantCount / totalSpeakerOccurrences <= 0.6) {
+      continue;
+    }
+
+    const shell = createAvatarShell(dominantSpeaker);
+    letterBlockquote.insertBefore(shell, letterBlockquote.firstChild);
+  }
+
   section.querySelectorAll("[data-speaker]").forEach((el) => {
     const speakers = el.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
     if (speakers.length === 0) return;
@@ -291,10 +339,12 @@ export function injectAvatarShells(section: Element, doc: Document): void {
     const isInsideDramaTable = el.closest("table[data-drama]") !== null;
     if (isInsideDramaTable) return;
 
-    const shell = doc.createElement("span");
-    shell.className = "character-placeholder character-talking start-of-paragraph";
-    shell.setAttribute("data-character", speakers[0]);
-    shell.setAttribute("data-is-talking", "true");
+    const letterBlockquote = el.closest(letterSelector);
+    if (letterBlockquote && processedLetterBlockquotes.has(letterBlockquote)) {
+      return;
+    }
+
+    const shell = createAvatarShell(speakers[0]);
 
     const avatarContainer = el.querySelector(".character-avatar");
     if (avatarContainer) {

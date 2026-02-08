@@ -332,6 +332,79 @@ describe("injectAvatarShells", () => {
     expect(result).toContain('<tr data-speaker="heffalump" class="has-speaker">');
     expect(result).not.toContain('<tr data-speaker="heffalump" class="has-speaker"><span');
   });
+
+  it("injects one avatar at letter start when a speaker has >60% share", () => {
+    const input = `
+      <section data-chapter="1">
+        <blockquote data-epub-type="z3998:letter">
+          <header>
+            <p data-speaker="robert-walton">To Mrs. Saville, England.</p>
+          </header>
+          <p data-speaker="robert-walton">Line 1</p>
+          <p data-speaker="robert-walton">Line 2</p>
+          <p data-speaker="robert-walton">Line 3</p>
+          <p data-speaker="victor-frankenstein">Different speaker line.</p>
+        </blockquote>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const letter = doc.querySelector('blockquote[data-epub-type~="z3998:letter"]');
+    expect(letter).toBeTruthy();
+
+    const placeholders = letter?.querySelectorAll(".character-placeholder") ?? [];
+    expect(placeholders.length).toBe(1);
+
+    const directPlaceholder = letter?.querySelector(":scope > .character-placeholder");
+    expect(directPlaceholder).toBeTruthy();
+    expect(directPlaceholder?.getAttribute("data-character")).toBe("robert-walton");
+
+    const nestedPlaceholders = letter?.querySelectorAll("p .character-placeholder") ?? [];
+    expect(nestedPlaceholders.length).toBe(0);
+  });
+
+  it("skips letter avatar when there is no dominant speaker", () => {
+    const input = `
+      <section data-chapter="1">
+        <blockquote data-epub-type="z3998:letter">
+          <p data-speaker="robert-walton">Line 1</p>
+          <p data-speaker="victor-frankenstein">Line 2</p>
+          <p data-speaker="robert-walton">Line 3</p>
+          <p data-speaker="victor-frankenstein">Line 4</p>
+        </blockquote>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const letter = doc.querySelector('blockquote[data-epub-type~="z3998:letter"]');
+
+    const placeholders = letter?.querySelectorAll(".character-placeholder") ?? [];
+    expect(placeholders.length).toBe(0);
+  });
+
+  it("treats 60% speaker share in letter as not dominant", () => {
+    const input = `
+      <section data-chapter="1">
+        <blockquote data-epub-type="z3998:letter">
+          <p data-speaker="robert-walton">Line 1</p>
+          <p data-speaker="robert-walton">Line 2</p>
+          <p data-speaker="robert-walton">Line 3</p>
+          <p data-speaker="victor-frankenstein">Line 4</p>
+          <p data-speaker="victor-frankenstein">Line 5</p>
+        </blockquote>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const letter = doc.querySelector('blockquote[data-epub-type~="z3998:letter"]');
+
+    const placeholders = letter?.querySelectorAll(".character-placeholder") ?? [];
+    expect(placeholders.length).toBe(0);
+  });
 });
 
 describe("normalizeChapterHtml (baseline)", () => {
