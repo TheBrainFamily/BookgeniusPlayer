@@ -1,6 +1,4 @@
-import fs from "fs";
 import type { ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
-import { GoogleGenAI } from "@google/genai";
 
 import { getParagraphsFromChapter } from "../../tools/createParagraphsWithPageNumbers";
 import { getParagraphsFromChapterWithText } from "../../tools/getParagraphsFromChapterWithText";
@@ -12,12 +10,11 @@ import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { readBookFile } from "../../helpers/readBookFile";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { getBookSettings } from "../../helpers/getBookSettings";
-// import { writeBookFile } from "../../helpers/writeBookFile";
-// dotenv.config();
-
-export type Document = { text: string; chapter: number; paragraphNumber: number };
-export type DocumentWithEmbeddings = Document & { Embeddings: number[] };
-export type BookEmbeddings = Map<number, DocumentWithEmbeddings[]>;
+import {
+  computeBatchEmbeddingsThroughHTTP,
+  type BookEmbeddings,
+  type Document,
+} from "./create-paragraph-embeddings-side-effects";
 
 /**
  * Options for generateEmbeddings when called with explicit data (not from global state)
@@ -31,86 +28,6 @@ export interface GenerateEmbeddingsOptions {
   bookForm?: string;
   /** Whether to write embeddings.json to file - default true */
   writeToFile?: boolean;
-}
-
-// const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY as string);
-// const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
-const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
-
-async function computeEmbeddingsThroughHttp(document: Document): Promise<DocumentWithEmbeddings> {
-  const embeddingResponse = await ai.models.embedContent({
-    model: "gemini-embedding-001",
-    contents: [document.text],
-    config: { taskType: "RETRIEVAL_DOCUMENT" },
-  });
-  const embeddingValues = embeddingResponse.embeddings?.[0]?.values as number[];
-  return { ...document, Embeddings: embeddingValues };
-}
-
-export async function computeBatchEmbeddingsThroughHTTP(
-  documents: Document[],
-): Promise<DocumentWithEmbeddings[]> {
-  const BATCH_SIZE = 30;
-  const RETRY_DELAYS = [5000, 30000, 35000, 35000, 35000, 35000, 35000, 35000]; // Retry delays in milliseconds
-
-  const processChunk = async (
-    chunk: Document[],
-    retryAttempt = 0,
-  ): Promise<DocumentWithEmbeddings[]> => {
-    try {
-      const documentsWithEmbeddings = await Promise.all(
-        chunk.map((row) => computeEmbeddingsThroughHttp(row)),
-      );
-      return documentsWithEmbeddings;
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (retryAttempt >= RETRY_DELAYS.length) {
-        throw new Error(
-          `Failed to embed documents after ${RETRY_DELAYS.length} retry attempts: ${errorMessage}`,
-        );
-      }
-
-      const delay = RETRY_DELAYS[retryAttempt];
-      console.log(error);
-      console.log(
-        `Embedding failed, retrying in ${delay / 1000}s. Attempt ${retryAttempt + 1}/${RETRY_DELAYS.length}`,
-      );
-
-      // Wait for the specified delay
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      if (errorMessage.includes("Request payload size exceeds the limit")) {
-        console.log(
-          `Request payload size exceeds the limit, ${chunk
-            .map((c) => `${c.chapter}P${c.paragraphNumber}: Text: ${c.text.length}`)
-            .join(" ")}`,
-        );
-        return processChunk(
-          chunk.map((c) => ({ ...c, text: c.text.slice(0, 10000) })),
-          retryAttempt + 1,
-        );
-      } else {
-        // Retry with incremented attempt count
-        return processChunk(chunk, retryAttempt + 1);
-      }
-    }
-  };
-
-  const results: DocumentWithEmbeddings[] = [];
-
-  // Process documents in batches of BATCH_SIZE
-  for (let i = 0; i < documents.length; i += BATCH_SIZE) {
-    const chunk = documents.slice(i, i + BATCH_SIZE);
-    console.log(
-      `Processing batch ${i / BATCH_SIZE + 1}/${Math.ceil(documents.length / BATCH_SIZE)}, documents ${
-        i + 1
-      }-${Math.min(i + BATCH_SIZE, documents.length)}`,
-    );
-
-    const batchResults = await processChunk(chunk);
-    results.push(...batchResults);
-  }
-
-  return results;
 }
 
 function loadSummariesFromFile(): ScenesSummariesPerChapter[] {
@@ -214,36 +131,6 @@ export const generateEmbeddings = async (
   }
 
   return embeddingsForChapters;
-};
-
-export const returnEmbeddings = async () => {
-  throw new Error("this is not working, leaving just in case to see what is calling it");
-  console.log("Starting to compute paragraph embeddings");
-
-  const fromChapter = 1;
-  const toChapter = 5;
-  let embeddingsForAllChapters: Map<number, DocumentWithEmbeddings[]> = new Map();
-  try {
-    const loadedEmbeddings = JSON.parse(readBookFile("embeddings.json", FILE_TYPE.TEMPORARY));
-
-    // const loadedEmbeddings = [];
-    if (loadedEmbeddings.length > 0 && loadedEmbeddings[0][1].length > 0) {
-      console.log("loadedEmbeddings", loadedEmbeddings);
-      embeddingsForAllChapters = new Map(loadedEmbeddings);
-      console.log("File already exists, skipping generation...");
-    } else {
-      console.log("File exists but empty, generating...");
-      embeddingsForAllChapters = await generateEmbeddings(fromChapter, toChapter);
-    }
-  } catch {
-    try {
-      embeddingsForAllChapters = JSON.parse(fs.readFileSync("data/embeddings.json", "utf8"));
-    } catch {
-      console.log("File does not exist, generating...");
-      embeddingsForAllChapters = await generateEmbeddings(fromChapter, toChapter);
-    }
-  }
-  return embeddingsForAllChapters;
 };
 
 if (require.main === module) {

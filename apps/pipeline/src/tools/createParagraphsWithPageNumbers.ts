@@ -1,12 +1,12 @@
-import fs from "fs";
-import path from "path";
 import * as cheerio from "cheerio";
-import { resolveBookDir } from "../helpers/resolveBookDir";
 import { getBookData } from "../shared-books-data/getBooksData";
 import {
   getParagraphsFromChapterWithText,
   getSectionAttributes,
 } from "./getParagraphsFromChapterWithText";
+import { getMtimeMs } from "./get-mtime-ms";
+import { readBookFile } from "../helpers/readBookFile";
+import { FILE_TYPE } from "../helpers/filesHelpers";
 
 type ChapterParagraph = ReturnType<typeof getParagraphsFromChapterWithText>[number];
 type CachedCheerio = {
@@ -19,21 +19,19 @@ type CachedCheerio = {
 let cachedCheerio: CachedCheerio | undefined;
 
 function getCachedBookTextAndParser(): { bookText: string; $: cheerio.CheerioAPI } {
-  const bookDir = resolveBookDir();
-  const richXmlPath = path.join(bookDir, "input", "rich.xml");
-  const stats = fs.statSync(richXmlPath);
-
+  const richXmlPath = readBookFile("rich.xml", FILE_TYPE.INPUT);
+  const mtimeMs = getMtimeMs(richXmlPath);
   if (
     cachedCheerio &&
     cachedCheerio.richXmlPath === richXmlPath &&
-    cachedCheerio.mtimeMs === stats.mtimeMs
+    cachedCheerio.mtimeMs === getMtimeMs(richXmlPath)
   ) {
     return { bookText: cachedCheerio.bookText, $: cachedCheerio.$ };
   }
 
   const { bookText } = getBookData();
   const $ = cheerio.load(bookText);
-  cachedCheerio = { richXmlPath, mtimeMs: stats.mtimeMs, bookText, $ };
+  cachedCheerio = { richXmlPath, mtimeMs, bookText, $ };
 
   return { bookText, $ };
 }
@@ -45,15 +43,6 @@ export const getParagraphsFromChapter = (
 ) => {
   const { bookText, $ } = getCachedBookTextAndParser();
   return getParagraphsFromChapterWithText(chapter, bookText, clean, pureText, $);
-};
-
-/**
- * Get section-level attributes for a chapter (e.g., data-epub-type, data-chapter-format)
- * These are needed to preserve semantic information when rewrapping sections after AI processing.
- */
-export const getSectionAttributesFromChapter = (chapter: number): Record<string, string> => {
-  const { bookText, $ } = getCachedBookTextAndParser();
-  return getSectionAttributes(chapter, bookText, $);
 };
 
 export const getChapterParagraphsAndSectionAttributes = (

@@ -59,4 +59,30 @@ describe("getParagraphsFromChapterWithText", () => {
     expect(html).toContain("1805–1812");
     expect(html).not.toContain("1805-1812");
   });
+
+  it("flattens nested blockquote content into a single top-level paragraph in pureText mode", () => {
+    const bookText = `
+      <section data-chapter="5">
+        <blockquote epub:type="z3998:diary">
+          <header>
+            <p>Lucy Westenra’s Diary.</p>
+          </header>
+          <blockquote epub:type="z3998:diary-entry">
+            <p><i>12 September.</i>⁠—How good they all are to me. ...</p>
+            <p>Other text</p>
+          </blockquote>
+        </blockquote>
+      </section>
+    `;
+
+    const paragraphs = getParagraphsFromChapterWithText(5, bookText, true, true);
+
+    expect(paragraphs).toHaveLength(1);
+    expect(paragraphs[0]?.dataIndex).toBe(0);
+    expect(paragraphs[0]?.elementType).toBe("blockquote");
+    expect(paragraphs[0]?.text).toContain("Lucy Westenra’s Diary.");
+    expect(paragraphs[0]?.text).toContain("12 September.");
+    expect(paragraphs[0]?.text).toContain("How good they all are to me.");
+    expect(paragraphs[0]?.text).toContain("Other text");
+  });
 });
