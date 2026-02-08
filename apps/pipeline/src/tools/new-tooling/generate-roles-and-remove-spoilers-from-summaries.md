@@ -15,6 +15,7 @@ Your goal is to process a list of characters and output a JSON object where each
 3. **REMOVE Plot Events:** Delete actions taken _during_ the narrative.
 4. **REMOVE Fates:** Delete mentions of death, marriage, imprisonment, or endings.
 5. **Handle "One-Scene" Characters:** Describe them by their professional function.
+6. **REMOVE Name Repetition:** Summary will always be shown next to the name of the character, so do not start it with the character's name. Start directly with their role, relationship, or descriptor (e.g., instead of "Victor Lambert is a scientist...", say "A brilliant scientist...").
 
 ### PART 2: THE ROLE (The Label)
 
@@ -40,7 +41,7 @@ Compare your `role` with the `name` (ignoring parentheses).
 2.  **Occupation:** (e.g., "Whaling Captain", "Magistrate").
 3.  **Archetype:** (e.g., "Witness", "Villager").
 
-### EXAMPLES:
+#### EXAMPLES:
 
 **Input Name:** "Sherlock Holmes"
 **Output Role:** "Consulting Detective"
