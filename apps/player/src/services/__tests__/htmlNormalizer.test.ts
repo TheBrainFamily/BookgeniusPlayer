@@ -4,10 +4,12 @@
 import { describe, it, expect } from "vitest";
 import {
   compareStructure,
+  extractCharacterOccurrences,
   injectAvatarShells,
   injectDataIndex,
   normalizeChapterHtml,
   normalizeChapterHtmlEnhanced,
+  preprocessInlineSpeakerSpans,
   sanitizeHtml,
   stripCharacterMarkup,
 } from "../htmlNormalizer";
@@ -29,6 +31,19 @@ const applyDataIndex = (html: string): string => {
 const applyAvatarShells = (html: string): string => {
   const { doc, section } = parseSection(html);
   injectAvatarShells(section, doc);
+  return section.outerHTML;
+};
+
+const applyInlineSpeakerSegmentation = (
+  html: string,
+  options: { withAvatars?: boolean } = {},
+): string => {
+  const { doc, section } = parseSection(html);
+  injectDataIndex(section);
+  preprocessInlineSpeakerSpans(section, doc);
+  if (options.withAvatars ?? true) {
+    injectAvatarShells(section, doc);
+  }
   return section.outerHTML;
 };
 
@@ -55,6 +70,17 @@ describe("stripCharacterMarkup", () => {
     expect(result).toContain("<h4>Title</h4>");
     expect(result).toContain("<em>emphasis</em>");
     expect(result).not.toContain("data-speaker");
+  });
+
+  it("unwraps inline speaker wrappers preserving text", () => {
+    const input = `
+      <p>
+        <span class="inline-speaker-line inline-speaker-line--speaker" data-speaker="henry-clerval">
+          Henry said: <span data-speaker="henry-clerval">"You are quite right"</span>
+        </span>
+      </p>
+    `;
+    expect(stripCharacterMarkup(input)).toBe('<p> Henry said: "You are quite right" </p>');
   });
 });
 
@@ -135,7 +161,7 @@ describe("compareStructure", () => {
 // });
 
 describe("injectDataIndex", () => {
-  it("assigns sequential data-index to all direct children", () => {
+  it("assigns sequential data-index in reading order for mixed chapter leaves", () => {
     const input = `
       <section data-chapter="1">
         <h4>Title</h4>
@@ -172,6 +198,50 @@ describe("injectDataIndex", () => {
     expect(result).toContain('data-index="0"');
     expect(result).toContain('data-index="1"');
     expect(result).toContain('data-index="2"');
+  });
+
+  it("indexes diary header and diary-entry paragraph leaves instead of outer blockquote", () => {
+    const input = `
+      <section data-chapter="1">
+        <blockquote epub:type="z3998:diary">
+          <header>
+            <p>Lucy Westenra’s Diary.</p>
+          </header>
+          <blockquote epub:type="z3998:diary-entry">
+            <p><i>12 September.</i>⁠—How good they all are to me. ...</p>
+            <p>Other text</p>
+          </blockquote>
+        </blockquote>
+      </section>
+    `;
+    const result = applyDataIndex(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const outerDiary = doc.querySelector('blockquote[epub\\:type="z3998:diary"]');
+    expect(outerDiary?.hasAttribute("data-index")).toBe(false);
+
+    const paragraphs = doc.querySelectorAll("section[data-chapter] p");
+    expect(paragraphs).toHaveLength(3);
+    expect(paragraphs[0]?.getAttribute("data-index")).toBe("0");
+    expect(paragraphs[1]?.getAttribute("data-index")).toBe("1");
+    expect(paragraphs[2]?.getAttribute("data-index")).toBe("2");
+  });
+
+  it("assigns data-index to image-only figures via img leaf", () => {
+    const input = `
+      <section data-chapter="1">
+        <figure>
+          <img alt="Portrait" src="/figures/portrait.svg" />
+        </figure>
+      </section>
+    `;
+    const result = applyDataIndex(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    expect(doc.querySelector("img")?.getAttribute("data-index")).toBe("0");
+    expect(doc.querySelector("figure")?.hasAttribute("data-index")).toBe(false);
   });
 });
 
@@ -407,6 +477,201 @@ describe("injectAvatarShells", () => {
   });
 });
 
+describe("preprocessInlineSpeakerSpans", () => {
+  it("splits deep inline speech into narration and speaker lines while keeping one paragraph index", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>
+          The street was crowded and loud before he finally leaned closer and whispered
+          <span data-speaker="henry-clerval">"You are quite right"</span> before stepping back.
+        </p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const paragraph = doc.querySelector("p[data-index='0']");
+    const lines = paragraph?.querySelectorAll(":scope > .inline-speaker-line") ?? [];
+
+    expect(doc.querySelectorAll("[data-index]").length).toBe(1);
+    expect(lines.length).toBe(3);
+    expect(lines[0].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[1].classList.contains("inline-speaker-line--speaker")).toBe(true);
+    expect(lines[1].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[1].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+  });
+
+  it("hoists first speaker line when first quote starts before threshold", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>Henry said: <span data-speaker="henry-clerval">"You are quite right"</span> and then left.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    expect(lines.length).toBe(2);
+    expect(lines[0].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[0].textContent).toContain("Henry said:");
+    expect(lines[0].textContent).toContain("You are quite right");
+    expect(lines[0].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+    expect(lines[1].classList.contains("inline-speaker-line--narration")).toBe(true);
+  });
+
+  it("uses visible offset with nested formatting before first speaker", () => {
+    const input = `
+      <section data-chapter="1">
+        <p><em>This opening sentence with nested emphasis is intentionally very long.</em> Then narration continues <strong>before</strong> the quote <span data-speaker="henry-clerval">"You are quite right"</span> ends.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input, { withAvatars: false });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    expect(lines.length).toBe(3);
+    expect(lines[0].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[1].getAttribute("data-speaker")).toBe("henry-clerval");
+  });
+
+  it("hoists when inline speaker starts at offset 0", () => {
+    const input = `
+      <section data-chapter="1">
+        <p><span data-speaker="henry-clerval">"You are quite right"</span> and then left.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    expect(lines.length).toBe(2);
+    expect(lines[0].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[0].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+  });
+
+  it("is a no-op for block-level speaker paragraphs without inline speaker spans", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="hero">"This is already block-level dialogue."</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const paragraph = doc.querySelector("p[data-index='0']");
+
+    expect(doc.querySelectorAll(".inline-speaker-line").length).toBe(0);
+    expect(paragraph?.getAttribute("data-speaker")).toBe("hero");
+    expect(paragraph?.querySelector(".character-placeholder")).toBeTruthy();
+  });
+
+  it("splits speaker switches in one paragraph while keeping a single data-index", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>I said: <span data-speaker="hero">thus, I came at length opposite..</span> and then my dear friend <span data-c="henry-clerval">Henry </span> said: <span data-speaker="henry-clerval">"You are quite right"</span> and that was that</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const paragraph = doc.querySelector("p[data-index='0']");
+    const lines = paragraph?.querySelectorAll(":scope > .inline-speaker-line") ?? [];
+
+    expect(doc.querySelectorAll("[data-index]").length).toBe(1);
+    expect(lines.length).toBe(4);
+    expect(lines[0].getAttribute("data-speaker")).toBe("hero");
+    expect(lines[1].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[2].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[3].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[0].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+    expect(lines[2].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+  });
+
+  it("keeps paragraph speaker as line speaker around mid-paragraph switch", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="hero">"I can start this." then <span data-speaker="henry-clerval">"And I can interrupt."</span> then I continue.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input, { withAvatars: false });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const paragraph = doc.querySelector("p[data-index='0']");
+    const lines = paragraph?.querySelectorAll(":scope > .inline-speaker-line--speaker") ?? [];
+
+    expect(paragraph?.hasAttribute("data-speaker")).toBe(false);
+    expect(Array.from(lines).map((line) => line.getAttribute("data-speaker"))).toEqual([
+      "hero",
+      "henry-clerval",
+      "hero",
+    ]);
+  });
+
+  it("handles all speaker switches in one paragraph", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>Lead in <span data-speaker="hero">"A"</span> then <span data-speaker="henry-clerval">"B"</span> then <span data-speaker="victor-frankenstein">"C"</span> end.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input, { withAvatars: false });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const speakerLines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line--speaker");
+
+    expect(Array.from(speakerLines).map((line) => line.getAttribute("data-speaker"))).toEqual([
+      "hero",
+      "henry-clerval",
+      "victor-frankenstein",
+    ]);
+  });
+
+  it("does not segment verse and drama-table contexts", () => {
+    const input = `
+      <section data-chapter="1">
+        <blockquote data-epub-type="z3998:verse">
+          <p>Verse line with <span data-speaker="hero">"inline quote"</span>.</p>
+        </blockquote>
+        <table data-drama="">
+          <tbody>
+            <tr>
+              <td><p>Drama cell <span data-speaker="hero">"line"</span>.</p></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input, { withAvatars: false });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    expect(doc.querySelectorAll(".inline-speaker-line").length).toBe(0);
+    expect(doc.querySelector('blockquote [data-speaker="hero"]')).toBeTruthy();
+    expect(doc.querySelector('table[data-drama] [data-speaker="hero"]')).toBeTruthy();
+  });
+});
+
+describe("extractCharacterOccurrences", () => {
+  it("dedupes speaking slugs per paragraph while reading inline speaker segments", () => {
+    const input = `
+      <section data-chapter="13">
+        <p data-speaker="hero">I said: <span data-speaker="hero">"thus"</span> then <span data-speaker="henry-clerval">"you are right"</span>.</p>
+      </section>
+    `;
+    const { doc, section } = parseSection(input);
+    injectDataIndex(section);
+    preprocessInlineSpeakerSpans(section, doc);
+
+    const speaking = extractCharacterOccurrences(section, 13).filter((occurrence) => occurrence.isSpeaking);
+    expect(speaking).toEqual([
+      { slug: "hero", chapter: 13, paragraph: 0, isSpeaking: true },
+      { slug: "henry-clerval", chapter: 13, paragraph: 0, isSpeaking: true },
+    ]);
+  });
+});
+
 describe("normalizeChapterHtml (baseline)", () => {
   it("preserves drama tables and does not wrap prose into play rows", () => {
     const input = `
@@ -432,6 +697,43 @@ describe("normalizeChapterHtml (baseline)", () => {
     expect(section?.querySelector("tr[data-speaker='heffalump']")).toBeTruthy();
     expect(section?.querySelectorAll(".play-row").length).toBe(0);
     expect(section?.querySelectorAll(".character-placeholder").length).toBe(1);
+  });
+
+  it("normalizes early inline speaker into a hoisted speaker line", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>Henry said: <span data-speaker="henry-clerval">"You are quite right"</span> and then left.</p>
+      </section>
+    `;
+    const result = normalizeChapterHtml(input);
+    const { section } = parseSection(result);
+    const lines = section.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    expect(lines.length).toBe(2);
+    expect(lines[0].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[0].querySelector(".character-placeholder")).toBeTruthy();
+    expect(lines[1].classList.contains("inline-speaker-line--narration")).toBe(true);
+  });
+
+  it("handles Frankenstein chapter 13 inline speaker snippet with separate narration and speech lines", () => {
+    // Regression fixture source:
+    // /Users/lukaszgandecki/projects/bookgenius/frontend/ConvexAssets/books/mary-shelley_frankenstein/chapters-source/chapter-13.html
+    const input = `
+      <section data-chapter="13">
+        <p>Continuing thus, I came at length opposite to the inn at which the various diligences and carriages usually stopped. Here I paused, I knew not why; but I remained some minutes with my eyes fixed on a coach that was coming towards me from the other end of the street. As it drew nearer, I observed that it was the Swiss diligence: it stopped just where I was standing; and, on the door being opened, I perceived <span data-c="henry-clerval">Henry Clerval</span>, who, on seeing me, instantly sprung out. <span data-speaker="henry-clerval">“My dear <span data-c="victor-frankenstein">Frankenstein</span>,” exclaimed he, “how glad I am to see you! how fortunate that you should be here at the very moment of my alighting!”</span></p>
+      </section>
+    `;
+    const result = normalizeChapterHtml(input);
+    const { section } = parseSection(result);
+    const paragraph = section.querySelector("p[data-index='0']");
+    const lines = paragraph?.querySelectorAll(":scope > .inline-speaker-line") ?? [];
+
+    expect(section.querySelectorAll("[data-index]").length).toBe(1);
+    expect(lines.length).toBe(2);
+    expect(lines[0].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[0].textContent).toContain("Continuing thus");
+    expect(lines[1].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[1].querySelector(".character-placeholder")).toBeTruthy();
   });
 });
 

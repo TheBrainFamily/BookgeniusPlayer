@@ -1,4 +1,5 @@
 import { getFigureUrl } from "@player/utils/assetUrls";
+import { forEachIndexedMixedFormatLeaf } from "./mixedFormatLeafIndexing";
 
 const BLOCKED_TAGS = new Set([
   "script",
@@ -16,6 +17,17 @@ const BLOCKED_TAGS = new Set([
   "base",
   "noscript",
 ]);
+
+const INLINE_SPEAKER_HOIST_THRESHOLD = 50;
+const INLINE_SPEAKER_LINE_CLASS = "inline-speaker-line";
+const INLINE_SPEAKER_LINE_SPEAKER_CLASS = "inline-speaker-line--speaker";
+const INLINE_SPEAKER_LINE_NARRATION_CLASS = "inline-speaker-line--narration";
+
+type InlineSpeakerSegment = {
+  kind: "speaker" | "narration";
+  speaker: string | null;
+  fragment: DocumentFragment;
+};
 
 export function sanitizeHtml(html: string): string {
   const parser = new DOMParser();
@@ -236,7 +248,7 @@ function indexPlayRowParagraphs(playRow: Element, startIndex: number): number {
   return index;
 }
 
-function indexMixedFormatChildren(section: Element): void {
+export function indexMixedFormatChildren(section: Element): void {
   let index = 0;
   for (const child of Array.from(section.children)) {
     const tagName = child.tagName.toLowerCase();
@@ -253,6 +265,29 @@ function indexMixedFormatChildren(section: Element): void {
       }
     } else {
       child.setAttribute("data-index", String(index++));
+    }
+  }
+}
+
+export function indexMixedFormatLeaves(section: Element): void {
+  let index = 0;
+
+  for (const child of Array.from(section.children)) {
+    if (child.classList.contains("play-row")) {
+      index = indexPlayRowParagraphs(child, index);
+    } else {
+      index = forEachIndexedMixedFormatLeaf(
+        [child],
+        {
+          getTagName: (element) => element.tagName,
+          getTextContent: (element) => element.textContent,
+          getChildren: (element) => Array.from(element.children),
+        },
+        (leafElement, dataIndex) => {
+          leafElement.setAttribute("data-index", String(dataIndex));
+        },
+        index,
+      );
     }
   }
 }
@@ -275,9 +310,206 @@ export function injectDataIndex(section: Element): void {
   const isMixedOrProse = chapterFormat === "mixed" || !hasPlayRows;
 
   if (isMixedOrProse) {
-    indexMixedFormatChildren(section);
+    indexMixedFormatLeaves(section);
   } else {
     indexPurePlayFormat(section);
+  }
+}
+
+function normalizeWhitespaceForVisibility(text: string): string {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function normalizeSpeakerAttr(speakerAttr: string | null): string | null {
+  if (!speakerAttr) return null;
+  const normalized = speakerAttr.split(/\s+/).filter(Boolean).join(" ");
+  return normalized.length > 0 ? normalized : null;
+}
+
+function hasVisibleSegmentContent(segment: InlineSpeakerSegment): boolean {
+  return normalizeWhitespaceForVisibility(segment.fragment.textContent ?? "").length > 0;
+}
+
+function cloneBetweenNodes(
+  block: Element,
+  doc: Document,
+  startAfter: Node | null,
+  endBefore: Node | null,
+): DocumentFragment {
+  const range = doc.createRange();
+  if (startAfter) {
+    range.setStartAfter(startAfter);
+  } else {
+    range.setStart(block, 0);
+  }
+  if (endBefore) {
+    range.setEndBefore(endBefore);
+  } else {
+    range.setEnd(block, block.childNodes.length);
+  }
+  return range.cloneContents();
+}
+
+function cloneNodeChildren(node: Node, doc: Document): DocumentFragment {
+  const fragment = doc.createDocumentFragment();
+  for (const child of Array.from(node.childNodes)) {
+    fragment.appendChild(child.cloneNode(true));
+  }
+  return fragment;
+}
+
+function getTopLevelInlineSpeakerSpans(block: Element): HTMLSpanElement[] {
+  return Array.from(block.querySelectorAll<HTMLSpanElement>("span[data-speaker]")).filter((span) => {
+    if (span.closest(`.${INLINE_SPEAKER_LINE_CLASS}`)) return false;
+    if (span.closest("p, blockquote") !== block) return false;
+    return span.parentElement?.closest("span[data-speaker]") === null;
+  });
+}
+
+function getVisibleTextOffsetBeforeNode(block: Element, doc: Document, node: Node): number {
+  const range = doc.createRange();
+  range.setStart(block, 0);
+  range.setEndBefore(node);
+  return normalizeWhitespaceForVisibility(range.toString()).length;
+}
+
+function compactInlineSpeakerSegments(segments: InlineSpeakerSegment[]): InlineSpeakerSegment[] {
+  const compacted: InlineSpeakerSegment[] = [];
+
+  for (const segment of segments) {
+    if (!hasVisibleSegmentContent(segment)) continue;
+
+    const previous = compacted[compacted.length - 1];
+    const sameKind = previous && previous.kind === segment.kind;
+    const sameSpeaker =
+      sameKind && segment.kind === "narration" ? true : previous?.speaker === segment.speaker;
+
+    if (previous && sameKind && sameSpeaker) {
+      previous.fragment.append(segment.fragment);
+      continue;
+    }
+
+    compacted.push(segment);
+  }
+
+  return compacted;
+}
+
+function hoistLeadingNarrationIntoFirstSpeaker(
+  segments: InlineSpeakerSegment[],
+  doc: Document,
+): InlineSpeakerSegment[] {
+  const firstSpeakerIndex = segments.findIndex((segment) => segment.kind === "speaker");
+  if (firstSpeakerIndex <= 0) return segments;
+
+  const leadingNarration = segments.slice(0, firstSpeakerIndex);
+  if (leadingNarration.some((segment) => segment.kind !== "narration")) {
+    return segments;
+  }
+
+  const mergedFragment = doc.createDocumentFragment();
+  for (const segment of leadingNarration) {
+    mergedFragment.append(segment.fragment);
+  }
+  mergedFragment.append(segments[firstSpeakerIndex].fragment);
+  segments[firstSpeakerIndex].fragment = mergedFragment;
+
+  return segments.slice(firstSpeakerIndex);
+}
+
+function buildInlineSpeakerSegments(
+  block: Element,
+  doc: Document,
+  inlineSpeakerSpans: HTMLSpanElement[],
+  parentSpeaker: string | null,
+): InlineSpeakerSegment[] {
+  const segments: InlineSpeakerSegment[] = [];
+  let previousInlineSpeakerSpan: Node | null = null;
+
+  for (const inlineSpeakerSpan of inlineSpeakerSpans) {
+    const beforeFragment = cloneBetweenNodes(block, doc, previousInlineSpeakerSpan, inlineSpeakerSpan);
+    segments.push({
+      kind: parentSpeaker ? "speaker" : "narration",
+      speaker: parentSpeaker,
+      fragment: beforeFragment,
+    });
+
+    const inlineSpeaker = normalizeSpeakerAttr(inlineSpeakerSpan.getAttribute("data-speaker"));
+    const inlineSpeakerFragment = cloneNodeChildren(inlineSpeakerSpan, doc);
+    segments.push({
+      kind: inlineSpeaker ? "speaker" : parentSpeaker ? "speaker" : "narration",
+      speaker: inlineSpeaker ?? parentSpeaker,
+      fragment: inlineSpeakerFragment,
+    });
+
+    previousInlineSpeakerSpan = inlineSpeakerSpan;
+  }
+
+  const trailingFragment = cloneBetweenNodes(block, doc, previousInlineSpeakerSpan, null);
+  segments.push({
+    kind: parentSpeaker ? "speaker" : "narration",
+    speaker: parentSpeaker,
+    fragment: trailingFragment,
+  });
+
+  return segments;
+}
+
+function shouldSkipInlineSpeakerSegmentation(block: Element): boolean {
+  if (block.closest(".play-row")) return true;
+  if (block.closest("table[data-drama]")) return true;
+  if (block.closest('[data-epub-type~="z3998:verse"], [epub\\:type~="z3998:verse"]')) return true;
+  return block.querySelector(`:scope > .${INLINE_SPEAKER_LINE_CLASS}`) !== null;
+}
+
+function renderInlineSpeakerSegments(
+  block: Element,
+  doc: Document,
+  segments: InlineSpeakerSegment[],
+): void {
+  block.replaceChildren();
+
+  for (const segment of segments) {
+    const lineElement = doc.createElement("span");
+    lineElement.classList.add(INLINE_SPEAKER_LINE_CLASS);
+
+    if (segment.kind === "speaker" && segment.speaker !== null) {
+      lineElement.classList.add(INLINE_SPEAKER_LINE_SPEAKER_CLASS);
+      lineElement.setAttribute("data-speaker", segment.speaker);
+    } else {
+      lineElement.classList.add(INLINE_SPEAKER_LINE_NARRATION_CLASS);
+    }
+
+    lineElement.append(segment.fragment);
+    block.appendChild(lineElement);
+  }
+}
+
+export function preprocessInlineSpeakerSpans(section: Element, doc: Document): void {
+  const blocks = Array.from(section.querySelectorAll("p, blockquote"));
+
+  for (const block of blocks) {
+    if (shouldSkipInlineSpeakerSegmentation(block)) continue;
+
+    const inlineSpeakerSpans = getTopLevelInlineSpeakerSpans(block);
+    if (inlineSpeakerSpans.length === 0) continue;
+
+    const parentSpeaker = normalizeSpeakerAttr(block.getAttribute("data-speaker"));
+    const firstSpeakerOffset = getVisibleTextOffsetBeforeNode(block, doc, inlineSpeakerSpans[0]);
+
+    let segments = buildInlineSpeakerSegments(block, doc, inlineSpeakerSpans, parentSpeaker);
+    segments = compactInlineSpeakerSegments(segments);
+
+    const shouldHoistFirstSpeaker = !parentSpeaker && firstSpeakerOffset < INLINE_SPEAKER_HOIST_THRESHOLD;
+    if (shouldHoistFirstSpeaker) {
+      segments = hoistLeadingNarrationIntoFirstSpeaker(segments, doc);
+      segments = compactInlineSpeakerSegments(segments);
+    }
+
+    if (segments.length === 0) continue;
+
+    renderInlineSpeakerSegments(block, doc, segments);
+    block.removeAttribute("data-speaker");
   }
 }
 
@@ -290,11 +522,16 @@ export function injectAvatarShells(section: Element, doc: Document): void {
     return shell;
   };
 
-  const letterSelector = 'blockquote[data-epub-type~="z3998:letter"]';
+  const letterSelector =
+    'blockquote[data-epub-type~="z3998:letter"], blockquote[epub\\:type~="z3998:letter"]';
   const letterBlockquotes = Array.from(section.querySelectorAll(letterSelector));
   const processedLetterBlockquotes = new WeakSet<Element>();
 
   for (const letterBlockquote of letterBlockquotes) {
+    if (letterBlockquote.querySelector(`.${INLINE_SPEAKER_LINE_CLASS}`)) {
+      continue;
+    }
+
     processedLetterBlockquotes.add(letterBlockquote);
 
     const speakerCounts = new Map<string, number>();
@@ -336,6 +573,11 @@ export function injectAvatarShells(section: Element, doc: Document): void {
 
     el.classList.add("has-speaker");
 
+    const hasInlineSpeakerChildren =
+      (el.tagName.toLowerCase() === "p" || el.tagName.toLowerCase() === "blockquote") &&
+      el.querySelector(`:scope > .${INLINE_SPEAKER_LINE_SPEAKER_CLASS}`) !== null;
+    if (hasInlineSpeakerChildren) return;
+
     const isInsideDramaTable = el.closest("table[data-drama]") !== null;
     if (isInsideDramaTable) return;
 
@@ -343,6 +585,11 @@ export function injectAvatarShells(section: Element, doc: Document): void {
     if (letterBlockquote && processedLetterBlockquotes.has(letterBlockquote)) {
       return;
     }
+
+    const hasShellAtStart =
+      el.querySelector(":scope > .character-placeholder.character-talking.start-of-paragraph") !==
+      null;
+    if (hasShellAtStart) return;
 
     const shell = createAvatarShell(speakers[0]);
 
@@ -567,6 +814,7 @@ export function normalizeChapterHtmlEnhanced(
   section.setAttribute("data-chapter-format", "mixed");
   wrapPlayElements(section, doc);
   injectDataIndex(section);
+  preprocessInlineSpeakerSpans(section, doc);
   injectAvatarShells(section, doc);
   transformFigureUrls(section);
 
@@ -747,6 +995,7 @@ export function normalizeChapterHtmlPoemProse(
   unwrapPoemSections(section); // Remove poem wrappers so structure matches enhancedProse
   section.setAttribute("data-chapter-format", "mixed");
   injectDataIndex(section);
+  preprocessInlineSpeakerSpans(section, doc);
   injectAvatarShells(section, doc);
   transformFigureUrls(section);
 
@@ -787,6 +1036,7 @@ export function normalizeChapterHtml(html: string): string {
   transformFormatBToPlayRows(section, doc);
   wrapPlayElements(section, doc);
   injectDataIndex(section);
+  preprocessInlineSpeakerSpans(section, doc);
   injectAvatarShells(section, doc);
   transformFigureUrls(section);
 
@@ -810,6 +1060,7 @@ export function normalizeBookHtml(html: string): string {
   sections.forEach((section) => {
     wrapPlayElements(section, doc);
     injectDataIndex(section);
+    preprocessInlineSpeakerSpans(section, doc);
     injectAvatarShells(section, doc);
     transformFigureUrls(section);
   });
@@ -911,17 +1162,29 @@ export function extractCharacterOccurrences(
       });
     });
   } else {
-    let paragraphIndex = 0;
-    for (const child of Array.from(section.children)) {
-      const speakers = child.getAttribute("data-speaker")?.split(/\s+/).filter(Boolean) ?? [];
-      for (const slug of speakers) {
-        occurrences.push({
-          slug,
-          chapter: chapterNumber,
-          paragraph: paragraphIndex,
-          isSpeaking: true,
-        });
-      }
+    section.querySelectorAll("[data-index]").forEach((child) => {
+      const paragraphIndex = parseInt(child.getAttribute("data-index") || "0", 10);
+      const speakingInParagraph = new Set<string>();
+      const addSpeakerOccurrences = (speakerAttr: string | null) => {
+        const speakers = speakerAttr?.split(/\s+/).filter(Boolean) ?? [];
+        for (const slug of speakers) {
+          if (speakingInParagraph.has(slug)) continue;
+          speakingInParagraph.add(slug);
+          occurrences.push({
+            slug,
+            chapter: chapterNumber,
+            paragraph: paragraphIndex,
+            isSpeaking: true,
+          });
+        }
+      };
+
+      const closestSpeakerContainer = child.parentElement?.closest("[data-speaker]");
+      addSpeakerOccurrences(closestSpeakerContainer?.getAttribute("data-speaker") ?? null);
+      addSpeakerOccurrences(child.getAttribute("data-speaker"));
+      child.querySelectorAll("[data-speaker]").forEach((speakerEl) => {
+        addSpeakerOccurrences(speakerEl.getAttribute("data-speaker"));
+      });
 
       child.querySelectorAll("span[data-c]").forEach((mention) => {
         const slug = mention.getAttribute("data-c");
@@ -934,9 +1197,7 @@ export function extractCharacterOccurrences(
           });
         }
       });
-
-      paragraphIndex++;
-    }
+    });
   }
 
   return occurrences;
@@ -962,6 +1223,19 @@ export function countParagraphs(section: Element): number {
 
 export function stripCharacterMarkup(html: string): string {
   let result = html.replace(/<span\s+data-c="[^"]*">([^<]*)<\/span>/g, "$1");
+  const unwrapSpeakerPatterns = [
+    /<span\b[^>]*\bdata-speaker="[^"]*"[^>]*>([\s\S]*?)<\/span>/g,
+    /<span\b[^>]*\bclass="[^"]*\binline-speaker-line\b[^"]*"[^>]*>([\s\S]*?)<\/span>/g,
+  ];
+
+  for (const pattern of unwrapSpeakerPatterns) {
+    let previousResult = "";
+    while (previousResult !== result) {
+      previousResult = result;
+      result = result.replace(pattern, "$1");
+    }
+  }
+
   result = result.replace(/\s+data-speaker="[^"]*"/g, "");
   result = result.replace(/\s+/g, " ").trim();
   return result;

@@ -43,6 +43,58 @@
   margin-top: 0;
 }
 
+/* Inline speaker segmentation lines (single data-index paragraph visual split) */
+.inline-speaker-line {
+  display: block;
+  text-indent: 0;
+}
+
+.inline-speaker-line + .inline-speaker-line {
+  margin-top: 0.2em;
+}
+
+.inline-speaker-line--speaker::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.inline-speaker-line--speaker {
+  min-height: 1.2em;
+}
+
+.inline-speaker-line--speaker > .character-placeholder.character-talking.start-of-paragraph,
+.inline-speaker-line--speaker > .character-placeholder.character-talking.start-of-paragraph:first-of-type {
+  float: left;
+  margin-left: 0;
+  margin-right: 0.5em;
+  shape-outside: circle(50%);
+}
+
+.inline-speaker-line--speaker
+  > .character-placeholder.character-talking.start-of-paragraph
+  .inline-avatar {
+  --avatar-size: clamp(2.4em, 5vw, 2.8em);
+}
+
+@media (max-width: 639px) {
+  .inline-speaker-line + .inline-speaker-line {
+    margin-top: 0.14em;
+  }
+
+  .inline-speaker-line--speaker > .character-placeholder.character-talking.start-of-paragraph,
+  .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph:first-of-type {
+    margin-right: 0.35em;
+  }
+
+  .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph
+    .inline-avatar {
+    --avatar-size: clamp(2em, 9vw, 2.35em);
+  }
+}
+
 p[data-text-alignment="right"] .character-talking,
 blockquote[data-text-alignment="right"] .character-talking {
   margin-right: -3em;
@@ -423,6 +475,55 @@ p.dialogue .dialogue-avatar {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    object-fit: cover;
+  }
+
+  p[data-index] > .inline-speaker-line,
+  blockquote[data-index]:not([data-epub-type="z3998:verse"]) > .inline-speaker-line {
+    text-indent: 0 !important;
+  }
+
+  p[data-index]
+    > .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph,
+  blockquote[data-index]:not([data-epub-type="z3998:verse"])
+    > .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph {
+    float: left;
+    margin-right: 0.5rem;
+    shape-outside: circle(50%);
+  }
+
+  p[data-index]
+    > .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph
+    .inline-avatar,
+  blockquote[data-index]:not([data-epub-type="z3998:verse"])
+    > .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph
+    .inline-avatar {
+    float: left;
+    width: 4.5rem !important;
+    height: 4.5rem !important;
+    margin-left: calc(-1 * var(--padding-x, 1rem) + 0.2rem);
+    shape-outside: circle(50%);
+    clip-path: circle(50%);
+  }
+
+  p[data-index]
+    > .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph
+    .inline-avatar
+    img,
+  blockquote[data-index]:not([data-epub-type="z3998:verse"])
+    > .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph
+    .inline-avatar
+    img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: block;
     object-fit: cover;
   }
 }
