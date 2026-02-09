@@ -1,0 +1,2362 @@
+{
+  "book": "Krolowa-Sniegu",
+  "chapters": [
+    {
+      "chapter": 1,
+      "oldCount": 12,
+      "newCount": 12,
+      "diff": 0,
+      "mappings": [
+        {
+          "oldIndex": 0,
+          "newIndex": 0,
+          "oldText": "I. Czarodziejskie zwierciadło",
+          "newText": "I. Czarodziejskie zwierciadło",
+          "tag": "h3",
+          "expanded": false
+        },
+        {
+          "oldIndex": 1,
+          "newIndex": 1,
+          "oldText": "Żył sobie niegdyś bardzo złośliwy czarodziej. Całą jego przyjemnością było dokuc",
+          "newText": "Żył sobie niegdyś bardzo złośliwy czarodziej. Całą jego przyjemnością było dokuc",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 2,
+          "newIndex": 2,
+          "oldText": "Wymyślił wreszcie i zrobił takie sztuczne zwierciadło, iż wszystkie rzeczy piękn",
+          "newText": "Wymyślił wreszcie i zrobił takie sztuczne zwierciadło, iż wszystkie rzeczy piękn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 3,
+          "newIndex": 3,
+          "oldText": "Tym sposobem cały świat w tym zwierciadle był brzydki i zły, a nic na nim nie by",
+          "newText": "Tym sposobem cały świat w tym zwierciadle był brzydki i zły, a nic na nim nie by",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 4,
+          "newIndex": 4,
+          "oldText": "I tacy ludzie byli bardzo nieszczęśliwi, a było ich coraz więcej.",
+          "newText": "I tacy ludzie byli bardzo nieszczęśliwi, a było ich coraz więcej.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 5,
+          "newIndex": 5,
+          "oldText": "Cieszył się zły czarodziej, ale to mu nie wystarczało. Uczniowie jego postanowil",
+          "newText": "Cieszył się zły czarodziej, ale to mu nie wystarczało. Uczniowie jego postanowil",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 6,
+          "newIndex": 6,
+          "oldText": "I zaczęli lecieć do góry. Bardzo im było trudno, a jeszcze z tak ciężkim zwierci",
+          "newText": "I zaczęli lecieć do góry. Bardzo im było trudno, a jeszcze z tak ciężkim zwierci",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 7,
+          "newIndex": 7,
+          "oldText": "Ale to właśnie było najgorsze nieszczęście!",
+          "newText": "Ale to właśnie było najgorsze nieszczęście!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 8,
+          "newIndex": 8,
+          "oldText": "Zamiast jednego lustra, były ich teraz miliony; rozproszyły się wszędzie, a w ka",
+          "newText": "Zamiast jednego lustra, były ich teraz miliony; rozproszyły się wszędzie, a w ka",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 9,
+          "newIndex": 9,
+          "oldText": "Gorzej jeszcze, jeżeli okruszyna lustra wpadła komu do serca. Nieszczęśliwy trac",
+          "newText": "Gorzej jeszcze, jeżeli okruszyna lustra wpadła komu do serca. Nieszczęśliwy trac",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 10,
+          "newIndex": 10,
+          "oldText": "Z większych kawałków porobiono szyby, z innych szkła do okularów, a mnóstwo jesz",
+          "newText": "Z większych kawałków porobiono szyby, z innych szkła do okularów, a mnóstwo jesz",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 11,
+          "newIndex": 11,
+          "oldText": "A niegodziwych pyłków ciągle jeszcze pełno i zobaczymy, co z tego wynikło.",
+          "newText": "A niegodziwych pyłków ciągle jeszcze pełno i zobaczymy, co z tego wynikło.",
+          "tag": "p",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "chapter": 2,
+      "oldCount": 56,
+      "newCount": 65,
+      "diff": 9,
+      "mappings": [
+        {
+          "oldIndex": 0,
+          "newIndex": 0,
+          "oldText": "II. Sąsiedzi",
+          "newText": "II. Sąsiedzi",
+          "tag": "h3",
+          "expanded": false
+        },
+        {
+          "oldIndex": 1,
+          "newIndex": 1,
+          "oldText": "W pewnym bardzo starym mieście, w bardzo wysokim domu na poddaszu mieszkało dwoj",
+          "newText": "W pewnym bardzo starym mieście, w bardzo wysokim domu na poddaszu mieszkało dwoj",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 2,
+          "newIndex": 2,
+          "oldText": "W tym mieście było tyle ludzi, że nie mógł każdy dla siebie mieć osobnego domku,",
+          "newText": "W tym mieście było tyle ludzi, że nie mógł każdy dla siebie mieć osobnego domku,",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 3,
+          "newIndex": 3,
+          "oldText": "Bo posłuchajcie tylko: w tym wysokim domu na poddaszu każda rodzina miała własną",
+          "newText": "Bo posłuchajcie tylko: w tym wysokim domu na poddaszu każda rodzina miała własną",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 4,
+          "newIndex": 4,
+          "oldText": "Były to bardzo dobre dzieci i kochały się jak brat i siostra.",
+          "newText": "Były to bardzo dobre dzieci i kochały się jak brat i siostra.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 5,
+          "newIndex": 5,
+          "oldText": "Na wiosnę rodzice Kaja i Gerdy ustawiali na brzegu dachu długie skrzynie, napełn",
+          "newText": "Na wiosnę rodzice Kaja i Gerdy ustawiali na brzegu dachu długie skrzynie, napełn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 6,
+          "newIndex": 6,
+          "oldText": "Im mocniej dogrzewało złote słonko, tym piękniej było w ogródku na dachu. Zielon",
+          "newText": "Im mocniej dogrzewało złote słonko, tym piękniej było w ogródku na dachu. Zielon",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 7,
+          "newIndex": 7,
+          "oldText": "Ślicznie tu było w lecie.",
+          "newText": "Ślicznie tu było w lecie.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 8,
+          "newIndex": 8,
+          "oldText": "Ale w zimie wszystko znikało. Biały śnieg pokrywał dachy, a zamknięte okna częst",
+          "newText": "Ale w zimie wszystko znikało. Biały śnieg pokrywał dachy, a zamknięte okna częst",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 9,
+          "newIndex": 9,
+          "oldText": "— Pójdź tu do nas! — mówiło oko.",
+          "newText": "— Pójdź tu do nas! — mówiło oko.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 10,
+          "newIndex": 10,
+          "oldText": "— Dobrze, dobrze!",
+          "newText": "— Dobrze, dobrze!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 11,
+          "newIndex": 11,
+          "oldText": "W lecie tak łatwo było przejść z jednego mieszkania do drugiego, ale w zimie mus",
+          "newText": "W lecie tak łatwo było przejść z jednego mieszkania do drugiego, ale w zimie mus",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 12,
+          "newIndex": 12,
+          "oldText": "— Patrz, patrz! Białe pszczoły wyleciały z ula — mówiła stara babka, ukazując wn",
+          "newText": "— Patrz, patrz! Białe pszczoły wyleciały z ula — mówiła stara babka, ukazując wn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 13,
+          "newIndex": 13,
+          "oldText": "— Pszczoły, pszczoły — powtarzała wesoło Gerda. — A czy mają swoją królową?",
+          "newText": "— Pszczoły, pszczoły — powtarzała wesoło Gerda. — A czy mają swoją królową?",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 14,
+          "newIndex": 14,
+          "oldText": "— Rozumie się, że mają — odpowiedziała babka. — Największy ze wszystkich płatków",
+          "newText": "— Rozumie się, że mają — odpowiedziała babka. — Największy ze wszystkich płatków",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 15,
+          "newIndex": 15,
+          "oldText": "— Tak! Tak! Widzieliśmy! — wołały dzieci, zachwycone słowami babki.",
+          "newText": "— Tak! Tak! Widzieliśmy! — wołały dzieci, zachwycone słowami babki.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 16,
+          "newIndex": 16,
+          "oldText": "— A czy królowa śniegu mogłaby przyjść tutaj? — zapytała Gerda.",
+          "newText": "— A czy królowa śniegu mogłaby przyjść tutaj? — zapytała Gerda.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 17,
+          "newIndex": 17,
+          "oldText": "— Ach, niech no tylko przyjdzie! — krzyknął Kaj wesoło. — Posadziłbym ją zaraz p",
+          "newText": "— Ach, niech no tylko przyjdzie! — krzyknął Kaj wesoło. — Posadziłbym ją zaraz p",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 18,
+          "newIndex": 18,
+          "oldText": "Babka pogłaskała go lekko po głowie i zaczęła opowiadać co innego.",
+          "newText": "Babka pogłaskała go lekko po głowie i zaczęła opowiadać co innego.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 19,
+          "newIndex": 19,
+          "oldText": "Raz wieczorem Kaj już na wpół rozebrany wszedł na stołek i wyjrzał przez okrągły",
+          "newText": "Raz wieczorem Kaj już na wpół rozebrany wszedł na stołek i wyjrzał przez okrągły",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 20,
+          "newIndex": 20,
+          "oldText": "Nazajutrz dzień był jasny, pogodny i mroźny, ale wkrótce nastąpiła odwilż, wiatr",
+          "newText": "Nazajutrz dzień był jasny, pogodny i mroźny, ale wkrótce nastąpiła odwilż, wiatr",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 21,
+          "newIndex": 21,
+          "oldText": "Groszek pachnący spadał w festonach na skrzynie, powoje otwierały śliczne kielic",
+          "newText": "Groszek pachnący spadał w festonach na skrzynie, powoje otwierały śliczne kielic",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 22,
+          "newIndex": 22,
+          "oldText": "Gerda z Kajem siedzieli pod krzaczkiem i śpiewali razem ulubioną swoją piosenkę.",
+          "newText": "Gerda z Kajem siedzieli pod krzaczkiem i śpiewali razem ulubioną swoją piosenkę.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 23,
+          "newIndex": 23,
+          "oldText": "Co ja kocham na tym świecie? Złote słonko, cudne kwiecie! Boże ptaszki śpiewając",
+          "newText": "Co ja kocham na tym świecie?",
+          "tag": "blockquote",
+          "expanded": true
+        },
+        {
+          "oldIndex": 24,
+          "newIndex": 33,
+          "oldText": "Razu jednego dzieci siedziały w ogródku i oglądały bardzo ładną książkę z obrazk",
+          "newText": "Razu jednego dzieci siedziały w ogródku i oglądały bardzo ładną książkę z obrazk",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 25,
+          "newIndex": 34,
+          "oldText": "— Aj! — zawołał Kaj nagle. — Coś mnie ukłuło w serce! Coś mi do oka wpadło!",
+          "newText": "— Aj! — zawołał Kaj nagle. — Coś mnie ukłuło w serce! Coś mi do oka wpadło!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 26,
+          "newIndex": 35,
+          "oldText": "— Może ukłuł cię kolec róży? — rzekła troskliwie Gerda. — Czekaj, zobaczę, co ci",
+          "newText": "— Może ukłuł cię kolec róży? — rzekła troskliwie Gerda. — Czekaj, zobaczę, co ci",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 27,
+          "newIndex": 36,
+          "oldText": "— Pewno już wyleciało — rzekł Kaj niecierpliwie i odsunął się od dziewczynki.",
+          "newText": "— Pewno już wyleciało — rzekł Kaj niecierpliwie i odsunął się od dziewczynki.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 28,
+          "newIndex": 37,
+          "oldText": "Niestety, nie wyleciało. Był to właśnie drobniutki pyłek stłuczonego zwierciadła",
+          "newText": "Niestety, nie wyleciało. Był to właśnie drobniutki pyłek stłuczonego zwierciadła",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 29,
+          "newIndex": 38,
+          "oldText": "— Czegóż beczysz? — zapytał opryskliwie. — Żebyś wiedziała, jaka jesteś brzydka!",
+          "newText": "— Czegóż beczysz? — zapytał opryskliwie. — Żebyś wiedziała, jaka jesteś brzydka!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 30,
+          "newIndex": 39,
+          "oldText": "Kopnął skrzynię, zerwał różę i rozdeptał.",
+          "newText": "Kopnął skrzynię, zerwał różę i rozdeptał.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 31,
+          "newIndex": 40,
+          "oldText": "— Kaju! — zawołała z przestrachem dziewczynka.",
+          "newText": "— Kaju! — zawołała z przestrachem dziewczynka.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 32,
+          "newIndex": 41,
+          "oldText": "Widząc jej przerażenie, roześmiał się szkaradnie, zerwał jeszcze jedną różę, rzu",
+          "newText": "Widząc jej przerażenie, roześmiał się szkaradnie, zerwał jeszcze jedną różę, rzu",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 33,
+          "newIndex": 42,
+          "oldText": "Od tej chwili Kaj zmienił się zupełnie. Kiedy Gerda chciała oglądać z nim obrazk",
+          "newText": "Od tej chwili Kaj zmienił się zupełnie. Kiedy Gerda chciała oglądać z nim obrazk",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 34,
+          "newIndex": 43,
+          "oldText": "W gruncie rzeczy Kaj nic temu nie był winien, tylko szkaradny pyłek szkła czarod",
+          "newText": "W gruncie rzeczy Kaj nic temu nie był winien, tylko szkaradny pyłek szkła czarod",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 35,
+          "newIndex": 44,
+          "oldText": "Razu jednego w zimie, gdy śnieg padał, przyniósł Kaj na podwórze szkło powiększa",
+          "newText": "Razu jednego w zimie, gdy śnieg padał, przyniósł Kaj na podwórze szkło powiększa",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 36,
+          "newIndex": 45,
+          "oldText": "— Spojrzyj, Gerdo — rzekł — jakie ogromne! Niby kwiaty, niby gwiazdy, a jakie sz",
+          "newText": "— Spojrzyj, Gerdo — rzekł — jakie ogromne! Niby kwiaty, niby gwiazdy, a jakie sz",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 37,
+          "newIndex": 46,
+          "oldText": "Nagle pobiegł na górę, przyniósł swoje saneczki i ciepłe rękawice, oznajmił Gerd",
+          "newText": "Nagle pobiegł na górę, przyniósł swoje saneczki i ciepłe rękawice, oznajmił Gerd",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 38,
+          "newIndex": 47,
+          "oldText": "Na rynku była wesoła zabawa. Chłopcy ślizgali się po śniegu w swoich sankach, na",
+          "newText": "Na rynku była wesoła zabawa. Chłopcy ślizgali się po śniegu w swoich sankach, na",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 39,
+          "newIndex": 48,
+          "oldText": "Wtem wjechały na rynek duże, białe sanie zaprzężone białymi końmi. Osoba siedząc",
+          "newText": "Wtem wjechały na rynek duże, białe sanie zaprzężone białymi końmi. Osoba siedząc",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 40,
+          "newIndex": 49,
+          "oldText": "Kaj doznawał wielkiej przyjemności, bo nigdy jeszcze nie jechał tak prędko; nie ",
+          "newText": "Kaj doznawał wielkiej przyjemności, bo nigdy jeszcze nie jechał tak prędko; nie ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 41,
+          "newIndex": 50,
+          "oldText": "I tak powtórzyło się parę razy.",
+          "newText": "I tak powtórzyło się parę razy.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 42,
+          "newIndex": 51,
+          "oldText": "Śnieg zaczął padać gęsty, pociemniało, Kaj nie widział już nic dookoła prócz krę",
+          "newText": "Śnieg zaczął padać gęsty, pociemniało, Kaj nie widział już nic dookoła prócz krę",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 43,
+          "newIndex": 52,
+          "oldText": "Kaj chciał się przeżegnać, zmówić pacierz, lecz w żaden sposób przypomnieć sobie",
+          "newText": "Kaj chciał się przeżegnać, zmówić pacierz, lecz w żaden sposób przypomnieć sobie",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 44,
+          "newIndex": 53,
+          "oldText": "Płatki śniegu padały coraz większe, wyglądały na koniec niby białe ptaszki. Zdaw",
+          "newText": "Płatki śniegu padały coraz większe, wyglądały na koniec niby białe ptaszki. Zdaw",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 45,
+          "newIndex": 54,
+          "oldText": "Naraz konie stanęły, sanie się zatrzymały, a siedząca w nich osoba podniosła się",
+          "newText": "Naraz konie stanęły, sanie się zatrzymały, a siedząca w nich osoba podniosła się",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 46,
+          "newIndex": 55,
+          "oldText": "— Dobrze jedziemy! — rzekła. — Ale po co masz tam marznąć? Chodź pod moje niedźw",
+          "newText": "— Dobrze jedziemy! — rzekła. — Ale po co masz tam marznąć? Chodź pod moje niedźw",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 47,
+          "newIndex": 56,
+          "oldText": "Posadziła go w saniach obok siebie, nakryła białym futrem, a jemu się zdawało, ż",
+          "newText": "Posadziła go w saniach obok siebie, nakryła białym futrem, a jemu się zdawało, ż",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 48,
+          "newIndex": 57,
+          "oldText": "— Jeszcze ci zimno? — rzekła i pocałowała go w czoło.",
+          "newText": "— Jeszcze ci zimno? — rzekła i pocałowała go w czoło.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 49,
+          "newIndex": 58,
+          "oldText": "Huu! Jakiż to był zimny pocałunek! Uczuł lód aż w głębi serca, które — jak wiemy",
+          "newText": "Huu! Jakiż to był zimny pocałunek! Uczuł lód aż w głębi serca, które — jak wiemy",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 50,
+          "newIndex": 59,
+          "oldText": "— Moje saneczki! Moje saneczki! — zawołał z wielką trwogą, aby nie stracić ulubi",
+          "newText": "— Moje saneczki! Moje saneczki! — zawołał z wielką trwogą, aby nie stracić ulubi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 51,
+          "newIndex": 60,
+          "oldText": "Królowa śniegu pochyliła się nad Kajem i pocałowała go powtórnie, a w tej chwili",
+          "newText": "Królowa śniegu pochyliła się nad Kajem i pocałowała go powtórnie, a w tej chwili",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 52,
+          "newIndex": 61,
+          "oldText": "Teraz nie bał się wcale pięknej pani, nie wydawała mu się straszna. Opowiadał je",
+          "newText": "Teraz nie bał się wcale pięknej pani, nie wydawała mu się straszna. Opowiadał je",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 53,
+          "newIndex": 62,
+          "oldText": "Wreszcie wzięła go na ręce i wzleciała z nim razem wysoko, wysoko, ku ciemnym ch",
+          "newText": "Wreszcie wzięła go na ręce i wzleciała z nim razem wysoko, wysoko, ku ciemnym ch",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 54,
+          "newIndex": 63,
+          "oldText": "Przelatywali ponad ciemnymi lasami, nad górami, morzami i lądami. Zimny wicher h",
+          "newText": "Przelatywali ponad ciemnymi lasami, nad górami, morzami i lądami. Zimny wicher h",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 55,
+          "newIndex": 64,
+          "oldText": "I tak płynęła długa noc zimowa, a gdy nastąpił ranek, Kaj spał u nóg królowej śn",
+          "newText": "I tak płynęła długa noc zimowa, a gdy nastąpił ranek, Kaj spał u nóg królowej śn",
+          "tag": "p",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "chapter": 3,
+      "oldCount": 50,
+      "newCount": 50,
+      "diff": 0,
+      "mappings": [
+        {
+          "oldIndex": 0,
+          "newIndex": 0,
+          "oldText": "III. W ogródku wróżki",
+          "newText": "III. W ogródku wróżki",
+          "tag": "h3",
+          "expanded": false
+        },
+        {
+          "oldIndex": 1,
+          "newIndex": 1,
+          "oldText": "Jakże smutno i strasznie było biednej Gerdzie, kiedy wieczorem Kaj nie wrócił do",
+          "newText": "Jakże smutno i strasznie było biednej Gerdzie, kiedy wieczorem Kaj nie wrócił do",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 2,
+          "newIndex": 2,
+          "oldText": "Nikt nie wiedział, gdzie się podział i co się z nim stało. Chłopcy opowiadali, ż",
+          "newText": "Nikt nie wiedział, gdzie się podział i co się z nim stało. Chłopcy opowiadali, ż",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 3,
+          "newIndex": 3,
+          "oldText": "Płakali rodzice, babka i Gerda, bo myśleli, że z mostu zsunął się w rzekę i uton",
+          "newText": "Płakali rodzice, babka i Gerda, bo myśleli, że z mostu zsunął się w rzekę i uton",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 4,
+          "newIndex": 4,
+          "oldText": "Wreszcie nadeszła wiosna, zajaśniało piękne słoneczko.",
+          "newText": "Wreszcie nadeszła wiosna, zajaśniało piękne słoneczko.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 5,
+          "newIndex": 5,
+          "oldText": "— Kaj nie żyje! — rzekła do niego Gerda.",
+          "newText": "— Kaj nie żyje! — rzekła do niego Gerda.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 6,
+          "newIndex": 6,
+          "oldText": "— Albo to prawda! — odpowiedziało słońce.",
+          "newText": "— Albo to prawda! — odpowiedziało słońce.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 7,
+          "newIndex": 7,
+          "oldText": "Powróciły jaskółki do gniazd zeszłorocznych.",
+          "newText": "Powróciły jaskółki do gniazd zeszłorocznych.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 8,
+          "newIndex": 8,
+          "oldText": "— Kaj nie żyje! — oznajmiła im Gerda.",
+          "newText": "— Kaj nie żyje! — oznajmiła im Gerda.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 9,
+          "newIndex": 9,
+          "oldText": "— Nieprawda! — odpowiedziały jaskółki.",
+          "newText": "— Nieprawda! — odpowiedziały jaskółki.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 10,
+          "newIndex": 10,
+          "oldText": "A wtedy i Gerda przestała w to wierzyć.",
+          "newText": "A wtedy i Gerda przestała w to wierzyć.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 11,
+          "newIndex": 11,
+          "oldText": "— Włożę czerwone buciki, których Kaj jeszcze nie widział i pójdę do rzeki zapyta",
+          "newText": "— Włożę czerwone buciki, których Kaj jeszcze nie widział i pójdę do rzeki zapyta",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 12,
+          "newIndex": 12,
+          "oldText": "Było bardzo wcześnie, ale wstała zaraz, ubrała się cichutko, żeby nie obudzić ba",
+          "newText": "Było bardzo wcześnie, ale wstała zaraz, ubrała się cichutko, żeby nie obudzić ba",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 13,
+          "newIndex": 13,
+          "oldText": "— Czy to prawda, że zabrałaś mi mojego Kaja? — zapytała niespokojnie. — Oddaj mi",
+          "newText": "— Czy to prawda, że zabrałaś mi mojego Kaja? — zapytała niespokojnie. — Oddaj mi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 14,
+          "newIndex": 14,
+          "oldText": "Zdawało jej się, że fale zaszemrały jakoś dziwnie, jakby się zgadzały na ten ukł",
+          "newText": "Zdawało jej się, że fale zaszemrały jakoś dziwnie, jakby się zgadzały na ten ukł",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 15,
+          "newIndex": 15,
+          "oldText": "Buciki upadły niedaleko, a fala wyniosła je na brzeg z powrotem. Rzeka nie chcia",
+          "newText": "Buciki upadły niedaleko, a fala wyniosła je na brzeg z powrotem. Rzeka nie chcia",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 16,
+          "newIndex": 16,
+          "oldText": "Wtedy Gerda przelękła się bardzo i zaczęła głośno płakać. Ale nikt jej nie słysz",
+          "newText": "Wtedy Gerda przelękła się bardzo i zaczęła głośno płakać. Ale nikt jej nie słysz",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 17,
+          "newIndex": 17,
+          "oldText": "— Ćwir! Ćwir! Ćwir! Jesteśmy tutaj! Nie bój się! Jesteśmy tutaj.",
+          "newText": "— Ćwir! Ćwir! Ćwir! Jesteśmy tutaj! Nie bój się! Jesteśmy tutaj.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 18,
+          "newIndex": 18,
+          "oldText": "I Gerda uspokoiła się powoli. Czółenko płynęło z prądem, a ona siedziała cichutk",
+          "newText": "I Gerda uspokoiła się powoli. Czółenko płynęło z prądem, a ona siedziała cichutk",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 19,
+          "newIndex": 19,
+          "oldText": "Prześlicznie wyglądały brzegi rzeki; na zielonych, kwiecistych łąkach pasły się ",
+          "newText": "Prześlicznie wyglądały brzegi rzeki; na zielonych, kwiecistych łąkach pasły się ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 20,
+          "newIndex": 20,
+          "oldText": "— Może mnie rzeka zaniesie do Kaja — pomyślała Gerda i przestała się smucić. Usi",
+          "newText": "— Może mnie rzeka zaniesie do Kaja — pomyślała Gerda i przestała się smucić. Usi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 21,
+          "newIndex": 21,
+          "oldText": "Gerda pomyślała, że to żywi ludzie i wołała ratunku, ale naturalnie nikt jej nie",
+          "newText": "Gerda pomyślała, że to żywi ludzie i wołała ratunku, ale naturalnie nikt jej nie",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 22,
+          "newIndex": 22,
+          "oldText": "Wtem drzwi domku się otworzyły i wyszła z niego zgarbiona staruszka, podpierając",
+          "newText": "Wtem drzwi domku się otworzyły i wyszła z niego zgarbiona staruszka, podpierając",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 23,
+          "newIndex": 23,
+          "oldText": "— Ach, biedne dziecko! — zawołała stara. — Skądże się wzięłaś na tej bystrej rze",
+          "newText": "— Ach, biedne dziecko! — zawołała stara. — Skądże się wzięłaś na tej bystrej rze",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 24,
+          "newIndex": 24,
+          "oldText": "Drepcząc prędko, staruszka zbliżyła się do brzegu, zaczepiła o czółno swoim zakr",
+          "newText": "Drepcząc prędko, staruszka zbliżyła się do brzegu, zaczepiła o czółno swoim zakr",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 25,
+          "newIndex": 25,
+          "oldText": "Ach, jak przyjemnie zrobiło się Gerdzie, gdy znów uczuła pod nogami twardą ziemi",
+          "newText": "Ach, jak przyjemnie zrobiło się Gerdzie, gdy znów uczuła pod nogami twardą ziemi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 26,
+          "newIndex": 26,
+          "oldText": "— Kto jesteś, moje dziecko i skąd się tu wzięłaś? — pytała znów kobieta, uważnie",
+          "newText": "— Kto jesteś, moje dziecko i skąd się tu wzięłaś? — pytała znów kobieta, uważnie",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 27,
+          "newIndex": 27,
+          "oldText": "Wtedy Gerda opowiedziała jej wszystko i pytała, czy nie wie co o Kaju.",
+          "newText": "Wtedy Gerda opowiedziała jej wszystko i pytała, czy nie wie co o Kaju.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 28,
+          "newIndex": 28,
+          "oldText": "Staruszka nie wiedziała, ale była tego zdania, że Kaj może się znaleźć, a tymcza",
+          "newText": "Staruszka nie wiedziała, ale była tego zdania, że Kaj może się znaleźć, a tymcza",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 29,
+          "newIndex": 29,
+          "oldText": "Potem weszły do domku. Przez wysokie okienka czerwone, żółte i niebieskie, dziwn",
+          "newText": "Potem weszły do domku. Przez wysokie okienka czerwone, żółte i niebieskie, dziwn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 30,
+          "newIndex": 30,
+          "oldText": "Wiśnie były wyborne, Gerda głodna, więc jadła, uśmiechając się z zadowolenia. St",
+          "newText": "Wiśnie były wyborne, Gerda głodna, więc jadła, uśmiechając się z zadowolenia. St",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 31,
+          "newIndex": 31,
+          "oldText": "— Dawno już mieć pragnęłam taką miłą, dobrą dziewczynkę — mówiła łagodnym głosem",
+          "newText": "— Dawno już mieć pragnęłam taką miłą, dobrą dziewczynkę — mówiła łagodnym głosem",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 32,
+          "newIndex": 32,
+          "oldText": "Potem Gerda została w izdebce, a staruszka wyszła sama do ogródka, dotknęła swoi",
+          "newText": "Potem Gerda została w izdebce, a staruszka wyszła sama do ogródka, dotknęła swoi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 33,
+          "newIndex": 33,
+          "oldText": "Teraz dziewczynka wybiegła także do ogródka. Ach, jak tu było ślicznie i przyjem",
+          "newText": "Teraz dziewczynka wybiegła także do ogródka. Ach, jak tu było ślicznie i przyjem",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 34,
+          "newIndex": 34,
+          "oldText": "Nazajutrz z rana obudziła się wesoło i bawiła znowu cały dzień w ogródku, wśród ",
+          "newText": "Nazajutrz z rana obudziła się wesoło i bawiła znowu cały dzień w ogródku, wśród ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 35,
+          "newIndex": 35,
+          "oldText": "Gerda znała teraz wszystkie kwiatki, ale chociaż miała ich tutaj tak wiele, ciąg",
+          "newText": "Gerda znała teraz wszystkie kwiatki, ale chociaż miała ich tutaj tak wiele, ciąg",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 36,
+          "newIndex": 36,
+          "oldText": "Wtem raz na słomianym kapeluszu wróżki spostrzegła malowaną różę. Zdziwiona i sz",
+          "newText": "Wtem raz na słomianym kapeluszu wróżki spostrzegła malowaną różę. Zdziwiona i sz",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 37,
+          "newIndex": 37,
+          "oldText": "Wówczas gorzko płakać zaczęła. Jej łzy gorące padały na ziemię i przesiąkły prze",
+          "newText": "Wówczas gorzko płakać zaczęła. Jej łzy gorące padały na ziemię i przesiąkły prze",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 38,
+          "newIndex": 38,
+          "oldText": "— Och, jakże dawno ja tu jestem! — zawołała. — A miałam szukać Kaja. Moje śliczn",
+          "newText": "— Och, jakże dawno ja tu jestem! — zawołała. — A miałam szukać Kaja. Moje śliczn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 39,
+          "newIndex": 39,
+          "oldText": "— O, nie! — odparły róże. — Byłyśmy przecie pod ziemią, tam go nie ma.",
+          "newText": "— O, nie! — odparły róże. — Byłyśmy przecie pod ziemią, tam go nie ma.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 40,
+          "newIndex": 40,
+          "oldText": "— Dziękuję wam — zawołała uszczęśliwiona Gerda i pobiegła do innych kwiatków, ab",
+          "newText": "— Dziękuję wam — zawołała uszczęśliwiona Gerda i pobiegła do innych kwiatków, ab",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 41,
+          "newIndex": 41,
+          "oldText": "Lecz daremnie pytała. Kwiatki uśmiechały się wszystkie do słońca i śpiewały mu s",
+          "newText": "Lecz daremnie pytała. Kwiatki uśmiechały się wszystkie do słońca i śpiewały mu s",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 42,
+          "newIndex": 42,
+          "oldText": "— Na próżno je pytam — pomyślała wreszcie. — One kochają tylko swoje powieści i ",
+          "newText": "— Na próżno je pytam — pomyślała wreszcie. — One kochają tylko swoje powieści i ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 43,
+          "newIndex": 43,
+          "oldText": "Podniosła spódniczkę, aby lepiej biec mogła i pośpieszyła do furtki.",
+          "newText": "Podniosła spódniczkę, aby lepiej biec mogła i pośpieszyła do furtki.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 44,
+          "newIndex": 44,
+          "oldText": "Ale furtka zamknięta była na klucz. Wtedy zaczęła mocno szarpać klamkę, aż zardz",
+          "newText": "Ale furtka zamknięta była na klucz. Wtedy zaczęła mocno szarpać klamkę, aż zardz",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 45,
+          "newIndex": 45,
+          "oldText": "Teraz dopiero obejrzała się dokoła: lato minęło dawno, późna jesień była na świe",
+          "newText": "Teraz dopiero obejrzała się dokoła: lato minęło dawno, późna jesień była na świe",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 46,
+          "newIndex": 46,
+          "oldText": "— Boże! Boże! Ileż ja czasu straciłam — narzekała Gerda. — Oto już późna jesień,",
+          "newText": "— Boże! Boże! Ileż ja czasu straciłam — narzekała Gerda. — Oto już późna jesień,",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 47,
+          "newIndex": 47,
+          "oldText": "I wstała, by iść dalej.",
+          "newText": "I wstała, by iść dalej.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 48,
+          "newIndex": 48,
+          "oldText": "Szła bosymi nóżkami po kamienistej drodze, a dokoła było smutno i ponuro. Czuła ",
+          "newText": "Szła bosymi nóżkami po kamienistej drodze, a dokoła było smutno i ponuro. Czuła ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 49,
+          "newIndex": 49,
+          "oldText": "Szaro i smutno było na szerokim świecie, otulonym w szare, ciężkie, ołowiane chm",
+          "newText": "Szaro i smutno było na szerokim świecie, otulonym w szare, ciężkie, ołowiane chm",
+          "tag": "p",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "chapter": 4,
+      "oldCount": 44,
+      "newCount": 44,
+      "diff": 0,
+      "mappings": [
+        {
+          "oldIndex": 0,
+          "newIndex": 0,
+          "oldText": "IV. U księżniczki",
+          "newText": "IV. U księżniczki",
+          "tag": "h3",
+          "expanded": false
+        },
+        {
+          "oldIndex": 1,
+          "newIndex": 1,
+          "oldText": "Długo szła tak Gerda, w końcu zmęczyła się bardzo i usiadła znowu pod drzewem. W",
+          "newText": "Długo szła tak Gerda, w końcu zmęczyła się bardzo i usiadła znowu pod drzewem. W",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 2,
+          "newIndex": 2,
+          "oldText": "Znaczyło to: „Dzień dobry, kochana dziewczynko, musisz być bardzo biedna, kiedy ",
+          "newText": "Znaczyło to: „Dzień dobry, kochana dziewczynko, musisz być bardzo biedna, kiedy ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 3,
+          "newIndex": 3,
+          "oldText": "Gerda zrozumiała, co chce powiedzieć wrona i tak jej była wdzięczna za współczuc",
+          "newText": "Gerda zrozumiała, co chce powiedzieć wrona i tak jej była wdzięczna za współczuc",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 4,
+          "newIndex": 4,
+          "oldText": "Wrona kręciła łebkiem w zamyśleniu, podlatywała na prawo i lewo i powtarzała jak",
+          "newText": "Wrona kręciła łebkiem w zamyśleniu, podlatywała na prawo i lewo i powtarzała jak",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 5,
+          "newIndex": 5,
+          "oldText": "— A może? A być może? A kto wie? Kto wie? Kto wie?",
+          "newText": "— A może? A być może? A kto wie? Kto wie? Kto wie?",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 6,
+          "newIndex": 6,
+          "oldText": "- Widziałaś go! — zawołała uszczęśliwiona Gerda i zaczęła całować i ściskać wron",
+          "newText": "- Widziałaś go! — zawołała uszczęśliwiona Gerda i zaczęła całować i ściskać wron",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 7,
+          "newIndex": 7,
+          "oldText": "— Spokojnie! Spokojnie! — powtarzała wrona. — Powiedziałam: kto wie! Może — może",
+          "newText": "— Spokojnie! Spokojnie! — powtarzała wrona. — Powiedziałam: kto wie! Może — może",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 8,
+          "newIndex": 8,
+          "oldText": "— Ach, nie umiem! — z żalem szepnęła Gerda. — Babka umiała dobrze, ale się nie n",
+          "newText": "— Ach, nie umiem! — z żalem szepnęła Gerda. — Babka umiała dobrze, ale się nie n",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 9,
+          "newIndex": 9,
+          "oldText": "— Kra! Kra! Nic nie szkodzi — rzekła wrona. — I tak się rozumiemy. Będę mówiła, ",
+          "newText": "— Kra! Kra! Nic nie szkodzi — rzekła wrona. — I tak się rozumiemy. Będę mówiła, ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 10,
+          "newIndex": 10,
+          "oldText": "I zaczęła opowiadać:",
+          "newText": "I zaczęła opowiadać:",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 11,
+          "newIndex": 11,
+          "oldText": "— W tym państwie, gdzie jesteśmy, rządzi bardzo mądra, bardzo mądra księżniczka.",
+          "newText": "— W tym państwie, gdzie jesteśmy, rządzi bardzo mądra, bardzo mądra księżniczka.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 12,
+          "newIndex": 12,
+          "oldText": "- Oj, żebyś wiedziała, co się wtedy działo, jakie tłumy cisnęły się do zamku! Al",
+          "newText": "- Oj, żebyś wiedziała, co się wtedy działo, jakie tłumy cisnęły się do zamku! Al",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 13,
+          "newIndex": 13,
+          "oldText": "— A Kaj? — przerwała nieśmiała Gerda.",
+          "newText": "— A Kaj? — przerwała nieśmiała Gerda.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 14,
+          "newIndex": 14,
+          "oldText": "— Otóż właśnie, moja kochana, dwa dni tak upłynęły, aż trzeciego przyszedł piesz",
+          "newText": "— Otóż właśnie, moja kochana, dwa dni tak upłynęły, aż trzeciego przyszedł piesz",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 15,
+          "newIndex": 15,
+          "oldText": "— To Kaj! — zawołała, klaszcząc w ręce, Gerda.",
+          "newText": "— To Kaj! — zawołała, klaszcząc w ręce, Gerda.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 16,
+          "newIndex": 16,
+          "oldText": "— Na plecach miał tornister — ciągnęła dalej wrona.",
+          "newText": "— Na plecach miał tornister — ciągnęła dalej wrona.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 17,
+          "newIndex": 17,
+          "oldText": "— Ach, nie, to były pewno jego sanki. Właśnie z sankami zginął.",
+          "newText": "— Ach, nie, to były pewno jego sanki. Właśnie z sankami zginął.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 18,
+          "newIndex": 18,
+          "oldText": "— Ha, może sanki — zgodziła się wrona. — Dobrze się nie przyglądałam. Poszedł śm",
+          "newText": "— Ha, może sanki — zgodziła się wrona. — Dobrze się nie przyglądałam. Poszedł śm",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 19,
+          "newIndex": 19,
+          "oldText": "— O, to z pewnością Kaj! — krzyknęła Gerda. — Właśnie miał skrzypiące buty, jesz",
+          "newText": "— O, to z pewnością Kaj! — krzyknęła Gerda. — Właśnie miał skrzypiące buty, jesz",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 20,
+          "newIndex": 20,
+          "oldText": "— Bardzo być może — potwierdziła wrona. — Szedł do samej księżniczki i nie zmies",
+          "newText": "— Bardzo być może — potwierdziła wrona. — Szedł do samej księżniczki i nie zmies",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 21,
+          "newIndex": 21,
+          "oldText": "— To z pewnością Kaj — rzekła uszczęśliwiona Gerda. — On był zawsze ogromnie mąd",
+          "newText": "— To z pewnością Kaj — rzekła uszczęśliwiona Gerda. — On był zawsze ogromnie mąd",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 22,
+          "newIndex": 22,
+          "oldText": "— Bah! — zakrakała wrona. — Łatwo to powiedzieć. Przecież takiej obdartej i bose",
+          "newText": "— Bah! — zakrakała wrona. — Łatwo to powiedzieć. Przecież takiej obdartej i bose",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 23,
+          "newIndex": 23,
+          "oldText": "— Powiedz tylko Kajowi, że tu jestem, a sam przyjdzie po mnie natychmiast.",
+          "newText": "— Powiedz tylko Kajowi, że tu jestem, a sam przyjdzie po mnie natychmiast.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 24,
+          "newIndex": 24,
+          "oldText": "— Zaczekaj tu przy płocie — rzekła wrona i poleciała do pałacu.",
+          "newText": "— Zaczekaj tu przy płocie — rzekła wrona i poleciała do pałacu.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 25,
+          "newIndex": 25,
+          "oldText": "Ciemno już było, kiedy powróciła.",
+          "newText": "Ciemno już było, kiedy powróciła.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 26,
+          "newIndex": 26,
+          "oldText": "— To wszystko na nic — rzekła. — Boso cię tu nie wpuszczą, straż i lokaje bardzo",
+          "newText": "— To wszystko na nic — rzekła. — Boso cię tu nie wpuszczą, straż i lokaje bardzo",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 27,
+          "newIndex": 27,
+          "oldText": "— O, moja droga wrono! — cicho szepnęła Gerda, idąc do zamku długą, cienistą ale",
+          "newText": "— O, moja droga wrono! — cicho szepnęła Gerda, idąc do zamku długą, cienistą ale",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 28,
+          "newIndex": 28,
+          "oldText": "Serce Gerdy uderzało mocno z niepokoju i szczęścia. Czasem zdawało jej się, że r",
+          "newText": "Serce Gerdy uderzało mocno z niepokoju i szczęścia. Czasem zdawało jej się, że r",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 29,
+          "newIndex": 29,
+          "oldText": "Na koniec weszła z wroną na małe boczne schodki. Na szafie w korytarzu stała noc",
+          "newText": "Na koniec weszła z wroną na małe boczne schodki. Na szafie w korytarzu stała noc",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 30,
+          "newIndex": 30,
+          "oldText": "Kruk uważnie popatrzył na nią i odezwał się wreszcie:",
+          "newText": "Kruk uważnie popatrzył na nią i odezwał się wreszcie:",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 31,
+          "newIndex": 31,
+          "oldText": "— Pójdę naprzód, a wy za mną. Droga prosta i nikogo na niej nie spotkamy.",
+          "newText": "— Pójdę naprzód, a wy za mną. Droga prosta i nikogo na niej nie spotkamy.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 32,
+          "newIndex": 32,
+          "oldText": "— A mnie się zdaje, że ktoś za nami idzie — powiedziała Gerda i obejrzała się z ",
+          "newText": "— A mnie się zdaje, że ktoś za nami idzie — powiedziała Gerda i obejrzała się z ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 33,
+          "newIndex": 33,
+          "oldText": "— To sny o polowaniu śpieszą do księcia pana i księżniczki — uspokoił ją kruk na",
+          "newText": "— To sny o polowaniu śpieszą do księcia pana i księżniczki — uspokoił ją kruk na",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 34,
+          "newIndex": 34,
+          "oldText": "Mijali szereg przepysznych pokoi, których ściany obite były czerwonym, błękitnym",
+          "newText": "Mijali szereg przepysznych pokoi, których ściany obite były czerwonym, błękitnym",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 35,
+          "newIndex": 35,
+          "oldText": "Gerda pochyliła się nad nim ciekawie i zobaczyła jego opaloną szyję. Ucieszona, ",
+          "newText": "Gerda pochyliła się nad nim ciekawie i zobaczyła jego opaloną szyję. Ucieszona, ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 36,
+          "newIndex": 36,
+          "oldText": "Z drugiej lilii wychyliła się główka księżniczki, która patrzyła także, co się s",
+          "newText": "Z drugiej lilii wychyliła się główka księżniczki, która patrzyła także, co się s",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 37,
+          "newIndex": 37,
+          "oldText": "Gerda zaczęła płakać i opowiedziała wszystko od początku, nie zapominając o wiel",
+          "newText": "Gerda zaczęła płakać i opowiedziała wszystko od początku, nie zapominając o wiel",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 38,
+          "newIndex": 38,
+          "oldText": "— Biedne dziecię — rzekła z litością księżniczka. — Nie martw się, nie gniewamy ",
+          "newText": "— Biedne dziecię — rzekła z litością księżniczka. — Nie martw się, nie gniewamy ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 39,
+          "newIndex": 39,
+          "oldText": "Książę oddał Gerdzie swoje własne łóżko i życzył, żeby w nim spała spokojnie, a ",
+          "newText": "Książę oddał Gerdzie swoje własne łóżko i życzył, żeby w nim spała spokojnie, a ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 40,
+          "newIndex": 40,
+          "oldText": "— O, jacyż dobrzy ludzie i zwierzęta! — i w tej chwili zasnęła.",
+          "newText": "— O, jacyż dobrzy ludzie i zwierzęta! — i w tej chwili zasnęła.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 41,
+          "newIndex": 41,
+          "oldText": "Nazajutrz księżniczka dała jej prześliczną aksamitną suknię i prosiła bardzo, że",
+          "newText": "Nazajutrz księżniczka dała jej prześliczną aksamitną suknię i prosiła bardzo, że",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 42,
+          "newIndex": 42,
+          "oldText": "Więc dostała ciepłe ubranie, buciki i mufkę, a gdy się posiliła, stanęła przed b",
+          "newText": "Więc dostała ciepłe ubranie, buciki i mufkę, a gdy się posiliła, stanęła przed b",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 43,
+          "newIndex": 43,
+          "oldText": "Gerda jechała dalej sama jedna, lecz się nie obawiała głodu ani zimna, gdyż kare",
+          "newText": "Gerda jechała dalej sama jedna, lecz się nie obawiała głodu ani zimna, gdyż kare",
+          "tag": "p",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "chapter": 5,
+      "oldCount": 43,
+      "newCount": 43,
+      "diff": 0,
+      "mappings": [
+        {
+          "oldIndex": 0,
+          "newIndex": 0,
+          "oldText": "V. Mała zbójniczka",
+          "newText": "V. Mała zbójniczka",
+          "tag": "h3",
+          "expanded": false
+        },
+        {
+          "oldIndex": 1,
+          "newIndex": 1,
+          "oldText": "Złocista kareta wjechała do ciemnego lasu i między drzewami świeciła jak słońce.",
+          "newText": "Złocista kareta wjechała do ciemnego lasu i między drzewami świeciła jak słońce.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 2,
+          "newIndex": 2,
+          "oldText": "— Złoto! Złoto! — krzyczeli i rzucili się na karetę, uchwycili konia za cugle, p",
+          "newText": "— Złoto! Złoto! — krzyczeli i rzucili się na karetę, uchwycili konia za cugle, p",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 3,
+          "newIndex": 3,
+          "oldText": "— Ach, jaka biała, tłusta, orzeszkami karmiona! — zawołała chciwie stara rozbójn",
+          "newText": "— Ach, jaka biała, tłusta, orzeszkami karmiona! — zawołała chciwie stara rozbójn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 4,
+          "newIndex": 4,
+          "oldText": "Wyciągnęła zza pasa wielki nóż błyszczący i podniosła rękę, aby zabić biedną Ger",
+          "newText": "Wyciągnęła zza pasa wielki nóż błyszczący i podniosła rękę, aby zabić biedną Ger",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 5,
+          "newIndex": 5,
+          "oldText": "— Nie dam jej zabić! Nie zabijaj! — wołało dzikie, rozpuszczone dziecko. — Ja ch",
+          "newText": "— Nie dam jej zabić! Nie zabijaj! — wołało dzikie, rozpuszczone dziecko. — Ja ch",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 6,
+          "newIndex": 6,
+          "oldText": "Stara zbójnica pozwalała swojej córeczce na wszystko, więc schowała na powrót nó",
+          "newText": "Stara zbójnica pozwalała swojej córeczce na wszystko, więc schowała na powrót nó",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 7,
+          "newIndex": 7,
+          "oldText": "Mała zbójniczka śmiała się głośno z radości i tupała nogami. Była ona w tym samy",
+          "newText": "Mała zbójniczka śmiała się głośno z radości i tupała nogami. Była ona w tym samy",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 8,
+          "newIndex": 8,
+          "oldText": "— Nie bój się, nie dam cię zabić, chyba że się na ciebie rozgniewam. Oni muszą m",
+          "newText": "— Nie bój się, nie dam cię zabić, chyba że się na ciebie rozgniewam. Oni muszą m",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 9,
+          "newIndex": 9,
+          "oldText": "— Nie — odrzekła dziewczynka i ze łzami w oczach opowiedziała jej swoją historię",
+          "newText": "— Nie — odrzekła dziewczynka i ze łzami w oczach opowiedziała jej swoją historię",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 10,
+          "newIndex": 10,
+          "oldText": "Mała zbójniczka słuchała ciekawie, a oczy jej świeciły jak dwa ognie. W tej chwi",
+          "newText": "Mała zbójniczka słuchała ciekawie, a oczy jej świeciły jak dwa ognie. W tej chwi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 11,
+          "newIndex": 11,
+          "oldText": "Był to wielki budynek, stary, brudny, odrapany, pełen dziur i szczelin, w któryc",
+          "newText": "Był to wielki budynek, stary, brudny, odrapany, pełen dziur i szczelin, w któryc",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 12,
+          "newIndex": 12,
+          "oldText": "W zamku, w olbrzymiej okopconej sali o czarnych ścianach i kamiennej podłodze, p",
+          "newText": "W zamku, w olbrzymiej okopconej sali o czarnych ścianach i kamiennej podłodze, p",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 13,
+          "newIndex": 13,
+          "oldText": "— Dziś będziesz spała ze mną i z moimi zwierzątkami! — rzekła zbójniczka, gdy si",
+          "newText": "— Dziś będziesz spała ze mną i z moimi zwierzątkami! — rzekła zbójniczka, gdy si",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 14,
+          "newIndex": 14,
+          "oldText": "— To moje leśne gołębie — rzekła rozbójniczka. — Wszystko to moje, co tu wkoło w",
+          "newText": "— To moje leśne gołębie — rzekła rozbójniczka. — Wszystko to moje, co tu wkoło w",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 15,
+          "newIndex": 15,
+          "oldText": "— A to mój ren kochany — dodała, pokazując ogromnego rena, przywiązanego na sznu",
+          "newText": "— A to mój ren kochany — dodała, pokazując ogromnego rena, przywiązanego na sznu",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 16,
+          "newIndex": 16,
+          "oldText": "Wyjęła zaraz wielki nóż świecący, wyostrzyła go o ścianę i pociągnęła renowi po ",
+          "newText": "Wyjęła zaraz wielki nóż świecący, wyostrzyła go o ścianę i pociągnęła renowi po ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 17,
+          "newIndex": 17,
+          "oldText": "— Czy ty sypiasz z tym nożem? — spytała z obawą Gerda.",
+          "newText": "— Czy ty sypiasz z tym nożem? — spytała z obawą Gerda.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 18,
+          "newIndex": 18,
+          "oldText": "— Zawsze sypiam z nożem w ręku — odparła zbójniczka.— Nikt nie wie, co się może ",
+          "newText": "— Zawsze sypiam z nożem w ręku — odparła zbójniczka.— Nikt nie wie, co się może ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 19,
+          "newIndex": 19,
+          "oldText": "I Gerda znowu zaczęła opowiadać. Leśne gołębie słuchały ciekawie, a zbójniczka o",
+          "newText": "I Gerda znowu zaczęła opowiadać. Leśne gołębie słuchały ciekawie, a zbójniczka o",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 20,
+          "newIndex": 20,
+          "oldText": "Okropny to był obraz i Gerda patrzyła nań z przerażeniem.",
+          "newText": "Okropny to był obraz i Gerda patrzyła nań z przerażeniem.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 21,
+          "newIndex": 21,
+          "oldText": "— Grr! Grr! — zagruchały tymczasem gołębie. — Widziałyśmy twojego Kaja. Biała ku",
+          "newText": "— Grr! Grr! — zagruchały tymczasem gołębie. — Widziałyśmy twojego Kaja. Biała ku",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 22,
+          "newIndex": 22,
+          "oldText": "— Co wy mówicie? — spytała Gerda. — Jaka królowa śniegu? Czy naprawdę wiecie co ",
+          "newText": "— Co wy mówicie? — spytała Gerda. — Jaka królowa śniegu? Czy naprawdę wiecie co ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 23,
+          "newIndex": 23,
+          "oldText": "— Jechała lasem do krainy lodów, gdzie wiecznie śnieg i zimno, i mróz nieustanny",
+          "newText": "— Jechała lasem do krainy lodów, gdzie wiecznie śnieg i zimno, i mróz nieustanny",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 24,
+          "newIndex": 24,
+          "oldText": "— Tak, tak — potwierdził ren, wstrząsając głową. — Śnieg i lód, białe pola, wiel",
+          "newText": "— Tak, tak — potwierdził ren, wstrząsając głową. — Śnieg i lód, białe pola, wiel",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 25,
+          "newIndex": 25,
+          "oldText": "— O, Kaju! Kaju! Kaju! — zawołała dziewczynka, aż obudziła zbójniczkę, która pog",
+          "newText": "— O, Kaju! Kaju! Kaju! — zawołała dziewczynka, aż obudziła zbójniczkę, która pog",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 26,
+          "newIndex": 26,
+          "oldText": "— Będziesz ty cicho — mruknęła z gniewem. — Czy chcesz, żebym cię zabiła nożem?",
+          "newText": "— Będziesz ty cicho — mruknęła z gniewem. — Czy chcesz, żebym cię zabiła nożem?",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 27,
+          "newIndex": 27,
+          "oldText": "Dopiero gdy dzień się zrobił, opowiedziała Gerda wszystko, co słyszała w nocy, a",
+          "newText": "Dopiero gdy dzień się zrobił, opowiedziała Gerda wszystko, co słyszała w nocy, a",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 28,
+          "newIndex": 28,
+          "oldText": "— Może — może — szeptała. — Czy to prawda, renie? Czy znasz kraj wiecznych lodów",
+          "newText": "— Może — może — szeptała. — Czy to prawda, renie? Czy znasz kraj wiecznych lodów",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 29,
+          "newIndex": 29,
+          "oldText": "— A któż go może znać lepiej ode mnie — odparł ten z błyszczącymi jak ogień oczy",
+          "newText": "— A któż go może znać lepiej ode mnie — odparł ten z błyszczącymi jak ogień oczy",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 30,
+          "newIndex": 30,
+          "oldText": "— Słuchaj — rzekła zbójniczka do Gerdy — wszyscy nasi ludzie poszli na wyprawę, ",
+          "newText": "— Słuchaj — rzekła zbójniczka do Gerdy — wszyscy nasi ludzie poszli na wyprawę, ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 31,
+          "newIndex": 31,
+          "oldText": "I tak się wszystko stało. Przy śniadaniu stara zbójnica napiła się z wielkiej fl",
+          "newText": "I tak się wszystko stało. Przy śniadaniu stara zbójnica napiła się z wielkiej fl",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 32,
+          "newIndex": 32,
+          "oldText": "— Lubię cię straszyć, dotykając nożem twojej szyi, dziś jednak zrobię co innego.",
+          "newText": "— Lubię cię straszyć, dotykając nożem twojej szyi, dziś jednak zrobię co innego.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 33,
+          "newIndex": 33,
+          "oldText": "Ren podskoczył z radości i gotów był zaraz do drogi. Więc zbójniczka zaczęła ubi",
+          "newText": "Ren podskoczył z radości i gotów był zaraz do drogi. Więc zbójniczka zaczęła ubi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 34,
+          "newIndex": 34,
+          "oldText": "— Masz tu swoje buciki — powiedziała. — Nie możesz jechać boso, bo zmarzłabyś. S",
+          "newText": "— Masz tu swoje buciki — powiedziała. — Nie możesz jechać boso, bo zmarzłabyś. S",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 35,
+          "newIndex": 35,
+          "oldText": "Gerda chciała dziękować zbójniczce, lecz rozpłakała się z wielkiej radości.",
+          "newText": "Gerda chciała dziękować zbójniczce, lecz rozpłakała się z wielkiej radości.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 36,
+          "newIndex": 36,
+          "oldText": "— Tylko mi nie becz, bo tego nie lubię! — zawołała dzika dziewczynka. — Masz tut",
+          "newText": "— Tylko mi nie becz, bo tego nie lubię! — zawołała dzika dziewczynka. — Masz tut",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 37,
+          "newIndex": 37,
+          "oldText": "Posadziła Gerdę na poduszce i przywiązała ją mocno do rena, potem otworzyła drzw",
+          "newText": "Posadziła Gerdę na poduszce i przywiązała ją mocno do rena, potem otworzyła drzw",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 38,
+          "newIndex": 38,
+          "oldText": "— No, teraz w drogę! Hop! Hop! Z całej siły! A pamiętaj sobie, żeby Gerdzie się ",
+          "newText": "— No, teraz w drogę! Hop! Hop! Z całej siły! A pamiętaj sobie, żeby Gerdzie się ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 39,
+          "newIndex": 39,
+          "oldText": "Gerda na pożegnanie wyciągnęła do niej małe rączki w ogromnych rękawicach, a ren",
+          "newText": "Gerda na pożegnanie wyciągnęła do niej małe rączki w ogromnych rękawicach, a ren",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 40,
+          "newIndex": 40,
+          "oldText": "Wilki wyły, wrony i kruki krakały, na niebie błyszczały gwiazdy i księżyc, a dal",
+          "newText": "Wilki wyły, wrony i kruki krakały, na niebie błyszczały gwiazdy i księżyc, a dal",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 41,
+          "newIndex": 41,
+          "oldText": "— Widzisz zorzę północną, która płonie tam w moim kraju, w kraju wiecznego lodu!",
+          "newText": "— Widzisz zorzę północną, która płonie tam w moim kraju, w kraju wiecznego lodu!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 42,
+          "newIndex": 42,
+          "oldText": "Na koniec, kiedy chleby zostały zjedzone, a z szynki nie pozostało ani śladu, uk",
+          "newText": "Na koniec, kiedy chleby zostały zjedzone, a z szynki nie pozostało ani śladu, uk",
+          "tag": "p",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "chapter": 6,
+      "oldCount": 34,
+      "newCount": 34,
+      "diff": 0,
+      "mappings": [
+        {
+          "oldIndex": 0,
+          "newIndex": 0,
+          "oldText": "VI. Laponka i Eskimoska",
+          "newText": "VI. Laponka i Eskimoska",
+          "tag": "h3",
+          "expanded": false
+        },
+        {
+          "oldIndex": 1,
+          "newIndex": 1,
+          "oldText": "Zatrzymali się nagle przed niepozornym domkiem. Była to chatka tak niska, że dac",
+          "newText": "Zatrzymali się nagle przed niepozornym domkiem. Była to chatka tak niska, że dac",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 2,
+          "newIndex": 2,
+          "oldText": "Ren opowiedział jej swoją historię, która wydawała mu się najważniejszą, a potem",
+          "newText": "Ren opowiedział jej swoją historię, która wydawała mu się najważniejszą, a potem",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 3,
+          "newIndex": 3,
+          "oldText": "— Ach, biedaki! — rzekła Laponka, wysłuchawszy wszystkiego uważnie. — Daleka, ba",
+          "newText": "— Ach, biedaki! — rzekła Laponka, wysłuchawszy wszystkiego uważnie. — Daleka, ba",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 4,
+          "newIndex": 4,
+          "oldText": "Potem dała Gerdzie jeść, pić, a gdy dziewczynka posiliła się i ogrzała, Laponka ",
+          "newText": "Potem dała Gerdzie jeść, pić, a gdy dziewczynka posiliła się i ogrzała, Laponka ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 5,
+          "newIndex": 5,
+          "oldText": "I pędzili znowu na północ bez wytchnienia i odpoczynku. Drogę wskazywały im wspa",
+          "newText": "I pędzili znowu na północ bez wytchnienia i odpoczynku. Drogę wskazywały im wspa",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 6,
+          "newIndex": 6,
+          "oldText": "Wreszcie stanęli przed chatką Eskimoski. Tu drzwi nie było wcale, więc musieli z",
+          "newText": "Wreszcie stanęli przed chatką Eskimoski. Tu drzwi nie było wcale, więc musieli z",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 7,
+          "newIndex": 7,
+          "oldText": "Wewnątrz chaty było tak strasznie gorąco, że Eskimoska, mała, tłusta i bardzo br",
+          "newText": "Wewnątrz chaty było tak strasznie gorąco, że Eskimoska, mała, tłusta i bardzo br",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 8,
+          "newIndex": 8,
+          "oldText": "Potem wzięła rybę i zaczęła czytać list Laponki.",
+          "newText": "Potem wzięła rybę i zaczęła czytać list Laponki.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 9,
+          "newIndex": 9,
+          "oldText": "Przeczytała go raz i drugi i zamyśliła się głęboko. Ren zbliżył się do niej i mó",
+          "newText": "Przeczytała go raz i drugi i zamyśliła się głęboko. Ren zbliżył się do niej i mó",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 10,
+          "newIndex": 10,
+          "oldText": "— Wiem, że jesteś bardzo mądra i masz wielką władzę, że rozkazujesz wiatrom, któ",
+          "newText": "— Wiem, że jesteś bardzo mądra i masz wielką władzę, że rozkazujesz wiatrom, któ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 11,
+          "newIndex": 11,
+          "oldText": "— Siłę dwunastu mężczyzn! — powtórzyła Eskimoska z uśmiechem, kiwając głową. — N",
+          "newText": "— Siłę dwunastu mężczyzn! — powtórzyła Eskimoska z uśmiechem, kiwając głową. — N",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 12,
+          "newIndex": 12,
+          "oldText": "Potem wzięła z półki duży kawał zwiniętej skóry, rozłożyła ją z wielką uwagą i p",
+          "newText": "Potem wzięła z półki duży kawał zwiniętej skóry, rozłożyła ją z wielką uwagą i p",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 13,
+          "newIndex": 13,
+          "oldText": "Ren kręcił się koło niej nieustannie, potrącał ją rogami, ocierał się bokiem i p",
+          "newText": "Ren kręcił się koło niej nieustannie, potrącał ją rogami, ocierał się bokiem i p",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 14,
+          "newIndex": 14,
+          "oldText": "— Kaj jest naprawdę u królowej śniegu, ale jemu tam dobrze. Zdaje mu się, że jes",
+          "newText": "— Kaj jest naprawdę u królowej śniegu, ale jemu tam dobrze. Zdaje mu się, że jes",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 15,
+          "newIndex": 15,
+          "oldText": "— Więc cóż począć? — rzekł ren strapiony.",
+          "newText": "— Więc cóż począć? — rzekł ren strapiony.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 16,
+          "newIndex": 16,
+          "oldText": "— Trzeba go uleczyć, trzeba wyjąć mu z serca i z oka szczątki czarodziejskiego z",
+          "newText": "— Trzeba go uleczyć, trzeba wyjąć mu z serca i z oka szczątki czarodziejskiego z",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 17,
+          "newIndex": 17,
+          "oldText": "— A jak to zrobić?",
+          "newText": "— A jak to zrobić?",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 18,
+          "newIndex": 18,
+          "oldText": "— Nie wiem. To nie moja sprawa.",
+          "newText": "— Nie wiem. To nie moja sprawa.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 19,
+          "newIndex": 19,
+          "oldText": "— Więc nie chcesz pomóc Gerdzie? Nie możesz jej dać żadnej władzy?",
+          "newText": "— Więc nie chcesz pomóc Gerdzie? Nie możesz jej dać żadnej władzy?",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 20,
+          "newIndex": 20,
+          "oldText": "— Zmiłuj się, renie, powiedz, cóż ja jej więcej dać mogę nad tę władzę, którą sa",
+          "newText": "— Zmiłuj się, renie, powiedz, cóż ja jej więcej dać mogę nad tę władzę, którą sa",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 21,
+          "newIndex": 21,
+          "oldText": "A teraz słuchaj jeszcze, co ci powiem. O dwie mile stąd zaczyna się ogród królow",
+          "newText": "A teraz słuchaj jeszcze, co ci powiem. O dwie mile stąd zaczyna się ogród królow",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 22,
+          "newIndex": 22,
+          "oldText": "Eskimoska posadziła Gerdę na renie, przywiązała ją dobrze, a poczciwe zwierzę po",
+          "newText": "Eskimoska posadziła Gerdę na renie, przywiązała ją dobrze, a poczciwe zwierzę po",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 23,
+          "newIndex": 23,
+          "oldText": "— Ach, moje buciki! Moje rękawice! — zawołała Gerda, gdy mróz ostry owiał jej bo",
+          "newText": "— Ach, moje buciki! Moje rękawice! — zawołała Gerda, gdy mróz ostry owiał jej bo",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 24,
+          "newIndex": 24,
+          "oldText": "Ale ren nie śmiał się wrócić, ani zatrzymać i biegł naprzód, co miał siły, aż st",
+          "newText": "Ale ren nie śmiał się wrócić, ani zatrzymać i biegł naprzód, co miał siły, aż st",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 25,
+          "newIndex": 25,
+          "oldText": "Tu zsadził Gerdę na ziemię i pocałował ją w usta, a z oczu popłynęły mu wielkie ",
+          "newText": "Tu zsadził Gerdę na ziemię i pocałował ją w usta, a z oczu popłynęły mu wielkie ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 26,
+          "newIndex": 26,
+          "oldText": "Potem zawrócił i znów biegł przed siebie, wcale się nie oglądając.",
+          "newText": "Potem zawrócił i znów biegł przed siebie, wcale się nie oglądając.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 27,
+          "newIndex": 27,
+          "oldText": "A biedna Gerda została na śniegu sama jedna, bosa, bez rękawic i bucików, wśród ",
+          "newText": "A biedna Gerda została na śniegu sama jedna, bosa, bez rękawic i bucików, wśród ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 28,
+          "newIndex": 28,
+          "oldText": "Zaczęła biec naprzód, jak mogła najprędzej. Ale natychmiast zastąpił jej drogę c",
+          "newText": "Zaczęła biec naprzód, jak mogła najprędzej. Ale natychmiast zastąpił jej drogę c",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 29,
+          "newIndex": 29,
+          "oldText": "Wtedy przypomniała sobie dziewczynka, jak oglądała z Kajem płatki śniegu przez s",
+          "newText": "Wtedy przypomniała sobie dziewczynka, jak oglądała z Kajem płatki śniegu przez s",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 30,
+          "newIndex": 30,
+          "oldText": "Dziwne, szkaradne wojsko.",
+          "newText": "Dziwne, szkaradne wojsko.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 31,
+          "newIndex": 31,
+          "oldText": "Gerda w trwodze zaczęła się modlić. Ale mróz był tak wielki, iż własny jej oddec",
+          "newText": "Gerda w trwodze zaczęła się modlić. Ale mróz był tak wielki, iż własny jej oddec",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 32,
+          "newIndex": 32,
+          "oldText": "Było ich coraz więcej, a kiedy Gerda skończyła pacierz, już otaczał ją cały legi",
+          "newText": "Było ich coraz więcej, a kiedy Gerda skończyła pacierz, już otaczał ją cały legi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 33,
+          "newIndex": 33,
+          "oldText": "A tymczasem zobaczmy, co tam robił Kaj. O Gerdzie nie myślał wcale i nie przypus",
+          "newText": "A tymczasem zobaczmy, co tam robił Kaj. O Gerdzie nie myślał wcale i nie przypus",
+          "tag": "p",
+          "expanded": false
+        }
+      ]
+    },
+    {
+      "chapter": 7,
+      "oldCount": 48,
+      "newCount": 59,
+      "diff": 11,
+      "mappings": [
+        {
+          "oldIndex": 0,
+          "newIndex": 0,
+          "oldText": "VII. W pałacu królowej śniegu",
+          "newText": "VII. W pałacu królowej śniegu",
+          "tag": "h3",
+          "expanded": false
+        },
+        {
+          "oldIndex": 1,
+          "newIndex": 1,
+          "oldText": "Ściany pałacu były z olbrzymich zasp śnieżnych, w których wichry wywierciły drzw",
+          "newText": "Ściany pałacu były z olbrzymich zasp śnieżnych, w których wichry wywierciły drzw",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 2,
+          "newIndex": 2,
+          "oldText": "Nigdy w tej białej olbrzymiej przestrzeni nie słyszano śmiechu ani wesołego głos",
+          "newText": "Nigdy w tej białej olbrzymiej przestrzeni nie słyszano śmiechu ani wesołego głos",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 3,
+          "newIndex": 3,
+          "oldText": "Mały Kaj był siny z zimna, prawie czarny, ale nie wiedział o tym i nie czuł wcal",
+          "newText": "Mały Kaj był siny z zimna, prawie czarny, ale nie wiedział o tym i nie czuł wcal",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 4,
+          "newIndex": 4,
+          "oldText": "Więc były na lodzie kwadraty, trójkąty, liczby i wyrazy: śnieg, jezioro, królowa",
+          "newText": "Więc były na lodzie kwadraty, trójkąty, liczby i wyrazy: śnieg, jezioro, królowa",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 5,
+          "newIndex": 5,
+          "oldText": "— Jeśli zdołasz ułożyć ten wyraz, będziesz wolny, a ja daruję ci cały świat i no",
+          "newText": "— Jeśli zdołasz ułożyć ten wyraz, będziesz wolny, a ja daruję ci cały świat i no",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 6,
+          "newIndex": 6,
+          "oldText": "Więc Kaj pragnął bardzo ułożyć dziwne słowo, a nie umiał. On, taki mądry, nie wi",
+          "newText": "Więc Kaj pragnął bardzo ułożyć dziwne słowo, a nie umiał. On, taki mądry, nie wi",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 7,
+          "newIndex": 7,
+          "oldText": "Tymczasem ciepły wiatr wionął z południa i królowa śniegu wstała z wysokiego tro",
+          "newText": "Tymczasem ciepły wiatr wionął z południa i królowa śniegu wstała z wysokiego tro",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 8,
+          "newIndex": 8,
+          "oldText": "— Muszę śpieszyć do ciepłych krajów — powiedziała — trzeba znowu nakryć moje cza",
+          "newText": "— Muszę śpieszyć do ciepłych krajów — powiedziała — trzeba znowu nakryć moje cza",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 9,
+          "newIndex": 9,
+          "oldText": "I zniknęła w tumanach śniegu.",
+          "newText": "I zniknęła w tumanach śniegu.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 10,
+          "newIndex": 10,
+          "oldText": "Kaj został sam w olbrzymiej, pustej sali. Zrobił sobie z kawałków lodu wygodne s",
+          "newText": "Kaj został sam w olbrzymiej, pustej sali. Zrobił sobie z kawałków lodu wygodne s",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 11,
+          "newIndex": 11,
+          "oldText": "Wtedy właśnie Gerda weszła do pałacu. Ostry wicher z przeciągłym jękiem rzucił s",
+          "newText": "Wtedy właśnie Gerda weszła do pałacu. Ostry wicher z przeciągłym jękiem rzucił s",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 12,
+          "newIndex": 12,
+          "oldText": "Gerda weszła do olbrzymiej sali, pustej, białej i cichej. Nagle zobaczyła Kaja. ",
+          "newText": "Gerda weszła do olbrzymiej sali, pustej, białej i cichej. Nagle zobaczyła Kaja. ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 13,
+          "newIndex": 13,
+          "oldText": "— Kaju! Kochany Kaju! Znalazłam cię przecież!",
+          "newText": "— Kaju! Kochany Kaju! Znalazłam cię przecież!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 14,
+          "newIndex": 14,
+          "oldText": "Lecz Kaj siedział cichy, sztywny, nieruchomy — a taki zimny!",
+          "newText": "Lecz Kaj siedział cichy, sztywny, nieruchomy — a taki zimny!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 15,
+          "newIndex": 15,
+          "oldText": "Gerda wybuchnęła płaczem. Jej łzy gorące padały mu na piersi, przenikały mu do s",
+          "newText": "Gerda wybuchnęła płaczem. Jej łzy gorące padały mu na piersi, przenikały mu do s",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 16,
+          "newIndex": 16,
+          "oldText": "I nagle serce zabiło mu mocniej, zimny dreszcz przebiegł ciało, zdumiony podniós",
+          "newText": "I nagle serce zabiło mu mocniej, zimny dreszcz przebiegł ciało, zdumiony podniós",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 17,
+          "newIndex": 17,
+          "oldText": "Co ja kocham na tym świecie? Złote słonko, jasne kwiecie! Boże ptaszki śpiewając",
+          "newText": "Co ja kocham na tym świecie?",
+          "tag": "blockquote",
+          "expanded": true
+        },
+        {
+          "oldIndex": 18,
+          "newIndex": 20,
+          "oldText": "A kiedy wymówiła słowa: „Wszystko kocham serca biciem, a przestanę chyba z życie",
+          "newText": "A kiedy wymówiła słowa: „Wszystko kocham serca biciem, a przestanę chyba z życie",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 19,
+          "newIndex": 21,
+          "oldText": "Wówczas dopiero poznał naprawdę Gerdę i wydawała mu się tak piękną jak dawniej i",
+          "newText": "Wówczas dopiero poznał naprawdę Gerdę i wydawała mu się tak piękną jak dawniej i",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 20,
+          "newIndex": 22,
+          "oldText": "Po raz pierwszy w białym pałacu, u stóp tronu królowej śniegu rozległy się niezn",
+          "newText": "Po raz pierwszy w białym pałacu, u stóp tronu królowej śniegu rozległy się niezn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 21,
+          "newIndex": 23,
+          "oldText": "W pałacu królowej śniegu, na lodowym jeziorze, u stóp wysokiego lodowatego tronu",
+          "newText": "W pałacu królowej śniegu, na lodowym jeziorze, u stóp wysokiego lodowatego tronu",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 22,
+          "newIndex": 24,
+          "oldText": "»Kocham«.",
+          "newText": "»Kocham«.",
+          "tag": "blockquote",
+          "expanded": false
+        },
+        {
+          "oldIndex": 23,
+          "newIndex": 25,
+          "oldText": "A dzieci stały przy nim uśmiechnięte, opromienione złotem i różowym światłem. Ge",
+          "newText": "A dzieci stały przy nim uśmiechnięte, opromienione złotem i różowym światłem. Ge",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 24,
+          "newIndex": 26,
+          "oldText": "Teraz mogła powrócić i królowa śniegu; był zupełnie wolny! Wolność jego jaśniała",
+          "newText": "Teraz mogła powrócić i królowa śniegu; był zupełnie wolny! Wolność jego jaśniała",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 25,
+          "newIndex": 27,
+          "oldText": "Dzieci wzięły się za ręce i wyszły z okropnego pałacu. Rozmawiały o domu, rodzic",
+          "newText": "Dzieci wzięły się za ręce i wyszły z okropnego pałacu. Rozmawiały o domu, rodzic",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 26,
+          "newIndex": 28,
+          "oldText": "Gdy stanęły przy krzaku z czerwonymi jagodami, zastały tam dwa reny: stary ren p",
+          "newText": "Gdy stanęły przy krzaku z czerwonymi jagodami, zastały tam dwa reny: stary ren p",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 27,
+          "newIndex": 29,
+          "oldText": "Oba reny odprowadziły dzieci do granicy swego kraju i pożegnały tam, gdzie znikn",
+          "newText": "Oba reny odprowadziły dzieci do granicy swego kraju i pożegnały tam, gdzie znikn",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 28,
+          "newIndex": 30,
+          "oldText": "— Bądźcie zdrowi! — Bądźcie zdrowi! — powiedziały sobie nawzajem.",
+          "newText": "— Bądźcie zdrowi! — Bądźcie zdrowi! — powiedziały sobie nawzajem.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 29,
+          "newIndex": 31,
+          "oldText": "W powietrzu zaświergotały małe ptaszki, las zaszemrał młodymi listeczkami i na m",
+          "newText": "W powietrzu zaświergotały małe ptaszki, las zaszemrał młodymi listeczkami i na m",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 30,
+          "newIndex": 32,
+          "oldText": "Była to mała zbójniczka na kucyku, którego Gerda dostała od księżniczki wraz ze ",
+          "newText": "Była to mała zbójniczka na kucyku, którego Gerda dostała od księżniczki wraz ze ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 31,
+          "newIndex": 33,
+          "oldText": "Gerda i zbójniczka poznały się natychmiast i wydały okrzyk radości.",
+          "newText": "Gerda i zbójniczka poznały się natychmiast i wydały okrzyk radości.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 32,
+          "newIndex": 34,
+          "oldText": "— Znalazłaś Kaja! — wołała ucieszona zbójniczka.",
+          "newText": "— Znalazłaś Kaja! — wołała ucieszona zbójniczka.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 33,
+          "newIndex": 35,
+          "oldText": "— Powracamy do domu! — odpowiedziała szczęśliwa Gerda. — Dziękujemy ci za wszyst",
+          "newText": "— Powracamy do domu! — odpowiedziała szczęśliwa Gerda. — Dziękujemy ci za wszyst",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 34,
+          "newIndex": 36,
+          "oldText": "— Księżniczka wyjechała w daleką podróż.",
+          "newText": "— Księżniczka wyjechała w daleką podróż.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 35,
+          "newIndex": 37,
+          "oldText": "— A wrona?",
+          "newText": "— A wrona?",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 36,
+          "newIndex": 38,
+          "oldText": "— Wrona nie żyje. Kruk nosi po niej żałobę.",
+          "newText": "— Wrona nie żyje. Kruk nosi po niej żałobę.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 37,
+          "newIndex": 39,
+          "oldText": "— Pozdrów go od nas — rzekła ze smutkiem Gerda.",
+          "newText": "— Pozdrów go od nas — rzekła ze smutkiem Gerda.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 38,
+          "newIndex": 40,
+          "oldText": "— Bądźcie zdrowi! — rzekła zbójniczka i serdecznie uściskała małych wędrowców.",
+          "newText": "— Bądźcie zdrowi! — rzekła zbójniczka i serdecznie uściskała małych wędrowców.",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 39,
+          "newIndex": 41,
+          "oldText": "A dzieci szły, trzymając się za ręce i rozmawiając o tym, co kochały. Dokoła nic",
+          "newText": "A dzieci szły, trzymając się za ręce i rozmawiając o tym, co kochały. Dokoła nic",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 40,
+          "newIndex": 42,
+          "oldText": "Tak zbliżyły się do wielkiego miasta. Dzwony odezwały się z wieży kościelnej i d",
+          "newText": "Tak zbliżyły się do wielkiego miasta. Dzwony odezwały się z wieży kościelnej i d",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 41,
+          "newIndex": 43,
+          "oldText": "Ściskając się za ręce, biegły do swego domu, po znanych schodach, na znane podda",
+          "newText": "Ściskając się za ręce, biegły do swego domu, po znanych schodach, na znane podda",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 42,
+          "newIndex": 44,
+          "oldText": "Nic się tu nic zmieniło: sprzęty stały na swoim miejscu, na zegarze posuwały się",
+          "newText": "Nic się tu nic zmieniło: sprzęty stały na swoim miejscu, na zegarze posuwały się",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 43,
+          "newIndex": 45,
+          "oldText": "Wchodząc we drzwi, zauważyły dopiero, jak urosły w przeciągu tego czasu. A tam, ",
+          "newText": "Wchodząc we drzwi, zauważyły dopiero, jak urosły w przeciągu tego czasu. A tam, ",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 44,
+          "newIndex": 46,
+          "oldText": "Jak tu ślicznie, jak jasno, jak wesoło!",
+          "newText": "Jak tu ślicznie, jak jasno, jak wesoło!",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 45,
+          "newIndex": 47,
+          "oldText": "O pałacu królowej śniegu zapomnieli. Usiedli znowu na małych stołeczkach jak daw",
+          "newText": "O pałacu królowej śniegu zapomnieli. Usiedli znowu na małych stołeczkach jak daw",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 46,
+          "newIndex": 48,
+          "oldText": "A dzieci zaśpiewały razem:",
+          "newText": "A dzieci zaśpiewały razem:",
+          "tag": "p",
+          "expanded": false
+        },
+        {
+          "oldIndex": 47,
+          "newIndex": 49,
+          "oldText": "Co ja kocham na tym świecie? Złote słonko, cudne kwiecie! Boże ptaszki śpiewając",
+          "newText": "Co ja kocham na tym świecie?",
+          "tag": "blockquote",
+          "expanded": true
+        }
+      ]
+    }
+  ],
+  "totalOld": 287,
+  "totalNew": 307,
+  "affectedChapters": 2,
+  "cuesMapped": 53,
+  "cuesTotal": 53
+}

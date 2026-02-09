@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BookGenius Release Readiness Update (Feb 3–8, 2026)</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --paper: #ffffff;
+      --ink: #1b1f24;
+      --muted: #5d6773;
+      --line: #d7dce3;
+      --accent: #174ea6;
+      --accent-soft: #e8f0fe;
+      --code-bg: #111827;
+      --code-ink: #e5e7eb;
+      --shadow: 0 10px 30px rgba(25, 34, 54, 0.09);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(1200px 600px at 25% -10%, #dde7fb 0, var(--bg) 60%);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    .shell {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 28px 20px 44px;
+    }
+
+    .header {
+      background: linear-gradient(130deg, #0f285a 0%, #153a83 70%, #1950b4 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+      margin-bottom: 22px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 2.2vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    .header p {
+      margin: 10px 0 0;
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 16px;
+      max-height: calc(100vh - 34px);
+      overflow: auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 12px;
+    }
+
+    .toc h2 {
+      margin: 3px 8px 10px;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+    }
+
+    .toc-link {
+      display: block;
+      text-decoration: none;
+      color: #243042;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-bottom: 3px;
+      font-size: 0.88rem;
+      line-height: 1.3;
+    }
+
+    .toc-link:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .toc-link.lvl-3 { padding-left: 16px; font-size: 0.84rem; color: #415268; }
+    .toc-link.lvl-4 { padding-left: 24px; font-size: 0.81rem; color: #576880; }
+
+    .paper {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 2vw, 30px);
+      overflow-wrap: anywhere;
+    }
+
+    .paper :is(h1, h2, h3, h4) {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", serif;
+      line-height: 1.25;
+      color: #0f1f3d;
+      scroll-margin-top: 16px;
+    }
+
+    .paper h1 { margin: 0 0 0.9rem; font-size: clamp(1.5rem, 2.3vw, 2rem); }
+    .paper h2 {
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+      font-size: clamp(1.16rem, 1.8vw, 1.45rem);
+      border-top: 1px solid #edf0f5;
+      padding-top: 1rem;
+    }
+    .paper h3 { margin-top: 1.15rem; margin-bottom: 0.4rem; font-size: 1.05rem; }
+    .paper h4 { margin-top: 0.95rem; margin-bottom: 0.28rem; font-size: 0.98rem; }
+
+    .paper p { margin: 0.6rem 0 0.72rem; color: #1b2432; }
+    .paper ul, .paper ol { margin: 0.45rem 0 0.85rem 1.2rem; padding: 0; }
+    .paper li { margin: 0.2rem 0; }
+    .paper hr { border: 0; border-top: 1px solid #e5e9f0; margin: 1.2rem 0; }
+
+    .paper code {
+      font-family: "SF Mono", "Menlo", "Consolas", monospace;
+      background: #f0f3f8;
+      border: 1px solid #e0e6ef;
+      border-radius: 6px;
+      padding: 0.08rem 0.36rem;
+      font-size: 0.9em;
+    }
+
+    .paper pre {
+      margin: 0.85rem 0 1rem;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      overflow: auto;
+      border: 1px solid #1f2937;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .paper pre code {
+      background: transparent;
+      border: none;
+      color: inherit;
+      padding: 0;
+      font-size: 0.88rem;
+    }
+
+    .paper a { color: var(--accent); text-decoration: none; }
+    .paper a:hover { text-decoration: underline; }
+
+    @media (max-width: 1040px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: relative; top: 0; max-height: none; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .shell { max-width: none; margin: 0; padding: 0; }
+      .header { box-shadow: none; border: 1px solid #ccc; }
+      .layout { display: block; }
+      .toc { display: none; }
+      .paper {
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+      }
+      .paper h2 { break-after: avoid-page; }
+      .paper pre { white-space: pre-wrap; overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <h1>BookGenius Release Readiness Update (Feb 3–8, 2026)</h1>
+      <p>Generated 2026-02-08 21:22:55 • standalone HTML</p>
+    </header>
+    <main class="layout">
+      <nav class="toc" aria-label="Table of contents">
+        <h2>Contents</h2>
+        <a class="toc-link lvl-2" href="#tl-dr">TL;DR</a><a class="toc-link lvl-2" href="#what-we-improved-plain-language">What We Improved (Plain Language)</a><a class="toc-link lvl-2" href="#1-reading-experience">1) Reading Experience</a><a class="toc-link lvl-2" href="#2-pipeline-reliability-and-throughput">2) Pipeline Reliability and Throughput</a><a class="toc-link lvl-2" href="#3-content-quality-and-consistency">3) Content Quality and Consistency</a><a class="toc-link lvl-2" href="#4-standard-ebooks-rollout-readiness">4) Standard Ebooks Rollout Readiness</a><a class="toc-link lvl-2" href="#5-testing-and-confidence">5) Testing and Confidence</a><a class="toc-link lvl-2" href="#business-impact-framing">Business Impact Framing</a><a class="toc-link lvl-2" href="#for-users">For Users</a><a class="toc-link lvl-2" href="#for-operations">For Operations</a><a class="toc-link lvl-2" href="#for-release-risk">For Release Risk</a><a class="toc-link lvl-2" href="#suggested-external-summary-if-you-want-to-send-quickly">Suggested External Summary (if you want to send quickly)</a><a class="toc-link lvl-2" href="#recommended-next-release-gates">Recommended Next Release Gates</a>
+      </nav>
+      <article class="paper">
+        <h1>Release Readiness Update (Feb 3-8, 2026)</h1>
+<p>Audience: partners and early users waiting for the next release<br/>
+Tone: high-level, non-technical summary with clear product and reliability impact</p>
+<h2 node="[object Object]" id="tl-dr">TL;DR</h2>
+<p>This week was a major &quot;stabilize and scale&quot; sprint. We made the reading experience smoother, made the content pipeline much more resilient under real-world load, and prepared the Standard Ebooks library for broader rollout.</p>
+<p>What this means in practical terms:</p>
+<ul>
+<li>Better reliability: fewer pipeline stalls and fewer manual recoveries.</li>
+<li>Better user experience: smoother reading transitions, cleaner character metadata, image zoom, and better progress behavior.</li>
+<li>Better release confidence: stronger test coverage and better operational tooling to monitor and recover runs.</li>
+</ul>
+<hr/>
+<h2 node="[object Object]" id="what-we-improved-plain-language">What We Improved (Plain Language)</h2>
+<h2 node="[object Object]" id="1-reading-experience">1) Reading Experience</h2>
+<ul>
+<li>Added richer in-reader controls for visuals (including stronger graphics settings and transition polish).</li>
+<li>Improved image handling with zoom support and cleaner modal behavior.</li>
+<li>Smoothed chapter/book progress behavior and improved avatar/name presentation for characters.</li>
+<li>Improved chapter loading behavior for long books, reducing visible loading friction.</li>
+</ul>
+<p>Why this matters: the product now feels more stable and intentional during long reading sessions, not just in short demos.</p>
+<h2 node="[object Object]" id="2-pipeline-reliability-and-throughput">2) Pipeline Reliability and Throughput</h2>
+<ul>
+<li>Introduced stronger queueing and retry behavior across key AI steps.</li>
+<li>Added fallback paths between model providers when one service is rate-limited or overloaded.</li>
+<li>Added better cancellation/abort handling so interrupted jobs fail safely rather than leaving messy partial state.</li>
+<li>Added single-step pipeline execution with dependency checks to support safer restarts and targeted reruns.</li>
+</ul>
+<p>Why this matters: this is the core of release readiness. We reduced &quot;one failure blocks everything&quot; behavior and moved toward predictable, recoverable processing.</p>
+<h2 node="[object Object]" id="3-content-quality-and-consistency">3) Content Quality and Consistency</h2>
+<ul>
+<li>Added and expanded text-repair flows for malformed source chapters.</li>
+<li>Strengthened rewrite continuity and chapter-summary alignment with rewritten output.</li>
+<li>Added role/spoiler cleanup flow for character metadata, including retroactive backfill support for already-processed books.</li>
+<li>Removed deprecated metadata paths to reduce confusion and drift.</li>
+</ul>
+<p>Why this matters: readers get cleaner output, and quality now scales better as we process more titles.</p>
+<h2 node="[object Object]" id="4-standard-ebooks-rollout-readiness">4) Standard Ebooks Rollout Readiness</h2>
+<ul>
+<li>Expanded ingestion/queue workflows and supporting metadata datasets.</li>
+<li>Improved library browsing structure and category-driven display behavior.</li>
+<li>Added deployment-ready metadata bundles (book meta, categories, descriptions).</li>
+<li>Added operational scripts for cover upload/baking and processing queue management.</li>
+</ul>
+<p>Why this matters: the catalog side is now much closer to production operation, not just a manual pipeline.</p>
+<h2 node="[object Object]" id="5-testing-and-confidence">5) Testing and Confidence</h2>
+<ul>
+<li>Added substantial new tests across rewrite orchestration, summary mapping, character metadata cleanup, and embeddings.</li>
+<li>Added integration-level safety nets for embeddings and side-effect handling.</li>
+<li>Added benchmark context tooling so quality comparisons are reproducible and auditable.</li>
+</ul>
+<p>Why this matters: we are reducing &quot;it worked once&quot; risk and increasing repeatability release-over-release.</p>
+<hr/>
+<h2 node="[object Object]" id="business-impact-framing">Business Impact Framing</h2>
+<h2 node="[object Object]" id="for-users">For Users</h2>
+<ul>
+<li>Smoother and more polished reading.</li>
+<li>Better visual and metadata consistency.</li>
+<li>Fewer obvious generation artifacts.</li>
+</ul>
+<h2 node="[object Object]" id="for-operations">For Operations</h2>
+<ul>
+<li>Faster recovery from failures.</li>
+<li>Better ability to run targeted reruns without restarting whole pipelines.</li>
+<li>Clearer monitoring and diagnostics during long processing runs.</li>
+</ul>
+<h2 node="[object Object]" id="for-release-risk">For Release Risk</h2>
+<ul>
+<li>Lower technical risk than a week ago due to stronger fallback, queueing, and retry behavior.</li>
+<li>Lower quality risk due to larger automated test and benchmark coverage.</li>
+<li>Remaining risk is now more about scale validation than basic architecture gaps.</li>
+</ul>
+<hr/>
+<h2 node="[object Object]" id="suggested-external-summary-if-you-want-to-send-quickly">Suggested External Summary (if you want to send quickly)</h2>
+<p>Over the last week, we focused on release readiness rather than isolated features. We strengthened the AI pipeline with queueing, retries, and fallback systems; improved reader experience with smoother visuals and better progress behavior; and prepared the Standard Ebooks catalog for broader rollout with stronger metadata and operational tooling. The result is a platform that is more stable, easier to operate, and better positioned for a reliable next release.</p>
+<hr/>
+<h2 node="[object Object]" id="recommended-next-release-gates">Recommended Next Release Gates</h2>
+<ol>
+<li>Run a multi-book soak test on the upgraded pipeline (queue + fallback paths).</li>
+<li>Validate end-to-end quality on a representative mix of prose/play/problematic source books.</li>
+<li>Confirm catalog delivery flow (metadata + covers + reader metadata rendering) in staging.</li>
+<li>Freeze and tag the release candidate once those checks pass.</li>
+</ol>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

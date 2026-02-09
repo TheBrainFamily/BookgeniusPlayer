@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BookGenius Engineering Report (Feb 3–8, 2026)</title>
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --paper: #ffffff;
+      --ink: #1b1f24;
+      --muted: #5d6773;
+      --line: #d7dce3;
+      --accent: #174ea6;
+      --accent-soft: #e8f0fe;
+      --code-bg: #111827;
+      --code-ink: #e5e7eb;
+      --shadow: 0 10px 30px rgba(25, 34, 54, 0.09);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(1200px 600px at 25% -10%, #dde7fb 0, var(--bg) 60%);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.62;
+    }
+
+    .shell {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 28px 20px 44px;
+    }
+
+    .header {
+      background: linear-gradient(130deg, #0f285a 0%, #153a83 70%, #1950b4 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 26px;
+      margin-bottom: 22px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 2.2vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    .header p {
+      margin: 10px 0 0;
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 16px;
+      max-height: calc(100vh - 34px);
+      overflow: auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 12px;
+    }
+
+    .toc h2 {
+      margin: 3px 8px 10px;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+    }
+
+    .toc-link {
+      display: block;
+      text-decoration: none;
+      color: #243042;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-bottom: 3px;
+      font-size: 0.88rem;
+      line-height: 1.3;
+    }
+
+    .toc-link:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .toc-link.lvl-3 { padding-left: 16px; font-size: 0.84rem; color: #415268; }
+    .toc-link.lvl-4 { padding-left: 24px; font-size: 0.81rem; color: #576880; }
+
+    .paper {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 2vw, 30px);
+      overflow-wrap: anywhere;
+    }
+
+    .paper :is(h1, h2, h3, h4) {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", serif;
+      line-height: 1.25;
+      color: #0f1f3d;
+      scroll-margin-top: 16px;
+    }
+
+    .paper h1 { margin: 0 0 0.9rem; font-size: clamp(1.5rem, 2.3vw, 2rem); }
+    .paper h2 {
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+      font-size: clamp(1.16rem, 1.8vw, 1.45rem);
+      border-top: 1px solid #edf0f5;
+      padding-top: 1rem;
+    }
+    .paper h3 { margin-top: 1.15rem; margin-bottom: 0.4rem; font-size: 1.05rem; }
+    .paper h4 { margin-top: 0.95rem; margin-bottom: 0.28rem; font-size: 0.98rem; }
+
+    .paper p { margin: 0.6rem 0 0.72rem; color: #1b2432; }
+    .paper ul, .paper ol { margin: 0.45rem 0 0.85rem 1.2rem; padding: 0; }
+    .paper li { margin: 0.2rem 0; }
+    .paper hr { border: 0; border-top: 1px solid #e5e9f0; margin: 1.2rem 0; }
+
+    .paper code {
+      font-family: "SF Mono", "Menlo", "Consolas", monospace;
+      background: #f0f3f8;
+      border: 1px solid #e0e6ef;
+      border-radius: 6px;
+      padding: 0.08rem 0.36rem;
+      font-size: 0.9em;
+    }
+
+    .paper pre {
+      margin: 0.85rem 0 1rem;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      overflow: auto;
+      border: 1px solid #1f2937;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    .paper pre code {
+      background: transparent;
+      border: none;
+      color: inherit;
+      padding: 0;
+      font-size: 0.88rem;
+    }
+
+    .paper a { color: var(--accent); text-decoration: none; }
+    .paper a:hover { text-decoration: underline; }
+
+    @media (max-width: 1040px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: relative; top: 0; max-height: none; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .shell { max-width: none; margin: 0; padding: 0; }
+      .header { box-shadow: none; border: 1px solid #ccc; }
+      .layout { display: block; }
+      .toc { display: none; }
+      .paper {
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+      }
+      .paper h2 { break-after: avoid-page; }
+      .paper pre { white-space: pre-wrap; overflow: visible; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <h1>BookGenius Engineering Report (Feb 3–8, 2026)</h1>
+      <p>Generated 2026-02-08 20:13:57 • standalone HTML</p>
+    </header>
+    <main class="layout">
+      <nav class="toc" aria-label="Table of contents">
+        <h2>Contents</h2>
+        <a class="toc-link lvl-2" href="#executive-summary">Executive Summary</a><a class="toc-link lvl-2" href="#2026-02-04-tue-3-commits-3-374-565">2026-02-04 (Tue) - 3 commits, +3,374 / -565</a><a class="toc-link lvl-3" href="#08-08-eb36d71b-28-276-12-files-update-convex-to-1-31-5-across-packages">08:08 - `eb36d71b` - `+28/-276` (12 files) - update convex to 1.31.5 across packages</a><a class="toc-link lvl-3" href="#08-14-84ef3420-0-0-merge-merge-pull-request-9">08:14 - `84ef3420` - `+0/-0` (merge) - merge pull request #9</a><a class="toc-link lvl-3" href="#20-17-d6aba0f5-3346-289-71-files-paragraph-counts-unwrapped-restore-and-broad-pipeline-cleanup">20:17 - `d6aba0f5` - `+3346/-289` (71 files) - paragraph counts, unwrapped restore, and broad pipeline cleanup</a><a class="toc-link lvl-2" href="#2026-02-05-wed-4-commits-1-184-197">2026-02-05 (Wed) - 4 commits, +1,184 / -197</a><a class="toc-link lvl-3" href="#10-57-d1f35dbc-159-2-5-files-wrapping-restoring-unwrapped-refinements">10:57 - `d1f35dbc` - `+159/-2` (5 files) - wrapping/restoring unwrapped refinements</a><a class="toc-link lvl-3" href="#14-09-2f18f5ce-310-30-15-files-free-run-mode-raw-llm-capture-generic-avatar-fallback-se-search">14:09 - `2f18f5ce` - `+310/-30` (15 files) - free-run mode, raw LLM capture, generic avatar fallback, SE search</a><a class="toc-link lvl-3" href="#16-01-c93d7128-656-55-24-files-image-zoom-modal-pipeline-convex-workflow-improvements">16:01 - `c93d7128` - `+656/-55` (24 files) - image zoom modal + pipeline/Convex workflow improvements</a><a class="toc-link lvl-3" href="#17-22-f05340f3-59-110-5-files-gemini-timeout-mitigation">17:22 - `f05340f3` - `+59/-110` (5 files) - Gemini timeout mitigation</a><a class="toc-link lvl-2" href="#2026-02-06-thu-8-commits-20-640-734">2026-02-06 (Thu) - 8 commits, +20,640 / -734</a><a class="toc-link lvl-3" href="#08-28-b9a4aa1f-2242-212-25-files-standard-ebooks-ingestion-queue-notes-platform-entry-points">08:28 - `b9a4aa1f` - `+2242/-212` (25 files) - Standard Ebooks ingestion + queue + notes + platform entry points</a><a class="toc-link lvl-3" href="#11-30-c41dba0c-778-79-11-files-platform-carousel-ux-and-library-performance">11:30 - `c41dba0c` - `+778/-79` (11 files) - platform carousel UX and library performance</a><a class="toc-link lvl-3" href="#11-31-6491d121-0-1-1-file-remove-noisy-log">11:31 - `6491d121` - `+0/-1` (1 file) - remove noisy log</a><a class="toc-link lvl-3" href="#15-59-e5df4b1a-618-187-8-files-checkpoint-for-automated-pipeline-improvements">15:59 - `e5df4b1a` - `+618/-187` (8 files) - checkpoint for automated pipeline improvements</a><a class="toc-link lvl-3" href="#16-01-a98284cc-1088-252-15-files-pipeline-stability-library-section-evolution">16:01 - `a98284cc` - `+1088/-252` (15 files) - pipeline stability + library section evolution</a><a class="toc-link lvl-3" href="#17-55-cf35d3e9-35-3-4-files-chapter-dynamic-loading-improvements">17:55 - `cf35d3e9` - `+35/-3` (4 files) - chapter dynamic loading improvements</a><a class="toc-link lvl-3" href="#17-59-b21d7ea6-10461-0-2-files-missing-metadata-uploaded">17:59 - `b21d7ea6` - `+10461/-0` (2 files) - missing metadata uploaded</a><a class="toc-link lvl-3" href="#18-47-a1403061-5418-0-1-file-descriptions-for-deployment">18:47 - `a1403061` - `+5418/-0` (1 file) - descriptions for deployment</a><a class="toc-link lvl-2" href="#2026-02-07-fri-16-commits-6-634-1-712">2026-02-07 (Fri) - 16 commits, +6,634 / -1,712</a><a class="toc-link lvl-3" href="#08-24-5e78b167-224-26-9-files-genai-upgrade-thinking-typography-preservation">08:24 - `5e78b167` - `+224/-26` (9 files) - genai upgrade + thinking + typography preservation</a><a class="toc-link lvl-3" href="#10-16-b1666640-412-94-4-files-chunk-rewrite-continuity-test-coverage">10:16 - `b1666640` - `+412/-94` (4 files) - chunk rewrite continuity + test coverage</a><a class="toc-link lvl-3" href="#12-04-38776894-1599-204-14-files-queued-rewrite-orchestrator-benchmark-artifacts">12:04 - `38776894` - `+1599/-204` (14 files) - queued rewrite orchestrator + benchmark artifacts</a><a class="toc-link lvl-3" href="#12-14-53c50416-36-10-1-file-callo3-updates">12:14 - `53c50416` - `+36/-10` (1 file) - callO3 updates</a><a class="toc-link lvl-3" href="#12-46-f1ea823c-8-6-7-files-callo3-gpt-5-transition">12:46 - `f1ea823c` - `+8/-6` (7 files) - callO3 -&gt; GPT-5 transition</a><a class="toc-link lvl-3" href="#12-46-95025b40-590-28-2-files-reference-card-benchmarking-across-models">12:46 - `95025b40` - `+590/-28` (2 files) - reference-card benchmarking across models</a><a class="toc-link lvl-3" href="#13-11-3dd233bb-1-1-1-file-prompt-schema-alignment">13:11 - `3dd233bb` - `+1/-1` (1 file) - prompt-schema alignment</a><a class="toc-link lvl-3" href="#14-09-2498f22f-528-23-9-files-visual-guide-shadow-benchmarking-tests">14:09 - `2498f22f` - `+528/-23` (9 files) - visual-guide shadow benchmarking + tests</a><a class="toc-link lvl-3" href="#15-37-95e778ee-779-375-15-files-remove-rolling-summary-step-gate-mapping-on-rewrite-output">15:37 - `95e778ee` - `+779/-375` (15 files) - remove rolling summary step, gate mapping on rewrite output</a><a class="toc-link lvl-3" href="#15-41-bd1e3cea-140-50-3-files-queue-gemini-vertex-calls-for-chapter-summary-mapping">15:41 - `bd1e3cea` - `+140/-50` (3 files) - queue Gemini/Vertex calls for chapter summary mapping</a><a class="toc-link lvl-3" href="#15-42-9fb7824c-501-7-2-files-merge-small-se-divider-sections-into-adjacent-chapters">15:42 - `9fb7824c` - `+501/-7` (2 files) - merge small SE divider sections into adjacent chapters</a><a class="toc-link lvl-3" href="#17-18-2ab46996-650-0-2-files-benchmark-context-bundle-collector">17:18 - `2ab46996` - `+650/-0` (2 files) - benchmark context bundle collector</a><a class="toc-link lvl-3" href="#18-35-03421c2e-428-211-5-files-reuse-visual-guides-harden-xml-coverage">18:35 - `03421c2e` - `+428/-211` (5 files) - reuse visual guides + harden XML coverage</a><a class="toc-link lvl-3" href="#20-05-bb3b4222-5-665-7-files-remove-deprecated-metadata-tooling">20:05 - `bb3b4222` - `+5/-665` (7 files) - remove deprecated metadata tooling</a><a class="toc-link lvl-3" href="#20-22-1c0fa41d-700-8-23-files-character-role-spoiler-cleanup-metadata-flow-pipeline-convex-player">20:22 - `1c0fa41d` - `+700/-8` (23 files) - character role + spoiler-cleanup metadata flow (pipeline + convex + player)</a><a class="toc-link lvl-3" href="#20-37-494571f4-33-4-4-files-remove-parenthetical-aliases-in-character-display-names">20:37 - `494571f4` - `+33/-4` (4 files) - remove parenthetical aliases in character display names</a><a class="toc-link lvl-2" href="#2026-02-08-sat-9-commits-2-489-1-089">2026-02-08 (Sat) - 9 commits, +2,489 / -1,089</a><a class="toc-link lvl-3" href="#08-53-689e9166-0-301-1-file-remove-old-data-file">08:53 - `689e9166` - `+0/-301` (1 file) - remove old data file</a><a class="toc-link lvl-3" href="#09-18-b7190145-647-191-9-files-slug-first-cleanup-retroactive-role-backfill">09:18 - `b7190145` - `+647/-191` (9 files) - slug-first cleanup + retroactive role backfill</a><a class="toc-link lvl-3" href="#10-06-f58eca8c-2-1-1-file-improved-spoiler-role-prompt">10:06 - `f58eca8c` - `+2/-1` (1 file) - improved spoiler/role prompt</a><a class="toc-link lvl-3" href="#10-06-8661f3db-6-0-1-file-default-code-settings">10:06 - `8661f3db` - `+6/-0` (1 file) - default code settings</a><a class="toc-link lvl-3" href="#11-45-7075968e-389-51-6-files-generate-music-covers-with-style-matching">11:45 - `7075968e` - `+389/-51` (6 files) - generate music covers with style matching</a><a class="toc-link lvl-3" href="#12-15-6597a280-7-5-1-file-queue-background-prompt-gemini-calls">12:15 - `6597a280` - `+7/-5` (1 file) - queue background prompt Gemini calls</a><a class="toc-link lvl-3" href="#13-31-66c3f4d6-200-11-3-files-letter-avatar-and-reading-progress-smoothing">13:31 - `66c3f4d6` - `+200/-11` (3 files) - letter-avatar and reading-progress smoothing</a><a class="toc-link lvl-3" href="#14-43-5175c86c-764-393-22-files-pipeline-flow-updates-player-transition-polish">14:43 - `5175c86c` - `+764/-393` (22 files) - pipeline flow updates + player transition polish</a><a class="toc-link lvl-3" href="#18-20-733b9d93-474-136-7-files-embeddings-safety-net-integration-coverage">18:20 - `733b9d93` - `+474/-136` (7 files) - embeddings safety-net + integration coverage</a><a class="toc-link lvl-2" href="#branch-vs-main-clarification">Branch vs Main Clarification</a><a class="toc-link lvl-2" href="#architecture-functionality-matrix-per-commit">Architecture + Functionality Matrix (Per Commit)</a><a class="toc-link lvl-3" href="#2026-02-04">2026-02-04</a><a class="toc-link lvl-4" href="#eb36d71b-update-convex-to-1-31-5-across-packages">`eb36d71b` - update convex to 1.31.5 across packages</a><a class="toc-link lvl-4" href="#84ef3420-merge-pull-request-9">`84ef3420` - merge pull request #9</a><a class="toc-link lvl-4" href="#d6aba0f5-paragraph-counts-restore-unwrapped-and-other-fixes">`d6aba0f5` - paragraph counts. restore unwrapped and other fixes</a><a class="toc-link lvl-3" href="#2026-02-05">2026-02-05</a><a class="toc-link lvl-4" href="#d1f35dbc-adding-the-wrapping-restoring-unwrapped">`d1f35dbc` - adding the wrapping/restoring unwrapped</a><a class="toc-link lvl-4" href="#2f18f5ce-free-run-mode-raw-llm-capture-generic-avatar-fallback-se-search">`2f18f5ce` - free-run mode, raw LLM capture, generic avatar fallback, SE search</a><a class="toc-link lvl-4" href="#c93d7128-zooming-on-images-html-edit-in-convex-pipeline-improvements">`c93d7128` - zooming on images, html edit in convex, pipeline improvements</a><a class="toc-link lvl-4" href="#f05340f3-prevent-gemini-timing-out">`f05340f3` - prevent gemini timing out</a><a class="toc-link lvl-3" href="#2026-02-06">2026-02-06</a><a class="toc-link lvl-4" href="#b9a4aa1f-standard-ebooks-automation-wave">`b9a4aa1f` - standard ebooks automation wave</a><a class="toc-link lvl-4" href="#c41dba0c-platform-carousel-ux-and-library-performance">`c41dba0c` - platform carousel UX and library performance</a><a class="toc-link lvl-4" href="#6491d121-remove-useless-noisy-log">`6491d121` - remove useless noisy log</a><a class="toc-link lvl-4" href="#e5df4b1a-checkpoint-for-automated-pipeline-improvements">`e5df4b1a` - checkpoint for automated pipeline improvements</a><a class="toc-link lvl-4" href="#a98284cc-platform-library-section-improvements-and-pipeline-stability">`a98284cc` - platform library section improvements and pipeline stability</a><a class="toc-link lvl-4" href="#cf35d3e9-improvement-for-chapter-dynamic-loading">`cf35d3e9` - improvement for chapter dynamic loading</a><a class="toc-link lvl-4" href="#b21d7ea6-missing-metadata-uploaded">`b21d7ea6` - missing metadata uploaded</a><a class="toc-link lvl-4" href="#a1403061-descriptions-also-needed-for-deployment">`a1403061` - descriptions also needed for deployment</a><a class="toc-link lvl-3" href="#2026-02-07">2026-02-07</a><a class="toc-link lvl-4" href="#5e78b167-genai-upgrade-thinking-typography-preservation">`5e78b167` - genai upgrade + thinking + typography preservation</a><a class="toc-link lvl-4" href="#b1666640-chunk-rewrite-continuity-and-tests">`b1666640` - chunk rewrite continuity and tests</a><a class="toc-link lvl-4" href="#38776894-queued-rewrite-orchestrator-with-benchmark-artifacts">`38776894` - queued rewrite orchestrator with benchmark artifacts</a><a class="toc-link lvl-4" href="#53c50416-apply-current-callo3-updates">`53c50416` - apply current callO3 updates</a><a class="toc-link lvl-4" href="#f1ea823c-callo3-changed-to-gpt5">`f1ea823c` - callO3 changed to gpt5</a><a class="toc-link lvl-4" href="#95025b40-benchmark-reference-cards-with-gpt5-gemini">`95025b40` - benchmark reference cards with gpt5+gemini</a><a class="toc-link lvl-4" href="#3dd233bb-tweak-prompt-to-align-with-schema">`3dd233bb` - tweak prompt to align with schema</a><a class="toc-link lvl-4" href="#2498f22f-visual-guide-shadow-benchmarking-and-coverage-tests">`2498f22f` - visual-guide shadow benchmarking and coverage tests</a><a class="toc-link lvl-4" href="#95e778ee-remove-rolling-summary-step-and-gate-mapping-on-rewrite-output">`95e778ee` - remove rolling summary step and gate mapping on rewrite output</a><a class="toc-link lvl-4" href="#bd1e3cea-queue-gemini-and-vertex-calls-for-summary-mapping">`bd1e3cea` - queue Gemini and Vertex calls for summary mapping</a><a class="toc-link lvl-4" href="#9fb7824c-merge-small-structural-se-divider-sections">`9fb7824c` - merge small structural SE divider sections</a><a class="toc-link lvl-4" href="#2ab46996-benchmark-context-bundle-collector">`2ab46996` - benchmark context bundle collector</a><a class="toc-link lvl-4" href="#03421c2e-reuse-reference-visual-guides-and-harden-xml-coverage">`03421c2e` - reuse reference visual guides and harden xml coverage</a><a class="toc-link lvl-4" href="#bb3b4222-remove-deprecated-metadata-tooling">`bb3b4222` - remove deprecated metadata tooling</a><a class="toc-link lvl-4" href="#1c0fa41d-character-role-spoiler-cleanup-metadata-flow">`1c0fa41d` - character role + spoiler-cleanup metadata flow</a><a class="toc-link lvl-4" href="#494571f4-strip-parenthetical-aliases-from-display-names">`494571f4` - strip parenthetical aliases from display names</a><a class="toc-link lvl-3" href="#2026-02-08">2026-02-08</a><a class="toc-link lvl-4" href="#689e9166-remove-old-data-file">`689e9166` - remove old data file</a><a class="toc-link lvl-4" href="#b7190145-slug-first-cleanup-and-retroactive-role-backfill">`b7190145` - slug-first cleanup and retroactive role backfill</a><a class="toc-link lvl-4" href="#f58eca8c-improved-prompt-for-removing-spoilers-and-creating-roles">`f58eca8c` - improved prompt for removing spoilers and creating roles</a><a class="toc-link lvl-4" href="#8661f3db-default-code-settings">`8661f3db` - default code settings</a><a class="toc-link lvl-4" href="#7075968e-generate-music-covers-with-style-matched-cover-art">`7075968e` - generate-music-covers with style-matched cover art</a><a class="toc-link lvl-4" href="#6597a280-queue-background-prompt-gemini-calls">`6597a280` - queue background prompt Gemini calls</a><a class="toc-link lvl-4" href="#66c3f4d6-fix-letter-avatars-and-smooth-chapter-book-progress">`66c3f4d6` - fix letter avatars and smooth chapter/book progress</a><a class="toc-link lvl-4" href="#5175c86c-update-pipeline-flow-and-polish-player-transitions">`5175c86c` - update pipeline flow and polish player transitions</a><a class="toc-link lvl-4" href="#733b9d93-embeddings-safety-net-and-integration-coverage">`733b9d93` - embeddings safety-net and integration coverage</a><a class="toc-link lvl-2" href="#suggested-render-path-markdown-html">Suggested Render Path (Markdown -&gt; HTML)</a>
+      </nav>
+      <article class="paper">
+        <h1>Engineering Report: Feb 3-8, 2026</h1>
+<p>Author focus: <code>Lukasz Gandecki</code><br/>
+Scope: commits on current branch <code>different-embedding-calculations</code> and <code>main</code>, from <code>2026-02-03</code> (inclusive)</p>
+<h2 node="[object Object]" id="executive-summary">Executive Summary</h2>
+<p>This period was not &quot;wheel spinning.&quot; It was a dense architecture-and-reliability week with visible product surface improvements.</p>
+<ul>
+<li>Commits: <code>40</code></li>
+<li>Net code movement: <code>+34,321 / -4,297</code></li>
+<li>Unique files touched: <code>218</code></li>
+<li>Main branch activity in period: <code>2</code> commits (both already included in this branch history)</li>
+</ul>
+<p>Primary outcomes:</p>
+<ol>
+<li>Pipeline reliability was substantially hardened (rate-limit handling, Vertex fallback paths, abort/cancel semantics, step dependency checks, retry orchestration).</li>
+<li>Standard Ebooks moved closer to production operation (queue tooling, notes import, metadata datasets, cover upload/bake workflow, deployment data).</li>
+<li>Player UX improved meaningfully (image zoom modal, graphics controls, smoother progress semantics, character-name cleanup, chapter loading behavior).</li>
+<li>Quality investment stayed high through tests and reproducibility tooling (large spec additions, benchmark-context collector, embedding integration coverage).</li>
+</ol>
+<hr/>
+<h2 node="[object Object]" id="2026-02-04-tue-3-commits-3-374-565">2026-02-04 (Tue) - 3 commits, +3,374 / -565</h2>
+<h3 node="[object Object]" id="08-08-eb36d71b-28-276-12-files-update-convex-to-1-31-5-across-packages">08:08 - <code>eb36d71b</code> - <code>+28/-276</code> (12 files) - update convex to 1.31.5 across packages</h3>
+<p>This commit synchronized Convex dependency versions across the monorepo package manifests and lockfile. It removed drift between apps and reduced risk of runtime mismatch between backend/client SDK expectations. This was a maintenance but strategically important commit because later pipeline and CMS/player updates rely on consistent Convex tooling behavior.</p>
+<h3 node="[object Object]" id="08-14-84ef3420-0-0-merge-merge-pull-request-9">08:14 - <code>84ef3420</code> - <code>+0/-0</code> (merge) - merge pull request #9</h3>
+<p>This merge integrated the Convex upgrade path into <code>main</code> and then into your working history. Operationally, this matters as a baseline alignment point: subsequent changes in this report build on this dependency state.</p>
+<h3 node="[object Object]" id="20-17-d6aba0f5-3346-289-71-files-paragraph-counts-unwrapped-restore-and-broad-pipeline-cleanup">20:17 - <code>d6aba0f5</code> - <code>+3346/-289</code> (71 files) - paragraph counts, unwrapped restore, and broad pipeline cleanup</h3>
+<p>This was a major text-processing and migration commit. You added dedicated repair scripts for legacy play/non-play chapter structures, unwrapped paragraph restoration, and non-HTML-tag scanning. You also added paragraph-count infrastructure and a backfill server path, which supports stronger text integrity checks and later progress calculations.</p>
+<p>On pipeline tooling, you introduced multiple focused fixers with tests (custom tags, stage directions, didaskalia, multi-speaker handling), improved chapter-title extraction/testing, and tightened chapter upload/fix workflows. On the player side, you added minor-character handling and normalization tests, while removing older chapter-title utility paths. Net effect: significantly better source-to-render text fidelity and auditable repair tooling.</p>
+<p>Simplified pattern introduced:</p>
+<pre><code class="language-ts">// Before: one-shot transform with weak guarantees
+// After: explicit fix pipeline with measurable checks
+for (const chapter of chapters) {
+  const repaired = fixCustomTags(chapter);
+  const restored = restoreUnwrappedBlocks(repaired);
+  const counted = backfillParagraphCounts(restored);
+  assertNoInvalidTags(counted);
+}
+</code></pre>
+<hr/>
+<h2 node="[object Object]" id="2026-02-05-wed-4-commits-1-184-197">2026-02-05 (Wed) - 4 commits, +1,184 / -197</h2>
+<h3 node="[object Object]" id="10-57-d1f35dbc-159-2-5-files-wrapping-restoring-unwrapped-refinements">10:57 - <code>d1f35dbc</code> - <code>+159/-2</code> (5 files) - wrapping/restoring unwrapped refinements</h3>
+<p>You extended the unwrapped-lines restoration path with <code>ensure-section-wrapper</code> helpers and tests. This tightened chapter XML structure guarantees so downstream rewrite/summarization logic can assume consistent section envelopes instead of ad hoc fallbacks.</p>
+<h3 node="[object Object]" id="14-09-2f18f5ce-310-30-15-files-free-run-mode-raw-llm-capture-generic-avatar-fallback-se-search">14:09 - <code>2f18f5ce</code> - <code>+310/-30</code> (15 files) - free-run mode, raw LLM capture, generic avatar fallback, SE search</h3>
+<p>This commit introduced &quot;free-run&quot; behavior in the pipeline path and expanded tooling around experimentation. It also added a generic avatar fallback path, reducing failure impact when character image generation is incomplete. On the UI side, Standard Ebooks page behavior was expanded and search surface improved. You also added paragraph-sanitization logic/tests to prevent nested paragraph artifacts from propagating.</p>
+<h3 node="[object Object]" id="16-01-c93d7128-656-55-24-files-image-zoom-modal-pipeline-convex-workflow-improvements">16:01 - <code>c93d7128</code> - <code>+656/-55</code> (24 files) - image zoom modal + pipeline/Convex workflow improvements</h3>
+<p>Player UX gained a full image-zoom feature with modal renderer/store wiring (<code>ImageZoomModal</code>, renderer, modal store). In parallel, pipeline CLI and scheduling paths were adjusted, including a new upload-figures CLI. Convex paragraph editing/generator paths were also touched, pointing to better round-trip editing of HTML content and safer operational tools.</p>
+<h3 node="[object Object]" id="17-22-f05340f3-59-110-5-files-gemini-timeout-mitigation">17:22 - <code>f05340f3</code> - <code>+59/-110</code> (5 files) - Gemini timeout mitigation</h3>
+<p>You reduced timeout pressure in Gemini-dependent pipeline steps by changing call behavior and simplifying related flows. Supporting prompt generation and summary tooling were adjusted to cooperate with this path. This commit is small in file count but high leverage for run stability.</p>
+<p>Simplified reliability shape:</p>
+<pre><code class="language-ts">try {
+  return await callGeminiFast(prompt, { maxRetries: 0 });
+} catch (err) {
+  // fallback branch used by later commits too
+  return await callAlternativeProvider(prompt);
+}
+</code></pre>
+<hr/>
+<h2 node="[object Object]" id="2026-02-06-thu-8-commits-20-640-734">2026-02-06 (Thu) - 8 commits, +20,640 / -734</h2>
+<h3 node="[object Object]" id="08-28-b9a4aa1f-2242-212-25-files-standard-ebooks-ingestion-queue-notes-platform-entry-points">08:28 - <code>b9a4aa1f</code> - <code>+2242/-212</code> (25 files) - Standard Ebooks ingestion + queue + notes + platform entry points</h3>
+<p>This was the first large Standard Ebooks productization wave. You added queueing/orchestration for SE processing, drama classification, notes parsing/import paths with tests, and significant converter updates. On the platform app, you introduced dedicated SE card/modal/page components and tRPC integration surface for loading this catalog. You also continued unwrapped restoration hardening with additional repro/spec coverage.</p>
+<h3 node="[object Object]" id="11-30-c41dba0c-778-79-11-files-platform-carousel-ux-and-library-performance">11:30 - <code>c41dba0c</code> - <code>+778/-79</code> (11 files) - platform carousel UX and library performance</h3>
+<p>You introduced a new <code>LibrarySection</code>, feature sections, and a dev performance monitor hook, plus broader polish to hero/featured/footer/i18n. The component and style changes strongly indicate focus on perceived responsiveness and browseability under a larger catalog.</p>
+<h3 node="[object Object]" id="11-31-6491d121-0-1-1-file-remove-noisy-log">11:31 - <code>6491d121</code> - <code>+0/-1</code> (1 file) - remove noisy log</h3>
+<p>Small but useful cleanup: removed redundant logging in media activation path, reducing console noise during runtime diagnostics.</p>
+<h3 node="[object Object]" id="15-59-e5df4b1a-618-187-8-files-checkpoint-for-automated-pipeline-improvements">15:59 - <code>e5df4b1a</code> - <code>+618/-187</code> (8 files) - checkpoint for automated pipeline improvements</h3>
+<p>Despite the generic message, this commit contains major reliability architecture work. You added robust Gemini rate-limit/quota detection and delay parsing, Vertex fallback (text + structured), and explicit abort helpers. Pipeline scheduling was updated to cancel cleanly and avoid marking aborted runs as generic failures. Rewrite tooling became abort-aware with signal checks across chunk processing.</p>
+<p>Simplified pattern from this commit family:</p>
+<pre><code class="language-ts">if (isQuotaOrRateLimitError(err)) {
+  const delay = extractRetryDelayMs(err);
+  if (canUseVertex()) return callVertexFallback(prompt);
+  if (delay) await sleep(delay);
+}
+</code></pre>
+<h3 node="[object Object]" id="16-01-a98284cc-1088-252-15-files-pipeline-stability-library-section-evolution">16:01 - <code>a98284cc</code> - <code>+1088/-252</code> (15 files) - pipeline stability + library section evolution</h3>
+<p>You continued hardening with stream-safe Vertex handling and cache-oriented chapter/book parsing (<code>mtime</code>-aware caching). Operational scripts were added for SE cover upload + URL baking and queue running. You also introduced rewritten-text coverage verification tooling, which provides a direct quality gate between source text and rewritten output.</p>
+<p>On platform, <code>LibrarySection</code> moved toward data-driven category rendering and CDN cover URLs, reducing runtime dependency on remote index APIs and improving predictable rendering behavior.</p>
+<h3 node="[object Object]" id="17-55-cf35d3e9-35-3-4-files-chapter-dynamic-loading-improvements">17:55 - <code>cf35d3e9</code> - <code>+35/-3</code> (4 files) - chapter dynamic loading improvements</h3>
+<p>You added explicit virtualization-window logic and integrated it into chapter content/preload flow. This improves memory/load behavior in long books and reduces visible content churn during navigation.</p>
+<h3 node="[object Object]" id="17-59-b21d7ea6-10461-0-2-files-missing-metadata-uploaded">17:59 - <code>b21d7ea6</code> - <code>+10461/-0</code> (2 files) - missing metadata uploaded</h3>
+<p>You added large production datasets for SE catalog metadata (<code>book-meta.json</code>, <code>categories.json</code>). This unlocked immediate catalog grouping and card construction without live dependency on external index assembly.</p>
+<h3 node="[object Object]" id="18-47-a1403061-5418-0-1-file-descriptions-for-deployment">18:47 - <code>a1403061</code> - <code>+5418/-0</code> (1 file) - descriptions for deployment</h3>
+<p>You completed SE deployment data by adding precomputed descriptions/hooks. Combined with prior metadata commit, this provided enough static catalog material for production-like browse and discovery UX.</p>
+<hr/>
+<h2 node="[object Object]" id="2026-02-07-fri-16-commits-6-634-1-712">2026-02-07 (Fri) - 16 commits, +6,634 / -1,712</h2>
+<h3 node="[object Object]" id="08-24-5e78b167-224-26-9-files-genai-upgrade-thinking-typography-preservation">08:24 - <code>5e78b167</code> - <code>+224/-26</code> (9 files) - genai upgrade + thinking + typography preservation</h3>
+<p>You upgraded <code>@google/genai</code>, enabled stronger thinking configuration for structured outputs, and preserved typographic characters instead of normalizing them away. That matters for literary quality in public-domain texts where punctuation style carries tone.</p>
+<h3 node="[object Object]" id="10-16-b1666640-412-94-4-files-chunk-rewrite-continuity-test-coverage">10:16 - <code>b1666640</code> - <code>+412/-94</code> (4 files) - chunk rewrite continuity + test coverage</h3>
+<p>You added large targeted tests for paragraph rewrite continuity and improved chunk logic accordingly. This directly addresses coherence between adjacent chunks, a common failure mode in chunked LLM rewriting.</p>
+<h3 node="[object Object]" id="12-04-38776894-1599-204-14-files-queued-rewrite-orchestrator-benchmark-artifacts">12:04 - <code>38776894</code> - <code>+1599/-204</code> (14 files) - queued rewrite orchestrator + benchmark artifacts</h3>
+<p>This introduced a dedicated rewrite orchestrator with extensive tests and reporting support. It formalized queue-based rewrite execution, benchmark reporting, and prompt/path integration. Architecturally, this is a shift from ad hoc rewrite invocation toward controlled, measurable orchestration.</p>
+<p>Simplified orchestration shape:</p>
+<pre><code class="language-ts">for (const chapter of chapters) {
+  queue.enqueue(() =&gt; rewriteChapter(chapter, promptVariant));
+}
+await queue.drain();
+writeBenchmarkReport(results);
+</code></pre>
+<h3 node="[object Object]" id="12-14-53c50416-36-10-1-file-callo3-updates">12:14 - <code>53c50416</code> - <code>+36/-10</code> (1 file) - callO3 updates</h3>
+<p>Provider wrapper updates aligned call behavior with current model assumptions and retry settings.</p>
+<h3 node="[object Object]" id="12-46-f1ea823c-8-6-7-files-callo3-gpt-5-transition">12:46 - <code>f1ea823c</code> - <code>+8/-6</code> (7 files) - callO3 -&gt; GPT-5 transition</h3>
+<p>You renamed/repointed provider wiring (<code>callO3</code> -&gt; <code>callGpt5</code>) across rewrite/reference-card paths. This was a low-volume but important consistency migration.</p>
+<h3 node="[object Object]" id="12-46-95025b40-590-28-2-files-reference-card-benchmarking-across-models">12:46 - <code>95025b40</code> - <code>+590/-28</code> (2 files) - reference-card benchmarking across models</h3>
+<p>You introduced heavier benchmarking and test coverage for reference-card generation with GPT-5/Gemini variants, including sampled comparison logic. This improves confidence in quality-vs-cost routing decisions.</p>
+<h3 node="[object Object]" id="13-11-3dd233bb-1-1-1-file-prompt-schema-alignment">13:11 - <code>3dd233bb</code> - <code>+1/-1</code> (1 file) - prompt-schema alignment</h3>
+<p>Small prompt adjustment to keep output aligned to expected schema.</p>
+<h3 node="[object Object]" id="14-09-2498f22f-528-23-9-files-visual-guide-shadow-benchmarking-tests">14:09 - <code>2498f22f</code> - <code>+528/-23</code> (9 files) - visual-guide shadow benchmarking + tests</h3>
+<p>You added visual-guide experimentation tooling and tests around entity image prompt generation and reference-card integration, improving determinism and observability of visual-style decisions.</p>
+<h3 node="[object Object]" id="15-37-95e778ee-779-375-15-files-remove-rolling-summary-step-gate-mapping-on-rewrite-output">15:37 - <code>95e778ee</code> - <code>+779/-375</code> (15 files) - remove rolling summary step, gate mapping on rewrite output</h3>
+<p>This is a structural pipeline simplification. You removed an older rolling summary path, gated chapter mapping on rewritten output readiness, updated scheduler/progress behavior, and replaced legacy summary tooling with a more explicit chapter-by-chapter-with-paragraphs flow and tests.</p>
+<h3 node="[object Object]" id="15-41-bd1e3cea-140-50-3-files-queue-gemini-vertex-calls-for-chapter-summary-mapping">15:41 - <code>bd1e3cea</code> - <code>+140/-50</code> (3 files) - queue Gemini/Vertex calls for chapter summary mapping</h3>
+<p>You introduced <code>chapter-summary-llm-queue.ts</code> to control provider concurrency and improve throughput while preserving stability under provider limits.</p>
+<h3 node="[object Object]" id="15-42-9fb7824c-501-7-2-files-merge-small-se-divider-sections-into-adjacent-chapters">15:42 - <code>9fb7824c</code> - <code>+501/-7</code> (2 files) - merge small SE divider sections into adjacent chapters</h3>
+<p>SE converter logic now merges tiny structural divider sections, reducing chapter fragmentation and improving downstream chapter-level processing consistency.</p>
+<h3 node="[object Object]" id="17-18-2ab46996-650-0-2-files-benchmark-context-bundle-collector">17:18 - <code>2ab46996</code> - <code>+650/-0</code> (2 files) - benchmark context bundle collector</h3>
+<p>You added a dedicated collector to package benchmark context artifacts. This is critical for experiment reproducibility and model-output audits.</p>
+<h3 node="[object Object]" id="18-35-03421c2e-428-211-5-files-reuse-visual-guides-harden-xml-coverage">18:35 - <code>03421c2e</code> - <code>+428/-211</code> (5 files) - reuse visual guides + harden XML coverage</h3>
+<p>This commit tightened visual-guide reuse and expanded XML-focused handling in summary/generation paths, reducing duplication and parser fragility.</p>
+<h3 node="[object Object]" id="20-05-bb3b4222-5-665-7-files-remove-deprecated-metadata-tooling">20:05 - <code>bb3b4222</code> - <code>+5/-665</code> (7 files) - remove deprecated metadata tooling</h3>
+<p>You removed dead/legacy metadata generation scripts and stale prompt/files, reducing maintenance surface and accidental usage risk.</p>
+<h3 node="[object Object]" id="20-22-1c0fa41d-700-8-23-files-character-role-spoiler-cleanup-metadata-flow-pipeline-convex-player">20:22 - <code>1c0fa41d</code> - <code>+700/-8</code> (23 files) - character role + spoiler-cleanup metadata flow (pipeline + convex + player)</h3>
+<p>This commit built an end-to-end metadata enrichment stage: role generation and spoiler cleanup became first-class pipeline outputs, then propagated through Convex schema/query/generator changes to the player UI (character captions/cards). Tests were added across pipeline and data layers, indicating production-intent depth.</p>
+<p>Simplified stage concept:</p>
+<pre><code class="language-ts">const cleaned = await generateRolesAndSpoilerSafeSummaries(rawCharacterSummaries);
+await saveCharacterMetadata(cleaned); // Convex
+renderCharacterCard(cleaned.role, cleaned.summary); // Player
+</code></pre>
+<h3 node="[object Object]" id="20-37-494571f4-33-4-4-files-remove-parenthetical-aliases-in-character-display-names">20:37 - <code>494571f4</code> - <code>+33/-4</code> (4 files) - remove parenthetical aliases in character display names</h3>
+<p>You tightened display formatting by stripping alias suffixes from visible character names and added tests around caption formatting. Small change, immediate UX clarity gain.</p>
+<hr/>
+<h2 node="[object Object]" id="2026-02-08-sat-9-commits-2-489-1-089">2026-02-08 (Sat) - 9 commits, +2,489 / -1,089</h2>
+<h3 node="[object Object]" id="08-53-689e9166-0-301-1-file-remove-old-data-file">08:53 - <code>689e9166</code> - <code>+0/-301</code> (1 file) - remove old data file</h3>
+<p>You deleted stale JSON artifact (<code>single-summary-per-person.json</code>), reducing risk of accidental dependency on outdated benchmark/input material.</p>
+<h3 node="[object Object]" id="09-18-b7190145-647-191-9-files-slug-first-cleanup-retroactive-role-backfill">09:18 - <code>b7190145</code> - <code>+647/-191</code> (9 files) - slug-first cleanup + retroactive role backfill</h3>
+<p>You made role-cleanup processing more robust and introduced a retroactive backfill path for already-processed books. This is exactly the kind of migration capability needed when metadata semantics evolve after initial ingestion.</p>
+<h3 node="[object Object]" id="10-06-f58eca8c-2-1-1-file-improved-spoiler-role-prompt">10:06 - <code>f58eca8c</code> - <code>+2/-1</code> (1 file) - improved spoiler/role prompt</h3>
+<p>Prompt refinement tuned role extraction and spoiler redaction behavior.</p>
+<h3 node="[object Object]" id="10-06-8661f3db-6-0-1-file-default-code-settings">10:06 - <code>8661f3db</code> - <code>+6/-0</code> (1 file) - default code settings</h3>
+<p>Environment defaults were updated in Codex settings; operational quality-of-life change.</p>
+<h3 node="[object Object]" id="11-45-7075968e-389-51-6-files-generate-music-covers-with-style-matching">11:45 - <code>7075968e</code> - <code>+389/-51</code> (6 files) - generate music covers with style matching</h3>
+<p>You added an end-to-end script to generate abstract audio cover art by combining model analysis/generation plus media post-processing and metadata import integration. Supporting fixes were included for MIME mapping and upload hooks.</p>
+<h3 node="[object Object]" id="12-15-6597a280-7-5-1-file-queue-background-prompt-gemini-calls">12:15 - <code>6597a280</code> - <code>+7/-5</code> (1 file) - queue background prompt Gemini calls</h3>
+<p>You tuned background prompt generation to use queued provider calls for better throughput/rate-limit behavior.</p>
+<h3 node="[object Object]" id="13-31-66c3f4d6-200-11-3-files-letter-avatar-and-reading-progress-smoothing">13:31 - <code>66c3f4d6</code> - <code>+200/-11</code> (3 files) - letter-avatar and reading-progress smoothing</h3>
+<p>You improved avatar normalization behavior and refined chapter/book progress calculations in the reader. Added tests around normalizer behavior to lock in correctness.</p>
+<h3 node="[object Object]" id="14-43-5175c86c-764-393-22-files-pipeline-flow-updates-player-transition-polish">14:43 - <code>5175c86c</code> - <code>+764/-393</code> (22 files) - pipeline flow updates + player transition polish</h3>
+<p>This commit combined pipeline operations and frontend polish:</p>
+<ul>
+<li>Pipeline: <code>continue-pipeline-cli</code> refactor, <code>--only-step</code> support, dependency validation for single-step execution, queue-runner integration, broader scheduler correctness.</li>
+<li>Generation behavior: FREE_RUN handling and background-style routing improvements.</li>
+<li>Platform: feature-gated nav/footer/search behavior for launched-vs-hidden library.</li>
+<li>Player: substantial graphics controls (image/video overlay opacity, edge fade, zoom speed), smoother spacer/gradient transitions, blur animation updates, modal flow improvements.</li>
+</ul>
+<p>Simplified dependency gate added in this family:</p>
+<pre><code class="language-ts">if (onlyStep) {
+  const missing = getMissingStepDeps(onlyStep, completedSteps);
+  if (missing.length) throw new Error(`Missing deps: ${missing.join(&quot;, &quot;)}`);
+}
+</code></pre>
+<h3 node="[object Object]" id="18-20-733b9d93-474-136-7-files-embeddings-safety-net-integration-coverage">18:20 - <code>733b9d93</code> - <code>+474/-136</code> (7 files) - embeddings safety-net + integration coverage</h3>
+<p>You refactored paragraph embedding creation to separate side effects from orchestration logic, then added unit + integration specs and supporting cache/mtime utilities. This increases confidence in answer-server embedding correctness and reduces regression risk.</p>
+<p>Simplified separation pattern:</p>
+<pre><code class="language-ts">// orchestration
+const paragraphs = await loadParagraphs(chapter);
+const vectors = await createEmbeddings(paragraphs);
+await persistEmbeddingSideEffects(vectors); // isolated/testable
+</code></pre>
+<hr/>
+<h2 node="[object Object]" id="branch-vs-main-clarification">Branch vs Main Clarification</h2>
+<ul>
+<li><code>main</code> commits in this period (authored by you): <code>2</code>
+<ul>
+<li><code>eb36d71b</code> (Convex upgrade)</li>
+<li><code>84ef3420</code> (merge commit)</li>
+</ul>
+</li>
+<li>Unique commits on current branch since Feb 3: the remaining <code>38</code></li>
+<li>There were no &quot;main-only&quot; authored commits in this window that were missing from your current branch.</li>
+</ul>
+<hr/>
+<h2 node="[object Object]" id="architecture-functionality-matrix-per-commit">Architecture + Functionality Matrix (Per Commit)</h2>
+<p>This section makes the split explicit for investor/technical review:</p>
+<ul>
+<li><code>Architecture</code> = system design, data flow, reliability, maintainability.</li>
+<li><code>Functionality</code> = user/operator-visible behavior change.</li>
+</ul>
+<h3 node="[object Object]" id="2026-02-04">2026-02-04</h3>
+<h4 node="[object Object]" id="eb36d71b-update-convex-to-1-31-5-across-packages"><code>eb36d71b</code> - update convex to 1.31.5 across packages</h4>
+<p>Architecture: unified Convex dependency baseline across apps and lockfile.
+Functionality: reduced cross-app/version mismatch risk during runtime and deploy.</p>
+<h4 node="[object Object]" id="84ef3420-merge-pull-request-9"><code>84ef3420</code> - merge pull request #9</h4>
+<p>Architecture: integrated Convex upgrade baseline into <code>main</code> history.
+Functionality: enabled subsequent feature work to run on one consistent dependency graph.</p>
+<h4 node="[object Object]" id="d6aba0f5-paragraph-counts-restore-unwrapped-and-other-fixes"><code>d6aba0f5</code> - paragraph counts. restore unwrapped and other fixes</h4>
+<p>Architecture: introduced a large repair/tooling layer for malformed chapters and added paragraph-count backfill infrastructure plus test coverage.
+Functionality: improved chapter text correctness in pipeline output and downstream player rendering (fewer broken structures/tags).</p>
+<h3 node="[object Object]" id="2026-02-05">2026-02-05</h3>
+<h4 node="[object Object]" id="d1f35dbc-adding-the-wrapping-restoring-unwrapped"><code>d1f35dbc</code> - adding the wrapping/restoring unwrapped</h4>
+<p>Architecture: formalized section-wrapper guarantees around restoration flow.
+Functionality: fewer malformed section boundaries in rewritten chapters.</p>
+<h4 node="[object Object]" id="2f18f5ce-free-run-mode-raw-llm-capture-generic-avatar-fallback-se-search"><code>2f18f5ce</code> - free-run mode, raw LLM capture, generic avatar fallback, SE search</h4>
+<p>Architecture: added alternate pipeline execution mode and cleaner fallback handling for image generation.
+Functionality: operators can run faster experimental passes; end users see fallback avatars instead of missing visuals.</p>
+<h4 node="[object Object]" id="c93d7128-zooming-on-images-html-edit-in-convex-pipeline-improvements"><code>c93d7128</code> - zooming on images, html edit in convex, pipeline improvements</h4>
+<p>Architecture: added modal/store wiring for zoom and expanded pipeline CLI/tooling paths.
+Functionality: users can zoom illustrations in-reader; operators gained new upload/edit flow capabilities.</p>
+<h4 node="[object Object]" id="f05340f3-prevent-gemini-timing-out"><code>f05340f3</code> - prevent gemini timing out</h4>
+<p>Architecture: simplified/tuned Gemini call behavior to be timeout-resistant.
+Functionality: fewer pipeline failures caused by long/fragile model calls.</p>
+<h3 node="[object Object]" id="2026-02-06">2026-02-06</h3>
+<h4 node="[object Object]" id="b9a4aa1f-standard-ebooks-automation-wave"><code>b9a4aa1f</code> - standard ebooks automation wave</h4>
+<p>Architecture: introduced SE queueing, notes import, drama classification, and converter/test expansions.
+Functionality: much broader, automatable ingestion of Standard Ebooks catalog into product surfaces.</p>
+<h4 node="[object Object]" id="c41dba0c-platform-carousel-ux-and-library-performance"><code>c41dba0c</code> - platform carousel UX and library performance</h4>
+<p>Architecture: added new library/feature components and monitoring hook for frontend perf.
+Functionality: faster-feeling browse flow and improved discoverability in platform library UI.</p>
+<h4 node="[object Object]" id="6491d121-remove-useless-noisy-log"><code>6491d121</code> - remove useless noisy log</h4>
+<p>Architecture: cleaned noisy instrumentation in media activation path.
+Functionality: cleaner runtime diagnostics for development and incident triage.</p>
+<h4 node="[object Object]" id="e5df4b1a-checkpoint-for-automated-pipeline-improvements"><code>e5df4b1a</code> - checkpoint for automated pipeline improvements</h4>
+<p>Architecture: added robust Gemini rate-limit detection, retry-delay parsing, Vertex fallback, and abort-aware scheduling.
+Functionality: long-running pipeline jobs fail less often and cancel more safely.</p>
+<h4 node="[object Object]" id="a98284cc-platform-library-section-improvements-and-pipeline-stability"><code>a98284cc</code> - platform library section improvements and pipeline stability</h4>
+<p>Architecture: introduced mtime-aware caching, queue-runner/upload scripts, and rewritten-text coverage verification.
+Functionality: faster repeated processing and more reliable catalog/cover rollout with clearer quality checks.</p>
+<h4 node="[object Object]" id="cf35d3e9-improvement-for-chapter-dynamic-loading"><code>cf35d3e9</code> - improvement for chapter dynamic loading</h4>
+<p>Architecture: added virtualization window logic to loading pipeline.
+Functionality: smoother reading through large books with fewer loading artifacts.</p>
+<h4 node="[object Object]" id="b21d7ea6-missing-metadata-uploaded"><code>b21d7ea6</code> - missing metadata uploaded</h4>
+<p>Architecture: imported large static metadata datasets into repo.
+Functionality: library can render categories/book cards directly from shipped data.</p>
+<h4 node="[object Object]" id="a1403061-descriptions-also-needed-for-deployment"><code>a1403061</code> - descriptions also needed for deployment</h4>
+<p>Architecture: completed deployment data bundle with description payloads.
+Functionality: richer book cards/search hooks available at runtime.</p>
+<h3 node="[object Object]" id="2026-02-07">2026-02-07</h3>
+<h4 node="[object Object]" id="5e78b167-genai-upgrade-thinking-typography-preservation"><code>5e78b167</code> - genai upgrade + thinking + typography preservation</h4>
+<p>Architecture: upgraded model SDK and tuned structured-generation settings.
+Functionality: better summary/reference quality and preserved literary punctuation in output.</p>
+<h4 node="[object Object]" id="b1666640-chunk-rewrite-continuity-and-tests"><code>b1666640</code> - chunk rewrite continuity and tests</h4>
+<p>Architecture: strengthened chunk rewrite strategy with substantial specs.
+Functionality: less abrupt style/content drift between adjacent rewritten chunks.</p>
+<h4 node="[object Object]" id="38776894-queued-rewrite-orchestrator-with-benchmark-artifacts"><code>38776894</code> - queued rewrite orchestrator with benchmark artifacts</h4>
+<p>Architecture: introduced orchestrator abstraction and benchmark-reporting pipeline.
+Functionality: operators can run and compare rewrite strategies more predictably.</p>
+<h4 node="[object Object]" id="53c50416-apply-current-callo3-updates"><code>53c50416</code> - apply current callO3 updates</h4>
+<p>Architecture: refreshed provider wrapper behavior.
+Functionality: improved compatibility of model invocation layer.</p>
+<h4 node="[object Object]" id="f1ea823c-callo3-changed-to-gpt5"><code>f1ea823c</code> - callO3 changed to gpt5</h4>
+<p>Architecture: normalized provider naming/wiring from O3 path to GPT-5 path.
+Functionality: rewrite/reference-card flows now call intended model entrypoints consistently.</p>
+<h4 node="[object Object]" id="95025b40-benchmark-reference-cards-with-gpt5-gemini"><code>95025b40</code> - benchmark reference cards with gpt5+gemini</h4>
+<p>Architecture: added model comparison harness and large test expansion for reference-card generation.
+Functionality: more measurable control over card quality/cost tradeoffs.</p>
+<h4 node="[object Object]" id="3dd233bb-tweak-prompt-to-align-with-schema"><code>3dd233bb</code> - tweak prompt to align with schema</h4>
+<p>Architecture: tightened prompt-template contract with schema parser expectations.
+Functionality: fewer schema-shape mismatches in generated output.</p>
+<h4 node="[object Object]" id="2498f22f-visual-guide-shadow-benchmarking-and-coverage-tests"><code>2498f22f</code> - visual-guide shadow benchmarking and coverage tests</h4>
+<p>Architecture: added visual-guide experiment framework and image-prompt test coverage.
+Functionality: more stable character/visual reference generation.</p>
+<h4 node="[object Object]" id="95e778ee-remove-rolling-summary-step-and-gate-mapping-on-rewrite-output"><code>95e778ee</code> - remove rolling summary step and gate mapping on rewrite output</h4>
+<p>Architecture: simplified summary pipeline by removing redundant stage and enforcing rewrite-gated mapping.
+Functionality: chapter summaries/maps align better with final rewritten text.</p>
+<h4 node="[object Object]" id="bd1e3cea-queue-gemini-and-vertex-calls-for-summary-mapping"><code>bd1e3cea</code> - queue Gemini and Vertex calls for summary mapping</h4>
+<p>Architecture: introduced LLM queue module for chapter-summary mapping calls.
+Functionality: improved throughput and fewer provider-overload incidents.</p>
+<h4 node="[object Object]" id="9fb7824c-merge-small-structural-se-divider-sections"><code>9fb7824c</code> - merge small structural SE divider sections</h4>
+<p>Architecture: changed SE converter chapter segmentation logic.
+Functionality: cleaner chapter boundaries and less fragmentation for downstream UI/pipeline stages.</p>
+<h4 node="[object Object]" id="2ab46996-benchmark-context-bundle-collector"><code>2ab46996</code> - benchmark context bundle collector</h4>
+<p>Architecture: added artifact collector for reproducible benchmark context snapshots.
+Functionality: easier run-to-run comparisons and debugging of model behavior.</p>
+<h4 node="[object Object]" id="03421c2e-reuse-reference-visual-guides-and-harden-xml-coverage"><code>03421c2e</code> - reuse reference visual guides and harden xml coverage</h4>
+<p>Architecture: reduced duplication in visual-guide usage and extended XML handling paths/tests.
+Functionality: fewer generation inconsistencies and parser edge-case failures.</p>
+<h4 node="[object Object]" id="bb3b4222-remove-deprecated-metadata-tooling"><code>bb3b4222</code> - remove deprecated metadata tooling</h4>
+<p>Architecture: deleted obsolete metadata scripts and stale supporting files.
+Functionality: lower accidental use of unsupported pipelines.</p>
+<h4 node="[object Object]" id="1c0fa41d-character-role-spoiler-cleanup-metadata-flow"><code>1c0fa41d</code> - character role + spoiler-cleanup metadata flow</h4>
+<p>Architecture: added full metadata-processing stage and propagated schema/query changes through Convex + player.
+Functionality: character cards/captions now expose cleaner role-aware, spoiler-reduced metadata.</p>
+<h4 node="[object Object]" id="494571f4-strip-parenthetical-aliases-from-display-names"><code>494571f4</code> - strip parenthetical aliases from display names</h4>
+<p>Architecture: tightened character caption formatting logic and tests.
+Functionality: cleaner, more readable character names in UI.</p>
+<h3 node="[object Object]" id="2026-02-08">2026-02-08</h3>
+<h4 node="[object Object]" id="689e9166-remove-old-data-file"><code>689e9166</code> - remove old data file</h4>
+<p>Architecture: removed stale benchmark/data artifact from active tree.
+Functionality: reduced risk of outdated data influencing results.</p>
+<h4 node="[object Object]" id="b7190145-slug-first-cleanup-and-retroactive-role-backfill"><code>b7190145</code> - slug-first cleanup and retroactive role backfill</h4>
+<p>Architecture: introduced retroactive metadata cleanup/backfill tooling and stronger role-cleanup logic.
+Functionality: previously processed books can be upgraded to newer metadata quality without full reprocessing.</p>
+<h4 node="[object Object]" id="f58eca8c-improved-prompt-for-removing-spoilers-and-creating-roles"><code>f58eca8c</code> - improved prompt for removing spoilers and creating roles</h4>
+<p>Architecture: refined role/spoiler prompt contract.
+Functionality: cleaner summaries with better spoiler suppression.</p>
+<h4 node="[object Object]" id="8661f3db-default-code-settings"><code>8661f3db</code> - default code settings</h4>
+<p>Architecture: updated local code-assistant environment defaults.
+Functionality: more consistent coding environment behavior for ongoing work.</p>
+<h4 node="[object Object]" id="7075968e-generate-music-covers-with-style-matched-cover-art"><code>7075968e</code> - generate-music-covers with style-matched cover art</h4>
+<p>Architecture: added media-cover generation pipeline (analysis -&gt; image gen/edit -&gt; resize/embed -&gt; metadata import).
+Functionality: generated MP3 tracks gain style-aligned cover art and improved metadata handling.</p>
+<h4 node="[object Object]" id="6597a280-queue-background-prompt-gemini-calls"><code>6597a280</code> - queue background prompt Gemini calls</h4>
+<p>Architecture: moved background prompt generation to queued provider invocation.
+Functionality: steadier background generation under load/rate limits.</p>
+<h4 node="[object Object]" id="66c3f4d6-fix-letter-avatars-and-smooth-chapter-book-progress"><code>66c3f4d6</code> - fix letter avatars and smooth chapter/book progress</h4>
+<p>Architecture: adjusted normalization and reading-progress logic with tests.
+Functionality: better avatar fallback behavior and smoother progress indicators for readers.</p>
+<h4 node="[object Object]" id="5175c86c-update-pipeline-flow-and-polish-player-transitions"><code>5175c86c</code> - update pipeline flow and polish player transitions</h4>
+<p>Architecture: expanded pipeline step controls (<code>--only-step</code>, dependency checks), improved scheduler/runner orchestration, and revised graphics settings plumbing.
+Functionality: operators can resume/run targeted stages safely; readers get finer visual controls and smoother transitions.</p>
+<h4 node="[object Object]" id="733b9d93-embeddings-safety-net-and-integration-coverage"><code>733b9d93</code> - embeddings safety-net and integration coverage</h4>
+<p>Architecture: split embedding side effects from orchestration and added unit/integration safety net.
+Functionality: answer-server embedding generation is more reliable and regression-resistant.</p>
+<hr/>
+<h2 node="[object Object]" id="suggested-render-path-markdown-html">Suggested Render Path (Markdown -&gt; HTML)</h2>
+<p>If you want a shareable HTML artifact for investor updates:</p>
+<pre><code class="language-bash">bunx marked docs/reports/engineering-report-2026-02-03-to-2026-02-08.md &gt; /tmp/engineering-report.html
+open /tmp/engineering-report.html
+</code></pre>
+<p>If you want, I can also generate a styled HTML version (with typography, section TOC, and print/PDF-ready CSS) directly in the repo.</p>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

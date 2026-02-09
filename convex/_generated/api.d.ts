@@ -39,6 +39,7 @@ import type * as lib_parseFormData from "../lib/parseFormData.js";
 import type * as lib_sharedTypes from "../lib/sharedTypes.js";
 import type * as metadata from "../metadata.js";
 import type * as metadataMigrations from "../metadataMigrations.js";
+import type * as migration from "../migration.js";
 import type * as musicCues from "../musicCues.js";
 import type * as musicMetadata from "../musicMetadata.js";
 import type * as notes from "../notes.js";
@@ -87,6 +88,7 @@ declare const fullApi: ApiFromModules<{
   "lib/sharedTypes": typeof lib_sharedTypes;
   metadata: typeof metadata;
   metadataMigrations: typeof metadataMigrations;
+  migration: typeof migration;
   musicCues: typeof musicCues;
   musicMetadata: typeof musicMetadata;
   notes: typeof notes;
