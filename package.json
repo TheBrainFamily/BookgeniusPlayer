@@ -76,9 +76,6 @@
     "@types/react-dom": "19.1.7"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs}": [
-      "eslint --cache --fix"
-    ],
     "*.{js,jsx,ts,tsx,json,md,yml,mjs,cjs}": [
       "prettier --write"
     ]
