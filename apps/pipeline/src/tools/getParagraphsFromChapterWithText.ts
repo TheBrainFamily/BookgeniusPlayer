@@ -1,16 +1,17 @@
 import * as cheerio from "cheerio";
 import { forEachIndexedMixedFormatLeaf } from "@player/services/mixedFormatLeafIndexing";
-import type { AnyNode } from "domhandler";
 
 /**
  * Extract attributes from a cheerio element
  */
-function getElementAttributes($elem: cheerio.Cheerio<AnyNode>): Record<string, string> {
+function getElementAttributes($elem: {
+  attr(): Record<string, string | null> | undefined;
+}): Record<string, string> {
   const attrs: Record<string, string> = {};
   const rawAttrs = $elem.attr();
   if (rawAttrs) {
     for (const [key, value] of Object.entries(rawAttrs)) {
-      if (value !== undefined) {
+      if (typeof value === "string") {
         attrs[key] = value;
       }
     }
