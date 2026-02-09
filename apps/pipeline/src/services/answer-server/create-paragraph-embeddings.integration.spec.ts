@@ -70,8 +70,8 @@ describe("generateEmbeddings integration (real paragraph extraction)", () => {
 
     const summaries = [
       makeChapterSummary(5, [
-        { paragraphsSummary: "Diary summary", paragraphNumbers: [1], mainParagraphNumber: 1 },
-        { paragraphsSummary: "Frame summary", paragraphNumbers: [0, 2], mainParagraphNumber: 2 },
+        { paragraphsSummary: "Diary summary", paragraphNumbers: [1, 2, 3], mainParagraphNumber: 2 },
+        { paragraphsSummary: "Frame summary", paragraphNumbers: [0, 4], mainParagraphNumber: 4 },
       ]),
     ];
 
@@ -121,17 +121,17 @@ describe("generateEmbeddings integration (real paragraph extraction)", () => {
     expect(computeBatchEmbeddingsThroughHTTP).toHaveBeenCalledTimes(1);
     expect(computeBatchEmbeddingsThroughHTTP).toHaveBeenCalledWith([
       {
-        text: "<Summary>Diary summary</Summary> <Text>Lucy Westenra’s Diary. 12 September.⁠—How good they all are to me. ... Other text</Text>",
+        text: "<Summary>Diary summary</Summary> <Text>Lucy Westenra’s Diary.\n12 September.⁠—How good they all are to me. ...\nOther text</Text>",
         chapter: 5,
-        paragraphNumber: 1,
+        paragraphNumber: 2,
       },
       {
         text: "<Summary>Frame summary</Summary> <Text>Letter I\nStandalone tail</Text>",
         chapter: 5,
-        paragraphNumber: 2,
+        paragraphNumber: 4,
       },
-      { text: "Diary summary", chapter: 5, paragraphNumber: 1 },
-      { text: "Frame summary", chapter: 5, paragraphNumber: 2 },
+      { text: "Diary summary", chapter: 5, paragraphNumber: 2 },
+      { text: "Frame summary", chapter: 5, paragraphNumber: 4 },
     ]);
   });
 });

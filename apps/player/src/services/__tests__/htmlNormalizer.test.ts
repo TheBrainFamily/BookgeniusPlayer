@@ -173,6 +173,22 @@ describe("injectDataIndex", () => {
     expect(result).toContain('data-index="1"');
     expect(result).toContain('data-index="2"');
   });
+
+  it("assigns data-index to image-only figures via img leaf", () => {
+    const input = `
+      <section data-chapter="1">
+        <figure>
+          <img alt="Portrait" src="/figures/portrait.svg" />
+        </figure>
+      </section>
+    `;
+    const result = applyDataIndex(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    expect(doc.querySelector("img")?.getAttribute("data-index")).toBe("0");
+    expect(doc.querySelector("figure")?.hasAttribute("data-index")).toBe(false);
+  });
 });
 
 describe("injectAvatarShells", () => {

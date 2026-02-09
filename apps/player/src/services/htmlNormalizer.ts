@@ -1,4 +1,5 @@
 import { getFigureUrl } from "@player/utils/assetUrls";
+import { forEachIndexedMixedFormatLeaf } from "./mixedFormatLeafIndexing";
 
 const BLOCKED_TAGS = new Set([
   "script",
@@ -258,79 +259,26 @@ export function indexMixedFormatChildren(section: Element): void {
   }
 }
 
-const LEAF_TAGS = new Set([
-  "p",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "li",
-  "td",
-  "th",
-  "dt",
-  "dd",
-  "figcaption",
-  "hr",
-  "cite",
-]);
-
-const CONTAINER_TAGS = new Set([
-  "blockquote",
-  "div",
-  "section",
-  "table",
-  "tbody",
-  "thead",
-  "tfoot",
-  "tr",
-  "ol",
-  "ul",
-  "dl",
-  "header",
-  "footer",
-  "figure",
-  "aside",
-  "hgroup",
-]);
-
 /** New indexing: recursively find leaf elements inside containers. */
 export function indexMixedFormatLeaves(section: Element): void {
   let index = 0;
-
-  function recurse(el: Element): void {
-    const tag = el.tagName.toLowerCase();
-    const text = (el.textContent || "").trim();
-
-    if (!text) return;
-
-    if (LEAF_TAGS.has(tag)) {
-      el.setAttribute("data-index", String(index++));
-      return;
-    }
-
-    if (CONTAINER_TAGS.has(tag)) {
-      if (el.children.length === 0) {
-        // Container with only text (no child elements) → treat as leaf
-        el.setAttribute("data-index", String(index++));
-        return;
-      }
-      for (const child of Array.from(el.children)) {
-        recurse(child);
-      }
-      return;
-    }
-
-    // Unknown tag with text → treat as leaf
-    el.setAttribute("data-index", String(index++));
-  }
 
   for (const child of Array.from(section.children)) {
     if (child.classList.contains("play-row")) {
       index = indexPlayRowParagraphs(child, index);
     } else {
-      recurse(child);
+      index = forEachIndexedMixedFormatLeaf(
+        [child],
+        {
+          getTagName: (element) => element.tagName,
+          getTextContent: (element) => element.textContent,
+          getChildren: (element) => Array.from(element.children),
+        },
+        (leafElement, dataIndex) => {
+          leafElement.setAttribute("data-index", String(dataIndex));
+        },
+        index,
+      );
     }
   }
 }

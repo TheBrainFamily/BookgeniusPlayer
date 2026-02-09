@@ -1,9 +1,11 @@
 import * as cheerio from "cheerio";
+import { forEachIndexedMixedFormatLeaf } from "@player/services/mixedFormatLeafIndexing";
+import type { AnyNode } from "domhandler";
 
 /**
  * Extract attributes from a cheerio element
  */
-function getElementAttributes($elem: ReturnType<cheerio.CheerioAPI>): Record<string, string> {
+function getElementAttributes($elem: cheerio.Cheerio<AnyNode>): Record<string, string> {
   const attrs: Record<string, string> = {};
   const rawAttrs = $elem.attr();
   if (rawAttrs) {
@@ -16,6 +18,35 @@ function getElementAttributes($elem: ReturnType<cheerio.CheerioAPI>): Record<str
   return attrs;
 }
 
+function getImagePlaceholderText(attributes: Record<string, string>): string {
+  const alt = attributes.alt?.trim();
+  if (alt) {
+    return `[Image: ${alt}]`;
+  }
+  const ariaLabel = attributes["aria-label"]?.trim();
+  if (ariaLabel) {
+    return `[Image: ${ariaLabel}]`;
+  }
+  const title = attributes.title?.trim();
+  if (title) {
+    return `[Image: ${title}]`;
+  }
+  return "[Image]";
+}
+
+function getNonTextPlaceholder(
+  elementType: string,
+  attributes: Record<string, string>,
+): string | null {
+  if (elementType === "img") {
+    return getImagePlaceholderText(attributes);
+  }
+  if (elementType === "hr") {
+    return "[Section break]";
+  }
+  return null;
+}
+
 export const getParagraphsFromChapterWithText = (
   chapter: number,
   bookText: string,
@@ -24,9 +55,28 @@ export const getParagraphsFromChapterWithText = (
   passed$?: cheerio.CheerioAPI,
 ) => {
   const $ = passed$ ?? cheerio.load(bookText);
-  return Array.from($(`[data-chapter="${chapter}"] > *`))
-    .map((elem) => {
-      const $elem = $(elem);
+  const chapterRoots = $(`[data-chapter="${chapter}"]`).first().children().toArray();
+  type ChapterNode = (typeof chapterRoots)[number];
+  const indexedLeaves: Array<{ node: ChapterNode; dataIndex: number }> = [];
+
+  forEachIndexedMixedFormatLeaf(
+    chapterRoots,
+    {
+      getTagName: (node) => {
+        const tagName = $(node).prop("tagName");
+        return typeof tagName === "string" ? tagName : undefined;
+      },
+      getTextContent: (node) => $(node).text(),
+      getChildren: (node) => $(node).children().toArray() as ChapterNode[],
+    },
+    (node, dataIndex) => {
+      indexedLeaves.push({ node, dataIndex });
+    },
+  );
+
+  return indexedLeaves
+    .map(({ node, dataIndex }) => {
+      const $elem = $(node);
       const elementType = ($elem.prop("tagName") ?? "unknown").toLowerCase();
       const attributes = getElementAttributes($elem);
       const $clone = $elem.clone();
@@ -34,28 +84,23 @@ export const getParagraphsFromChapterWithText = (
         $clone.find("note").remove();
         $clone.find("a").remove();
       }
-      let text = "";
-      if (pureText) {
-        text = $clone.text().trim();
-      } else {
-        text = $clone.html()?.trim() ?? "";
+      let rawText = pureText ? $clone.text().trim() : ($clone.html()?.trim() ?? "");
+
+      if (!rawText && !pureText) {
+        rawText = $.html($clone).trim();
       }
 
-      return { text, elementType, attributes };
-    })
-    .filter((element) => element?.text.length > 0)
-    .map((pageText, index) => {
-      const text = pageText.text
+      if (!rawText) {
+        rawText = getNonTextPlaceholder(elementType, attributes) ?? "";
+      }
+
+      const text = rawText
         .replace(/\s+/g, " ")
         .replace(/\n\s*\n/g, "\n\n")
         .trim();
-      return {
-        text,
-        dataIndex: index,
-        elementType: pageText.elementType,
-        attributes: pageText.attributes,
-      };
-    });
+      return { text, dataIndex, elementType, attributes };
+    })
+    .filter((element) => element.text.length > 0);
 };
 
 /**

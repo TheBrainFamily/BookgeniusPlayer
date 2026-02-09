@@ -2,11 +2,14 @@ import { describe, it, expect } from "vitest";
 import { getParagraphsFromChapterWithText } from "./getParagraphsFromChapterWithText";
 
 describe("getParagraphsFromChapterWithText", () => {
-  it("preserves curly double quotes inside attribute values", () => {
+  it("preserves curly double quotes inside image attribute values", () => {
     const bookText = `
       <section data-chapter="1">
         <figure>
-          <img alt="A note with “ll” and “and” visible." src="/figures/note.svg" />
+          <figcaption>
+            Visible text
+            <img alt="A note with “ll” and “and” visible." src="/figures/note.svg" />
+          </figcaption>
         </figure>
       </section>
     `;
@@ -60,7 +63,7 @@ describe("getParagraphsFromChapterWithText", () => {
     expect(html).not.toContain("1805-1812");
   });
 
-  it("flattens nested blockquote content into a single top-level paragraph in pureText mode", () => {
+  it("indexes nested leaf paragraphs in reading order for blockquote structures", () => {
     const bookText = `
       <section data-chapter="5">
         <blockquote epub:type="z3998:diary">
@@ -77,12 +80,51 @@ describe("getParagraphsFromChapterWithText", () => {
 
     const paragraphs = getParagraphsFromChapterWithText(5, bookText, true, true);
 
+    expect(paragraphs).toHaveLength(3);
+    expect(paragraphs[0]?.dataIndex).toBe(0);
+    expect(paragraphs[1]?.dataIndex).toBe(1);
+    expect(paragraphs[2]?.dataIndex).toBe(2);
+    expect(paragraphs[0]?.elementType).toBe("p");
+    expect(paragraphs[1]?.elementType).toBe("p");
+    expect(paragraphs[2]?.elementType).toBe("p");
+    expect(paragraphs[0]?.text).toContain("Lucy Westenra’s Diary.");
+    expect(paragraphs[1]?.text).toContain("12 September.");
+    expect(paragraphs[1]?.text).toContain("How good they all are to me.");
+    expect(paragraphs[2]?.text).toContain("Other text");
+  });
+
+  it("keeps image-only figure as indexable leaf with meaningful pureText placeholder", () => {
+    const bookText = `
+      <section data-chapter="2">
+        <figure>
+          <img alt="Map of the estate" src="/figures/map.svg" />
+        </figure>
+      </section>
+    `;
+
+    const paragraphs = getParagraphsFromChapterWithText(2, bookText, true, true);
+
     expect(paragraphs).toHaveLength(1);
     expect(paragraphs[0]?.dataIndex).toBe(0);
-    expect(paragraphs[0]?.elementType).toBe("blockquote");
-    expect(paragraphs[0]?.text).toContain("Lucy Westenra’s Diary.");
-    expect(paragraphs[0]?.text).toContain("12 September.");
-    expect(paragraphs[0]?.text).toContain("How good they all are to me.");
-    expect(paragraphs[0]?.text).toContain("Other text");
+    expect(paragraphs[0]?.elementType).toBe("img");
+    expect(paragraphs[0]?.text).toBe("[Image: Map of the estate]");
+  });
+
+  it("keeps image-only figure HTML in non-pure mode", () => {
+    const bookText = `
+      <section data-chapter="3">
+        <figure>
+          <img alt="Portrait" src="/figures/portrait.svg" />
+        </figure>
+      </section>
+    `;
+
+    const paragraphs = getParagraphsFromChapterWithText(3, bookText, true, false);
+
+    expect(paragraphs).toHaveLength(1);
+    expect(paragraphs[0]?.dataIndex).toBe(0);
+    expect(paragraphs[0]?.elementType).toBe("img");
+    expect(paragraphs[0]?.text).toContain('alt="Portrait"');
+    expect(paragraphs[0]?.text).toContain('src="/figures/portrait.svg"');
   });
 });
