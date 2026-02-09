@@ -17,6 +17,7 @@
     "bench:collect-context": "bun src/tools/collect-benchmark-context.ts",
     "generate-new-book": "bun src/tools/generate-book-cli/index.ts",
     "pipeline:from-fb2": "bun src/server/pipeline-cli.ts",
+    "restore:book-to-convex": "bun src/server/restore-book-to-convex.ts",
     "postinstall": "patch-package",
     "typecheck": "tsgo --noEmit --incremental"
   },

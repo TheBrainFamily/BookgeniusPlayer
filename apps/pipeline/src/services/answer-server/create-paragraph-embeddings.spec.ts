@@ -7,7 +7,10 @@ import { readBookFile } from "../../helpers/readBookFile";
 import { writeBookFile } from "../../helpers/writeBookFile";
 import { getBookSettings } from "../../helpers/getBookSettings";
 import { getMtimeMs } from "../../tools/get-mtime-ms";
-import { computeBatchEmbeddingsThroughHTTP } from "./create-paragraph-embeddings-side-effects";
+import {
+  computeBatchEmbeddingsThroughHTTP,
+  type Document,
+} from "./create-paragraph-embeddings-side-effects";
 import { generateEmbeddings } from "./create-paragraph-embeddings";
 
 vi.mock("../../tools/getBookForm", () => ({ getBookForm: vi.fn() }));
@@ -65,7 +68,7 @@ describe("generateEmbeddings", () => {
     });
     asMock(getMtimeMs).mockReturnValue(12345);
 
-    asMock(computeBatchEmbeddingsThroughHTTP).mockImplementation(async (documents) =>
+    asMock(computeBatchEmbeddingsThroughHTTP).mockImplementation(async (documents: Document[]) =>
       documents.map((document, index) => ({ ...document, Embeddings: [index + 1] })),
     );
   });

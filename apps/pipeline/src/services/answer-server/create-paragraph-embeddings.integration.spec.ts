@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
+import type { Document } from "./create-paragraph-embeddings-side-effects";
 
 vi.mock("../../tools/getBookForm", () => ({ getBookForm: vi.fn() }));
 
@@ -64,7 +65,7 @@ describe("generateEmbeddings integration (real paragraph extraction)", () => {
       language: "en",
     });
     asMock(getMtimeMs).mockReturnValue(987654321);
-    asMock(computeBatchEmbeddingsThroughHTTP).mockImplementation(async (documents) =>
+    asMock(computeBatchEmbeddingsThroughHTTP).mockImplementation(async (documents: Document[]) =>
       documents.map((document, index) => ({ ...document, Embeddings: [index + 1] })),
     );
 
