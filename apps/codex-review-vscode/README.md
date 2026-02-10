@@ -35,6 +35,7 @@ This generates all of:
 - `.codex-review/agent-brief.txt`
 
 For large changesets, CLI prints only an initial preview and a `narration-list` command for the next page.
+`start` also suggests an initial interactive batch of ~5 chunks, then you can keep calling `next-batch`.
 
 Scope review to selected files/paths (repeatable):
 
@@ -86,6 +87,16 @@ Check current session health and pending files:
 
 ```bash
 bun run apps/codex-review-vscode/src/cli.ts status --workspace . --limit 20
+```
+
+`status` also reports viewed chunks (`last opened`) so the agent can align with what the user is currently reviewing.
+
+Continue interactive batches:
+
+```bash
+bun run apps/codex-review-vscode/src/cli.ts next-batch --workspace .
+# alias:
+bun run apps/codex-review-vscode/src/cli.ts continue --workspace .
 ```
 
 Each narration command prints authored/remaining progress so an agent can iterate until done.

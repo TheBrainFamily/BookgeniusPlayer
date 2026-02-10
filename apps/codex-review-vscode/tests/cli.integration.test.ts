@@ -51,10 +51,29 @@ describe("cli integration", () => {
     const { repoDir } = createRepoFixture();
     const output = runCli(["start", "--workspace", repoDir], repoDir);
     expect(output).toContain("Generated review session");
+    expect(output).toContain("Quick interactive batch");
+    expect(output).toContain("Continue when ready:");
     expect(existsSync(path.join(repoDir, ".codex-review", "review-plan.json"))).toBe(true);
     expect(existsSync(path.join(repoDir, ".codex-review", "chunk-narrations.json"))).toBe(true);
     expect(existsSync(path.join(repoDir, ".codex-review", "session-lock.json"))).toBe(true);
     expect(existsSync(path.join(repoDir, ".codex-review", "agent-brief.txt"))).toBe(true);
+  });
+
+  it("next-batch and continue alias suggest progressive chunk batches", () => {
+    const { repoDir } = createRepoFixture();
+    runCli(["start", "--workspace", repoDir], repoDir);
+
+    const nextBatchOutput = runCli(["next-batch", "--workspace", repoDir], repoDir);
+    expect(
+      nextBatchOutput.includes("Suggested review batch") ||
+        nextBatchOutput.includes("No additional unreviewed chunks available for a new batch."),
+    ).toBe(true);
+
+    const continueAliasOutput = runCli(["continue", "--workspace", repoDir], repoDir);
+    expect(
+      continueAliasOutput.includes("Suggested review batch") ||
+        continueAliasOutput.includes("No additional unreviewed chunks available for a new batch."),
+    ).toBe(true);
   });
 
   it("status reports pending files and detects drift after workspace changes", () => {

@@ -108,6 +108,14 @@ async function openChunk(current: LoadedSession, chunkId: string): Promise<void>
   }
 
   activeChunkId = chunk.id;
+  const viewed = new Set(current.state.viewedChunkIds ?? []);
+  viewed.add(chunk.id);
+  current.state.viewedChunkIds = Array.from(viewed);
+  current.state.lastOpenedChunkId = chunk.id;
+  current.state.updatedAt = new Date().toISOString();
+  writeReviewState(current.workspaceRoot, current.state);
+  provider?.setSession({ plan: current.plan, state: current.state });
+
   const absolutePath = path.join(current.workspaceRoot, chunk.filePath);
   const uri = vscode.Uri.file(absolutePath);
   await vscode.commands.executeCommand("git.openChange", uri);
@@ -139,6 +147,10 @@ async function setChunkStatus(
   }
 
   current.state.chunkStatus[chunkId] = status;
+  const viewed = new Set(current.state.viewedChunkIds ?? []);
+  viewed.add(chunkId);
+  current.state.viewedChunkIds = Array.from(viewed);
+  current.state.lastOpenedChunkId = chunkId;
   current.state.updatedAt = new Date().toISOString();
   writeReviewState(current.workspaceRoot, current.state);
   provider?.setSession({ plan: current.plan, state: current.state });

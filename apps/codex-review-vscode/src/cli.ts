@@ -10,7 +10,6 @@ import {
   buildReviewPlan,
   computeProgress,
   computeNarrationProgress,
-  createInitialReviewState,
   createAiChunkNarrationTemplate,
   createAiStorySeed,
   createAiStoryStepsTemplate,
@@ -30,10 +29,17 @@ import {
   STORY_OUTPUT_SCHEMA_EXAMPLE,
   writeReviewArtifacts,
   writeReviewPlanAndTour,
+  writeReviewState,
   writeSessionLock,
 } from "./core";
 import type { AiChunkNarrationFile, AiStoryOutput, AiStoryStepsFile } from "./core/story-ai";
-import type { AuthorNotes, ReviewPlan, ReviewSessionLock, ReviewState } from "./core/types";
+import type {
+  AuthorNotes,
+  ReviewChunk,
+  ReviewPlan,
+  ReviewSessionLock,
+  ReviewState,
+} from "./core/types";
 
 interface CliOptions {
   workspaceRoot: string;
@@ -52,6 +58,16 @@ interface CliOptions {
   pendingOnly: boolean;
   includeFiles: string[];
   includePaths: string[];
+}
+
+const QUICK_BATCH_SIZE = 5;
+
+interface BatchSuggestion {
+  chunkId: string;
+  filePath: string;
+  line: number;
+  stepId?: string;
+  stepTitle?: string;
 }
 
 function valueFromEqualsArg(arg: string, prefix: string): string | undefined {
@@ -231,6 +247,9 @@ function resolveCommand(argv: string[]): { command: string; startIndex: number }
   if (first === "set") {
     return { command: "narration-set-chunks", startIndex: 1 };
   }
+  if (first === "continue") {
+    return { command: "next-batch", startIndex: 1 };
+  }
 
   return { command: first, startIndex: 1 };
 }
@@ -256,7 +275,7 @@ function parseArgs(argv: string[]): { command: string; options: CliOptions } {
 
 function printUsage(): void {
   console.log(
-    "Usage:\n  bun run src/cli.ts start [--workspace <path>] [--base-ref <ref>] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts status [--workspace <path>] [--narration-file <path>] [--limit <n>]\n  bun run src/cli.ts chunks [--workspace <path>] [--file <path>] [--path <prefix>] [--offset <n>] [--limit <n>] [--all]\n  bun run src/cli.ts set --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]\n  bun run src/cli.ts narration list [--workspace <path>] [--file <path>] [--path <prefix>] [--offset <n>] [--limit <n>] [--all]\n  bun run src/cli.ts narration setChunks --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]\n  bun run src/cli.ts generate [--workspace <path>] [--base-ref <ref>] [--notes <path>] [--story-file <path>] [--seed-out <path>] [--steps-out <path>] [--narration-out <path>] [--include-file <path>] [--include-path <path>] [--include=<path>]\n  bun run src/cli.ts create-story-seed [--workspace <path>] [--base-ref <ref>] [--notes <path>] [--seed-out <path>] [--steps-out <path>] [--narration-out <path>] [--story-instructions <path>] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts apply-story [--workspace <path>] [--story-file <path> | --steps-file <path>] [--narration-file <path>]\n  bun run src/cli.ts narration-list [--workspace <path>] [--narration-file <path>] [--offset <n>] [--limit <n>] [--all] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts narration-set-chunks --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]",
+    "Usage:\n  bun run src/cli.ts start [--workspace <path>] [--base-ref <ref>] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts status [--workspace <path>] [--narration-file <path>] [--limit <n>]\n  bun run src/cli.ts next-batch [--workspace <path>]   # alias: continue\n  bun run src/cli.ts chunks [--workspace <path>] [--file <path>] [--path <prefix>] [--offset <n>] [--limit <n>] [--all]\n  bun run src/cli.ts set --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]\n  bun run src/cli.ts narration list [--workspace <path>] [--file <path>] [--path <prefix>] [--offset <n>] [--limit <n>] [--all]\n  bun run src/cli.ts narration setChunks --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]\n  bun run src/cli.ts generate [--workspace <path>] [--base-ref <ref>] [--notes <path>] [--story-file <path>] [--seed-out <path>] [--steps-out <path>] [--narration-out <path>] [--include-file <path>] [--include-path <path>] [--include=<path>]\n  bun run src/cli.ts create-story-seed [--workspace <path>] [--base-ref <ref>] [--notes <path>] [--seed-out <path>] [--steps-out <path>] [--narration-out <path>] [--story-instructions <path>] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts apply-story [--workspace <path>] [--story-file <path> | --steps-file <path>] [--narration-file <path>]\n  bun run src/cli.ts narration-list [--workspace <path>] [--narration-file <path>] [--offset <n>] [--limit <n>] [--all] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts narration-set-chunks --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]",
   );
 }
 
@@ -289,6 +308,97 @@ function ensureParentDirectory(absolutePath: string): void {
 function writePrettyJson(absolutePath: string, value: unknown): void {
   ensureParentDirectory(absolutePath);
   writeFileSync(absolutePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
+
+function toChunkLine(chunk: ReviewChunk): number {
+  return Math.max(1, chunk.newStart > 0 ? chunk.newStart : chunk.oldStart);
+}
+
+function findStepForChunk(
+  plan: ReviewPlan,
+  chunkId: string,
+): ReviewPlan["steps"][number] | undefined {
+  return plan.steps.find((step) => step.chunkIds.includes(chunkId));
+}
+
+function toBatchSuggestion(plan: ReviewPlan, chunk: ReviewChunk): BatchSuggestion {
+  const step = findStepForChunk(plan, chunk.id);
+  return {
+    chunkId: chunk.id,
+    filePath: chunk.filePath,
+    line: toChunkLine(chunk),
+    stepId: step?.id,
+    stepTitle: step ? `${step.level.toUpperCase()} · ${step.title}` : undefined,
+  };
+}
+
+function selectNextBatch(
+  plan: ReviewPlan,
+  state: ReviewState,
+  batchSize = QUICK_BATCH_SIZE,
+): BatchSuggestion[] {
+  const chunkById = new Map(plan.chunks.map((chunk) => [chunk.id, chunk]));
+  const surfaced = new Set(state.surfacedChunkIds ?? []);
+  const picked = new Set<string>();
+  const selected: BatchSuggestion[] = [];
+
+  for (const step of plan.steps) {
+    for (const chunkId of step.chunkIds) {
+      if (selected.length >= batchSize) {
+        break;
+      }
+      if (picked.has(chunkId) || surfaced.has(chunkId)) {
+        continue;
+      }
+      const status = state.chunkStatus[chunkId] ?? "unreviewed";
+      if (status !== "unreviewed") {
+        continue;
+      }
+      const chunk = chunkById.get(chunkId);
+      if (!chunk) {
+        continue;
+      }
+      picked.add(chunkId);
+      selected.push(toBatchSuggestion(plan, chunk));
+    }
+    if (selected.length >= batchSize) {
+      break;
+    }
+  }
+
+  if (selected.length < batchSize) {
+    for (const chunk of plan.chunks) {
+      if (selected.length >= batchSize) {
+        break;
+      }
+      if (picked.has(chunk.id) || surfaced.has(chunk.id)) {
+        continue;
+      }
+      const status = state.chunkStatus[chunk.id] ?? "unreviewed";
+      if (status !== "unreviewed") {
+        continue;
+      }
+      picked.add(chunk.id);
+      selected.push(toBatchSuggestion(plan, chunk));
+    }
+  }
+
+  return selected;
+}
+
+function updateSurfacedChunks(state: ReviewState, selected: BatchSuggestion[]): ReviewState {
+  const surfaced = new Set(state.surfacedChunkIds ?? []);
+  for (const item of selected) {
+    surfaced.add(item.chunkId);
+  }
+  return { ...state, surfacedChunkIds: Array.from(surfaced), updatedAt: new Date().toISOString() };
+}
+
+function formatBatchSuggestions(items: BatchSuggestion[]): string[] {
+  return items.map((item, index) => {
+    const stepSuffix = item.stepTitle ? ` | ${item.stepTitle}` : "";
+    return `${index + 1}. ${item.chunkId} | ${item.filePath}:${item.line}${stepSuffix}`;
+  });
 }
 
 function parseStoryFromFile(storyFilePath: string, plan: ReviewPlan): AiStoryOutput {
@@ -410,6 +520,11 @@ function tryReadState(workspaceRoot: string): ReviewState | undefined {
   }
 }
 
+function ensureReviewState(workspaceRoot: string, plan: ReviewPlan): ReviewState {
+  const existing = tryReadState(workspaceRoot);
+  return ensureStateMatchesPlan(workspaceRoot, plan, existing);
+}
+
 function toDefaultSeedOutPath(workspaceRoot: string): string {
   return path.join(workspaceRoot, ".codex-review", "story-seed.json");
 }
@@ -516,6 +631,10 @@ function writeAgentBrief(
     "Editable files:",
     `- ${storyFiles.stepsPath}`,
     `- ${storyFiles.narrationPath}`,
+    "",
+    "Interactive flow:",
+    `- Start is already done with first ${QUICK_BATCH_SIZE} suggested chunks.`,
+    `- Get next suggested batch: bun run apps/codex-review-vscode/src/cli.ts next-batch --workspace ${quoteArg(workspaceRoot)}`,
     "",
     "Loop:",
     `1. Check progress and pending files: ${statusCommand}`,
@@ -626,6 +745,12 @@ function runGenerate(options: CliOptions): void {
     : baselinePlan;
 
   writeReviewArtifacts(options.workspaceRoot, finalPlan);
+  const state = ensureReviewState(options.workspaceRoot, finalPlan);
+  const initialBatch = selectNextBatch(finalPlan, state, QUICK_BATCH_SIZE);
+  if (initialBatch.length > 0) {
+    const updatedState = updateSurfacedChunks(state, initialBatch);
+    writeReviewState(options.workspaceRoot, updatedState);
+  }
   const storyFiles = writeStoryAuthoringFiles(options, finalPlan);
   const sessionLock = createSessionLock(
     finalPlan,
@@ -657,6 +782,15 @@ function runGenerate(options: CliOptions): void {
   console.log(`Story steps (edit): ${storyFiles.stepsPath}`);
   console.log(`Chunk narrations (edit): ${storyFiles.narrationPath}`);
   console.log(`Agent brief: ${agentBriefPath}`);
+  if (initialBatch.length > 0) {
+    console.log(`Quick interactive batch (${initialBatch.length} chunk(s)):`);
+    for (const line of formatBatchSuggestions(initialBatch)) {
+      console.log(line);
+    }
+    console.log(
+      `Continue when ready: bun run apps/codex-review-vscode/src/cli.ts next-batch --workspace ${quoteArg(options.workspaceRoot)}`,
+    );
+  }
   console.log(`Optional single-file story target: ${storyPath}`);
   console.log(`Next: update ${storyFiles.stepsPath} and/or ${storyFiles.narrationPath}.`);
   console.log(`Then run: ${applyCommand}`);
@@ -825,7 +959,7 @@ function toPendingByFile(
 
 function runStatus(options: CliOptions): void {
   const plan = readReviewPlan(options.workspaceRoot);
-  const state = tryReadState(options.workspaceRoot) ?? createInitialReviewState(plan);
+  const state = ensureReviewState(options.workspaceRoot, plan);
   const reviewProgress = computeProgress(plan, state);
   const narrationPath =
     options.narrationFilePath ?? toDefaultNarrationOutPath(options.workspaceRoot);
@@ -851,6 +985,17 @@ function runStatus(options: CliOptions): void {
   );
   console.log(
     `Narration: ${narrationProgress.authored}/${narrationProgress.total} authored (${narrationProgress.pending} remaining).`,
+  );
+  const viewedCount = new Set(state.viewedChunkIds ?? []).size;
+  console.log(`Viewed chunks: ${viewedCount}/${plan.chunks.length}`);
+  if (state.lastOpenedChunkId) {
+    const lastChunk = plan.chunks.find((chunk) => chunk.id === state.lastOpenedChunkId);
+    if (lastChunk) {
+      console.log(`Last opened: ${lastChunk.filePath}:${toChunkLine(lastChunk)} (${lastChunk.id})`);
+    }
+  }
+  console.log(
+    `Surfaced in batches: ${(state.surfacedChunkIds ?? []).length}/${plan.chunks.length}`,
   );
   console.log(`Files with pending narration: ${pendingByFile.length}`);
   for (const item of pendingByFile.slice(0, visibleLimit)) {
@@ -880,6 +1025,33 @@ function runStatus(options: CliOptions): void {
     ].join(" ");
     console.log(`Next action: apply story to plan/tour with ${applyCommand}`);
   }
+}
+
+function runNextBatch(options: CliOptions): void {
+  const plan = readReviewPlan(options.workspaceRoot);
+  const state = ensureReviewState(options.workspaceRoot, plan);
+  const selected = selectNextBatch(plan, state, QUICK_BATCH_SIZE);
+  if (selected.length === 0) {
+    console.log("No additional unreviewed chunks available for a new batch.");
+    console.log(
+      `Status: bun run apps/codex-review-vscode/src/cli.ts status --workspace ${quoteArg(options.workspaceRoot)}`,
+    );
+    return;
+  }
+
+  const updatedState = updateSurfacedChunks(state, selected);
+  writeReviewState(options.workspaceRoot, updatedState);
+
+  console.log(`Suggested review batch (${selected.length} chunk(s)):`); // interactive continuation
+  for (const line of formatBatchSuggestions(selected)) {
+    console.log(line);
+  }
+  console.log(
+    `If user accepts/questions this batch, continue with: bun run apps/codex-review-vscode/src/cli.ts next-batch --workspace ${quoteArg(options.workspaceRoot)}`,
+  );
+  console.log(
+    `Inspect one file in detail: bun run apps/codex-review-vscode/src/cli.ts chunks --workspace ${quoteArg(options.workspaceRoot)} --file ${quoteArg(selected[0].filePath)} --limit 8`,
+  );
 }
 
 function runNarrationList(options: CliOptions): void {
@@ -1009,6 +1181,10 @@ function main(): void {
   }
   if (command === "status") {
     runStatus(options);
+    return;
+  }
+  if (command === "next-batch") {
+    runNextBatch(options);
     return;
   }
   if (command === "apply-story") {

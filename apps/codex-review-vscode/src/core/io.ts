@@ -80,7 +80,13 @@ export function createInitialReviewState(plan: ReviewPlan): ReviewState {
     chunkStatus[chunk.id] = "unreviewed";
   }
 
-  return { sessionId: plan.sessionId, chunkStatus, updatedAt: new Date().toISOString() };
+  return {
+    sessionId: plan.sessionId,
+    chunkStatus,
+    viewedChunkIds: [],
+    surfacedChunkIds: [],
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 export function writeReviewArtifacts(workspaceRoot: string, plan: ReviewPlan): void {
@@ -159,9 +165,24 @@ export function ensureStateMatchesPlan(
     }
   }
 
+  const knownChunkIds = new Set(plan.chunks.map((chunk) => chunk.id));
+  const viewedChunkIds = Array.from(
+    new Set((existingState.viewedChunkIds ?? []).filter((chunkId) => knownChunkIds.has(chunkId))),
+  );
+  const surfacedChunkIds = Array.from(
+    new Set((existingState.surfacedChunkIds ?? []).filter((chunkId) => knownChunkIds.has(chunkId))),
+  );
+  const lastOpenedChunkId =
+    existingState.lastOpenedChunkId && knownChunkIds.has(existingState.lastOpenedChunkId)
+      ? existingState.lastOpenedChunkId
+      : undefined;
+
   const nextState: ReviewState = {
     ...existingState,
     chunkStatus: nextChunkStatus,
+    viewedChunkIds,
+    surfacedChunkIds,
+    lastOpenedChunkId,
     updatedAt: existingState.updatedAt || new Date().toISOString(),
   };
   writeReviewState(workspaceRoot, nextState);

@@ -45,6 +45,9 @@ export interface ReviewPlan {
 export interface ReviewState {
   sessionId: string;
   chunkStatus: Record<string, ChunkStatus>;
+  viewedChunkIds: string[];
+  surfacedChunkIds: string[];
+  lastOpenedChunkId?: string;
   updatedAt: string;
 }
 
