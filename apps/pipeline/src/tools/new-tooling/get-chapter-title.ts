@@ -1,24 +1,22 @@
-import { type Element as XMLElement } from "@xmldom/xmldom";
+const getTitleText = (el?: Element | null) => (el ? (el.textContent || "").trim() : "");
 
-const getTitleText = (el?: XMLElement | null) => (el ? (el.textContent || "").trim() : "");
-
-const getAttribute = (el: XMLElement, name: string): string | null => {
+const getAttribute = (el: Element, name: string): string | null => {
   const attr = el.getAttribute(name);
   return attr ? attr.trim() : null;
 };
 
-const hasEpubType = (el: XMLElement, type: string): boolean => {
+const hasEpubType = (el: Element, type: string): boolean => {
   const epubType = getAttribute(el, "data-epub-type");
   return epubType ? epubType.includes(type) : false;
 };
 
-const extractLabelAndOrdinalFromSpans = (h2: XMLElement): { label: string; ordinal: string } => {
+const extractLabelAndOrdinalFromSpans = (h2: Element): { label: string; ordinal: string } => {
   let label = "";
   let ordinal = "";
 
   const spans = h2.getElementsByTagName("span");
   for (let i = 0; i < spans.length; i++) {
-    const span = spans[i] as XMLElement;
+    const span = spans[i];
     const spanEpubType = getAttribute(span, "data-epub-type");
     if (spanEpubType === "label") {
       label = getTitleText(span);
@@ -40,23 +38,23 @@ const formatTitleWithOrdinal = (label: string, ordinal: string, title: string): 
   return title;
 };
 
-const getTitleFromHgroup = (hgroup: XMLElement): string | null => {
+const getTitleFromHgroup = (hgroup: Element): string | null => {
   const titleParagraphs = Array.from(hgroup.getElementsByTagName("p")).filter((p) =>
-    hasEpubType(p as XMLElement, "title"),
+    hasEpubType(p, "title"),
   );
 
   if (titleParagraphs.length === 0) {
     return null;
   }
 
-  const titleText = getTitleText(titleParagraphs[0] as XMLElement);
+  const titleText = getTitleText(titleParagraphs[0]);
   const h2Elements = hgroup.getElementsByTagName("h2");
 
   if (h2Elements.length === 0) {
     return titleText;
   }
 
-  const h2 = h2Elements[0] as XMLElement;
+  const h2 = h2Elements[0];
 
   // Check if h2 itself has ordinal attribute
   if (hasEpubType(h2, "ordinal")) {
@@ -68,7 +66,7 @@ const getTitleFromHgroup = (hgroup: XMLElement): string | null => {
   return formatTitleWithOrdinal(label, ordinal, titleText);
 };
 
-const getLegacyChapterTitle = (chapter: XMLElement): string => {
+const getLegacyChapterTitle = (chapter: Element): string => {
   let currentAct = "";
 
   const actElements =
@@ -104,11 +102,11 @@ const getLegacyChapterTitle = (chapter: XMLElement): string => {
     .join(", ");
 };
 
-export const getChapterTitle = (chapter: XMLElement): string => {
+export const getChapterTitle = (chapter: Element): string => {
   // Check for hgroup structure first
   const hgroups = chapter.getElementsByTagName("hgroup");
   if (hgroups.length > 0) {
-    const hgroupTitle = getTitleFromHgroup(hgroups[0] as XMLElement);
+    const hgroupTitle = getTitleFromHgroup(hgroups[0]);
     if (hgroupTitle) {
       return hgroupTitle;
     }

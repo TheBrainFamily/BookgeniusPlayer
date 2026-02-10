@@ -4,16 +4,33 @@ import { convex } from "../server/convex-client";
 import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import { getChapterTitle } from "src/tools/new-tooling/get-chapter-title";
-import { DOMParser, type Element as XMLElement } from "@xmldom/xmldom";
+import { ensureDomParser } from "../lib/domParser";
 import { computeParagraphCount } from "../lib/paragraphCount";
 
-type Args = {
+type CliArgs = {
   bookSlug: string;
   inputPath: string;
   only?: string;
   basename?: string;
   dryRun: boolean;
   allowNew: boolean;
+};
+
+export type UploadChaptersSourceArgs = {
+  bookSlug: string;
+  inputPath: string;
+  only?: string;
+  onlyBasenames?: string[];
+  basename?: string;
+  dryRun?: boolean;
+  allowNew?: boolean;
+};
+
+export type UploadChaptersSourceStats = {
+  uploaded: number;
+  skipped: number;
+  missing: number;
+  total: number;
 };
 
 function resolvePath(inputPath: string): string {
@@ -23,11 +40,11 @@ function resolvePath(inputPath: string): string {
   return path.resolve(inputPath);
 }
 
-function parseArgs(): Args {
+function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
   if (args.length < 2) {
     console.error(
-      "Usage: bun apps/pipeline/src/server/upload-chapters-source.ts <book-slug> <file-or-dir> [--only <basename>] [--basename <basename>] [--dry-run] [--allow-new]",
+      "Usage: bun apps/pipeline/src/scripts/upload-chapters-source.ts <book-slug> <file-or-dir> [--only <basename>] [--basename <basename>] [--dry-run] [--allow-new]",
     );
     process.exit(1);
   }
@@ -55,36 +72,61 @@ function listHtmlFiles(inputDir: string): string[] {
   const htmlFiles = fs.readdirSync(inputDir).filter((file) => file.toLowerCase().endsWith(".html"));
   if (htmlFiles.length >= 1) {
     return htmlFiles;
-  } else {
-    const xmlFiles = fs
-      .readdirSync(inputDir)
-      .filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
-    if (xmlFiles.length >= 1) {
-      return xmlFiles;
-    } else {
-      console.error(`No .html or .xml files found in ${inputDir}`);
-      process.exit(1);
-    }
   }
+
+  const xmlFiles = fs
+    .readdirSync(inputDir)
+    .filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
+  if (xmlFiles.length >= 1) {
+    return xmlFiles;
+  }
+
+  throw new Error(`No .html or .xml files found in ${inputDir}`);
 }
 
-async function main() {
-  const { bookSlug, inputPath, only, basename, dryRun, allowNew } = parseArgs();
+function toOnlySet(args: { only?: string; onlyBasenames?: string[] }): Set<string> | null {
+  const values: string[] = [];
+  if (args.only) {
+    values.push(args.only);
+  }
+  if (args.onlyBasenames && args.onlyBasenames.length > 0) {
+    values.push(...args.onlyBasenames);
+  }
+  if (values.length === 0) {
+    return null;
+  }
+
+  return new Set(values);
+}
+
+export function shouldUploadBasename(basename: string, onlySet: Set<string> | null): boolean {
+  if (!onlySet) {
+    return true;
+  }
+  return onlySet.has(basename);
+}
+
+export async function uploadChaptersSource(
+  args: UploadChaptersSourceArgs,
+): Promise<UploadChaptersSourceStats> {
+  const { bookSlug, basename } = args;
+  const inputPath = resolvePath(args.inputPath);
+  const dryRun = Boolean(args.dryRun);
+  const allowNew = Boolean(args.allowNew);
+  const onlySet = toOnlySet(args);
   const folderPath = `books/${bookSlug}/chapters-source`;
   const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
 
   if (!convexUrl) {
-    console.error("Missing CONVEX_URL environment variable");
-    process.exit(1);
+    throw new Error("Missing CONVEX_URL environment variable");
   }
 
   if (!fs.existsSync(inputPath)) {
-    console.error(`Path not found: ${inputPath}`);
-    process.exit(1);
+    throw new Error(`Path not found: ${inputPath}`);
   }
 
   const adminClient = new AdminConvexHttpClient(convexUrl);
-  const stats = { uploaded: 0, skipped: 0, missing: 0, total: 0 };
+  const stats: UploadChaptersSourceStats = { uploaded: 0, skipped: 0, missing: 0, total: 0 };
 
   const stat = fs.statSync(inputPath);
   const files = stat.isDirectory()
@@ -96,7 +138,7 @@ async function main() {
 
   if (files.length === 0) {
     console.log("No .html files found to upload.");
-    return;
+    return stats;
   }
 
   console.log(`Found ${files.length} file(s) to upload to ${folderPath}`);
@@ -107,7 +149,7 @@ async function main() {
   for (const file of files) {
     stats.total += 1;
 
-    if (only && file.basename !== only) {
+    if (!shouldUploadBasename(file.basename, onlySet)) {
       stats.skipped += 1;
       continue;
     }
@@ -156,16 +198,29 @@ async function main() {
     }
   }
 
+  return stats;
+}
+
+async function main() {
+  const { bookSlug, inputPath, only, basename, dryRun, allowNew } = parseArgs();
+  const stats = await uploadChaptersSource({
+    bookSlug,
+    inputPath,
+    only,
+    basename,
+    dryRun,
+    allowNew,
+  });
   console.log(
     `Done. Uploaded: ${stats.uploaded}, skipped: ${stats.skipped}, missing: ${stats.missing}, total: ${stats.total}`,
   );
 }
 
-function parseChapterIntoDom(chapter: string): XMLElement {
+function parseChapterIntoDom(chapter: string): Element {
+  ensureDomParser();
   const parser = new DOMParser();
   const doc = parser.parseFromString(chapter, "text/html");
-  const root = doc.documentElement as XMLElement;
-  return root;
+  return doc.documentElement;
 }
 
 export function mapFilenameToBasename(filename: string): string {

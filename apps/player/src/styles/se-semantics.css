@@ -253,6 +253,24 @@
     margin-bottom: 2em;
   }
 
+  /* === THEMATIC BREAKS (hr) === */
+  /* Mirrors Standard Ebooks core.css defaults used across most books. */
+
+  hr {
+    border: none;
+    border-top: 1px solid;
+    height: 0;
+    margin: 1.5em auto;
+    width: 25%;
+  }
+
+  /* In poetry, hr is commonly used as a spacer between stanzas. */
+  [data-epub-type~="z3998:poem"] hr,
+  [data-epub-type~="z3998:verse"] hr {
+    border: none;
+    margin: 0.5em auto;
+  }
+
   /* === SUBCHAPTER === */
 
   [data-epub-type~="z3998:subchapter"] {
@@ -441,4 +459,10 @@
   #content-container section[data-epub-type~="epigraph"] > * + * {
     margin-top: 3em;
   }
+}
+
+/* Keep the first paragraph after hr flush-left (SE core.css behavior). */
+#legacy #content-container hr + p,
+#content-container hr + p {
+  text-indent: 0;
 }

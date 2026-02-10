@@ -45,7 +45,7 @@ const VISUAL_GUIDE_REQUEST_INSTRUCTION = `
 For every character, include \`visualGuide\`:
 - One short paragraph focused only on physical appearance, possibly including their job, role, ethnicity, age, build, hair, eyes, facial features, distinctive marks (scars, tattoos), clothing, and accessories _if_ they are characteristic or commonly worn. 
 - No spoilers, no relationships, no plot details.
-- If details are sparse, infer plausible visible traits from context (age range, styling, clothing, look, sex, ethnicity, etc.).
+- If details are sparse, infer plausible visible traits from context (age range, styling, clothing, look, sex, ethnicity, etc.). Do not say: "not described", just output the best guess.
 - Exaggerate unique visual traits mentioned in the text to make characters distinct. Images based on the decription will be used as a memory jog for users. Especially if there is many similar people we should make them distinct. 
 - Lets say there is 5 soldiers that have no unique features described, imagine some elements. Don't create basically the same visualGuide for all of them.
 `;

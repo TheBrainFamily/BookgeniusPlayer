@@ -397,6 +397,43 @@ function compactInlineSpeakerSegments(segments: InlineSpeakerSegment[]): InlineS
   return compacted;
 }
 
+/**
+ * When a short narration segment (e.g., "said she,") sits between two speaker
+ * segments for the same character, absorb all three into one speaker segment.
+ * This prevents the same character from getting a second avatar line.
+ */
+function absorbNarrationBridges(segments: InlineSpeakerSegment[]): InlineSpeakerSegment[] {
+  if (segments.length < 3) return segments;
+
+  const result: InlineSpeakerSegment[] = [];
+  let i = 0;
+
+  while (i < segments.length) {
+    const curr = segments[i];
+    const mid = segments[i + 1];
+    const next = segments[i + 2];
+
+    if (
+      curr.kind === "speaker" &&
+      mid?.kind === "narration" &&
+      next?.kind === "speaker" &&
+      curr.speaker !== null &&
+      curr.speaker === next.speaker &&
+      normalizeWhitespaceForVisibility(mid.fragment.textContent ?? "").length <
+        INLINE_SPEAKER_HOIST_THRESHOLD
+    ) {
+      curr.fragment.append(mid.fragment, next.fragment);
+      result.push(curr);
+      i += 3;
+    } else {
+      result.push(curr);
+      i += 1;
+    }
+  }
+
+  return result;
+}
+
 function hoistLeadingNarrationIntoFirstSpeaker(
   segments: InlineSpeakerSegment[],
   doc: Document,
@@ -506,12 +543,14 @@ export function preprocessInlineSpeakerSpans(section: Element, doc: Document): v
 
     let segments = buildInlineSpeakerSegments(block, doc, inlineSpeakerSpans, parentSpeaker);
     segments = compactInlineSpeakerSegments(segments);
+    segments = absorbNarrationBridges(segments);
 
     const shouldHoistFirstSpeaker =
       !parentSpeaker && firstSpeakerOffset < INLINE_SPEAKER_HOIST_THRESHOLD;
     if (shouldHoistFirstSpeaker) {
       segments = hoistLeadingNarrationIntoFirstSpeaker(segments, doc);
       segments = compactInlineSpeakerSegments(segments);
+      segments = absorbNarrationBridges(segments);
     }
 
     if (segments.length === 0) continue;
@@ -522,9 +561,11 @@ export function preprocessInlineSpeakerSpans(section: Element, doc: Document): v
 }
 
 export function injectAvatarShells(section: Element, doc: Document): void {
-  const createAvatarShell = (speaker: string): HTMLSpanElement => {
+  const createAvatarShell = (speaker: string, isNested: boolean = false): HTMLSpanElement => {
     const shell = doc.createElement("span");
-    shell.className = "character-placeholder character-talking start-of-paragraph";
+    shell.className = isNested
+      ? "character-placeholder character-talking mid-sentence-speaker"
+      : "character-placeholder character-talking start-of-paragraph";
     shell.setAttribute("data-character", speaker);
     shell.setAttribute("data-is-talking", "true");
     return shell;
@@ -595,11 +636,11 @@ export function injectAvatarShells(section: Element, doc: Document): void {
     }
 
     const hasShellAtStart =
-      el.querySelector(":scope > .character-placeholder.character-talking.start-of-paragraph") !==
-      null;
+      el.querySelector(":scope > .character-placeholder.character-talking") !== null;
     if (hasShellAtStart) return;
 
-    const shell = createAvatarShell(speakers[0]);
+    const isNestedSpeaker = el.parentElement?.closest("[data-speaker]") !== null;
+    const shell = createAvatarShell(speakers[0], isNestedSpeaker);
 
     const avatarContainer = el.querySelector(".character-avatar");
     if (avatarContainer) {

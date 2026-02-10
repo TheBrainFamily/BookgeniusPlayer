@@ -33,9 +33,11 @@
   },
   "footer": {
     "description": "Czytaj klasykę mądrzej ze śledzeniem postaci, pytaniami bez spoilerów i wybranymi tytułami z imersyjnymi produkcjami.",
+    "descriptionClassic": "Odkryj literaturę na nowo dzięki naszym wciągającym powieściom wizualnym z pięknymi animacjami i nastrojową ścieżką dźwiękową.",
     "quickLinks": {
       "title": "Szybki dostęp",
       "viewCollection": "Przeglądaj Bibliotekę",
+      "viewCollectionClassic": "Przejrzyj zbiór",
       "myProgress": "Moje postępy",
       "readingHistory": "Historia czytelnicza",
       "settings": "Ustawienia",
@@ -94,7 +96,20 @@
     "returnHome": "Wróć do biblioteki",
     "description": "Wygląda na to, że ta strona zaginęła w rozległej bibliotece internetu."
   },
+  "heroClassic": {
+    "title": "Odkryj literaturę",
+    "subtitle": "na nowo",
+    "description": "Wejdź do świata powieści wizualnych z niezwykłymi animacjami i klimatyczną ścieżką dźwiękową. Tu każda historia staje się wyjątkowym doświadczeniem, które ożywia klasyczne dzieła literatury.",
+    "startReading": "Zacznij Czytać",
+    "viewCollection": "Przejrzyj zbiór"
+  },
+  "statsClassic": {
+    "visualNovels": "Nowele Wizualne",
+    "immersive": "Angażujący",
+    "productions": "Produkcja"
+  },
   "title": "Inteligentny Czytnik Klasyki",
+  "titleClassic": "Wciągające powieści wizualne",
   "continueReading": "Czytaj dalej",
   "reachedFreePreview": "Wykorzystano limit bezpłatnego dostępu.",
   "bestAccessAvailable": "Wersja beta już jest!",

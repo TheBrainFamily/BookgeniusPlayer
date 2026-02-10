@@ -12,5 +12,7 @@ export function ensureDomParser(): void {
 
   const { window } = new JSDOM("");
   (globalThis as { DOMParser: typeof window.DOMParser }).DOMParser = window.DOMParser;
+  (globalThis as { XMLSerializer: typeof window.XMLSerializer }).XMLSerializer =
+    window.XMLSerializer;
   initialized = true;
 }

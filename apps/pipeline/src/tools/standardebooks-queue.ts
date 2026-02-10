@@ -5,7 +5,6 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import dotenv from "dotenv";
 import { convertAndSaveSEBook } from "./se-converter/index";
-import { classifyDramaBooks, type BookAnalysis } from "./se-converter/drama-classifier";
 import { isValidStep } from "../server/pipeline-progress";
 import { type Step } from "../shared/pipelineTypes";
 
@@ -14,23 +13,45 @@ dotenv.config({ path: path.resolve(import.meta.dir, "..", "..", ".env") });
 const PIPELINE_ROOT = path.resolve(import.meta.dir, "..", "..");
 const REPO_ROOT = path.resolve(PIPELINE_ROOT, "..", "..");
 const CONVEX_ASSETS_DIR = path.join(REPO_ROOT, "ConvexAssets", "books");
-const INDEX_PATH = path.join(PIPELINE_ROOT, "standardebooks-data", "index.json");
 const QUEUE_PATH = path.join(PIPELINE_ROOT, "standardebooks-data", "queue.json");
 const BOOKS_DATA_DIR = path.join(PIPELINE_ROOT, "books-data");
 
-const EMBEDDED_DRAMA_WHITELIST = [
-  "a-a-milne_the-house-at-pooh-corner",
-  "james-joyce_ulysses",
-  "f-scott-fitzgerald_the-beautiful-and-damned",
-  "george-eliot_daniel-deronda",
-  "ann-radcliffe_the-mysteries-of-udolpho",
-  "dorothy-l-sayers_clouds-of-witness",
-  "dorothy-l-sayers_unnatural-death",
-  "anna-katharine-green_the-leavenworth-case",
-  "richard-hughes_a-high-wind-in-jamaica",
-  "william-faulkner_soldiers-pay",
-  "william-wells-brown_clotel",
-];
+const DISABLED_PATH = path.join(PIPELINE_ROOT, "standardebooks-data", "disabled-slugs.json");
+const SE_DATA_DIR = path.join(PIPELINE_ROOT, "standardebooks-data");
+const CATEGORIES_PATH = path.join(SE_DATA_DIR, "book-categories.json");
+const POPULARITY_PATH = path.join(SE_DATA_DIR, "popularity.json");
+const GENRE_CATEGORIES_PATH = path.join(SE_DATA_DIR, "categories.json");
+
+const VALID_BUCKETS = [
+  "1-novels-standard",
+  "2-novels-embedded-drama",
+  "3-narrative-nonfiction",
+  "4-big-novels",
+  "5-epic-poetry",
+  "6-story-collections",
+  "7-no-character-nonfiction",
+  "8-lyric-poetry",
+  "9-drama",
+] as const;
+
+type Bucket = (typeof VALID_BUCKETS)[number];
+
+const DEFAULT_BUCKETS: Bucket[] = ["1-novels-standard", "2-novels-embedded-drama"];
+
+interface CategoryEntry {
+  title: string;
+  author: string;
+  wordCount: number;
+  bucket: string;
+  chapters: number;
+}
+
+interface PopularityFile {
+  meta: { source: string; sortedBy: string; fetchedAt: string; totalBooks: number };
+  books: { rank: number; slug: string; title: string; author: string }[];
+}
+
+type GenreCategories = Record<string, string[]>;
 
 type QueueStatus = "queued" | "running" | "done" | "failed" | "skipped";
 
@@ -47,9 +68,9 @@ interface QueueFile {
     createdAt: string;
     updatedAt: string;
     total: number;
-    embeddedWhitelist: string[];
-    excluded: { fullPlay: number; embeddedDrama: number; alreadyExists: number };
-    includedEmbedded: number;
+    bucket: string;
+    priorityCount: number;
+    excluded: { alreadyExists: number; otherBucket: number };
   };
   items: QueueItem[];
 }
@@ -199,64 +220,139 @@ function setupSignalHandlers() {
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 }
 
-async function buildQueue() {
-  if (!fs.existsSync(INDEX_PATH)) {
-    throw new Error(`index.json not found: ${INDEX_PATH}`);
+function loadBookCategories(): Map<string, CategoryEntry> {
+  if (!fs.existsSync(CATEGORIES_PATH)) {
+    throw new Error(`book-categories.json not found: ${CATEGORIES_PATH}`);
+  }
+  const raw = JSON.parse(fs.readFileSync(CATEGORIES_PATH, "utf-8")) as Record<
+    string,
+    CategoryEntry
+  >;
+  return new Map(Object.entries(raw));
+}
+
+function loadPopularityRanks(): Map<string, number> {
+  if (!fs.existsSync(POPULARITY_PATH)) {
+    throw new Error(`popularity.json not found: ${POPULARITY_PATH}`);
+  }
+  const data = JSON.parse(fs.readFileSync(POPULARITY_PATH, "utf-8")) as PopularityFile;
+  const ranks = new Map<string, number>();
+  for (const book of data.books) {
+    ranks.set(book.slug, book.rank);
+  }
+  return ranks;
+}
+
+function loadGenreCategories(): GenreCategories {
+  if (!fs.existsSync(GENRE_CATEGORIES_PATH)) {
+    throw new Error(`categories.json not found: ${GENRE_CATEGORIES_PATH}`);
+  }
+  return JSON.parse(fs.readFileSync(GENRE_CATEGORIES_PATH, "utf-8")) as GenreCategories;
+}
+
+function buildPopularityOrder(
+  targetBuckets: Bucket[],
+  bookCategories: Map<string, CategoryEntry>,
+  popularityRanks: Map<string, number>,
+  genreCategories: GenreCategories,
+): { orderedSlugs: string[]; priorityCount: number } {
+  const bucketSet = new Set<string>(targetBuckets);
+  const isInBucket = (slug: string) => {
+    const entry = bookCategories.get(slug);
+    return entry !== undefined && bucketSet.has(entry.bucket);
+  };
+
+  // Priority tier: top 7 per genre category (filtered to target buckets), round-robin interleaved
+  const PRIORITY_PER_GENRE = 7;
+  const genreNames = Object.keys(genreCategories);
+
+  // For each genre, collect up to 7 slugs that are in the target bucket
+  const genreTop: string[][] = genreNames.map((genre) => {
+    const slugs: string[] = [];
+    for (const slug of genreCategories[genre]) {
+      if (slugs.length >= PRIORITY_PER_GENRE) break;
+      if (isInBucket(slug)) {
+        slugs.push(slug);
+      }
+    }
+    return slugs;
+  });
+
+  // Interleave round-robin: genre1[0], genre2[0], ..., genre1[1], genre2[1], ...
+  const prioritySlugs: string[] = [];
+  const seen = new Set<string>();
+  for (let i = 0; i < PRIORITY_PER_GENRE; i++) {
+    for (const top of genreTop) {
+      if (i < top.length && !seen.has(top[i])) {
+        prioritySlugs.push(top[i]);
+        seen.add(top[i]);
+      }
+    }
   }
 
-  const index = JSON.parse(fs.readFileSync(INDEX_PATH, "utf-8")) as { books: { slug: string }[] };
-  const slugs = index.books.map((b) => b.slug);
-
-  const analyses = await classifyDramaBooks(slugs);
-  const analysisBySlug = new Map<string, BookAnalysis>();
-  for (const analysis of analyses) {
-    analysisBySlug.set(analysis.slug, analysis);
+  // Remainder: all other books in the bucket, sorted by popularity rank
+  const allBucketSlugs: string[] = [];
+  for (const [slug, entry] of bookCategories) {
+    if (bucketSet.has(entry.bucket) && !seen.has(slug)) {
+      allBucketSlugs.push(slug);
+    }
   }
+  allBucketSlugs.sort((a, b) => {
+    const ra = popularityRanks.get(a) ?? Infinity;
+    const rb = popularityRanks.get(b) ?? Infinity;
+    return ra - rb;
+  });
+
+  return {
+    orderedSlugs: [...prioritySlugs, ...allBucketSlugs],
+    priorityCount: prioritySlugs.length,
+  };
+}
+
+function buildQueue(bucket?: string, includeExisting = false) {
+  const targetBuckets: Bucket[] = bucket ? [bucket as Bucket] : DEFAULT_BUCKETS;
+  const bucketLabel = targetBuckets.join("+");
+
+  const bookCategories = loadBookCategories();
+  const popularityRanks = loadPopularityRanks();
+  const genreCategories = loadGenreCategories();
+
+  const { orderedSlugs, priorityCount } = buildPopularityOrder(
+    targetBuckets,
+    bookCategories,
+    popularityRanks,
+    genreCategories,
+  );
 
   const now = new Date().toISOString();
   const items: QueueItem[] = [];
-  let excludedFull = 0;
-  let excludedEmbedded = 0;
   let excludedExisting = 0;
-  let includedEmbedded = 0;
 
-  for (const slug of slugs) {
-    const existingDir = path.join(BOOKS_DATA_DIR, slug);
-    const convexMirrorDir = path.join(CONVEX_ASSETS_DIR, slug);
-    if (fs.existsSync(existingDir) || fs.existsSync(convexMirrorDir)) {
-      excludedExisting += 1;
-      continue;
-    }
-
-    const analysis = analysisBySlug.get(slug);
-    if (analysis?.category === "FULL_PLAY") {
-      excludedFull += 1;
-      continue;
-    }
-
-    if (analysis?.category === "EMBEDDED_DRAMA") {
-      if (!EMBEDDED_DRAMA_WHITELIST.includes(slug)) {
-        excludedEmbedded += 1;
+  for (const slug of orderedSlugs) {
+    if (!includeExisting) {
+      const existingDir = path.join(BOOKS_DATA_DIR, slug);
+      const convexMirrorDir = path.join(CONVEX_ASSETS_DIR, slug);
+      if (fs.existsSync(existingDir) || fs.existsSync(convexMirrorDir)) {
+        excludedExisting += 1;
         continue;
       }
-      includedEmbedded += 1;
     }
 
     items.push({ slug, status: "queued", attempts: 0, updatedAt: now });
   }
 
+  const totalInBucket = orderedSlugs.length;
   const queue: QueueFile = {
     meta: {
       createdAt: now,
       updatedAt: now,
       total: items.length,
-      embeddedWhitelist: [...EMBEDDED_DRAMA_WHITELIST],
+      bucket: bucketLabel,
+      priorityCount,
       excluded: {
-        fullPlay: excludedFull,
-        embeddedDrama: excludedEmbedded,
         alreadyExists: excludedExisting,
+        otherBucket: bookCategories.size - totalInBucket,
       },
-      includedEmbedded,
     },
     items,
   };
@@ -264,36 +360,48 @@ async function buildQueue() {
   writeQueue(queue);
 
   console.log(`Queue written to ${QUEUE_PATH}`);
-  summarizeQueue(queue);
-  console.log(`Excluded: full_play=${excludedFull}, embedded_drama=${excludedEmbedded}`);
+  console.log(`Bucket: ${bucketLabel}`);
+  console.log(`Priority tier (top 7/genre): ${priorityCount} books`);
+  console.log(`Total in bucket: ${totalInBucket}`);
   console.log(`Skipped (already exists): ${excludedExisting}`);
-  console.log(`Included embedded drama (whitelist): ${includedEmbedded}`);
+  console.log(`Queued: ${items.length}`);
+  summarizeQueue(queue);
+}
+
+function loadDisabledSlugs(): Set<string> {
+  if (!fs.existsSync(DISABLED_PATH)) return new Set();
+  const data = JSON.parse(fs.readFileSync(DISABLED_PATH, "utf-8")) as string[];
+  return new Set(data);
 }
 
 async function runQueue(limit?: number, onlyStep?: Step) {
   setupSignalHandlers();
   const queue = readQueue();
+  const disabled = loadDisabledSlugs();
   let consecutiveFailures = 0;
   let processed = 0;
 
+  if (disabled.size > 0) {
+    console.log(`Loaded ${disabled.size} disabled slugs`);
+  }
+
   for (const item of queue.items) {
-    if (item.status === "done" || item.status === "skipped" || item.status === "failed") {
+    if (item.status === "done") {
+      continue;
+    }
+
+    if (disabled.has(item.slug)) {
+      if (item.status !== "skipped") {
+        item.status = "skipped";
+        item.updatedAt = new Date().toISOString();
+        writeQueue(queue);
+      }
       continue;
     }
 
     if (limit !== undefined && processed >= limit) {
       console.log(`Reached limit ${limit}. Stopping.`);
       break;
-    }
-
-    const existingDir = path.join(BOOKS_DATA_DIR, item.slug);
-    const convexMirrorDir = path.join(CONVEX_ASSETS_DIR, item.slug);
-    if (fs.existsSync(existingDir) || fs.existsSync(convexMirrorDir)) {
-      item.status = "skipped";
-      item.updatedAt = new Date().toISOString();
-      writeQueue(queue);
-      console.log(`Skipped  (already exists in books-data or ConvexAssets).`);
-      continue;
     }
 
     item.status = "running";
@@ -406,9 +514,26 @@ async function runSingleSlug(slug: string, onlyStep?: Step) {
 async function main() {
   const argv = await yargs(hideBin(process.argv))
     .scriptName("standardebooks-queue")
-    .command("build", "Build queue from standardebooks-data", {}, async () => {
-      await buildQueue();
-    })
+    .command(
+      "build",
+      "Build queue from standardebooks-data",
+      (y) =>
+        y
+          .option("bucket", {
+            type: "string",
+            choices: VALID_BUCKETS,
+            describe:
+              "Only include books from this bucket (default: 1-novels-standard + 2-novels-embedded-drama)",
+          })
+          .option("include-existing", {
+            type: "boolean",
+            default: false,
+            describe: "Include books that already have books-data or ConvexAssets directories",
+          }),
+      async (args) => {
+        buildQueue(args.bucket, args["include-existing"]);
+      },
+    )
     .command(
       "run",
       "Run queue (one book at a time)",

@@ -26,6 +26,17 @@ Example: `{"id": "winston-smith", "name": "Winston Smith"}`
 - Keep narration outside `data-speaker` spans.
 - If speakers switch inside one paragraph, create separate speaker spans for each spoken fragment.
 - Do not rely only on quote marks. Infer speech from context too (speaker verbs, direct address, narrative cues).
+- Do not wrap if the text only summarizes the act of speaking without giving the words
+
+### Example:
+
+```html
+The <span data-c="safie">lady</span> was dressed in a dark suit, and covered with a thick black
+veil. <span data-c="agatha-de-lacey">Agatha</span> asked a question; to which the
+<span data-c="safie">stranger</span> only replied by pronouncing, in a sweet accent, the name of
+<span data-c="felix-de-lacey">Felix</span>. <span data-c="agatha-de-lacey">Agatha</span> then asked:
+<span data-speaker="agatha-de-lacey">“Who are you?”</span>
+```
 
 ### Special Rule: Letter-like Containers
 

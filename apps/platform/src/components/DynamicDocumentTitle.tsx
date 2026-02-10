@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 
 import { books } from "@platform/books";
 
+const libraryLaunched = !!import.meta.env.VITE_LIBRARY_LAUNCHED;
+
 const DynamicDocumentTitle = () => {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
@@ -29,7 +31,7 @@ const DynamicDocumentTitle = () => {
       return;
     }
 
-    document.title = `${baseTitle} - ${t("title")}`;
+    document.title = `${baseTitle} - ${t(libraryLaunched ? "title" : "titleClassic")}`;
   }, [bookTitle, t]);
 
   return null;

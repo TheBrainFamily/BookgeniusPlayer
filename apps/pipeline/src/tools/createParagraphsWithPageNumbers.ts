@@ -5,8 +5,7 @@ import {
   getSectionAttributes,
 } from "./getParagraphsFromChapterWithText";
 import { getMtimeMs } from "./get-mtime-ms";
-import { readBookFile } from "../helpers/readBookFile";
-import { FILE_TYPE } from "../helpers/filesHelpers";
+import { FILE_TYPE, getFilePath } from "../helpers/filesHelpers";
 
 type ChapterParagraph = ReturnType<typeof getParagraphsFromChapterWithText>[number];
 type CachedCheerio = {
@@ -19,7 +18,7 @@ type CachedCheerio = {
 let cachedCheerio: CachedCheerio | undefined;
 
 function getCachedBookTextAndParser(): { bookText: string; $: cheerio.CheerioAPI } {
-  const richXmlPath = readBookFile("rich.xml", FILE_TYPE.INPUT);
+  const richXmlPath = getFilePath("rich.xml", FILE_TYPE.INPUT);
   const mtimeMs = getMtimeMs(richXmlPath);
   if (
     cachedCheerio &&

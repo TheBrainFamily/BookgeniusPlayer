@@ -1,27 +1,12 @@
-import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
-import type { Element as XMLElement, Node as XMLNode } from "@xmldom/xmldom";
+import { ensureDomParser } from "../../lib/domParser";
 
-type OriginalBlock = { element: XMLElement; tagName: string; normalizedText: string };
+type OriginalBlock = { element: Element; tagName: string; normalizedText: string };
 
 function normalizeText(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
-function getTextContent(node: XMLNode): string {
-  if (node.nodeType === node.TEXT_NODE) {
-    return node.nodeValue ?? "";
-  }
-  if (node.nodeType === node.ELEMENT_NODE && node.childNodes) {
-    let text = "";
-    for (let i = 0; i < node.childNodes.length; i++) {
-      text += getTextContent(node.childNodes[i]);
-    }
-    return text;
-  }
-  return "";
-}
-
-function getElementAttributes(element: XMLElement): Record<string, string> {
+function getElementAttributes(element: Element): Record<string, string> {
   const attrs: Record<string, string> = {};
   if (!element.attributes) return attrs;
   for (let i = 0; i < element.attributes.length; i++) {
@@ -43,18 +28,18 @@ function stripXmlns(serialized: string): string {
   return serialized.replace(/\s+xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, "");
 }
 
-function serializeNodes(nodes: XMLNode[], serializer: XMLSerializer): string {
+function serializeNodes(nodes: ChildNode[], serializer: XMLSerializer): string {
   return nodes.map((node) => stripXmlns(serializer.serializeToString(node))).join("");
 }
 
-function extractOriginalBlocks(section: XMLElement): OriginalBlock[] {
+function extractOriginalBlocks(section: Element): OriginalBlock[] {
   const blocks: OriginalBlock[] = [];
   for (let i = 0; i < section.childNodes.length; i++) {
     const node = section.childNodes[i];
     if (node.nodeType !== node.ELEMENT_NODE) continue;
-    const element = node as XMLElement;
+    const element = node as Element;
     const tagName = (element.tagName || "").toLowerCase();
-    const normalizedText = normalizeText(getTextContent(element));
+    const normalizedText = normalizeText(element.textContent || "");
     blocks.push({ element, tagName, normalizedText });
   }
   return blocks;
@@ -75,8 +60,8 @@ function findMatchingOriginalIndex(
 }
 
 function wrapDanglingNodes(
-  originalElement: XMLElement,
-  danglingNodes: XMLNode[],
+  originalElement: Element,
+  danglingNodes: ChildNode[],
   serializer: XMLSerializer,
 ): string {
   const tagName = (originalElement.tagName || "").toLowerCase();
@@ -88,6 +73,7 @@ function wrapDanglingNodes(
 export function restoreUnwrappedBlocks(originalHtml: string, modelHtml: string): string {
   if (originalHtml === modelHtml) return modelHtml;
 
+  ensureDomParser();
   const parser = new DOMParser();
   const originalDoc = parser.parseFromString(`<section>${originalHtml}</section>`, "text/html");
   const modelDoc = parser.parseFromString(`<section>${modelHtml}</section>`, "text/html");
@@ -103,14 +89,16 @@ export function restoreUnwrappedBlocks(originalHtml: string, modelHtml: string):
   const serializer = new XMLSerializer();
 
   const output: string[] = [];
-  let danglingNodes: XMLNode[] = [];
+  let danglingNodes: ChildNode[] = [];
   let changed = false;
   let originalIndex = 0;
 
   const flushDangling = () => {
     if (danglingNodes.length === 0) return;
 
-    const danglingText = normalizeText(danglingNodes.map((node) => getTextContent(node)).join(""));
+    const danglingText = normalizeText(
+      danglingNodes.map((node) => node.textContent || "").join(""),
+    );
     const matchIndex = findMatchingOriginalIndex(originalBlocks, originalIndex, danglingText);
 
     if (matchIndex >= 0) {
@@ -137,7 +125,7 @@ export function restoreUnwrappedBlocks(originalHtml: string, modelHtml: string):
     }
 
     if (node.nodeType === node.ELEMENT_NODE) {
-      const element = node as XMLElement;
+      const element = node as Element;
       const tagName = (element.tagName || "").toLowerCase();
 
       if (!allowedTags.has(tagName)) {
@@ -150,7 +138,7 @@ export function restoreUnwrappedBlocks(originalHtml: string, modelHtml: string):
       // Keep valid block element as-is
       output.push(stripXmlns(serializer.serializeToString(element)));
 
-      const elementText = normalizeText(getTextContent(element));
+      const elementText = normalizeText(element.textContent || "");
       const matchIndex = findMatchingOriginalIndex(originalBlocks, originalIndex, elementText);
       if (matchIndex >= 0) {
         originalIndex = matchIndex + 1;

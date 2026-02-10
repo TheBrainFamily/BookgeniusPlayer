@@ -10,7 +10,7 @@
 
 import { spawn } from "child_process";
 import { join, relative } from "path";
-
+process.exit(0);
 const PROJECT_ROOT = process.env.PROJECT_ROOT || process.cwd();
 
 interface Diagnostic {

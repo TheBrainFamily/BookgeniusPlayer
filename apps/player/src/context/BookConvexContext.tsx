@@ -432,6 +432,7 @@ export function BookConvexProvider({ bookPath, children }: BookConvexProviderPro
   }, [characters]);
 
   const renderMode = useMemo(() => getRenderModeFromUrl(), []);
+  console.log("[BookConvex] Render mode", renderMode);
   const bookFormValue = useMemo(
     () => book?.metadata?.form?.toLowerCase() || "book",
     [book?.metadata?.form],

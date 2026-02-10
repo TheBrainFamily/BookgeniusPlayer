@@ -1,5 +1,4 @@
-import { DOMParser } from "@xmldom/xmldom";
-import { type Element as XMLElement, type Node as XMLNode } from "@xmldom/xmldom";
+import { ensureDomParser } from "../../lib/domParser";
 import { getParagraphsFromChapterWithText } from "../getParagraphsFromChapterWithText";
 import { getChapterTitle } from "./get-chapter-title";
 import * as cheerio from "cheerio";
@@ -7,12 +6,12 @@ import * as cheerio from "cheerio";
 const escapeXml = (str: string) =>
   str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-const isElement = (node: XMLNode): node is XMLElement => node.nodeType === 1; /* ELEMENT_NODE */
+const isElement = (node: Node): node is Element => node.nodeType === 1; /* ELEMENT_NODE */
 
-function collectChapterElements(root: XMLElement): Map<number, XMLElement> {
-  const byNumber = new Map<number, XMLElement>();
+function collectChapterElements(root: Element): Map<number, Element> {
+  const byNumber = new Map<number, Element>();
 
-  const stack: XMLNode[] = [root];
+  const stack: Node[] = [root];
   while (stack.length) {
     const node = stack.pop()!;
     if (isElement(node)) {
@@ -36,9 +35,10 @@ function collectChapterElements(root: XMLElement): Map<number, XMLElement> {
 }
 
 export function generateChaptersXmlFromRich(bookText: string): string {
+  ensureDomParser();
   const parser = new DOMParser();
   const doc = parser.parseFromString(bookText, "text/html");
-  const root = doc.documentElement as XMLElement | null;
+  const root = doc.documentElement;
 
   if (!root) {
     throw new Error("Invalid rich.xml: missing documentElement");

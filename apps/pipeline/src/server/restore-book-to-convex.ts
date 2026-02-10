@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import fs from "fs";
 import path from "path";
-import { DOMParser, type Element as XMLElement } from "@xmldom/xmldom";
+import { ensureDomParser } from "../lib/domParser";
 import pLimit from "p-limit";
 import PQueue from "p-queue";
 import { convex } from "./convex-client";
@@ -135,10 +135,11 @@ function requirePathExists(filePath: string, label: string): void {
   }
 }
 
-function parseChapterIntoDom(chapter: string): XMLElement {
+function parseChapterIntoDom(chapter: string): Element {
+  ensureDomParser();
   const parser = new DOMParser();
   const doc = parser.parseFromString(chapter, "text/html");
-  return doc.documentElement as XMLElement;
+  return doc.documentElement;
 }
 
 function parseSummaryFile(filePath: string): SummaryFile {

@@ -1,4 +1,4 @@
-import { DOMParser } from "@xmldom/xmldom";
+import { ensureDomParser } from "../../lib/domParser";
 
 type OriginalBlock = { openTag: string; closeTag: string; normalizedText: string };
 
@@ -70,14 +70,15 @@ function splitInlineParagraphBoundaries(lines: string[]): { lines: string[]; cha
   return { lines: result, changed };
 }
 
-function getTextContent(html: string, parser: DOMParser): string {
+function getTextContent(html: string): string {
+  ensureDomParser();
+  const parser = new DOMParser();
   const doc = parser.parseFromString(`<p>${html}</p>`, "text/html");
-  const p = doc.getElementsByTagName("p")[0];
+  const p = doc.body?.getElementsByTagName("p")[0];
   return p?.textContent ?? "";
 }
 
 function extractOriginalBlocks(originalInner: string): OriginalBlock[] {
-  const parser = new DOMParser();
   const blocks: OriginalBlock[] = [];
   const lines = originalInner.split(/\r?\n/);
 
@@ -91,7 +92,7 @@ function extractOriginalBlocks(originalInner: string): OriginalBlock[] {
 
     const openTag = trimmed.slice(0, openEnd + 1);
     const innerHtml = trimmed.slice(openEnd + 1, closeStart);
-    const normalizedText = normalizeText(getTextContent(innerHtml, parser));
+    const normalizedText = normalizeText(getTextContent(innerHtml));
 
     blocks.push({ openTag, closeTag: "</p>", normalizedText });
   }
@@ -118,7 +119,6 @@ export function restoreUnwrappedLines(originalInner: string, modelInner: string)
   const blocks = extractOriginalBlocks(originalInner);
   if (blocks.length === 0) return modelInner;
 
-  const parser = new DOMParser();
   let normalizedModel = modelInner.includes("\n")
     ? modelInner
     : modelInner.replace(/<\/p>\s*/gi, "</p>\n").replace(/\s*<p\b/gi, "\n<p");
@@ -218,7 +218,7 @@ export function restoreUnwrappedLines(originalInner: string, modelInner: string)
       lineContent = lineContent.slice(0, closingPMatch.index).trimEnd();
     }
 
-    const normalizedText = normalizeText(getTextContent(lineContent, parser));
+    const normalizedText = normalizeText(getTextContent(lineContent));
     const matchIndex = findMatchingIndex(blocks, originalIndex, normalizedText);
 
     if (matchIndex >= 0) {

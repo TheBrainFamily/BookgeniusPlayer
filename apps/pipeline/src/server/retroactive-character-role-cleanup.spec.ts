@@ -11,6 +11,10 @@ vi.mock("./convex-client", () => ({
   updateCharacterFolder: vi.fn(),
 }));
 
+vi.mock("../tools/new-tooling/generate-roles-and-remove-spoilers-from-summaries", () => ({
+  generateRolesAndRemoveSpoilersFromSummaries: vi.fn(),
+}));
+
 async function runRetro(params: { slug: string; runId?: string; deps?: Record<string, unknown> }) {
   const mod = await import("./retroactive-character-role-cleanup");
   return await mod.runRetroactiveCharacterRoleCleanup(params);

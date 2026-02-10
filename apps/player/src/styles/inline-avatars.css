@@ -22,6 +22,22 @@
   z-index: 1;
 }
 
+.character-talking:hover {
+  transform: scale(1.15);
+  z-index: 2;
+}
+
+/* Mid-sentence speaker avatars — nested inside another speaker's text */
+.character-placeholder.character-talking.mid-sentence-speaker {
+  display: inline-block;
+  vertical-align: middle;
+  margin: -0.2em 0.2em 0.1em 0;
+}
+
+.character-placeholder.character-talking.mid-sentence-speaker .inline-avatar {
+  --avatar-size: clamp(1.4em, 3.5vw, 1.8em);
+}
+
 .character-talking.start-of-paragraph:first-of-type {
   margin-left: -3em;
 }
@@ -33,6 +49,8 @@
 
 .character-talking {
   margin-right: 0;
+  transition: transform 0.2s ease;
+  transform-origin: center center;
 }
 
 .character-talking:not(:has(~ .character-talking)) {
@@ -64,7 +82,8 @@
 }
 
 .inline-speaker-line--speaker > .character-placeholder.character-talking.start-of-paragraph,
-.inline-speaker-line--speaker > .character-placeholder.character-talking.start-of-paragraph:first-of-type {
+.inline-speaker-line--speaker
+  > .character-placeholder.character-talking.start-of-paragraph:first-of-type {
   float: left;
   margin-left: 0;
   margin-right: 0.5em;
@@ -75,6 +94,15 @@
   > .character-placeholder.character-talking.start-of-paragraph
   .inline-avatar {
   --avatar-size: clamp(2.4em, 5vw, 2.8em);
+}
+
+/* On desktop, don't float avatars — keep them inline to avoid awkward 2-line indent */
+@media (min-width: 640px) {
+  .inline-speaker-line--speaker > .character-placeholder.character-talking.start-of-paragraph,
+  .inline-speaker-line--speaker
+    > .character-placeholder.character-talking.start-of-paragraph:first-of-type {
+    float: none;
+  }
 }
 
 @media (max-width: 639px) {
@@ -148,15 +176,15 @@ blockquote > .character-placeholder.character-talking.start-of-paragraph {
   --preview-size: clamp(80px, 15vw, 100px);
 
   position: fixed;
-  z-index: 1000;
+  z-index: 10000;
   pointer-events: none;
-  filter: var(--floating-avatar-shadow);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
   opacity: 0;
-  transform: translateY(4px) scale(0.98);
+  transform: translateY(4px) scale(0.96);
   will-change: opacity, transform;
   transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .floating-avatar.visible {
@@ -170,8 +198,7 @@ blockquote > .character-placeholder.character-talking.start-of-paragraph {
   object-fit: cover;
   object-position: center;
   border-radius: 50%;
-  /* background: color-mix(in srgb, var(--text-light, rgba(255, 255, 255, 0.9)) 60%, transparent); */
-  border: var(--avatar-border-width-large) solid var(--avatar-border-color-large);
+  border: clamp(2px, 0.3vw, 3px) solid rgba(255, 255, 255, 0.85);
 }
 
 /* --- Floating Footnote Styles --- */
@@ -220,26 +247,20 @@ blockquote > .character-placeholder.character-talking.start-of-paragraph {
 
 /* --- Character Highlighted Styles --- */
 .character-highlighted {
-  border: 1px dashed transparent;
-  border-radius: 0.375rem;
-  padding: 0 0.375em;
   text-indent: 0;
-  display: inline-block;
-  line-height: 1.5em;
-  box-decoration-break: clone;
-  vertical-align: baseline;
+  border-radius: 0.25rem;
 }
 
 .character-highlighted-activated {
-  border-color: color-mix(in srgb, var(--text-light, gray) 60%, transparent);
-  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 40%, transparent);
+  text-decoration: underline dotted color-mix(in srgb, var(--text-light, gray) 40%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .character-highlighted-activated:hover {
-  color: var(--text-light, #5e5e5e);
-  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 80%, transparent);
-  border-color: color-mix(in srgb, var(--text-light, gray) 80%, transparent);
+  background-color: color-mix(in srgb, var(--bg-content-light, #f5deb3) 60%, transparent);
 }
 
 /* Hide empty character-highlighted spans (e.g., exit markers in stage directions) */

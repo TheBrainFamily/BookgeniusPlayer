@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ScenesSummariesPerChapter } from "../../tools/new-tooling/get-chapter-by-chapter-with-paragraphs-json-summary";
-import { FILE_TYPE } from "../../helpers/filesHelpers";
+import { FILE_TYPE, getFilePath } from "../../helpers/filesHelpers";
 import { getBookForm } from "../../tools/getBookForm";
 import { getBookData } from "../../shared-books-data/getBooksData";
 import { readBookFile } from "../../helpers/readBookFile";
@@ -16,6 +16,11 @@ import { generateEmbeddings } from "./create-paragraph-embeddings";
 vi.mock("../../tools/getBookForm", () => ({ getBookForm: vi.fn() }));
 
 vi.mock("../../shared-books-data/getBooksData", () => ({ getBookData: vi.fn() }));
+
+vi.mock("../../helpers/filesHelpers", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../helpers/filesHelpers")>();
+  return { ...actual, getFilePath: vi.fn() };
+});
 
 vi.mock("../../helpers/readBookFile", () => ({ readBookFile: vi.fn() }));
 
@@ -67,6 +72,7 @@ describe("generateEmbeddings", () => {
       language: "en",
     });
     asMock(getMtimeMs).mockReturnValue(12345);
+    asMock(getFilePath).mockReturnValue("/virtual/book/input/rich.xml");
 
     asMock(computeBatchEmbeddingsThroughHTTP).mockImplementation(async (documents: Document[]) =>
       documents.map((document, index) => ({ ...document, Embeddings: [index + 1] })),
@@ -135,9 +141,6 @@ describe("generateEmbeddings", () => {
       if (fileName === "summaries-with-paragraphs.json" && fileType === FILE_TYPE.TEMPORARY) {
         return JSON.stringify(summaries);
       }
-      if (fileName === "rich.xml" && fileType === FILE_TYPE.INPUT) {
-        return "/virtual/book/input/rich.xml";
-      }
       throw new Error(`Unexpected readBookFile call: ${fileName} ${String(fileType)}`);
     });
     asMock(getBookData).mockReturnValue({
@@ -151,7 +154,6 @@ describe("generateEmbeddings", () => {
       "summaries-with-paragraphs.json",
       FILE_TYPE.TEMPORARY,
     );
-    expect(readBookFile).toHaveBeenCalledWith("rich.xml", FILE_TYPE.INPUT);
     expect(writeBookFile).toHaveBeenCalledTimes(1);
   });
 

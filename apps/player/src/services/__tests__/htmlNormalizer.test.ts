@@ -455,6 +455,46 @@ describe("injectAvatarShells", () => {
     expect(placeholders.length).toBe(0);
   });
 
+  it("uses mid-sentence-speaker class for nested speaker avatars", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="elizabeth">"When I reflect," said she, "<span data-speaker="elizabeth">on the miserable death of Justine Moritz</span>"</p>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const placeholders = doc.querySelectorAll(".character-placeholder");
+    expect(placeholders.length).toBe(2);
+
+    // The paragraph-level avatar should have start-of-paragraph
+    const paragraphShell = doc.querySelector("p > .character-placeholder.start-of-paragraph");
+    expect(paragraphShell).toBeTruthy();
+
+    // The nested span avatar should have mid-sentence-speaker (not start-of-paragraph)
+    const nestedShell = doc.querySelector(
+      "span[data-speaker] > .character-placeholder.mid-sentence-speaker",
+    );
+    expect(nestedShell).toBeTruthy();
+    expect(nestedShell?.classList.contains("start-of-paragraph")).toBe(false);
+  });
+
+  it("uses start-of-paragraph class for non-nested speaker avatars", () => {
+    const input = `
+      <section data-chapter="1">
+        <p data-speaker="bob">Hello world</p>
+      </section>
+    `;
+    const result = applyAvatarShells(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+
+    const shell = doc.querySelector(".character-placeholder");
+    expect(shell?.classList.contains("start-of-paragraph")).toBe(true);
+    expect(shell?.classList.contains("mid-sentence-speaker")).toBe(false);
+  });
+
   it("treats 60% speaker share in letter as not dominant", () => {
     const input = `
       <section data-chapter="1">
@@ -626,6 +666,42 @@ describe("preprocessInlineSpeakerSpans", () => {
       "henry-clerval",
       "victor-frankenstein",
     ]);
+  });
+
+  it("absorbs short narration bridge when same speaker continues", () => {
+    const input = `
+      <section data-chapter="1">
+        <p><span data-speaker="elizabeth">"When I reflect, my dear cousin,"</span> said she, <span data-speaker="elizabeth">"on the miserable death of Justine Moritz, I no longer see the world."</span></p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input, { withAvatars: false });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    // "said she," is short narration between same speaker → absorbed into one speaker line
+    expect(lines.length).toBe(1);
+    expect(lines[0].getAttribute("data-speaker")).toBe("elizabeth");
+    expect(lines[0].textContent).toContain("When I reflect");
+    expect(lines[0].textContent).toContain("said she,");
+    expect(lines[0].textContent).toContain("miserable death");
+  });
+
+  it("does not absorb narration bridge between different speakers", () => {
+    const input = `
+      <section data-chapter="1">
+        <p><span data-speaker="hero">"Hello,"</span> he said, and then <span data-speaker="henry-clerval">"Goodbye,"</span> replied Henry.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input, { withAvatars: false });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const speakerLines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line--speaker");
+
+    // Different speakers should remain separate
+    expect(speakerLines.length).toBe(2);
+    expect(speakerLines[0].getAttribute("data-speaker")).toBe("hero");
+    expect(speakerLines[1].getAttribute("data-speaker")).toBe("henry-clerval");
   });
 
   it("does not segment verse and drama-table contexts", () => {

@@ -1,64 +1,34 @@
-import { DOMParser } from "@xmldom/xmldom";
-import type { Node } from "@xmldom/xmldom"; // Import Node type
 import * as Diff from "diff"; // Import the diff library
 import { readBookFile } from "../../helpers/readBookFile";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
+import { ensureDomParser } from "../../lib/domParser";
 
 /**
- * Recursively extracts text content from an XML node and its children.
- * @param node The XML node to process.
- * @returns The concatenated text content.
- */
-function getTextContentRecursive(node: Node): string {
-  let text = "";
-  if (node.nodeType === node.TEXT_NODE) {
-    // It's a text node, get its value
-    text += node.nodeValue || "";
-  } else if (node.nodeType === node.ELEMENT_NODE) {
-    // It's an element node, process its children
-    if (node.childNodes) {
-      for (let i = 0; i < node.childNodes.length; i++) {
-        text += getTextContentRecursive(node.childNodes[i]);
-      }
-    }
-  }
-  // Ignore comments, processing instructions, etc.
-  return text;
-}
-
-/**
- * Extracts, normalizes, and returns the text content of an XML string.
- * Normalization involves replacing multiple whitespace characters with single spaces
- * and trimming leading/trailing whitespace.
- * @param xmlString The XML string to parse.
+ * Extracts, normalizes, and returns the text content of an HTML string.
+ * Uses JSDOM's DOMParser (via ensureDomParser) which correctly handles
+ * HTML void elements like <hr> and <br>.
+ * @param htmlString The HTML string to parse.
  * @returns The normalized text content, or null if parsing fails.
  */
-function getNormalizedTextFromXml(xmlString: string): string | null {
+function getNormalizedTextFromHtml(htmlString: string): string | null {
   try {
+    ensureDomParser();
     const parser = new DOMParser();
-    const doc = parser.parseFromString(xmlString, "text/html");
+    const doc = parser.parseFromString(htmlString, "text/html");
 
-    // Check for parser errors (simple check, might need more robust error handling)
-    const parserError = doc.getElementsByTagName("parsererror");
-    if (parserError.length > 0) {
-      console.error("Error parsing XML:", getTextContentRecursive(parserError[0]));
+    if (!doc.body) {
+      console.error("HTML document does not have a body element.");
       return null;
     }
 
-    // Check if documentElement is null before passing to getTextContentRecursive
-    if (!doc.documentElement) {
-      console.error("XML document does not have a root element.");
-      return null;
-    }
-
-    const textContent = getTextContentRecursive(doc.documentElement);
+    const textContent = doc.body.textContent || "";
 
     // Normalize whitespace: replace multiple spaces/newlines/tabs with a single space
     // and trim leading/trailing whitespace.
     const normalizedText = textContent.replace(/\s+/g, " ").trim();
     return normalizedText;
   } catch (error) {
-    console.error("Exception during XML parsing:", error);
+    console.error("Exception during HTML parsing:", error);
     return null;
   }
 }
@@ -93,8 +63,8 @@ function splitIntoSentences(text: string): string[] {
 export function compareXmlTextContent(originalXml: string, modifiedXml: string): boolean {
   console.log("Comparing XML text content...");
 
-  const originalText = getNormalizedTextFromXml(`<Chapter>${originalXml}</Chapter>`);
-  const modifiedText = getNormalizedTextFromXml(`<Chapter>${modifiedXml}</Chapter>`);
+  const originalText = getNormalizedTextFromHtml(`<section>${originalXml}</section>`);
+  const modifiedText = getNormalizedTextFromHtml(`<section>${modifiedXml}</section>`);
 
   // console.log("\nOriginal Normalized Text:");
   // console.log(`"${originalText}"`);

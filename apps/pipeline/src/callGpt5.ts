@@ -53,7 +53,10 @@ export const callGpt5 = async <T = string>(
   });
   let response = "";
   for await (const chunk of chatCompletion) {
-    response += chunk.choices[0].delta.content;
+    const content = chunk.choices?.[0]?.delta?.content;
+    if (content) {
+      response += content;
+    }
   }
   return response;
 };

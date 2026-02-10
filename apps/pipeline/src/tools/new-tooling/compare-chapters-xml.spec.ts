@@ -5,12 +5,60 @@ import { compareXmlTextContent, restoreOriginalText } from "./compare-chapters-x
 //   return "";
 // };
 
-test("compare chapters xml", () => {
-  const original = `<p>Hi there</p>`;
-  const changed = `<p>Hi there</p>`;
-  const restored = restoreOriginalText(original, changed, []);
+describe("compareXmlTextContent", () => {
+  test("identical content returns true", () => {
+    const original = `<p>Hi there</p>`;
+    const changed = `<p>Hi there</p>`;
+    const restored = restoreOriginalText(original, changed, []);
 
-  expect(compareXmlTextContent(original, restored)).toBe(true);
+    expect(compareXmlTextContent(original, restored)).toBe(true);
+  });
+
+  test("different text content returns false", () => {
+    const original = `<p>Hello world</p>`;
+    const changed = `<p>Goodbye world</p>`;
+
+    expect(compareXmlTextContent(original, changed)).toBe(false);
+  });
+
+  test("same text, different tags returns true", () => {
+    const original = `<p>Some important text here</p>`;
+    const changed = `<div>Some important text here</div>`;
+
+    expect(compareXmlTextContent(original, changed)).toBe(true);
+  });
+
+  test("whitespace normalization — extra spaces/newlines", () => {
+    const original = `<p>The   quick brown\n\n fox</p>`;
+    const changed = `<p>The quick brown fox</p>`;
+
+    expect(compareXmlTextContent(original, changed)).toBe(true);
+  });
+
+  test("void HTML elements — hr and br in content", () => {
+    const original = `<p>Before the break</p><hr><p>After the break</p>`;
+    const changed = `<p>Before the break</p><hr><p>After the break</p>`;
+
+    expect(compareXmlTextContent(original, changed)).toBe(true);
+  });
+
+  test("nested elements — deep nesting like blockquote > p", () => {
+    const original = `<blockquote><p>Nested text content</p></blockquote>`;
+    const changed = `<blockquote><p>Nested text content</p></blockquote>`;
+
+    expect(compareXmlTextContent(original, changed)).toBe(true);
+  });
+
+  test("empty inputs — both empty strings", () => {
+    expect(compareXmlTextContent("", "")).toBe(true);
+  });
+
+  test("mixed content — headers, paragraphs, lists together", () => {
+    const original = `<h1>Title</h1><p>Paragraph one.</p><ul><li>Item A</li><li>Item B</li></ul>`;
+    const changed = `<h1>Title</h1><p>Paragraph one.</p><ul><li>Item A</li><li>Item B</li></ul>`;
+
+    expect(compareXmlTextContent(original, changed)).toBe(true);
+  });
 });
 
 // __tests__/restoreOriginalText.spec.ts

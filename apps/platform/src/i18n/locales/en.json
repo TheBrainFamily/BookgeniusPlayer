@@ -33,9 +33,11 @@
   },
   "footer": {
     "description": "Read classic literature smarter with character tracking, spoiler-free Q&A, and select titles with immersive productions.",
+    "descriptionClassic": "Experience literature like never before with our immersive visual novels featuring beautiful animations and atmospheric soundtracks.",
     "quickLinks": {
       "title": "Quick Links",
       "viewCollection": "Browse Library",
+      "viewCollectionClassic": "View Collection",
       "myProgress": "My Progress",
       "readingHistory": "Reading History",
       "settings": "Settings",
@@ -94,7 +96,20 @@
     "returnHome": "Return to Library",
     "description": "It seems this page has been lost in the vast library of the internet."
   },
+  "heroClassic": {
+    "title": "Experience Literature",
+    "subtitle": "Like Never Before",
+    "description": "Immerse yourself in fully-produced visual novels with stunning animations, character voices, and atmospheric soundtracks. Each story becomes a living, breathing experience that brings classic literature to vibrant life.",
+    "startReading": "Start Reading",
+    "viewCollection": "View Collection"
+  },
+  "statsClassic": {
+    "visualNovels": "Visual Novels",
+    "immersive": "Immersive",
+    "productions": "Productions"
+  },
   "title": "Smart Classic Literature Reader",
+  "titleClassic": "Immersive Visual Novel",
   "continueReading": "Continue Reading",
   "reachedFreePreview": "You've reached the end of the free preview.",
   "bestAccessAvailable": "Best Access Available!",

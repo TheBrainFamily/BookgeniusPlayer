@@ -1,13 +1,19 @@
-import { DOMParser, type Element as XMLElement } from "@xmldom/xmldom";
 import { describe, it, expect } from "vitest";
+import { ensureDomParser } from "../../lib/domParser";
 import { getChapterTitle } from "./get-chapter-title";
+
+ensureDomParser();
+
+function parseXml(xml: string): Element {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, "text/xml");
+  return doc.documentElement;
+}
 
 describe("getChapterTitle", () => {
   it("should return the chapter title", () => {
     const chapter = `<chapter number="1"><Title>Chapter 1</Title><content>Content 1</content></chapter>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("Chapter 1");
   });
@@ -22,9 +28,7 @@ describe("getChapterTitle", () => {
         <p data-epub-type="title">The Castle</p>
       </hgroup>
     </section>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("Book II: The Castle");
   });
@@ -36,9 +40,7 @@ describe("getChapterTitle", () => {
         <p data-epub-type="title">I Go to Styles</p>
       </hgroup>
     </section>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("I: I Go to Styles");
   });
@@ -47,9 +49,7 @@ describe("getChapterTitle", () => {
     const chapter = `<section data-chapter="1" data-epub-type="dedication">
       <p>To my Mother</p>
     </section>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("Dedication");
   });
@@ -60,9 +60,7 @@ describe("getChapterTitle", () => {
         <p data-epub-type="title">Prologue</p>
       </hgroup>
     </section>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("Prologue");
   });
@@ -74,9 +72,7 @@ describe("getChapterTitle", () => {
         <p data-epub-type="title">The Beginning</p>
       </hgroup>
     </section>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("The Beginning");
   });
@@ -86,9 +82,7 @@ describe("getChapterTitle", () => {
       <h3>Act I</h3>
       <Title>The Opening</Title>
     </chapter>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("Act I, The Opening");
   });
@@ -98,9 +92,7 @@ describe("getChapterTitle", () => {
       <Title>Chapter One.</Title>
       <Subtitle>In which our hero begins</Subtitle>
     </chapter>`;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(chapter, "text/xml");
-    const root = doc.documentElement as XMLElement;
+    const root = parseXml(chapter);
 
     expect(getChapterTitle(root)).toBe("Chapter One, In which our hero begins");
   });

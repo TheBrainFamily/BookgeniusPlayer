@@ -14,7 +14,7 @@ let currentAnchorEl: HTMLElement | null = null;
 let hoverDebounceTimeout: number | null = null;
 let removalDelayTimeout: number | null = null;
 
-const HOVER_DEBOUNCE_MS = 50;
+const HOVER_DEBOUNCE_MS = 0;
 const DEFAULT_AVATAR_SIZE = 100;
 const VIEWPORT_PAD = 8;
 const VERTICAL_GAP = 10;
@@ -228,6 +228,7 @@ export function highlightCharacter(characterEl: HTMLSpanElement) {
     characterEl.addEventListener("pointerenter", () => {
       // Look up URL dynamically to pick up reactive updates
       const avatarSrc = getAvatarSrcForElement(characterEl);
+      console.log("[FloatingAvatar] pointerenter", characterSlug, { avatarSrc });
       if (!avatarSrc) return;
 
       if (hoverDebounceTimeout) clearTimeout(hoverDebounceTimeout);

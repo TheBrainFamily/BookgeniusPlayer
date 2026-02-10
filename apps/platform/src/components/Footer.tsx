@@ -7,6 +7,8 @@ interface FooterProps {
   onSearchQuery?: (query: string) => void;
 }
 
+const libraryLaunched = !!import.meta.env.VITE_LIBRARY_LAUNCHED;
+
 const Footer = ({ onSearchQuery }: FooterProps) => {
   const { t } = useTranslation();
   return (
@@ -28,7 +30,7 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
               </h3>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              {t("footer.description")}
+              {t(libraryLaunched ? "footer.description" : "footer.descriptionClassic")}
             </p>
           </div>
 
@@ -45,7 +47,13 @@ const Footer = ({ onSearchQuery }: FooterProps) => {
                   variant="ghost"
                   className="p-0 h-auto text-muted-foreground hover:text-library-gold text-left hover:bg-transparent justify-start w-fit"
                 >
-                  <a href="#library">{t("footer.quickLinks.viewCollection")}</a>
+                  <a href={libraryLaunched ? "#library" : "#book-collection"}>
+                    {t(
+                      libraryLaunched
+                        ? "footer.quickLinks.viewCollection"
+                        : "footer.quickLinks.viewCollectionClassic",
+                    )}
+                  </a>
                 </Button>
                 {[
                   t("footer.quickLinks.myProgress"),

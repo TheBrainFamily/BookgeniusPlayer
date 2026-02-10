@@ -5,7 +5,7 @@ import { convex } from "../server/convex-client";
 import { AdminConvexHttpClient } from "../lib/AdminConvexHttpClient";
 import { api } from "@bookgenius/convex/_generated/api";
 import { getChapterTitle } from "src/tools/new-tooling/get-chapter-title";
-import { DOMParser, type Element as XMLElement } from "@xmldom/xmldom";
+import { ensureDomParser } from "../lib/domParser";
 import { computeParagraphCount } from "../lib/paragraphCount";
 import { mapFilenameToBasename } from "./upload-chapters-source";
 
@@ -68,11 +68,11 @@ function detectContentType(filePath: string): string {
   return filePath.toLowerCase().endsWith(".html") ? "text/html" : "application/octet-stream";
 }
 
-function parseChapterIntoDom(chapter: string): XMLElement {
+function parseChapterIntoDom(chapter: string): Element {
+  ensureDomParser();
   const parser = new DOMParser();
   const doc = parser.parseFromString(chapter, "text/html");
-  const root = doc.documentElement as XMLElement;
-  return root;
+  return doc.documentElement;
 }
 
 async function uploadSlug(
