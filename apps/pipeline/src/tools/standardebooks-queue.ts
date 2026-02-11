@@ -51,6 +51,9 @@ const VALID_BUCKETS = [
 type Bucket = (typeof VALID_BUCKETS)[number];
 
 const DEFAULT_BUCKETS: Bucket[] = ["1-novels-standard", "2-novels-embedded-drama"];
+const DEFAULT_RUN_WORKERS = 2;
+const DEFAULT_WORKER_STAGGER_MS = 90_000;
+const DEFAULT_RATE_SCALE = 0.9;
 
 interface CategoryEntry {
   title: string;
@@ -118,6 +121,19 @@ interface QueueBuildSelectionResult {
   guardExamples: string[];
 }
 
+interface PipelineEnvOverrides {
+  rateScale: number;
+  embeddingsConcurrency?: number;
+}
+
+interface RunQueueOptions {
+  limit?: number;
+  onlyStep?: Step;
+  workers: number;
+  workerStaggerMs: number;
+  envOverrides?: PipelineEnvOverrides;
+}
+
 function readQueue(): QueueFile {
   if (!fs.existsSync(QUEUE_PATH)) {
     throw new Error(`Queue file not found: ${QUEUE_PATH}`);
@@ -149,10 +165,51 @@ function summarizeQueue(queue: QueueFile) {
   console.log(`  skipped: ${counts.skipped}`);
 }
 
-let activePipelineChild: Bun.Subprocess | null = null;
+const activePipelineChildren = new Set<Bun.Subprocess>();
 
 function getPipelineRunnerPath() {
   return path.join(PIPELINE_ROOT, "src", "server", "queue-pipeline-runner.ts");
+}
+
+function parsePositiveInt(value: string | undefined, fallback: number): number {
+  const parsed = Number.parseInt(value || "", 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return parsed;
+}
+
+function scaleRate(value: number, scale: number): number {
+  return Math.max(1, Math.round(value * scale));
+}
+
+function buildChildEnv(overrides?: PipelineEnvOverrides): Record<string, string> | undefined {
+  if (!overrides) {
+    return undefined;
+  }
+
+  const envPatch: Record<string, string> = {};
+  const normalizedScale = Number.isFinite(overrides.rateScale)
+    ? Math.max(0.1, Math.min(2, overrides.rateScale))
+    : 1;
+
+  if (normalizedScale !== 1) {
+    const primaryConcurrency = parsePositiveInt(process.env.REWRITE_PRIMARY_CONCURRENCY, 60);
+    const primaryIntervalCap = parsePositiveInt(process.env.REWRITE_PRIMARY_INTERVAL_CAP, 900);
+    const fallbackConcurrency = parsePositiveInt(process.env.REWRITE_FALLBACK_CONCURRENCY, 8);
+    const fallbackPairLimit = parsePositiveInt(process.env.REWRITE_FALLBACK_PAIR_LIMIT, 8);
+
+    envPatch.REWRITE_PRIMARY_CONCURRENCY = `${scaleRate(primaryConcurrency, normalizedScale)}`;
+    envPatch.REWRITE_PRIMARY_INTERVAL_CAP = `${scaleRate(primaryIntervalCap, normalizedScale)}`;
+    envPatch.REWRITE_FALLBACK_CONCURRENCY = `${scaleRate(fallbackConcurrency, normalizedScale)}`;
+    envPatch.REWRITE_FALLBACK_PAIR_LIMIT = `${scaleRate(fallbackPairLimit, normalizedScale)}`;
+  }
+
+  if (typeof overrides.embeddingsConcurrency === "number" && overrides.embeddingsConcurrency > 0) {
+    envPatch.EMBEDDINGS_REQUEST_CONCURRENCY = `${Math.round(overrides.embeddingsConcurrency)}`;
+  }
+
+  return Object.keys(envPatch).length > 0 ? envPatch : undefined;
 }
 
 async function pipeProcessOutput(
@@ -185,6 +242,7 @@ async function pipeProcessOutput(
 async function runPipelineInSubprocess(
   slug: string,
   onlyStep?: Step,
+  envOverrides?: PipelineEnvOverrides,
 ): Promise<{ status: "done" } | { status: "error"; error: string }> {
   const runnerPath = getPipelineRunnerPath();
   if (!fs.existsSync(runnerPath)) {
@@ -198,13 +256,15 @@ async function runPipelineInSubprocess(
       args.push("--only-step", onlyStep);
     }
 
+    const childEnvPatch = buildChildEnv(envOverrides);
     const child = Bun.spawn(args, {
       cwd: PIPELINE_ROOT,
       stdin: "ignore",
       stdout: "pipe",
       stderr: "pipe",
+      env: childEnvPatch ? { ...process.env, ...childEnvPatch } : process.env,
     });
-    activePipelineChild = child;
+    activePipelineChildren.add(child);
 
     const stdoutPromise = pipeProcessOutput(child.stdout, (text) => process.stdout.write(text));
     const stderrPromise = pipeProcessOutput(
@@ -216,14 +276,14 @@ async function runPipelineInSubprocess(
     );
 
     Promise.all([stdoutPromise, stderrPromise]).catch((err) => {
-      activePipelineChild = null;
+      activePipelineChildren.delete(child);
       reject(err);
     });
 
     child.exited
       .then(async (code) => {
         await Promise.allSettled([stdoutPromise, stderrPromise]);
-        activePipelineChild = null;
+        activePipelineChildren.delete(child);
         if (code === 0) {
           resolve({ status: "done" });
           return;
@@ -234,7 +294,7 @@ async function runPipelineInSubprocess(
         resolve({ status: "error", error });
       })
       .catch((err) => {
-        activePipelineChild = null;
+        activePipelineChildren.delete(child);
         reject(err);
       });
   });
@@ -243,17 +303,21 @@ async function runPipelineInSubprocess(
 function setupSignalHandlers() {
   const shutdown = (signal: NodeJS.Signals) => {
     console.log(`\nReceived ${signal}. Stopping queue...`);
-    const child = activePipelineChild;
-    if (!child || child.killed) {
+    const children = Array.from(activePipelineChildren).filter((child) => !child.killed);
+    if (children.length === 0) {
       process.exit(130);
       return;
     }
 
-    child.kill("SIGTERM");
+    for (const child of children) {
+      child.kill("SIGTERM");
+    }
     setTimeout(() => {
-      if (!child.killed) {
-        console.log("Force killing active pipeline subprocess...");
-        child.kill("SIGKILL");
+      for (const child of children) {
+        if (!child.killed) {
+          console.log("Force killing active pipeline subprocess...");
+          child.kill("SIGKILL");
+        }
       }
       process.exit(130);
     }, 10_000);
@@ -563,84 +627,169 @@ function loadDisabledSlugs(): Set<string> {
   return new Set(data);
 }
 
-async function runQueue(limit?: number, onlyStep?: Step) {
+async function runQueue(options: RunQueueOptions) {
+  const { limit, onlyStep, workers, workerStaggerMs, envOverrides } = options;
   setupSignalHandlers();
   const queue = readQueue();
   const disabled = loadDisabledSlugs();
   let consecutiveFailures = 0;
-  let processed = 0;
+  let claimed = 0;
+  let stopClaiming = false;
+  let loggedStopAfterFailures = false;
+  let loggedLimitReached = false;
 
   if (disabled.size > 0) {
     console.log(`Loaded ${disabled.size} disabled slugs`);
   }
+  console.log(
+    `Running queue with workers=${workers}, stagger=${workerStaggerMs}ms, rateScale=${envOverrides?.rateScale ?? 1}, embeddingsConcurrency=${envOverrides?.embeddingsConcurrency ?? "default"}`,
+  );
 
-  for (const item of queue.items) {
-    if (item.status === "done") {
-      continue;
+  let queueLock = Promise.resolve();
+  const withQueueLock = async <T>(fn: () => T | Promise<T>): Promise<T> => {
+    const previousLock = queueLock;
+    let release: () => void = () => {};
+    queueLock = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await previousLock;
+    try {
+      return await fn();
+    } finally {
+      release();
     }
+  };
 
-    if (disabled.has(item.slug)) {
-      if (item.status !== "skipped") {
+  const markDisabledSlugs = async () => {
+    await withQueueLock(() => {
+      let changed = false;
+      for (const item of queue.items) {
+        if (!disabled.has(item.slug)) continue;
+        if (item.status === "done" || item.status === "skipped") continue;
         item.status = "skipped";
         item.updatedAt = new Date().toISOString();
+        changed = true;
+      }
+      if (changed) {
         writeQueue(queue);
       }
-      continue;
-    }
+    });
+  };
 
-    if (limit !== undefined && processed >= limit) {
-      console.log(`Reached limit ${limit}. Stopping.`);
-      break;
-    }
+  const claimNextItem = async (): Promise<QueueItem | null> => {
+    return await withQueueLock(() => {
+      if (stopClaiming) {
+        return null;
+      }
+      if (limit !== undefined && claimed >= limit) {
+        if (!loggedLimitReached) {
+          console.log(`Reached limit ${limit}. Stopping new claims.`);
+          loggedLimitReached = true;
+        }
+        stopClaiming = true;
+        return null;
+      }
 
-    item.status = "running";
-    item.attempts += 1;
-    item.lastError = undefined;
-    item.updatedAt = new Date().toISOString();
-    writeQueue(queue);
+      const item = queue.items.find(
+        (candidate) => candidate.status === "queued" || candidate.status === "failed",
+      );
+      if (!item) {
+        return null;
+      }
 
-    console.log(`\n=== Processing ${item.slug} ===`);
+      item.status = "running";
+      item.attempts += 1;
+      item.lastError = undefined;
+      item.updatedAt = new Date().toISOString();
+      claimed += 1;
+      writeQueue(queue);
+      return item;
+    });
+  };
 
-    try {
-      await convertAndSaveSEBook(item.slug);
-      const result = await runPipelineInSubprocess(item.slug, onlyStep);
+  const completeItem = async (
+    slug: string,
+    result: { status: "done" } | { status: "failed"; error: string },
+  ) => {
+    await withQueueLock(() => {
+      const item = queue.items.find((candidate) => candidate.slug === slug);
+      if (!item) {
+        return;
+      }
 
       if (result.status === "done") {
         item.status = "done";
+        item.lastError = undefined;
         item.updatedAt = new Date().toISOString();
         writeQueue(queue);
-        console.log(`✔ Completed ${item.slug}`);
+        console.log(`✔ Completed ${slug}`);
         consecutiveFailures = 0;
-      } else {
-        item.status = "failed";
-        item.lastError = result.error || "Unknown error";
-        item.updatedAt = new Date().toISOString();
-        writeQueue(queue);
-        console.log(`✖ Failed ${item.slug}: ${item.lastError}`);
-        consecutiveFailures += 1;
+        return;
       }
-    } catch (err) {
+
       item.status = "failed";
-      item.lastError = err instanceof Error ? err.message : String(err);
+      item.lastError = result.error || "Unknown error";
       item.updatedAt = new Date().toISOString();
       writeQueue(queue);
-      console.log(`✖ Failed ${item.slug}: ${item.lastError}`);
+      console.log(`✖ Failed ${slug}: ${item.lastError}`);
       consecutiveFailures += 1;
-    }
 
-    processed += 1;
+      if (consecutiveFailures >= 3) {
+        stopClaiming = true;
+        if (!loggedStopAfterFailures) {
+          console.log("Stopping after 3 consecutive failures.");
+          loggedStopAfterFailures = true;
+        }
+      }
+    });
+  };
 
-    if (consecutiveFailures >= 3) {
-      console.log("Stopping after 3 consecutive failures.");
-      break;
-    }
-  }
+  await markDisabledSlugs();
+
+  const workerTasks = Array.from({ length: workers }, (_, workerIndex) =>
+    (async () => {
+      if (workerStaggerMs > 0 && workerIndex > 0) {
+        const delay = workerStaggerMs * workerIndex;
+        console.log(`[worker-${workerIndex + 1}] Delaying start by ${delay}ms`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+
+      while (true) {
+        const item = await claimNextItem();
+        if (!item) {
+          return;
+        }
+
+        console.log(`\n=== [worker-${workerIndex + 1}] Processing ${item.slug} ===`);
+
+        try {
+          await convertAndSaveSEBook(item.slug);
+          const result = await runPipelineInSubprocess(item.slug, onlyStep, envOverrides);
+          if (result.status === "done") {
+            await completeItem(item.slug, { status: "done" });
+          } else {
+            await completeItem(item.slug, {
+              status: "failed",
+              error: result.error || "Unknown error",
+            });
+          }
+        } catch (err) {
+          await completeItem(item.slug, {
+            status: "failed",
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
+    })(),
+  );
+
+  await Promise.all(workerTasks);
 
   console.log("\nQueue run complete.");
   summarizeQueue(queue);
 }
 
-async function runSingleSlug(slug: string, onlyStep?: Step) {
+async function runSingleSlug(slug: string, onlyStep?: Step, envOverrides?: PipelineEnvOverrides) {
   setupSignalHandlers();
   const queueExists = fs.existsSync(QUEUE_PATH);
   const queue = queueExists ? readQueue() : null;
@@ -668,7 +817,7 @@ async function runSingleSlug(slug: string, onlyStep?: Step) {
       console.log(`Using existing books-data/${slug} for single-step run`);
     }
 
-    const result = await runPipelineInSubprocess(slug, onlyStep);
+    const result = await runPipelineInSubprocess(slug, onlyStep, envOverrides);
 
     if (result.status === "done") {
       if (queue && queueItem) {
@@ -738,13 +887,29 @@ async function main() {
     )
     .command(
       "run",
-      "Run queue (one book at a time)",
+      "Run queue",
       (y) =>
         y
           .option("limit", { type: "number", describe: "Max items to process" })
           .option("slug", {
             type: "string",
             describe: "Process only this slug (bypasses queue iteration)",
+          })
+          .option("workers", {
+            type: "number",
+            describe: "Number of concurrent pipeline subprocess workers",
+          })
+          .option("worker-stagger-ms", {
+            type: "number",
+            describe: "Delay between worker starts in milliseconds",
+          })
+          .option("rate-scale", {
+            type: "number",
+            describe: "Scale factor applied to rewrite queue-related child env limits (e.g. 0.9)",
+          })
+          .option("embeddings-concurrency", {
+            type: "number",
+            describe: "Override EMBEDDINGS_REQUEST_CONCURRENCY in child subprocesses (optional)",
           })
           .option("only-step", {
             type: "string",
@@ -757,12 +922,43 @@ async function main() {
           throw new Error(`Invalid step slug: ${onlyStepRaw}`);
         }
         const onlyStep = onlyStepRaw as Step | undefined;
+        const workers = Math.max(
+          1,
+          Math.round(
+            Number.isFinite(args.workers)
+              ? Number(args.workers)
+              : parsePositiveInt(process.env.SE_QUEUE_WORKERS, DEFAULT_RUN_WORKERS),
+          ),
+        );
+        const workerStaggerMs = Math.max(
+          0,
+          Math.round(
+            Number.isFinite(args["worker-stagger-ms"])
+              ? Number(args["worker-stagger-ms"])
+              : parsePositiveInt(process.env.SE_QUEUE_WORKER_STAGGER_MS, DEFAULT_WORKER_STAGGER_MS),
+          ),
+        );
+        const rawRateScale = Number.isFinite(args["rate-scale"])
+          ? Number(args["rate-scale"])
+          : Number.parseFloat(process.env.SE_QUEUE_RATE_SCALE || `${DEFAULT_RATE_SCALE}`);
+        const rateScale = Number.isFinite(rawRateScale) ? rawRateScale : 1;
+        const embeddingsConcurrencyRaw = Number.isFinite(args["embeddings-concurrency"])
+          ? Number(args["embeddings-concurrency"])
+          : Number.parseInt(process.env.SE_QUEUE_EMBEDDINGS_CONCURRENCY || "", 10);
+        const embeddingsConcurrency = Number.isFinite(embeddingsConcurrencyRaw)
+          ? Math.max(1, Math.round(embeddingsConcurrencyRaw))
+          : undefined;
+
+        const envOverrides: PipelineEnvOverrides | undefined =
+          rateScale !== 1 || embeddingsConcurrency !== undefined
+            ? { rateScale, embeddingsConcurrency }
+            : undefined;
 
         if (args.slug) {
-          await runSingleSlug(args.slug, onlyStep);
+          await runSingleSlug(args.slug, onlyStep, envOverrides);
           return;
         }
-        await runQueue(args.limit, onlyStep);
+        await runQueue({ limit: args.limit, onlyStep, workers, workerStaggerMs, envOverrides });
       },
     )
     .command("status", "Show queue status", {}, () => {

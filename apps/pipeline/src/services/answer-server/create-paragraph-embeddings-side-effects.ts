@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import pLimit from "p-limit";
 
 // const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY as string);
 // const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
@@ -7,6 +8,17 @@ const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY })
 export type Document = { text: string; chapter: number; paragraphNumber: number };
 export type DocumentWithEmbeddings = Document & { Embeddings: number[] };
 export type BookEmbeddings = Map<number, DocumentWithEmbeddings[]>;
+
+const DEFAULT_BATCH_SIZE = 30;
+const DEFAULT_REQUEST_CONCURRENCY = 30;
+
+function parsePositiveInt(value: string | undefined, fallback: number): number {
+  const parsed = Number.parseInt(value || "", 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return parsed;
+}
 
 export async function computeEmbeddingsThroughHttp(
   document: Document,
@@ -23,7 +35,11 @@ export async function computeEmbeddingsThroughHttp(
 export async function computeBatchEmbeddingsThroughHTTP(
   documents: Document[],
 ): Promise<DocumentWithEmbeddings[]> {
-  const BATCH_SIZE = 30;
+  const BATCH_SIZE = parsePositiveInt(process.env.EMBEDDINGS_BATCH_SIZE, DEFAULT_BATCH_SIZE);
+  const REQUEST_CONCURRENCY = Math.min(
+    BATCH_SIZE,
+    parsePositiveInt(process.env.EMBEDDINGS_REQUEST_CONCURRENCY, DEFAULT_REQUEST_CONCURRENCY),
+  );
   const RETRY_DELAYS = [5000, 30000, 35000, 35000, 35000, 35000, 35000, 35000]; // Retry delays in milliseconds
 
   const processChunk = async (
@@ -31,8 +47,9 @@ export async function computeBatchEmbeddingsThroughHTTP(
     retryAttempt = 0,
   ): Promise<DocumentWithEmbeddings[]> => {
     try {
+      const limit = pLimit(REQUEST_CONCURRENCY);
       const documentsWithEmbeddings = await Promise.all(
-        chunk.map((row) => computeEmbeddingsThroughHttp(row)),
+        chunk.map((row) => limit(() => computeEmbeddingsThroughHttp(row))),
       );
       return documentsWithEmbeddings;
     } catch (error: unknown) {
@@ -76,7 +93,7 @@ export async function computeBatchEmbeddingsThroughHTTP(
     console.log(
       `Processing batch ${i / BATCH_SIZE + 1}/${Math.ceil(documents.length / BATCH_SIZE)}, documents ${
         i + 1
-      }-${Math.min(i + BATCH_SIZE, documents.length)}`,
+      }-${Math.min(i + BATCH_SIZE, documents.length)} (batchSize=${BATCH_SIZE}, concurrency=${REQUEST_CONCURRENCY})`,
     );
 
     const batchResults = await processChunk(chunk);
