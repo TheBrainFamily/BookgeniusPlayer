@@ -498,12 +498,21 @@ function absorbTrailingNarration(segments: InlineSpeakerSegment[]): InlineSpeake
 }
 
 /**
- * When a short narration segment (e.g., "said she,") sits between two speaker
- * segments for the same character, absorb all three into one speaker segment.
- * This prevents the same character from getting a second avatar line.
+ * When a narration segment sits between two speaker segments for the same
+ * character, absorb all three into one speaker segment.
+ *
+ * The narration bridge length is only checked when multiple speakers are
+ * present.  When the entire paragraph belongs to one speaker (e.g. Porthos
+ * quoting himself with an attribution like "cried Porthos, clapping his
+ * hands"), the bridge is absorbed regardless of length.
  */
 function absorbNarrationBridges(segments: InlineSpeakerSegment[]): InlineSpeakerSegment[] {
   if (segments.length < 3) return segments;
+
+  const speakerSet = new Set(
+    segments.filter((s) => s.kind === "speaker" && s.speaker !== null).map((s) => s.speaker),
+  );
+  const singleSpeaker = speakerSet.size === 1;
 
   const result: InlineSpeakerSegment[] = [];
   let i = 0;
@@ -519,8 +528,9 @@ function absorbNarrationBridges(segments: InlineSpeakerSegment[]): InlineSpeaker
       next?.kind === "speaker" &&
       curr.speaker !== null &&
       curr.speaker === next.speaker &&
-      normalizeWhitespaceForVisibility(mid.fragment.textContent ?? "").length <
-        INLINE_SPEAKER_HOIST_THRESHOLD
+      (singleSpeaker ||
+        normalizeWhitespaceForVisibility(mid.fragment.textContent ?? "").length <
+          INLINE_SPEAKER_HOIST_THRESHOLD)
     ) {
       curr.fragment.append(mid.fragment, next.fragment);
       result.push(curr);

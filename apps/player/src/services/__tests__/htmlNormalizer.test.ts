@@ -711,6 +711,24 @@ describe("preprocessInlineSpeakerSpans", () => {
     expect(lines[0].textContent).toContain("miserable death");
   });
 
+  it("absorbs long narration bridge when the paragraph has a single speaker", () => {
+    const input = `
+      <section data-chapter="1">
+        <p><span data-speaker="porthos">"Oh, the Red Duke! Bravo! Bravo! The Red Duke!"</span> cried Porthos, clapping his hands and nodding his head. <span data-speaker="porthos">"The Red Duke is capital."</span></p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input, { withAvatars: false });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    expect(lines.length).toBe(1);
+    expect(lines[0].getAttribute("data-speaker")).toBe("porthos");
+    expect(lines[0].textContent).toContain("Oh, the Red Duke");
+    expect(lines[0].textContent).toContain("clapping his hands");
+    expect(lines[0].textContent).toContain("The Red Duke is capital");
+  });
+
   it("does not absorb narration bridge between different speakers", () => {
     const input = `
       <section data-chapter="1">
