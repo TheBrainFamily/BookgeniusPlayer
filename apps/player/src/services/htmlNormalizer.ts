@@ -583,8 +583,20 @@ export function injectAvatarShells(section: Element, doc: Document): void {
 
     processedLetterBlockquotes.add(letterBlockquote);
 
+    const blockquoteSpeaker = letterBlockquote
+      .getAttribute("data-speaker")
+      ?.split(/\s+/)
+      .filter(Boolean)[0];
+
     const speakerCounts = new Map<string, number>();
     let totalSpeakerOccurrences = 0;
+
+    // Include the letter block's own speaker so single-speaker letters
+    // (with no nested [data-speaker]) still get a top avatar shell.
+    if (blockquoteSpeaker) {
+      speakerCounts.set(blockquoteSpeaker, (speakerCounts.get(blockquoteSpeaker) ?? 0) + 1);
+      totalSpeakerOccurrences += 1;
+    }
 
     letterBlockquote.querySelectorAll("[data-speaker]").forEach((el) => {
       const isInsideDramaTable = el.closest("table[data-drama]") !== null;
@@ -608,11 +620,13 @@ export function injectAvatarShells(section: Element, doc: Document): void {
       }
     }
 
-    if (!dominantSpeaker || dominantCount / totalSpeakerOccurrences <= 0.6) {
+    const hasDominantSpeaker = dominantSpeaker && dominantCount / totalSpeakerOccurrences > 0.6;
+    const letterSpeaker = hasDominantSpeaker ? dominantSpeaker : blockquoteSpeaker;
+    if (!letterSpeaker) {
       continue;
     }
 
-    const shell = createAvatarShell(dominantSpeaker);
+    const shell = createAvatarShell(letterSpeaker);
     letterBlockquote.insertBefore(shell, letterBlockquote.firstChild);
   }
 
