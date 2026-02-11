@@ -17,8 +17,7 @@ export interface ReviewChunk {
   newLines: number;
   patch: string;
   preview: string;
-  explanation: string;
-  reasoning: string;
+  narration: string;
 }
 
 export interface ReviewStep {
@@ -79,10 +78,4 @@ export interface CodeTour {
   title: string;
   description: string;
   steps: CodeTourStep[];
-}
-
-export interface AuthorNotes {
-  summary?: { intent?: string; areas?: string[] };
-  stepOverrides?: Record<string, { title?: string; why?: string }>;
-  chunkOverrides?: Record<string, { explanation?: string; reasoning?: string }>;
 }

@@ -34,9 +34,9 @@ function normalizeGitOutput(value: string): string {
 
 function shouldIgnoreReviewArtifactPath(filePath: string): boolean {
   return (
-    filePath === ".codex-review" ||
+    filePath === ".let-me-explain" ||
     filePath === ".tours" ||
-    filePath.startsWith(".codex-review/") ||
+    filePath.startsWith(".let-me-explain/") ||
     filePath.startsWith(".tours/")
   );
 }
@@ -74,18 +74,14 @@ function toChunkId(seed: HunkSeed): string {
   return `chunk-${createHash("sha1").update(base).digest("hex").slice(0, 12)}`;
 }
 
-function inferExplanation(seed: HunkSeed): string {
+function inferNarration(seed: HunkSeed): string {
   const plusCount = seed.patchLines.filter(
     (line) => line.startsWith("+") && !line.startsWith("+++ "),
   ).length;
   const minusCount = seed.patchLines.filter(
     (line) => line.startsWith("-") && !line.startsWith("--- "),
   ).length;
-  return `Changes ${plusCount} added and ${minusCount} removed lines in this chunk.`;
-}
-
-function inferReasoning(filePath: string): string {
-  return `Part of the working tree update for ${filePath}.`;
+  return `Changes ${plusCount} added and ${minusCount} removed lines in ${seed.filePath}.`;
 }
 
 export function deriveArea(filePath: string): string {
@@ -110,8 +106,7 @@ function toChunkFromSeed(seed: HunkSeed): ReviewChunk {
     newLines: seed.newLines,
     patch: seed.patchLines.join("\n"),
     preview: toPreviewText(seed.patchLines),
-    explanation: inferExplanation(seed),
-    reasoning: inferReasoning(seed.filePath),
+    narration: inferNarration(seed),
   };
 }
 
@@ -260,8 +255,7 @@ function toUntrackedChunk(workspaceRoot: string, filePath: string): ReviewChunk 
     newLines: Math.max(lineCount, 1),
     patch: patchLines.join("\n"),
     preview: nonEmpty.slice(0, 160),
-    explanation: "Adds a new untracked file.",
-    reasoning: `File is currently untracked and included for review: ${filePath}.`,
+    narration: `Adds a new untracked file: ${filePath}.`,
   };
 }
 

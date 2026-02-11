@@ -229,17 +229,17 @@ function resolveStepId(arg: unknown): string | undefined {
 
 export function activate(context: vscode.ExtensionContext): void {
   provider = new ReviewTreeProvider();
-  treeView = vscode.window.createTreeView("codexReviewView", {
+  treeView = vscode.window.createTreeView("letMeExplainView", {
     treeDataProvider: provider,
     showCollapseAll: true,
   });
   context.subscriptions.push(treeView);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("codexReview.generateSession", async () => {
+    vscode.commands.registerCommand("letMeExplain.generateSession", async () => {
       await generateAndLoadSession();
     }),
-    vscode.commands.registerCommand("codexReview.loadSession", async () => {
+    vscode.commands.registerCommand("letMeExplain.loadSession", async () => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;
@@ -248,7 +248,7 @@ export function activate(context: vscode.ExtensionContext): void {
         `Loaded session ${loaded.plan.sessionId} (${loaded.plan.chunks.length} chunks).`,
       );
     }),
-    vscode.commands.registerCommand("codexReview.openStep", async (arg: unknown) => {
+    vscode.commands.registerCommand("letMeExplain.openStep", async (arg: unknown) => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;
@@ -270,7 +270,7 @@ export function activate(context: vscode.ExtensionContext): void {
       }
       await openChunk(loaded, chunkId);
     }),
-    vscode.commands.registerCommand("codexReview.openChunk", async (arg: unknown) => {
+    vscode.commands.registerCommand("letMeExplain.openChunk", async (arg: unknown) => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;
@@ -282,21 +282,21 @@ export function activate(context: vscode.ExtensionContext): void {
       }
       await openChunk(loaded, chunkId);
     }),
-    vscode.commands.registerCommand("codexReview.acceptChunk", async (arg: unknown) => {
+    vscode.commands.registerCommand("letMeExplain.acceptChunk", async (arg: unknown) => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;
       }
       await setChunkStatus(loaded, resolveChunkId(arg), "accept");
     }),
-    vscode.commands.registerCommand("codexReview.rejectChunk", async (arg: unknown) => {
+    vscode.commands.registerCommand("letMeExplain.rejectChunk", async (arg: unknown) => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;
       }
       await setChunkStatus(loaded, resolveChunkId(arg), "reject");
     }),
-    vscode.commands.registerCommand("codexReview.nextUnreviewed", async () => {
+    vscode.commands.registerCommand("letMeExplain.nextUnreviewed", async () => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;
@@ -308,7 +308,7 @@ export function activate(context: vscode.ExtensionContext): void {
       }
       await openChunk(loaded, next.id);
     }),
-    vscode.commands.registerCommand("codexReview.showProgress", async () => {
+    vscode.commands.registerCommand("letMeExplain.showProgress", async () => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;
@@ -318,7 +318,7 @@ export function activate(context: vscode.ExtensionContext): void {
         `Accepted: ${progress.accepted}, Rejected: ${progress.rejected}, Unreviewed: ${progress.unreviewed}`,
       );
     }),
-    vscode.commands.registerCommand("codexReview.completeReview", async () => {
+    vscode.commands.registerCommand("letMeExplain.completeReview", async () => {
       const loaded = await ensureSessionLoaded();
       if (!loaded) {
         return;

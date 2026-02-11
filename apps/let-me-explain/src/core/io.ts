@@ -3,6 +3,7 @@ import path from "node:path";
 
 import type {
   CodeTour,
+  CodeTourStep,
   ReviewChunk,
   ReviewPlan,
   ReviewProgress,
@@ -10,7 +11,7 @@ import type {
   ReviewState,
 } from "./types";
 
-const REVIEW_FOLDER = ".codex-review";
+const REVIEW_FOLDER = ".let-me-explain";
 const TOURS_FOLDER = ".tours";
 const PLAN_FILE = "review-plan.json";
 const STATE_FILE = "review-state.json";
@@ -32,27 +33,34 @@ function toPlanStepLine(chunk: ReviewChunk | undefined): number {
   return Math.max(1, line);
 }
 
-function toCodeTour(plan: ReviewPlan): CodeTour {
+function toCodeTour(plan: ReviewPlan, authoredChunkIds?: Set<string>): CodeTour {
   const chunkMap = new Map(plan.chunks.map((chunk) => [chunk.id, chunk]));
-  const steps = plan.steps.map((step) => {
-    const chunk = chunkMap.get(step.chunkIds[0]);
-    const file = chunk?.filePath ?? step.files[0] ?? ".";
-    const descriptionPieces = [step.why];
-    if (chunk) {
-      descriptionPieces.push(`\n\nWhat changed: ${chunk.explanation}`);
-      descriptionPieces.push(`\nWhy: ${chunk.reasoning}`);
-    }
-    return {
-      title: `${step.level.toUpperCase()}: ${step.title}`,
-      description: descriptionPieces.join(""),
-      file,
-      line: toPlanStepLine(chunk),
-    };
-  });
+  const steps: CodeTourStep[] = [];
+
+  for (const step of plan.steps) {
+    const resolvedChunks = step.chunkIds
+      .map((id) => chunkMap.get(id))
+      .filter((chunk): chunk is ReviewChunk => {
+        if (!chunk) return false;
+        if (authoredChunkIds && !authoredChunkIds.has(chunk.id)) return false;
+        return true;
+      });
+
+    if (resolvedChunks.length === 0) continue;
+
+    const isMulti = resolvedChunks.length > 1;
+    resolvedChunks.forEach((chunk, index) => {
+      const isFirst = index === 0;
+      const suffix = isMulti ? ` (${index + 1}/${resolvedChunks.length})` : "";
+      const title = `${step.level.toUpperCase()}: ${step.title}${suffix}`;
+      const description = isFirst ? `${step.why}\n\n${chunk.narration}` : chunk.narration;
+      steps.push({ title, description, file: chunk.filePath, line: toPlanStepLine(chunk) });
+    });
+  }
 
   return {
     $schema: "https://aka.ms/codetour-schema",
-    title: `Codex Review ${plan.sessionId}`,
+    title: `Let Me Explain ${plan.sessionId}`,
     description: plan.summary.intent,
     steps,
   };
@@ -99,14 +107,18 @@ export function writeReviewArtifacts(workspaceRoot: string, plan: ReviewPlan): v
   const statePath = getReviewStatePath(workspaceRoot);
   const tourPath = getCodeTourPath(workspaceRoot, plan.sessionId);
   const state = createInitialReviewState(plan);
-  const tour = toCodeTour(plan);
+  const tour = toCodeTour(plan, new Set());
 
   writeFileSync(planPath, prettyJson(plan), "utf8");
   writeFileSync(statePath, prettyJson(state), "utf8");
   writeFileSync(tourPath, prettyJson(tour), "utf8");
 }
 
-export function writeReviewPlanAndTour(workspaceRoot: string, plan: ReviewPlan): void {
+export function writeReviewPlanAndTour(
+  workspaceRoot: string,
+  plan: ReviewPlan,
+  authoredChunkIds?: Set<string>,
+): void {
   const reviewDir = path.join(workspaceRoot, REVIEW_FOLDER);
   const toursDir = path.join(workspaceRoot, TOURS_FOLDER);
   ensureDirExists(reviewDir);
@@ -114,7 +126,7 @@ export function writeReviewPlanAndTour(workspaceRoot: string, plan: ReviewPlan):
 
   const planPath = getReviewPlanPath(workspaceRoot);
   const tourPath = getCodeTourPath(workspaceRoot, plan.sessionId);
-  const tour = toCodeTour(plan);
+  const tour = toCodeTour(plan, authoredChunkIds);
 
   writeFileSync(planPath, prettyJson(plan), "utf8");
   writeFileSync(tourPath, prettyJson(tour), "utf8");

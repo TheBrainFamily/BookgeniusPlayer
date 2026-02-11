@@ -8,12 +8,11 @@ import {
 } from "./git";
 import { applyAiStoryToPlan } from "./story-ai";
 import type { AiStoryOutput } from "./story-ai";
-import type { AuthorNotes, ReviewChunk, ReviewPlan, ReviewStep } from "./types";
+import type { ReviewChunk, ReviewPlan, ReviewStep } from "./types";
 
 export interface BuildReviewPlanOptions {
   workspaceRoot: string;
   baseRef?: string;
-  notes?: AuthorNotes;
   story?: AiStoryOutput;
   includeFiles?: string[];
   includePaths?: string[];
@@ -61,37 +60,6 @@ function toLowSteps(chunks: ReviewChunk[]): ReviewStep[] {
     files: [chunk.filePath],
     chunkIds: [chunk.id],
   }));
-}
-
-function applyNotesToChunks(chunks: ReviewChunk[], notes: AuthorNotes | undefined): ReviewChunk[] {
-  if (!notes?.chunkOverrides) {
-    return chunks;
-  }
-  return chunks.map((chunk) => {
-    const override = notes.chunkOverrides?.[chunk.id];
-    if (!override) {
-      return chunk;
-    }
-    return {
-      ...chunk,
-      explanation: override.explanation ?? chunk.explanation,
-      reasoning: override.reasoning ?? chunk.reasoning,
-    };
-  });
-}
-
-function applyNotesToSteps(steps: ReviewStep[], notes: AuthorNotes | undefined): ReviewStep[] {
-  if (!notes?.stepOverrides) {
-    return steps;
-  }
-
-  return steps.map((step) => {
-    const override = notes.stepOverrides?.[step.id];
-    if (!override) {
-      return step;
-    }
-    return { ...step, title: override.title ?? step.title, why: override.why ?? step.why };
-  });
 }
 
 function toSortedChunks(chunks: ReviewChunk[]): ReviewChunk[] {
@@ -175,7 +143,7 @@ export function buildReviewPlan(options: BuildReviewPlanOptions): ReviewPlan {
   const parsed = parsePatchToChunks(patch);
   const withUntracked = [...parsed.chunks, ...createUntrackedChunks(options.workspaceRoot)];
   const scopedChunks = filterChunksByScope(withUntracked, options);
-  const chunks = applyNotesToChunks(toSortedChunks(scopedChunks), options.notes);
+  const chunks = toSortedChunks(scopedChunks);
   if (chunks.length === 0) {
     throw new Error(
       `No working tree chunks found for current scope${scopeDescription(options)}. Make changes or adjust include filters.`,
@@ -194,13 +162,8 @@ export function buildReviewPlan(options: BuildReviewPlanOptions): ReviewPlan {
     chunkIds: chunks.map((chunk) => chunk.id),
   };
 
-  const steps = applyNotesToSteps(
-    [highStep, ...toMidSteps(chunks), ...toLowSteps(chunks)],
-    options.notes,
-  );
-  const summaryIntent =
-    options.notes?.summary?.intent ??
-    `Working tree update touching ${chunks.length} chunks in ${areas.length} area(s).`;
+  const steps = [highStep, ...toMidSteps(chunks), ...toLowSteps(chunks)];
+  const summaryIntent = `Working tree update touching ${chunks.length} chunks in ${areas.length} area(s).`;
 
   // Ensure every step references known chunk ids.
   for (const step of steps) {
@@ -214,10 +177,7 @@ export function buildReviewPlan(options: BuildReviewPlanOptions): ReviewPlan {
     source: "working_tree",
     createdAt: new Date().toISOString(),
     diffHash: computeChunksFingerprint(chunks),
-    summary: {
-      intent: summaryIntent,
-      areas: options.notes?.summary?.areas?.length ? options.notes.summary.areas : areas,
-    },
+    summary: { intent: summaryIntent, areas },
     steps,
     chunks,
   };

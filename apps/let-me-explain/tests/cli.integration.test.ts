@@ -16,7 +16,7 @@ function runCli(args: string[], cwd: string): string {
 }
 
 function createRepoFixture(): { repoDir: string; targetFile: string } {
-  const repoDir = mkdtempSync(path.join(tmpdir(), "codex-review-cli-"));
+  const repoDir = mkdtempSync(path.join(tmpdir(), "let-me-explain-cli-"));
   TEMP_DIRS.push(repoDir);
 
   run("git", ["init"], repoDir);
@@ -53,10 +53,10 @@ describe("cli integration", () => {
     expect(output).toContain("Generated review session");
     expect(output).toContain("Quick interactive batch");
     expect(output).toContain("Continue when ready:");
-    expect(existsSync(path.join(repoDir, ".codex-review", "review-plan.json"))).toBe(true);
-    expect(existsSync(path.join(repoDir, ".codex-review", "chunk-narrations.json"))).toBe(true);
-    expect(existsSync(path.join(repoDir, ".codex-review", "session-lock.json"))).toBe(true);
-    expect(existsSync(path.join(repoDir, ".codex-review", "agent-brief.txt"))).toBe(true);
+    expect(existsSync(path.join(repoDir, ".let-me-explain", "review-plan.json"))).toBe(true);
+    expect(existsSync(path.join(repoDir, ".let-me-explain", "chunk-narrations.json"))).toBe(true);
+    expect(existsSync(path.join(repoDir, ".let-me-explain", "session-lock.json"))).toBe(true);
+    expect(existsSync(path.join(repoDir, ".let-me-explain", "agent-brief.txt"))).toBe(true);
   });
 
   it("next-batch and continue alias suggest progressive chunk batches", () => {
@@ -124,7 +124,7 @@ describe("cli integration", () => {
     expect(listOutput).toContain('"items":');
     expect(listOutput).toContain("apps/player/src/review-target.ts");
 
-    const narrationPath = path.join(repoDir, ".codex-review", "chunk-narrations.json");
+    const narrationPath = path.join(repoDir, ".let-me-explain", "chunk-narrations.json");
     const narration = JSON.parse(readFileSync(narrationPath, "utf8")) as {
       chunkNarration: Array<{ chunkId: string; filePath: string; authored?: boolean }>;
     };
@@ -138,8 +138,7 @@ describe("cli integration", () => {
 
     const payload = JSON.stringify({
       ids: [targetChunkId],
-      explanation: "Updated by integration test",
-      reasoning: "Validate alias command",
+      narration: "Updated by integration test",
       level: "mid",
       title: "Target file story",
       why: "Narrate this file first",
@@ -149,8 +148,7 @@ describe("cli integration", () => {
 
     const secondPayload = JSON.stringify({
       ids: [targetChunkId],
-      explanation: "Updated by integration test v2",
-      reasoning: "Validate narration setChunks alias",
+      narration: "Updated by integration test v2",
     });
     const setAliasOutput = runCli(
       ["narration", "setChunks", "--workspace", repoDir, "--payload", secondPayload],
@@ -159,12 +157,12 @@ describe("cli integration", () => {
     expect(setAliasOutput).toContain("Updated narration chunks: 1");
 
     const updatedNarration = JSON.parse(readFileSync(narrationPath, "utf8")) as {
-      chunkNarration: Array<{ chunkId: string; explanation: string; authored?: boolean }>;
+      chunkNarration: Array<{ chunkId: string; narration: string; authored?: boolean }>;
     };
     const updated = updatedNarration.chunkNarration.find(
       (entry) => entry.chunkId === targetChunkId,
     );
-    expect(updated?.explanation).toBe("Updated by integration test v2");
+    expect(updated?.narration).toBe("Updated by integration test v2");
     expect(updated?.authored).toBe(true);
   });
 });

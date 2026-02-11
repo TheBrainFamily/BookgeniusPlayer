@@ -9,8 +9,7 @@ export interface AiStoryStep {
 
 export interface AiChunkNarration {
   chunkId: string;
-  explanation: string;
-  reasoning: string;
+  narration: string;
 }
 
 export interface AiStoryOutput {
@@ -34,7 +33,7 @@ export interface AiStorySeed {
   outputSchema: {
     summary: { intent: string; areas: string[] };
     steps: Array<{ level: "high" | "mid" | "low"; title: string; why: string; chunkIds: string[] }>;
-    chunkNarration: Array<{ chunkId: string; explanation: string; reasoning: string }>;
+    chunkNarration: Array<{ chunkId: string; narration: string }>;
   };
   summaryHint: { currentIntent: string; areas: string[] };
   chunks: AiStorySeedChunk[];
@@ -50,8 +49,7 @@ export interface AiChunkNarrationFileEntry {
   chunkId: string;
   filePath: string;
   preview: string;
-  explanation: string;
-  reasoning: string;
+  narration: string;
   authored?: boolean;
   authoredAt?: string;
 }
@@ -61,18 +59,19 @@ export interface AiChunkNarrationFile {
 }
 
 export const STORY_INSTRUCTIONS = [
-  "Create a guided review story for these code chunks.",
-  "Do not evaluate correctness and do not mark issues.",
-  "Describe only what changed and why.",
-  "Ordering from high-level to low-level is often a good strategy, but not necessarily the best way.",
-  "Use only provided chunk IDs.",
-  "Ensure every chunk appears in at least one step.",
+  "Aim for ~5 steps. Group related chunks into the same step.",
+  "When test files are present, start with a step showing the tests — they reveal intent.",
+  "Each chunk narration should tell a connected story: what was the situation before, what changed, and why.",
+  'Vary the style naturally. Think "Previously X. Now Y because Z." but don\'t force a template.',
+  "Order steps to build understanding: tests → core logic → integration → peripherals.",
+  "Do not evaluate correctness or mark issues.",
+  "Use only provided chunk IDs. Every chunk must appear in at least one step.",
 ];
 
 export const STORY_OUTPUT_SCHEMA_EXAMPLE: AiStorySeed["outputSchema"] = {
   summary: { intent: "string", areas: ["string"] },
   steps: [{ level: "high", title: "string", why: "string", chunkIds: ["chunk-id"] }],
-  chunkNarration: [{ chunkId: "chunk-id", explanation: "string", reasoning: "string" }],
+  chunkNarration: [{ chunkId: "chunk-id", narration: "string" }],
 };
 
 function toTrimmed(value: unknown, fallback = ""): string {
@@ -101,7 +100,7 @@ function applyNarration(
     if (!narration) {
       return chunk;
     }
-    return { ...chunk, explanation: narration.explanation, reasoning: narration.reasoning };
+    return { ...chunk, narration: narration.narration };
   });
 }
 
@@ -169,16 +168,16 @@ function parseNarration(rawNarration: unknown, knownChunkIds: Set<string>): AiCh
       if (!item || typeof item !== "object") {
         return undefined;
       }
-      const narration = item as { chunkId?: unknown; explanation?: unknown; reasoning?: unknown };
-      const chunkId = toTrimmed(narration.chunkId);
+      const entry = item as { chunkId?: unknown; narration?: unknown };
+      const chunkId = toTrimmed(entry.chunkId);
       if (!knownChunkIds.has(chunkId)) {
         return undefined;
       }
-      return {
-        chunkId,
-        explanation: toTrimmed(narration.explanation, "Describes what changed in this chunk."),
-        reasoning: toTrimmed(narration.reasoning, "Describes why this chunk exists."),
-      };
+      const narration = toTrimmed(entry.narration);
+      if (!narration) {
+        return undefined;
+      }
+      return { chunkId, narration };
     })
     .filter((item): item is AiChunkNarration => Boolean(item));
 }
@@ -219,8 +218,7 @@ export function createAiChunkNarrationTemplate(plan: ReviewPlan): AiChunkNarrati
       chunkId: chunk.id,
       filePath: chunk.filePath,
       preview: chunk.preview,
-      explanation: chunk.explanation,
-      reasoning: chunk.reasoning,
+      narration: chunk.narration,
       authored: false,
     })),
   };

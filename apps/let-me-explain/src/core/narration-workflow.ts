@@ -3,8 +3,7 @@ import type { ReviewChunk, ReviewLevel } from "./types";
 
 export interface SetChunksPayload {
   ids: string[];
-  explanation?: string;
-  reasoning?: string;
+  narration?: string;
   level?: ReviewLevel;
   title?: string;
   why?: string;
@@ -80,8 +79,7 @@ function createDefaultNarrationEntry(chunk: ReviewChunk): AiChunkNarrationFileEn
     chunkId: chunk.id,
     filePath: chunk.filePath,
     preview: chunk.preview,
-    explanation: chunk.explanation,
-    reasoning: chunk.reasoning,
+    narration: chunk.narration,
     authored: false,
   };
 }
@@ -101,7 +99,7 @@ function isEntryAuthored(
   if (!chunk) {
     return false;
   }
-  return entry.explanation !== chunk.explanation || entry.reasoning !== chunk.reasoning;
+  return entry.narration !== chunk.narration;
 }
 
 function validatePayload(payload: SetChunksPayload): void {
@@ -109,14 +107,12 @@ function validatePayload(payload: SetChunksPayload): void {
     throw new Error("set-chunks requires at least one chunk id.");
   }
 
-  const hasNarration = Boolean(payload.explanation) || Boolean(payload.reasoning);
+  const hasNarration = Boolean(payload.narration);
   const hasAnyStepField = Boolean(payload.level) || Boolean(payload.title) || Boolean(payload.why);
   const hasFullStep = Boolean(payload.level && payload.title && payload.why);
 
   if (!hasNarration && !hasAnyStepField) {
-    throw new Error(
-      "set-chunks requires narration fields (explanation/reasoning) and/or step fields.",
-    );
+    throw new Error("set-chunks requires a narration field and/or step fields.");
   }
   if (hasAnyStepField && !hasFullStep) {
     throw new Error("When setting a step, provide level, title, and why together.");
@@ -135,8 +131,7 @@ export function parseSetChunksPayload(jsonText: string): SetChunksPayload {
   }
   const root = parsed as {
     ids?: unknown;
-    explanation?: unknown;
-    reasoning?: unknown;
+    narration?: unknown;
     level?: unknown;
     title?: unknown;
     why?: unknown;
@@ -145,19 +140,22 @@ export function parseSetChunksPayload(jsonText: string): SetChunksPayload {
   const ids = Array.isArray(root.ids)
     ? Array.from(
         new Set(
-          root.ids.filter((id): id is string => typeof id === "string").map((id) => id.trim()),
+          root.ids
+            .filter((id): id is string => typeof id === "string")
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0)
+            .map((id) => (id.startsWith("chunk-") ? id : `chunk-${id}`)),
         ),
-      ).filter((id) => id.length > 0)
+      )
     : [];
-  const explanation = toTrimmed(root.explanation);
-  const reasoning = toTrimmed(root.reasoning);
+  const narration = toTrimmed(root.narration) || undefined;
   const levelRaw = toTrimmed(root.level);
   const level =
     levelRaw === "high" || levelRaw === "mid" || levelRaw === "low" ? levelRaw : undefined;
   const title = toTrimmed(root.title);
   const why = toTrimmed(root.why);
 
-  const payload: SetChunksPayload = { ids, explanation, reasoning, level, title, why };
+  const payload: SetChunksPayload = { ids, narration, level, title, why };
   validatePayload(payload);
   return payload;
 }
@@ -189,8 +187,7 @@ export function syncNarrationWithPlan(
       chunkId: chunk.id,
       filePath: chunk.filePath,
       preview: chunk.preview,
-      explanation: existing.explanation,
-      reasoning: existing.reasoning,
+      narration: existing.narration,
       authored: existing.authored,
       authoredAt: existing.authoredAt,
     };
@@ -204,8 +201,7 @@ export function syncNarrationWithPlan(
         previous?.chunkId !== entry.chunkId ||
         previous?.filePath !== entry.filePath ||
         previous?.preview !== entry.preview ||
-        previous?.explanation !== entry.explanation ||
-        previous?.reasoning !== entry.reasoning ||
+        previous?.narration !== entry.narration ||
         previous?.authored !== entry.authored ||
         previous?.authoredAt !== entry.authoredAt
       );
@@ -272,7 +268,7 @@ export function applySetChunksToNarration(
   const targetIds = payload.ids.filter((id) => knownIds.has(id));
   const missingIds = payload.ids.filter((id) => !knownIds.has(id));
   const targetSet = new Set(targetIds);
-  const hasNarrationUpdate = Boolean(payload.explanation || payload.reasoning);
+  const hasNarrationUpdate = Boolean(payload.narration);
   let updatedCount = 0;
 
   const updatedEntries = narration.chunkNarration.map((entry) => {
@@ -282,8 +278,7 @@ export function applySetChunksToNarration(
     updatedCount += 1;
     return {
       ...entry,
-      explanation: payload.explanation ?? entry.explanation,
-      reasoning: payload.reasoning ?? entry.reasoning,
+      narration: payload.narration ?? entry.narration,
       authored: hasNarrationUpdate ? true : entry.authored,
       authoredAt: hasNarrationUpdate ? nowIso : entry.authoredAt,
     };

@@ -41,8 +41,7 @@ function createPlan(): ReviewPlan {
         newLines: 2,
         patch: "@@ -0,0 +1,2 @@",
         preview: "const a = 1;",
-        explanation: "Adds a.",
-        reasoning: "Needed for feature a.",
+        narration: "Adds a. Needed for feature a.",
       },
       {
         id: "chunk-2",
@@ -54,8 +53,7 @@ function createPlan(): ReviewPlan {
         newLines: 2,
         patch: "@@ -0,0 +1,2 @@",
         preview: "const b = 1;",
-        explanation: "Adds b.",
-        reasoning: "Needed for feature b.",
+        narration: "Adds b. Needed for feature b.",
       },
     ],
   };
@@ -91,8 +89,8 @@ describe("story-ai parsing", () => {
         { level: "bad", title: "Invalid", why: "Invalid", chunkIds: ["chunk-2"] },
       ],
       chunkNarration: [
-        { chunkId: "chunk-1", explanation: "Updated explanation", reasoning: "Updated why" },
-        { chunkId: "chunk-missing", explanation: "Ignore", reasoning: "Ignore" },
+        { chunkId: "chunk-1", narration: "Updated narration for chunk-1" },
+        { chunkId: "chunk-missing", narration: "Ignore" },
       ],
     });
 
@@ -124,14 +122,14 @@ describe("story-ai parsing", () => {
     expect(steps?.steps.length).toBe(1);
 
     const narrationFromArray = parseAiChunkNarrationFromJsonText(
-      JSON.stringify([{ chunkId: "chunk-1", explanation: "E", reasoning: "R" }]),
+      JSON.stringify([{ chunkId: "chunk-1", narration: "Narration for chunk-1" }]),
       knownChunkIds,
     );
     expect(narrationFromArray?.length).toBe(1);
 
     const narrationFromObject = parseAiChunkNarrationFromJsonText(
       JSON.stringify({
-        chunkNarration: [{ chunkId: "chunk-2", explanation: "E2", reasoning: "R2" }],
+        chunkNarration: [{ chunkId: "chunk-2", narration: "Narration for chunk-2" }],
       }),
       knownChunkIds,
     );
@@ -161,8 +159,8 @@ describe("story-ai parsing", () => {
         ],
         chunkNarration: [
           "skip-me",
-          { chunkId: "chunk-1", explanation: 42, reasoning: null },
-          { chunkId: "chunk-2", explanation: "ok", reasoning: "ok" },
+          { chunkId: "chunk-1", narration: 42 },
+          { chunkId: "chunk-2", narration: "ok narration" },
         ],
       }),
       knownChunkIds,
@@ -174,9 +172,8 @@ describe("story-ai parsing", () => {
     expect(parsed?.steps.length).toBe(1);
     expect(parsed?.steps[0]?.title).toBe("Review step");
     expect(parsed?.steps[0]?.why).toBe("Understand this part before moving on.");
-    expect(parsed?.chunkNarration?.length).toBe(2);
-    expect(parsed?.chunkNarration?.[0]?.explanation).toBe("Describes what changed in this chunk.");
-    expect(parsed?.chunkNarration?.[0]?.reasoning).toBe("Describes why this chunk exists.");
+    expect(parsed?.chunkNarration?.length).toBe(1);
+    expect(parsed?.chunkNarration?.[0]?.narration).toBe("ok narration");
   });
 });
 
@@ -193,13 +190,7 @@ describe("applyAiStoryToPlan", () => {
           chunkIds: ["chunk-1", "chunk-missing"],
         },
       ],
-      chunkNarration: [
-        {
-          chunkId: "chunk-1",
-          explanation: "Narrated explanation",
-          reasoning: "Narrated reasoning",
-        },
-      ],
+      chunkNarration: [{ chunkId: "chunk-1", narration: "Narrated explanation with reasoning" }],
     });
 
     expect(updated.summary.intent).toBe("Updated intent");
@@ -209,8 +200,8 @@ describe("applyAiStoryToPlan", () => {
     expect(updated.steps[0]?.chunkIds).toEqual(["chunk-1"]);
     expect(updated.steps[1]?.id).toBe("step-low-fallback-2");
     expect(updated.steps[1]?.chunkIds).toEqual(["chunk-2"]);
-    expect(updated.chunks.find((chunk) => chunk.id === "chunk-1")?.explanation).toBe(
-      "Narrated explanation",
+    expect(updated.chunks.find((chunk) => chunk.id === "chunk-1")?.narration).toBe(
+      "Narrated explanation with reasoning",
     );
   });
 });

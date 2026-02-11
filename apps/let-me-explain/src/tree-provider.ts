@@ -119,7 +119,7 @@ export class ReviewTreeProvider implements vscode.TreeDataProvider<ReviewTreeIte
         stepId: step.id,
         tooltip: `${step.why}\nChunks: ${step.chunkIds.length}`,
         description: `${step.chunkIds.length} chunk(s)`,
-        command: { command: "codexReview.openStep", title: "Open Step", arguments: [step.id] },
+        command: { command: "letMeExplain.openStep", title: "Open Step", arguments: [step.id] },
         contextValue: "step",
       });
     });
@@ -135,9 +135,13 @@ export class ReviewTreeProvider implements vscode.TreeDataProvider<ReviewTreeIte
         {
           chunkId: chunk.id,
           description: statusLabel(status),
-          tooltip: `${chunk.preview}\n\n${chunk.explanation}\n${chunk.reasoning}`,
+          tooltip: `${chunk.preview}\n\n${chunk.narration}`,
           iconPath: iconForStatus(status),
-          command: { command: "codexReview.openChunk", title: "Open Chunk", arguments: [chunk.id] },
+          command: {
+            command: "letMeExplain.openChunk",
+            title: "Open Chunk",
+            arguments: [chunk.id],
+          },
           contextValue: "chunk",
         },
       );

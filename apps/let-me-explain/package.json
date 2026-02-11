@@ -1,0 +1,122 @@
+{
+  "name": "let-me-explain",
+  "displayName": "Let Me Explain",
+  "description": "Guided, chunk-level code review sessions for working tree diffs.",
+  "private": true,
+  "version": "0.0.1",
+  "publisher": "bookgenius",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:letMeExplainView",
+    "onCommand:letMeExplain.generateSession",
+    "onCommand:letMeExplain.loadSession",
+    "onCommand:letMeExplain.acceptChunk",
+    "onCommand:letMeExplain.rejectChunk",
+    "onCommand:letMeExplain.nextUnreviewed"
+  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "start": "bun run src/cli.ts start --workspace ../..",
+    "build": "tsc -p .",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "bun test",
+    "generate": "bun run src/cli.ts generate --workspace ../..",
+    "status": "bun run src/cli.ts status --workspace ../..",
+    "create-story-seed": "bun run src/cli.ts create-story-seed --workspace ../..",
+    "apply-story": "bun run src/cli.ts apply-story --workspace ../.. --story-file ../../.let-me-explain/story.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.5",
+    "@types/vscode": "^1.109.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "letMeExplain.generateSession",
+        "title": "Let Me Explain: Generate Session"
+      },
+      {
+        "command": "letMeExplain.loadSession",
+        "title": "Let Me Explain: Load Session"
+      },
+      {
+        "command": "letMeExplain.openStep",
+        "title": "Let Me Explain: Open Step"
+      },
+      {
+        "command": "letMeExplain.openChunk",
+        "title": "Let Me Explain: Open Chunk"
+      },
+      {
+        "command": "letMeExplain.acceptChunk",
+        "title": "Let Me Explain: Accept Chunk"
+      },
+      {
+        "command": "letMeExplain.rejectChunk",
+        "title": "Let Me Explain: Reject Chunk"
+      },
+      {
+        "command": "letMeExplain.nextUnreviewed",
+        "title": "Let Me Explain: Next Unreviewed Chunk"
+      },
+      {
+        "command": "letMeExplain.showProgress",
+        "title": "Let Me Explain: Show Progress"
+      },
+      {
+        "command": "letMeExplain.completeReview",
+        "title": "Let Me Explain: Complete Review"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "letMeExplainView",
+          "name": "Let Me Explain"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "letMeExplain.acceptChunk",
+          "when": "view == letMeExplainView && viewItem == chunk"
+        },
+        {
+          "command": "letMeExplain.rejectChunk",
+          "when": "view == letMeExplainView && viewItem == chunk"
+        },
+        {
+          "command": "letMeExplain.openChunk",
+          "when": "view == letMeExplainView && viewItem == chunk"
+        },
+        {
+          "command": "letMeExplain.openStep",
+          "when": "view == letMeExplainView && viewItem == step"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "letMeExplain.generateSession",
+          "when": "view == letMeExplainView",
+          "group": "navigation"
+        },
+        {
+          "command": "letMeExplain.loadSession",
+          "when": "view == letMeExplainView",
+          "group": "navigation"
+        },
+        {
+          "command": "letMeExplain.nextUnreviewed",
+          "when": "view == letMeExplainView",
+          "group": "navigation"
+        }
+      ]
+    }
+  }
+}

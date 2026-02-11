@@ -22,8 +22,7 @@ const CHUNKS: ReviewChunk[] = [
     newLines: 2,
     patch: "@@ -0,0 +1,2 @@",
     preview: "const a = 1;",
-    explanation: "Adds a.",
-    reasoning: "Needed for feature a.",
+    narration: "Adds a. Needed for feature a.",
   },
   {
     id: "chunk-2",
@@ -35,8 +34,7 @@ const CHUNKS: ReviewChunk[] = [
     newLines: 2,
     patch: "@@ -0,0 +1,2 @@",
     preview: "const b = 1;",
-    explanation: "Adds b.",
-    reasoning: "Needed for feature b.",
+    narration: "Adds b. Needed for feature b.",
   },
   {
     id: "chunk-3",
@@ -48,8 +46,7 @@ const CHUNKS: ReviewChunk[] = [
     newLines: 2,
     patch: "@@ -0,0 +1,2 @@",
     preview: "export const c = 1;",
-    explanation: "Adds c.",
-    reasoning: "Needed for feature c.",
+    narration: "Adds c. Needed for feature c.",
   },
 ];
 
@@ -59,8 +56,7 @@ function createNarrationFile(): AiChunkNarrationFile {
       chunkId: chunk.id,
       filePath: chunk.filePath,
       preview: chunk.preview,
-      explanation: chunk.explanation,
-      reasoning: chunk.reasoning,
+      narration: chunk.narration,
       authored: false,
     })),
   };
@@ -71,8 +67,7 @@ describe("parseSetChunksPayload", () => {
     const payload = parseSetChunksPayload(
       JSON.stringify({
         ids: ["chunk-1", "chunk-2", "chunk-2"],
-        explanation: "Explains change",
-        reasoning: "Explains why",
+        narration: "Explains change and why",
         level: "mid",
         title: "Reader changes",
         why: "Understand feature flow",
@@ -96,7 +91,7 @@ describe("parseSetChunksPayload", () => {
 
   it("rejects payload with no actionable fields", () => {
     expect(() => parseSetChunksPayload(JSON.stringify({ ids: ["chunk-1"] }))).toThrow(
-      "set-chunks requires narration fields",
+      "set-chunks requires a narration field",
     );
   });
 });
@@ -144,7 +139,7 @@ describe("listNarrationEntries", () => {
   it("infers authored status when authored flag is missing and text changed", () => {
     const narration = createNarrationFile();
     delete narration.chunkNarration[2].authored;
-    narration.chunkNarration[2].explanation = "Changed narrative";
+    narration.chunkNarration[2].narration = "Changed narrative";
     const progress = computeNarrationProgress(narration, CHUNKS);
     expect(progress.authored).toBe(1);
     expect(progress.pending).toBe(2);
@@ -156,8 +151,7 @@ describe("listNarrationEntries", () => {
       chunkId: "chunk-missing",
       filePath: "apps/player/src/missing.ts",
       preview: "missing",
-      explanation: "something",
-      reasoning: "something",
+      narration: "something",
     });
 
     const progress = computeNarrationProgress(narration, CHUNKS);
@@ -173,11 +167,7 @@ describe("applySetChunksToNarration", () => {
     const nowIso = "2026-02-10T00:00:00.000Z";
     const result = applySetChunksToNarration(
       narration,
-      {
-        ids: ["chunk-1", "chunk-missing"],
-        explanation: "New explanation",
-        reasoning: "New reasoning",
-      },
+      { ids: ["chunk-1", "chunk-missing"], narration: "New narration for this chunk" },
       CHUNKS,
       nowIso,
     );
@@ -185,8 +175,7 @@ describe("applySetChunksToNarration", () => {
     expect(result.updatedCount).toBe(1);
     expect(result.missingIds).toEqual(["chunk-missing"]);
     const entry = result.narration.chunkNarration.find((item) => item.chunkId === "chunk-1");
-    expect(entry?.explanation).toBe("New explanation");
-    expect(entry?.reasoning).toBe("New reasoning");
+    expect(entry?.narration).toBe("New narration for this chunk");
     expect(entry?.authored).toBe(true);
     expect(entry?.authoredAt).toBe(nowIso);
 
@@ -287,13 +276,12 @@ describe("syncNarrationWithPlan", () => {
   it("syncs stale narration entries with current plan chunks", () => {
     const narration = createNarrationFile();
     narration.chunkNarration[0].authored = true;
-    narration.chunkNarration[0].explanation = "Custom explanation";
+    narration.chunkNarration[0].narration = "Custom narration";
     narration.chunkNarration.push({
       chunkId: "chunk-old",
       filePath: "old/file.ts",
       preview: "old",
-      explanation: "old",
-      reasoning: "old",
+      narration: "old",
       authored: true,
     });
 
@@ -328,8 +316,7 @@ describe("syncNarrationWithPlan", () => {
       newLines: 1,
       patch: "@@ -0,0 +1,1 @@",
       preview: "const newValue = true;",
-      explanation: "Adds new value",
-      reasoning: "Support extra flow",
+      narration: "Adds new value to support extra flow.",
     };
 
     const synced = syncNarrationWithPlan(narration, [...CHUNKS, newChunk]);
@@ -339,6 +326,6 @@ describe("syncNarrationWithPlan", () => {
     expect(added).toBeDefined();
     expect(added?.filePath).toBe("apps/player/src/new.ts");
     expect(added?.authored).toBe(false);
-    expect(added?.explanation).toBe("Adds new value");
+    expect(added?.narration).toBe("Adds new value to support extra flow.");
   });
 });

@@ -14,7 +14,6 @@ import {
   createAiStorySeed,
   createAiStoryStepsTemplate,
   ensureStateMatchesPlan,
-  getSessionLockPath,
   getWorkspaceStatusFingerprint,
   listNarrationEntries,
   parseSetChunksPayload,
@@ -25,26 +24,17 @@ import {
   parseAiStoryStepsFromJsonText,
   readReviewPlan,
   readReviewState,
-  STORY_INSTRUCTIONS,
-  STORY_OUTPUT_SCHEMA_EXAMPLE,
   writeReviewArtifacts,
   writeReviewPlanAndTour,
   writeReviewState,
   writeSessionLock,
 } from "./core";
 import type { AiChunkNarrationFile, AiStoryOutput, AiStoryStepsFile } from "./core/story-ai";
-import type {
-  AuthorNotes,
-  ReviewChunk,
-  ReviewPlan,
-  ReviewSessionLock,
-  ReviewState,
-} from "./core/types";
+import type { ReviewChunk, ReviewPlan, ReviewSessionLock, ReviewState } from "./core/types";
 
 interface CliOptions {
   workspaceRoot: string;
   baseRef: string;
-  notesPath?: string;
   storyFilePath?: string;
   stepsFilePath?: string;
   narrationFilePath?: string;
@@ -110,12 +100,6 @@ const ARG_HANDLERS: Record<string, ArgHandler> = {
   },
   "-b": (options, nextValue) => {
     options.baseRef = nextValue ?? options.baseRef;
-  },
-  "--notes": (options, nextValue) => {
-    options.notesPath = path.resolve(nextValue ?? "");
-  },
-  "-n": (options, nextValue) => {
-    options.notesPath = path.resolve(nextValue ?? "");
   },
   "--story-file": (options, nextValue) => {
     options.storyFilePath = path.resolve(nextValue ?? "");
@@ -216,6 +200,9 @@ function consumeArg(argv: string[], index: number, options: CliOptions): number 
 
   const handler = ARG_HANDLERS[arg];
   if (!handler) {
+    if (arg.startsWith("{")) {
+      options.payloadText = arg;
+    }
     return index;
   }
   handler(options, argv[index + 1]);
@@ -277,17 +264,6 @@ function printUsage(): void {
   console.log(
     "Usage:\n  bun run src/cli.ts start [--workspace <path>] [--base-ref <ref>] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts status [--workspace <path>] [--narration-file <path>] [--limit <n>]\n  bun run src/cli.ts next-batch [--workspace <path>]   # alias: continue\n  bun run src/cli.ts chunks [--workspace <path>] [--file <path>] [--path <prefix>] [--offset <n>] [--limit <n>] [--all]\n  bun run src/cli.ts set --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]\n  bun run src/cli.ts narration list [--workspace <path>] [--file <path>] [--path <prefix>] [--offset <n>] [--limit <n>] [--all]\n  bun run src/cli.ts narration setChunks --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]\n  bun run src/cli.ts generate [--workspace <path>] [--base-ref <ref>] [--notes <path>] [--story-file <path>] [--seed-out <path>] [--steps-out <path>] [--narration-out <path>] [--include-file <path>] [--include-path <path>] [--include=<path>]\n  bun run src/cli.ts create-story-seed [--workspace <path>] [--base-ref <ref>] [--notes <path>] [--seed-out <path>] [--steps-out <path>] [--narration-out <path>] [--story-instructions <path>] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts apply-story [--workspace <path>] [--story-file <path> | --steps-file <path>] [--narration-file <path>]\n  bun run src/cli.ts narration-list [--workspace <path>] [--narration-file <path>] [--offset <n>] [--limit <n>] [--all] [--include-file <path>] [--include-path <path>]\n  bun run src/cli.ts narration-set-chunks --payload '<json>' [--workspace <path>] [--narration-file <path>] [--steps-file <path>]",
   );
-}
-
-function loadAuthorNotes(notesPath: string | undefined): AuthorNotes | undefined {
-  if (!notesPath) {
-    return undefined;
-  }
-  if (!existsSync(notesPath)) {
-    throw new Error(`Notes file not found: ${notesPath}`);
-  }
-  const raw = readFileSync(notesPath, "utf8");
-  return JSON.parse(raw) as AuthorNotes;
 }
 
 function loadStoryInstructions(storyInstructionsPath: string | undefined): string | undefined {
@@ -394,10 +370,11 @@ function updateSurfacedChunks(state: ReviewState, selected: BatchSuggestion[]): 
   return { ...state, surfacedChunkIds: Array.from(surfaced), updatedAt: new Date().toISOString() };
 }
 
-function formatBatchSuggestions(items: BatchSuggestion[]): string[] {
+function formatBatchSuggestions(items: BatchSuggestion[], prefixLen = 12): string[] {
   return items.map((item, index) => {
+    const shortId = item.chunkId.replace("chunk-", "").slice(0, prefixLen);
     const stepSuffix = item.stepTitle ? ` | ${item.stepTitle}` : "";
-    return `${index + 1}. ${item.chunkId} | ${item.filePath}:${item.line}${stepSuffix}`;
+    return `${index + 1}. ${shortId} | ${item.filePath}:${item.line}${stepSuffix}`;
   });
 }
 
@@ -526,23 +503,19 @@ function ensureReviewState(workspaceRoot: string, plan: ReviewPlan): ReviewState
 }
 
 function toDefaultSeedOutPath(workspaceRoot: string): string {
-  return path.join(workspaceRoot, ".codex-review", "story-seed.json");
+  return path.join(workspaceRoot, ".let-me-explain", "story-seed.json");
 }
 
 function toDefaultStepsOutPath(workspaceRoot: string): string {
-  return path.join(workspaceRoot, ".codex-review", "story-steps.json");
+  return path.join(workspaceRoot, ".let-me-explain", "story-steps.json");
 }
 
 function toDefaultNarrationOutPath(workspaceRoot: string): string {
-  return path.join(workspaceRoot, ".codex-review", "chunk-narrations.json");
-}
-
-function toDefaultStoryOutPath(workspaceRoot: string): string {
-  return path.join(workspaceRoot, ".codex-review", "story.json");
+  return path.join(workspaceRoot, ".let-me-explain", "chunk-narrations.json");
 }
 
 function toDefaultAgentBriefPath(workspaceRoot: string): string {
-  return path.join(workspaceRoot, ".codex-review", "agent-brief.txt");
+  return path.join(workspaceRoot, ".let-me-explain", "agent-brief.txt");
 }
 
 function createSessionLock(plan: ReviewPlan, workspaceFingerprint: string): ReviewSessionLock {
@@ -555,17 +528,9 @@ function createSessionLock(plan: ReviewPlan, workspaceFingerprint: string): Revi
   };
 }
 
-function logScopeHint(options: CliOptions): void {
-  if (options.includeFiles.length === 0 && options.includePaths.length === 0) {
-    console.log("Scope: full working tree.");
-    return;
-  }
-  if (options.includeFiles.length > 0) {
-    console.log(`Scope include files: ${options.includeFiles.join(", ")}`);
-  }
-  if (options.includePaths.length > 0) {
-    console.log(`Scope include paths: ${options.includePaths.join(", ")}`);
-  }
+function relPath(absolute: string, workspaceRoot: string): string {
+  const rel = path.relative(workspaceRoot, absolute);
+  return rel || ".";
 }
 
 function quoteArg(value: string): string {
@@ -591,28 +556,27 @@ function writeAgentBrief(
 ): string {
   const briefPath = toDefaultAgentBriefPath(workspaceRoot);
   const applyCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts apply-story",
+    "bun run apps/let-me-explain/src/cli.ts apply-story",
     `--workspace ${quoteArg(workspaceRoot)}`,
     `--steps-file ${quoteArg(storyFiles.stepsPath)}`,
     `--narration-file ${quoteArg(storyFiles.narrationPath)}`,
   ].join(" ");
   const statusCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts status",
+    "bun run apps/let-me-explain/src/cli.ts status",
     `--workspace ${quoteArg(workspaceRoot)}`,
   ].join(" ");
   const chunksCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts chunks",
+    "bun run apps/let-me-explain/src/cli.ts chunks",
     `--workspace ${quoteArg(workspaceRoot)}`,
     "--limit 8",
     ...toIncludeArgs(options),
   ].join(" ");
   const setCommandExample = [
-    "bun run apps/codex-review-vscode/src/cli.ts narration setChunks",
+    "bun run apps/let-me-explain/src/cli.ts narration setChunks",
     `--workspace ${quoteArg(workspaceRoot)}`,
     `--payload '${JSON.stringify({
       ids: ["chunk-id"],
-      explanation: "What changed in this chunk.",
-      reasoning: "Why this chunk exists.",
+      narration: "Previously X was missing. Now Y handles it because Z.",
       level: "mid",
       title: "Short step title",
       why: "Why review this step now.",
@@ -620,7 +584,7 @@ function writeAgentBrief(
   ].join(" ");
 
   const content = [
-    "Codex Review Agent Brief",
+    "Let Me Explain Agent Brief",
     "",
     `Session: ${plan.sessionId}`,
     `Chunks: ${plan.chunks.length}`,
@@ -634,7 +598,7 @@ function writeAgentBrief(
     "",
     "Interactive flow:",
     `- Start is already done with first ${QUICK_BATCH_SIZE} suggested chunks.`,
-    `- Get next suggested batch: bun run apps/codex-review-vscode/src/cli.ts next-batch --workspace ${quoteArg(workspaceRoot)}`,
+    `- Get next suggested batch: bun run apps/let-me-explain/src/cli.ts next-batch --workspace ${quoteArg(workspaceRoot)}`,
     "",
     "Loop:",
     `1. Check progress and pending files: ${statusCommand}`,
@@ -650,10 +614,13 @@ function writeAgentBrief(
     "- `set` == `narration-set-chunks`",
     "",
     "Rules:",
-    "- Do not evaluate correctness.",
-    "- Describe what changed and why.",
-    "- Use only existing chunk IDs.",
-    "- Ensure every chunk appears in at least one step.",
+    "- Do not evaluate correctness or mark issues.",
+    "- Each chunk narration should tell a connected story: what was the situation before, what changed, and why.",
+    "- Vary the style naturally. Think 'Previously X. Now Y because Z.' but don't force a template.",
+    "- Aim for ~5 steps. Group related chunks into the same step.",
+    "- When test files are present, start with a step showing the tests — they reveal intent.",
+    "- Order steps to build understanding: tests → core logic → integration → peripherals.",
+    "- Use only existing chunk IDs. Every chunk must appear in at least one step.",
     "",
   ].join("\n");
 
@@ -686,139 +653,17 @@ function writeStoryAuthoringFiles(options: CliOptions, plan: ReviewPlan): StoryA
   return { seedPath, stepsPath, narrationPath };
 }
 
-function logStoryGuidance(): void {
-  console.log("Story instructions:");
-  for (const instruction of STORY_INSTRUCTIONS) {
-    console.log(`- ${instruction}`);
-  }
-  console.log("Output schema:");
-  console.log(JSON.stringify(STORY_OUTPUT_SCHEMA_EXAMPLE, null, 2));
-}
-
-function logNarrationPreview(options: CliOptions, narrationPath: string, plan: ReviewPlan): void {
-  const previewLimit = 8;
-  const narrationTemplate = createAiChunkNarrationTemplate(plan);
-  const result = listNarrationEntries(narrationTemplate, plan.chunks, {
-    limit: previewLimit,
-    offset: 0,
-    pendingOnly: true,
-  });
-
-  console.log(
-    `Narration progress: ${result.progress.authored}/${result.progress.total} authored, ${result.progress.pending} remaining.`,
-  );
-
-  if (result.progress.total <= previewLimit) {
-    return;
-  }
-
-  console.log(
-    `Large narration file detected (${result.progress.total} chunks). Showing first ${result.shown}:`,
-  );
-  for (const item of result.items) {
-    console.log(`- ${item.chunkId} | ${item.filePath} | ${item.preview}`);
-  }
-
-  const listCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts narration-list",
-    `--workspace ${quoteArg(options.workspaceRoot)}`,
-    `--narration-file ${quoteArg(narrationPath)}`,
-    `--offset ${result.nextOffset}`,
-    `--limit ${previewLimit}`,
-    ...toIncludeArgs(options),
-  ].join(" ");
-  console.log(`To continue listing pending chunks: ${listCommand}`);
-}
-
-function runGenerate(options: CliOptions): void {
-  const notes = loadAuthorNotes(options.notesPath);
-  const baselinePlan = buildReviewPlan({
-    workspaceRoot: options.workspaceRoot,
-    baseRef: options.baseRef,
-    notes,
-    includeFiles: options.includeFiles,
-    includePaths: options.includePaths,
-  });
-
-  const finalPlan = options.storyFilePath
-    ? applyAiStoryToPlan(baselinePlan, parseStoryFromFile(options.storyFilePath, baselinePlan))
-    : baselinePlan;
-
-  writeReviewArtifacts(options.workspaceRoot, finalPlan);
-  const state = ensureReviewState(options.workspaceRoot, finalPlan);
-  const initialBatch = selectNextBatch(finalPlan, state, QUICK_BATCH_SIZE);
-  if (initialBatch.length > 0) {
-    const updatedState = updateSurfacedChunks(state, initialBatch);
-    writeReviewState(options.workspaceRoot, updatedState);
-  }
-  const storyFiles = writeStoryAuthoringFiles(options, finalPlan);
-  const sessionLock = createSessionLock(
-    finalPlan,
-    getWorkspaceStatusFingerprint(options.workspaceRoot),
-  );
-  writeSessionLock(options.workspaceRoot, sessionLock);
-  const agentBriefPath = writeAgentBrief(options.workspaceRoot, finalPlan, storyFiles, options);
-
-  const planPath = path.join(options.workspaceRoot, ".codex-review", "review-plan.json");
-  const statePath = path.join(options.workspaceRoot, ".codex-review", "review-state.json");
-  const tourPath = path.join(options.workspaceRoot, ".tours", `review-${finalPlan.sessionId}.tour`);
-  const storyPath = toDefaultStoryOutPath(options.workspaceRoot);
-  const applyCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts apply-story",
-    `--workspace ${quoteArg(options.workspaceRoot)}`,
-    `--steps-file ${quoteArg(storyFiles.stepsPath)}`,
-    `--narration-file ${quoteArg(storyFiles.narrationPath)}`,
-  ].join(" ");
-
-  console.log(`Generated review session ${finalPlan.sessionId}`);
-  logScopeHint(options);
-  if (options.storyFilePath) {
-    console.log(`Applied story file: ${options.storyFilePath}`);
-  }
-  console.log(`Plan: ${planPath}`);
-  console.log(`State: ${statePath}`);
-  console.log(`CodeTour: ${tourPath}`);
-  console.log(`Story seed (read-only context): ${storyFiles.seedPath}`);
-  console.log(`Story steps (edit): ${storyFiles.stepsPath}`);
-  console.log(`Chunk narrations (edit): ${storyFiles.narrationPath}`);
-  console.log(`Agent brief: ${agentBriefPath}`);
-  if (initialBatch.length > 0) {
-    console.log(`Quick interactive batch (${initialBatch.length} chunk(s)):`);
-    for (const line of formatBatchSuggestions(initialBatch)) {
-      console.log(line);
-    }
-    console.log(
-      `Continue when ready: bun run apps/codex-review-vscode/src/cli.ts next-batch --workspace ${quoteArg(options.workspaceRoot)}`,
-    );
-  }
-  console.log(`Optional single-file story target: ${storyPath}`);
-  console.log(`Next: update ${storyFiles.stepsPath} and/or ${storyFiles.narrationPath}.`);
-  console.log(`Then run: ${applyCommand}`);
-  console.log(
-    `Status anytime: bun run apps/codex-review-vscode/src/cli.ts status --workspace ${quoteArg(options.workspaceRoot)}`,
-  );
-  console.log("Alternative: provide --story-file with full story JSON in the previous schema.");
-  console.log(
-    "Tip: scope to a subset with --include-file path/to/file.ts or --include-path apps/player (repeatable).",
-  );
-  logNarrationPreview(options, storyFiles.narrationPath, finalPlan);
-  logStoryGuidance();
-}
-
 function runCreateStorySeed(options: CliOptions): void {
   const shouldRebuildPlan =
     options.includeFiles.length > 0 ||
     options.includePaths.length > 0 ||
-    Boolean(options.notesPath) ||
     options.baseRef !== "HEAD";
 
   let plan: ReviewPlan;
   if (shouldRebuildPlan) {
-    const notes = loadAuthorNotes(options.notesPath);
     plan = buildReviewPlan({
       workspaceRoot: options.workspaceRoot,
       baseRef: options.baseRef,
-      notes,
       includeFiles: options.includeFiles,
       includePaths: options.includePaths,
     });
@@ -827,12 +672,7 @@ function runCreateStorySeed(options: CliOptions): void {
     try {
       plan = readReviewPlan(options.workspaceRoot);
     } catch {
-      const notes = loadAuthorNotes(options.notesPath);
-      plan = buildReviewPlan({
-        workspaceRoot: options.workspaceRoot,
-        baseRef: options.baseRef,
-        notes,
-      });
+      plan = buildReviewPlan({ workspaceRoot: options.workspaceRoot, baseRef: options.baseRef });
       writeReviewArtifacts(options.workspaceRoot, plan);
     }
   }
@@ -841,21 +681,11 @@ function runCreateStorySeed(options: CliOptions): void {
   const sessionLock = createSessionLock(plan, getWorkspaceStatusFingerprint(options.workspaceRoot));
   writeSessionLock(options.workspaceRoot, sessionLock);
   const agentBriefPath = writeAgentBrief(options.workspaceRoot, plan, storyFiles, options);
-  const applyCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts apply-story",
-    `--workspace ${quoteArg(options.workspaceRoot)}`,
-    `--steps-file ${quoteArg(storyFiles.stepsPath)}`,
-    `--narration-file ${quoteArg(storyFiles.narrationPath)}`,
-  ].join(" ");
 
-  console.log(`Story seed written: ${storyFiles.seedPath}`);
-  console.log(`Story steps template written: ${storyFiles.stepsPath}`);
-  console.log(`Chunk narration template written: ${storyFiles.narrationPath}`);
-  console.log(`Agent brief: ${agentBriefPath}`);
-  console.log(`Next: update ${storyFiles.stepsPath} and/or ${storyFiles.narrationPath}.`);
-  console.log(`Then run: ${applyCommand}`);
-  logNarrationPreview(options, storyFiles.narrationPath, plan);
-  logStoryGuidance();
+  const r = (p: string) => relPath(p, options.workspaceRoot);
+  console.log(`Session: ${plan.sessionId} | ${plan.chunks.length} chunks`);
+  console.log(`Seed: ${r(storyFiles.seedPath)}`);
+  console.log(`Brief: ${r(agentBriefPath)}`);
 }
 
 function resolveSplitStoryInputs(options: CliOptions): {
@@ -894,30 +724,22 @@ function runApplyStory(options: CliOptions): void {
       );
 
   const updatedPlan = applyAiStoryToPlan(existingPlan, story);
-  writeReviewPlanAndTour(options.workspaceRoot, updatedPlan);
+  const narrationPath =
+    splitInputs.narrationFilePath ?? toDefaultNarrationOutPath(options.workspaceRoot);
+  const narration = readNarrationWithSync(options.workspaceRoot, existingPlan, narrationPath);
+  const authoredChunkIds = new Set(
+    narration.chunkNarration.filter((e) => e.authored).map((e) => e.chunkId),
+  );
+  writeReviewPlanAndTour(options.workspaceRoot, updatedPlan, authoredChunkIds);
   const existingState = tryReadState(options.workspaceRoot);
   ensureStateMatchesPlan(options.workspaceRoot, updatedPlan, existingState);
 
-  const planPath = path.join(options.workspaceRoot, ".codex-review", "review-plan.json");
   const tourPath = path.join(
     options.workspaceRoot,
     ".tours",
     `review-${updatedPlan.sessionId}.tour`,
   );
-  if (options.storyFilePath) {
-    console.log(`Applied story file: ${options.storyFilePath}`);
-  } else {
-    if (splitInputs.stepsFilePath) {
-      console.log(`Applied steps file: ${splitInputs.stepsFilePath}`);
-    } else {
-      console.log("Applied steps: existing plan steps (no custom steps file provided).");
-    }
-    if (splitInputs.narrationFilePath) {
-      console.log(`Applied narration file: ${splitInputs.narrationFilePath}`);
-    }
-  }
-  console.log(`Updated plan: ${planPath}`);
-  console.log(`Updated tour: ${tourPath}`);
+  console.log(`Applied. Tour: ${relPath(tourPath, options.workspaceRoot)}`);
 }
 
 function readNarrationWithSync(
@@ -977,53 +799,19 @@ function runStatus(options: CliOptions): void {
     driftStatus = "unknown (missing session lock)";
   }
 
-  console.log(`Session: ${plan.sessionId}`);
-  console.log(`Lock file: ${getSessionLockPath(options.workspaceRoot)}`);
-  console.log(`Working tree since session: ${driftStatus}`);
+  console.log(`Session: ${plan.sessionId} | drift: ${driftStatus}`);
+  console.log(`Narration: ${narrationProgress.authored}/${narrationProgress.total}`);
   console.log(
-    `Review labels: ${reviewProgress.total - reviewProgress.unreviewed}/${reviewProgress.total} labeled (${reviewProgress.unreviewed} unreviewed).`,
+    `Review: ${reviewProgress.total - reviewProgress.unreviewed}/${reviewProgress.total} labeled`,
   );
-  console.log(
-    `Narration: ${narrationProgress.authored}/${narrationProgress.total} authored (${narrationProgress.pending} remaining).`,
-  );
-  const viewedCount = new Set(state.viewedChunkIds ?? []).size;
-  console.log(`Viewed chunks: ${viewedCount}/${plan.chunks.length}`);
-  if (state.lastOpenedChunkId) {
-    const lastChunk = plan.chunks.find((chunk) => chunk.id === state.lastOpenedChunkId);
-    if (lastChunk) {
-      console.log(`Last opened: ${lastChunk.filePath}:${toChunkLine(lastChunk)} (${lastChunk.id})`);
+  if (pendingByFile.length > 0) {
+    console.log(`Pending files:`);
+    for (const item of pendingByFile.slice(0, visibleLimit)) {
+      console.log(`  ${item.filePath}: ${item.pending}`);
     }
-  }
-  console.log(
-    `Surfaced in batches: ${(state.surfacedChunkIds ?? []).length}/${plan.chunks.length}`,
-  );
-  console.log(`Files with pending narration: ${pendingByFile.length}`);
-  for (const item of pendingByFile.slice(0, visibleLimit)) {
-    console.log(`- ${item.filePath}: ${item.pending}`);
-  }
-  if (pendingByFile.length > visibleLimit) {
-    console.log(`... ${pendingByFile.length - visibleLimit} more file(s).`);
-  }
-
-  if (narrationProgress.pending > 0) {
-    const firstFile = pendingByFile[0]?.filePath;
-    if (firstFile) {
-      const nextChunksCommand = [
-        "bun run apps/codex-review-vscode/src/cli.ts chunks",
-        `--workspace ${quoteArg(options.workspaceRoot)}`,
-        `--file ${quoteArg(firstFile)}`,
-        "--limit 8",
-      ].join(" ");
-      console.log(`Next action: ${nextChunksCommand}`);
+    if (pendingByFile.length > visibleLimit) {
+      console.log(`  ... ${pendingByFile.length - visibleLimit} more`);
     }
-  } else {
-    const applyCommand = [
-      "bun run apps/codex-review-vscode/src/cli.ts apply-story",
-      `--workspace ${quoteArg(options.workspaceRoot)}`,
-      `--steps-file ${quoteArg(toDefaultStepsOutPath(options.workspaceRoot))}`,
-      `--narration-file ${quoteArg(narrationPath)}`,
-    ].join(" ");
-    console.log(`Next action: apply story to plan/tour with ${applyCommand}`);
   }
 }
 
@@ -1032,26 +820,19 @@ function runNextBatch(options: CliOptions): void {
   const state = ensureReviewState(options.workspaceRoot, plan);
   const selected = selectNextBatch(plan, state, QUICK_BATCH_SIZE);
   if (selected.length === 0) {
-    console.log("No additional unreviewed chunks available for a new batch.");
-    console.log(
-      `Status: bun run apps/codex-review-vscode/src/cli.ts status --workspace ${quoteArg(options.workspaceRoot)}`,
-    );
+    console.log("No more unreviewed chunks.");
     return;
   }
 
   const updatedState = updateSurfacedChunks(state, selected);
   writeReviewState(options.workspaceRoot, updatedState);
 
-  console.log(`Suggested review batch (${selected.length} chunk(s)):`); // interactive continuation
-  for (const line of formatBatchSuggestions(selected)) {
+  const allHashes = plan.chunks.map((c) => c.id.replace("chunk-", ""));
+  const pLen = shortestUniquePrefix(allHashes);
+  console.log(`Batch (${selected.length}):`);
+  for (const line of formatBatchSuggestions(selected, pLen)) {
     console.log(line);
   }
-  console.log(
-    `If user accepts/questions this batch, continue with: bun run apps/codex-review-vscode/src/cli.ts next-batch --workspace ${quoteArg(options.workspaceRoot)}`,
-  );
-  console.log(
-    `Inspect one file in detail: bun run apps/codex-review-vscode/src/cli.ts chunks --workspace ${quoteArg(options.workspaceRoot)} --file ${quoteArg(selected[0].filePath)} --limit 8`,
-  );
 }
 
 function runNarrationList(options: CliOptions): void {
@@ -1067,58 +848,241 @@ function runNarrationList(options: CliOptions): void {
     pendingOnly: options.pendingOnly,
   });
 
-  console.log(`Narration file: ${narrationPath}`);
-  logScopeHint(options);
-  console.log(
-    `Progress: ${result.progress.authored}/${result.progress.total} authored, ${result.progress.pending} remaining.`,
-  );
-  console.log(
-    `Scope: ${result.filteredPending}/${result.filteredTotal} pending, showing ${result.shown}, ${result.remainingFiltered} still hidden by pagination.`,
-  );
+  console.log(`Progress: ${result.progress.authored}/${result.progress.total}`);
   console.log(
     JSON.stringify(
       {
-        offset: options.offset,
-        limit: options.limit,
-        pendingOnly: options.pendingOnly,
         nextOffset: result.nextOffset,
+        remaining: result.remainingFiltered,
         items: result.items.map((item) => ({
           chunkId: item.chunkId,
           filePath: item.filePath,
           preview: item.preview,
-          authored: item.authored,
         })),
       },
       null,
       2,
     ),
   );
+}
 
-  if (result.remainingFiltered > 0) {
-    const nextCommand = [
-      "bun run apps/codex-review-vscode/src/cli.ts narration-list",
-      `--workspace ${quoteArg(options.workspaceRoot)}`,
-      `--narration-file ${quoteArg(narrationPath)}`,
-      `--offset ${result.nextOffset}`,
-      `--limit ${options.limit}`,
-      ...(options.pendingOnly ? [] : ["--all"]),
-      ...toIncludeArgs(options),
-    ].join(" ");
-    console.log(`Next page: ${nextCommand}`);
-  } else if (result.filteredPending > 0) {
-    console.log("No more pages in this view, but pending chunks remain in scope.");
-  } else {
-    console.log("All chunks in this view are authored.");
+function startFreshSession(options: CliOptions): ReviewPlan {
+  const plan = buildReviewPlan({
+    workspaceRoot: options.workspaceRoot,
+    baseRef: options.baseRef,
+    includeFiles: options.includeFiles,
+    includePaths: options.includePaths,
+  });
+  writeReviewArtifacts(options.workspaceRoot, plan);
+  ensureReviewState(options.workspaceRoot, plan);
+  writeStoryAuthoringFiles(options, plan);
+  const sessionLock = createSessionLock(plan, getWorkspaceStatusFingerprint(options.workspaceRoot));
+  writeSessionLock(options.workspaceRoot, sessionLock);
+  return plan;
+}
+
+function ensureSession(options: CliOptions): ReviewPlan {
+  let oldPlan: ReviewPlan | undefined;
+  try {
+    oldPlan = readReviewPlan(options.workspaceRoot);
+  } catch {
+    // No existing session
   }
+
+  if (!oldPlan) {
+    return startFreshSession(options);
+  }
+
+  // Check if diff changed since session was created
+  const freshPlan = buildReviewPlan({
+    workspaceRoot: options.workspaceRoot,
+    baseRef: options.baseRef,
+    includeFiles: options.includeFiles,
+    includePaths: options.includePaths,
+  });
+
+  if (freshPlan.diffHash === oldPlan.diffHash) {
+    return oldPlan;
+  }
+
+  // Diff changed — regenerate but preserve authored narrations for surviving chunks
+  const narrationPath =
+    options.narrationFilePath ?? toDefaultNarrationOutPath(options.workspaceRoot);
+  const oldNarration = existsSync(narrationPath)
+    ? readNarrationWithSync(options.workspaceRoot, oldPlan, narrationPath)
+    : undefined;
+
+  const authoredMap = new Map<string, { narration: string; authoredAt?: string }>();
+  if (oldNarration) {
+    for (const entry of oldNarration.chunkNarration) {
+      if (entry.authored) {
+        authoredMap.set(entry.chunkId, {
+          narration: entry.narration,
+          authoredAt: entry.authoredAt,
+        });
+      }
+    }
+  }
+
+  writeReviewArtifacts(options.workspaceRoot, freshPlan);
+  ensureReviewState(options.workspaceRoot, freshPlan);
+
+  // Build new narration template, carrying over surviving authored entries
+  const newNarration = createAiChunkNarrationTemplate(freshPlan);
+  let preserved = 0;
+  for (const entry of newNarration.chunkNarration) {
+    const old = authoredMap.get(entry.chunkId);
+    if (old) {
+      entry.narration = old.narration;
+      entry.authored = true;
+      entry.authoredAt = old.authoredAt;
+      preserved++;
+    }
+  }
+  writePrettyJson(narrationPath, newNarration);
+
+  // Rebuild steps + seed
+  const stepsPath = options.stepsFilePath ?? toDefaultStepsOutPath(options.workspaceRoot);
+  writePrettyJson(stepsPath, createAiStoryStepsTemplate(freshPlan));
+  const seedPath = options.seedOutPath ?? toDefaultSeedOutPath(options.workspaceRoot);
+  const storyInstructions = loadStoryInstructions(options.storyInstructionsPath);
+  writePrettyJson(seedPath, createAiStorySeed(freshPlan, storyInstructions));
+
+  const sessionLock = createSessionLock(
+    freshPlan,
+    getWorkspaceStatusFingerprint(options.workspaceRoot),
+  );
+  writeSessionLock(options.workspaceRoot, sessionLock);
+
+  const lost = authoredMap.size - preserved;
+  console.log(
+    `Regenerated: ${freshPlan.chunks.length} chunks | ${preserved} narrations preserved` +
+      (lost > 0 ? ` | ${lost} lost (chunks changed)` : ""),
+  );
+
+  return freshPlan;
+}
+
+function shortestUniquePrefix(ids: string[], min = 4): number {
+  for (let len = min; len < 12; len++) {
+    const prefixes = new Set(ids.map((id) => id.slice(0, len)));
+    if (prefixes.size === ids.length) {
+      return len;
+    }
+  }
+  return 12;
+}
+
+function resolveChunkIds(partialIds: string[], knownIds: string[]): string[] {
+  return partialIds.map((partial) => {
+    // Already a full known ID
+    if (knownIds.includes(partial)) {
+      return partial;
+    }
+    // Strip chunk- prefix for matching
+    const hash = partial.replace(/^chunk-/, "");
+    const matches = knownIds.filter((id) => id.replace(/^chunk-/, "").startsWith(hash));
+    if (matches.length === 1) {
+      return matches[0]!;
+    }
+    if (matches.length > 1) {
+      throw new Error(`Ambiguous chunk ID "${partial}" — matches: ${matches.join(", ")}`);
+    }
+    return partial; // Let downstream handle unknown
+  });
+}
+
+function printReviewInstructions(plan: ReviewPlan, options: CliOptions): void {
+  const narrationPath =
+    options.narrationFilePath ?? toDefaultNarrationOutPath(options.workspaceRoot);
+  const narration = readNarrationWithSync(options.workspaceRoot, plan, narrationPath);
+  const progress = computeNarrationProgress(narration, plan.chunks);
+
+  // Group chunks by file
+  const byFile = new Map<string, ReviewChunk[]>();
+  for (const chunk of plan.chunks) {
+    const rel = relPath(path.resolve(options.workspaceRoot, chunk.filePath), options.workspaceRoot);
+    const list = byFile.get(rel) ?? [];
+    list.push(chunk);
+    byFile.set(rel, list);
+  }
+
+  const tourRel = relPath(
+    path.join(options.workspaceRoot, ".tours", `review-${plan.sessionId}.tour`),
+    options.workspaceRoot,
+  );
+
+  const lines = [
+    "=== Let Me Explain ===",
+    "",
+    "You made code changes in this workspace. This tool helps you explain them to",
+    "the user through a CodeTour they read in VS Code alongside the actual diffs.",
+    "",
+    `Session: ${plan.sessionId}`,
+    `Progress: ${progress.authored}/${progress.total} narrated`,
+    `Tour: ${tourRel}`,
+    "",
+    "HOW IT WORKS:",
+    "- You narrate chunks one at a time (or in small groups). Each narration is",
+    "  saved and the tour file updates live — the user can open it immediately.",
+    "- You decide the order. Start with tests (they show intent), then core logic,",
+    "  then integration, then peripherals.",
+    "- Each narration tells a story: what was the situation before, what changed, why.",
+    "",
+    "WORKFLOW:",
+    "1. Pick ~5 chunks to narrate first. Use the previews below to orient.",
+    "   If a preview isn't enough context, read the actual file before narrating.",
+    "2. For each chunk, run:",
+    `   bun explain '{"ids":["<short-id>"],"narration":"Previously X. Now Y because Z."}'`,
+    "   The tour updates automatically. User can open it after the first save.",
+    "3. Tell the user the first stops are ready and wait for feedback.",
+    "4. If they ask questions, answer here. Rewrite narrations if the level is wrong",
+    "   (too technical, missing context, wrong assumptions about their knowledge).",
+    "5. When accepted, pick the next ~5 chunks. Run `bun explain` to see progress.",
+    "",
+    "TIPS:",
+    "- Only group chunks if they are truly about the same logical change.",
+    "  When in doubt, narrate separately — a wrong grouping puts the wrong",
+    "  narration next to unrelated code in the tour.",
+    "- Vary your style. Don't use a rigid template.",
+    "- You can always re-narrate a chunk by sending the same id with new text.",
+    "",
+    `CHUNKS (${progress.authored}/${progress.total} narrated):`,
+  ];
+
+  const allHashes = plan.chunks.map((c) => c.id.replace("chunk-", ""));
+  const prefixLen = shortestUniquePrefix(allHashes);
+
+  for (const [filePath, chunks] of byFile) {
+    lines.push(`  ${filePath} (${chunks.length}):`);
+    lines.push("    chunk | lines | preview");
+    for (const chunk of chunks) {
+      const authored = narration.chunkNarration.find((n) => n.chunkId === chunk.id);
+      const marker = authored && authored.narration !== chunk.narration ? " *" : "";
+      const start = chunk.newStart > 0 ? chunk.newStart : chunk.oldStart;
+      const span = chunk.newStart > 0 ? chunk.newLines : chunk.oldLines;
+      const range = span > 1 ? `${start}-${start + span - 1}` : `${start}`;
+      const shortId = chunk.id.replace("chunk-", "").slice(0, prefixLen);
+      const preview =
+        chunk.preview.length > 80 ? chunk.preview.slice(0, 77) + "..." : chunk.preview;
+      lines.push(`    ${shortId} | ${range} | ${preview}${marker}`);
+    }
+  }
+
+  console.log(lines.join("\n"));
 }
 
 function runNarrationSetChunks(options: CliOptions): void {
   if (!options.payloadText) {
-    throw new Error("narration-set-chunks requires --payload '<json>'.");
+    const plan = ensureSession(options);
+    printReviewInstructions(plan, options);
+    return;
   }
 
   const payload = parseSetChunksPayload(options.payloadText);
   const plan = readReviewPlan(options.workspaceRoot);
+  const allChunkIds = plan.chunks.map((chunk) => chunk.id);
+  payload.ids = resolveChunkIds(payload.ids, allChunkIds);
   const narrationPath =
     options.narrationFilePath ?? toDefaultNarrationOutPath(options.workspaceRoot);
   const stepsPath = options.stepsFilePath ?? toDefaultStepsOutPath(options.workspaceRoot);
@@ -1127,7 +1091,7 @@ function runNarrationSetChunks(options: CliOptions): void {
     ? readStepsTemplateFile(stepsPath)
     : createAiStoryStepsTemplate(plan);
   const updatedNarrationResult = applySetChunksToNarration(syncedNarration, payload, plan.chunks);
-  const knownChunkIds = new Set(plan.chunks.map((chunk) => chunk.id));
+  const knownChunkIds = new Set(allChunkIds);
   const updatedSteps = applySetChunksToSteps(steps, payload, knownChunkIds);
   if (updatedNarrationResult.updatedCount === 0) {
     throw new Error(
@@ -1138,41 +1102,27 @@ function runNarrationSetChunks(options: CliOptions): void {
   writePrettyJson(narrationPath, updatedNarrationResult.narration);
   writePrettyJson(stepsPath, updatedSteps);
 
-  const progress = computeNarrationProgress(updatedNarrationResult.narration, plan.chunks);
-  console.log(`Updated narration chunks: ${updatedNarrationResult.updatedCount}`);
-  if (payload.level && payload.title && payload.why) {
-    console.log(
-      `Added story step for these chunk IDs with level=${payload.level}, title=${payload.title}.`,
-    );
-  }
-  if (updatedNarrationResult.missingIds.length > 0) {
-    console.log(`Ignored unknown chunk IDs: ${updatedNarrationResult.missingIds.join(", ")}`);
-  }
-  console.log(`Narration file updated: ${narrationPath}`);
-  console.log(`Steps file updated: ${stepsPath}`);
-  console.log(
-    `Progress: ${progress.authored}/${progress.total} authored, ${progress.pending} remaining.`,
+  // Auto-apply: rebuild tour with only authored chunks
+  const authoredChunkIds = new Set(
+    updatedNarrationResult.narration.chunkNarration
+      .filter((entry) => entry.authored)
+      .map((entry) => entry.chunkId),
   );
-  const listCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts narration-list",
-    `--workspace ${quoteArg(options.workspaceRoot)}`,
-    `--narration-file ${quoteArg(narrationPath)}`,
-    "--pending-only",
-  ].join(" ");
-  console.log(`List remaining chunks: ${listCommand}`);
-  const applyCommand = [
-    "bun run apps/codex-review-vscode/src/cli.ts apply-story",
-    `--workspace ${quoteArg(options.workspaceRoot)}`,
-    `--steps-file ${quoteArg(stepsPath)}`,
-    `--narration-file ${quoteArg(narrationPath)}`,
-  ].join(" ");
-  console.log(`Apply to plan/tour: ${applyCommand}`);
+  const story = parseStoryFromSplitFiles(stepsPath, narrationPath, plan);
+  const updatedPlan = applyAiStoryToPlan(plan, story);
+  writeReviewPlanAndTour(options.workspaceRoot, updatedPlan, authoredChunkIds);
+
+  const progress = computeNarrationProgress(updatedNarrationResult.narration, plan.chunks);
+  if (updatedNarrationResult.missingIds.length > 0) {
+    console.log(`Ignored unknown IDs: ${updatedNarrationResult.missingIds.join(", ")}`);
+  }
+  console.log(`Progress: ${progress.authored}/${progress.total}`);
 }
 
 function main(): void {
   const { command, options } = parseArgs(process.argv.slice(2));
   if (command === "generate") {
-    runGenerate(options);
+    runNarrationSetChunks(options);
     return;
   }
   if (command === "create-story-seed") {
