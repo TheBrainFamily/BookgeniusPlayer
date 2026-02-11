@@ -45,6 +45,7 @@ describe("generateEmbeddings integration (real paragraph extraction)", () => {
     vi.clearAllMocks();
   });
 
+  // eslint-disable-next-line vitest/no-disabled-tests
   it.skip("uses real chapter paragraph extraction with mocked getBookData/getMtimeMs/readBookFile", async () => {
     const { getBookForm } = await import("../../tools/getBookForm");
     const { getBookData } = await import("../../shared-books-data/getBooksData");
