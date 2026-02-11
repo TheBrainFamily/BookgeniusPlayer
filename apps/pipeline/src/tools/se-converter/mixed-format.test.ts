@@ -116,6 +116,63 @@ describe("SE Converter - Mixed prose and play format", () => {
       expect(result.textHtml).toContain("Later that day:");
       expect(result.textHtml).toContain("The end.");
     });
+
+    it("annotates ulysses-style drama rows with data-drama/data-speaker/data-persona", () => {
+      const files = [
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter z3998:fiction">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Circe</h2>
+      <p>Leopold Bloom enters.</p>
+      <table>
+        <tbody>
+          <tr class="together">
+            <td rowspan="1" epub:type="z3998:persona">The Calls</td>
+            <td>Wait, my love, and I’ll be with you.</td>
+          </tr>
+          <tr class="together">
+            <td rowspan="1" epub:type="z3998:persona">The Answers</td>
+            <td>Round behind the stable.</td>
+          </tr>
+          <tr>
+            <td><i epub:type="z3998:stage-direction">A deafmute idiot jerks past.</i></td>
+          </tr>
+          <tr>
+            <td epub:type="z3998:persona">The Idiot</td>
+            <td><i epub:type="z3998:stage-direction">Lifts a palsied left arm.</i> Grhahute!</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>The hall murmurs.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.textHtml).toContain('data-chapter-format="mixed"');
+      expect(result.textHtml).toContain('<table data-drama="">');
+      expect(result.textHtml).toContain('<tr class="together" data-speaker="the-calls">');
+      expect(result.textHtml).toContain('<tr class="together" data-speaker="the-answers">');
+      expect(result.textHtml).toContain('<tr data-speaker="the-idiot">');
+      expect(result.textHtml).toContain(
+        '<td rowspan="1" data-epub-type="z3998:persona" data-persona="">The Calls</td>',
+      );
+      expect(result.textHtml).toContain(
+        '<td rowspan="1" data-epub-type="z3998:persona" data-persona="">The Answers</td>',
+      );
+      expect(result.textHtml).toContain(
+        '<td data-epub-type="z3998:persona" data-persona="">The Idiot</td>',
+      );
+      expect(result.textHtml).toContain(
+        '<i data-epub-type="z3998:stage-direction">A deafmute idiot jerks past.</i>',
+      );
+    });
   });
 
   describe("blockquotes (songs, timelines)", () => {

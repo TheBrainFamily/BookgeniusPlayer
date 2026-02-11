@@ -339,14 +339,14 @@ export const callGeminiWithThinking = async (prompt: string, options: GeminiCall
       }
       return text;
     } catch (error) {
-      if (isQuotaOrRateLimitError(error)) {
-        if (!preferVertex) {
-          const vertexResult = await tryVertexTextFallback(prompt, model).catch(() => null);
-          if (vertexResult !== null) {
-            return vertexResult;
-          }
+      if (!preferVertex && attempt === 0) {
+        const vertexResult = await tryVertexTextFallback(prompt, model).catch(() => null);
+        if (vertexResult !== null) {
+          return vertexResult;
         }
+      }
 
+      if (isQuotaOrRateLimitError(error)) {
         const retryDelayMs = extractRetryDelayMs(error);
         if (retryDelayMs !== null && attempt < maxRateLimitRetries) {
           console.log(
@@ -436,16 +436,16 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
       });
       return object as T;
     } catch (error) {
-      if (isQuotaOrRateLimitError(error)) {
-        if (!preferVertex) {
-          const vertexResult = await tryVertexSchemaFallback(prompt, zodSchema, model).catch(
-            () => null,
-          );
-          if (vertexResult !== null) {
-            return vertexResult;
-          }
+      if (!preferVertex && attempt === 0) {
+        const vertexResult = await tryVertexSchemaFallback(prompt, zodSchema, model).catch(
+          () => null,
+        );
+        if (vertexResult !== null) {
+          return vertexResult;
         }
+      }
 
+      if (isQuotaOrRateLimitError(error)) {
         const retryDelayMs = extractRetryDelayMs(error);
         if (retryDelayMs !== null && attempt < maxRateLimitRetries) {
           console.log(

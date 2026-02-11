@@ -1,6 +1,8 @@
 import PQueue from "p-queue";
 import type { z } from "zod";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
+import { withRetry } from "../retry";
+import { isRetryableInfraError } from "../retryableErrors";
 
 export type GeminiVertexProvider = "gemini" | "vertex";
 
@@ -24,6 +26,22 @@ const PRIMARY_INTERVAL_MS = Number.parseInt(
 );
 const ENQUEUE_STAGGER_MS = Number.parseInt(
   process.env.CHAPTER_SUMMARY_QUEUE_STAGGER_MS || process.env.REWRITE_QUEUE_STAGGER_MS || "50",
+  10,
+);
+const CALL_MAX_RETRIES = Number.parseInt(
+  process.env.CHAPTER_SUMMARY_CALL_MAX_RETRIES || process.env.PIPELINE_STEP_MAX_RETRIES || "60",
+  10,
+);
+const CALL_RETRY_BASE_MS = Number.parseInt(
+  process.env.CHAPTER_SUMMARY_CALL_RETRY_BASE_MS ||
+    process.env.PIPELINE_STEP_RETRY_BASE_MS ||
+    "15000",
+  10,
+);
+const CALL_RETRY_MAX_MS = Number.parseInt(
+  process.env.CHAPTER_SUMMARY_CALL_RETRY_MAX_MS ||
+    process.env.PIPELINE_STEP_RETRY_MAX_MS ||
+    "900000",
   10,
 );
 
@@ -65,15 +83,35 @@ export async function runChapterSummaryQueuedSchemaCall<T>(params: {
   signal?: AbortSignal;
 }): Promise<{ provider: GeminiVertexProvider; result: T }> {
   const { prompt, schema, model = "gemini-3-flash-preview", signal } = params;
-  const provider = getNextProvider();
-  await waitForEnqueueStagger();
+  let provider: GeminiVertexProvider = "gemini";
 
-  const result = await primaryQueue.add(
-    async () =>
-      await callGeminiWithThinkingAndSchemaAndParsed(prompt, schema, model, {
-        preferVertex: provider === "vertex",
-      }),
-    { signal, throwOnTimeout: true },
+  const result = await withRetry<T>(
+    async () => {
+      provider = getNextProvider();
+      await waitForEnqueueStagger();
+
+      return await primaryQueue.add(
+        async () =>
+          await callGeminiWithThinkingAndSchemaAndParsed(prompt, schema, model, {
+            preferVertex: provider === "vertex",
+          }),
+        { signal, throwOnTimeout: true },
+      );
+    },
+    {
+      label: "chapter-summary-queue",
+      maxRetries: CALL_MAX_RETRIES,
+      baseDelayMs: CALL_RETRY_BASE_MS,
+      maxDelayMs: CALL_RETRY_MAX_MS,
+      signal,
+      isRetryable: (error) => isRetryableInfraError(error),
+      onRetry: (attempt, error, delayMs) => {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `[chapter-summary-queue] transient failure attempt ${attempt}/${CALL_MAX_RETRIES} (provider=${provider}): ${message}. Retrying in ${Math.round(delayMs / 1000)}s`,
+        );
+      },
+    },
   );
 
   return { provider, result };

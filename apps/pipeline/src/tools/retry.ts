@@ -1,4 +1,5 @@
 import { logger } from "../logger";
+import { abortableSleep, checkAborted, isAbortError } from "../helpers/abortHelpers";
 
 export type RetryOptions = {
   maxRetries?: number;
@@ -8,9 +9,8 @@ export type RetryOptions = {
   isRetryable?: (error: unknown, attempt: number) => boolean;
   onRetry?: (attempt: number, error: unknown, delayMs: number) => void;
   jitter?: boolean;
+  signal?: AbortSignal;
 };
-
-const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function withRetry<T>(
   fn: (attempt: number) => Promise<T>,
@@ -22,12 +22,14 @@ export async function withRetry<T>(
     isRetryable = () => true,
     onRetry,
     jitter = true,
+    signal,
   }: RetryOptions = {},
 ): Promise<T> {
   let lastError: unknown;
   const maxAttempts = maxRetries + 1;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    checkAborted(signal, `${label} before attempt ${attempt}`);
     const isRetry = attempt > 1;
     try {
       if (isRetry) {
@@ -36,6 +38,9 @@ export async function withRetry<T>(
       return await fn(attempt);
     } catch (error) {
       lastError = error;
+      if (isAbortError(error)) {
+        throw error;
+      }
       const message = error instanceof Error ? error.message : String(error);
       logger.error(`Operation failed: ${message}`, label, error);
 
@@ -49,7 +54,7 @@ export async function withRetry<T>(
       const delay = jitter ? Math.round(capped * (0.8 + Math.random() * 0.4)) : capped;
       logger.info(`Retrying in ${delay}ms...`, label);
       if (onRetry) onRetry(attempt, error, delay);
-      await sleep(delay);
+      await abortableSleep(delay, signal);
     }
   }
 

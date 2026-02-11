@@ -64,6 +64,8 @@ import {
 } from "./parallel-scheduler";
 import { buildNotesToUploadFromNoteMap, normalizeNoteRefId } from "./notes-import";
 import { isAbortError } from "../../src/helpers/abortHelpers";
+import { withRetry } from "../../src/tools/retry";
+import { getRetryableErrorMessage, isRetryableInfraError } from "../../src/tools/retryableErrors";
 import {
   buildCleanedCharacterSummaryMap,
   parseCharacterRoleCleanupResponse,
@@ -101,6 +103,9 @@ export type Job = {
 export const jobs = new Map<string, Job>();
 
 const DEFAULT_EBOOK_CONVERT = "/Applications/calibre.app/Contents/MacOS/ebook-convert";
+const STEP_MAX_RETRIES = Number.parseInt(process.env.PIPELINE_STEP_MAX_RETRIES || "60", 10);
+const STEP_RETRY_BASE_MS = Number.parseInt(process.env.PIPELINE_STEP_RETRY_BASE_MS || "15000", 10);
+const STEP_RETRY_MAX_MS = Number.parseInt(process.env.PIPELINE_STEP_RETRY_MAX_MS || "900000", 10);
 
 function slugify(input: string): string {
   return input
@@ -162,7 +167,7 @@ function getContentType(filename: string): string {
   return types[ext] || "application/octet-stream";
 }
 
-async function runStep(job: Job, step: Step, fn: () => Promise<void>) {
+async function runStep(job: Job, step: Step, fn: () => Promise<void>, signal?: AbortSignal) {
   const s = job.steps.find((x) => x.step === step)!;
 
   if (s.status === "done") {
@@ -181,7 +186,34 @@ async function runStep(job: Job, step: Step, fn: () => Promise<void>) {
   });
 
   try {
-    await fn();
+    await withRetry(
+      async (attempt) => {
+        if (attempt > 1) {
+          addLog(job, `🔁 Retrying ${StepLabels[step]} attempt ${attempt - 1}/${STEP_MAX_RETRIES}`);
+        }
+        await fn();
+      },
+      {
+        label: `pipeline-step:${step}`,
+        maxRetries: STEP_MAX_RETRIES,
+        baseDelayMs: STEP_RETRY_BASE_MS,
+        maxDelayMs: STEP_RETRY_MAX_MS,
+        signal,
+        isRetryable: (error) => {
+          if (isAbortError(error)) {
+            return false;
+          }
+          return isRetryableInfraError(error);
+        },
+        onRetry: (attempt, error, delayMs) => {
+          const message = getRetryableErrorMessage(error);
+          addLog(
+            job,
+            `⚠ ${StepLabels[step]} transient failure (${attempt}/${STEP_MAX_RETRIES}): ${message}. Next retry in ${Math.round(delayMs / 1000)}s`,
+          );
+        },
+      },
+    );
     s.status = "done";
     s.endedAt = Date.now();
     addLog(job, `✔ ${StepLabels[step]} done`);
@@ -996,7 +1028,7 @@ export async function startPipeline(input: {
       addLog(job, `⚠ No function defined for step: ${step}`);
       return;
     }
-    await runStep(job, step, fn);
+    await runStep(job, step, fn, pipelineSignal);
   };
 
   const run = async () => {

@@ -21,6 +21,20 @@ const SE_DATA_DIR = path.join(PIPELINE_ROOT, "standardebooks-data");
 const CATEGORIES_PATH = path.join(SE_DATA_DIR, "book-categories.json");
 const POPULARITY_PATH = path.join(SE_DATA_DIR, "popularity.json");
 const GENRE_CATEGORIES_PATH = path.join(SE_DATA_DIR, "categories.json");
+const SE_BOOKS_DIR = path.join(SE_DATA_DIR, "books");
+
+const PHASE_ONE_TITLE_EXCLUSION_PATTERN = /\b(poetry|poems|ballads|essays?)\b/i;
+const PHASE_ONE_MANUAL_EXCLUDED_SLUGS: Record<string, string> = {
+  "george-bernard-shaw_short-plays": "manual-non-novel-play",
+  "j-m-synge_short-plays": "manual-non-novel-play",
+  "mary-weston-fordham_magnolia-leaves": "manual-non-novel-poetry",
+  "robert-frost_north-of-boston": "manual-non-novel-poetry",
+  "w-e-b-du-bois_darkwater": "manual-non-novel-philosophy",
+  "w-e-b-du-bois_the-souls-of-black-folk": "manual-non-novel-philosophy",
+  "thomas-de-quincey_suspiria-de-profundis": "manual-non-novel-prose-poems",
+  "washington-irving_the-sketchbook-of-geoffrey-crayon-gent": "manual-non-novel-short-stories",
+  "lord-dunsany_the-book-of-wonder_sidney-h-sime": "manual-non-novel-short-stories",
+};
 
 const VALID_BUCKETS = [
   "1-novels-standard",
@@ -70,9 +84,38 @@ interface QueueFile {
     total: number;
     bucket: string;
     priorityCount: number;
-    excluded: { alreadyExists: number; otherBucket: number };
+    excluded: {
+      alreadyExists: number;
+      otherBucket: number;
+      wordCount?: number;
+      phaseOneGuard?: number;
+    };
   };
   items: QueueItem[];
+}
+
+interface BookMetadata {
+  title?: string;
+  description?: string;
+  subjects?: string[];
+}
+
+interface PhaseOneGuardDecision {
+  allow: boolean;
+  reason?: string;
+}
+
+type QueueFilterDecision =
+  | { include: true }
+  | { include: false; reason: "word-count" | "phase-one-guard"; detail?: string };
+
+interface QueueBuildSelectionResult {
+  items: QueueItem[];
+  excludedExisting: number;
+  excludedByWordCount: number;
+  excludedByPhaseOneGuard: number;
+  guardReasonCounts: Map<string, number>;
+  guardExamples: string[];
 }
 
 function readQueue(): QueueFile {
@@ -250,6 +293,128 @@ function loadGenreCategories(): GenreCategories {
   return JSON.parse(fs.readFileSync(GENRE_CATEGORIES_PATH, "utf-8")) as GenreCategories;
 }
 
+const metadataCache = new Map<string, BookMetadata | null>();
+
+function loadBookMetadata(slug: string): BookMetadata | null {
+  if (metadataCache.has(slug)) {
+    return metadataCache.get(slug) ?? null;
+  }
+
+  const metadataPath = path.join(SE_BOOKS_DIR, slug, "metadata.json");
+  if (!fs.existsSync(metadataPath)) {
+    metadataCache.set(slug, null);
+    return null;
+  }
+
+  const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8")) as BookMetadata;
+  metadataCache.set(slug, metadata);
+  return metadata;
+}
+
+function assessPhaseOneNarrativeEligibility(
+  slug: string,
+  fallbackTitle: string,
+): PhaseOneGuardDecision {
+  const metadata = loadBookMetadata(slug);
+  if (!metadata) {
+    return { allow: true };
+  }
+
+  const title = (metadata.title ?? fallbackTitle).trim();
+  if (PHASE_ONE_TITLE_EXCLUSION_PATTERN.test(title)) {
+    return { allow: false, reason: "title-poetry-or-essays" };
+  }
+
+  return { allow: true };
+}
+
+function evaluateQueueFilters(
+  slug: string,
+  category: CategoryEntry,
+  options: { maxWords?: number; applyPhaseOneGuards: boolean },
+): QueueFilterDecision {
+  if (options.maxWords !== undefined && category.wordCount > options.maxWords) {
+    return { include: false, reason: "word-count" };
+  }
+
+  if (!options.applyPhaseOneGuards) {
+    return { include: true };
+  }
+
+  const manualReason = PHASE_ONE_MANUAL_EXCLUDED_SLUGS[slug];
+  if (manualReason) {
+    return { include: false, reason: "phase-one-guard", detail: manualReason };
+  }
+
+  const decision = assessPhaseOneNarrativeEligibility(slug, category.title);
+  if (!decision.allow) {
+    return { include: false, reason: "phase-one-guard", detail: decision.reason ?? "unknown" };
+  }
+
+  return { include: true };
+}
+
+function hasExistingArtifacts(slug: string): boolean {
+  const existingDir = path.join(BOOKS_DATA_DIR, slug);
+  const convexMirrorDir = path.join(CONVEX_ASSETS_DIR, slug);
+  return fs.existsSync(existingDir) || fs.existsSync(convexMirrorDir);
+}
+
+function buildQueueItems(
+  orderedSlugs: string[],
+  bookCategories: Map<string, CategoryEntry>,
+  now: string,
+  options: { includeExisting: boolean; maxWords?: number; applyPhaseOneGuards: boolean },
+): QueueBuildSelectionResult {
+  const items: QueueItem[] = [];
+  let excludedExisting = 0;
+  let excludedByWordCount = 0;
+  let excludedByPhaseOneGuard = 0;
+  const guardReasonCounts = new Map<string, number>();
+  const guardExamples: string[] = [];
+
+  for (const slug of orderedSlugs) {
+    const category = bookCategories.get(slug);
+    if (!category) {
+      continue;
+    }
+
+    const decision = evaluateQueueFilters(slug, category, {
+      maxWords: options.maxWords,
+      applyPhaseOneGuards: options.applyPhaseOneGuards,
+    });
+    if (!decision.include) {
+      if (decision.reason === "word-count") {
+        excludedByWordCount += 1;
+      } else {
+        excludedByPhaseOneGuard += 1;
+        const reason = decision.detail ?? "unknown";
+        guardReasonCounts.set(reason, (guardReasonCounts.get(reason) ?? 0) + 1);
+        if (guardExamples.length < 8) {
+          guardExamples.push(`${slug} (${reason})`);
+        }
+      }
+      continue;
+    }
+
+    if (!options.includeExisting && hasExistingArtifacts(slug)) {
+      excludedExisting += 1;
+      continue;
+    }
+
+    items.push({ slug, status: "queued", attempts: 0, updatedAt: now });
+  }
+
+  return {
+    items,
+    excludedExisting,
+    excludedByWordCount,
+    excludedByPhaseOneGuard,
+    guardReasonCounts,
+    guardExamples,
+  };
+}
+
 function buildPopularityOrder(
   targetBuckets: Bucket[],
   bookCategories: Map<string, CategoryEntry>,
@@ -309,9 +474,16 @@ function buildPopularityOrder(
   };
 }
 
-function buildQueue(bucket?: string, includeExisting = false) {
+function buildQueue(
+  bucket?: string,
+  includeExisting = false,
+  options?: { skipPhaseOneGuards?: boolean; maxWords?: number },
+) {
   const targetBuckets: Bucket[] = bucket ? [bucket as Bucket] : DEFAULT_BUCKETS;
   const bucketLabel = targetBuckets.join("+");
+  const usingDefaultBuckets = bucket === undefined;
+  const applyPhaseOneGuards = usingDefaultBuckets && !options?.skipPhaseOneGuards;
+  const maxWords = options?.maxWords;
 
   const bookCategories = loadBookCategories();
   const popularityRanks = loadPopularityRanks();
@@ -325,23 +497,21 @@ function buildQueue(bucket?: string, includeExisting = false) {
   );
 
   const now = new Date().toISOString();
-  const items: QueueItem[] = [];
-  let excludedExisting = 0;
-
-  for (const slug of orderedSlugs) {
-    if (!includeExisting) {
-      const existingDir = path.join(BOOKS_DATA_DIR, slug);
-      const convexMirrorDir = path.join(CONVEX_ASSETS_DIR, slug);
-      if (fs.existsSync(existingDir) || fs.existsSync(convexMirrorDir)) {
-        excludedExisting += 1;
-        continue;
-      }
-    }
-
-    items.push({ slug, status: "queued", attempts: 0, updatedAt: now });
-  }
+  const {
+    items,
+    excludedExisting,
+    excludedByWordCount,
+    excludedByPhaseOneGuard,
+    guardReasonCounts,
+    guardExamples,
+  } = buildQueueItems(orderedSlugs, bookCategories, now, {
+    includeExisting,
+    maxWords,
+    applyPhaseOneGuards,
+  });
 
   const totalInBucket = orderedSlugs.length;
+  const totalEligibleAfterGuards = totalInBucket - excludedByWordCount - excludedByPhaseOneGuard;
   const queue: QueueFile = {
     meta: {
       createdAt: now,
@@ -352,6 +522,8 @@ function buildQueue(bucket?: string, includeExisting = false) {
       excluded: {
         alreadyExists: excludedExisting,
         otherBucket: bookCategories.size - totalInBucket,
+        ...(maxWords !== undefined ? { wordCount: excludedByWordCount } : {}),
+        ...(applyPhaseOneGuards ? { phaseOneGuard: excludedByPhaseOneGuard } : {}),
       },
     },
     items,
@@ -363,6 +535,23 @@ function buildQueue(bucket?: string, includeExisting = false) {
   console.log(`Bucket: ${bucketLabel}`);
   console.log(`Priority tier (top 7/genre): ${priorityCount} books`);
   console.log(`Total in bucket: ${totalInBucket}`);
+  if (maxWords !== undefined) {
+    console.log(`Skipped (word count > ${maxWords}): ${excludedByWordCount}`);
+  }
+  if (applyPhaseOneGuards) {
+    console.log(`Skipped (phase 1 narrative guard): ${excludedByPhaseOneGuard}`);
+    if (guardReasonCounts.size > 0) {
+      const reasons = Array.from(guardReasonCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .map(([reason, count]) => `${reason}=${count}`)
+        .join(", ");
+      console.log(`  reasons: ${reasons}`);
+    }
+    if (guardExamples.length > 0) {
+      console.log(`  examples: ${guardExamples.join(", ")}`);
+    }
+  }
+  console.log(`Eligible after guards: ${totalEligibleAfterGuards}`);
   console.log(`Skipped (already exists): ${excludedExisting}`);
   console.log(`Queued: ${items.length}`);
   summarizeQueue(queue);
@@ -529,9 +718,22 @@ async function main() {
             type: "boolean",
             default: false,
             describe: "Include books that already have books-data or ConvexAssets directories",
+          })
+          .option("skip-phase-one-guards", {
+            type: "boolean",
+            default: false,
+            describe:
+              "When building default bucket queue, allow poetry/essays/travel entries even if detected",
+          })
+          .option("max-words", {
+            type: "number",
+            describe: "Exclude books above this word count (optional; disabled by default)",
           }),
       async (args) => {
-        buildQueue(args.bucket, args["include-existing"]);
+        buildQueue(args.bucket, args["include-existing"], {
+          skipPhaseOneGuards: args["skip-phase-one-guards"],
+          maxWords: args["max-words"],
+        });
       },
     )
     .command(

@@ -19,7 +19,6 @@ import {
   needsChunking,
   chunkParagraphs,
   buildChunkXml,
-  buildParagraphXml,
   combineChunks,
   type Paragraph,
   type ChapterChunk,
@@ -65,7 +64,7 @@ function buildChunkedPrompt(
     "utf8",
   );
 
-  const paragraphsXml = paragraphs.map(buildParagraphXml).join("\n");
+  const paragraphsXml = buildChunkXml(paragraphs);
 
   let previousContextSection = "";
   let outputOnlyInstruction = "";
@@ -95,7 +94,10 @@ ${previousChunkOutput}
 }
 
 function clearXmlFence(response: string): string {
-  return response.replace(/```xml\n/, "").replace(/\n```$/, "");
+  return response
+    .replace(/```xml\n/, "")
+    .replace(/```html\n/, "")
+    .replace(/\n```$/, "");
 }
 
 function buildChunkValidationHandler(
@@ -341,7 +343,7 @@ export const identifyAndRewriteParagraphs = async (
 
   const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
-  const paragraphsForPage = paragraphsFromChapter.map(buildParagraphXml).join("\n");
+  const paragraphsForPage = buildChunkXml(paragraphsFromChapter);
 
   let prompt = "";
   if (chapterFormat === "play") {
