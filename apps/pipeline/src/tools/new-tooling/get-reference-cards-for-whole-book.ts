@@ -1,12 +1,16 @@
 import fs from "fs";
 import path from "path";
-import { type NewReferenceCardsResponse } from "../../types";
+import { type Chapter, type NewReferenceCardsResponse } from "../../types";
 import { NewReferenceCardsResponseSchema } from "../../schemes";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { callGpt5WithSchema } from "../../callGpt5";
 import { writeBookFile } from "../../helpers/writeBookFile";
+import { FILE_TYPE } from "../../helpers/filesHelpers";
+import { doesBookFileExist, readBookFile } from "../../helpers/readBookFile";
+import { getCurrentBookSlug } from "../../helpers/getCurrentBook";
+import { generateTagName } from "../../helpers/generateTagName";
 
 type ProviderId = "gpt-5" | "gemini-flash" | "gemini-pro";
 type AttemptStatus = "success" | "failure" | "skipped";
@@ -29,6 +33,25 @@ type ProviderSuccess = {
   attempt: BenchmarkAttempt;
 };
 type ProviderAttemptResult = { success?: ProviderSuccess; attempt: BenchmarkAttempt };
+
+type SEChapterMetadataEntry = { number: number; sourceFilenames: string[]; segmentHints: string[] };
+
+type SegmentResult = {
+  segmentId: string;
+  chapterNumbers: number[];
+  characters: NewReferenceCardsResponse["characters"];
+};
+
+const SEGMENTED_LARGE_NOVEL_SLUGS = new Set([
+  "leo-tolstoy_war-and-peace_louise-maude_aylmer-maude",
+  "victor-hugo_les-miserables_isabel-f-hapgood",
+  "t-e-lawrence_seven-pillars-of-wisdom",
+]);
+
+const SEGMENTED_REFERENCE_CARDS_FILE = "single-summary-per-person-by-segment.json";
+const CANONICAL_REFERENCE_CARDS_FILE = "single-summary-per-person-canonical.json";
+const CHAPTER_TO_SEGMENT_FILE = "chapter-to-segment-map.json";
+const SE_CHAPTER_METADATA_FILE = "se-chapter-metadata.json";
 
 const GENERIC_AVATAR_CARD = {
   name: "generic-avatar",
@@ -119,6 +142,201 @@ function buildNameSet(response: NewReferenceCardsResponse): string[] {
   return Array.from(names).sort();
 }
 
+function dedupeCharactersBySlug(
+  characters: NewReferenceCardsResponse["characters"],
+): NewReferenceCardsResponse["characters"] {
+  const bySlug = new Map<string, NewReferenceCardsResponse["characters"][number]>();
+  for (const character of characters) {
+    const name = character.name.trim();
+    if (!name) continue;
+    const slug = generateTagName(name).toLowerCase();
+    if (!slug || bySlug.has(slug)) continue;
+    bySlug.set(slug, {
+      ...character,
+      name,
+      referenceCard: character.referenceCard.trim(),
+      visualGuide: character.visualGuide.trim(),
+    });
+  }
+  return Array.from(bySlug.values());
+}
+
+function parseBookNumberFromWarAndPeaceFilename(fileName: string): string | null {
+  const match = fileName.match(/^chapter-(\d+)-\d+-\d+\.xhtml$/);
+  return match ? `book-${match[1]}` : null;
+}
+
+function parseBookNumberFromWarAndPeaceHint(hint: string): string | null {
+  const partMatch = hint.match(/^part-(\d+)-\d+$/);
+  if (partMatch) return `book-${partMatch[1]}`;
+  const bookMatch = hint.match(/^book-(\d+)$/);
+  return bookMatch ? `book-${bookMatch[1]}` : null;
+}
+
+function parseBookNumberFromLesMisFilename(fileName: string): string | null {
+  const match = fileName.match(/^chapter-(\d+)-(\d+)-\d+\.xhtml$/);
+  return match ? `book-${match[1]}-${match[2]}` : null;
+}
+
+function parseBookNumberFromLesMisHint(hint: string): string | null {
+  const match = hint.match(/^book-(\d+)-(\d+)$/);
+  return match ? `book-${match[1]}-${match[2]}` : null;
+}
+
+function parseBookNumberFromSevenPillarsHint(hint: string): string | null {
+  const match = hint.match(/^book-(\d+)$/);
+  return match ? `book-${match[1]}` : null;
+}
+
+function deriveSegmentIdForChapter(
+  slug: string,
+  metadata: SEChapterMetadataEntry | undefined,
+): string | null {
+  if (!metadata) return null;
+
+  const fileNames = metadata.sourceFilenames || [];
+  const hints = metadata.segmentHints || [];
+
+  if (slug === "leo-tolstoy_war-and-peace_louise-maude_aylmer-maude") {
+    for (const fileName of fileNames) {
+      const parsed = parseBookNumberFromWarAndPeaceFilename(fileName);
+      if (parsed) return parsed;
+    }
+    for (const hint of hints) {
+      const parsed = parseBookNumberFromWarAndPeaceHint(hint);
+      if (parsed) return parsed;
+    }
+    return null;
+  }
+
+  if (slug === "victor-hugo_les-miserables_isabel-f-hapgood") {
+    for (const fileName of fileNames) {
+      const parsed = parseBookNumberFromLesMisFilename(fileName);
+      if (parsed) return parsed;
+    }
+    for (const hint of hints) {
+      const parsed = parseBookNumberFromLesMisHint(hint);
+      if (parsed) return parsed;
+    }
+    return null;
+  }
+
+  if (slug === "t-e-lawrence_seven-pillars-of-wisdom") {
+    for (const hint of hints) {
+      const parsed = parseBookNumberFromSevenPillarsHint(hint);
+      if (parsed) return parsed;
+    }
+    for (const fileName of fileNames) {
+      const match = fileName.match(/^book-(\d+)\.xhtml$/);
+      if (match) return `book-${match[1]}`;
+    }
+    return null;
+  }
+
+  return null;
+}
+
+function resolveMissingSegmentIds(segmentIds: Array<string | null>): string[] {
+  const resolved = [...segmentIds];
+
+  let lastKnown: string | null = null;
+  for (let i = 0; i < resolved.length; i++) {
+    if (resolved[i]) {
+      lastKnown = resolved[i];
+      continue;
+    }
+    if (lastKnown) {
+      resolved[i] = lastKnown;
+    }
+  }
+
+  let nextKnown: string | null = null;
+  for (let i = resolved.length - 1; i >= 0; i--) {
+    if (resolved[i]) {
+      nextKnown = resolved[i];
+      continue;
+    }
+    if (nextKnown) {
+      resolved[i] = nextKnown;
+    }
+  }
+
+  return resolved.map((segmentId) => segmentId || "book-1");
+}
+
+function buildSegmentPlan(
+  slug: string,
+  chapters: Chapter[],
+  chapterMetadata: SEChapterMetadataEntry[],
+): {
+  chapterToSegment: Record<number, string>;
+  segments: Array<{ segmentId: string; chapters: Chapter[] }>;
+} {
+  const byChapterNumber = new Map<number, SEChapterMetadataEntry>();
+  for (const entry of chapterMetadata) {
+    byChapterNumber.set(entry.number, entry);
+  }
+
+  const provisionalSegmentIds = chapters.map((chapter) =>
+    deriveSegmentIdForChapter(slug, byChapterNumber.get(chapter.number)),
+  );
+  const resolvedSegmentIds = resolveMissingSegmentIds(provisionalSegmentIds);
+
+  const chapterToSegment: Record<number, string> = {};
+  const segments: Array<{ segmentId: string; chapters: Chapter[] }> = [];
+  const segmentIndexById = new Map<string, number>();
+
+  chapters.forEach((chapter, index) => {
+    const segmentId = resolvedSegmentIds[index];
+    chapterToSegment[chapter.number] = segmentId;
+
+    const existingIndex = segmentIndexById.get(segmentId);
+    if (existingIndex === undefined) {
+      segmentIndexById.set(segmentId, segments.length);
+      segments.push({ segmentId, chapters: [chapter] });
+      return;
+    }
+
+    segments[existingIndex].chapters.push(chapter);
+  });
+
+  return { chapterToSegment, segments };
+}
+
+function buildPromptForChapters(
+  filteredChapters: Chapter[],
+  knownCharacters: Array<{ name: string; summary: string }>,
+): string {
+  const filteredXml = `<chapters>
+${filteredChapters
+  .map(
+    (chapter) =>
+      `<chapter number="${chapter.number}"><title>${chapter.title}</title><content>${chapter.content}</content></chapter>`,
+  )
+  .join("\n")}
+</chapters>`;
+
+  const knownCharactersMapped = knownCharacters
+    .map((character) => `<character name="${character.name}" summary="${character.summary}" />`)
+    .join("\n");
+  const prompt = fs.readFileSync(path.join(__dirname, "./single-summary-per-person.md"), "utf8");
+  const knownCharactersPrompt =
+    knownCharactersMapped.length > 0
+      ? `## Known Characters
+### Notes
+
+- Be consistent with character names.
+- Use the known character names and summaries for the already known characters from previous book segments in this novel.
+- Return only characters that appear or are mentioned in the current chapter set.
+
+### List of known characters from previous book segments
+
+${knownCharactersMapped}\n\n`
+      : "";
+
+  return `${prompt}${knownCharactersPrompt}\n\n${VISUAL_GUIDE_REQUEST_INSTRUCTION}\n\n## Book Text \n\n${filteredXml}`;
+}
+
 async function callProviderWithCapture(
   provider: ProviderId,
   sampled: boolean,
@@ -185,33 +403,7 @@ function buildCombinedPrompt(): string {
   );
 
   console.log(`Filtered ${filteredChapters.length} chapters`);
-  const filteredXml = `<chapters>
-${filteredChapters
-  .map(
-    (chapter) =>
-      `<chapter number="${chapter.number}"><title>${chapter.title}</title><content>${chapter.content}</content></chapter>`,
-  )
-  .join("\n")}
-</chapters>`;
-
-  const knownCharacters: { name: string; summary: string }[] = [];
-  const knownCharactersMapped = knownCharacters
-    .map((character) => `<character name="${character.name}" summary="${character.summary}" />`)
-    .join("\n");
-  const prompt = fs.readFileSync(path.join(__dirname, "./single-summary-per-person.md"), "utf8");
-  const knownCharactersPrompt =
-    knownCharactersMapped.length > 0
-      ? `## Known Characters
-### Notes
-
-- Be consistent with character names.
-- Use the known character names and summaries for the already known characters from the previous book in the series.
-
-### List of characters from the previous book in the series
-
-${knownCharactersMapped}\n\n`
-      : "";
-  const combinedPrompt = `${prompt}${knownCharactersPrompt}\n\n${VISUAL_GUIDE_REQUEST_INSTRUCTION}\n\n## Book Text \n\n${filteredXml}`;
+  const combinedPrompt = buildPromptForChapters(filteredChapters, []);
   console.log("combinedPrompt length:", combinedPrompt.length);
   return combinedPrompt;
 }
@@ -358,11 +550,10 @@ function selectFinalProvider(
   return { selectedRaw: undefined, selectedProvider: null };
 }
 
-export const getReferenceCardsForWholeBook = async (): Promise<NewReferenceCardsResponse> => {
-  const combinedPrompt = buildCombinedPrompt();
-  writeBookFile("get-reference-cards-for-whole-book-prompt.md", combinedPrompt);
-
-  const benchmarkRoot = buildBenchmarkRoot();
+async function runProviderSelectionForPrompt(
+  combinedPrompt: string,
+  benchmarkRoot: string,
+): Promise<NewReferenceCardsResponse> {
   writeBookFile(`${benchmarkRoot}/prompt.md`, combinedPrompt);
 
   const sampleRate = parseSampleRate(process.env.REFERENCE_CARDS_GEMINI_PRO_SAMPLE_RATE);
@@ -401,8 +592,156 @@ export const getReferenceCardsForWholeBook = async (): Promise<NewReferenceCards
 
   const selected = appendGenericAvatarIfMissing(selectedRaw);
   writeBookFile(`${benchmarkRoot}/outputs/selected.json`, JSON.stringify(selected, null, 2));
-
   return selected;
+}
+
+function normalizeSegmentFileToken(segmentId: string): string {
+  return segmentId
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function stripGenericAvatar(
+  characters: NewReferenceCardsResponse["characters"],
+): NewReferenceCardsResponse["characters"] {
+  return characters.filter((character) => character.name.trim().toLowerCase() !== "generic-avatar");
+}
+
+async function runSegmentedReferenceCards(
+  slug: string,
+  benchmarkRoot: string,
+): Promise<NewReferenceCardsResponse> {
+  if (!doesBookFileExist(SE_CHAPTER_METADATA_FILE, FILE_TYPE.INPUT)) {
+    throw new Error(
+      `Missing ${SE_CHAPTER_METADATA_FILE} for segmented large novel flow (${slug}). Re-run SE conversion.`,
+    );
+  }
+
+  const chapterMetadata = JSON.parse(
+    readBookFile(SE_CHAPTER_METADATA_FILE, FILE_TYPE.INPUT),
+  ) as SEChapterMetadataEntry[];
+  const booksSettings = getBookSettings();
+  const chapters = getChaptersUpTo(
+    booksSettings.startFromChapter,
+    booksSettings.startFromChapter + booksSettings.numberOfChaptersToProcess,
+  );
+
+  const { chapterToSegment, segments } = buildSegmentPlan(slug, chapters, chapterMetadata);
+
+  const knownBySlug = new Map<string, { name: string; summary: string }>();
+  const canonicalBySlug = new Map<
+    string,
+    { character: NewReferenceCardsResponse["characters"][number]; firstSegmentId: string }
+  >();
+  const segmentResults: SegmentResult[] = [];
+
+  for (const segment of segments) {
+    const knownCharacters = Array.from(knownBySlug.values());
+    const segmentPrompt = buildPromptForChapters(segment.chapters, knownCharacters);
+    const segmentToken = normalizeSegmentFileToken(segment.segmentId) || "segment";
+
+    writeBookFile(
+      `get-reference-cards-for-whole-book-prompt-${segmentToken}.md`,
+      segmentPrompt,
+      FILE_TYPE.TEMPORARY,
+    );
+
+    const segmentResponse = await runProviderSelectionForPrompt(
+      segmentPrompt,
+      `${benchmarkRoot}/segments/${segmentToken}`,
+    );
+    const dedupedSegmentCharacters = dedupeCharactersBySlug(
+      stripGenericAvatar(segmentResponse.characters),
+    );
+
+    segmentResults.push({
+      segmentId: segment.segmentId,
+      chapterNumbers: segment.chapters.map((chapter) => chapter.number),
+      characters: dedupedSegmentCharacters,
+    });
+
+    for (const character of dedupedSegmentCharacters) {
+      const characterSlug = generateTagName(character.name).toLowerCase();
+      if (!knownBySlug.has(characterSlug)) {
+        knownBySlug.set(characterSlug, { name: character.name, summary: character.referenceCard });
+      }
+      if (!canonicalBySlug.has(characterSlug)) {
+        canonicalBySlug.set(characterSlug, { character, firstSegmentId: segment.segmentId });
+      }
+    }
+  }
+
+  const canonicalCharacters = appendGenericAvatarIfMissing({
+    characters: Array.from(canonicalBySlug.values()).map((entry) => entry.character),
+  });
+
+  const chapterToSegmentForFile = Object.fromEntries(
+    Object.entries(chapterToSegment).map(([key, value]) => [String(key), value]),
+  );
+
+  writeBookFile(
+    SEGMENTED_REFERENCE_CARDS_FILE,
+    JSON.stringify(
+      {
+        mode: "hardcoded-book-segments-v1",
+        slug,
+        segments: segmentResults,
+        chapterToSegment: chapterToSegmentForFile,
+      },
+      null,
+      2,
+    ),
+    FILE_TYPE.PERMANENT,
+  );
+
+  writeBookFile(
+    CHAPTER_TO_SEGMENT_FILE,
+    JSON.stringify(chapterToSegmentForFile, null, 2),
+    FILE_TYPE.PERMANENT,
+  );
+
+  writeBookFile(
+    CANONICAL_REFERENCE_CARDS_FILE,
+    JSON.stringify(canonicalCharacters, null, 2),
+    FILE_TYPE.PERMANENT,
+  );
+
+  writeBookFile(
+    `${benchmarkRoot}/summary.json`,
+    JSON.stringify(
+      {
+        mode: "hardcoded-book-segments-v1",
+        slug,
+        segmentCount: segmentResults.length,
+        segments: segmentResults.map((segment) => ({
+          segmentId: segment.segmentId,
+          chapters: segment.chapterNumbers.length,
+          characters: segment.characters.length,
+        })),
+      },
+      null,
+      2,
+    ),
+  );
+  writeBookFile(
+    `${benchmarkRoot}/outputs/selected.json`,
+    JSON.stringify(canonicalCharacters, null, 2),
+  );
+
+  return canonicalCharacters;
+}
+
+export const getReferenceCardsForWholeBook = async (): Promise<NewReferenceCardsResponse> => {
+  const currentSlug = getCurrentBookSlug();
+  const benchmarkRoot = buildBenchmarkRoot();
+  if (SEGMENTED_LARGE_NOVEL_SLUGS.has(currentSlug)) {
+    return await runSegmentedReferenceCards(currentSlug, benchmarkRoot);
+  }
+
+  const combinedPrompt = buildCombinedPrompt();
+  writeBookFile("get-reference-cards-for-whole-book-prompt.md", combinedPrompt);
+  return await runProviderSelectionForPrompt(combinedPrompt, benchmarkRoot);
 };
 
 if (require.main === module) {

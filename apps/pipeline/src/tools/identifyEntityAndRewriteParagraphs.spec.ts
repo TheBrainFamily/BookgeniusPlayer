@@ -381,4 +381,38 @@ describe("identifyCharactersAndRewriteParagraphs chunk scheduler", () => {
     const summary = JSON.parse(summaryRaw || "{}") as { grokSelectedDueToGptFailure?: number };
     expect(summary.grokSelectedDueToGptFailure).toBeGreaterThanOrEqual(1);
   });
+
+  it("uses per-segment character summaries when segmented reference cards file exists", async () => {
+    vi.mocked(chapterChunker.needsChunking).mockReturnValue(false);
+    testState.configureChapters(1, 2);
+
+    testState.fileStore.set(
+      "single-summary-per-person-by-segment.json",
+      JSON.stringify({
+        segments: [
+          {
+            segmentId: "book-1",
+            chapterNumbers: [1],
+            characters: [{ name: "Alice", referenceCard: "Alice segment one summary" }],
+          },
+          {
+            segmentId: "book-2",
+            chapterNumbers: [2],
+            characters: [{ name: "Bob", referenceCard: "Bob segment two summary" }],
+          },
+        ],
+        chapterToSegment: { "1": "book-1", "2": "book-2" },
+      }),
+    );
+
+    await identifyCharactersAndRewriteParagraphs(createReferenceCards());
+
+    const chapter1Call = testState.providerCalls.find((call) => call.chapter === 1);
+    const chapter2Call = testState.providerCalls.find((call) => call.chapter === 2);
+
+    expect(chapter1Call?.prompt).toContain("Alice segment one summary");
+    expect(chapter1Call?.prompt).not.toContain("Bob segment two summary");
+    expect(chapter2Call?.prompt).toContain("Bob segment two summary");
+    expect(chapter2Call?.prompt).not.toContain("Alice segment one summary");
+  });
 });

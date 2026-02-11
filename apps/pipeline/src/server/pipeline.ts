@@ -1083,8 +1083,10 @@ export async function startPipeline(input: {
       try {
         while (true) {
           const doneOrFailed =
-            schedulerState.completedSteps.size + schedulerState.failedSteps.size >=
-            stepsToRun.length;
+            stepsToRun.filter(
+              (step) =>
+                schedulerState.completedSteps.has(step) || schedulerState.failedSteps.has(step),
+            ).length >= stepsToRun.length;
           if (doneOrFailed) {
             break;
           }

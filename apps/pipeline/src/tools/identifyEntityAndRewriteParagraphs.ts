@@ -29,6 +29,8 @@ import {
   type RewriteProviderName,
 } from "./rewrite-orchestrator";
 
+const SEGMENTED_REFERENCE_CARDS_FILE = "single-summary-per-person-by-segment.json";
+
 const CHAPTER_SCAN_LOG_EVERY = Number.parseInt(
   process.env.REWRITE_CHAPTER_SCAN_LOG_EVERY || "25",
   10,
@@ -389,18 +391,59 @@ export const identifyAndRewriteParagraphs = async (
 
 interface ChapterData {
   chapter: number;
+  charactersForChapter: { name: string; summary: string }[];
   paragraphs: Paragraph[];
   chunks: ChapterChunk[];
-  jsonCharacters: string;
   needsChunking: boolean;
   sectionAttributes: Record<string, string>;
+}
+
+type SegmentedReferenceCardsFile = {
+  segments: Array<{
+    segmentId: string;
+    chapterNumbers: number[];
+    characters: Array<{ name: string; referenceCard: string }>;
+  }>;
+  chapterToSegment: Record<string, string>;
+};
+
+function loadSegmentedCharactersForChapter():
+  | ((chapter: number) => { name: string; summary: string }[])
+  | null {
+  if (!doesBookFileExist(SEGMENTED_REFERENCE_CARDS_FILE, FILE_TYPE.PERMANENT)) {
+    return null;
+  }
+
+  const parsed = JSON.parse(
+    readBookFile(SEGMENTED_REFERENCE_CARDS_FILE, FILE_TYPE.PERMANENT),
+  ) as SegmentedReferenceCardsFile;
+  const bySegment = new Map<string, { name: string; summary: string }[]>();
+
+  for (const segment of parsed.segments || []) {
+    bySegment.set(
+      segment.segmentId,
+      (segment.characters || [])
+        .filter((character) => character.name !== "generic-avatar")
+        .map((character) => ({ name: character.name, summary: character.referenceCard })),
+    );
+  }
+
+  const chapterToSegment = parsed.chapterToSegment || {};
+
+  return (chapter: number) => {
+    const segmentId = chapterToSegment[String(chapter)];
+    if (!segmentId) {
+      return [];
+    }
+    return bySegment.get(segmentId) || [];
+  };
 }
 
 async function processChunkedChapterFromPreScan(
   data: ChapterData,
   signal?: AbortSignal,
 ): Promise<void> {
-  const { chapter, chunks, jsonCharacters, sectionAttributes } = data;
+  const { chapter, chunks, charactersForChapter, sectionAttributes } = data;
   checkAborted(signal, `process pre-scanned chunked chapter ${chapter}`);
 
   if (chunks.length === 0) {
@@ -408,6 +451,7 @@ async function processChunkedChapterFromPreScan(
   }
 
   logger.info(`📦 Processing chapter ${chapter} in ${chunks.length} chunks`);
+  const jsonCharacters = buildJsonCharacters(charactersForChapter);
 
   const processedChunks: string[] = [];
 
@@ -449,10 +493,17 @@ export const identifyCharactersAndRewriteParagraphs = async (
   checkAborted(signal, "identifyCharactersAndRewriteParagraphs start");
   const bookSettings = getBookSettings();
 
-  const charactersForChapter = referenceCards.characters
+  const defaultCharactersForChapter = referenceCards.characters
     .filter((c) => c.name !== "generic-avatar") // Exclude synthetic generic-avatar from LLM prompts
     .map((c) => ({ name: c.name, summary: c.referenceCard }));
-  const jsonCharacters = buildJsonCharacters(charactersForChapter);
+  const segmentedCharactersResolver = loadSegmentedCharactersForChapter();
+  const resolveCharactersForChapter = (chapter: number) => {
+    if (!segmentedCharactersResolver) {
+      return defaultCharactersForChapter;
+    }
+    const segmentedCharacters = segmentedCharactersResolver(chapter);
+    return segmentedCharacters.length > 0 ? segmentedCharacters : defaultCharactersForChapter;
+  };
 
   // Prepare all chapter data
   const chapters = Array.from(
@@ -479,9 +530,9 @@ export const identifyCharactersAndRewriteParagraphs = async (
       alreadyCompleteCount += 1;
       const chapterData: ChapterData = {
         chapter,
+        charactersForChapter: resolveCharactersForChapter(chapter),
         paragraphs: [],
         chunks: [],
-        jsonCharacters,
         needsChunking: false,
         sectionAttributes: {},
       };
@@ -512,9 +563,9 @@ export const identifyCharactersAndRewriteParagraphs = async (
 
     const chapterData: ChapterData = {
       chapter,
+      charactersForChapter: resolveCharactersForChapter(chapter),
       paragraphs,
       chunks,
-      jsonCharacters,
       needsChunking: shouldChunk,
       sectionAttributes,
     };
@@ -549,7 +600,7 @@ export const identifyCharactersAndRewriteParagraphs = async (
 
   // Process simple chapters in parallel (no chunking needed)
   const simplePromises = simpleChapters.map((data) =>
-    identifyAndRewriteParagraphs(data.chapter, charactersForChapter, 0, signal),
+    identifyAndRewriteParagraphs(data.chapter, data.charactersForChapter, 0, signal),
   );
 
   const chunkedPromises = chunkedChapters.map((data) =>

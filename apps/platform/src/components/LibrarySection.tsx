@@ -212,7 +212,6 @@ function CategoryRow({
     <div ref={containerRef} className="mb-10 space-y-5 min-h-[460px]">
       <div className="flex items-center justify-between px-8 md:px-12 lg:px-20 group">
         <h3 className="text-3xl font-bold text-foreground">{label}</h3>
-        <span className="text-muted-foreground">{slugs.length} books</span>
       </div>
 
       <div className="relative group/carousel">
@@ -434,11 +433,7 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
             )}
           </div>
           <div className="text-sm text-muted-foreground">
-            {normalizedQuery
-              ? `Showing ${visibleCount} of ${totalBooks} books`
-              : isLoading
-                ? ""
-                : `${totalBooks.toLocaleString()} books`}
+            {normalizedQuery ? `Showing ${visibleCount} of ${totalBooks} books` : ""}
           </div>
         </div>
       </div>

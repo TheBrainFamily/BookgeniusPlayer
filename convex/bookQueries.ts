@@ -21,7 +21,7 @@
  */
 
 import { v } from "convex/values";
-import { publicQuery, adminQuery } from "./functions";
+import { publicQuery, adminQuery, adminMutation } from "./functions";
 import { components } from "./_generated/api";
 
 // =============================================================================
@@ -36,8 +36,31 @@ import { components } from "./_generated/api";
 export const listAvailableBookSlugs = publicQuery({
   args: {},
   handler: async (ctx) => {
-    const books = await ctx.db.query("books").collect();
-    return books.map((book) => book.slug);
+    const [books, exclusions] = await Promise.all([
+      ctx.db.query("books").collect(),
+      ctx.db.query("bookExclusions").collect(),
+    ]);
+    const excluded = new Set(exclusions.map((e) => e.slug));
+    return books.map((b) => b.slug).filter((s) => !excluded.has(s));
+  },
+});
+
+/**
+ * Replace the entire bookExclusions table with a new set of exclusions.
+ * Called by the pipeline script after computing which SE books are incomplete.
+ */
+export const syncBookExclusions = adminMutation({
+  args: { exclusions: v.array(v.object({ slug: v.string(), reason: v.optional(v.string()) })) },
+  handler: async (ctx, { exclusions }) => {
+    const existing = await ctx.db.query("bookExclusions").collect();
+    for (const row of existing) {
+      await ctx.db.delete(row._id);
+    }
+    const now = Date.now();
+    for (const { slug, reason } of exclusions) {
+      await ctx.db.insert("bookExclusions", { slug, reason, addedAt: now });
+    }
+    return { deleted: existing.length, inserted: exclusions.length };
   },
 });
 

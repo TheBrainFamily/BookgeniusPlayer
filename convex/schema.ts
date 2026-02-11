@@ -8,6 +8,13 @@ import { authTables } from "@convex-dev/auth/server";
 export default defineSchema({
   ...authTables,
 
+  // Books excluded from the public library (e.g. SE books with incomplete pipelines)
+  bookExclusions: defineTable({
+    slug: v.string(),
+    reason: v.optional(v.string()),
+    addedAt: v.number(),
+  }).index("by_slug", ["slug"]),
+
   // Book ownership - tracks who owns each book
   books: defineTable({
     path: v.string(), // "books/{slug}" - matches asset manager folder

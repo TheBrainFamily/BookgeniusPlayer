@@ -16,10 +16,18 @@ export interface SEConversionResult {
   textHtml: string;
   chaptersXml: string;
   lastChapter: number;
+  /** Metadata for each converted chapter, aligned to final chapter numbering */
+  chapterMetadata: SEChapterMetadata[];
   /** List of images referenced in the book content */
   images: SEImageReference[];
   /** Extracted endnotes/footnotes keyed as fnN */
   notes: SENote[];
+}
+
+export interface SEChapterMetadata {
+  number: number;
+  sourceFilenames: string[];
+  segmentHints: string[];
 }
 
 // Files to skip - these are not actual book content
@@ -142,6 +150,60 @@ function normalizeSectionText(section: Element): string {
   return (section.textContent || "").replace(/\s+/g, " ").trim();
 }
 
+function uniqueStrings(values: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const normalized = value.trim();
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    result.push(normalized);
+  }
+
+  return result;
+}
+
+function buildChapterMetadata(sourceFilename: string, element: Element): SEChapterMetadata {
+  const hints: string[] = [];
+
+  const dataParent = element.getAttribute("data-parent");
+  if (dataParent) {
+    hints.push(dataParent);
+  }
+
+  const id = element.getAttribute("id");
+  if (id && /^(book|part|volume|introduction|prologue|epilogue)(-|$)/i.test(id)) {
+    hints.push(id);
+  }
+
+  return { number: 0, sourceFilenames: [sourceFilename], segmentHints: uniqueStrings(hints) };
+}
+
+function mergeChapterMetadata(
+  base: SEChapterMetadata,
+  extras: SEChapterMetadata[],
+  options: { extrasFirst: boolean },
+): SEChapterMetadata {
+  if (extras.length === 0) {
+    return { ...base };
+  }
+
+  const extraFiles = extras.flatMap((entry) => entry.sourceFilenames);
+  const extraHints = extras.flatMap((entry) => entry.segmentHints);
+
+  const sourceFilenames = options.extrasFirst
+    ? uniqueStrings([...extraFiles, ...base.sourceFilenames])
+    : uniqueStrings([...base.sourceFilenames, ...extraFiles]);
+  const segmentHints = options.extrasFirst
+    ? uniqueStrings([...extraHints, ...base.segmentHints])
+    : uniqueStrings([...base.segmentHints, ...extraHints]);
+
+  return { number: base.number, sourceFilenames, segmentHints };
+}
+
 function extractTopLevelSection(htmlPart: string): Element | null {
   const dom = new JSDOM(`<body>${htmlPart}</body>`);
   return dom.window.document.querySelector("section[data-chapter]");
@@ -220,7 +282,12 @@ function computeChapterContentPreviewFromHtmlPart(htmlPart: string): string {
 function renumberMergedSections(
   htmlParts: string[],
   chapters: { number: number; title: string; content: string }[],
-): { htmlParts: string[]; chapters: { number: number; title: string; content: string }[] } {
+  chapterMetadata: SEChapterMetadata[],
+): {
+  htmlParts: string[];
+  chapters: { number: number; title: string; content: string }[];
+  chapterMetadata: SEChapterMetadata[];
+} {
   const renumberedHtmlParts = htmlParts.map((htmlPart, index) =>
     htmlPart.replace(/data-chapter="[^"]+"/, `data-chapter="${index + 1}"`),
   );
@@ -232,53 +299,80 @@ function renumberMergedSections(
       computeChapterContentPreviewFromHtmlPart(renumberedHtmlParts[index]) || chapter.content,
   }));
 
-  return { htmlParts: renumberedHtmlParts, chapters: renumberedChapters };
+  const renumberedMetadata = chapterMetadata.map((entry, index) => ({
+    ...entry,
+    number: index + 1,
+  }));
+
+  return {
+    htmlParts: renumberedHtmlParts,
+    chapters: renumberedChapters,
+    chapterMetadata: renumberedMetadata,
+  };
 }
 
 function mergeSmallStructuralSections(
   htmlParts: string[],
   chapters: { number: number; title: string; content: string }[],
-): { htmlParts: string[]; chapters: { number: number; title: string; content: string }[] } {
-  if (htmlParts.length !== chapters.length) {
-    return { htmlParts, chapters };
+  chapterMetadata: SEChapterMetadata[],
+): {
+  htmlParts: string[];
+  chapters: { number: number; title: string; content: string }[];
+  chapterMetadata: SEChapterMetadata[];
+} {
+  if (htmlParts.length !== chapters.length || htmlParts.length !== chapterMetadata.length) {
+    return { htmlParts, chapters, chapterMetadata };
   }
 
   const pendingWrappers: string[] = [];
+  const pendingMetadata: SEChapterMetadata[] = [];
   const mergedHtmlParts: string[] = [];
   const mergedChapters: { number: number; title: string; content: string }[] = [];
+  const mergedMetadata: SEChapterMetadata[] = [];
 
   for (let i = 0; i < htmlParts.length; i++) {
     const htmlPart = htmlParts[i];
     const chapter = chapters[i];
+    const metadata = chapterMetadata[i];
     const mergeCandidate = isMergeableStructuralSection(htmlPart);
 
     if (mergeCandidate.merge) {
       pendingWrappers.push(mergeCandidate.wrapper);
+      pendingMetadata.push(metadata);
       continue;
     }
 
     let sectionHtml = htmlPart;
+    let sectionMetadata = { ...metadata };
     if (pendingWrappers.length > 0) {
       sectionHtml = insertSectionContentAtStart(sectionHtml, pendingWrappers.join("\n"));
+      sectionMetadata = mergeChapterMetadata(sectionMetadata, pendingMetadata, {
+        extrasFirst: true,
+      });
       pendingWrappers.length = 0;
+      pendingMetadata.length = 0;
     }
 
     mergedHtmlParts.push(sectionHtml);
     mergedChapters.push(chapter);
+    mergedMetadata.push(sectionMetadata);
   }
 
   if (pendingWrappers.length > 0) {
     if (mergedHtmlParts.length === 0) {
-      return renumberMergedSections(htmlParts, chapters);
+      return renumberMergedSections(htmlParts, chapters, chapterMetadata);
     }
     const lastIndex = mergedHtmlParts.length - 1;
     mergedHtmlParts[lastIndex] = insertSectionContentAtEnd(
       mergedHtmlParts[lastIndex],
       pendingWrappers.join("\n"),
     );
+    mergedMetadata[lastIndex] = mergeChapterMetadata(mergedMetadata[lastIndex], pendingMetadata, {
+      extrasFirst: false,
+    });
   }
 
-  return renumberMergedSections(mergedHtmlParts, mergedChapters);
+  return renumberMergedSections(mergedHtmlParts, mergedChapters, mergedMetadata);
 }
 
 export function assertSeConversionTextCoverage(
@@ -535,6 +629,7 @@ function extractChaptersFromElement(
 ): {
   chapters: { number: number; title: string; content: string }[];
   htmlParts: string[];
+  chapterMetadata: SEChapterMetadata[];
   nextChapter: number;
 } {
   const chapterFormat = detectChapterFormat(container);
@@ -556,6 +651,7 @@ function extractChaptersFromElement(
 
   const chapters: { number: number; title: string; content: string }[] = [];
   const htmlParts: string[] = [];
+  const chapterMetadata: SEChapterMetadata[] = [];
   let chapterCounter = startChapter;
 
   if (nestedChapterSections.length > 0) {
@@ -610,6 +706,10 @@ function extractChaptersFromElement(
         title: escapeXml(title),
         content: escapeXml(extractTextContent(section).substring(0, 500)),
       });
+      chapterMetadata.push({
+        ...buildChapterMetadata(file.filename, section),
+        number: chapterCounter,
+      });
       chapterCounter++;
     }
   } else {
@@ -631,10 +731,14 @@ function extractChaptersFromElement(
       title: escapeXml(title),
       content: escapeXml(extractTextContent(container).substring(0, 500)),
     });
+    chapterMetadata.push({
+      ...buildChapterMetadata(file.filename, container),
+      number: chapterCounter,
+    });
     chapterCounter++;
   }
 
-  return { chapters, htmlParts, nextChapter: chapterCounter };
+  return { chapters, htmlParts, chapterMetadata, nextChapter: chapterCounter };
 }
 
 function extractChaptersFromFile(
@@ -643,13 +747,14 @@ function extractChaptersFromFile(
 ): {
   chapters: { number: number; title: string; content: string }[];
   htmlParts: string[];
+  chapterMetadata: SEChapterMetadata[];
   nextChapter: number;
 } {
   const dom = new JSDOM(file.content, { contentType: "application/xhtml+xml" });
   const doc = dom.window.document;
   const body = doc.querySelector("body");
 
-  if (!body) return { chapters: [], htmlParts: [], nextChapter: startChapter };
+  if (!body) return { chapters: [], htmlParts: [], chapterMetadata: [], nextChapter: startChapter };
 
   const topLevelElements = Array.from(body.children).filter((child) => {
     const tag = child.tagName?.toLowerCase();
@@ -661,15 +766,17 @@ function extractChaptersFromFile(
   let chapterCounter = startChapter;
   const chapters: { number: number; title: string; content: string }[] = [];
   const htmlParts: string[] = [];
+  const chapterMetadata: SEChapterMetadata[] = [];
 
   for (const container of containers) {
     const result = extractChaptersFromElement(container, file, chapterCounter);
     chapters.push(...result.chapters);
     htmlParts.push(...result.htmlParts);
+    chapterMetadata.push(...result.chapterMetadata);
     chapterCounter = result.nextChapter;
   }
 
-  return { chapters, htmlParts, nextChapter: chapterCounter };
+  return { chapters, htmlParts, chapterMetadata, nextChapter: chapterCounter };
 }
 
 export function convertSeXhtmlToHtml(
@@ -678,18 +785,21 @@ export function convertSeXhtmlToHtml(
 ): SEConversionResult {
   let allChapters: { number: number; title: string; content: string }[] = [];
   let allHtmlParts: string[] = [];
+  let allChapterMetadata: SEChapterMetadata[] = [];
   let chapterCounter = 1;
 
   for (const file of xhtmlFiles) {
     const result = extractChaptersFromFile(file, chapterCounter);
     allChapters.push(...result.chapters);
     allHtmlParts.push(...result.htmlParts);
+    allChapterMetadata.push(...result.chapterMetadata);
     chapterCounter = result.nextChapter;
   }
 
-  const merged = mergeSmallStructuralSections(allHtmlParts, allChapters);
+  const merged = mergeSmallStructuralSections(allHtmlParts, allChapters, allChapterMetadata);
   allHtmlParts = merged.htmlParts;
   allChapters = merged.chapters;
+  allChapterMetadata = merged.chapterMetadata;
 
   let textHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${allHtmlParts.join("\n")}</body></html>`;
 
@@ -731,7 +841,14 @@ export function convertSeXhtmlToHtml(
     )
     .join("\n")}\n</chapters>`;
 
-  return { textHtml, chaptersXml, lastChapter: allChapters.length, images, notes: [] };
+  return {
+    textHtml,
+    chaptersXml,
+    lastChapter: allChapters.length,
+    chapterMetadata: allChapterMetadata,
+    images,
+    notes: [],
+  };
 }
 
 export async function convertSEBook(
@@ -822,6 +939,11 @@ export async function convertAndSaveSEBook(bookSlug: string): Promise<void> {
 
   const richXml = wrapInRichXml(result.textHtml);
   fs.writeFileSync(path.join(inputDir, "rich.xml"), richXml, "utf8");
+  fs.writeFileSync(
+    path.join(inputDir, "se-chapter-metadata.json"),
+    JSON.stringify(result.chapterMetadata, null, 2),
+    "utf8",
+  );
 
   const seNotesPath = path.join(inputDir, "se-notes.json");
   if (result.notes.length > 0) {

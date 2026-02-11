@@ -210,6 +210,93 @@ describe("SE Converter", () => {
     });
   });
 
+  describe("chapter metadata", () => {
+    it("emits chapter metadata for simple chapter files", () => {
+      const files = [
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="chapter-1" epub:type="chapter">
+      <h2>Chapter One</h2>
+      <p>Simple chapter content.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.chapterMetadata).toEqual([
+        { number: 1, sourceFilenames: ["chapter-1.xhtml"], segmentHints: [] },
+      ]);
+    });
+
+    it("captures chapter segment hints from data-parent", () => {
+      const files = [
+        {
+          filename: "chapter-21.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section data-parent="book-2" id="chapter-21" epub:type="chapter">
+      <h2>Chapter XXI</h2>
+      <p>Book two chapter content.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.chapterMetadata).toEqual([
+        { number: 1, sourceFilenames: ["chapter-21.xhtml"], segmentHints: ["book-2"] },
+      ]);
+    });
+
+    it("preserves structural source metadata when mergeable divider is merged into a chapter", () => {
+      const files = [
+        {
+          filename: "book-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section id="book-1" epub:type="part">
+      <h2>Book I</h2>
+    </section>
+  </body>
+</html>`,
+        },
+        {
+          filename: "chapter-1.xhtml",
+          content: `<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <body epub:type="bodymatter">
+    <section data-parent="book-1" id="chapter-1" epub:type="chapter">
+      <h2>Chapter I</h2>
+      <p>First chapter body.</p>
+    </section>
+  </body>
+</html>`,
+        },
+      ];
+
+      const result = convertSeXhtmlToHtml(files);
+
+      expect(result.lastChapter).toBe(1);
+      expect(result.chapterMetadata).toEqual([
+        {
+          number: 1,
+          sourceFilenames: ["book-1.xhtml", "chapter-1.xhtml"],
+          segmentHints: ["book-1"],
+        },
+      ]);
+    });
+  });
+
   describe("structural divider merging", () => {
     it("merges consecutive structural headers into the next chapter", () => {
       const files = [

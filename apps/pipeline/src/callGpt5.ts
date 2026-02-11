@@ -1,7 +1,7 @@
 import "dotenv/config";
 import OpenAI from "openai";
 import { z } from "zod";
-import { generateObject } from "ai";
+import { streamObject } from "ai";
 
 import { createOpenAI } from "@ai-sdk/openai";
 
@@ -27,20 +27,27 @@ const openai = createOpenAI({ baseURL: endpoint, apiKey: api_key });
 
 const client = new OpenAI({ baseURL: endpoint, apiKey: api_key });
 
+const ignore = (chunk: unknown) => {
+  return chunk;
+};
 export const callGpt5WithSchema = async <T>(
   prompt: string,
   zodSchema: z.ZodSchema<T>,
   model: string = "gpt-5.2",
 ) => {
-  const { object } = await generateObject({
+  const { object, partialObjectStream } = await streamObject({
     model: openai(model),
     schema: zodSchema,
     prompt,
     experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
   });
-  return object;
-};
 
+  for await (const chunk of partialObjectStream) {
+    ignore(chunk);
+  }
+
+  return await object;
+};
 export const callGpt5 = async <T = string>(
   prompt: string,
   _schema?: z.ZodSchema<T>,
@@ -62,11 +69,9 @@ export const callGpt5 = async <T = string>(
 };
 
 if (require.main === module) {
-  const response = await callGpt5("What is the capital of France?");
-  console.log(response);
   const response2 = await callGpt5WithSchema(
-    "What is the capital of France?",
-    z.object({ capital: z.string() }),
+    "What is the capital of France and poulation of France and the capital?",
+    z.object({ capital: z.string(), population: z.number(), capitalPopulation: z.number() }),
   );
   console.log(response2);
 }
