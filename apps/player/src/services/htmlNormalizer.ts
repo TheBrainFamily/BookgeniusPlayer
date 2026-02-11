@@ -397,6 +397,87 @@ function compactInlineSpeakerSegments(segments: InlineSpeakerSegment[]): InlineS
   return compacted;
 }
 
+/** Walk a node tree depth-first and return the first Text node with non-whitespace content. */
+function findFirstTextNode(node: Node): Text | null {
+  if (node.nodeType === 3 /* Node.TEXT_NODE */ && node.textContent?.trim()) {
+    return node as Text;
+  }
+  for (const child of Array.from(node.childNodes)) {
+    const found = findFirstTextNode(child);
+    if (found) return found;
+  }
+  return null;
+}
+
+const HAIR_SPACE = "\u200A";
+
+/**
+ * Walk the section DOM and restore hair-space between nested opening quotes.
+ *
+ * Standard Ebooks uses `&hairsp;` between `"` and `'` so the quote marks
+ * are visually distinct without a full word-space.  The pipeline's speaker
+ * annotation can replace that with a regular space.
+ *
+ * Finds text nodes ending with an opening quote + whitespace where the next
+ * visible content starts with an opening quote, and collapses to hair-space.
+ */
+function restoreNestedQuoteSpacing(section: Element): void {
+  const ownerDoc = section.ownerDocument ?? document;
+  const walker = ownerDoc.createTreeWalker(section, 0x4 /* NodeFilter.SHOW_TEXT */);
+  let node: Text | null;
+  while ((node = walker.nextNode() as Text | null)) {
+    if (!node.textContent) continue;
+    // Text node ends with opening quote + whitespace
+    if (/[\u201C\u2018"']\s+$/.test(node.textContent)) {
+      const nextText = findFirstTextNodeAfter(node, section);
+      if (nextText?.textContent && /^[\u201C\u2018"']/.test(nextText.textContent)) {
+        node.textContent = node.textContent.replace(/\s+$/, HAIR_SPACE);
+      }
+    }
+  }
+}
+
+/** Starting from `node`, find the first text node with content that follows it in document order. */
+function findFirstTextNodeAfter(node: Node, root: Element): Text | null {
+  const ownerDoc = root.ownerDocument ?? document;
+  const walker = ownerDoc.createTreeWalker(root, 0x4 /* NodeFilter.SHOW_TEXT */);
+  walker.currentNode = node;
+  let next: Text | null;
+  while ((next = walker.nextNode() as Text | null)) {
+    if (next.textContent?.trim()) return next;
+  }
+  return null;
+}
+
+/**
+ * When a segment starts with orphaned punctuation (e.g., ". She did not…"),
+ * move that punctuation to the tail of the preceding segment so the avatar
+ * line doesn't open with a stray period or comma.
+ */
+function shiftLeadingPunctuation(
+  segments: InlineSpeakerSegment[],
+  doc: Document,
+): InlineSpeakerSegment[] {
+  for (let i = 1; i < segments.length; i++) {
+    const prev = segments[i - 1];
+    const curr = segments[i];
+
+    const firstText = findFirstTextNode(curr.fragment);
+    if (!firstText?.textContent) continue;
+
+    const match = firstText.textContent.match(/^([.,;!?)+\u2014\u2026]+\s?)/);
+    if (!match) continue;
+
+    const punctuation = match[1];
+    firstText.textContent = firstText.textContent.slice(punctuation.length);
+    if (!firstText.textContent) firstText.remove();
+
+    prev.fragment.append(doc.createTextNode(punctuation));
+  }
+
+  return segments;
+}
+
 /**
  * When a short narration segment (e.g., "said she,") sits between two speaker
  * segments for the same character, absorb all three into one speaker segment.
@@ -553,11 +634,15 @@ export function preprocessInlineSpeakerSpans(section: Element, doc: Document): v
       segments = absorbNarrationBridges(segments);
     }
 
+    segments = shiftLeadingPunctuation(segments, doc);
+
     if (segments.length === 0) continue;
 
     renderInlineSpeakerSegments(block, doc, segments);
     block.removeAttribute("data-speaker");
   }
+
+  restoreNestedQuoteSpacing(section);
 }
 
 export function injectAvatarShells(section: Element, doc: Document): void {
@@ -703,6 +788,101 @@ export function injectAvatarShells(section: Element, doc: Document): void {
       el.classList.add("character-highlighted");
     }
   });
+
+  deduplicateConsecutiveAvatars(section);
+  deduplicateConsecutiveMidSentenceSpeakers(section);
+}
+
+/**
+ * Remove the leading avatar shell from long same-speaker runs (4+ paragraphs).
+ * Short runs (1–3 paragraphs) keep all their avatars — that's normal dialogue.
+ *
+ * Two-pass approach:
+ *  1. Walk paragraphs in order and group consecutive same-speaker elements into runs.
+ *  2. For runs of length >= MIN_RUN_FOR_DEDUP, remove the avatar from paragraphs 2+.
+ *
+ * Play rows and drama tables are excluded — each row independently shows its avatar.
+ */
+const MIN_RUN_FOR_DEDUP = 4;
+
+function deduplicateConsecutiveAvatars(section: Element): void {
+  const indexedElements = Array.from(section.querySelectorAll<HTMLElement>("[data-index]")).sort(
+    (a, b) => parseInt(a.dataset.index ?? "0", 10) - parseInt(b.dataset.index ?? "0", 10),
+  );
+
+  // Pass 1: build runs of consecutive same-speaker paragraphs
+  type Run = { elements: HTMLElement[] };
+  const runs: Run[] = [];
+  let currentRun: Run | null = null;
+  let prevTrailingSpeaker: string | null = null;
+
+  for (const el of indexedElements) {
+    if (el.closest(".play-row") || el.closest("table[data-drama]")) {
+      currentRun = null;
+      prevTrailingSpeaker = null;
+      continue;
+    }
+
+    const shells = el.querySelectorAll<HTMLElement>(".character-placeholder.start-of-paragraph");
+
+    if (shells.length === 0) {
+      currentRun = null;
+      prevTrailingSpeaker = null;
+      continue;
+    }
+
+    const leadingSpeaker = shells[0].dataset.character ?? null;
+    const trailingSpeaker = shells[shells.length - 1].dataset.character ?? null;
+
+    if (leadingSpeaker && leadingSpeaker === prevTrailingSpeaker && currentRun) {
+      currentRun.elements.push(el);
+    } else {
+      currentRun = { elements: [el] };
+      runs.push(currentRun);
+    }
+
+    prevTrailingSpeaker = trailingSpeaker;
+  }
+
+  // Pass 2: for long runs, strip the avatar from paragraphs after the first
+  for (const run of runs) {
+    if (run.elements.length < MIN_RUN_FOR_DEDUP) continue;
+
+    for (let i = 1; i < run.elements.length; i++) {
+      const el = run.elements[i];
+      const shell = el.querySelector<HTMLElement>(".character-placeholder.start-of-paragraph");
+      if (shell) {
+        shell.remove();
+        el.classList.add("speaker-continuation");
+      }
+    }
+  }
+}
+
+/**
+ * Within each paragraph, hide consecutive mid-sentence speaker avatars for
+ * the same character.  Tracks across ALL avatar shells (start-of-paragraph
+ * and mid-sentence) so that a mid-sentence avatar immediately following
+ * a start-of-paragraph avatar for the same character is also hidden.
+ */
+function deduplicateConsecutiveMidSentenceSpeakers(section: Element): void {
+  const indexedElements = section.querySelectorAll<HTMLElement>("[data-index]");
+
+  for (const el of indexedElements) {
+    const allShells = el.querySelectorAll<HTMLElement>(".character-placeholder");
+    let prevCharacter: string | null = null;
+
+    for (const shell of allShells) {
+      const character = shell.dataset.character ?? null;
+      const isMidSentence = shell.classList.contains("mid-sentence-speaker");
+
+      if (isMidSentence && character && character === prevCharacter) {
+        shell.remove();
+      } else {
+        prevCharacter = character;
+      }
+    }
+  }
 }
 
 export function detectSourceFormat(html: string): "compiled" | "source" {

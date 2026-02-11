@@ -67,6 +67,12 @@
   text-indent: 0;
 }
 
+/* Restore normal paragraph indent when the leading avatar was deduplicated,
+   but only when the first line has no inline avatars that already provide structure */
+.speaker-continuation > .inline-speaker-line:first-child:not(:has(.mid-sentence-speaker)) {
+  text-indent: 1.5em;
+}
+
 .inline-speaker-line + .inline-speaker-line {
   margin-top: 0.2em;
 }

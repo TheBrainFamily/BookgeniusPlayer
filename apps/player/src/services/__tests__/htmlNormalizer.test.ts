@@ -1073,3 +1073,211 @@ describe("sanitizeHtml", () => {
     expect(result).toContain("<p>Text</p>");
   });
 });
+
+// ---------------------------------------------------------------------------
+// shiftLeadingPunctuation (tested via preprocessInlineSpeakerSpans + avatars)
+// ---------------------------------------------------------------------------
+describe("shiftLeadingPunctuation", () => {
+  it("moves orphaned period from next segment to previous segment", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">called her, as well as I could distinguish, </span><span data-speaker="bob">his sweet Arabian</span><span data-speaker="alice">. She did not appear to understand him.</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html, { withAvatars: false });
+    // The period+space should move to the bob segment, not start the alice segment
+    expect(result).toContain("Arabian. ");
+    expect(result).not.toMatch(/data-speaker="alice"[^>]*>\s*\. She/);
+  });
+
+  it("moves orphaned comma from next segment to previous segment", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="narrator">He said</span><span data-speaker="bob">hello</span><span data-speaker="narrator">, then walked away.</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html, { withAvatars: false });
+    expect(result).toContain("hello, ");
+  });
+
+  it("does not shift when segment starts with a regular word", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">She said </span><span data-speaker="bob">hello there</span><span data-speaker="alice"> She continued walking.</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html, { withAvatars: false });
+    expect(result).toContain("She continued");
+  });
+
+  it("moves semicolon from next segment", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">she whispered </span><span data-speaker="bob">a secret</span><span data-speaker="alice">; then she fell silent.</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html, { withAvatars: false });
+    expect(result).toContain("secret; ");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// restoreNestedQuoteSpacing
+// ---------------------------------------------------------------------------
+describe("restoreNestedQuoteSpacing", () => {
+  it("collapses regular space to hair space between nested opening quotes", () => {
+    // Simulates: Creature says `" ` then companion says `'Do you consider...'`
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="creature">\u201C <span data-speaker="companion">\u2018Do you consider,\u2019</span> said his companion.</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html, { withAvatars: false });
+    // The " and ' are separated by a <span> tag in the HTML, so the hair space
+    // sits between the " text node and the <span>:  "\u200A<span...>'
+    expect(result).toContain('\u201C\u200A<span data-speaker="companion">');
+    expect(result).not.toContain('\u201C <span data-speaker="companion">');
+  });
+
+  it("does not alter spacing when no nested quotes are involved", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">She said </span><span data-speaker="bob">\u201CHello.\u201D</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html, { withAvatars: false });
+    // Regular space between segments should be preserved as-is
+    expect(result).toContain("said ");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// deduplicateConsecutiveAvatars (tested via the full pipeline)
+// ---------------------------------------------------------------------------
+describe("deduplicateConsecutiveAvatars", () => {
+  it("keeps all avatars for short runs (fewer than 4 paragraphs)", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">"First paragraph."</span></p>
+      <p><span data-speaker="alice">"Second paragraph."</span></p>
+      <p><span data-speaker="alice">"Third paragraph."</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const shells = section.querySelectorAll(".character-placeholder.start-of-paragraph");
+    // 3 paragraphs is below the threshold — all keep their avatars
+    expect(shells).toHaveLength(3);
+  });
+
+  it("strips avatars from paragraphs 2+ in long runs (4+ paragraphs)", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">"First."</span></p>
+      <p><span data-speaker="alice">"Second."</span></p>
+      <p><span data-speaker="alice">"Third."</span></p>
+      <p><span data-speaker="alice">"Fourth."</span></p>
+      <p><span data-speaker="alice">"Fifth."</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const shells = section.querySelectorAll(".character-placeholder.start-of-paragraph");
+    // Only the first paragraph keeps the avatar
+    expect(shells).toHaveLength(1);
+    expect(shells[0].closest("[data-index]")?.getAttribute("data-index")).toBe("0");
+
+    // Continuation paragraphs get the class for CSS text-indent restoration
+    for (let i = 1; i <= 4; i++) {
+      const p = section.querySelector(`[data-index='${i}']`) as HTMLElement;
+      expect(p.classList.contains("speaker-continuation")).toBe(true);
+    }
+    // First paragraph should NOT have the class
+    const p0 = section.querySelector("[data-index='0']") as HTMLElement;
+    expect(p0.classList.contains("speaker-continuation")).toBe(false);
+  });
+
+  it("shows avatar again after a speaker change", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">"Hello."</span></p>
+      <p><span data-speaker="bob">"Hi there."</span></p>
+      <p><span data-speaker="alice">"How are you?"</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const shells = section.querySelectorAll(".character-placeholder.start-of-paragraph");
+    // All three should have avatars (alice, bob, alice — each is after a change)
+    expect(shells).toHaveLength(3);
+  });
+
+  it("shows avatar again after a non-speaker element breaks the run", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">"Before the heading."</span></p>
+      <h3>Chapter Break</h3>
+      <p><span data-speaker="alice">"After the heading."</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const shells = section.querySelectorAll(".character-placeholder.start-of-paragraph");
+    // Both alice paragraphs should have avatars (heading breaks the chain)
+    expect(shells).toHaveLength(2);
+  });
+
+  it("resets the run counter after a speaker change", () => {
+    // alice×5 → bob → alice×3 — first run is long (deduplicated), second is short (kept)
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">"A1."</span></p>
+      <p><span data-speaker="alice">"A2."</span></p>
+      <p><span data-speaker="alice">"A3."</span></p>
+      <p><span data-speaker="alice">"A4."</span></p>
+      <p><span data-speaker="alice">"A5."</span></p>
+      <p><span data-speaker="bob">"B1."</span></p>
+      <p><span data-speaker="alice">"A6."</span></p>
+      <p><span data-speaker="alice">"A7."</span></p>
+      <p><span data-speaker="alice">"A8."</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const shells = section.querySelectorAll(".character-placeholder.start-of-paragraph");
+    // First alice run (5 paragraphs, ≥4): 1 avatar. Bob: 1. Second alice run (3, <4): 3 avatars.
+    expect(shells).toHaveLength(5);
+  });
+
+  it("shows avatar after inline speaker change leaves a different trailing speaker", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="alice">She heard </span><span data-speaker="bob">"goodbye."</span></p>
+      <p><span data-speaker="alice">"Wait!"</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    // p1 trailing=bob, p2 leading=alice → different speakers, NOT in same run
+    const p2 = section.querySelector("[data-index='1']");
+    const p2Shells = p2?.querySelectorAll(".character-placeholder.start-of-paragraph");
+    expect(p2Shells?.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// deduplicateConsecutiveMidSentenceSpeakers
+// ---------------------------------------------------------------------------
+describe("deduplicateConsecutiveMidSentenceSpeakers", () => {
+  it("hides the second mid-sentence avatar when the same character speaks twice in a row", () => {
+    // Creature narrates with two consecutive Felix inline quotes
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="creature">" <span data-speaker="felix">'It is utterly useless,'</span> replied Felix; <span data-speaker="felix">'we can never again inhabit your cottage.'</span></span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const midShells = section.querySelectorAll(".character-placeholder.mid-sentence-speaker");
+    // Only the first Felix mid-sentence shell should remain
+    expect(midShells).toHaveLength(1);
+    expect(midShells[0].getAttribute("data-character")).toBe("felix");
+  });
+
+  it("shows both avatars when different characters speak mid-sentence", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="creature">He heard <span data-speaker="felix">'hello'</span> and <span data-speaker="agatha">'welcome'</span> from the cottage.</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const midShells = section.querySelectorAll(".character-placeholder.mid-sentence-speaker");
+    expect(midShells).toHaveLength(2);
+    expect(midShells[0].getAttribute("data-character")).toBe("felix");
+    expect(midShells[1].getAttribute("data-character")).toBe("agatha");
+  });
+
+  it("shows avatar again when a different character appears between same-character quotes", () => {
+    const html = `<section data-chapter="1">
+      <p><span data-speaker="creature">He heard <span data-speaker="felix">'hello'</span> then <span data-speaker="agatha">'welcome'</span> then <span data-speaker="felix">'goodbye'</span> from them.</span></p>
+    </section>`;
+    const result = applyInlineSpeakerSegmentation(html);
+    const { section } = parseSection(result);
+    const midShells = section.querySelectorAll(".character-placeholder.mid-sentence-speaker");
+    // felix, agatha, felix — all different from previous, all shown
+    expect(midShells).toHaveLength(3);
+  });
+});
