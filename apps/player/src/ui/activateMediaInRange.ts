@@ -328,15 +328,15 @@ function populateInlineAvatarShell(
 
   // Handle unknown characters (not in Convex)
   if (!characterData) {
-    console.log("generic", genericCharacter);
+    // Don't show generic avatars for mid-sentence speakers — only for main dialogue blocks
+    const parentPlaceholder = shell.closest<HTMLElement>(".character-placeholder");
+    if (parentPlaceholder?.classList.contains("mid-sentence-speaker")) {
+      parentPlaceholder.style.display = "none";
+      return false;
+    }
+
     // Try generic avatar first, then SVG fallback
     const genericAvatarUrl = genericCharacter?.media?.avatarUrl;
-    console.log(`[populateInlineAvatarShell] Unknown character "${characterSlug}":`, {
-      hasGenericCharacter: !!genericCharacter,
-      genericCharacterSlug: genericCharacter?.slug,
-      genericAvatarUrl,
-      genericMedia: genericCharacter?.media,
-    });
     const fallbackSrc = genericAvatarUrl ?? generateFallbackAvatarUrl(characterSlug);
 
     // Generate display name from slug: "other-board-members" -> "Other Board Members"
