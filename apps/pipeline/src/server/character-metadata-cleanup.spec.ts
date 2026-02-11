@@ -70,4 +70,12 @@ describe("character-metadata-cleanup", () => {
       }),
     ).toThrow();
   });
+
+  it("fails fast when role key is omitted", () => {
+    expect(() =>
+      parseCharacterRoleCleanupResponse({
+        characters: [{ slug: "victor-frankenstein", referenceCard: "Clean Victor" }],
+      }),
+    ).toThrow();
+  });
 });

@@ -150,6 +150,32 @@ describe("generateRolesAndRemoveSpoilersFromSummaries", () => {
     expect(state.callGpt5Mock).toHaveBeenCalledTimes(1);
   });
 
+  it("retries same provider with correction context before fallback on slug coverage mismatch", async () => {
+    state.callGeminiMock
+      .mockResolvedValueOnce({
+        characters: [
+          { slug: "alice", referenceCard: "Clean Alice", role: "Hero" },
+          { slug: "boob", referenceCard: "Typo Bob", role: "Friend" },
+        ],
+      })
+      .mockResolvedValueOnce(cleanedBy("gemini-api-corrected"));
+
+    const result = await generateWithOptions();
+
+    expect(result.characters.map((character) => character.slug)).toEqual(["alice", "bob"]);
+    expect(result.characters[0].referenceCard).toBe("Clean Alice (gemini-api-corrected)");
+    expect(state.callGeminiMock).toHaveBeenCalledTimes(2);
+    expect(state.callGpt5Mock).not.toHaveBeenCalled();
+
+    const firstPrompt = state.callGeminiMock.mock.calls[0]?.[0] as string;
+    const correctionPrompt = state.callGeminiMock.mock.calls[1]?.[0] as string;
+    expect(correctionPrompt).not.toBe(firstPrompt);
+    expect(correctionPrompt).toContain("RETRY FEEDBACK (IMPORTANT)");
+    expect(correctionPrompt).toContain("Spoiler cleanup response coverage mismatch");
+    expect(correctionPrompt).toContain('"slug": "boob"');
+    expect(correctionPrompt).toContain('"expectedSlugs"');
+  });
+
   it("falls back when provider response includes extra slugs not in input", async () => {
     state.callGeminiMock.mockResolvedValue({
       characters: [

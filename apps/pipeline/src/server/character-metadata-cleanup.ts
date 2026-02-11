@@ -3,11 +3,7 @@ import { z } from "zod";
 export type CleanedCharacterSummary = { referenceCard: string; role?: string };
 export const CharacterRoleCleanupResponseSchema = z.object({
   characters: z.array(
-    z.object({
-      slug: z.string().min(1),
-      referenceCard: z.string(),
-      role: z.string().nullable().optional(),
-    }),
+    z.object({ slug: z.string().min(1), referenceCard: z.string(), role: z.string().nullable() }),
   ),
 });
 export type CharacterRoleCleanupResponse = z.infer<typeof CharacterRoleCleanupResponseSchema>;

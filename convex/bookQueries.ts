@@ -29,6 +29,19 @@ import { components } from "./_generated/api";
 // =============================================================================
 
 /**
+ * List slugs of all available books.
+ * Used by the library to grey out books that aren't yet processed.
+ * Lightweight — returns only slug strings. Reactively updates when new books are added.
+ */
+export const listAvailableBookSlugs = publicQuery({
+  args: {},
+  handler: async (ctx) => {
+    const books = await ctx.db.query("books").collect();
+    return books.map((book) => book.slug);
+  },
+});
+
+/**
  * List all books (folders under "books/").
  * Returns book metadata from the books table.
  */

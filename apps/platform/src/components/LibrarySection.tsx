@@ -10,6 +10,8 @@ import {
 import { BookModal } from "@platform/components/standard-ebooks/StandardEbooksBookModal";
 import { useRouteTransition } from "@platform/providers/RouteTransitionProvider";
 import { SPLASH_FADE_DURATION_MS } from "@player/components/SplashScreen";
+import { useAvailableBooks } from "@platform/hooks/useAvailableBooks";
+import { toast } from "sonner";
 
 type BookMeta = { t: string; a: string; w: number; c?: string };
 
@@ -82,6 +84,7 @@ function CategoryRow({
   slugs,
   bookMeta,
   descriptions,
+  availableBooks,
   onSelectBook,
   onOpenModal,
 }: {
@@ -89,6 +92,7 @@ function CategoryRow({
   slugs: string[];
   bookMeta: Record<string, BookMeta>;
   descriptions: Descriptions | null;
+  availableBooks: Set<string> | undefined;
   onSelectBook: (slug: string) => void;
   onOpenModal: (book: CollectionBook) => void;
 }) {
@@ -254,7 +258,12 @@ function CategoryRow({
                   marginRight: globalIndex < collectionBooks.length - 1 ? LIBRARY_CARD_GAP : 0,
                 }}
               >
-                <BookCard book={book} onSelect={onSelectBook} onOpenModal={onOpenModal} />
+                <BookCard
+                  book={book}
+                  onSelect={onSelectBook}
+                  onOpenModal={onOpenModal}
+                  unavailable={availableBooks ? !availableBooks.has(book.slug) : false}
+                />
               </div>
             );
           })}
@@ -281,6 +290,7 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
   const [descriptions, setDescriptions] = useState<Descriptions | null>(null);
   const [modalBook, setModalBook] = useState<CollectionBook | null>(null);
   const [localSearch, setLocalSearch] = useState("");
+  const availableBooks = useAvailableBooks();
 
   useEffect(() => {
     Promise.all([
@@ -304,6 +314,11 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
 
   const handleBookSelect = useCallback(
     (slug: string) => {
+      if (availableBooks && !availableBooks.has(slug)) {
+        toast("This book is being processed. Expected availability: end of February.");
+        return;
+      }
+
       const meta = bookMeta?.[slug];
       const desc = descriptions?.[slug];
       const title = meta?.t ?? "BookGenius";
@@ -319,7 +334,7 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
         });
       }, SPLASH_FADE_DURATION_MS);
     },
-    [bookMeta, descriptions, navigate, setNavigatedFromPlatform, startTransition],
+    [availableBooks, bookMeta, descriptions, navigate, setNavigatedFromPlatform, startTransition],
   );
 
   const handleOpenModal = useCallback((book: CollectionBook) => {
@@ -445,6 +460,7 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
                 slugs={searchResults}
                 bookMeta={bookMeta!}
                 descriptions={descriptions}
+                availableBooks={availableBooks}
                 onSelectBook={handleBookSelect}
                 onOpenModal={handleOpenModal}
               />
@@ -457,6 +473,7 @@ export default function LibrarySection({ searchQuery = "" }: LibrarySectionProps
                   slugs={displayCategories![cat.id]}
                   bookMeta={bookMeta!}
                   descriptions={descriptions}
+                  availableBooks={availableBooks}
                   onSelectBook={handleBookSelect}
                   onOpenModal={handleOpenModal}
                 />

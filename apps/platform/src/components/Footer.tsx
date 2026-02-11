@@ -7,7 +7,7 @@ interface FooterProps {
   onSearchQuery?: (query: string) => void;
 }
 
-const libraryLaunched = !!import.meta.env.VITE_LIBRARY_LAUNCHED;
+const libraryLaunched = true;
 
 const Footer = ({ onSearchQuery }: FooterProps) => {
   const { t } = useTranslation();

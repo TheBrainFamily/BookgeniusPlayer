@@ -10,7 +10,7 @@ import Footer from "@platform/components/Footer";
 import { useDevPerformanceMonitor } from "@platform/hooks/useDevPerformanceMonitor";
 import BookCollection from "@platform/components/BookCollection";
 
-const libraryLaunched = !!import.meta.env.VITE_LIBRARY_LAUNCHED;
+const libraryLaunched = true;
 
 const Index = () => {
   useDevPerformanceMonitor("home");

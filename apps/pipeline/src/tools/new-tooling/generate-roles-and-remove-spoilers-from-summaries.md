@@ -61,6 +61,7 @@ _(Reasoning: "Fisherman's Son" repeats the name. Redundant.)_
 ### TASK:
 
 Process the following JSON list. Return JSON with the same character set by `slug`.
+For every character object, ALWAYS include the `role` key. If role is redundant/unknown, set `"role": null` (do not omit the key).
 Output format:
 `{ "characters": [{ "slug": "...", "referenceCard": "...", "role": "..." | null }] }`
 

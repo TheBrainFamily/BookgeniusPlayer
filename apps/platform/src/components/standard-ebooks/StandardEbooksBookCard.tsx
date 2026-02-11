@@ -1,5 +1,5 @@
 import { memo, useState, useEffect, useCallback, useRef } from "react";
-import { BookOpen, Play, Clock } from "lucide-react";
+import { BookOpen, Play, Clock, Loader2 } from "lucide-react";
 import { Button } from "@platform/components/ui/button";
 import { Badge } from "@platform/components/ui/badge";
 
@@ -23,10 +23,11 @@ export interface BookCardProps {
   book: CollectionBook;
   onSelect: (slug: string) => void;
   onOpenModal?: (book: CollectionBook) => void;
+  unavailable?: boolean;
 }
 
 // eslint-disable-next-line complexity
-function StandardEbooksBookCard({ book, onSelect, onOpenModal }: BookCardProps) {
+function StandardEbooksBookCard({ book, onSelect, onOpenModal, unavailable }: BookCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandToLeft, setExpandToLeft] = useState(false);
@@ -109,12 +110,16 @@ function StandardEbooksBookCard({ book, onSelect, onOpenModal }: BookCardProps) 
   );
 
   const handleCardClick = useCallback(() => {
+    if (unavailable) {
+      onSelect(book.slug);
+      return;
+    }
     if (onOpenModal) {
       onOpenModal(book);
     } else if (!isExpanded) {
       onSelect(book.slug);
     }
-  }, [isExpanded, book, onSelect, onOpenModal]);
+  }, [unavailable, isExpanded, book, onSelect, onOpenModal]);
 
   const coverElement = (
     <div className="relative flex-shrink-0" style={{ width: "100%" }}>
@@ -133,12 +138,19 @@ function StandardEbooksBookCard({ book, onSelect, onOpenModal }: BookCardProps) 
           <img
             src={book.cover}
             alt={book.title}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover${unavailable ? " grayscale opacity-50" : ""}`}
             loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <BookOpen className="w-14 h-14 text-white/50" />
+          </div>
+        )}
+        {unavailable && (
+          <div className="absolute top-3 left-3 z-10">
+            <Badge className="bg-black/70 text-white border-0 text-xs px-2 py-0.5 backdrop-blur-sm">
+              Coming Soon
+            </Badge>
           </div>
         )}
         <div
@@ -218,14 +230,26 @@ function StandardEbooksBookCard({ book, onSelect, onOpenModal }: BookCardProps) 
             )}
           </div>
 
-          <Button
-            className="w-full gap-2 font-medium shadow-sm hover:shadow-md transition-all"
-            size="default"
-            onClick={handleStartClick}
-          >
-            <Play className="w-4 h-4 fill-current" />
-            Read Now
-          </Button>
+          {unavailable ? (
+            <Button
+              className="w-full gap-2 font-medium shadow-sm transition-all"
+              size="default"
+              variant="secondary"
+              disabled
+            >
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Coming Soon
+            </Button>
+          ) : (
+            <Button
+              className="w-full gap-2 font-medium shadow-sm hover:shadow-md transition-all"
+              size="default"
+              onClick={handleStartClick}
+            >
+              <Play className="w-4 h-4 fill-current" />
+              Read Now
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -283,7 +307,7 @@ function StandardEbooksBookCard({ book, onSelect, onOpenModal }: BookCardProps) 
 
         <div className="h-[72px] mt-3">
           <h3
-            className={`text-base font-medium text-foreground line-clamp-2 transition-opacity duration-300 ${isExpanded ? "opacity-0" : "opacity-100"}`}
+            className={`text-base font-medium line-clamp-2 transition-opacity duration-300 ${unavailable ? "text-muted-foreground" : "text-foreground"} ${isExpanded ? "opacity-0" : "opacity-100"}`}
           >
             {book.title}
           </h3>

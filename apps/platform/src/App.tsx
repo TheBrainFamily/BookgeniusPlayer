@@ -22,6 +22,7 @@ import i18n from "@platform/i18n";
 import DynamicDocumentTitle from "./components/DynamicDocumentTitle";
 import { BookgeniusChat } from "./integrations/BookgeniusChat";
 import { SnapplifyChat } from "./integrations/SnapplifyChat";
+import { ConvexAppProvider } from "./providers/ConvexAppProvider";
 
 const queryClient = new QueryClient();
 
@@ -39,51 +40,53 @@ const AppWithAuth = () => {
 
   return (
     <AuthProvider>
-      <I18nextProvider i18n={i18n}>
-        <RouteTransitionProvider>
-          <DynamicDocumentTitle />
-          <BookgeniusChat />
-          <SnapplifyChat />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/standard-ebooks" element={<StandardEbooksPage />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/experience/:slug" element={<BookExperience />} />
-            <Route path="/GenreExploration" element={<GenreExploration />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route
-              path="/sign-in"
-              element={
-                <AuthComponentsWrapper
-                  componentName="SignIn"
-                  useAuth={useAuth}
-                  fallbackComponent={NotFound}
-                />
-              }
-            />
-            <Route
-              path="/sign-up"
-              element={
-                <AuthComponentsWrapper
-                  componentName="SignUp"
-                  useAuth={useAuth}
-                  fallbackComponent={NotFound}
-                />
-              }
-            />
-            <Route
-              path="/reader/"
-              element={
-                <Suspense fallback={null}>
-                  <LazyWrappedPlayerApp />
-                </Suspense>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </RouteTransitionProvider>
-      </I18nextProvider>
+      <ConvexAppProvider>
+        <I18nextProvider i18n={i18n}>
+          <RouteTransitionProvider>
+            <DynamicDocumentTitle />
+            <BookgeniusChat />
+            <SnapplifyChat />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/standard-ebooks" element={<StandardEbooksPage />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/experience/:slug" element={<BookExperience />} />
+              <Route path="/GenreExploration" element={<GenreExploration />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route
+                path="/sign-in"
+                element={
+                  <AuthComponentsWrapper
+                    componentName="SignIn"
+                    useAuth={useAuth}
+                    fallbackComponent={NotFound}
+                  />
+                }
+              />
+              <Route
+                path="/sign-up"
+                element={
+                  <AuthComponentsWrapper
+                    componentName="SignUp"
+                    useAuth={useAuth}
+                    fallbackComponent={NotFound}
+                  />
+                }
+              />
+              <Route
+                path="/reader/"
+                element={
+                  <Suspense fallback={null}>
+                    <LazyWrappedPlayerApp />
+                  </Suspense>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </RouteTransitionProvider>
+        </I18nextProvider>
+      </ConvexAppProvider>
     </AuthProvider>
   );
 };

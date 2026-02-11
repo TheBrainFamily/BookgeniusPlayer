@@ -25,7 +25,7 @@ const CharacterRoleCleanupInputCharacterSchema = z.object({
 const CharacterRoleCleanupCharacterSchema = z.object({
   slug: z.string().min(1),
   referenceCard: z.string(),
-  role: z.string().nullable().optional(),
+  role: z.string().nullable(),
 });
 
 export const CharacterRoleCleanupResponseSchema = z.object({
@@ -93,6 +93,54 @@ function buildPrompt(characters: CharacterRoleCleanupInputCharacter[]): string {
   const payload = JSON.stringify({ characters }, null, 2);
 
   return `${template}\n\`\`\`json\n${payload}\n\`\`\`\n`;
+}
+
+function isCoverageMismatchError(error: unknown): error is Error {
+  return (
+    error instanceof Error && error.message.includes("Spoiler cleanup response coverage mismatch")
+  );
+}
+
+function toFileSafeToken(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function buildCoverageCorrectionPrompt(
+  basePrompt: string,
+  inputCharacters: CharacterRoleCleanupInputCharacter[],
+  invalidResponse: CharacterRoleCleanupResponse,
+  validationErrorMessage: string,
+): string {
+  const expectedSlugs = inputCharacters.map((character) => character.slug);
+  const retryContext = JSON.stringify(
+    { validationError: validationErrorMessage, expectedSlugs, invalidResponse },
+    null,
+    2,
+  );
+
+  return `${basePrompt}
+
+### RETRY FEEDBACK (IMPORTANT)
+
+Your previous output failed validation and MUST be corrected.
+
+Hard constraints:
+- Keep the same character set by slug.
+- Copy every slug EXACTLY from the input (no spelling/plural/grammar fixes).
+- Return exactly ${expectedSlugs.length} characters, no extras, no omissions.
+- Keep JSON shape exactly: { "characters": [{ "slug": "...", "referenceCard": "...", "role": "..." | null }] }
+
+Previous validation failure context:
+\`\`\`json
+${retryContext}
+\`\`\`
+
+Return corrected JSON only.
+`;
 }
 
 function normalizeSlug(slug: string): string {
@@ -194,6 +242,42 @@ async function runProviderWithRetries(
   );
 }
 
+async function runProviderWithCoverageCorrection(params: {
+  providerName: string;
+  basePrompt: string;
+  inputCharacters: CharacterRoleCleanupInputCharacter[];
+  callWithPrompt: (prompt: string) => Promise<CharacterRoleCleanupResponse>;
+}): Promise<CharacterRoleCleanupResponse> {
+  const { providerName, basePrompt, inputCharacters, callWithPrompt } = params;
+  const firstResult = await runProviderWithRetries(providerName, () => callWithPrompt(basePrompt));
+
+  try {
+    return ensureCoverageAndOrder(inputCharacters, firstResult);
+  } catch (error) {
+    if (!isCoverageMismatchError(error)) {
+      throw error;
+    }
+
+    const correctionPrompt = buildCoverageCorrectionPrompt(
+      basePrompt,
+      inputCharacters,
+      firstResult,
+      error.message,
+    );
+    const providerToken = toFileSafeToken(providerName) || "provider";
+    writeBookFile(
+      `generate-roles-and-remove-spoilers-from-summaries-correction-prompt-${providerToken}.md`,
+      correctionPrompt,
+      FILE_TYPE.TEMPORARY,
+    );
+
+    const correctedResult = await runProviderWithRetries(`${providerName} corrective retry`, () =>
+      callWithPrompt(correctionPrompt),
+    );
+    return ensureCoverageAndOrder(inputCharacters, correctedResult);
+  }
+}
+
 export const generateRolesAndRemoveSpoilersFromSummaries = async (
   options: GenerateRolesAndRemoveSpoilersOptions = {},
 ): Promise<CharacterRoleCleanupResponse> => {
@@ -211,16 +295,20 @@ export const generateRolesAndRemoveSpoilersFromSummaries = async (
   const failures: string[] = [];
 
   try {
-    const geminiResult = await runProviderWithRetries("Gemini API", async () => {
-      const result = await callGeminiWithThinkingAndSchemaAndParsed(
-        prompt,
-        CharacterRoleCleanupResponseSchema,
-        MODEL,
-        { preferVertex: false },
-      );
-      return CharacterRoleCleanupResponseSchema.parse(result);
+    const normalized = await runProviderWithCoverageCorrection({
+      providerName: "Gemini API",
+      basePrompt: prompt,
+      inputCharacters,
+      callWithPrompt: async (providerPrompt) => {
+        const result = await callGeminiWithThinkingAndSchemaAndParsed(
+          providerPrompt,
+          CharacterRoleCleanupResponseSchema,
+          MODEL,
+          { preferVertex: false },
+        );
+        return CharacterRoleCleanupResponseSchema.parse(result);
+      },
     });
-    const normalized = ensureCoverageAndOrder(inputCharacters, geminiResult);
     writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
     return normalized;
   } catch (error) {
@@ -228,16 +316,20 @@ export const generateRolesAndRemoveSpoilersFromSummaries = async (
   }
 
   try {
-    const vertexResult = await runProviderWithRetries("Gemini Vertex", async () => {
-      const result = await callGeminiWithThinkingAndSchemaAndParsed(
-        prompt,
-        CharacterRoleCleanupResponseSchema,
-        MODEL,
-        { preferVertex: true },
-      );
-      return CharacterRoleCleanupResponseSchema.parse(result);
+    const normalized = await runProviderWithCoverageCorrection({
+      providerName: "Gemini Vertex",
+      basePrompt: prompt,
+      inputCharacters,
+      callWithPrompt: async (providerPrompt) => {
+        const result = await callGeminiWithThinkingAndSchemaAndParsed(
+          providerPrompt,
+          CharacterRoleCleanupResponseSchema,
+          MODEL,
+          { preferVertex: true },
+        );
+        return CharacterRoleCleanupResponseSchema.parse(result);
+      },
     });
-    const normalized = ensureCoverageAndOrder(inputCharacters, vertexResult);
     writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
     return normalized;
   } catch (error) {
@@ -245,11 +337,15 @@ export const generateRolesAndRemoveSpoilersFromSummaries = async (
   }
 
   try {
-    const gpt5Result = await runProviderWithRetries("GPT-5", async () => {
-      const result = await callGpt5WithSchema(prompt, CharacterRoleCleanupResponseSchema);
-      return CharacterRoleCleanupResponseSchema.parse(result);
+    const normalized = await runProviderWithCoverageCorrection({
+      providerName: "GPT-5",
+      basePrompt: prompt,
+      inputCharacters,
+      callWithPrompt: async (providerPrompt) => {
+        const result = await callGpt5WithSchema(providerPrompt, CharacterRoleCleanupResponseSchema);
+        return CharacterRoleCleanupResponseSchema.parse(result);
+      },
     });
-    const normalized = ensureCoverageAndOrder(inputCharacters, gpt5Result);
     writeBookFile(OUTPUT_FILE_NAME, JSON.stringify(normalized, null, 2), FILE_TYPE.PERMANENT);
     return normalized;
   } catch (error) {
