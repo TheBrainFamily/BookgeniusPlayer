@@ -399,7 +399,7 @@ function compactInlineSpeakerSegments(segments: InlineSpeakerSegment[]): InlineS
 
 /** Walk a node tree depth-first and return the first Text node with non-whitespace content. */
 function findFirstTextNode(node: Node): Text | null {
-  if (node.nodeType === 3 /* Node.TEXT_NODE */ && node.textContent?.trim()) {
+  if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
     return node as Text;
   }
   for (const child of Array.from(node.childNodes)) {
@@ -423,7 +423,7 @@ const HAIR_SPACE = "\u200A";
  */
 function restoreNestedQuoteSpacing(section: Element): void {
   const ownerDoc = section.ownerDocument ?? document;
-  const walker = ownerDoc.createTreeWalker(section, 0x4 /* NodeFilter.SHOW_TEXT */);
+  const walker = ownerDoc.createTreeWalker(section, NodeFilter.SHOW_TEXT);
   let node: Text | null;
   while ((node = walker.nextNode() as Text | null)) {
     if (!node.textContent) continue;
@@ -440,7 +440,7 @@ function restoreNestedQuoteSpacing(section: Element): void {
 /** Starting from `node`, find the first text node with content that follows it in document order. */
 function findFirstTextNodeAfter(node: Node, root: Element): Text | null {
   const ownerDoc = root.ownerDocument ?? document;
-  const walker = ownerDoc.createTreeWalker(root, 0x4 /* NodeFilter.SHOW_TEXT */);
+  const walker = ownerDoc.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   walker.currentNode = node;
   let next: Text | null;
   while ((next = walker.nextNode() as Text | null)) {
@@ -476,6 +476,25 @@ function shiftLeadingPunctuation(
   }
 
   return segments;
+}
+
+/**
+ * When the last segment is narration and its first visible character is lowercase,
+ * it's a sentence continuation (e.g., `"Thank you," so softly that...`).
+ * Absorb it into the preceding segment so they render on the same line.
+ */
+function absorbTrailingNarration(segments: InlineSpeakerSegment[]): InlineSpeakerSegment[] {
+  if (segments.length < 2) return segments;
+  const last = segments[segments.length - 1];
+  if (last.kind !== "narration") return segments;
+  const text = (last.fragment.textContent ?? "").trimStart();
+  if (text.length === 0) return segments;
+  const firstChar = text[0];
+  const isContinuation =
+    firstChar === firstChar.toLowerCase() && firstChar !== firstChar.toUpperCase();
+  if (!isContinuation) return segments;
+  segments[segments.length - 2].fragment.append(last.fragment);
+  return segments.slice(0, -1);
 }
 
 /**
@@ -635,6 +654,7 @@ export function preprocessInlineSpeakerSpans(section: Element, doc: Document): v
     }
 
     segments = shiftLeadingPunctuation(segments, doc);
+    segments = absorbTrailingNarration(segments);
 
     if (segments.length === 0) continue;
 
@@ -1318,6 +1338,56 @@ function countDataIndexFromHtml(html: string): number {
 }
 
 /**
+ * Lightweight counting helpers that only run structural transforms needed for
+ * data-index assignment. Presentation-layer steps (preprocessInlineSpeakerSpans,
+ * injectAvatarShells, transformFigureUrls) are skipped — they don't affect the
+ * count and they reference browser globals (Node.TEXT_NODE, NodeFilter.SHOW_TEXT)
+ * that are unavailable in Bun/pipeline environments.
+ */
+
+function countParagraphsDefault(html: string): number {
+  const sanitized = sanitizeHtml(html);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(sanitized, "text/html");
+  const section = doc.querySelector("section[data-chapter]");
+  if (!section) return 0;
+
+  transformFormatBToPlayRows(section, doc);
+  wrapPlayElements(section, doc);
+  injectDataIndex(section);
+  return section.querySelectorAll("[data-index]").length;
+}
+
+function countParagraphsEnhanced(html: string): number {
+  const sanitized = sanitizeHtml(html);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(sanitized, "text/html");
+  const section = doc.querySelector("section[data-chapter]");
+  if (!section) return 0;
+
+  transformProseToPlayRows(section, doc, {});
+  section.setAttribute("data-chapter-format", "mixed");
+  wrapPlayElements(section, doc);
+  injectDataIndex(section);
+  return section.querySelectorAll("[data-index]").length;
+}
+
+function countParagraphsPoemProse(html: string): number {
+  const sanitized = sanitizeHtml(html);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(sanitized, "text/html");
+  const section = doc.querySelector("section[data-chapter]");
+  if (!section) return 0;
+
+  const state = { lastSpeaker: null as string | null, alignment: "left" as "left" | "right" };
+  transformPoemToPlayRows(section, doc, state, {});
+  unwrapPoemSections(section);
+  section.setAttribute("data-chapter-format", "mixed");
+  injectDataIndex(section);
+  return section.querySelectorAll("[data-index]").length;
+}
+
+/**
  * Count paragraphs the same way the player indexes them (via data-index).
  * This ensures calculateReadProgress stays accurate without loading all chapters client-side.
  */
@@ -1333,23 +1403,22 @@ export function countParagraphsFromChapterHtml(
     throw new Error("DOMParser is not available. Provide a DOMParser implementation first.");
   }
 
-  let normalizedHtml = html;
-  if (detectSourceFormat(html) === "source") {
-    const renderMode = options.renderMode ?? "default";
-    const bookForm = options.bookForm?.toLowerCase() ?? "";
-    const useEnhancedProse = renderMode === "enhancedProse" && bookForm !== "play";
-    const usePoemProse = renderMode === "poemProse";
-
-    if (usePoemProse) {
-      normalizedHtml = normalizeChapterHtmlPoemProse(html);
-    } else if (useEnhancedProse) {
-      normalizedHtml = normalizeChapterHtmlEnhanced(html);
-    } else {
-      normalizedHtml = normalizeChapterHtml(html);
-    }
+  if (detectSourceFormat(html) === "compiled") {
+    return countDataIndexFromHtml(html);
   }
 
-  return countDataIndexFromHtml(normalizedHtml);
+  const renderMode = options.renderMode ?? "default";
+  const bookForm = options.bookForm?.toLowerCase() ?? "";
+  const useEnhancedProse = renderMode === "enhancedProse" && bookForm !== "play";
+  const usePoemProse = renderMode === "poemProse";
+
+  if (usePoemProse) {
+    return countParagraphsPoemProse(html);
+  } else if (useEnhancedProse) {
+    return countParagraphsEnhanced(html);
+  } else {
+    return countParagraphsDefault(html);
+  }
 }
 
 export interface CharacterOccurrence {

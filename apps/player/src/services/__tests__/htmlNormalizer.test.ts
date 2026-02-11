@@ -555,11 +555,12 @@ describe("preprocessInlineSpeakerSpans", () => {
     const lines = paragraph?.querySelectorAll(":scope > .inline-speaker-line") ?? [];
 
     expect(doc.querySelectorAll("[data-index]").length).toBe(1);
-    expect(lines.length).toBe(3);
+    expect(lines.length).toBe(2);
     expect(lines[0].classList.contains("inline-speaker-line--narration")).toBe(true);
     expect(lines[1].classList.contains("inline-speaker-line--speaker")).toBe(true);
     expect(lines[1].getAttribute("data-speaker")).toBe("henry-clerval");
     expect(lines[1].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+    expect(lines[1].textContent).toContain("before stepping back.");
   });
 
   it("hoists first speaker line when first quote starts before threshold", () => {
@@ -573,12 +574,12 @@ describe("preprocessInlineSpeakerSpans", () => {
     const doc = parser.parseFromString(result, "text/html");
     const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
 
-    expect(lines.length).toBe(2);
+    expect(lines.length).toBe(1);
     expect(lines[0].getAttribute("data-speaker")).toBe("henry-clerval");
     expect(lines[0].textContent).toContain("Henry said:");
     expect(lines[0].textContent).toContain("You are quite right");
+    expect(lines[0].textContent).toContain("and then left.");
     expect(lines[0].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
-    expect(lines[1].classList.contains("inline-speaker-line--narration")).toBe(true);
   });
 
   it("uses visible offset with nested formatting before first speaker", () => {
@@ -592,9 +593,10 @@ describe("preprocessInlineSpeakerSpans", () => {
     const doc = parser.parseFromString(result, "text/html");
     const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
 
-    expect(lines.length).toBe(3);
+    expect(lines.length).toBe(2);
     expect(lines[0].classList.contains("inline-speaker-line--narration")).toBe(true);
     expect(lines[1].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[1].textContent).toContain("ends.");
   });
 
   it("hoists when inline speaker starts at offset 0", () => {
@@ -608,8 +610,9 @@ describe("preprocessInlineSpeakerSpans", () => {
     const doc = parser.parseFromString(result, "text/html");
     const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
 
-    expect(lines.length).toBe(2);
+    expect(lines.length).toBe(1);
     expect(lines[0].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[0].textContent).toContain("and then left.");
     expect(lines[0].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
   });
 
@@ -642,11 +645,11 @@ describe("preprocessInlineSpeakerSpans", () => {
     const lines = paragraph?.querySelectorAll(":scope > .inline-speaker-line") ?? [];
 
     expect(doc.querySelectorAll("[data-index]").length).toBe(1);
-    expect(lines.length).toBe(4);
+    expect(lines.length).toBe(3);
     expect(lines[0].getAttribute("data-speaker")).toBe("hero");
     expect(lines[1].classList.contains("inline-speaker-line--narration")).toBe(true);
     expect(lines[2].getAttribute("data-speaker")).toBe("henry-clerval");
-    expect(lines[3].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[2].textContent).toContain("and that was that");
     expect(lines[0].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
     expect(lines[2].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
   });
@@ -748,6 +751,42 @@ describe("preprocessInlineSpeakerSpans", () => {
     expect(doc.querySelector('blockquote [data-speaker="hero"]')).toBeTruthy();
     expect(doc.querySelector('table[data-drama] [data-speaker="hero"]')).toBeTruthy();
   });
+
+  it("keeps trailing narration as separate line when it starts uppercase (new sentence)", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>He said: <span data-speaker="hero">"Stop right there."</span> The crowd gasped.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    expect(lines.length).toBe(2);
+    expect(lines[0].getAttribute("data-speaker")).toBe("hero");
+    expect(lines[0].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+    expect(lines[1].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[1].textContent).toContain("The crowd gasped.");
+  });
+
+  it("absorbs trailing lowercase narration into preceding speaker segment", () => {
+    const input = `
+      <section data-chapter="1">
+        <p>The street was crowded and loud before he finally leaned closer and whispered <span data-speaker="henry-clerval">"You are quite right"</span> before stepping back.</p>
+      </section>
+    `;
+    const result = applyInlineSpeakerSegmentation(input);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(result, "text/html");
+    const lines = doc.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
+
+    expect(lines.length).toBe(2);
+    expect(lines[0].classList.contains("inline-speaker-line--narration")).toBe(true);
+    expect(lines[1].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[1].firstElementChild?.classList.contains("character-placeholder")).toBe(true);
+    expect(lines[1].textContent).toContain("before stepping back.");
+  });
 });
 
 describe("extractCharacterOccurrences", () => {
@@ -808,10 +847,10 @@ describe("normalizeChapterHtml (baseline)", () => {
     const { section } = parseSection(result);
     const lines = section.querySelectorAll("p[data-index='0'] > .inline-speaker-line");
 
-    expect(lines.length).toBe(2);
+    expect(lines.length).toBe(1);
     expect(lines[0].getAttribute("data-speaker")).toBe("henry-clerval");
+    expect(lines[0].textContent).toContain("and then left.");
     expect(lines[0].querySelector(".character-placeholder")).toBeTruthy();
-    expect(lines[1].classList.contains("inline-speaker-line--narration")).toBe(true);
   });
 
   it("handles Frankenstein chapter 13 inline speaker snippet with separate narration and speech lines", () => {
