@@ -820,7 +820,7 @@ export async function startPipeline(input: {
       const isStandardEbook = true;
       let autoStyle: GraphicalStyle;
 
-      if (isStandardEbook) {
+      if (false && isStandardEbook) {
         addLog(job, "Detected Standard Ebook - generating style from cover image");
         const metadata = JSON.parse(fs.readFileSync(seMetadataPath, "utf-8"));
         const coverBuffer = fs.readFileSync(seCoverPath);

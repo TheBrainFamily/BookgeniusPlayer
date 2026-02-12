@@ -4,7 +4,7 @@ import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
 import { withRetry } from "../retry";
 import { isRetryableInfraError } from "../retryableErrors";
 
-export type GeminiVertexProvider = "gemini" | "vertex";
+export type GeminiVertexProvider = "gemini" | "vertex" | "gemini-alt";
 
 const PRIMARY_CONCURRENCY = Number.parseInt(
   process.env.CHAPTER_SUMMARY_PRIMARY_CONCURRENCY ||
@@ -25,7 +25,7 @@ const PRIMARY_INTERVAL_MS = Number.parseInt(
   10,
 );
 const ENQUEUE_STAGGER_MS = Number.parseInt(
-  process.env.CHAPTER_SUMMARY_QUEUE_STAGGER_MS || process.env.REWRITE_QUEUE_STAGGER_MS || "50",
+  process.env.CHAPTER_SUMMARY_QUEUE_STAGGER_MS || process.env.REWRITE_QUEUE_STAGGER_MS || "200",
   10,
 );
 const CALL_MAX_RETRIES = Number.parseInt(
@@ -44,6 +44,19 @@ const CALL_RETRY_MAX_MS = Number.parseInt(
     "900000",
   10,
 );
+const CHAPTER_SUMMARY_ENABLE_GEMINI_ALT = process.env.CHAPTER_SUMMARY_ENABLE_GEMINI_ALT === "1";
+const HAS_GEMINI_ALT_KEY = Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY_ALTERNATIVE);
+
+const PRIMARY_PROVIDER_ORDER: GeminiVertexProvider[] =
+  CHAPTER_SUMMARY_ENABLE_GEMINI_ALT && HAS_GEMINI_ALT_KEY
+    ? ["gemini", "vertex", "gemini-alt"]
+    : ["gemini", "vertex"];
+
+if (CHAPTER_SUMMARY_ENABLE_GEMINI_ALT && !HAS_GEMINI_ALT_KEY) {
+  console.warn(
+    "[chapter-summary-queue] CHAPTER_SUMMARY_ENABLE_GEMINI_ALT=1 but GOOGLE_GENERATIVE_AI_API_KEY_ALTERNATIVE is missing; using gemini+vertex only.",
+  );
+}
 
 const primaryQueue = new PQueue({
   concurrency: PRIMARY_CONCURRENCY,
@@ -55,7 +68,8 @@ let roundRobinCounter = 0;
 let enqueueGate: Promise<void> = Promise.resolve();
 
 function getNextProvider(): GeminiVertexProvider {
-  const provider = roundRobinCounter % 2 === 0 ? "gemini" : "vertex";
+  const providerIndex = roundRobinCounter % PRIMARY_PROVIDER_ORDER.length;
+  const provider = PRIMARY_PROVIDER_ORDER[providerIndex];
   roundRobinCounter += 1;
   return provider;
 }
@@ -94,6 +108,7 @@ export async function runChapterSummaryQueuedSchemaCall<T>(params: {
         async () =>
           await callGeminiWithThinkingAndSchemaAndParsed(prompt, schema, model, {
             preferVertex: provider === "vertex",
+            useAlternativeApiKey: provider === "gemini-alt",
           }),
         { signal, throwOnTimeout: true },
       );

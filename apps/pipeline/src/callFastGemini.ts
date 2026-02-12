@@ -5,7 +5,11 @@ import {
   HarmCategory,
 } from "@google/genai";
 import { z } from "zod";
-import { google, type GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
+import {
+  createGoogleGenerativeAI,
+  google,
+  type GoogleGenerativeAIProviderOptions,
+} from "@ai-sdk/google";
 import { generateObject, generateText, streamText } from "ai";
 import "dotenv/config";
 
@@ -22,7 +26,24 @@ export function toGeminiSchema(zodSchema: z.ZodType): Record<string, unknown> {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-type GeminiCallOptions = { preferVertex?: boolean };
+type GeminiCallOptions = { preferVertex?: boolean; strictProvider?: boolean };
+
+const alternativeGeminiApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY_ALTERNATIVE;
+const googleAlternative = alternativeGeminiApiKey
+  ? createGoogleGenerativeAI({ apiKey: alternativeGeminiApiKey })
+  : null;
+
+function getGoogleProvider(useAlternativeApiKey: boolean) {
+  if (useAlternativeApiKey) {
+    if (!googleAlternative) {
+      throw new Error(
+        "GOOGLE_GENERATIVE_AI_API_KEY_ALTERNATIVE is required for alternative Gemini",
+      );
+    }
+    return googleAlternative;
+  }
+  return google;
+}
 
 type ErrorLike = {
   message?: string;
@@ -138,6 +159,52 @@ function isQuotaOrRateLimitError(error: unknown): boolean {
       message.includes("overloaded")
     );
   });
+}
+
+function getErrorStatus(error: unknown): number | undefined {
+  const candidates = getErrorCandidates(error);
+  for (const candidate of candidates) {
+    if (typeof candidate.statusCode === "number") {
+      return candidate.statusCode;
+    }
+  }
+  return undefined;
+}
+
+function toCompactProviderError(
+  error: unknown,
+  context: {
+    lane: "gemini" | "gemini-alt" | "vertex";
+    model: string;
+    operation: "text" | "schema";
+  },
+): Error {
+  const status = getErrorStatus(error);
+  const retryAfterMs = extractRetryDelayMs(error);
+  const message = getErrorCandidates(error)
+    .map((c) => c.message)
+    .find((m) => typeof m === "string" && m.length > 0);
+
+  const details = [
+    `Gemini ${context.operation} call failed`,
+    `lane=${context.lane}`,
+    `model=${context.model}`,
+    status ? `status=${status}` : undefined,
+    retryAfterMs ? `retryAfterMs=${Math.round(retryAfterMs)}` : undefined,
+    message || "unknown provider error",
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
+  const compact = new Error(details);
+  if (status !== undefined) {
+    // Keep status discoverable for retry classifiers higher in the stack.
+    (compact as Error & { statusCode?: number }).statusCode = status;
+  }
+  if (retryAfterMs !== null) {
+    (compact as Error & { retryAfterMs?: number }).retryAfterMs = retryAfterMs ?? undefined;
+  }
+  return compact;
 }
 
 function getVertexConfig(): { apiKey: string; enabled: true } | { enabled: false } {
@@ -304,8 +371,12 @@ Based on the book text answer the user's question, using quotes from the wider b
   return text;
 };
 
-export const callGeminiWithThinking = async (prompt: string, options: GeminiCallOptions = {}) => {
-  const { preferVertex = false } = options;
+export const callGeminiWithThinking = async (
+  prompt: string,
+  options: GeminiCallOptions & { useAlternativeApiKey?: boolean } = {},
+) => {
+  const { preferVertex = false, useAlternativeApiKey = false, strictProvider = false } = options;
+  const lane = preferVertex ? "vertex" : useAlternativeApiKey ? "gemini-alt" : "gemini";
   const safetySettings = [
     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.OFF },
     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.OFF },
@@ -313,33 +384,38 @@ export const callGeminiWithThinking = async (prompt: string, options: GeminiCall
     { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.OFF },
     { category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY, threshold: HarmBlockThreshold.OFF },
   ];
-  console.log("CALLING GEMINI WITH THINKING");
+  console.log(`CALLING GEMINI WITH THINKING [${lane}] promptChars=${prompt.length}`);
   const model = "gemini-3-flash-preview";
   const maxRateLimitRetries = 1;
 
   if (preferVertex) {
-    const vertexResult = await tryVertexTextFallback(prompt, model).catch(() => null);
-    if (vertexResult !== null) {
-      return vertexResult;
+    try {
+      const vertexResult = await tryVertexTextFallback(prompt, model);
+      if (vertexResult !== null) {
+        return vertexResult;
+      }
+      if (strictProvider) {
+        throw new Error("Vertex provider is not configured");
+      }
+    } catch (error) {
+      if (strictProvider) {
+        throw toCompactProviderError(error, { lane, model, operation: "text" });
+      }
     }
   }
 
   for (let attempt = 0; attempt <= maxRateLimitRetries; attempt++) {
     try {
-      const { textStream } = await streamText({
-        model: google(model),
+      const { text } = await generateText({
+        model: getGoogleProvider(useAlternativeApiKey)(model),
         prompt,
         maxRetries: 0,
         experimental_telemetry: { isEnabled: true, recordInputs: true, recordOutputs: true },
         providerOptions: { google: { safetySettings } },
       });
-      let text = "";
-      for await (const textPart of textStream) {
-        text += textPart;
-      }
       return text;
     } catch (error) {
-      if (!preferVertex && attempt === 0) {
+      if (!strictProvider && !preferVertex && attempt === 0) {
         const vertexResult = await tryVertexTextFallback(prompt, model).catch(() => null);
         if (vertexResult !== null) {
           return vertexResult;
@@ -356,7 +432,7 @@ export const callGeminiWithThinking = async (prompt: string, options: GeminiCall
           continue;
         }
       }
-      throw error;
+      throw toCompactProviderError(error, { lane, model, operation: "text" });
     }
   }
 
@@ -405,23 +481,35 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
   prompt: string,
   zodSchema: z.ZodSchema<T>,
   model: string = "gemini-3-flash-preview",
-  options: GeminiCallOptions = {},
+  options: GeminiCallOptions & { useAlternativeApiKey?: boolean } = {},
 ) => {
-  const { preferVertex = false } = options;
-  console.log("CALLING GEMINI WITH THINKING AND SCHEMA AND PARSED", model);
+  const { preferVertex = false, useAlternativeApiKey = false, strictProvider = false } = options;
+  const lane = preferVertex ? "vertex" : useAlternativeApiKey ? "gemini-alt" : "gemini";
+  console.log(
+    `CALLING GEMINI WITH THINKING AND SCHEMA AND PARSED [${lane}] model=${model} promptChars=${prompt.length}`,
+  );
   const maxRateLimitRetries = 1;
 
   if (preferVertex) {
-    const vertexResult = await tryVertexSchemaFallback(prompt, zodSchema, model).catch(() => null);
-    if (vertexResult !== null) {
-      return vertexResult;
+    try {
+      const vertexResult = await tryVertexSchemaFallback(prompt, zodSchema, model);
+      if (vertexResult !== null) {
+        return vertexResult;
+      }
+      if (strictProvider) {
+        throw new Error("Vertex provider is not configured");
+      }
+    } catch (error) {
+      if (strictProvider) {
+        throw toCompactProviderError(error, { lane, model, operation: "schema" });
+      }
     }
   }
 
   for (let attempt = 0; attempt <= maxRateLimitRetries; attempt++) {
     try {
       const { object } = await generateObject({
-        model: google(model),
+        model: getGoogleProvider(useAlternativeApiKey)(model),
         schema: zodSchema,
         prompt,
         maxRetries: 0,
@@ -436,7 +524,7 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
       });
       return object as T;
     } catch (error) {
-      if (!preferVertex && attempt === 0) {
+      if (!strictProvider && !preferVertex && attempt === 0) {
         const vertexResult = await tryVertexSchemaFallback(prompt, zodSchema, model).catch(
           () => null,
         );
@@ -455,7 +543,7 @@ export const callGeminiWithThinkingAndSchemaAndParsed = async <T>(
           continue;
         }
       }
-      throw error;
+      throw toCompactProviderError(error, { lane, model, operation: "schema" });
     }
   }
 

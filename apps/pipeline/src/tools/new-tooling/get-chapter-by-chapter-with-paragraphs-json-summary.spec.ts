@@ -355,8 +355,8 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
     expect(vi.mocked(convex.upsertCharacterChapterSummary)).toHaveBeenCalled();
   });
 
-  it("distributes chapter summary generation across gemini and vertex queue lanes", async () => {
-    testState.setChapterRange(1, 2);
+  it("distributes chapter summary generation across gemini and vertex lanes by default", async () => {
+    testState.setChapterRange(1, 3);
     testState.setRewrittenXml(
       1,
       `<section data-chapter="1"><p><span data-c="alice">Alice</span></p></section>`,
@@ -365,6 +365,10 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
       2,
       `<section data-chapter="2"><p><span data-c="bob">Bob</span></p></section>`,
     );
+    testState.setRewrittenXml(
+      3,
+      `<section data-chapter="3"><p><span data-c="carol">Carol</span></p></section>`,
+    );
 
     await turnChapterSummariesIntoBulletPointsMappedToParagraphs();
 
@@ -372,5 +376,10 @@ describe("turnChapterSummariesIntoBulletPointsMappedToParagraphs", () => {
       .mocked(callGeminiWithThinkingAndSchemaAndParsed)
       .mock.calls.map((call) => call[3]?.preferVertex);
     expect(preferVertexFlags).toEqual(expect.arrayContaining([false, true]));
+
+    const useAlternativeApiKeyFlags = vi
+      .mocked(callGeminiWithThinkingAndSchemaAndParsed)
+      .mock.calls.map((call) => call[3]?.useAlternativeApiKey);
+    expect(useAlternativeApiKeyFlags).not.toContain(true);
   });
 });

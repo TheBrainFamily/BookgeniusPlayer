@@ -1,7 +1,7 @@
 import fs from "fs";
 import PQueue from "p-queue";
 import pLimit from "p-limit";
-import { callGeminiWrapper, callGeminiVertexWrapper } from "../callClaude";
+import { callGeminiWithThinking } from "../callFastGemini";
 import { callGpt5 } from "../callGpt5";
 import { callGrok } from "../callGrok";
 import { FILE_TYPE } from "../helpers/filesHelpers";
@@ -9,8 +9,9 @@ import { checkAborted, isAbortError } from "../helpers/abortHelpers";
 import { logger } from "../logger";
 import { writeBookFile } from "../helpers/writeBookFile";
 import { appendBookFile } from "../helpers/appendBookFile";
+import { createPrimaryRewriteTokenLimiterFromEnv } from "./rewrite-token-limiter";
 
-export type RewriteProviderName = "gemini" | "vertex" | "gpt-5" | "grok";
+export type RewriteProviderName = "gemini" | "vertex" | "gemini-alt" | "gpt-5" | "grok";
 export type RewritePhase = "primary" | "fallback";
 export type RewriteErrorClass = "retryable_infra" | "non_retryable_provider" | "validation_failure";
 
@@ -20,6 +21,9 @@ export interface RewriteAttemptResult {
   status: "success" | "failure";
   errorClass?: RewriteErrorClass;
   errorMessage?: string;
+  isQuotaError?: boolean;
+  retryAfterMs?: number;
+  promptChars: number;
   durationMs: number;
   chapter: number;
   chunkIndex?: number;
@@ -84,9 +88,17 @@ const PRIMARY_SPIKE_THRESHOLD = Number.parseInt(
   process.env.REWRITE_PRIMARY_SPIKE_THRESHOLD || "10",
   10,
 );
+const PRIMARY_QUOTA_COOLDOWN_MS = Number.parseInt(
+  process.env.REWRITE_PRIMARY_QUOTA_COOLDOWN_MS || "15000",
+  10,
+);
+const PRIMARY_QUOTA_MAX_COOLDOWN_MS = Number.parseInt(
+  process.env.REWRITE_PRIMARY_QUOTA_MAX_COOLDOWN_MS || "120000",
+  10,
+);
 const FALLBACK_CONCURRENCY = Number.parseInt(process.env.REWRITE_FALLBACK_CONCURRENCY || "8", 10);
 const FALLBACK_PAIR_LIMIT = Number.parseInt(process.env.REWRITE_FALLBACK_PAIR_LIMIT || "8", 10);
-const ENQUEUE_STAGGER_MS = Number.parseInt(process.env.REWRITE_QUEUE_STAGGER_MS || "50", 10);
+const ENQUEUE_STAGGER_MS = Number.parseInt(process.env.REWRITE_QUEUE_STAGGER_MS || "200", 10);
 const PRIMARY_MAX_INFRA_ATTEMPTS = Number.parseInt(
   process.env.REWRITE_PRIMARY_MAX_INFRA_ATTEMPTS || "2",
   10,
@@ -95,6 +107,7 @@ const FALLBACK_MAX_INFRA_ATTEMPTS = Number.parseInt(
   process.env.REWRITE_FALLBACK_MAX_INFRA_ATTEMPTS || "2",
   10,
 );
+const REWRITE_ENABLE_GEMINI_ALT = process.env.REWRITE_ENABLE_GEMINI_ALT === "1";
 
 const primaryQueue = new PQueue({
   concurrency: PRIMARY_CONCURRENCY,
@@ -105,6 +118,10 @@ const primaryQueue = new PQueue({
 const gptQueue = new PQueue({ concurrency: FALLBACK_CONCURRENCY });
 const grokQueue = new PQueue({ concurrency: FALLBACK_CONCURRENCY });
 const fallbackPairLimiter = pLimit(FALLBACK_PAIR_LIMIT);
+const primaryTokenLimiter = createPrimaryRewriteTokenLimiterFromEnv();
+const PRIMARY_PROVIDER_ORDER: Array<
+  Extract<RewriteProviderName, "gemini" | "vertex" | "gemini-alt">
+> = REWRITE_ENABLE_GEMINI_ALT ? ["gemini", "vertex", "gemini-alt"] : ["gemini", "vertex"];
 
 const runId = process.env.REWRITE_BENCHMARK_RUN_ID || buildRunId();
 const benchmarkRoot = `rewrite-benchmarks/${runId}`;
@@ -113,6 +130,9 @@ const summaryFileName = `${benchmarkRoot}/summary.json`;
 let primaryRoundRobinCounter = 0;
 let enqueueGate: Promise<void> = Promise.resolve();
 let isPrimaryCoolingDown = false;
+let primaryCooldownUntil = 0;
+let primaryCooldownTimer: ReturnType<typeof setTimeout> | undefined;
+let currentQuotaCooldownMs = PRIMARY_QUOTA_COOLDOWN_MS;
 const retryablePrimaryFailures: number[] = [];
 
 const summaryState = {
@@ -120,11 +140,11 @@ const summaryState = {
   startedAt: new Date().toISOString(),
   totalAttempts: 0,
   attemptsByPhase: { primary: 0, fallback: 0 },
-  attemptsByProvider: { gemini: 0, vertex: 0, "gpt-5": 0, grok: 0 } as Record<
+  attemptsByProvider: { gemini: 0, vertex: 0, "gemini-alt": 0, "gpt-5": 0, grok: 0 } as Record<
     RewriteProviderName,
     number
   >,
-  successByProvider: { gemini: 0, vertex: 0, "gpt-5": 0, grok: 0 } as Record<
+  successByProvider: { gemini: 0, vertex: 0, "gemini-alt": 0, "gpt-5": 0, grok: 0 } as Record<
     RewriteProviderName,
     number
   >,
@@ -133,7 +153,7 @@ const summaryState = {
     non_retryable_provider: 0,
     validation_failure: 0,
   } as Record<RewriteErrorClass, number>,
-  finalWinnerCount: { gemini: 0, vertex: 0, "gpt-5": 0, grok: 0 } as Record<
+  finalWinnerCount: { gemini: 0, vertex: 0, "gemini-alt": 0, "gpt-5": 0, grok: 0 } as Record<
     RewriteProviderName,
     number
   >,
@@ -158,8 +178,10 @@ type ErrorCandidate = {
   status?: number;
   statusCode?: number;
   code?: string;
-  cause?: { code?: string; status?: number; statusCode?: number };
+  cause?: { code?: string; status?: number; statusCode?: number; message?: string };
   message?: string;
+  responseHeaders?: Record<string, string | undefined>;
+  responseBody?: string;
 };
 
 function getCandidateStatus(candidate: ErrorCandidate): number | undefined {
@@ -244,6 +266,119 @@ function getBackoffMs(attempt: number): number {
   return base + jitter;
 }
 
+function getErrorStatus(error: unknown): number | undefined {
+  const candidate = (error || {}) as ErrorCandidate;
+  return (
+    candidate.statusCode ??
+    candidate.status ??
+    candidate.cause?.statusCode ??
+    candidate.cause?.status
+  );
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  const candidate = (error || {}) as ErrorCandidate;
+  return candidate.message || "";
+}
+
+function parseRetryDelayToMs(raw: string | undefined): number | undefined {
+  if (!raw) {
+    return undefined;
+  }
+
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const numeric = Number.parseFloat(trimmed);
+  if (!Number.isNaN(numeric) && /^\d+(\.\d+)?$/.test(trimmed)) {
+    return numeric * 1000;
+  }
+
+  const secsMatch = trimmed.match(/(\d+(?:\.\d+)?)\s*s/i);
+  if (secsMatch) {
+    const seconds = Number.parseFloat(secsMatch[1]);
+    if (!Number.isNaN(seconds)) {
+      return seconds * 1000;
+    }
+  }
+
+  return undefined;
+}
+
+function extractRetryAfterMs(error: unknown): number | undefined {
+  const candidate = (error || {}) as ErrorCandidate;
+  const retryAfterMs = candidate.responseHeaders?.["retry-after-ms"];
+  const retryAfter = candidate.responseHeaders?.["retry-after"];
+  const rawBody = candidate.responseBody;
+
+  const byRetryAfterMs = parseRetryDelayToMs(retryAfterMs);
+  if (byRetryAfterMs && byRetryAfterMs > 0) {
+    return byRetryAfterMs;
+  }
+
+  if (retryAfter) {
+    const bySeconds = Number.parseFloat(retryAfter);
+    if (!Number.isNaN(bySeconds) && bySeconds > 0) {
+      return bySeconds * 1000;
+    }
+
+    const retryAt = Date.parse(retryAfter);
+    if (!Number.isNaN(retryAt)) {
+      const delta = retryAt - Date.now();
+      if (delta > 0) {
+        return delta;
+      }
+    }
+  }
+
+  if (rawBody) {
+    try {
+      const parsed = JSON.parse(rawBody) as {
+        error?: { details?: Array<{ "@type"?: string; retryDelay?: string }> };
+      };
+      const details = parsed.error?.details || [];
+      const retryInfo = details.find((d) => d?.["@type"]?.includes("google.rpc.RetryInfo"));
+      const retryDelay = parseRetryDelayToMs(retryInfo?.retryDelay);
+      if (retryDelay && retryDelay > 0) {
+        return retryDelay;
+      }
+    } catch {
+      // ignore parse issues and continue with message heuristics
+    }
+  }
+
+  const message = getErrorMessage(error);
+  const messageRetryDelay = parseRetryDelayToMs(message);
+  if (messageRetryDelay && messageRetryDelay > 0) {
+    return messageRetryDelay;
+  }
+
+  return undefined;
+}
+
+function isQuotaRateLimitError(error: unknown): boolean {
+  const status = getErrorStatus(error);
+  if (status === 429) {
+    return true;
+  }
+
+  const message = getErrorMessage(error).toLowerCase();
+  return (
+    message.includes("resource_exhausted") ||
+    message.includes("quota exceeded") ||
+    message.includes("rate limit") ||
+    message.includes("too many requests")
+  );
+}
+
 function buildAttemptFilePrefix(
   chapter: number,
   chunkIndex: number | undefined,
@@ -325,6 +460,42 @@ function markGrokSelectedDueToGptFailure(): void {
   writeBookFile(summaryFileName, JSON.stringify(summaryState, null, 2), FILE_TYPE.TEMPORARY);
 }
 
+function pausePrimaryDispatch(durationMs: number, reason: string): void {
+  const normalizedMs = Math.max(1, durationMs);
+  const now = Date.now();
+  const nextUntil = now + normalizedMs;
+  const effectiveUntil = Math.max(primaryCooldownUntil, nextUntil);
+  const effectiveDuration = effectiveUntil - now;
+
+  const wasCoolingDown = isPrimaryCoolingDown;
+  primaryCooldownUntil = effectiveUntil;
+
+  if (!wasCoolingDown) {
+    primaryQueue.pause();
+    isPrimaryCoolingDown = true;
+  }
+
+  logger.warning(`⏸️ Pausing primary rewrite dispatch for ${effectiveDuration}ms (${reason})`);
+
+  if (primaryCooldownTimer) {
+    clearTimeout(primaryCooldownTimer);
+  }
+
+  primaryCooldownTimer = setTimeout(() => {
+    const delayLeft = primaryCooldownUntil - Date.now();
+    if (delayLeft > 0) {
+      pausePrimaryDispatch(delayLeft, "extended cooldown");
+      return;
+    }
+
+    primaryQueue.start();
+    isPrimaryCoolingDown = false;
+    primaryCooldownUntil = 0;
+    primaryCooldownTimer = undefined;
+    logger.info("▶️ Primary rewrite dispatch resumed");
+  }, effectiveDuration);
+}
+
 function registerRetryablePrimaryFailure(): void {
   const now = Date.now();
   retryablePrimaryFailures.push(now);
@@ -336,21 +507,39 @@ function registerRetryablePrimaryFailure(): void {
     retryablePrimaryFailures.shift();
   }
 
-  if (isPrimaryCoolingDown || retryablePrimaryFailures.length < PRIMARY_SPIKE_THRESHOLD) {
+  if (retryablePrimaryFailures.length < PRIMARY_SPIKE_THRESHOLD) {
     return;
   }
 
-  isPrimaryCoolingDown = true;
-  primaryQueue.pause();
-  logger.warning(
-    `⏸️ Pausing primary rewrite dispatch for ${PRIMARY_SPIKE_PAUSE_MS}ms after ${retryablePrimaryFailures.length} retryable failures in ${PRIMARY_SPIKE_WINDOW_MS}ms`,
+  pausePrimaryDispatch(
+    PRIMARY_SPIKE_PAUSE_MS,
+    `${retryablePrimaryFailures.length} retryable failures in ${PRIMARY_SPIKE_WINDOW_MS}ms`,
+  );
+}
+
+function registerQuotaPrimaryFailure(
+  provider: RewriteProviderName,
+  promptChars: number,
+  retryAfterMs?: number,
+): void {
+  const requestedCooldownMs =
+    retryAfterMs && retryAfterMs > 0
+      ? retryAfterMs
+      : Math.min(currentQuotaCooldownMs, PRIMARY_QUOTA_MAX_COOLDOWN_MS);
+  const cooldownMs = Math.min(
+    Math.max(1, Math.ceil(requestedCooldownMs)),
+    PRIMARY_QUOTA_MAX_COOLDOWN_MS,
   );
 
-  setTimeout(() => {
-    primaryQueue.start();
-    isPrimaryCoolingDown = false;
-    logger.info("▶️ Primary rewrite dispatch resumed");
-  }, PRIMARY_SPIKE_PAUSE_MS);
+  currentQuotaCooldownMs = Math.min(currentQuotaCooldownMs * 2, PRIMARY_QUOTA_MAX_COOLDOWN_MS);
+  pausePrimaryDispatch(
+    cooldownMs,
+    `quota/rate-limit from ${provider} (promptChars=${promptChars})`,
+  );
+}
+
+function resetQuotaCooldownOnPrimarySuccess(): void {
+  currentQuotaCooldownMs = PRIMARY_QUOTA_COOLDOWN_MS;
 }
 
 async function waitForEnqueueStagger(signal?: AbortSignal): Promise<void> {
@@ -363,10 +552,30 @@ async function waitForEnqueueStagger(signal?: AbortSignal): Promise<void> {
   await current;
 }
 
+async function waitForPrimaryCooldown(signal?: AbortSignal): Promise<void> {
+  while (primaryCooldownUntil > 0) {
+    const waitMs = primaryCooldownUntil - Date.now();
+    if (waitMs <= 0) {
+      return;
+    }
+    checkAborted(signal, "primary cooldown wait");
+    await sleep(waitMs);
+  }
+}
+
 async function enqueuePrimary<T>(fn: () => Promise<T>, signal?: AbortSignal): Promise<T> {
-  await waitForEnqueueStagger(signal);
-  checkAborted(signal, "enqueue primary request");
-  return primaryQueue.add(() => fn(), { signal, throwOnTimeout: true });
+  while (true) {
+    await waitForPrimaryCooldown(signal);
+    await waitForEnqueueStagger(signal);
+
+    // Cooldown may start while this task is waiting its stagger slot.
+    if (primaryCooldownUntil > Date.now()) {
+      continue;
+    }
+
+    checkAborted(signal, "enqueue primary request");
+    return primaryQueue.add(() => fn(), { signal, throwOnTimeout: true });
+  }
 }
 
 async function enqueueFallback<T>(
@@ -380,18 +589,25 @@ async function enqueueFallback<T>(
 }
 
 function getNextPrimaryProvider(): RewriteProviderName {
-  const provider = primaryRoundRobinCounter % 2 === 0 ? "gemini" : "vertex";
+  const provider = PRIMARY_PROVIDER_ORDER[primaryRoundRobinCounter % PRIMARY_PROVIDER_ORDER.length];
   primaryRoundRobinCounter += 1;
   return provider;
 }
 
 async function callProvider(provider: RewriteProviderName, prompt: string): Promise<string> {
   if (provider === "gemini") {
-    return (await callGeminiWrapper(prompt, undefined, 1)) as string;
+    return await callGeminiWithThinking(prompt, { strictProvider: true });
   }
 
   if (provider === "vertex") {
-    return (await callGeminiVertexWrapper(prompt, undefined, 1)) as string;
+    return await callGeminiWithThinking(prompt, { preferVertex: true, strictProvider: true });
+  }
+
+  if (provider === "gemini-alt") {
+    return await callGeminiWithThinking(prompt, {
+      useAlternativeApiKey: true,
+      strictProvider: true,
+    });
   }
 
   if (provider === "gpt-5") {
@@ -417,6 +633,12 @@ async function runProviderAttempt(params: {
 
   try {
     checkAborted(signal, `rewrite ${provider} call`);
+    if (
+      phase === "primary" &&
+      (provider === "gemini" || provider === "vertex" || provider === "gemini-alt")
+    ) {
+      await primaryTokenLimiter.acquire({ provider, prompt, signal });
+    }
 
     const response =
       phase === "primary"
@@ -450,6 +672,7 @@ async function runProviderAttempt(params: {
         status: "failure",
         errorClass: "validation_failure",
         errorMessage: validation.failureReason || "validation failed",
+        promptChars: prompt.length,
         durationMs: Date.now() - startedAt,
         chapter,
         chunkIndex,
@@ -465,6 +688,7 @@ async function runProviderAttempt(params: {
       provider,
       phase,
       status: "success",
+      promptChars: prompt.length,
       durationMs: Date.now() - startedAt,
       chapter,
       chunkIndex,
@@ -487,6 +711,9 @@ async function runProviderAttempt(params: {
       status: "failure",
       errorClass,
       errorMessage: sanitizeErrorMessage(error),
+      isQuotaError: isQuotaRateLimitError(error),
+      retryAfterMs: extractRetryAfterMs(error),
+      promptChars: prompt.length,
       durationMs: Date.now() - startedAt,
       chapter,
       chunkIndex,
@@ -705,6 +932,13 @@ export async function executeRewriteWithQueues(
       }
 
       if (attemptResult.failedAttempt.errorClass === "retryable_infra") {
+        if (attemptResult.failedAttempt.isQuotaError) {
+          registerQuotaPrimaryFailure(
+            provider,
+            attemptResult.failedAttempt.promptChars,
+            attemptResult.failedAttempt.retryAfterMs,
+          );
+        }
         registerRetryablePrimaryFailure();
 
         if (attempt < PRIMARY_MAX_INFRA_ATTEMPTS - 1) {
@@ -735,6 +969,9 @@ export async function executeRewriteWithQueues(
     }
 
     collectedAttempts.push(attemptResult.attemptRecord);
+    if (attemptResult.phase === "primary") {
+      resetQuotaCooldownOnPrimarySuccess();
+    }
 
     return finalizeResult(collectedAttempts, attemptResult, false, false, chapter, chunkIndex);
   }

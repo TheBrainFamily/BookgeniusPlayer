@@ -11,6 +11,61 @@ const anthropic = new Anthropic({ timeout: 600000 * 3 });
  * @param ms Time to sleep in milliseconds
  */
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+const LOG_VERBOSE_LLM_ERRORS = process.env.LLM_LOG_VERBOSE_ERRORS === "1";
+
+type ProviderErrorLike = {
+  message?: string;
+  status?: number;
+  statusCode?: number;
+  code?: string;
+  cause?: { status?: number; statusCode?: number; code?: string };
+};
+
+function getProviderErrorStatus(error: unknown): number | undefined {
+  const candidate = (error || {}) as ProviderErrorLike;
+  return (
+    candidate.statusCode ??
+    candidate.status ??
+    candidate.cause?.statusCode ??
+    candidate.cause?.status
+  );
+}
+
+function isProviderQuotaOrRateLimitError(error: unknown): boolean {
+  const status = getProviderErrorStatus(error);
+  if (status === 429) {
+    return true;
+  }
+
+  const message = ((error as ProviderErrorLike | undefined)?.message || "").toLowerCase();
+  return (
+    message.includes("resource_exhausted") ||
+    message.includes("quota exceeded") ||
+    message.includes("rate limit") ||
+    message.includes("too many requests")
+  );
+}
+
+function summarizeProviderError(error: unknown): string {
+  const status = getProviderErrorStatus(error);
+  const code = ((error as ProviderErrorLike | undefined)?.code || "").toString();
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : "Unknown provider error";
+
+  const parts = [message];
+  if (status) {
+    parts.push(`status=${status}`);
+  }
+  if (code) {
+    parts.push(`code=${code}`);
+  }
+
+  return parts.join(" | ");
+}
 
 const callClaudeWithStreamAndThinking = async (
   prompt: string,
@@ -49,7 +104,7 @@ export const callGeminiWrapper = async <T>(
   maxRetries = 5,
 ) => {
   // return callOpenRouter(prompt, schema, maxRetries);
-  const result = await callClaude(prompt, schema, maxRetries, 1024, true);
+  const result = await callClaude(prompt, schema, maxRetries, 1024, true, true, true);
   return result;
 };
 
@@ -64,6 +119,23 @@ export const callGeminiVertexWrapper = async <T>(
     useGemini: true,
     useGeminiThinking: true,
     preferVertex: true,
+    strictGeminiProvider: true,
+  });
+  return result;
+};
+
+export const callGeminiAlternativeWrapper = async <T>(
+  prompt: string,
+  schema?: z.ZodSchema<T>,
+  maxRetries = 5,
+) => {
+  const result = await callClaudeInternal(prompt, schema, {
+    maxRetries,
+    thinkingTokens: 1024,
+    useGemini: true,
+    useGeminiThinking: true,
+    preferAlternativeGeminiKey: true,
+    strictGeminiProvider: true,
   });
   return result;
 };
@@ -86,6 +158,8 @@ const callClaudeInternal = async <T = string>(
     useGemini?: boolean;
     useGeminiThinking?: boolean;
     preferVertex?: boolean;
+    preferAlternativeGeminiKey?: boolean;
+    strictGeminiProvider?: boolean;
   } = {},
   // eslint-disable-next-line complexity -- multi-provider retry with fallback logic; refactor pending
 ) => {
@@ -95,6 +169,8 @@ const callClaudeInternal = async <T = string>(
     useGemini = false,
     useGeminiThinking = true,
     preferVertex = false,
+    preferAlternativeGeminiKey = false,
+    strictGeminiProvider = false,
   } = options;
 
   let lastError: unknown;
@@ -103,9 +179,13 @@ const callClaudeInternal = async <T = string>(
 
   let model: string = "claude";
   if (useGemini) {
-    model = preferVertex ? "gemini-vertex" : "gemini";
+    model = preferVertex ? "gemini-vertex" : preferAlternativeGeminiKey ? "gemini-alt" : "gemini";
     if (useGeminiThinking) {
-      model = preferVertex ? "gemini-vertex-thinking" : "gemini-thinking";
+      model = preferVertex
+        ? "gemini-vertex-thinking"
+        : preferAlternativeGeminiKey
+          ? "gemini-alt-thinking"
+          : "gemini-thinking";
     }
   }
   // TODO PINGWING when failed with "exception TypeError: fetch failed sending request","stack":"Error: exception TypeError: fetch failed sending reques" we shouldn't retry
@@ -128,7 +208,7 @@ const callClaudeInternal = async <T = string>(
         // logger.info(`Response for prompt: ${prompt.substring(0, 50)}`, { response: replyText, prompt });
       } else if (useGeminiThinking) {
         logger.debug(
-          `Calling Gemini with prompt: ${prompt.substring(0, 50)}`,
+          `Calling Gemini [${model}] promptChars=${prompt.length} prompt=${prompt.substring(0, 50)}`,
           DEBUG ? { prompt } : undefined,
         );
         if (schema) {
@@ -136,7 +216,11 @@ const callClaudeInternal = async <T = string>(
             prompt,
             schema,
             undefined,
-            { preferVertex },
+            {
+              preferVertex,
+              useAlternativeApiKey: preferAlternativeGeminiKey,
+              strictProvider: strictGeminiProvider,
+            },
           );
           logger.success(`Received structured response for prompt: ${prompt.substring(0, 50)}`, {
             response: extracted,
@@ -144,7 +228,11 @@ const callClaudeInternal = async <T = string>(
           });
           return extracted;
         } else {
-          replyText = await callGeminiWithThinking(prompt, { preferVertex });
+          replyText = await callGeminiWithThinking(prompt, {
+            preferVertex,
+            useAlternativeApiKey: preferAlternativeGeminiKey,
+            strictProvider: strictGeminiProvider,
+          });
         }
       } else {
         logger.debug(
@@ -191,10 +279,27 @@ const callClaudeInternal = async <T = string>(
       }
     } catch (error: unknown) {
       lastError = error;
-      if (error instanceof Error) {
-        logger.error(`LLM API error: ${error.message}`, model, error);
+      const summary = summarizeProviderError(error);
+      const isQuota = isProviderQuotaOrRateLimitError(error);
+
+      if (isQuota) {
+        logger.warning(
+          `LLM API transient quota/rate-limit: ${summary} | promptChars=${prompt.length}`,
+          model,
+          LOG_VERBOSE_LLM_ERRORS ? error : undefined,
+        );
+      } else if (error instanceof Error) {
+        logger.error(
+          `LLM API error: ${summary} | promptChars=${prompt.length}`,
+          model,
+          LOG_VERBOSE_LLM_ERRORS ? error : undefined,
+        );
       } else {
-        logger.error("An unknown error occurred during LLM call", model, error);
+        logger.error(
+          `LLM API error: ${summary} | promptChars=${prompt.length}`,
+          model,
+          LOG_VERBOSE_LLM_ERRORS ? error : undefined,
+        );
       }
 
       // If we've reached max attempts, throw the error
@@ -222,12 +327,14 @@ export const callClaude = async <T = string>(
   thinkingTokens = 1024 * 10,
   useGemini = false,
   useGeminiThinking = true,
+  strictGeminiProvider = false,
 ) => {
   return callClaudeInternal(prompt, schema, {
     maxRetries,
     thinkingTokens,
     useGemini,
     useGeminiThinking,
+    strictGeminiProvider,
   });
 };
 

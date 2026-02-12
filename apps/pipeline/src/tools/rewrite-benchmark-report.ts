@@ -4,7 +4,7 @@ import path from "path";
 import { resolveBookDir } from "../helpers/resolveBookDir";
 
 interface ManifestRow {
-  provider: "gemini" | "vertex" | "gpt-5" | "grok";
+  provider: "gemini" | "vertex" | "gemini-alt" | "gpt-5" | "grok";
   phase: "primary" | "fallback";
   status: "success" | "failure";
   errorClass?: "retryable_infra" | "non_retryable_provider" | "validation_failure";

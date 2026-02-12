@@ -6,10 +6,12 @@ const state = vi.hoisted(() => {
   const tempRoot = `/tmp/rewrite-orchestrator-spec-${Math.random().toString(36).slice(2)}`;
 
   const calls: Array<{ provider: string; prompt: string }> = [];
+  const tokenBudgetCalls: Array<{ provider: string; prompt: string }> = [];
   const appendCalls: Array<{ fileName: string; content: string; fileType?: string }> = [];
   const providerQueues: Record<string, Array<unknown>> = {
     gemini: [],
     vertex: [],
+    "gemini-alt": [],
     "gpt-5": [],
     grok: [],
   };
@@ -17,9 +19,11 @@ const state = vi.hoisted(() => {
   function reset(): void {
     fs.rmSync(tempRoot, { recursive: true, force: true });
     calls.length = 0;
+    tokenBudgetCalls.length = 0;
     appendCalls.length = 0;
     providerQueues.gemini = [];
     providerQueues.vertex = [];
+    providerQueues["gemini-alt"] = [];
     providerQueues["gpt-5"] = [];
     providerQueues.grok = [];
   }
@@ -71,6 +75,7 @@ const state = vi.hoisted(() => {
   return {
     tempRoot,
     calls,
+    tokenBudgetCalls,
     appendCalls,
     reset,
     enqueueProviderResult,
@@ -85,9 +90,25 @@ const loggerWarning = vi.hoisted(() => vi.fn());
 const loggerInfo = vi.hoisted(() => vi.fn());
 const loggerError = vi.hoisted(() => vi.fn());
 
-vi.mock("../callClaude", () => ({
-  callGeminiWrapper: vi.fn((prompt: string) => state.invoke("gemini", prompt)),
-  callGeminiVertexWrapper: vi.fn((prompt: string) => state.invoke("vertex", prompt)),
+vi.mock("../callFastGemini", () => ({
+  callGeminiWithThinking: vi.fn(
+    (
+      prompt: string,
+      options?: {
+        preferVertex?: boolean;
+        useAlternativeApiKey?: boolean;
+        strictProvider?: boolean;
+      },
+    ) => {
+      if (options?.preferVertex) {
+        return state.invoke("vertex", prompt);
+      }
+      if (options?.useAlternativeApiKey) {
+        return state.invoke("gemini-alt", prompt);
+      }
+      return state.invoke("gemini", prompt);
+    },
+  ),
 }));
 
 vi.mock("../callGpt5", () => ({
@@ -119,6 +140,20 @@ vi.mock("../logger", () => ({
   logger: { warning: loggerWarning, info: loggerInfo, error: loggerError },
 }));
 
+vi.mock("./rewrite-token-limiter", () => ({
+  createPrimaryRewriteTokenLimiterFromEnv: vi.fn(() => ({
+    acquire: vi.fn(
+      async (params: {
+        provider: "gemini" | "vertex" | "gemini-alt";
+        prompt: string;
+        signal?: AbortSignal;
+      }) => {
+        state.tokenBudgetCalls.push({ provider: params.provider, prompt: params.prompt });
+      },
+    ),
+  })),
+}));
+
 function buildValidation(response: string): RewriteValidationResult {
   const isValid = !response.includes("INVALID");
   return {
@@ -133,8 +168,12 @@ async function loadOrchestrator(env: Record<string, string> = {}) {
   vi.resetModules();
 
   process.env.REWRITE_BENCHMARK_RUN_ID = "spec-run";
+  process.env.REWRITE_ENABLE_GEMINI_ALT = env.REWRITE_ENABLE_GEMINI_ALT || "1";
   process.env.REWRITE_PRIMARY_SPIKE_THRESHOLD = env.REWRITE_PRIMARY_SPIKE_THRESHOLD || "10";
   process.env.REWRITE_PRIMARY_SPIKE_PAUSE_MS = env.REWRITE_PRIMARY_SPIKE_PAUSE_MS || "100";
+  process.env.REWRITE_PRIMARY_QUOTA_COOLDOWN_MS = env.REWRITE_PRIMARY_QUOTA_COOLDOWN_MS || "20";
+  process.env.REWRITE_PRIMARY_QUOTA_MAX_COOLDOWN_MS =
+    env.REWRITE_PRIMARY_QUOTA_MAX_COOLDOWN_MS || "200";
   process.env.REWRITE_PRIMARY_MAX_INFRA_ATTEMPTS = env.REWRITE_PRIMARY_MAX_INFRA_ATTEMPTS || "2";
   process.env.REWRITE_FALLBACK_MAX_INFRA_ATTEMPTS = env.REWRITE_FALLBACK_MAX_INFRA_ATTEMPTS || "2";
 
@@ -149,7 +188,7 @@ describe("rewrite-orchestrator", () => {
     loggerError.mockReset();
   });
 
-  it("uses round-robin selection between gemini and vertex", async () => {
+  it("uses round-robin selection between gemini, vertex, and gemini-alt", async () => {
     const { executeRewriteWithQueues } = await loadOrchestrator();
 
     const first = await executeRewriteWithQueues({
@@ -164,9 +203,20 @@ describe("rewrite-orchestrator", () => {
       validateResponse: ({ response }) => buildValidation(response),
     });
 
+    const third = await executeRewriteWithQueues({
+      chapter: 3,
+      prompt: "prompt-3",
+      validateResponse: ({ response }) => buildValidation(response),
+    });
+
     expect(first.provider).toBe("gemini");
     expect(second.provider).toBe("vertex");
-    expect(state.calls.slice(0, 2).map((call) => call.provider)).toEqual(["gemini", "vertex"]);
+    expect(third.provider).toBe("gemini-alt");
+    expect(state.calls.slice(0, 3).map((call) => call.provider)).toEqual([
+      "gemini",
+      "vertex",
+      "gemini-alt",
+    ]);
   });
 
   it("retries retryable infra failures in primary queue and then succeeds", async () => {
@@ -243,8 +293,11 @@ describe("rewrite-orchestrator", () => {
 
     state.enqueueProviderResult("gemini", Object.assign(new Error("gateway"), { statusCode: 502 }));
     state.enqueueProviderResult("vertex", Object.assign(new Error("gateway"), { statusCode: 502 }));
+    state.enqueueProviderResult(
+      "gemini-alt",
+      Object.assign(new Error("gateway"), { statusCode: 502 }),
+    );
     state.enqueueProviderResult("gemini", Object.assign(new Error("gateway"), { statusCode: 502 }));
-    state.enqueueProviderResult("vertex", Object.assign(new Error("gateway"), { statusCode: 502 }));
 
     await expect(
       executeRewriteWithQueues({
@@ -263,6 +316,29 @@ describe("rewrite-orchestrator", () => {
     ).rejects.toThrow();
 
     expect(loggerWarning).toHaveBeenCalled();
+  });
+
+  it("pauses primary dispatch immediately on quota/rate-limit failures", async () => {
+    const { executeRewriteWithQueues } = await loadOrchestrator({
+      REWRITE_PRIMARY_SPIKE_THRESHOLD: "99",
+      REWRITE_PRIMARY_QUOTA_COOLDOWN_MS: "5",
+      REWRITE_PRIMARY_QUOTA_MAX_COOLDOWN_MS: "20",
+    });
+
+    state.enqueueProviderResult(
+      "gemini",
+      Object.assign(new Error("Resource has been exhausted"), { statusCode: 429 }),
+    );
+    state.enqueueProviderResult("vertex", "vertex-after-quota");
+
+    const result = await executeRewriteWithQueues({
+      chapter: 61,
+      prompt: "prompt-61",
+      validateResponse: ({ response }) => buildValidation(response),
+    });
+
+    expect(result.provider).toBe("vertex");
+    expect(loggerWarning).toHaveBeenCalledWith(expect.stringContaining("quota/rate-limit"));
   });
 
   it("writes manifest rows for every attempt", async () => {
@@ -317,5 +393,44 @@ describe("rewrite-orchestrator", () => {
 
     const manifestRaw = state.readFile("rewrite-benchmarks/spec-run/manifest.ndjson");
     expect(manifestRaw.trim().split("\n")).toHaveLength(2);
+  });
+
+  it("acquires token budget before primary provider call", async () => {
+    const { executeRewriteWithQueues } = await loadOrchestrator();
+
+    state.enqueueProviderResult("gemini", "good-xml");
+    await executeRewriteWithQueues({
+      chapter: 10,
+      prompt: "prompt-10",
+      validateResponse: ({ response }) => buildValidation(response),
+    });
+
+    expect(state.tokenBudgetCalls).toContainEqual({ provider: "gemini", prompt: "prompt-10" });
+  });
+
+  it("acquires token budget for gemini-alt lane", async () => {
+    const { executeRewriteWithQueues } = await loadOrchestrator();
+
+    state.enqueueProviderResult("gemini", "ok-1");
+    state.enqueueProviderResult("vertex", "ok-2");
+    state.enqueueProviderResult("gemini-alt", "ok-3");
+
+    await executeRewriteWithQueues({
+      chapter: 11,
+      prompt: "prompt-11",
+      validateResponse: ({ response }) => buildValidation(response),
+    });
+    await executeRewriteWithQueues({
+      chapter: 12,
+      prompt: "prompt-12",
+      validateResponse: ({ response }) => buildValidation(response),
+    });
+    await executeRewriteWithQueues({
+      chapter: 13,
+      prompt: "prompt-13",
+      validateResponse: ({ response }) => buildValidation(response),
+    });
+
+    expect(state.tokenBudgetCalls).toContainEqual({ provider: "gemini-alt", prompt: "prompt-13" });
   });
 });

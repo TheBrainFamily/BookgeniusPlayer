@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { callGeminiWrapper } from "../../callClaude";
+import { callGeminiVertexWrapper, callGeminiWrapper } from "../../callClaude";
 import { callGeminiWithImage } from "../../callFastGemini";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { writeBookFile } from "../../helpers/writeBookFile";
@@ -104,7 +104,7 @@ ${STYLE_TEMPLATE}
     periodStyle: z.string(),
     avatarStyle: z.string(),
   }) as z.ZodType<GraphicalStyle>;
-  const response = await callGeminiWrapper(prompt, schema, 10);
+  const response = await callGeminiVertexWrapper(prompt, schema, 10);
 
   if (shouldSave) {
     writeBookFile("graphicalStyle.json", JSON.stringify(response, null, 2), FILE_TYPE.TEMPORARY);
@@ -162,7 +162,7 @@ Return format:
     avatarStyle: z.string(),
   }) as z.ZodType<GraphicalStyle>;
 
-  const response = await callGeminiWrapper(prompt, schema, 10);
+  const response = await callGeminiVertexWrapper(prompt, schema, 10);
   return response as GraphicalStyle;
 };
 
