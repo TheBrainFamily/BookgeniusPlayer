@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useBookConvex } from "@player/context/BookConvexContext";
 import { useGraphicsSettings } from "@player/stores/graphicsSettings.store";
 import { usePlayerDOM } from "@player/context/PlayerDOMContext";
 import { getBookMediaType } from "@player/ui/backgroundUtils";
@@ -22,9 +23,11 @@ function animateBlur(legacy: HTMLElement, targetBlur: number): number {
 
 export function useApplyGraphicsSettings() {
   const { legacy, bookContainer, contentContainer, bgVideoA, bgVideoB } = usePlayerDOM();
+  const { bookData } = useBookConvex();
   const {
     qualityLevel,
     backgroundBlur,
+    syncBackgroundBlurForBookSlug,
     animationSpeed,
     contentOpacity,
     videoContentOpacity,
@@ -32,6 +35,10 @@ export function useApplyGraphicsSettings() {
     zoomDuration,
   } = useGraphicsSettings();
   const blurAnimatedRef = useRef(false);
+
+  useEffect(() => {
+    syncBackgroundBlurForBookSlug(bookData?.slug);
+  }, [bookData?.slug, syncBackgroundBlurForBookSlug]);
 
   useEffect(() => {
     if (!legacy) return;
