@@ -314,6 +314,7 @@ describe("getReferenceCardsForWholeBook", () => {
         return {
           characters: [
             {
+              slug: "alice",
               name: "Alice",
               referenceCard: "Alice first appearance",
               visualGuide: "Alice first visual",
@@ -325,11 +326,17 @@ describe("getReferenceCardsForWholeBook", () => {
       return {
         characters: [
           {
-            name: "Alice",
+            slug: "alice",
+            name: "Alice (Ally)",
             referenceCard: "Alice later appearance",
             visualGuide: "Alice later visual",
           },
-          { name: "Bob", referenceCard: "Bob first appearance", visualGuide: "Bob first visual" },
+          {
+            slug: "bob",
+            name: "Bob",
+            referenceCard: "Bob first appearance",
+            visualGuide: "Bob first visual",
+          },
         ],
       };
     });
@@ -339,11 +346,19 @@ describe("getReferenceCardsForWholeBook", () => {
     expect(vi.mocked(callGpt5WithSchema)).toHaveBeenCalledTimes(2);
     const secondPrompt = vi.mocked(callGpt5WithSchema).mock.calls[1]?.[0] as string;
     expect(secondPrompt).toContain("Alice first appearance");
+    expect(secondPrompt).toContain('"slug": "alice"');
+    expect(secondPrompt).toContain('"canonicalName": "Alice"');
+    expect(secondPrompt).toContain("Reuse existing character identity for known people.");
+    expect(secondPrompt).toContain(
+      "keep the same canonical name exactly (no added aliases/parenthetical variants).",
+    );
 
     const alice = result.characters.find((character) => character.name === "Alice");
+    const aliasedAlice = result.characters.find((character) => character.name === "Alice (Ally)");
     const bob = result.characters.find((character) => character.name === "Bob");
     expect(alice?.referenceCard).toBe("Alice first appearance");
     expect(alice?.visualGuide).toBe("Alice first visual");
+    expect(aliasedAlice).toBeUndefined();
     expect(bob?.referenceCard).toBe("Bob first appearance");
 
     expect(state.files.has("single-summary-per-person-by-segment.json")).toBe(true);

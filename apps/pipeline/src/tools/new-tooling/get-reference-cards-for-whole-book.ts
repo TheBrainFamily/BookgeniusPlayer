@@ -1,7 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { type Chapter, type NewReferenceCardsResponse } from "../../types";
+import {
+  type Chapter,
+  type CharacterListResponse,
+  type NewReferenceCardsResponse,
+} from "../../types";
 import { NewReferenceCardsResponseSchema } from "../../schemes";
+import { z } from "zod";
 import { getChaptersUpTo } from "../../helpers/getChaptersUpTo";
 import { getBookSettings } from "../../helpers/getBookSettings";
 import { callGeminiWithThinkingAndSchemaAndParsed } from "../../callFastGemini";
@@ -27,20 +32,28 @@ type BenchmarkAttempt = {
   sampled: boolean;
 };
 
-type ProviderSuccess = {
-  provider: ProviderId;
-  response: NewReferenceCardsResponse;
-  attempt: BenchmarkAttempt;
-};
-type ProviderAttemptResult = { success?: ProviderSuccess; attempt: BenchmarkAttempt };
+type ProviderSuccess<T> = { provider: ProviderId; response: T; attempt: BenchmarkAttempt };
+type ProviderAttemptResult<T> = { success?: ProviderSuccess<T>; attempt: BenchmarkAttempt };
 
 type SEChapterMetadataEntry = { number: number; sourceFilenames: string[]; segmentHints: string[] };
 
 type SegmentResult = {
   segmentId: string;
   chapterNumbers: number[];
-  characters: NewReferenceCardsResponse["characters"];
+  characters: Array<{ slug: string; name: string; referenceCard: string; visualGuide: string }>;
 };
+
+const SegmentedReferenceCardsResponseSchema = z.object({
+  characters: z.array(
+    z.object({
+      slug: z.string().min(1),
+      name: z.string(),
+      referenceCard: z.string(),
+      visualGuide: z.string(),
+    }),
+  ),
+});
+type SegmentedReferenceCardsResponse = z.infer<typeof SegmentedReferenceCardsResponseSchema>;
 
 const SEGMENTED_LARGE_NOVEL_SLUGS = new Set([
   "leo-tolstoy_war-and-peace_louise-maude_aylmer-maude",
@@ -135,29 +148,54 @@ function buildBenchmarkRoot(): string {
   return `reference-cards-benchmarks/${runId}`;
 }
 
-function buildNameSet(response: NewReferenceCardsResponse): string[] {
+function buildNameSet<T extends CharacterListResponse>(response: T): string[] {
   const names = new Set(
     response.characters.map((character) => character.name.trim().toLowerCase()),
   );
   return Array.from(names).sort();
 }
 
-function dedupeCharactersBySlug(
-  characters: NewReferenceCardsResponse["characters"],
-): NewReferenceCardsResponse["characters"] {
-  const bySlug = new Map<string, NewReferenceCardsResponse["characters"][number]>();
+function normalizeProviderSlug(slug: string): string {
+  let normalized = slug
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  if (!normalized) {
+    normalized = "character";
+  }
+  if (!/^[a-z]/.test(normalized)) {
+    normalized = `c-${normalized}`;
+  }
+
+  return normalized;
+}
+
+function normalizeAndDedupeSegmentCharacters(
+  characters: SegmentedReferenceCardsResponse["characters"],
+  knownBySlug: Map<string, { name: string; summary: string }>,
+): SegmentResult["characters"] {
+  const bySlug = new Map<string, SegmentResult["characters"][number]>();
+
   for (const character of characters) {
-    const name = character.name.trim();
-    if (!name) continue;
-    const slug = generateTagName(name).toLowerCase();
-    if (!slug || bySlug.has(slug)) continue;
-    bySlug.set(slug, {
-      ...character,
-      name,
+    const trimmedName = character.name.trim();
+    if (!trimmedName) continue;
+
+    const fallbackSlug = generateTagName(trimmedName).toLowerCase();
+    const normalizedSlug = normalizeProviderSlug(character.slug || fallbackSlug);
+    if (!normalizedSlug || bySlug.has(normalizedSlug)) continue;
+
+    const canonicalKnown = knownBySlug.get(normalizedSlug);
+    bySlug.set(normalizedSlug, {
+      slug: normalizedSlug,
+      name: canonicalKnown?.name ?? trimmedName,
       referenceCard: character.referenceCard.trim(),
       visualGuide: character.visualGuide.trim(),
     });
   }
+
   return Array.from(bySlug.values());
 }
 
@@ -305,8 +343,10 @@ function buildSegmentPlan(
 
 function buildPromptForChapters(
   filteredChapters: Chapter[],
-  knownCharacters: Array<{ name: string; summary: string }>,
+  knownCharacters: Array<{ slug: string; name: string; summary: string }>,
+  options: { requireSlugOutput?: boolean } = {},
 ): string {
+  const { requireSlugOutput = false } = options;
   const filteredXml = `<chapters>
 ${filteredChapters
   .map(
@@ -316,35 +356,60 @@ ${filteredChapters
   .join("\n")}
 </chapters>`;
 
-  const knownCharactersMapped = knownCharacters
-    .map((character) => `<character name="${character.name}" summary="${character.summary}" />`)
-    .join("\n");
+  const knownCharactersPayload = JSON.stringify(
+    knownCharacters.map((character) => ({
+      slug: character.slug,
+      canonicalName: character.name,
+      summary: character.summary,
+    })),
+    null,
+    2,
+  );
   const prompt = fs.readFileSync(path.join(__dirname, "./single-summary-per-person.md"), "utf8");
   const knownCharactersPrompt =
-    knownCharactersMapped.length > 0
+    knownCharacters.length > 0
       ? `## Known Characters
 ### Notes
 
-- Be consistent with character names.
-- Use the known character names and summaries for the already known characters from previous book segments in this novel.
+- Reuse existing character identity for known people.
+- For known characters, keep the same canonical name exactly (no added aliases/parenthetical variants).
+- Do not create a new character entry for a person already listed in Known Characters.
+- Match known characters by the provided slug and canonicalName.
 - Return only characters that appear or are mentioned in the current chapter set.
 
 ### List of known characters from previous book segments
 
-${knownCharactersMapped}\n\n`
+${knownCharactersPayload}\n\n`
       : "";
+  const slugOutputPrompt = requireSlugOutput
+    ? `## Required Output Field: slug
 
-  return `${prompt}${knownCharactersPrompt}\n\n${VISUAL_GUIDE_REQUEST_INSTRUCTION}\n\n## Book Text \n\n${filteredXml}`;
+- Return each character with a required \`slug\` field.
+- For known characters, MUST reuse the exact slug from Known Characters.
+- For newly discovered characters, generate a stable kebab-case slug from canonical name.
+- Keep output shape exactly:
+\`\`\`json
+{
+  "characters": [
+    { "slug": "string", "name": "string", "referenceCard": "string", "visualGuide": "string" }
+  ]
+}
+\`\`\`
+`
+    : "";
+
+  return `${prompt}${knownCharactersPrompt}\n\n${slugOutputPrompt}\n\n${VISUAL_GUIDE_REQUEST_INSTRUCTION}\n\n## Book Text \n\n${filteredXml}`;
 }
 
-async function callProviderWithCapture(
+async function callProviderWithCapture<T extends CharacterListResponse>(
   provider: ProviderId,
   sampled: boolean,
+  schema: z.ZodSchema<T>,
   call: () => Promise<unknown>,
-): Promise<ProviderAttemptResult> {
+): Promise<ProviderAttemptResult<T>> {
   const startedAt = Date.now();
   try {
-    const response = NewReferenceCardsResponseSchema.parse(await call());
+    const response = schema.parse(await call());
     const attempt: BenchmarkAttempt = {
       provider,
       status: "success",
@@ -408,24 +473,20 @@ function buildCombinedPrompt(): string {
   return combinedPrompt;
 }
 
-function buildProviderTasks(combinedPrompt: string, shouldSampleGeminiPro: boolean) {
-  const gptTask = callProviderWithCapture("gpt-5", true, () =>
-    callGpt5WithSchema(combinedPrompt, NewReferenceCardsResponseSchema),
+function buildProviderTasks<T extends CharacterListResponse>(
+  combinedPrompt: string,
+  shouldSampleGeminiPro: boolean,
+  schema: z.ZodSchema<T>,
+) {
+  const gptTask = callProviderWithCapture("gpt-5", true, schema, () =>
+    callGpt5WithSchema(combinedPrompt, schema),
   );
-  const geminiFlashTask = callProviderWithCapture("gemini-flash", true, () =>
-    callGeminiWithThinkingAndSchemaAndParsed(
-      combinedPrompt,
-      NewReferenceCardsResponseSchema,
-      "gemini-3-flash-preview",
-    ),
+  const geminiFlashTask = callProviderWithCapture("gemini-flash", true, schema, () =>
+    callGeminiWithThinkingAndSchemaAndParsed(combinedPrompt, schema, "gemini-3-flash-preview"),
   );
   const geminiProTask = shouldSampleGeminiPro
-    ? callProviderWithCapture("gemini-pro", true, () =>
-        callGeminiWithThinkingAndSchemaAndParsed(
-          combinedPrompt,
-          NewReferenceCardsResponseSchema,
-          "gemini-3-pro-preview",
-        ),
+    ? callProviderWithCapture("gemini-pro", true, schema, () =>
+        callGeminiWithThinkingAndSchemaAndParsed(combinedPrompt, schema, "gemini-3-pro-preview"),
       )
     : Promise.resolve({
         attempt: {
@@ -435,15 +496,15 @@ function buildProviderTasks(combinedPrompt: string, shouldSampleGeminiPro: boole
           selectedAsFinal: false,
           sampled: false,
         },
-      });
+      } as ProviderAttemptResult<T>);
 
   return [gptTask, geminiFlashTask, geminiProTask] as const;
 }
 
-function normalizeProviderResults(
-  settled: PromiseSettledResult<ProviderAttemptResult>[],
+function normalizeProviderResults<T extends CharacterListResponse>(
+  settled: PromiseSettledResult<ProviderAttemptResult<T>>[],
   shouldSampleGeminiPro: boolean,
-): ProviderAttemptResult[] {
+): ProviderAttemptResult<T>[] {
   return settled.map((entry, index) => {
     if (entry.status === "fulfilled") {
       return entry.value;
@@ -465,9 +526,9 @@ function normalizeProviderResults(
   });
 }
 
-function markSelectedAttempt(
-  gptResult: ProviderAttemptResult,
-  geminiFlashResult: ProviderAttemptResult,
+function markSelectedAttempt<T extends CharacterListResponse>(
+  gptResult: ProviderAttemptResult<T>,
+  geminiFlashResult: ProviderAttemptResult<T>,
 ): void {
   if (gptResult.success) {
     gptResult.success.attempt.selectedAsFinal = true;
@@ -478,11 +539,11 @@ function markSelectedAttempt(
   }
 }
 
-function writeProviderOutputs(
+function writeProviderOutputs<T extends CharacterListResponse>(
   benchmarkRoot: string,
-  gptResult: ProviderAttemptResult,
-  geminiFlashResult: ProviderAttemptResult,
-  geminiProResult: ProviderAttemptResult,
+  gptResult: ProviderAttemptResult<T>,
+  geminiFlashResult: ProviderAttemptResult<T>,
+  geminiProResult: ProviderAttemptResult<T>,
 ): void {
   if (gptResult.success) {
     writeBookFile(
@@ -506,12 +567,12 @@ function writeProviderOutputs(
   }
 }
 
-function writeDiffs(
+function writeDiffs<T extends CharacterListResponse>(
   benchmarkRoot: string,
   shouldSampleGeminiPro: boolean,
-  gptResult: ProviderAttemptResult,
-  geminiFlashResult: ProviderAttemptResult,
-  geminiProResult: ProviderAttemptResult,
+  gptResult: ProviderAttemptResult<T>,
+  geminiFlashResult: ProviderAttemptResult<T>,
+  geminiProResult: ProviderAttemptResult<T>,
 ): void {
   if (gptResult.success && geminiFlashResult.success) {
     const diff = {
@@ -537,10 +598,10 @@ function writeDiffs(
   }
 }
 
-function selectFinalProvider(
-  gptResult: ProviderAttemptResult,
-  geminiFlashResult: ProviderAttemptResult,
-): { selectedRaw: NewReferenceCardsResponse | undefined; selectedProvider: ProviderId | null } {
+function selectFinalProvider<T extends CharacterListResponse>(
+  gptResult: ProviderAttemptResult<T>,
+  geminiFlashResult: ProviderAttemptResult<T>,
+): { selectedRaw: T | undefined; selectedProvider: ProviderId | null } {
   if (gptResult.success) {
     return { selectedRaw: gptResult.success.response, selectedProvider: "gpt-5" };
   }
@@ -550,10 +611,11 @@ function selectFinalProvider(
   return { selectedRaw: undefined, selectedProvider: null };
 }
 
-async function runProviderSelectionForPrompt(
+async function runProviderSelectionForPromptWithSchema<T extends CharacterListResponse>(
   combinedPrompt: string,
   benchmarkRoot: string,
-): Promise<NewReferenceCardsResponse> {
+  schema: z.ZodSchema<T>,
+): Promise<T> {
   writeBookFile(`${benchmarkRoot}/prompt.md`, combinedPrompt);
 
   const sampleRate = parseSampleRate(process.env.REFERENCE_CARDS_GEMINI_PRO_SAMPLE_RATE);
@@ -561,6 +623,7 @@ async function runProviderSelectionForPrompt(
   const [gptTask, geminiFlashTask, geminiProTask] = buildProviderTasks(
     combinedPrompt,
     shouldSampleGeminiPro,
+    schema,
   );
   const settled = await Promise.allSettled([gptTask, geminiFlashTask, geminiProTask]);
   const results = normalizeProviderResults(settled, shouldSampleGeminiPro);
@@ -590,6 +653,19 @@ async function runProviderSelectionForPrompt(
     throw new Error(`Reference cards failed. GPT-5: ${gptError}; Gemini Flash: ${geminiError}`);
   }
 
+  writeBookFile(`${benchmarkRoot}/outputs/selected.json`, JSON.stringify(selectedRaw, null, 2));
+  return selectedRaw;
+}
+
+async function runProviderSelectionForPrompt(
+  combinedPrompt: string,
+  benchmarkRoot: string,
+): Promise<NewReferenceCardsResponse> {
+  const selectedRaw = await runProviderSelectionForPromptWithSchema(
+    combinedPrompt,
+    benchmarkRoot,
+    NewReferenceCardsResponseSchema,
+  );
   const selected = appendGenericAvatarIfMissing(selectedRaw);
   writeBookFile(`${benchmarkRoot}/outputs/selected.json`, JSON.stringify(selected, null, 2));
   return selected;
@@ -600,12 +676,6 @@ function normalizeSegmentFileToken(segmentId: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-}
-
-function stripGenericAvatar(
-  characters: NewReferenceCardsResponse["characters"],
-): NewReferenceCardsResponse["characters"] {
-  return characters.filter((character) => character.name.trim().toLowerCase() !== "generic-avatar");
 }
 
 async function runSegmentedReferenceCards(
@@ -637,8 +707,14 @@ async function runSegmentedReferenceCards(
   const segmentResults: SegmentResult[] = [];
 
   for (const segment of segments) {
-    const knownCharacters = Array.from(knownBySlug.values());
-    const segmentPrompt = buildPromptForChapters(segment.chapters, knownCharacters);
+    const knownCharacters = Array.from(knownBySlug.entries()).map(([slug, value]) => ({
+      slug,
+      name: value.name,
+      summary: value.summary,
+    }));
+    const segmentPrompt = buildPromptForChapters(segment.chapters, knownCharacters, {
+      requireSlugOutput: true,
+    });
     const segmentToken = normalizeSegmentFileToken(segment.segmentId) || "segment";
 
     writeBookFile(
@@ -647,12 +723,14 @@ async function runSegmentedReferenceCards(
       FILE_TYPE.TEMPORARY,
     );
 
-    const segmentResponse = await runProviderSelectionForPrompt(
+    const segmentResponse = await runProviderSelectionForPromptWithSchema(
       segmentPrompt,
       `${benchmarkRoot}/segments/${segmentToken}`,
+      SegmentedReferenceCardsResponseSchema,
     );
-    const dedupedSegmentCharacters = dedupeCharactersBySlug(
-      stripGenericAvatar(segmentResponse.characters),
+    const dedupedSegmentCharacters = normalizeAndDedupeSegmentCharacters(
+      segmentResponse.characters.filter((character) => character.name.trim() !== "generic-avatar"),
+      knownBySlug,
     );
 
     segmentResults.push({
@@ -662,7 +740,7 @@ async function runSegmentedReferenceCards(
     });
 
     for (const character of dedupedSegmentCharacters) {
-      const characterSlug = generateTagName(character.name).toLowerCase();
+      const characterSlug = character.slug;
       if (!knownBySlug.has(characterSlug)) {
         knownBySlug.set(characterSlug, { name: character.name, summary: character.referenceCard });
       }

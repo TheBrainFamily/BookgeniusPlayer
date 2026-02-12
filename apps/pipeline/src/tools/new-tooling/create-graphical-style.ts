@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { callGeminiVertexWrapper, callGeminiWrapper } from "../../callClaude";
+import { callGeminiVertexWrapper } from "../../callClaude";
 import { callGeminiWithImage } from "../../callFastGemini";
 import { FILE_TYPE } from "../../helpers/filesHelpers";
 import { writeBookFile } from "../../helpers/writeBookFile";
