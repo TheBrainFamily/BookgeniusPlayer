@@ -1,7 +1,8 @@
 import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { readFileSync, readdirSync, existsSync } from "fs";
-import { join } from "path";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
 const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 const workspaces: string[] = pkg.workspaces ?? [];
@@ -20,6 +21,7 @@ function expandWorkspace(ws: string): string[] {
 }
 
 const tsconfigs = workspaces.flatMap(expandWorkspace);
+const repoRoot = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [tsconfigPaths({ projects: tsconfigs })],
@@ -27,5 +29,6 @@ export default defineConfig({
     environment: "jsdom",
     include: ["**/*.{spec,test}.{ts,tsx}"],
     exclude: ["**/node_modules/**", "**/dist/**"],
+    setupFiles: [join(repoRoot, "vitest.setup.ts")],
   },
 });

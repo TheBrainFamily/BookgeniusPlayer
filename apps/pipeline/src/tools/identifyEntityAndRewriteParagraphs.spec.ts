@@ -257,6 +257,23 @@ vi.mock("../callClaude", () => ({
   callGeminiVertexWrapper: vi.fn((prompt: string) => testState.callProvider("vertex", prompt)),
 }));
 
+vi.mock("../callFastGemini", () => ({
+  callGeminiWithThinking: vi.fn(
+    (
+      prompt: string,
+      opts?: { preferVertex?: boolean; useAlternativeApiKey?: boolean; strictProvider?: boolean },
+    ) => {
+      if (opts?.preferVertex) {
+        return testState.callProvider("vertex", prompt);
+      }
+      if (opts?.useAlternativeApiKey) {
+        return testState.callProvider("gemini", prompt);
+      }
+      return testState.callProvider("gemini", prompt);
+    },
+  ),
+}));
+
 vi.mock("../callGrok", () => ({
   callGrok: vi.fn((prompt: string) => testState.callProvider("grok", prompt)),
 }));

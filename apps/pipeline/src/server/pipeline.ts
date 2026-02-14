@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
+import pLimit from "p-limit";
 import { v4 as uuidv4 } from "uuid";
 import { type Step, StepLabels } from "../shared/pipelineTypes";
 import { convertBook, findFb2FilePath } from "../../src/tools/fb2-converter/index";
@@ -37,6 +38,8 @@ import {
 import { getBookSettings } from "../../src/helpers/getBookSettings";
 import { generateTagName } from "../../src/helpers/generateTagName";
 import { computeParagraphCount } from "../lib/paragraphCount";
+import { ensureDomParser } from "../lib/domParser";
+import { getChapterTitle } from "../../src/tools/new-tooling/get-chapter-title";
 import {
   initProgress,
   readProgress,
@@ -255,44 +258,62 @@ async function runStep(job: Job, step: Step, fn: () => Promise<void>, signal?: A
 }
 
 async function uploadChaptersToConvex(job: Job, tempOutputDir: string) {
+  const rawConcurrency = Number.parseInt(process.env.CHAPTER_UPLOAD_CONCURRENCY || "10", 10);
+  const uploadConcurrency =
+    Number.isFinite(rawConcurrency) && rawConcurrency > 0 ? rawConcurrency : 10;
   const files = fs
     .readdirSync(tempOutputDir)
     .filter((f) => f.match(/^rewritten-paragraphs-for-chapter-\d+\.xml$/));
 
-  for (const file of files) {
-    const match = file.match(/chapter-(\d+)/);
-    if (!match) continue;
+  const limit = pLimit(uploadConcurrency);
+  addLog(
+    job,
+    `Uploading ${files.length} rewritten chapters to Convex (concurrency=${uploadConcurrency})...`,
+  );
 
-    const chapterNumber = parseInt(match[1], 10);
-    const filePath = path.join(tempOutputDir, file);
-    const content = fs.readFileSync(filePath);
-    const basename = `chapter-${chapterNumber}.html`;
-    const paragraphCount = computeParagraphCount(content.toString("utf-8"));
+  await Promise.all(
+    files.map((file) => {
+      return limit(async () => {
+        const match = file.match(/chapter-(\d+)/);
+        if (!match) return;
 
-    addLog(job, `Uploading chapter ${chapterNumber} to Convex...`);
+        const chapterNumber = parseInt(match[1], 10);
+        const filePath = path.join(tempOutputDir, file);
+        const content = fs.readFileSync(filePath);
+        const basename = `chapter-${chapterNumber}.html`;
+        const htmlStr = content.toString("utf-8");
+        const paragraphCount = computeParagraphCount(htmlStr);
 
-    try {
-      await convex.uploadFile({
-        folderPath: `${job.bookPath}/chapters-source`,
-        basename,
-        content,
-        contentType: "text/html",
+        ensureDomParser();
+        const doc = new DOMParser().parseFromString(htmlStr, "text/html");
+        const title = getChapterTitle(doc.documentElement);
+
+        addLog(job, `Uploading chapter ${chapterNumber} to Convex...`);
+
+        try {
+          await convex.uploadFile({
+            folderPath: `${job.bookPath}/chapters-source`,
+            basename,
+            content,
+            contentType: "text/html",
+          });
+          await convex.updateChapterMetadata({
+            bookPath: job.bookPath,
+            folderPath: `${job.bookPath}/chapters-source`,
+            basename,
+            chapterNumber,
+            title,
+            paragraphCount,
+            sourceFormat: "html",
+          });
+          addLog(job, `✔ Chapter ${chapterNumber} uploaded`);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          addLog(job, `⚠ Failed to upload chapter ${chapterNumber}: ${msg}`);
+        }
       });
-      await convex.updateChapterMetadata({
-        bookPath: job.bookPath,
-        folderPath: `${job.bookPath}/chapters-source`,
-        basename,
-        chapterNumber,
-        title: `Chapter ${chapterNumber}`,
-        paragraphCount,
-        sourceFormat: "html",
-      });
-      addLog(job, `✔ Chapter ${chapterNumber} uploaded`);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      addLog(job, `⚠ Failed to upload chapter ${chapterNumber}: ${msg}`);
-    }
-  }
+    }),
+  );
 }
 
 function loadCleanedCharacterSummaryMap(): Map<string, CleanedCharacterSummary> {

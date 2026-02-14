@@ -73,3 +73,4 @@ apps/pipeline/app.log
 .tmp
 .let-me-explain/
 .tours/
+apps/pipeline/books-data-backup/
