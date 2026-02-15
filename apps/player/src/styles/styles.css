@@ -2514,6 +2514,14 @@ section[data-chapter] [data-index].edit-hover {
     --letter-desk-edge: 10px;
     --letter-paper-h-padding: clamp(0.75rem, 2vw, 1rem);
   }
+
+  #legacy
+    #content-container
+    blockquote[data-epub-type~="z3998:letter"]
+    > .character-placeholder.character-talking.start-of-paragraph {
+    bottom: -2rem;
+    right: 0;
+  }
 }
 
 /* ============================================ */
