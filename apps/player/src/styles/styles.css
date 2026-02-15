@@ -146,6 +146,7 @@ body:has(#player-scope.visible) {
   #content-container {
     display: flex;
     cursor: default;
+    overflow-x: hidden;
     overflow-y: auto;
     height: 100%;
     /* Keep programmatic smoothness explicit in code (goToParagraph, etc.). */
@@ -2271,3 +2272,304 @@ section[data-chapter] [data-index].edit-hover {
     display: none !important;
   }
 }
+
+/* ============================================ */
+/* Letter on Desk Mode                          */
+/* ============================================ */
+/* Style the LETTER element directly:                                          */
+/*   section[z3998:letter]    → section IS the letter (Dangerous Liaisons)     */
+/*   blockquote[z3998:letter] → blockquote IS the letter (Frankenstein etc.)   */
+
+#legacy {
+  --letter-paper-color: #faf8f0;
+  --letter-ink-color: #3d3225;
+  --letter-desk-edge: 30px;
+  --letter-paper-h-padding: clamp(1.25rem, 3vw, 2rem);
+  --letter-paper-shadow:
+    0 1px 2px rgba(60, 40, 20, 0.18), 0 4px 16px rgba(60, 40, 20, 0.14),
+    0 12px 48px rgba(40, 25, 10, 0.1), inset 0 0 60px rgba(120, 100, 70, 0.04);
+  --letter-desk-bg:
+    repeating-linear-gradient(
+      2deg,
+      transparent,
+      transparent 80px,
+      rgba(0, 0, 0, 0.03) 80px,
+      rgba(0, 0, 0, 0.03) 81px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      #6b4830 0px,
+      #74513a 12px,
+      #6b4830 28px,
+      #5f3f2b 40px,
+      #6b4830 52px
+    );
+}
+
+/* ── Pattern A: section IS the letter (Dangerous Liaisons) ── */
+
+/* Desk on wrapper */
+#legacy #content-container [data-chapter-wrapper]:has(> section[data-epub-type~="z3998:letter"]) {
+  background: var(--letter-desk-bg);
+  background-size:
+    100% 100%,
+    100% 52px;
+}
+
+/* Paper on section */
+#legacy #content-container section[data-epub-type~="z3998:letter"] {
+  position: relative;
+  max-width: calc(100% - 2 * var(--letter-desk-edge));
+  margin-left: auto;
+  margin-right: auto;
+  padding: 3rem var(--letter-paper-h-padding);
+}
+
+#legacy #content-container section[data-epub-type~="z3998:letter"]::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  background-color: var(--letter-paper-color);
+  border-radius: 2px;
+  z-index: 0;
+  box-shadow: var(--letter-paper-shadow);
+}
+
+#legacy #content-container section[data-epub-type~="z3998:letter"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Pattern B: blockquote IS the letter (Frankenstein, any book) ── */
+/* Desk via ::before (extends full-width), paper via ::after */
+
+#legacy #content-container blockquote[data-epub-type~="z3998:letter"] {
+  position: relative;
+  padding: 2.5rem var(--letter-paper-h-padding);
+  margin: calc(2 * var(--letter-desk-edge)) var(--letter-desk-edge);
+}
+
+/* Desk — extends to full content-column width, clipped by overflow */
+#legacy #content-container blockquote[data-epub-type~="z3998:letter"]::before {
+  content: "";
+  position: absolute;
+  top: calc(-1.5 * var(--letter-desk-edge));
+  bottom: calc(-1.5 * var(--letter-desk-edge));
+  left: -999px;
+  right: -999px;
+  z-index: 0;
+  background: var(--letter-desk-bg);
+  background-size:
+    100% 100%,
+    100% 52px;
+}
+
+/* Paper — sits on top of desk */
+#legacy #content-container blockquote[data-epub-type~="z3998:letter"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--letter-paper-color);
+  border-radius: 2px;
+  z-index: 1;
+  box-shadow: var(--letter-paper-shadow);
+}
+
+/* Content above both pseudos */
+#legacy #content-container blockquote[data-epub-type~="z3998:letter"] > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Ink color (both patterns) ── */
+
+#legacy #content-container section[data-epub-type~="z3998:letter"],
+#legacy #content-container section[data-epub-type~="z3998:letter"] *,
+#legacy #content-container blockquote[data-epub-type~="z3998:letter"],
+#legacy #content-container blockquote[data-epub-type~="z3998:letter"] * {
+  color: var(--letter-ink-color);
+  transition: none;
+}
+
+/* ── Shared: letter text overrides ── */
+
+/* Body paragraphs — justified, upright, indented */
+#legacy #content-container [data-epub-type~="z3998:letter"] p {
+  font-style: normal;
+  text-indent: 1.5em;
+  text-align: justify;
+}
+
+/* Header (address + dateline) — right-aligned block */
+#legacy #content-container [data-epub-type~="z3998:letter"] header {
+  text-align: right;
+  margin-bottom: 1.5em;
+}
+
+#legacy #content-container [data-epub-type~="z3998:letter"] header p {
+  text-align: right;
+  text-indent: 0;
+}
+
+/* Dateline — italic for contrast */
+#legacy #content-container [data-epub-type~="z3998:letter"] [data-epub-type~="se:letter.dateline"] {
+  text-align: right;
+  text-indent: 0;
+  font-style: italic;
+}
+
+/* Salutation — left-aligned, small-caps */
+#legacy #content-container [data-epub-type~="z3998:letter"] [data-epub-type~="z3998:salutation"] {
+  text-indent: 0;
+  font-variant: small-caps;
+}
+
+/* First paragraph after salutation — no indent */
+#legacy
+  #content-container
+  [data-epub-type~="z3998:letter"]
+  [data-epub-type~="z3998:salutation"]
+  + p {
+  text-indent: 0;
+}
+
+/* Drop cap — first paragraph + its initial letter */
+#legacy #content-container [data-epub-type~="z3998:letter"] header + p {
+  text-indent: 0;
+}
+
+#legacy #content-container [data-epub-type~="z3998:letter"] header + p::first-letter {
+  initial-letter: 2;
+  color: var(--letter-ink-color);
+  margin-right: 0.06em;
+}
+
+/* Footer — breathing room above */
+#legacy #content-container [data-epub-type~="z3998:letter"] footer {
+  margin-top: 1.5em;
+}
+
+#legacy #content-container [data-epub-type~="z3998:letter"] footer p {
+  text-align: right;
+  text-indent: 0;
+}
+
+/* Valediction — right-aligned, italic for handwritten feel */
+#legacy #content-container [data-epub-type~="z3998:letter"] [data-epub-type~="z3998:valediction"] {
+  text-align: right;
+  text-indent: 0;
+  font-style: italic;
+}
+
+/* Signature — right-aligned, italic small-caps (matches valediction's handwritten feel) */
+#legacy #content-container [data-epub-type~="z3998:letter"] [data-epub-type~="z3998:signature"] {
+  text-align: right;
+  text-indent: 0;
+  font-variant: small-caps;
+  font-style: italic;
+}
+
+/* ── Letter author avatar (wax seal, bottom-right) ── */
+
+#legacy
+  #content-container
+  blockquote[data-epub-type~="z3998:letter"]
+  > .character-placeholder.character-talking.start-of-paragraph {
+  position: absolute;
+  float: none;
+  margin: 0;
+  z-index: 3;
+  bottom: -1.5rem;
+  right: -1rem;
+}
+
+#legacy
+  #content-container
+  blockquote[data-epub-type~="z3998:letter"]
+  > .character-placeholder.character-talking.start-of-paragraph
+  .inline-avatar {
+  --avatar-size: 4.5rem;
+  border: 3px solid #6b4830;
+  box-shadow:
+    0 2px 8px rgba(60, 30, 10, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+/* --- Responsive: tablet --- */
+@media (max-width: 768px) {
+  #legacy {
+    --letter-desk-edge: 20px;
+  }
+}
+
+/* --- Responsive: mobile --- */
+@media (max-width: 480px) {
+  #legacy {
+    --letter-desk-edge: 10px;
+    --letter-paper-h-padding: clamp(0.75rem, 2vw, 1rem);
+  }
+}
+
+/* ============================================ */
+/* Poetry & Verse Blocks                        */
+/* ============================================ */
+/* Embedded poetry gets a subtle left border */
+
+#legacy #content-container blockquote[data-epub-type~="z3998:poem"],
+#legacy #content-container blockquote[data-epub-type~="z3998:verse"] {
+  position: relative;
+  padding: 1.2em 1.5em 1.2em 1.8em;
+  margin: 1.5em 0 1.5em 1em;
+}
+
+/* Cite / attribution line */
+#legacy #content-container [data-epub-type~="z3998:poem"] cite,
+#legacy #content-container [data-epub-type~="z3998:verse"] cite {
+  display: block;
+  text-align: right;
+  font-style: normal;
+  font-size: 0.88em;
+  margin-top: 0.8em;
+  opacity: 0.7;
+}
+
+/* ============================================ */
+/* Epigraph Sections                            */
+/* ============================================ */
+/* Full-chapter epigraphs get centered dramatic treatment */
+
+#legacy #content-container section[data-epub-type~="epigraph"] blockquote {
+  border-left: none;
+  background: none;
+  text-align: center;
+  font-size: 1.15em;
+  line-height: 1.8;
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+}
+
+#legacy #content-container section[data-epub-type~="epigraph"] blockquote p {
+  text-align: center;
+  text-indent: 0;
+}
+
+/* Epigraph attribution — small, spaced out */
+#legacy #content-container section[data-epub-type~="epigraph"] cite {
+  display: block;
+  text-align: center;
+  font-style: normal;
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  margin-top: 1.5em;
+  opacity: 0.65;
+}
+
+/* Publication titles — already italic via <i>, no extra styling needed */
